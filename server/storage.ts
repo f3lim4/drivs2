@@ -133,7 +133,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createVeiculo(veiculo: InsertVeiculo): Promise<Veiculo> {
-    const result = await db.insert(veiculos).values(veiculo).returning();
+    // Use RENAVAM as ID
+    const veiculoData = {
+      ...veiculo,
+      id: veiculo.renavam
+    };
+    const result = await db.insert(veiculos).values(veiculoData).returning();
     return result[0];
   }
 

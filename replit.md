@@ -19,6 +19,10 @@ Preferred communication style: Simple, everyday language.
 - ✅ Corrigido login do admin (admin@drivs.com.br / admin123)
 - ✅ Corrigido cadastro de locadoras pela interface web
 - ✅ Corrigido atualização de perfil após criação de locadora
+- ✅ Implementado RENAVAM como ID dos veículos
+- ✅ Corrigido cadastro de veículos pela interface web
+- ✅ Resolvido problema de identificação de locadora
+- ✅ Corrigido problema de inputs não controlados
 - Status: Sistema totalmente funcional e operacional
 
 ## System Architecture
