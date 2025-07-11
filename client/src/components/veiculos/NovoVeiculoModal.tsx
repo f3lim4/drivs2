@@ -57,7 +57,7 @@ const veiculoSchema = z.object({
   quilometragem: z.number().min(0, 'Quilometragem deve ser positiva'),
   valorSemanal: z.number().min(0, 'Valor deve ser positivo'),
   caucao: z.number().min(0, 'Caução deve ser positiva'),
-  taxaAdministrativa: z.number().optional(),
+  taxaAdministrativa: z.number().min(0).optional(),
   limiteQuilometragem: z.string().min(1, 'Limite de quilometragem é obrigatório'),
   
   // Manutenção
@@ -68,7 +68,7 @@ const veiculoSchema = z.object({
   seguradora: z.string().optional(),
   numeroApolice: z.string().optional(),
   vigenciaSeguro: z.string().optional(),
-  valorSeguroMensal: z.number().optional(),
+  valorSeguroMensal: z.number().min(0).optional(),
   
   // Status
   status: z.enum(['disponivel', 'alugado', 'manutencao', 'indisponivel']),
@@ -109,16 +109,16 @@ export function NovoVeiculoModal({
       quilometragem: 0,
       valorSemanal: 0,
       caucao: 0,
-      taxaAdministrativa: undefined,
+      taxaAdministrativa: 0,
       limiteQuilometragem: '',
       ultimaRevisao: '',
       proximaRevisao: '',
       seguradora: '',
       numeroApolice: '',
       vigenciaSeguro: '',
-      valorSeguroMensal: undefined,
+      valorSeguroMensal: 0,
       status: 'disponivel',
-      valorLimiteKm: undefined,
+      valorLimiteKm: 0,
     },
   });
 
@@ -126,76 +126,52 @@ export function NovoVeiculoModal({
     setLoading(true);
     
     try {
-      if (!profile?.locadora_id) {
+      if (!profile?.locadoraId) {
         throw new Error('Erro: Locadora não identificada');
       }
 
-      // Inserir veículo no banco de dados
-      const { data: veiculoData, error } = await supabase
-        .from('veiculos')
-        .insert({
-          locadora_id: profile.locadora_id,
-          placa: data.placa.toUpperCase(),
-          marca: data.marca,
-          modelo: data.modelo,
-          ano: data.ano,
-          cor: data.cor,
-          categoria: data.categoria,
-          renavam: data.renavam,
-          chassi: data.chassi.toUpperCase(),
-          combustivel: data.combustivel,
-          quilometragem: data.quilometragem,
-          valor_semanal: data.valorSemanal,
-          caucao: data.caucao,
-          taxa_administrativa: data.taxaAdministrativa,
-          limite_quilometragem: data.limiteQuilometragem,
-          valor_limite_km: data.valorLimiteKm,
-          ultima_revisao: data.ultimaRevisao || null,
-          proxima_revisao: data.proximaRevisao || null,
-          seguradora: data.seguradora,
-          numero_apolice: data.numeroApolice,
-          vigencia_seguro: data.vigenciaSeguro || null,
-          valor_seguro_mensal: data.valorSeguroMensal,
-          status: data.status,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Criar objeto compatível com a interface Veiculo
-      const novoVeiculo: Veiculo = {
-        id: veiculoData.id,
-        placa: veiculoData.placa,
-        marca: veiculoData.marca,
-        modelo: veiculoData.modelo,
-        ano: veiculoData.ano,
-        cor: veiculoData.cor,
-        categoria: veiculoData.categoria,
-        renavam: veiculoData.renavam,
-        chassi: veiculoData.chassi,
-        combustivel: veiculoData.combustivel,
-        quilometragem: veiculoData.quilometragem,
-        valorSemanal: veiculoData.valor_semanal,
-        caucao: veiculoData.caucao,
-        taxaAdministrativa: veiculoData.taxa_administrativa,
-        limiteQuilometragem: veiculoData.limite_quilometragem,
-        valorLimiteKm: veiculoData.valor_limite_km,
-        ultimaRevisao: veiculoData.ultima_revisao,
-        proximaRevisao: veiculoData.proxima_revisao,
-        seguradora: veiculoData.seguradora,
-        numeroApolice: veiculoData.numero_apolice,
-        vigenciaSeguro: veiculoData.vigencia_seguro,
-        valorSeguroMensal: veiculoData.valor_seguro_mensal,
-        status: veiculoData.status as 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel',
-        // Campos de compatibilidade
-        valorDiario: veiculoData.valor_semanal / 7,
-        valorCaucao: veiculoData.caucao,
-        kmLimite: veiculoData.limite_quilometragem === 'limitada' && veiculoData.valor_limite_km 
-          ? `${veiculoData.valor_limite_km} km/semana` 
-          : veiculoData.limite_quilometragem,
-        seguro: veiculoData.seguradora || 'Não informado',
+      // Criar veículo usando a nova API
+      const veiculoData = {
+        id: data.renavam, // RENAVAM como ID
+        locadoraId: profile.locadoraId,
+        placa: data.placa.toUpperCase(),
+        marca: data.marca,
+        modelo: data.modelo,
+        ano: data.ano,
+        cor: data.cor,
+        categoria: data.categoria,
+        renavam: data.renavam,
+        chassi: data.chassi.toUpperCase(),
+        combustivel: data.combustivel,
+        quilometragem: data.quilometragem,
+        valorSemanal: data.valorSemanal.toString(),
+        caucao: data.caucao.toString(),
+        taxaAdministrativa: data.taxaAdministrativa?.toString(),
+        limiteQuilometragem: data.limiteQuilometragem,
+        valorLimiteKm: data.valorLimiteKm,
+        ultimaRevisao: data.ultimaRevisao || null,
+        proximaRevisao: data.proximaRevisao || null,
+        seguradora: data.seguradora,
+        numeroApolice: data.numeroApolice,
+        vigenciaSeguro: data.vigenciaSeguro || null,
+        valorSeguroMensal: data.valorSeguroMensal?.toString(),
+        status: data.status,
       };
+
+      const response = await fetch('/api/veiculos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(veiculoData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erro ao criar veículo');
+      }
+
+      const novoVeiculo = await response.json();
 
       onVeiculoAdicionado(novoVeiculo);
       

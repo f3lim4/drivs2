@@ -43,7 +43,7 @@ export const locadoras = pgTable("locadoras", {
 
 // Veiculos table
 export const veiculos = pgTable("veiculos", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: text("id").primaryKey(), // RENAVAM será usado como ID
   locadoraId: text("locadora_id").notNull(), // Referência ao CNPJ da locadora
   // Informações Básicas
   placa: text("placa").notNull().unique(),
@@ -96,7 +96,6 @@ export const insertLocadoraSchema = createInsertSchema(locadoras).omit({
 });
 
 export const insertVeiculoSchema = createInsertSchema(veiculos).omit({
-  id: true,
   createdAt: true,
   updatedAt: true,
 });
