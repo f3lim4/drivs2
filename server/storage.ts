@@ -47,21 +47,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByUUID(uuid: string): Promise<User | undefined> {
-    // For now, we'll create a simple mapping since we don't have UUID in users table
-    // In production, you'd store the UUID relationship properly
-    const allProfiles = await db.select().from(profiles);
-    for (const profile of allProfiles) {
-      if (profile.userId === uuid) {
-        // Return a mock user for authentication
-        return {
-          id: 1,
-          uuid: profile.userId,
-          username: profile.email,
-          password: await bcrypt.hash("admin123", 10) // Default password for demo
-        };
-      }
-    }
-    return undefined;
+    // Look for the user by UUID in the users table
+    const result = await db.select().from(users).where(eq(users.uuid, uuid));
+    return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
