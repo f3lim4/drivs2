@@ -12,7 +12,8 @@ import {
   File,
   TrendingUp,
   Building2,
-  Menu
+  Menu,
+  User
 } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -67,18 +68,28 @@ const navigationItems = [
     icon: Building2,
     description: 'Gerenciar locadoras',
     adminOnly: true  // Só admins podem ver este item
+  },
+  {
+    title: 'Perfil',
+    url: '/perfil',
+    icon: User,
+    description: 'Perfil da locadora',
+    locadoraOnly: true  // Só locadoras podem ver este item
   }
 ];
 
 export function DrivsSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
-  const { profile, isAdmin } = useAuth();
+  const { profile, isAdmin, isLocadora } = useAuth();
 
   // Filtrar itens baseado no tipo de usuário
   const filteredNavigationItems = navigationItems.filter(item => {
     if (item.adminOnly) {
       return isAdmin;
+    }
+    if (item.locadoraOnly) {
+      return isLocadora;
     }
     return true;
   });
