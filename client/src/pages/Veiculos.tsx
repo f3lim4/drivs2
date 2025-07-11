@@ -96,13 +96,32 @@ export default function Veiculos() {
     setDeleteDialogOpen(true);
   };
 
-  const handleConfirmarExclusao = (veiculo: Veiculo) => {
-    removerVeiculo(veiculo.id);
-    toast({
-      title: "Veículo Excluído",
-      description: `${veiculo.marca} ${veiculo.modelo} foi excluído com sucesso.`,
-      variant: "destructive",
-    });
+  const handleConfirmarExclusao = async (veiculo: Veiculo) => {
+    try {
+      const response = await fetch(`/api/veiculos/${veiculo.id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao excluir veículo');
+      }
+      
+      // Remove do estado local após sucesso na API
+      removerVeiculo(veiculo.id);
+      
+      toast({
+        title: "Veículo Excluído",
+        description: `${veiculo.marca} ${veiculo.modelo} foi excluído com sucesso.`,
+        variant: "destructive",
+      });
+    } catch (error) {
+      console.error('Erro ao excluir veículo:', error);
+      toast({
+        title: "Erro ao excluir veículo",
+        description: "Não foi possível excluir o veículo. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleVisualizarVeiculo = (veiculo: Veiculo) => {

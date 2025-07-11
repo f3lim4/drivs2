@@ -23,6 +23,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ Corrigido cadastro de veículos pela interface web
 - ✅ Resolvido problema de identificação de locadora
 - ✅ Corrigido problema de inputs não controlados
+- ✅ Implementado sistema completo de motoristas com CPF como ID
+- ✅ Corrigido exclusão de veículos para persistir no banco de dados
 - Status: Sistema totalmente funcional e operacional
 
 ## System Architecture
