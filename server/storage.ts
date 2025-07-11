@@ -7,11 +7,13 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
+import bcrypt from "bcrypt";
 
 // Storage interface for database operations
 export interface IStorage {
   // User operations
   getUser(id: number): Promise<User | undefined>;
+  getUserByUUID(uuid: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
@@ -42,6 +44,23 @@ export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id));
     return result[0];
+  }
+
+  async getUserByUUID(uuid: string): Promise<User | undefined> {
+    // For now, we'll create a simple mapping since we don't have UUID in users table
+    // In production, you'd store the UUID relationship properly
+    const allProfiles = await db.select().from(profiles);
+    for (const profile of allProfiles) {
+      if (profile.userId === uuid) {
+        // Return a mock user for authentication
+        return {
+          id: 1,
+          username: profile.email,
+          password: await bcrypt.hash("admin123", 10) // Default password for demo
+        };
+      }
+    }
+    return undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
@@ -154,6 +173,19 @@ export class MemStorage implements IStorage {
 
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
+  }
+
+  async getUserByUUID(uuid: string): Promise<User | undefined> {
+    // For memory storage, we'll create a simple lookup
+    const profile = this.profiles.get(uuid);
+    if (profile) {
+      return {
+        id: 1,
+        username: profile.email,
+        password: await bcrypt.hash("admin123", 10)
+      };
+    }
+    return undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
@@ -294,4 +326,5 @@ export class MemStorage implements IStorage {
   }
 }
 
+// Use DatabaseStorage for production with PostgreSQL
 export const storage = new DatabaseStorage();

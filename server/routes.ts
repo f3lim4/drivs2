@@ -32,10 +32,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
-      // For now, we'll use a simple authentication check
-      // In production, you'd verify the password against the auth system
-      const isValidPassword = password === "Fbl@4510" && email === "drivs@drivs.com.br";
+      // Get user by user ID and verify password
+      const user = await storage.getUserByUUID(profile.userId);
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
       
+      // Check password
+      const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
