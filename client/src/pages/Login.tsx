@@ -6,12 +6,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Car } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
-import appDriverBackground from '@/assets/app-driver-background.jpg';
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,17 +22,14 @@ export default function Login() {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isAuthenticated, login } = useAuth();
 
   // Check if user is already logged in
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/');
-      }
-    };
-    checkUser();
-  }, [navigate]);
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,29 +46,29 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
-      });
-
-      if (error) {
-        toast({
-          title: "Erro no login",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
-      }
+      await login(credentials.email, credentials.password);
 
       toast({
         title: "Login realizado com sucesso!",
         description: "Bem-vindo ao DRIVS",
       });
-      navigate("/");
-    } catch (error) {
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error('Erro no login:', error);
+      
+      let errorMessage = 'Erro ao fazer login';
+      
+      if (error.message === 'Invalid login credentials') {
+        errorMessage = 'Email ou senha incorretos';
+      } else if (error.message === 'Email not confirmed') {
+        errorMessage = 'Email não confirmado';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Erro inesperado",
-        description: "Tente novamente em alguns instantes",
+        title: "Erro no Login",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -82,16 +78,10 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4 relative"
-      style={{
-        backgroundImage: `url(${appDriverBackground})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
+      className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800"
     >
       {/* Overlay escuro para melhor contraste */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
       
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
