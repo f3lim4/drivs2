@@ -34,8 +34,9 @@ import {
 } from '@/components/ui/select';
 import { Motorista } from '@/types';
 import { generateId } from '@/utils/formatters';
+import { useAuth } from '@/hooks/useAuth';
 
-// Schema de validação
+// Schema de validação baseado no schema do banco
 const motoristaSchema = z.object({
   // Informações Pessoais
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
@@ -78,6 +79,7 @@ export function NovoMotoristaModal({
   onMotoristaAdicionado 
 }: NovoMotoristaModalProps) {
   const [loading, setLoading] = useState(false);
+  const { profile } = useAuth();
 
   const form = useForm<MotoristaFormData>({
     resolver: zodResolver(motoristaSchema),
@@ -105,44 +107,50 @@ export function NovoMotoristaModal({
     setLoading(true);
     
     try {
-      // Simula delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Cria novo motorista
-      const novoMotorista: Motorista = {
-        id: generateId(),
-        // Informações Pessoais
+      // Preparar dados para envio à API
+      const motoristaData = {
+        id: data.cpf.replace(/\D/g, ''), // Usar CPF limpo como ID
+        locadoraId: profile?.locadoraId || '123456789',
         nome: data.nome,
         cpf: data.cpf,
         rg: data.rg,
         dataNascimento: data.dataNascimento,
-        // Contato
         telefone: data.telefone,
-        email: data.email,
-        // Carteira de Motorista
+        email: data.email || '',
         cnh: data.cnh,
         categoria: data.categoria,
         vencimentoCnh: data.vencimentoCnh,
-        // Endereço
         rua: data.rua,
         numero: data.numero,
         bairro: data.bairro,
         cidade: data.cidade,
         estado: data.estado,
         cep: data.cep,
-        // Status
         status: data.status,
-        // Campos de compatibilidade
-        contato: data.telefone,
-        localizacao: `${data.cidade}/${data.estado}`,
       };
 
+      // Enviar para API
+      const response = await fetch('/api/motoristas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(motoristaData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao cadastrar motorista');
+      }
+
+      const novoMotorista = await response.json();
       onMotoristaAdicionado(novoMotorista);
       onOpenChange(false);
       form.reset();
       
     } catch (error) {
       console.error('Erro ao cadastrar motorista:', error);
+      alert('Erro ao cadastrar motorista: ' + (error.message || 'Erro desconhecido'));
     } finally {
       setLoading(false);
     }
