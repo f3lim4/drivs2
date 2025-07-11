@@ -27,11 +27,6 @@ export function DrivsLayout({ children }: DrivsLayoutProps) {
             <div className="flex h-16 items-center px-4 gap-4">
               {/* Botão para minimizar/expandir sidebar */}
               <SidebarTrigger className="shrink-0" />
-              
-              {/* Título dinâmico da página */}
-              <div className="flex-1">
-                <h1 className="text-lg font-semibold">DRIVS</h1>
-              </div>
             </div>
           </header>
           
