@@ -126,8 +126,32 @@ export function NovoVeiculoModal({
     setLoading(true);
     
     try {
+      console.log('Profile debug:', profile);
+      
       if (!profile?.locadoraId) {
-        throw new Error('Erro: Locadora não identificada');
+        // Tentar recarregar o perfil do servidor
+        try {
+          const response = await fetch(`/api/auth/profile?email=${encodeURIComponent(profile?.email || '')}`);
+          if (response.ok) {
+            const updatedProfile = await response.json();
+            console.log('Updated profile:', updatedProfile);
+            if (updatedProfile.locadoraId) {
+              // Atualizar o perfil localmente
+              localStorage.setItem('drivs_profile', JSON.stringify(updatedProfile));
+              // Usar o perfil atualizado
+              if (profile) {
+                profile.locadoraId = updatedProfile.locadoraId;
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error refreshing profile:', error);
+        }
+        
+        // Se ainda não tem locadoraId, verificar se ainda precisa forçar logout
+        if (!profile?.locadoraId) {
+          throw new Error('Erro: Locadora não identificada - Faça logout e login novamente para atualizar seus dados');
+        }
       }
 
       // Criar veículo usando a nova API

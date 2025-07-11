@@ -22,6 +22,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("Note: Could not create admin profile (database may not be connected)");
   }
   // Authentication routes
+  app.get("/api/auth/profile", async (req, res) => {
+    try {
+      // Para simplificar, vou usar um endpoint que retorna o perfil baseado no email
+      // Em produção, isso seria baseado na sessão do usuário
+      const { email } = req.query;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      const profile = await storage.getProfileByEmail(email as string);
+      if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+      
+      res.json(profile);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
