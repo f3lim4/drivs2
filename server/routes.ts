@@ -56,37 +56,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const { email, password, name, type, locadoraData } = req.body;
+      const { username, password, name, type } = req.body;
       
       // Check if user already exists
-      const existingProfile = await storage.getProfileByEmail(email);
+      const existingProfile = await storage.getProfileByEmail(username);
       if (existingProfile) {
         return res.status(400).json({ message: "User already exists" });
       }
       
-      // Create user ID (in production, this would come from auth system)
-      const userId = crypto.randomUUID();
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
       
-      let locadoraId: string | undefined;
+      // Create user first
+      const user = await storage.createUser({
+        username,
+        password: hashedPassword
+      });
       
-      // If registering as locadora, create locadora first
-      if (type === "locadora" && locadoraData) {
-        const locadoraResult = insertLocadoraSchema.safeParse(locadoraData);
-        if (!locadoraResult.success) {
-          return res.status(400).json({ message: "Invalid locadora data", errors: locadoraResult.error.errors });
-        }
-        
-        const locadora = await storage.createLocadora(locadoraResult.data);
-        locadoraId = locadora.id;
+      // Get the created user with all fields to obtain the uuid
+      const createdUser = await storage.getUserByUsername(username);
+      if (!createdUser) {
+        throw new Error('Failed to create user');
       }
       
       // Create profile
       const profileData = {
-        userId,
-        email,
+        userId: createdUser.uuid,
+        email: username,
         name,
         type,
-        locadoraId
+        locadoraId: null
       };
       
       const profileResult = insertProfileSchema.safeParse(profileData);
@@ -97,11 +96,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const profile = await storage.createProfile(profileResult.data);
       
       res.json({ 
+        user,
         profile,
         message: "Registration successful" 
       });
     } catch (error) {
       console.error("Registration error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Profile routes
+  app.put("/api/profiles/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const updates = req.body;
+      
+      const profile = await storage.updateProfile(userId, updates);
+      res.json(profile);
+    } catch (error) {
+      console.error("Error updating profile:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

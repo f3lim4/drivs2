@@ -55,6 +55,7 @@ export class DatabaseStorage implements IStorage {
         // Return a mock user for authentication
         return {
           id: 1,
+          uuid: profile.userId,
           username: profile.email,
           password: await bcrypt.hash("admin123", 10) // Default password for demo
         };
@@ -186,6 +187,7 @@ export class MemStorage implements IStorage {
     if (profile) {
       return {
         id: 1,
+        uuid: profile.userId,
         username: profile.email,
         password: await bcrypt.hash("admin123", 10)
       };
@@ -201,7 +203,8 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentId++;
-    const user: User = { ...insertUser, id };
+    const uuid = crypto.randomUUID();
+    const user: User = { ...insertUser, id, uuid };
     this.users.set(id, user);
     return user;
   }
