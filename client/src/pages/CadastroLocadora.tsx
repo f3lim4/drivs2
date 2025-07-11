@@ -109,7 +109,7 @@ export default function CadastroLocadora() {
       }
 
       // 3. Atualizar o perfil do usuário com o ID da locadora
-      const profileResponse = await fetch(`/api/profiles/${authData.user.id}`, {
+      const profileResponse = await fetch(`/api/profiles/${authData.user.uuid}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
