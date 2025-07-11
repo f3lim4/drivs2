@@ -152,6 +152,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const locadora = await storage.createLocadora(result.data);
+      
+      // Atualizar o perfil da locadora com o locadora_id
+      try {
+        await storage.updateProfile(locadora.id, { locadoraId: locadora.id });
+      } catch (error) {
+        console.error("Error updating profile with locadora_id:", error);
+      }
+      
       res.json(locadora);
     } catch (error) {
       console.error("Error creating locadora:", error);
