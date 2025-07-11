@@ -1,0 +1,127 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* DRIVS Design System - Sistema de cores e estilos baseado no layout da locadora */
+
+@layer base {
+  :root {
+    /* Cores principais do DRIVS - baseadas no azul característico */
+    --background: 0 0% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Azul principal do DRIVS - melhorado para melhor contraste */
+    --primary: 210 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Cores secundárias para cards e elementos de destaque */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 215 25% 94%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    /* Cores de status para o sistema */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    --danger: 0 84.2% 60.2%;
+    --danger-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 224 71% 48%;
+
+    --radius: 0.5rem;
+    
+    /* Sidebar customizado com azul mais escuro */
+    --sidebar: 210 100% 25%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 210 100% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 90% 35%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 80% 30%;
+    --sidebar-ring: 210 100% 35%;
+
+
+    /* Gradientes para cards de estatísticas */
+    --gradient-blue: linear-gradient(135deg, hsl(224, 71%, 48%), hsl(224, 71%, 55%));
+    --gradient-green: linear-gradient(135deg, hsl(142, 76%, 36%), hsl(142, 76%, 43%));
+    --gradient-yellow: linear-gradient(135deg, hsl(38, 92%, 50%), hsl(38, 92%, 57%));
+    --gradient-red: linear-gradient(135deg, hsl(0, 84%, 60%), hsl(0, 84%, 67%));
+
+    /* Sombras elegantes */
+    --shadow-card: 0 2px 8px hsl(224 71% 48% / 0.1);
+    --shadow-hover: 0 4px 12px hsl(224 71% 48% / 0.15);
+
+    /* Transições suaves */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 224 71% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224 71% 48%;
+    
+    /* Sidebar customizado no modo dark */
+    --sidebar: 217.2 32.6% 17.5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217.2 32.6% 22%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 22%;
+    --sidebar-ring: 210 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
