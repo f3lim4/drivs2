@@ -28,6 +28,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ Criada página de perfil da locadora com edição de dados
 - ✅ Corrigido cadastro de motoristas com integração API
 - ✅ Corrigido exclusão de motoristas para persistir no banco de dados
+- ✅ Corrigido sistema de contratos para carregar motoristas e veículos da API
+- ✅ Implementado preenchimento automático de valor semanal e caução
 - Status: Sistema totalmente funcional e operacional
 
 ## System Architecture

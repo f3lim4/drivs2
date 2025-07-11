@@ -465,7 +465,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                           type="number" 
                           step="0.01"
                           min="0.01"
-                          placeholder="0" 
+                          placeholder="Preenchido automaticamente"
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
@@ -486,7 +486,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                           type="number" 
                           step="0.01"
                           min="0"
-                          placeholder="0" 
+                          placeholder="Preenchido automaticamente"
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
