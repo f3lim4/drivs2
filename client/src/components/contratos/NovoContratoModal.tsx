@@ -44,6 +44,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { Contrato, Motorista, Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
+import { useAuth } from '@/hooks/useAuth';
 
 // Schema de validação
 const contratoSchema = z.object({
@@ -74,6 +75,7 @@ export function NovoContratoModal({
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const { profile } = useAuth();
 
   // Função para obter a data de amanhã
   const getAmanha = () => {
@@ -96,9 +98,34 @@ export function NovoContratoModal({
 
   // Carrega dados dos motoristas e veículos
   useEffect(() => {
-    // Sem dados por enquanto
-    setLoadingData(false);
-  }, [open]);
+    const loadData = async () => {
+      if (!open || !profile?.locadoraId) return;
+      
+      setLoadingData(true);
+      
+      try {
+        // Carrega motoristas
+        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${profile.locadoraId}`);
+        if (motoristasResponse.ok) {
+          const motoristasData = await motoristasResponse.json();
+          setMotoristas(motoristasData);
+        }
+        
+        // Carrega veículos
+        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${profile.locadoraId}`);
+        if (veiculosResponse.ok) {
+          const veiculosData = await veiculosResponse.json();
+          setVeiculos(veiculosData);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    loadData();
+  }, [open, profile?.locadoraId]);
 
   // Filtra apenas veículos disponíveis
   const veiculosDisponiveis = veiculos.filter(veiculo => veiculo.status === 'disponivel');
@@ -107,8 +134,8 @@ export function NovoContratoModal({
   const handleVeiculoChange = (veiculoId: string) => {
     const veiculo = veiculos.find(v => v.id === veiculoId);
     if (veiculo) {
-      form.setValue('valorSemanal', veiculo.valorSemanal);
-      form.setValue('caucao', veiculo.caucao);
+      form.setValue('valorSemanal', Number(veiculo.valorSemanal) || 0);
+      form.setValue('caucao', Number(veiculo.caucao) || 0);
     }
   };
 
@@ -341,7 +368,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                                   {veiculo.marca} {veiculo.modelo} - {veiculo.placa}
                                 </span>
                                 <span className="text-sm text-muted-foreground">
-                                  R$ {veiculo.valorSemanal.toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
+                                  R$ {Number(veiculo.valorSemanal).toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
                                 </span>
                               </div>
                             </SelectItem>
