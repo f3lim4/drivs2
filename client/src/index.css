@@ -51,14 +51,14 @@
     --radius: 0.5rem;
     
     /* Sidebar customizado com azul mais escuro */
-    --sidebar: 210 100% 25%;
+    --sidebar: 210 100% 20%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 210 100% 35%;
+    --sidebar-primary: 210 100% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 90% 35%;
+    --sidebar-accent: 210 90% 30%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 210 80% 30%;
-    --sidebar-ring: 210 100% 35%;
+    --sidebar-border: 210 80% 25%;
+    --sidebar-ring: 210 100% 40%;
 
 
     /* Gradientes para cards de estatísticas */
@@ -123,5 +123,37 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Sidebar custom styles */
+  .sidebar {
+    background-color: hsl(var(--sidebar));
+    color: hsl(var(--sidebar-foreground));
+    border-color: hsl(var(--sidebar-border));
+  }
+  
+  .sidebar-header {
+    background-color: hsl(var(--sidebar));
+    border-color: hsl(var(--sidebar-border));
+  }
+  
+  .sidebar-content {
+    background-color: hsl(var(--sidebar));
+  }
+  
+  .sidebar-menu-item {
+    color: hsl(var(--sidebar-foreground));
+  }
+  
+  .sidebar-menu-item:hover {
+    background-color: hsl(var(--sidebar-accent) / 0.5);
+    color: hsl(var(--sidebar-accent-foreground));
+  }
+  
+  .sidebar-menu-item.active {
+    background-color: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-accent-foreground));
   }
 }
