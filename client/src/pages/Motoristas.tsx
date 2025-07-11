@@ -136,13 +136,32 @@ export default function Motoristas() {
     setDeleteDialogOpen(true);
   };
 
-  const handleConfirmarExclusao = (motorista: Motorista) => {
-    setMotoristas(prev => prev.filter(m => m.id !== motorista.id));
-    toast({
-      title: "Motorista Excluído",
-      description: `${motorista.nome} foi excluído com sucesso.`,
-      variant: "destructive",
-    });
+  const handleConfirmarExclusao = async (motorista: Motorista) => {
+    try {
+      const response = await fetch(`/api/motoristas/${motorista.id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao excluir motorista');
+      }
+      
+      // Remove do estado local após sucesso na API
+      setMotoristas(prev => prev.filter(m => m.id !== motorista.id));
+      
+      toast({
+        title: "Motorista Excluído",
+        description: `${motorista.nome} foi excluído com sucesso.`,
+        variant: "destructive",
+      });
+    } catch (error) {
+      console.error('Erro ao excluir motorista:', error);
+      toast({
+        title: "Erro ao excluir motorista",
+        description: "Não foi possível excluir o motorista. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleVisualizarMotorista = (motorista: Motorista) => {

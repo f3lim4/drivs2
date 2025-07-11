@@ -26,6 +26,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ Implementado sistema completo de motoristas com CPF como ID
 - ✅ Corrigido exclusão de veículos para persistir no banco de dados
 - ✅ Criada página de perfil da locadora com edição de dados
+- ✅ Corrigido cadastro de motoristas com integração API
+- ✅ Corrigido exclusão de motoristas para persistir no banco de dados
 - Status: Sistema totalmente funcional e operacional
 
 ## System Architecture
