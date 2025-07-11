@@ -11,7 +11,8 @@ import {
   FileText, 
   File,
   TrendingUp,
-  Building2
+  Building2,
+  Menu
 } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -25,6 +26,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 
 // Itens de navegação do sistema
@@ -104,14 +106,17 @@ export function DrivsSidebar() {
     <Sidebar className="border-r transition-all duration-300 bg-blue-600 border-blue-500">
       <SidebarContent className="bg-blue-600">
         {/* Header da sidebar com logo DRIVS */}
-        <div className="p-6 border-b border-blue-500 flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center">
-            <Car className="w-5 h-5 text-white" />
+        <div className="p-6 border-b border-blue-500 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center">
+              <Car className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">Drivs</h1>
+              <p className="text-xs text-white/70">Sistema de Locadoras</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-white">Drivs</h1>
-            <p className="text-xs text-white/70">Sistema de Locadoras</p>
-          </div>
+          <SidebarTrigger className="text-white hover:bg-blue-500/50 p-2" />
         </div>
 
         {/* Menu principal */}
