@@ -108,7 +108,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLocadora(locadora: InsertLocadora): Promise<Locadora> {
-    const result = await db.insert(locadoras).values(locadora).returning();
+    // Se o id não estiver definido, usar o CNPJ como ID
+    const locadoraWithId = {
+      ...locadora,
+      id: locadora.id || locadora.cnpj
+    };
+    const result = await db.insert(locadoras).values(locadoraWithId).returning();
     return result[0];
   }
 
@@ -244,7 +249,8 @@ export class MemStorage implements IStorage {
   }
 
   async createLocadora(locadora: InsertLocadora): Promise<Locadora> {
-    const id = crypto.randomUUID();
+    // Usar CNPJ como ID da locadora
+    const id = locadora.cnpj;
     const newLocadora: Locadora = { 
       ...locadora, 
       id,

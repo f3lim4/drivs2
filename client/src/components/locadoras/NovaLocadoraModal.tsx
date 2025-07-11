@@ -51,11 +51,15 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
     e.preventDefault();
     
     try {
-      const { error } = await supabase
-        .from('locadoras')
-        .insert({
+      const response = await fetch('/api/locadoras', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: formData.cnpj, // Usar CNPJ como ID
           nome: formData.nome,
-          razao_social: formData.razaoSocial,
+          razaoSocial: formData.razaoSocial,
           cnpj: formData.cnpj,
           email: formData.email,
           telefone: formData.telefone,
@@ -65,9 +69,13 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
           cep: formData.cep,
           responsavel: formData.responsavel,
           plano: formData.plano
-        });
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erro ao criar locadora');
+      }
 
       toast({
         title: "Locadora cadastrada com sucesso!",

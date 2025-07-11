@@ -95,6 +95,24 @@ export interface Aluguel {
   observacoes?: string;
 }
 
+export interface Locadora {
+  id: string; // CNPJ
+  nome: string;
+  razaoSocial: string;
+  cnpj: string;
+  email: string;
+  telefone: string;
+  endereco: string;
+  cidade: string;
+  estado: string;
+  cep: string;
+  responsavel: string;
+  status: 'ativa' | 'inativa' | 'pendente';
+  plano: 'basico' | 'premium' | 'enterprise';
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Contrato {
   id: string;
   tipo: 'locacao' | 'compra' | 'servico';

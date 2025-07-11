@@ -23,7 +23,7 @@ export const profiles = pgTable("profiles", {
 
 // Locadoras table
 export const locadoras = pgTable("locadoras", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: text("id").primaryKey(), // CNPJ será usado como ID
   nome: text("nome").notNull(),
   razaoSocial: text("razao_social").notNull(),
   cnpj: text("cnpj").notNull().unique(),
@@ -43,7 +43,7 @@ export const locadoras = pgTable("locadoras", {
 // Veiculos table
 export const veiculos = pgTable("veiculos", {
   id: uuid("id").primaryKey().defaultRandom(),
-  locadoraId: uuid("locadora_id").notNull(),
+  locadoraId: text("locadora_id").notNull(), // Referência ao CNPJ da locadora
   // Informações Básicas
   placa: text("placa").notNull().unique(),
   marca: text("marca").notNull(),
@@ -90,7 +90,6 @@ export const insertProfileSchema = createInsertSchema(profiles).omit({
 });
 
 export const insertLocadoraSchema = createInsertSchema(locadoras).omit({
-  id: true,
   createdAt: true,
   updatedAt: true,
 });
