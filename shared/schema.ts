@@ -78,6 +78,37 @@ export const veiculos = pgTable("veiculos", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Motoristas table
+export const motoristas = pgTable("motoristas", {
+  id: text("id").primaryKey(), // CPF será usado como ID
+  locadoraId: text("locadora_id").notNull(), // Referência ao CNPJ da locadora
+  // Informações Pessoais
+  nome: text("nome").notNull(),
+  cpf: text("cpf").notNull().unique(),
+  rg: text("rg").notNull(),
+  dataNascimento: date("data_nascimento").notNull(),
+  // Contato
+  telefone: text("telefone").notNull(),
+  email: text("email"),
+  // Carteira de Motorista
+  cnh: text("cnh").notNull().unique(),
+  categoria: text("categoria").notNull(),
+  vencimentoCnh: date("vencimento_cnh").notNull(),
+  // Endereço
+  rua: text("rua").notNull(),
+  numero: text("numero").notNull(),
+  bairro: text("bairro").notNull(),
+  cidade: text("cidade").notNull(),
+  estado: text("estado").notNull(),
+  cep: text("cep").notNull(),
+  // Status
+  status: text("status").notNull().default("ativo"), // 'ativo', 'inativo', 'vencido'
+  avatar: text("avatar"),
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -100,6 +131,11 @@ export const insertVeiculoSchema = createInsertSchema(veiculos).omit({
   updatedAt: true,
 });
 
+export const insertMotoristaSchema = createInsertSchema(motoristas).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -112,3 +148,6 @@ export type Locadora = typeof locadoras.$inferSelect;
 
 export type InsertVeiculo = z.infer<typeof insertVeiculoSchema>;
 export type Veiculo = typeof veiculos.$inferSelect;
+
+export type InsertMotorista = z.infer<typeof insertMotoristaSchema>;
+export type Motorista = typeof motoristas.$inferSelect;

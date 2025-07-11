@@ -13,21 +13,19 @@ export function useVeiculos() {
     try {
       setLoading(true);
       
-      let query = supabase.from('veiculos').select(`
-        *,
-        locadoras:locadora_id (
-          nome
-        )
-      `);
-
+      let url = '/api/veiculos';
+      
       // Se for locadora, só carregar seus veículos
-      if (isLocadora && profile?.locadora_id) {
-        query = query.eq('locadora_id', profile.locadora_id);
+      if (isLocadora && profile?.locadoraId) {
+        url += `?locadoraId=${profile.locadoraId}`;
       }
 
-      const { data, error } = await query;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Erro ao carregar veículos');
+      }
 
-      if (error) throw error;
+      const data = await response.json();
 
       // Converter dados do banco para formato esperado
       const veiculosFormatados: Veiculo[] = data.map((v: any) => ({
@@ -42,27 +40,27 @@ export function useVeiculos() {
         chassi: v.chassi,
         combustivel: v.combustivel,
         quilometragem: v.quilometragem,
-        valorSemanal: v.valor_semanal,
-        caucao: v.caucao,
-        taxaAdministrativa: v.taxa_administrativa,
-        limiteQuilometragem: v.limite_quilometragem,
-        valorLimiteKm: v.valor_limite_km,
-        ultimaRevisao: v.ultima_revisao,
-        proximaRevisao: v.proxima_revisao,
+        valorSemanal: parseFloat(v.valorSemanal),
+        caucao: parseFloat(v.caucao),
+        taxaAdministrativa: v.taxaAdministrativa ? parseFloat(v.taxaAdministrativa) : null,
+        limiteQuilometragem: v.limiteQuilometragem,
+        valorLimiteKm: v.valorLimiteKm,
+        ultimaRevisao: v.ultimaRevisao,
+        proximaRevisao: v.proximaRevisao,
         seguradora: v.seguradora,
-        numeroApolice: v.numero_apolice,
-        vigenciaSeguro: v.vigencia_seguro,
-        valorSeguroMensal: v.valor_seguro_mensal,
+        numeroApolice: v.numeroApolice,
+        vigenciaSeguro: v.vigenciaSeguro,
+        valorSeguroMensal: v.valorSeguroMensal ? parseFloat(v.valorSeguroMensal) : null,
         status: v.status as 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel',
         // Campos de compatibilidade
-        valorDiario: v.valor_semanal / 7,
-        valorCaucao: v.caucao,
-        kmLimite: v.limite_quilometragem === 'limitada' && v.valor_limite_km 
-          ? `${v.valor_limite_km} km/semana` 
-          : v.limite_quilometragem,
+        valorDiario: parseFloat(v.valorSemanal) / 7,
+        valorCaucao: parseFloat(v.caucao),
+        kmLimite: v.limiteQuilometragem === 'limitada' && v.valorLimiteKm 
+          ? `${v.valorLimiteKm} km/semana` 
+          : v.limiteQuilometragem,
         seguro: v.seguradora || 'Não informado',
         // Dados da locadora
-        locadoraNome: v.locadoras?.nome,
+        locadoraNome: v.locadoraNome,
       }));
 
       setVeiculos(veiculosFormatados);
@@ -94,7 +92,7 @@ export function useVeiculos() {
 
   useEffect(() => {
     carregarVeiculos();
-  }, [isLocadora, profile?.locadora_id]);
+  }, [isLocadora, profile?.locadoraId]);
 
   return {
     veiculos,
