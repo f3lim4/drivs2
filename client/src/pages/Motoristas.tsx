@@ -38,7 +38,7 @@ import { Users, UserCheck, UserX, Clock, Activity } from 'lucide-react';
 
 export default function Motoristas() {
   const { toast } = useToast();
-  const { isAdmin, isLocadora } = useAuth();
+  const { isAdmin, isLocadora, profile } = useAuth();
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -51,9 +51,38 @@ export default function Motoristas() {
 
   // Carrega dados dos motoristas
   useEffect(() => {
-    // Sem dados por enquanto
-    setLoading(false);
-  }, []);
+    const carregarMotoristas = async () => {
+      try {
+        setLoading(true);
+        
+        let url = '/api/motoristas';
+        
+        // Se for locadora, só carregar seus motoristas
+        if (isLocadora && profile?.locadoraId) {
+          url += `?locadoraId=${profile.locadoraId}`;
+        }
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Erro ao carregar motoristas');
+        }
+
+        const data = await response.json();
+        setMotoristas(data);
+      } catch (error) {
+        console.error('Erro ao carregar motoristas:', error);
+        toast({
+          title: "Erro ao carregar motoristas",
+          description: "Não foi possível carregar a lista de motoristas.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarMotoristas();
+  }, [isLocadora, profile?.locadoraId, toast]);
 
   // Filtra motoristas baseado na busca e filtros
   const filteredMotoristas = motoristas.filter(motorista => {

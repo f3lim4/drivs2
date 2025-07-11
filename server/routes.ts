@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -241,6 +241,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Veiculo deleted successfully" });
     } catch (error) {
       console.error("Error deleting veiculo:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Motoristas routes
+  app.get("/api/motoristas", async (req, res) => {
+    try {
+      const { locadoraId } = req.query;
+      
+      let motoristas;
+      if (locadoraId) {
+        motoristas = await storage.getMotoristasByLocadora(locadoraId as string);
+      } else {
+        motoristas = await storage.getAllMotoristas();
+      }
+      
+      res.json(motoristas);
+    } catch (error) {
+      console.error("Error fetching motoristas:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/motoristas/:id", async (req, res) => {
+    try {
+      const motorista = await storage.getMotorista(req.params.id);
+      if (!motorista) {
+        return res.status(404).json({ message: "Motorista not found" });
+      }
+      res.json(motorista);
+    } catch (error) {
+      console.error("Error fetching motorista:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/motoristas", async (req, res) => {
+    try {
+      const result = insertMotoristaSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
+      }
+      
+      const motorista = await storage.createMotorista(result.data);
+      res.json(motorista);
+    } catch (error) {
+      console.error("Error creating motorista:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/motoristas/:id", async (req, res) => {
+    try {
+      const motorista = await storage.updateMotorista(req.params.id, req.body);
+      res.json(motorista);
+    } catch (error) {
+      console.error("Error updating motorista:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/motoristas/:id", async (req, res) => {
+    try {
+      await storage.deleteMotorista(req.params.id);
+      res.json({ message: "Motorista deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting motorista:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

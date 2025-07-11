@@ -1,9 +1,10 @@
 import { 
-  users, profiles, locadoras, veiculos,
+  users, profiles, locadoras, veiculos, motoristas,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
-  type Veiculo, type InsertVeiculo
+  type Veiculo, type InsertVeiculo,
+  type Motorista, type InsertMotorista
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -37,6 +38,14 @@ export interface IStorage {
   createVeiculo(veiculo: InsertVeiculo): Promise<Veiculo>;
   updateVeiculo(id: string, updates: Partial<InsertVeiculo>): Promise<Veiculo>;
   deleteVeiculo(id: string): Promise<void>;
+  
+  // Motorista operations
+  getAllMotoristas(): Promise<Motorista[]>;
+  getMotoristasByLocadora(locadoraId: string): Promise<Motorista[]>;
+  getMotorista(id: string): Promise<Motorista | undefined>;
+  createMotorista(motorista: InsertMotorista): Promise<Motorista>;
+  updateMotorista(id: string, updates: Partial<InsertMotorista>): Promise<Motorista>;
+  deleteMotorista(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -153,6 +162,44 @@ export class DatabaseStorage implements IStorage {
   async deleteVeiculo(id: string): Promise<void> {
     await db.delete(veiculos).where(eq(veiculos.id, id));
   }
+
+  // Motorista operations
+  async getAllMotoristas(): Promise<Motorista[]> {
+    const result = await db.select().from(motoristas);
+    return result;
+  }
+
+  async getMotoristasByLocadora(locadoraId: string): Promise<Motorista[]> {
+    const result = await db.select().from(motoristas).where(eq(motoristas.locadoraId, locadoraId));
+    return result;
+  }
+
+  async getMotorista(id: string): Promise<Motorista | undefined> {
+    const result = await db.select().from(motoristas).where(eq(motoristas.id, id));
+    return result[0];
+  }
+
+  async createMotorista(motorista: InsertMotorista): Promise<Motorista> {
+    // Use CPF as ID
+    const motoristaData = {
+      ...motorista,
+      id: motorista.cpf
+    };
+    const result = await db.insert(motoristas).values(motoristaData).returning();
+    return result[0];
+  }
+
+  async updateMotorista(id: string, updates: Partial<InsertMotorista>): Promise<Motorista> {
+    const result = await db.update(motoristas)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(motoristas.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteMotorista(id: string): Promise<void> {
+    await db.delete(motoristas).where(eq(motoristas.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -160,6 +207,7 @@ export class MemStorage implements IStorage {
   private profiles: Map<string, Profile>;
   private locadorasMap: Map<string, Locadora>;
   private veiculosMap: Map<string, Veiculo>;
+  private motoristasMap: Map<string, Motorista>;
   currentId: number;
 
   constructor() {
@@ -167,6 +215,7 @@ export class MemStorage implements IStorage {
     this.profiles = new Map();
     this.locadorasMap = new Map();
     this.veiculosMap = new Map();
+    this.motoristasMap = new Map();
     this.currentId = 1;
   }
 
@@ -325,6 +374,50 @@ export class MemStorage implements IStorage {
 
   async deleteVeiculo(id: string): Promise<void> {
     this.veiculosMap.delete(id);
+  }
+
+  async getAllMotoristas(): Promise<Motorista[]> {
+    return Array.from(this.motoristasMap.values());
+  }
+
+  async getMotoristasByLocadora(locadoraId: string): Promise<Motorista[]> {
+    return Array.from(this.motoristasMap.values()).filter(m => m.locadoraId === locadoraId);
+  }
+
+  async getMotorista(id: string): Promise<Motorista | undefined> {
+    return this.motoristasMap.get(id);
+  }
+
+  async createMotorista(motorista: InsertMotorista): Promise<Motorista> {
+    const id = motorista.cpf; // Use CPF as ID
+    const newMotorista: Motorista = { 
+      ...motorista, 
+      id,
+      status: motorista.status || "ativo",
+      avatar: motorista.avatar || null,
+      email: motorista.email || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.motoristasMap.set(id, newMotorista);
+    return newMotorista;
+  }
+
+  async updateMotorista(id: string, updates: Partial<InsertMotorista>): Promise<Motorista> {
+    const existing = this.motoristasMap.get(id);
+    if (!existing) throw new Error('Motorista not found');
+    
+    const updated: Motorista = { 
+      ...existing, 
+      ...updates, 
+      updatedAt: new Date()
+    };
+    this.motoristasMap.set(id, updated);
+    return updated;
+  }
+
+  async deleteMotorista(id: string): Promise<void> {
+    this.motoristasMap.delete(id);
   }
 }
 
