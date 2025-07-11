@@ -31,6 +31,11 @@ const App = () => (
               <DrivsLayout><Dashboard /></DrivsLayout>
             </AuthGuard>
           } />
+          <Route path="/dashboard" element={
+            <AuthGuard>
+              <DrivsLayout><Dashboard /></DrivsLayout>
+            </AuthGuard>
+          } />
           <Route path="/motoristas" element={
             <AuthGuard>
               <DrivsLayout><Motoristas /></DrivsLayout>
