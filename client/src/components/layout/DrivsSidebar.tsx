@@ -11,14 +11,11 @@ import {
   FileText, 
   File,
   TrendingUp,
-  Building2,
-  ChevronLeft,
-  ChevronRight
+  Building2
 } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
 import {
   Sidebar,
   SidebarContent,
@@ -74,7 +71,6 @@ const navigationItems = [
 export function DrivsSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const { profile, isAdmin } = useAuth();
 
   // Filtrar itens baseado no tipo de usuário
@@ -105,38 +101,17 @@ export function DrivsSidebar() {
   };
 
   return (
-    <Sidebar className={`border-r transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} bg-blue-600 border-blue-500`}>
+    <Sidebar className="border-r transition-all duration-300 bg-blue-600 border-blue-500">
       <SidebarContent className="bg-blue-600">
         {/* Header da sidebar com logo DRIVS */}
-        <div className="p-6 border-b border-blue-500 flex items-center justify-between">
-          {!isCollapsed && (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center">
-                <Car className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-white">Drivs</h1>
-                <p className="text-xs text-white/70">Sistema de Locadoras</p>
-              </div>
-            </div>
-          )}
-          {isCollapsed && (
-            <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center mx-auto">
-              <Car className="w-5 h-5 text-white" />
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8 text-white hover:bg-blue-500/50"
-          >
-            {isCollapsed ? (
-              <ChevronRight className="w-4 h-4" />
-            ) : (
-              <ChevronLeft className="w-4 h-4" />
-            )}
-          </Button>
+        <div className="p-6 border-b border-blue-500 flex items-center gap-2">
+          <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center">
+            <Car className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-white">Drivs</h1>
+            <p className="text-xs text-white/70">Sistema de Locadoras</p>
+          </div>
         </div>
 
         {/* Menu principal */}
@@ -152,7 +127,7 @@ export function DrivsSidebar() {
                       title={item.description}
                     >
                       <item.icon className="w-5 h-5 flex-shrink-0" />
-                      {!isCollapsed && <span className="font-medium">{item.title}</span>}
+                      <span className="font-medium">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -163,12 +138,10 @@ export function DrivsSidebar() {
 
         {/* Informações do sistema */}
         <div className="mt-auto p-6 border-t border-blue-500">
-          {!isCollapsed && (
-            <div className="text-xs text-white/70">
-              <p>DRIVS v1.0</p>
-              <p>Sistema de Gestão</p>
-            </div>
-          )}
+          <div className="text-xs text-white/70">
+            <p>DRIVS v1.0</p>
+            <p>Sistema de Gestão</p>
+          </div>
         </div>
       </SidebarContent>
     </Sidebar>
