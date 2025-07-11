@@ -132,16 +132,16 @@ export function EditarVeiculoModal({
         chassi: veiculo.chassi,
         combustivel: veiculo.combustivel,
         quilometragem: veiculo.quilometragem,
-        valorSemanal: veiculo.valorSemanal,
-        caucao: veiculo.caucao,
-        taxaAdministrativa: veiculo.taxaAdministrativa,
+        valorSemanal: Number(veiculo.valorSemanal) || 0,
+        caucao: Number(veiculo.caucao) || 0,
+        taxaAdministrativa: Number(veiculo.taxaAdministrativa) || undefined,
         limiteQuilometragem: veiculo.limiteQuilometragem,
         ultimaRevisao: veiculo.ultimaRevisao || '',
         proximaRevisao: veiculo.proximaRevisao || '',
         seguradora: veiculo.seguradora || '',
         numeroApolice: veiculo.numeroApolice || '',
         vigenciaSeguro: veiculo.vigenciaSeguro || '',
-        valorSeguroMensal: veiculo.valorSeguroMensal,
+        valorSeguroMensal: Number(veiculo.valorSeguroMensal) || undefined,
         status: veiculo.status,
         valorLimiteKm: veiculo.valorLimiteKm,
       });
@@ -154,55 +154,53 @@ export function EditarVeiculoModal({
     setLoading(true);
     
     try {
-      // Simula delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Cria veículo atualizado
-      const veiculoAtualizado: Veiculo = {
-        ...veiculo,
-        // Informações Básicas
+      // Preparar dados para envio à API
+      const veiculoData = {
         placa: data.placa.toUpperCase(),
         marca: data.marca,
         modelo: data.modelo,
         ano: data.ano,
         cor: data.cor,
         categoria: data.categoria,
-        // Documentação
         renavam: data.renavam,
         chassi: data.chassi.toUpperCase(),
-        // Características Técnicas
         combustivel: data.combustivel,
         quilometragem: data.quilometragem,
-        valorSemanal: data.valorSemanal,
-        caucao: data.caucao,
-        taxaAdministrativa: data.taxaAdministrativa,
+        valorSemanal: data.valorSemanal.toString(),
+        caucao: data.caucao.toString(),
+        taxaAdministrativa: data.taxaAdministrativa?.toString(),
         limiteQuilometragem: data.limiteQuilometragem,
-        // Manutenção
-        ultimaRevisao: data.ultimaRevisao,
-        proximaRevisao: data.proximaRevisao,
-        // Seguro
+        valorLimiteKm: data.valorLimiteKm,
+        ultimaRevisao: data.ultimaRevisao || null,
+        proximaRevisao: data.proximaRevisao || null,
         seguradora: data.seguradora,
         numeroApolice: data.numeroApolice,
-        vigenciaSeguro: data.vigenciaSeguro,
-        valorSeguroMensal: data.valorSeguroMensal,
-        // Status
+        vigenciaSeguro: data.vigenciaSeguro || null,
+        valorSeguroMensal: data.valorSeguroMensal?.toString(),
         status: data.status,
-        // Campo condicional
-        valorLimiteKm: data.valorLimiteKm,
-        // Campos de compatibilidade
-        valorDiario: data.valorSemanal / 7,
-        valorCaucao: data.caucao,
-        kmLimite: data.limiteQuilometragem === 'limitada' && data.valorLimiteKm 
-          ? `${data.valorLimiteKm} km/semana` 
-          : data.limiteQuilometragem,
-        seguro: data.seguradora || 'Não informado',
       };
 
+      // Fazer chamada à API
+      const response = await fetch(`/api/veiculos/${veiculo.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(veiculoData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erro ao atualizar veículo');
+      }
+
+      const veiculoAtualizado = await response.json();
       onVeiculoEditado(veiculoAtualizado);
       onOpenChange(false);
       
     } catch (error) {
       console.error('Erro ao editar veículo:', error);
+      alert('Erro ao atualizar veículo: ' + (error.message || 'Erro desconhecido'));
     } finally {
       setLoading(false);
     }
