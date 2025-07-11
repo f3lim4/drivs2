@@ -96,17 +96,26 @@ export default function Perfil() {
   // Carregar dados da locadora
   useEffect(() => {
     const carregarLocadora = async () => {
-      if (!profile?.locadoraId) return;
+      console.log('Profile debug:', profile);
+      console.log('LocadoraId:', profile?.locadoraId);
+      
+      if (!profile?.locadoraId) {
+        console.log('No locadoraId found, stopping load');
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
+        console.log('Fetching locadora:', profile.locadoraId);
         const response = await fetch(`/api/locadoras/${profile.locadoraId}`);
         
         if (!response.ok) {
-          throw new Error('Erro ao carregar dados da locadora');
+          throw new Error(`Erro ao carregar dados da locadora: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('Locadora loaded:', data);
         setLocadora(data);
         
         // Atualizar form com os dados
