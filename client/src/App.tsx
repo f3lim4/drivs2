@@ -11,6 +11,7 @@ import Veiculos from "./pages/Veiculos";
 import Alugueis from "./pages/Alugueis";
 import Contratos from "./pages/Contratos";
 import Locadoras from "./pages/Locadoras";
+import Perfil from "./pages/Perfil";
 import Login from "./pages/Login";
 import CadastroLocadora from "./pages/CadastroLocadora";
 import NotFound from "./pages/NotFound";
@@ -59,6 +60,11 @@ const App = () => (
           <Route path="/locadoras" element={
             <AuthGuard>
               <DrivsLayout><Locadoras /></DrivsLayout>
+            </AuthGuard>
+          } />
+          <Route path="/perfil" element={
+            <AuthGuard>
+              <DrivsLayout><Perfil /></DrivsLayout>
             </AuthGuard>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
