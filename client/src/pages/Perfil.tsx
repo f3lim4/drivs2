@@ -76,6 +76,22 @@ export default function Perfil() {
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
+  // Função para recarregar o perfil do servidor
+  const reloadProfile = async () => {
+    if (!profile?.email) return null;
+    
+    try {
+      const response = await fetch(`/api/auth/profile?email=${encodeURIComponent(profile.email)}`);
+      if (response.ok) {
+        const updatedProfile = await response.json();
+        return updatedProfile;
+      }
+    } catch (error) {
+      console.error('Error reloading profile:', error);
+    }
+    return null;
+  };
+
   const form = useForm<PerfilFormData>({
     resolver: zodResolver(perfilSchema),
     defaultValues: {
@@ -96,26 +112,28 @@ export default function Perfil() {
   // Carregar dados da locadora
   useEffect(() => {
     const carregarLocadora = async () => {
-      console.log('Profile debug:', profile);
-      console.log('LocadoraId:', profile?.locadoraId);
+      let currentProfile = profile;
       
+      // Se não tem locadoraId, tentar recarregar o perfil do servidor
       if (!profile?.locadoraId) {
-        console.log('No locadoraId found, stopping load');
-        setLoading(false);
-        return;
+        const reloadedProfile = await reloadProfile();
+        if (reloadedProfile?.locadoraId) {
+          currentProfile = reloadedProfile;
+        } else {
+          setLoading(false);
+          return;
+        }
       }
 
       try {
         setLoading(true);
-        console.log('Fetching locadora:', profile.locadoraId);
-        const response = await fetch(`/api/locadoras/${profile.locadoraId}`);
+        const response = await fetch(`/api/locadoras/${currentProfile.locadoraId}`);
         
         if (!response.ok) {
           throw new Error(`Erro ao carregar dados da locadora: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('Locadora loaded:', data);
         setLocadora(data);
         
         // Atualizar form com os dados
@@ -145,7 +163,7 @@ export default function Perfil() {
     };
 
     carregarLocadora();
-  }, [profile?.locadoraId, form, toast]);
+  }, [profile?.locadoraId, profile?.email, form, toast]);
 
   const onSubmit = async (data: PerfilFormData) => {
     if (!profile?.locadoraId) return;
@@ -194,6 +212,34 @@ export default function Perfil() {
               Esta página é apenas para locadoras.
             </CardDescription>
           </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  // Se não tem locadoraId, mostrar opção para recarregar
+  if (!profile?.locadoraId && !loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-96">
+          <CardHeader>
+            <CardTitle>Dados Incompletos</CardTitle>
+            <CardDescription>
+              Seus dados de locadora não foram encontrados. 
+              Tente fazer logout e login novamente.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => {
+                localStorage.removeItem('drivs_profile');
+                window.location.href = '/login';
+              }}
+              className="w-full"
+            >
+              Fazer Login Novamente
+            </Button>
+          </CardContent>
         </Card>
       </div>
     );
