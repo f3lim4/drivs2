@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
-import { Locadora } from '@/types/locadora';
+import { Locadora } from '@/types';
 
 export const useLocadoras = () => {
   const [locadoras, setLocadoras] = useState<Locadora[]>([]);
@@ -12,13 +12,14 @@ export const useLocadoras = () => {
 
   const fetchLocadoras = async () => {
     try {
-      const { data, error } = await supabase
-        .from('locadoras')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setLocadoras(data as Locadora[] || []);
+      const response = await fetch('/api/locadoras');
+      
+      if (!response.ok) {
+        throw new Error('Erro ao carregar locadoras');
+      }
+      
+      const data = await response.json();
+      setLocadoras(data || []);
     } catch (error) {
       console.error('Erro ao carregar locadoras:', error);
       toast({
@@ -33,23 +34,14 @@ export const useLocadoras = () => {
 
   const deleteLocadora = async (id: string) => {
     try {
-      console.log('Tentando excluir locadora com ID:', id);
-      
-      // Verificar se está autenticado
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log('Usuário logado:', user?.email);
-      
-      const { error } = await supabase
-        .from('locadoras')
-        .delete()
-        .eq('id', id);
+      const response = await fetch(`/api/locadoras/${id}`, {
+        method: 'DELETE',
+      });
 
-      if (error) {
-        console.error('Erro na exclusão:', error);
-        throw error;
+      if (!response.ok) {
+        throw new Error('Erro ao excluir locadora');
       }
 
-      console.log('Locadora excluída com sucesso');
       setLocadoras(prev => prev.filter(l => l.id !== id));
       
       toast({
