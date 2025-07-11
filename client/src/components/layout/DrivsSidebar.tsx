@@ -98,38 +98,38 @@ export function DrivsSidebar() {
     const baseClasses = "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 min-h-[48px]";
     
     if (isActive(path)) {
-      return `${baseClasses} bg-sidebar-accent text-sidebar-accent-foreground font-medium`;
+      return `${baseClasses} bg-blue-600 text-white font-medium`;
     }
     
-    return `${baseClasses} text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground`;
+    return `${baseClasses} text-white hover:bg-blue-700/50 hover:text-white`;
   };
 
   return (
-    <Sidebar className={`border-r border-sidebar-border transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
-      <SidebarContent className="bg-sidebar">
+    <Sidebar className={`border-r transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} bg-blue-900 border-blue-800`}>
+      <SidebarContent className="bg-blue-900">
         {/* Header da sidebar com logo DRIVS */}
-        <div className="p-6 border-b border-sidebar-border flex items-center justify-between">
+        <div className="p-6 border-b border-blue-800 flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-sidebar-primary rounded-lg flex items-center justify-center">
-                <Car className="w-5 h-5 text-sidebar-primary-foreground" />
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Car className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-sidebar-foreground">Drivs</h1>
-                <p className="text-xs text-sidebar-foreground/70">Sistema de Locadoras</p>
+                <h1 className="text-lg font-bold text-white">Drivs</h1>
+                <p className="text-xs text-white/70">Sistema de Locadoras</p>
               </div>
             </div>
           )}
           {isCollapsed && (
-            <div className="w-8 h-8 bg-sidebar-primary rounded-lg flex items-center justify-center mx-auto">
-              <Car className="w-5 h-5 text-sidebar-primary-foreground" />
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mx-auto">
+              <Car className="w-5 h-5 text-white" />
             </div>
           )}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="h-8 w-8"
+            className="h-8 w-8 text-white hover:bg-blue-700/50"
           >
             {isCollapsed ? (
               <ChevronRight className="w-4 h-4" />
@@ -162,9 +162,9 @@ export function DrivsSidebar() {
         </SidebarGroup>
 
         {/* Informações do sistema */}
-        <div className="mt-auto p-6 border-t border-sidebar-border">
+        <div className="mt-auto p-6 border-t border-blue-800">
           {!isCollapsed && (
-            <div className="text-xs text-sidebar-foreground/50">
+            <div className="text-xs text-white/50">
               <p>DRIVS v1.0</p>
               <p>Sistema de Gestão</p>
             </div>
