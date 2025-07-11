@@ -8,6 +8,16 @@ DRIVS é um sistema completo para gerenciamento de locadoras de veículos, desen
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+### 2025-07-11: Sistema de Locadoras com CNPJ como ID
+- Configurado sistema para usar CNPJ como ID principal das locadoras
+- Migrado schema do banco para suportar CNPJ como chave primária
+- Atualizado backend para usar nova API em vez de Supabase
+- Implementado sistema de autenticação com bcrypt
+- Corrigido componentes frontend para usar nova API
+- Status: Funcional via API, correções finais em andamento para interface web
+
 ## System Architecture
 
 ### Frontend Architecture

@@ -59,51 +59,37 @@ export default function CadastroLocadora() {
     }
     
     try {
-      // 1. Verificar se já existe CNPJ, email ou telefone cadastrado
-      const { data: existingLocadora } = await supabase
-        .from('locadoras')
-        .select('cnpj, email, telefone')
-        .or(`cnpj.eq.${formData.cnpj},email.eq.${formData.email},telefone.eq.${formData.telefone}`)
-        .limit(1)
-        .single();
-
-      if (existingLocadora) {
-        if (existingLocadora.cnpj === formData.cnpj) {
-          throw new Error('CNPJ já cadastrado no sistema');
-        }
-        if (existingLocadora.email === formData.email) {
-          throw new Error('Email já cadastrado no sistema');
-        }
-        if (existingLocadora.telefone === formData.telefone) {
-          throw new Error('Telefone já cadastrado no sistema');
-        }
-      }
-
-      // 2. Criar o usuário de autenticação
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.senha,
-        options: {
-          emailRedirectTo: `${window.location.origin}/login`,
-          data: {
-            name: formData.responsavel,
-            type: 'locadora'
-          }
-        }
+      // 1. Criar usuário de autenticação
+      const authResponse = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.email,
+          password: formData.senha,
+          name: formData.responsavel,
+          type: 'locadora'
+        }),
       });
 
-      if (authError) throw authError;
-
-      if (!authData.user) {
-        throw new Error('Falha ao criar usuário');
+      if (!authResponse.ok) {
+        const error = await authResponse.json();
+        throw new Error(error.message || 'Erro ao criar usuário');
       }
 
-      // 3. Criar a entrada na tabela locadoras
-      const { data: locadoraData, error: locadoraError } = await supabase
-        .from('locadoras')
-        .insert({
+      const authData = await authResponse.json();
+
+      // 2. Criar a locadora
+      const locadoraResponse = await fetch('/api/locadoras', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: formData.cnpj,
           nome: formData.nome,
-          razao_social: formData.razaoSocial,
+          razaoSocial: formData.razaoSocial,
           cnpj: formData.cnpj,
           email: formData.email,
           telefone: formData.telefone,
@@ -114,24 +100,27 @@ export default function CadastroLocadora() {
           responsavel: formData.responsavel,
           plano: 'basico',
           status: 'ativa'
-        })
-        .select()
-        .single();
+        }),
+      });
 
-      if (locadoraError) throw locadoraError;
+      if (!locadoraResponse.ok) {
+        const error = await locadoraResponse.json();
+        throw new Error(error.message || 'Erro ao criar locadora');
+      }
 
-      // 4. Atualizar o perfil do usuário com o ID da locadora
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ 
-          locadora_id: locadoraData.id,
-          type: 'locadora'
-        })
-        .eq('user_id', authData.user.id);
+      // 3. Atualizar o perfil do usuário com o ID da locadora
+      const profileResponse = await fetch(`/api/profiles/${authData.user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          locadoraId: formData.cnpj
+        }),
+      });
 
-      if (profileError) {
-        console.error('Erro ao atualizar perfil:', profileError);
-        // Não falha o cadastro por causa disso
+      if (!profileResponse.ok) {
+        console.warn('Erro ao atualizar perfil, mas locadora foi criada');
       }
 
       toast({

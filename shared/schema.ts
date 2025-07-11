@@ -5,6 +5,7 @@ import { z } from "zod";
 // Users table for authentication
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().notNull().unique(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
 });
@@ -16,7 +17,7 @@ export const profiles = pgTable("profiles", {
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   type: text("type").notNull(), // 'admin' or 'locadora'
-  locadoraId: uuid("locadora_id"),
+  locadoraId: text("locadora_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
