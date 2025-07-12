@@ -50,14 +50,8 @@ export function StatCard({
 }: StatCardProps) {
   const config = variantConfig[variant];
   
-  // Formata o valor se for numérico (para valores monetários)
+  // Formata o valor se for numérico
   const formatValue = (val: string | number) => {
-    if (typeof val === 'number' && title.toLowerCase().includes('receita')) {
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      }).format(val);
-    }
     return val;
   };
 
