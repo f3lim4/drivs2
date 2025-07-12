@@ -16,8 +16,6 @@ interface DrivsHeaderProps {
 }
 
 export function DrivsHeader({ title, subtitle }: DrivsHeaderProps) {
-  const notificationCount = 1; // Número de notificações não lidas
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center gap-4">
@@ -34,7 +32,7 @@ export function DrivsHeader({ title, subtitle }: DrivsHeaderProps) {
         <SearchBar />
 
         {/* Notificações com badge */}
-        <NotificationsDropdown notificationCount={notificationCount} />
+        <NotificationsDropdown />
 
         {/* Menu do usuário */}
         <UserMenu />
