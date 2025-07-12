@@ -19,13 +19,13 @@ export default function Dashboard() {
   // Buscar dados dos motoristas
   const { data: motoristas = [], isLoading: loadingMotoristas } = useQuery<Motorista[]>({
     queryKey: ['/api/motoristas'],
-    enabled: !!profile,
+    enabled: true, // Sempre buscar dados, não depender do perfil
   });
 
   // Buscar dados dos veículos
   const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery<Veiculo[]>({
     queryKey: ['/api/veiculos'],
-    enabled: !!profile,
+    enabled: true, // Sempre buscar dados, não depender do perfil
   });
 
   const loading = loadingMotoristas || loadingVeiculos;

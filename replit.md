@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-11: Sistema de Locadoras com CNPJ como ID - CONCLUÍDO
+### 2025-07-12: Dashboard com Dados Reais - EM ANDAMENTO
 - ✅ Configurado sistema para usar CNPJ como ID principal das locadoras
 - ✅ Migrado schema do banco para suportar CNPJ como chave primária
 - ✅ Atualizado backend para usar nova API em vez de Supabase
@@ -30,7 +30,12 @@ Preferred communication style: Simple, everyday language.
 - ✅ Corrigido exclusão de motoristas para persistir no banco de dados
 - ✅ Corrigido sistema de contratos para carregar motoristas e veículos da API
 - ✅ Implementado preenchimento automático de valor semanal e caução
-- Status: Sistema totalmente funcional e operacional
+- ✅ Corrigido dashboard para carregar dados reais independente do perfil de usuário
+- ✅ Sistema de cálculo de estatísticas em tempo real implementado
+- ✅ Alertas automáticos para CNH vencida/vencendo funcionando
+- ✅ Formatação monetária em reais brasileiros
+- ✅ Eliminado loop infinito no useEffect do dashboard
+- Status: Dashboard agora carrega dados reais do banco de dados
 
 ## System Architecture
 
