@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-12: Dashboard com Dados Reais - EM ANDAMENTO
+### 2025-07-12: Sistema de Aluguéis Completo - CONCLUÍDO
 - ✅ Configurado sistema para usar CNPJ como ID principal das locadoras
 - ✅ Migrado schema do banco para suportar CNPJ como chave primária
 - ✅ Atualizado backend para usar nova API em vez de Supabase
@@ -35,7 +35,14 @@ Preferred communication style: Simple, everyday language.
 - ✅ Alertas automáticos para CNH vencida/vencendo funcionando
 - ✅ Formatação monetária em reais brasileiros
 - ✅ Eliminado loop infinito no useEffect do dashboard
-- Status: Dashboard agora carrega dados reais do banco de dados
+- ✅ Criado sistema completo de aluguéis com persistência no banco
+- ✅ Implementada API completa para CRUD de aluguéis
+- ✅ Modal de criação de aluguéis salva dados no banco de dados
+- ✅ Modal de exclusão de aluguéis remove dados do banco
+- ✅ Dashboard carrega dados reais dos aluguéis
+- ✅ Seção de aluguéis recentes mostra dados do banco
+- ✅ Notificações e alertas funcionando com dados reais
+- Status: Sistema completamente funcional com dados reais do banco PostgreSQL
 
 ## System Architecture
 
