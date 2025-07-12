@@ -211,7 +211,7 @@ veículo à mecânica serão cobrados do motorista responsável.
 alteração no endereço do LOCATÁRIO, o mesmo deverá comunicar imediatamente ao LOCADOR.
 
 2. CLÁUSULA SEGUNDA – DO VALOR
-2.1. O LOCATÁRIO pagará ao LOCADOR, a título de locação, o valor semanal de R$ ${data.valorSemanal.toFixed(2)}.
+2.1. O LOCATÁRIO pagará ao LOCADOR, a título de locação, o valor semanal de R$ ${parseFloat(data.valorSemanal).toFixed(2)}.
 2.2. O pagamento será feito toda segunda-feira, via depósito em conta do LOCADOR, e o atraso no pagamento do acordo
 da cláusula acima enseja multa de 10% (dez por cento) e juros de 2% (dois por cento) ao dia.
 
@@ -240,7 +240,7 @@ avisar ao LOCATÁRIO, e em hipótese alguma deve andar com o veículo fervendo o
 6.1. A rescisão, antes do vencimento contratual, por iniciativa de qualquer das partes, deverá ser precedida de
 notificação expressa com antecedência mínima de 1 mês. Caso não haja essa notificação, haverá multa por quebra do
 contrato no valor de 02 semanais do veículo.
-6.2. A caução no valor de R$ ${data.caucao.toFixed(2)} será devolvida no término do contrato, após o prazo de 30 dias úteis, desde que não haja nenhuma avaria
+6.2. A caução no valor de R$ ${parseFloat(data.caucao).toFixed(2)} será devolvida no término do contrato, após o prazo de 30 dias úteis, desde que não haja nenhuma avaria
 ou infração pendente.
 6.3. O descumprimento de qualquer uma das cláusulas por parte dos contratantes ensejará a rescisão deste
 instrumento e o devido pagamento de multa pela parte inadimplente, no valor correspondente a 02 semanas de
