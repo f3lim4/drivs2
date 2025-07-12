@@ -19,16 +19,28 @@ export default function Dashboard() {
   // Buscar dados dos motoristas
   const { data: motoristas = [], isLoading: loadingMotoristas } = useQuery<Motorista[]>({
     queryKey: ['/api/motoristas'],
-    enabled: true, // Sempre buscar dados, não depender do perfil
+    enabled: true,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
 
   // Buscar dados dos veículos
   const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery<Veiculo[]>({
     queryKey: ['/api/veiculos'],
-    enabled: true, // Sempre buscar dados, não depender do perfil
+    enabled: true,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
 
   const loading = loadingMotoristas || loadingVeiculos;
+
+  // Debug: log dos dados carregados
+  console.log('Dashboard - Dados carregados:', {
+    motoristas: motoristas.length,
+    veiculos: veiculos.length,
+    loading,
+    profile: profile?.type
+  });
 
   // Função para formatar valores monetários
   const formatCurrency = (value: number) => {
