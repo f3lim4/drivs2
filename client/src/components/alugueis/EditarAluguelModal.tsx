@@ -163,7 +163,7 @@ export function EditarAluguelModal({
       dataFim.setMonth(dataFim.getMonth() + data.tempoContrato);
 
       // Calcula valores
-      const valorMensal = parseFloat(veiculo.valorSemanal) * 4; // 4 semanas por mês
+      const valorMensal = veiculo.valorSemanal ? parseFloat(veiculo.valorSemanal) * 4 : 0; // 4 semanas por mês
       const valorTotal = valorMensal * data.tempoContrato;
 
       // Cria aluguel atualizado
@@ -183,7 +183,7 @@ export function EditarAluguelModal({
         valores: {
           diario: valorMensal,
           total: valorTotal,
-          caucao: parseFloat(veiculo.caucao),
+          caucao: veiculo.caucao ? parseFloat(veiculo.caucao) : 0,
           taxaAdmin: data.taxaAdministrativa,
         },
         status: data.status,
@@ -271,7 +271,7 @@ export function EditarAluguelModal({
                                 {veiculo.marca} {veiculo.modelo} - {veiculo.placa}
                               </span>
                               <span className="text-sm text-muted-foreground">
-                                R$ {parseFloat(veiculo.valorSemanal).toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
+                                R$ {veiculo.valorSemanal ? parseFloat(veiculo.valorSemanal).toFixed(2) : '0.00'}/semana • {veiculo.cor} • {veiculo.ano}
                               </span>
                             </div>
                           </SelectItem>
