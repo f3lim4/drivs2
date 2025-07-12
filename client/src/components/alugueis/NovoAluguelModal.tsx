@@ -94,12 +94,40 @@ export function NovoAluguelModal({
 
   // Carrega dados dos motoristas e veículos
   useEffect(() => {
-    // Sem dados por enquanto
-    setLoadingData(false);
+    if (open) {
+      const carregarDados = async () => {
+        try {
+          setLoadingData(true);
+          
+          // Carrega motoristas
+          const motoristaResponse = await fetch('/api/motoristas');
+          if (motoristaResponse.ok) {
+            const motoristasData = await motoristaResponse.json();
+            setMotoristas(motoristasData);
+          }
+          
+          // Carrega veículos
+          const veiculoResponse = await fetch('/api/veiculos');
+          if (veiculoResponse.ok) {
+            const veiculosData = await veiculoResponse.json();
+            setVeiculos(veiculosData);
+          }
+          
+        } catch (error) {
+          console.error('Erro ao carregar dados:', error);
+        } finally {
+          setLoadingData(false);
+        }
+      };
+      
+      carregarDados();
+    }
   }, [open]);
 
   // Filtra apenas veículos disponíveis
-  const veiculosDisponiveis = veiculos.filter(veiculo => veiculo.status === 'disponivel');
+  const veiculosDisponiveis = veiculos.filter(veiculo => 
+    veiculo.status === 'disponivel' || veiculo.status === 'ativo'
+  );
 
   // Filtra apenas motoristas ativos
   const motoristasAtivos = motoristas.filter(motorista => motorista.status === 'ativo');
@@ -124,8 +152,11 @@ export function NovoAluguelModal({
       const dataFim = new Date(dataInicio);
       dataFim.setMonth(dataFim.getMonth() + data.tempoContrato);
 
-      // Calcula valores
-      const valorMensal = veiculo.valorSemanal * 4; // 4 semanas por mês
+      // Calcula valores (converte string para número)
+      const valorSemanalNum = typeof veiculo.valorSemanal === 'string' ? 
+        parseFloat(veiculo.valorSemanal.replace(',', '.')) : 
+        veiculo.valorSemanal;
+      const valorMensal = valorSemanalNum * 4; // 4 semanas por mês
       const valorTotal = valorMensal * data.tempoContrato;
 
       // Cria novo aluguel
@@ -145,7 +176,9 @@ export function NovoAluguelModal({
         valores: {
           diario: valorMensal,
           total: valorTotal,
-          caucao: veiculo.caucao,
+          caucao: typeof veiculo.caucao === 'string' ? 
+            parseFloat(veiculo.caucao.replace(',', '.')) : 
+            veiculo.caucao,
           taxaAdmin: data.taxaAdministrativa,
         },
         status: 'pendente',
@@ -239,7 +272,9 @@ export function NovoAluguelModal({
                                   {veiculo.marca} {veiculo.modelo} - {veiculo.placa}
                                 </span>
                                 <span className="text-sm text-muted-foreground">
-                                  R$ {veiculo.valorSemanal.toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
+                                  R$ {typeof veiculo.valorSemanal === 'string' ? 
+                                    parseFloat(veiculo.valorSemanal.replace(',', '.')).toFixed(2) : 
+                                    veiculo.valorSemanal.toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
                                 </span>
                               </div>
                             </SelectItem>
