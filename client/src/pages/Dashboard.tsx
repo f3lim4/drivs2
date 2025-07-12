@@ -43,21 +43,18 @@ export default function Dashboard() {
     alertas: []
   });
 
-  // Atualizar estatísticas quando os dados forem carregados
-  useEffect(() => {
-    if (motoristas.length > 0 || veiculos.length > 0) {
-      calculateStats();
-    }
-  }, [motoristas, veiculos]);
+  const loading = loadingMotoristas || loadingVeiculos;
 
+  // Função para calcular estatísticas
   const calculateStats = () => {
+    console.log('Calculando stats - Motoristas:', motoristas.length, 'Veículos:', veiculos.length);
+    
     const hoje = new Date();
     const proximoMes = new Date(hoje);
     proximoMes.setMonth(proximoMes.getMonth() + 1);
 
     // Estatísticas de motoristas
     const motoristasAtivos = motoristas.filter(m => m.status === 'ativo').length;
-    const motoristasVencidos = motoristas.filter(m => m.status === 'vencido').length;
     
     // CNH vencendo nos próximos 30 dias
     const cnhVencendo = motoristas.filter(m => {
@@ -79,7 +76,7 @@ export default function Dashboard() {
     // Calcular receita mensal estimada (baseado nos veículos alugados)
     const receitaMensal = veiculos
       .filter(v => v.status === 'alugado')
-      .reduce((total, veiculo) => total + (veiculo.valorSemanal * 4), 0);
+      .reduce((total, veiculo) => total + (parseFloat(veiculo.valorSemanal.toString()) * 4), 0);
 
     // Gerar alertas baseados nos dados
     const alertas: Alert[] = [];
@@ -135,7 +132,12 @@ export default function Dashboard() {
     });
   };
 
-  const loading = loadingMotoristas || loadingVeiculos;
+  // Atualizar estatísticas quando os dados forem carregados
+  useEffect(() => {
+    if (!loading) {
+      calculateStats();
+    }
+  }, [motoristas, veiculos, loading]);
 
   // Função para formatar valores monetários
   const formatCurrency = (value: number) => {
