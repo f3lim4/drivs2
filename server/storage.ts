@@ -17,6 +17,7 @@ export interface IStorage {
   getUserByUUID(uuid: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserPassword(userId: number, hashedPassword: string): Promise<void>;
   
   // Profile operations
   getProfile(userId: string): Promise<Profile | undefined>;
@@ -69,6 +70,12 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const result = await db.insert(users).values(insertUser).returning();
     return result[0];
+  }
+
+  async updateUserPassword(userId: number, hashedPassword: string): Promise<void> {
+    await db.update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
   }
 
   // Profile operations
@@ -418,6 +425,14 @@ export class MemStorage implements IStorage {
 
   async deleteMotorista(id: string): Promise<void> {
     this.motoristasMap.delete(id);
+  }
+
+  async updateUserPassword(userId: number, hashedPassword: string): Promise<void> {
+    const user = this.users.get(userId);
+    if (user) {
+      user.password = hashedPassword;
+      this.users.set(userId, user);
+    }
   }
 }
 

@@ -62,7 +62,7 @@ export function UserMenu() {
           <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
           <DropdownMenuSeparator />
           
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate('/perfil')}>
             <User className="mr-2 h-4 w-4" />
             <span>Perfil</span>
           </DropdownMenuItem>
