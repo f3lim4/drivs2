@@ -16,7 +16,21 @@ import Login from "./pages/Login";
 import CadastroLocadora from "./pages/CadastroLocadora";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryFn: async ({ queryKey }) => {
+        const response = await fetch(queryKey[0] as string);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      },
+      retry: 3,
+      staleTime: 5 * 60 * 1000, // 5 minutos
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

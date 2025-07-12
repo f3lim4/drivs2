@@ -39,7 +39,9 @@ export default function Dashboard() {
     motoristas: motoristas.length,
     veiculos: veiculos.length,
     loading,
-    profile: profile?.type
+    profile: profile?.type,
+    motoristasSample: motoristas[0] || 'nenhum',
+    veiculosSample: veiculos[0] || 'nenhum'
   });
 
   // Função para formatar valores monetários
