@@ -31,9 +31,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
-import { User, Building, Phone, Mail, MapPin, Calendar, CreditCard } from 'lucide-react';
+import { User, Building, Phone, Mail, MapPin, Calendar, CreditCard, Lock } from 'lucide-react';
 
-// Schema de validação para perfil da locadora
+// Schema de validação para perfil da locadora (sem plano)
 const perfilSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
   razaoSocial: z.string().min(1, 'Razão social é obrigatória'),
@@ -45,10 +45,20 @@ const perfilSchema = z.object({
   estado: z.string().min(2, 'Estado é obrigatório'),
   cep: z.string().min(8, 'CEP deve ter 8 dígitos'),
   responsavel: z.string().min(1, 'Responsável é obrigatório'),
-  plano: z.string().min(1, 'Plano é obrigatório'),
+});
+
+// Schema de validação para troca de senha
+const senhaSchema = z.object({
+  senhaAtual: z.string().min(1, 'Senha atual é obrigatória'),
+  novaSenha: z.string().min(6, 'Nova senha deve ter pelo menos 6 caracteres'),
+  confirmarSenha: z.string().min(6, 'Confirmação de senha é obrigatória'),
+}).refine((data) => data.novaSenha === data.confirmarSenha, {
+  message: "As senhas não coincidem",
+  path: ["confirmarSenha"],
 });
 
 type PerfilFormData = z.infer<typeof perfilSchema>;
+type SenhaFormData = z.infer<typeof senhaSchema>;
 
 interface LocadoraData {
   id: string;
@@ -75,6 +85,8 @@ export default function Perfil() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
 
   // Função para recarregar o perfil do servidor
   const reloadProfile = async () => {
@@ -105,7 +117,15 @@ export default function Perfil() {
       estado: '',
       cep: '',
       responsavel: '',
-      plano: 'basico',
+    },
+  });
+
+  const senhaForm = useForm<SenhaFormData>({
+    resolver: zodResolver(senhaSchema),
+    defaultValues: {
+      senhaAtual: '',
+      novaSenha: '',
+      confirmarSenha: '',
     },
   });
 
@@ -148,7 +168,6 @@ export default function Perfil() {
           estado: data.estado,
           cep: data.cep,
           responsavel: data.responsavel,
-          plano: data.plano,
         });
       } catch (error) {
         console.error('Erro ao carregar locadora:', error);
@@ -199,6 +218,48 @@ export default function Perfil() {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Função para trocar senha
+  const onTrocarSenha = async (data: SenhaFormData) => {
+    if (!profile?.email) return;
+
+    try {
+      setChangingPassword(true);
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: profile.email,
+          senhaAtual: data.senhaAtual,
+          novaSenha: data.novaSenha,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erro ao trocar senha');
+      }
+
+      toast({
+        title: "Senha alterada",
+        description: "A senha foi alterada com sucesso.",
+      });
+      
+      setShowPasswordForm(false);
+      senhaForm.reset();
+    } catch (error) {
+      console.error('Erro ao trocar senha:', error);
+      toast({
+        title: "Erro ao alterar senha",
+        description: error.message || "Não foi possível alterar a senha. Verifique se a senha atual está correta.",
+        variant: "destructive",
+      });
+    } finally {
+      setChangingPassword(false);
     }
   };
 
@@ -463,38 +524,7 @@ export default function Perfil() {
                   </div>
                 </div>
 
-                <Separator />
 
-                {/* Plano */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center">
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    Plano
-                  </h3>
-                  
-                  <FormField
-                    control={form.control}
-                    name="plano"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Plano Atual</FormLabel>
-                        <FormControl>
-                          <Select value={field.value} onValueChange={field.onChange} disabled={!editMode}>
-                            <SelectTrigger className="w-48">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="basico">Básico</SelectItem>
-                              <SelectItem value="premium">Premium</SelectItem>
-                              <SelectItem value="enterprise">Enterprise</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
 
                 {/* Botões */}
                 <div className="flex justify-end space-x-2">
@@ -515,12 +545,22 @@ export default function Perfil() {
                       </Button>
                     </>
                   ) : (
-                    <Button
-                      type="button"
-                      onClick={() => setEditMode(true)}
-                    >
-                      Editar Perfil
-                    </Button>
+                    <>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowPasswordForm(true)}
+                      >
+                        <Lock className="h-4 w-4 mr-2" />
+                        Trocar Senha
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={() => setEditMode(true)}
+                      >
+                        Editar Perfil
+                      </Button>
+                    </>
                   )}
                 </div>
               </form>
@@ -558,6 +598,84 @@ export default function Perfil() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Modal de Troca de Senha */}
+        {showPasswordForm && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Lock className="h-5 w-5 mr-2" />
+                Trocar Senha
+              </CardTitle>
+              <CardDescription>
+                Digite sua senha atual e defina uma nova senha para sua conta.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...senhaForm}>
+                <form onSubmit={senhaForm.handleSubmit(onTrocarSenha)} className="space-y-4">
+                  <FormField
+                    control={senhaForm.control}
+                    name="senhaAtual"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Senha Atual *</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={senhaForm.control}
+                    name="novaSenha"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nova Senha *</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={senhaForm.control}
+                    name="confirmarSenha"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirmar Nova Senha *</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowPasswordForm(false);
+                        senhaForm.reset();
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button type="submit" disabled={changingPassword}>
+                      {changingPassword ? 'Alterando...' : 'Alterar Senha'}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

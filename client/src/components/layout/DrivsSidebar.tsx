@@ -68,13 +68,6 @@ const navigationItems = [
     icon: Building2,
     description: 'Gerenciar locadoras',
     adminOnly: true  // Só admins podem ver este item
-  },
-  {
-    title: 'Perfil',
-    url: '/perfil',
-    icon: User,
-    description: 'Perfil da locadora',
-    locadoraOnly: true  // Só locadoras podem ver este item
   }
 ];
 

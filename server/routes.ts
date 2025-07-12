@@ -128,6 +128,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Change password endpoint
+  app.post("/api/auth/change-password", async (req, res) => {
+    try {
+      const { email, senhaAtual, novaSenha } = req.body;
+      
+      if (!email || !senhaAtual || !novaSenha) {
+        return res.status(400).json({ message: "Email, senha atual e nova senha são obrigatórios" });
+      }
+      
+      // Find user profile by email
+      const profile = await storage.getProfileByEmail(email);
+      if (!profile) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      // Get user by user ID to verify current password
+      const user = await storage.getUserByUUID(profile.userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      // Check current password
+      const isValidPassword = await bcrypt.compare(senhaAtual, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ message: "Senha atual incorreta" });
+      }
+      
+      // Hash new password
+      const hashedNewPassword = await bcrypt.hash(novaSenha, 10);
+      
+      // Update password (we'll need to add this method to storage)
+      await storage.updateUserPassword(user.id, hashedNewPassword);
+      
+      res.json({ message: "Senha alterada com sucesso" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Profile routes
   app.put("/api/profiles/:userId", async (req, res) => {
     try {
