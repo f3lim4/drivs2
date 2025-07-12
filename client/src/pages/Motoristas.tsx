@@ -35,6 +35,7 @@ import { VisualizarMotoristaModal } from '@/components/motoristas/VisualizarMoto
 
 import { Motorista } from '@/types';
 import { Users, UserCheck, UserX, Clock, Activity } from 'lucide-react';
+import { addDays, isAfter, isBefore, parseISO } from 'date-fns';
 
 export default function Motoristas() {
   const { toast } = useToast();
@@ -84,6 +85,35 @@ export default function Motoristas() {
     carregarMotoristas();
   }, [isLocadora, profile?.locadoraId, toast]);
 
+  // Função para calcular status da CNH baseado na data de vencimento
+  const getStatusFromVencimento = (vencimentoCnh: string) => {
+    try {
+      const hoje = new Date();
+      
+      // Converte data no formato brasileiro (DD/MM/YYYY ou YYYY-MM-DD)
+      let vencimento: Date;
+      if (vencimentoCnh.includes('/')) {
+        const [dia, mes, ano] = vencimentoCnh.split('/');
+        vencimento = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+      } else {
+        vencimento = new Date(vencimentoCnh);
+      }
+      
+      const diasParaVencer = Math.ceil((vencimento.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diasParaVencer < 0) {
+        return 'vencido'; // CNH vencida
+      } else if (diasParaVencer <= 30) {
+        return 'vencendo'; // CNH vencendo em até 30 dias
+      } else {
+        return 'ativo'; // CNH válida
+      }
+    } catch (error) {
+      console.error('Erro ao processar data CNH:', error);
+      return 'ativo'; // Retorna ativo em caso de erro
+    }
+  };
+
   // Filtra motoristas baseado na busca e filtros
   const filteredMotoristas = motoristas.filter(motorista => {
     const matchesSearch = motorista.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -95,12 +125,12 @@ export default function Motoristas() {
     return matchesSearch && matchesStatus;
   });
 
-  // Calcula estatísticas
+  // Calcula estatísticas baseadas no status da CNH
   const stats = {
     total: motoristas.length,
-    ativos: motoristas.filter(m => m.status === 'ativo').length,
-    cnhVencendo: motoristas.filter(m => m.status === 'ativo').length, // Simplificado
-    cnhVencida: motoristas.filter(m => m.status === 'vencido').length,
+    ativos: motoristas.filter(m => getStatusFromVencimento(m.vencimentoCnh) === 'ativo').length,
+    cnhVencendo: motoristas.filter(m => getStatusFromVencimento(m.vencimentoCnh) === 'vencendo').length,
+    cnhVencida: motoristas.filter(m => getStatusFromVencimento(m.vencimentoCnh) === 'vencido').length,
   };
 
   // Funções dos botões
@@ -170,16 +200,24 @@ export default function Motoristas() {
   };
 
   // Retorna badge de status com cor apropriada
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const getStatusBadge = (motorista: Motorista) => {
+    const statusCnh = getStatusFromVencimento(motorista.vencimentoCnh);
+    
+    switch (statusCnh) {
       case 'ativo':
-        return <Badge variant="default" className="bg-success text-success-foreground">Ativo</Badge>;
-      case 'inativo':
-        return <Badge variant="secondary">Inativo</Badge>;
+        return <Badge variant="default" className="bg-green-100 text-green-800 border-green-200">
+          CNH Válida
+        </Badge>;
+      case 'vencendo':
+        return <Badge variant="default" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+          CNH Vencendo
+        </Badge>;
       case 'vencido':
-        return <Badge variant="destructive">CNH Vencida</Badge>;
+        return <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">
+          CNH Vencida
+        </Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline">{motorista.status}</Badge>;
     }
   };
 
@@ -337,7 +375,7 @@ export default function Motoristas() {
                     <p>{motorista.vencimentoCnh}</p>
                   </TableCell>
                   <TableCell>
-                    {getStatusBadge(motorista.status)}
+                    {getStatusBadge(motorista)}
                   </TableCell>
                   {isLocadora && (
                     <TableCell>
