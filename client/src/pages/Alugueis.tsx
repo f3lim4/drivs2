@@ -47,8 +47,46 @@ export default function Alugueis() {
 
   // Carrega dados dos aluguéis
   useEffect(() => {
-    // Sem dados por enquanto
-    setLoading(false);
+    const loadAlugueis = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/alugueis');
+        if (response.ok) {
+          const alugueisData = await response.json();
+          
+          // Converte dados da API para formato da interface
+          const alugueisFormatados = alugueisData.map((aluguel: any) => ({
+            id: aluguel.id,
+            motoristaId: aluguel.motoristaId,
+            motoristaNome: aluguel.motoristaNome || 'Nome não encontrado',
+            motoristaContato: aluguel.motoristaContato || 'Contato não encontrado',
+            veiculoId: aluguel.veiculoId,
+            veiculoModelo: aluguel.veiculoModelo || 'Modelo não encontrado',
+            veiculoPlaca: aluguel.veiculoPlaca || 'Placa não encontrada',
+            periodo: {
+              inicio: new Date(aluguel.dataInicio).toLocaleDateString('pt-BR'),
+              fim: new Date(aluguel.dataFim).toLocaleDateString('pt-BR'),
+              dias: aluguel.tempoContrato,
+            },
+            valores: {
+              diario: parseFloat(aluguel.valorMensal) / 30,
+              total: parseFloat(aluguel.valorTotal),
+              caucao: parseFloat(aluguel.caucao),
+              taxaAdmin: parseFloat(aluguel.taxaAdministrativa || '0'),
+            },
+            status: aluguel.status,
+          }));
+          
+          setAlugueis(alugueisFormatados);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar aluguéis:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadAlugueis();
   }, []);
 
   // Filtra aluguéis baseado na busca e filtros
