@@ -327,7 +327,9 @@ export default function Perfil() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Building className="h-5 w-5 text-muted-foreground" />
+                <div className="h-5 w-5 flex items-center justify-center text-muted-foreground">
+                  <Building className="w-full h-full" />
+                </div>
                 <CardTitle>Informações da Empresa</CardTitle>
               </div>
               <div className="flex items-center space-x-2">
@@ -551,7 +553,9 @@ export default function Perfil() {
                         variant="outline"
                         onClick={() => setShowPasswordForm(true)}
                       >
-                        <Lock className="h-4 w-4 mr-2" />
+                        <div className="h-4 w-4 mr-2 flex items-center justify-center">
+                          <Lock className="w-full h-full" />
+                        </div>
                         Trocar Senha
                       </Button>
                       <Button
@@ -572,7 +576,9 @@ export default function Perfil() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Calendar className="h-5 w-5 mr-2" />
+              <div className="h-5 w-5 mr-2 flex items-center justify-center">
+                <Calendar className="w-full h-full" />
+              </div>
               Informações da Conta
             </CardTitle>
           </CardHeader>
@@ -604,7 +610,9 @@ export default function Perfil() {
           <Card className="mt-6">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Lock className="h-5 w-5 mr-2" />
+                <div className="h-5 w-5 mr-2 flex items-center justify-center">
+                  <Lock className="w-full h-full" />
+                </div>
                 Trocar Senha
               </CardTitle>
               <CardDescription>

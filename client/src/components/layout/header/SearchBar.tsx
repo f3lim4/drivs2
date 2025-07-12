@@ -8,7 +8,9 @@ export function SearchBar() {
 
   return (
     <div className="relative hidden md:flex w-64">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 flex items-center justify-center">
+        <Search className="w-full h-full" />
+      </div>
       <Input
         type="search"
         placeholder="Pesquisar..."
