@@ -219,7 +219,36 @@ export class DatabaseStorage implements IStorage {
 
   // Aluguel operations
   async getAllAlugueis(): Promise<Aluguel[]> {
-    return await db.select().from(alugueis);
+    const alugueisData = await db.select().from(alugueis);
+    
+    // Enriquecer com dados do motorista e veículo
+    const enrichedAlugueis = await Promise.all(
+      alugueisData.map(async (aluguel) => {
+        try {
+          const motorista = await this.getMotorista(aluguel.motoristaId);
+          const veiculo = await this.getVeiculo(aluguel.veiculoId);
+          
+          return {
+            ...aluguel,
+            motoristaNome: motorista?.nome || 'Motorista não encontrado',
+            motoristaContato: motorista?.telefone || 'Contato não encontrado',
+            veiculoModelo: veiculo ? `${veiculo.marca} ${veiculo.modelo}` : 'Veículo não encontrado',
+            veiculoPlaca: veiculo?.placa || 'Placa não encontrada',
+          };
+        } catch (error) {
+          console.error('Erro ao buscar dados do aluguel:', error);
+          return {
+            ...aluguel,
+            motoristaNome: 'Erro ao carregar',
+            motoristaContato: 'Erro ao carregar',
+            veiculoModelo: 'Erro ao carregar',
+            veiculoPlaca: 'Erro ao carregar',
+          };
+        }
+      })
+    );
+    
+    return enrichedAlugueis;
   }
 
   async getAlugueisByLocadora(locadoraId: string): Promise<Aluguel[]> {

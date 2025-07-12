@@ -182,4 +182,9 @@ export type InsertMotorista = z.infer<typeof insertMotoristaSchema>;
 export type Motorista = typeof motoristas.$inferSelect;
 
 export type InsertAluguel = z.infer<typeof insertAluguelSchema>;
-export type Aluguel = typeof alugueis.$inferSelect;
+export type Aluguel = typeof alugueis.$inferSelect & {
+  motoristaNome?: string;
+  motoristaContato?: string;
+  veiculoModelo?: string;
+  veiculoPlaca?: string;
+};
