@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function Dashboard() {
-  const { profile, isLocadora } = useAuth();
+  const { profile } = useAuth();
   
   // Buscar dados dos motoristas
   const { data: motoristas = [], isLoading: loadingMotoristas } = useQuery<Motorista[]>({
@@ -28,116 +28,7 @@ export default function Dashboard() {
     enabled: !!profile,
   });
 
-  // Calcular estatísticas baseadas nos dados reais
-  const [stats, setStats] = useState<DashboardStats>({
-    totalMotoristas: 0,
-    motoristasAtivos: 0,
-    veiculosDisponiveis: 0,
-    totalVeiculos: 0,
-    veiculosAlugados: 0,
-    alugueisAtivos: 0,
-    receitaMensal: 0,
-    cnhVencendo: 0,
-    cnhVencida: 0,
-    veiculosManutencao: 0,
-    alertas: []
-  });
-
   const loading = loadingMotoristas || loadingVeiculos;
-
-  // Função para calcular estatísticas
-  const calculateStats = () => {
-    console.log('Calculando stats - Motoristas:', motoristas.length, 'Veículos:', veiculos.length);
-    
-    const hoje = new Date();
-    const proximoMes = new Date(hoje);
-    proximoMes.setMonth(proximoMes.getMonth() + 1);
-
-    // Estatísticas de motoristas
-    const motoristasAtivos = motoristas.filter(m => m.status === 'ativo').length;
-    
-    // CNH vencendo nos próximos 30 dias
-    const cnhVencendo = motoristas.filter(m => {
-      const vencimento = new Date(m.vencimentoCnh);
-      return vencimento >= hoje && vencimento <= proximoMes;
-    }).length;
-
-    // CNH já vencida
-    const cnhVencida = motoristas.filter(m => {
-      const vencimento = new Date(m.vencimentoCnh);
-      return vencimento < hoje;
-    }).length;
-
-    // Estatísticas de veículos
-    const veiculosDisponiveis = veiculos.filter(v => v.status === 'disponivel').length;
-    const veiculosAlugados = veiculos.filter(v => v.status === 'alugado').length;
-    const veiculosManutencao = veiculos.filter(v => v.status === 'manutencao').length;
-
-    // Calcular receita mensal estimada (baseado nos veículos alugados)
-    const receitaMensal = veiculos
-      .filter(v => v.status === 'alugado')
-      .reduce((total, veiculo) => total + (parseFloat(veiculo.valorSemanal.toString()) * 4), 0);
-
-    // Gerar alertas baseados nos dados
-    const alertas: Alert[] = [];
-    
-    if (cnhVencida > 0) {
-      alertas.push({
-        id: 'cnh-vencida',
-        titulo: 'CNH Vencida',
-        descricao: `${cnhVencida} motorista${cnhVencida > 1 ? 's' : ''} com CNH vencida`,
-        tipo: 'danger'
-      });
-    }
-
-    if (cnhVencendo > 0) {
-      alertas.push({
-        id: 'cnh-vencendo',
-        titulo: 'CNH Vencendo',
-        descricao: `${cnhVencendo} motorista${cnhVencendo > 1 ? 's' : ''} com CNH vencendo este mês`,
-        tipo: 'warning'
-      });
-    }
-
-    if (veiculosManutencao > 0) {
-      alertas.push({
-        id: 'veiculos-manutencao',
-        titulo: 'Veículos em Manutenção',
-        descricao: `${veiculosManutencao} veículo${veiculosManutencao > 1 ? 's' : ''} em manutenção`,
-        tipo: 'warning'
-      });
-    }
-
-    if (veiculosDisponiveis === 0 && veiculos.length > 0) {
-      alertas.push({
-        id: 'sem-veiculos',
-        titulo: 'Sem Veículos Disponíveis',
-        descricao: 'Todos os veículos estão alugados ou em manutenção',
-        tipo: 'warning'
-      });
-    }
-
-    setStats({
-      totalMotoristas: motoristas.length,
-      motoristasAtivos,
-      veiculosDisponiveis,
-      totalVeiculos: veiculos.length,
-      veiculosAlugados,
-      alugueisAtivos: veiculosAlugados, // Assumindo que veículos alugados = aluguéis ativos
-      receitaMensal,
-      cnhVencendo,
-      cnhVencida,
-      veiculosManutencao,
-      alertas
-    });
-  };
-
-  // Atualizar estatísticas quando os dados forem carregados
-  useEffect(() => {
-    if (!loading) {
-      calculateStats();
-    }
-  }, [motoristas, veiculos, loading]);
 
   // Função para formatar valores monetários
   const formatCurrency = (value: number) => {
@@ -146,6 +37,77 @@ export default function Dashboard() {
       currency: 'BRL',
     }).format(value);
   };
+
+  // Calcular estatísticas diretamente
+  const hoje = new Date();
+  const proximoMes = new Date(hoje);
+  proximoMes.setMonth(proximoMes.getMonth() + 1);
+
+  // Estatísticas de motoristas
+  const totalMotoristas = motoristas.length;
+  const motoristasAtivos = motoristas.filter(m => m.status === 'ativo').length;
+  
+  // CNH vencendo nos próximos 30 dias
+  const cnhVencendo = motoristas.filter(m => {
+    const vencimento = new Date(m.vencimentoCnh);
+    return vencimento >= hoje && vencimento <= proximoMes;
+  }).length;
+
+  // CNH já vencida
+  const cnhVencida = motoristas.filter(m => {
+    const vencimento = new Date(m.vencimentoCnh);
+    return vencimento < hoje;
+  }).length;
+
+  // Estatísticas de veículos
+  const totalVeiculos = veiculos.length;
+  const veiculosDisponiveis = veiculos.filter(v => v.status === 'disponivel').length;
+  const veiculosAlugados = veiculos.filter(v => v.status === 'alugado').length;
+  const veiculosManutencao = veiculos.filter(v => v.status === 'manutencao').length;
+
+  // Calcular receita mensal estimada (baseado nos veículos alugados)
+  const receitaMensal = veiculos
+    .filter(v => v.status === 'alugado')
+    .reduce((total, veiculo) => total + (parseFloat(veiculo.valorSemanal.toString()) * 4), 0);
+
+  // Gerar alertas baseados nos dados
+  const alertas: Alert[] = [];
+  
+  if (cnhVencida > 0) {
+    alertas.push({
+      id: 'cnh-vencida',
+      titulo: 'CNH Vencida',
+      descricao: `${cnhVencida} motorista${cnhVencida > 1 ? 's' : ''} com CNH vencida`,
+      tipo: 'danger'
+    });
+  }
+
+  if (cnhVencendo > 0) {
+    alertas.push({
+      id: 'cnh-vencendo',
+      titulo: 'CNH Vencendo',
+      descricao: `${cnhVencendo} motorista${cnhVencendo > 1 ? 's' : ''} com CNH vencendo este mês`,
+      tipo: 'warning'
+    });
+  }
+
+  if (veiculosManutencao > 0) {
+    alertas.push({
+      id: 'veiculos-manutencao',
+      titulo: 'Veículos em Manutenção',
+      descricao: `${veiculosManutencao} veículo${veiculosManutencao > 1 ? 's' : ''} em manutenção`,
+      tipo: 'warning'
+    });
+  }
+
+  if (veiculosDisponiveis === 0 && veiculos.length > 0) {
+    alertas.push({
+      id: 'sem-veiculos',
+      titulo: 'Sem Veículos Disponíveis',
+      descricao: 'Todos os veículos estão alugados ou em manutenção',
+      tipo: 'warning'
+    });
+  }
 
   if (loading) {
     return (
@@ -174,7 +136,7 @@ export default function Dashboard() {
         {/* Total de Motoristas */}
         <StatCard
           title="Total de Motoristas"
-          value={stats.totalMotoristas}
+          value={totalMotoristas}
           icon={<Activity />}
           variant="blue"
           trend={{
@@ -187,7 +149,7 @@ export default function Dashboard() {
         {/* Veículos Disponíveis */}
         <StatCard
           title="Veículos Disponíveis"
-          value={stats.veiculosDisponiveis}
+          value={veiculosDisponiveis}
           icon={<Car />}
           variant="green"
         />
@@ -195,7 +157,7 @@ export default function Dashboard() {
         {/* Aluguéis Ativos */}
         <StatCard
           title="Aluguéis Ativos"
-          value={stats.alugueisAtivos}
+          value={veiculosAlugados}
           icon={<BarChart3 />}
           variant="yellow"
         />
@@ -203,7 +165,7 @@ export default function Dashboard() {
         {/* Receita Mensal */}
         <StatCard
           title="Receita Mensal"
-          value={formatCurrency(stats.receitaMensal)}
+          value={formatCurrency(receitaMensal)}
           icon={<DollarSign />}
           variant="green"
           trend={{
@@ -243,16 +205,16 @@ export default function Dashboard() {
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-warning" />
               Alertas
-              {stats.alertas.length > 0 && (
+              {alertas.length > 0 && (
                 <Badge variant="destructive" className="ml-auto">
-                  {stats.alertas.length}
+                  {alertas.length}
                 </Badge>
               )}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {stats.alertas.map((alert: Alert) => (
+              {alertas.map((alert: Alert) => (
                 <div
                   key={alert.id}
                   className="flex items-start gap-3 p-3 rounded-lg border bg-card"
@@ -276,7 +238,7 @@ export default function Dashboard() {
                 </div>
               ))}
               
-              {stats.alertas.length === 0 && (
+              {alertas.length === 0 && (
                 <div className="text-center py-4">
                   <p className="text-sm text-muted-foreground">Nenhum alerta no momento</p>
                 </div>
@@ -293,7 +255,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">CNH Vencendo</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.cnhVencendo}</p>
+                <p className="text-2xl font-bold text-yellow-600">{cnhVencendo}</p>
               </div>
               <div className="p-2 rounded-lg bg-yellow-100">
                 <Clock className="w-6 h-6 text-yellow-600" />
@@ -307,7 +269,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">CNH Vencida</p>
-                <p className="text-2xl font-bold text-red-600">{stats.cnhVencida}</p>
+                <p className="text-2xl font-bold text-red-600">{cnhVencida}</p>
               </div>
               <div className="p-2 rounded-lg bg-red-100">
                 <AlertTriangle className="w-6 h-6 text-red-600" />
@@ -321,7 +283,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Veículos em Manutenção</p>
-                <p className="text-2xl font-bold text-gray-600">{stats.veiculosManutencao}</p>
+                <p className="text-2xl font-bold text-gray-600">{veiculosManutencao}</p>
               </div>
               <div className="p-2 rounded-lg bg-gray-100">
                 <Car className="w-6 h-6 text-gray-600" />
