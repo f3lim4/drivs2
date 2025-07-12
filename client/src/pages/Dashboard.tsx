@@ -8,10 +8,27 @@ import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, Bar
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DashboardStats, Alert } from '@/types';
+import { DashboardStats, Alert, Motorista, Veiculo } from '@/types';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Dashboard() {
+  const { profile, isLocadora } = useAuth();
+  
+  // Buscar dados dos motoristas
+  const { data: motoristas = [], isLoading: loadingMotoristas } = useQuery<Motorista[]>({
+    queryKey: ['/api/motoristas'],
+    enabled: !!profile,
+  });
+
+  // Buscar dados dos veículos
+  const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery<Veiculo[]>({
+    queryKey: ['/api/veiculos'],
+    enabled: !!profile,
+  });
+
+  // Calcular estatísticas baseadas nos dados reais
   const [stats, setStats] = useState<DashboardStats>({
     totalMotoristas: 0,
     motoristasAtivos: 0,
@@ -25,7 +42,122 @@ export default function Dashboard() {
     veiculosManutencao: 0,
     alertas: []
   });
-  const [loading, setLoading] = useState(false);
+
+  // Atualizar estatísticas quando os dados forem carregados
+  useEffect(() => {
+    if (motoristas.length > 0 || veiculos.length > 0) {
+      calculateStats();
+    }
+  }, [motoristas, veiculos]);
+
+  const calculateStats = () => {
+    const hoje = new Date();
+    const proximoMes = new Date(hoje);
+    proximoMes.setMonth(proximoMes.getMonth() + 1);
+
+    // Estatísticas de motoristas
+    const motoristasAtivos = motoristas.filter(m => m.status === 'ativo').length;
+    const motoristasVencidos = motoristas.filter(m => m.status === 'vencido').length;
+    
+    // CNH vencendo nos próximos 30 dias
+    const cnhVencendo = motoristas.filter(m => {
+      const vencimento = new Date(m.vencimentoCnh);
+      return vencimento >= hoje && vencimento <= proximoMes;
+    }).length;
+
+    // CNH já vencida
+    const cnhVencida = motoristas.filter(m => {
+      const vencimento = new Date(m.vencimentoCnh);
+      return vencimento < hoje;
+    }).length;
+
+    // Estatísticas de veículos
+    const veiculosDisponiveis = veiculos.filter(v => v.status === 'disponivel').length;
+    const veiculosAlugados = veiculos.filter(v => v.status === 'alugado').length;
+    const veiculosManutencao = veiculos.filter(v => v.status === 'manutencao').length;
+
+    // Calcular receita mensal estimada (baseado nos veículos alugados)
+    const receitaMensal = veiculos
+      .filter(v => v.status === 'alugado')
+      .reduce((total, veiculo) => total + (veiculo.valorSemanal * 4), 0);
+
+    // Gerar alertas baseados nos dados
+    const alertas: Alert[] = [];
+    
+    if (cnhVencida > 0) {
+      alertas.push({
+        id: 'cnh-vencida',
+        titulo: 'CNH Vencida',
+        descricao: `${cnhVencida} motorista${cnhVencida > 1 ? 's' : ''} com CNH vencida`,
+        tipo: 'danger'
+      });
+    }
+
+    if (cnhVencendo > 0) {
+      alertas.push({
+        id: 'cnh-vencendo',
+        titulo: 'CNH Vencendo',
+        descricao: `${cnhVencendo} motorista${cnhVencendo > 1 ? 's' : ''} com CNH vencendo este mês`,
+        tipo: 'warning'
+      });
+    }
+
+    if (veiculosManutencao > 0) {
+      alertas.push({
+        id: 'veiculos-manutencao',
+        titulo: 'Veículos em Manutenção',
+        descricao: `${veiculosManutencao} veículo${veiculosManutencao > 1 ? 's' : ''} em manutenção`,
+        tipo: 'warning'
+      });
+    }
+
+    if (veiculosDisponiveis === 0 && veiculos.length > 0) {
+      alertas.push({
+        id: 'sem-veiculos',
+        titulo: 'Sem Veículos Disponíveis',
+        descricao: 'Todos os veículos estão alugados ou em manutenção',
+        tipo: 'warning'
+      });
+    }
+
+    setStats({
+      totalMotoristas: motoristas.length,
+      motoristasAtivos,
+      veiculosDisponiveis,
+      totalVeiculos: veiculos.length,
+      veiculosAlugados,
+      alugueisAtivos: veiculosAlugados, // Assumindo que veículos alugados = aluguéis ativos
+      receitaMensal,
+      cnhVencendo,
+      cnhVencida,
+      veiculosManutencao,
+      alertas
+    });
+  };
+
+  const loading = loadingMotoristas || loadingVeiculos;
+
+  // Função para formatar valores monetários
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex-1 space-y-6 p-6">
+        <DrivsHeader 
+          title="Dashboard"
+          subtitle="Sistema Drivs - Gerencie sua locadora de forma eficiente"
+        />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -69,7 +201,7 @@ export default function Dashboard() {
         {/* Receita Mensal */}
         <StatCard
           title="Receita Mensal"
-          value={stats.receitaMensal}
+          value={formatCurrency(stats.receitaMensal)}
           icon={<DollarSign />}
           variant="green"
           trend={{
