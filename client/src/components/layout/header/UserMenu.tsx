@@ -46,8 +46,8 @@ export function UserMenu() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2 px-3">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-primary-foreground" />
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center p-1.5">
+              <User className="w-full h-full text-primary-foreground" />
             </div>
             <div className="hidden md:block text-left">
               <p className="text-sm font-medium">{profile?.name || 'Usuário'}</p>
@@ -63,7 +63,9 @@ export function UserMenu() {
           <DropdownMenuSeparator />
           
           <DropdownMenuItem onClick={() => navigate('/perfil')}>
-            <User className="mr-2 h-4 w-4" />
+            <div className="mr-2 h-4 w-4 flex items-center justify-center">
+              <User className="w-full h-full" />
+            </div>
             <span>Perfil</span>
           </DropdownMenuItem>
           

@@ -112,8 +112,8 @@ export function DrivsSidebar() {
         {/* Header da sidebar com logo DRIVS */}
         <div className="p-6 border-b border-blue-500 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center">
-              <Car className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center p-1">
+              <Car className="w-full h-full text-white" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-white">Drivs</h1>
@@ -135,7 +135,9 @@ export function DrivsSidebar() {
                       className={getLinkClasses(item.url)}
                       title={item.description}
                     >
-                      <item.icon className="w-5 h-5 flex-shrink-0" />
+                      <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                        <item.icon className="w-full h-full" />
+                      </div>
                       <span className="font-medium">{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>

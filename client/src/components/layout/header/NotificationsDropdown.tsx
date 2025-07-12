@@ -19,8 +19,10 @@ export function NotificationsDropdown({ notificationCount }: NotificationsDropdo
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="w-5 h-5" />
+        <Button variant="ghost" size="icon" className="relative w-10 h-10">
+          <div className="w-5 h-5 flex items-center justify-center">
+            <Bell className="w-full h-full" />
+          </div>
           {notificationCount > 0 && (
             <Badge 
               variant="destructive" 
