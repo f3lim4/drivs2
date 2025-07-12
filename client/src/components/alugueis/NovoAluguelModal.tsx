@@ -308,7 +308,7 @@ export function NovoAluguelModal({
                                 <span className="text-sm text-muted-foreground">
                                   R$ {typeof veiculo.valorSemanal === 'string' ? 
                                     parseFloat(veiculo.valorSemanal.replace(',', '.')).toFixed(2) : 
-                                    veiculo.valorSemanal.toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
+                                    parseFloat(veiculo.valorSemanal).toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
                                 </span>
                               </div>
                             </SelectItem>

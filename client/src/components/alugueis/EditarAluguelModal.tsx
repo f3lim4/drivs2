@@ -271,7 +271,7 @@ export function EditarAluguelModal({
                                 {veiculo.marca} {veiculo.modelo} - {veiculo.placa}
                               </span>
                               <span className="text-sm text-muted-foreground">
-                                R$ {veiculo.valorSemanal.toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
+                                R$ {parseFloat(veiculo.valorSemanal).toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
                               </span>
                             </div>
                           </SelectItem>
