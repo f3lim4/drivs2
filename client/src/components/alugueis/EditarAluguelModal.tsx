@@ -90,8 +90,34 @@ export function EditarAluguelModal({
 
   // Carrega dados dos motoristas e veículos
   useEffect(() => {
-    // Sem dados por enquanto
-    setLoadingData(false);
+    if (open) {
+      const carregarDados = async () => {
+        try {
+          setLoadingData(true);
+          
+          // Carrega motoristas
+          const motoristaResponse = await fetch('/api/motoristas');
+          if (motoristaResponse.ok) {
+            const motoristasData = await motoristaResponse.json();
+            setMotoristas(motoristasData);
+          }
+          
+          // Carrega veículos
+          const veiculoResponse = await fetch('/api/veiculos');
+          if (veiculoResponse.ok) {
+            const veiculosData = await veiculoResponse.json();
+            setVeiculos(veiculosData);
+          }
+          
+        } catch (error) {
+          console.error('Erro ao carregar dados:', error);
+        } finally {
+          setLoadingData(false);
+        }
+      };
+      
+      carregarDados();
+    }
   }, [open]);
 
   // Preenche o formulário quando o aluguel é selecionado
