@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Calendar, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -36,6 +37,7 @@ import { ExcluirAluguelDialog } from '@/components/alugueis/ExcluirAluguelDialog
 
 export default function Alugueis() {
   const { isAdmin, isLocadora } = useAuth();
+  const { toast } = useToast();
   const [alugueis, setAlugueis] = useState<Aluguel[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -123,8 +125,34 @@ export default function Alugueis() {
     setShowDeleteDialog(true);
   };
 
-  const handleConfirmarExclusao = (aluguel: Aluguel) => {
-    setAlugueis(prev => prev.filter(a => a.id !== aluguel.id));
+  const handleConfirmarExclusao = async (aluguel: Aluguel) => {
+    try {
+      const response = await fetch(`/api/alugueis/${aluguel.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Remove da lista local
+        setAlugueis(prev => prev.filter(a => a.id !== aluguel.id));
+        toast({
+          title: "Aluguel excluído",
+          description: "O aluguel foi removido com sucesso.",
+        });
+      } else {
+        toast({
+          title: "Erro ao excluir",
+          description: "Não foi possível excluir o aluguel. Tente novamente.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao excluir aluguel:', error);
+      toast({
+        title: "Erro ao excluir",
+        description: "Ocorreu um erro inesperado. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Calcula estatísticas
