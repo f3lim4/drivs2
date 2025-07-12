@@ -32,7 +32,15 @@ export default function Dashboard() {
     refetchOnMount: true,
   });
 
-  const loading = loadingMotoristas || loadingVeiculos;
+  // Buscar dados dos aluguéis
+  const { data: alugueis = [], isLoading: loadingAlugueis } = useQuery({
+    queryKey: ['/api/alugueis'],
+    enabled: true,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+  });
+
+  const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis;
 
   // Debug: log dos dados carregados
   console.log('Dashboard - Dados carregados:', {
@@ -79,10 +87,15 @@ export default function Dashboard() {
   const veiculosAlugados = veiculos.filter(v => v.status === 'alugado').length;
   const veiculosManutencao = veiculos.filter(v => v.status === 'manutencao').length;
 
-  // Calcular receita mensal estimada (baseado nos veículos alugados)
-  const receitaMensal = veiculos
-    .filter(v => v.status === 'alugado')
-    .reduce((total, veiculo) => total + (parseFloat(veiculo.valorSemanal.toString()) * 4), 0);
+  // Estatísticas de aluguéis
+  const totalAlugueis = alugueis.length;
+  const alugueisAtivos = alugueis.filter((a: any) => a.status === 'ativo').length;
+  const alugueisPendentes = alugueis.filter((a: any) => a.status === 'pendente').length;
+  
+  // Calcular receita mensal baseada nos aluguéis ativos
+  const receitaMensal = alugueis
+    .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
+    .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorMensal || '0'), 0);
 
   // Gerar alertas baseados nos dados
   const alertas: Alert[] = [];
@@ -171,7 +184,7 @@ export default function Dashboard() {
         {/* Aluguéis Ativos */}
         <StatCard
           title="Aluguéis Ativos"
-          value={veiculosAlugados}
+          value={alugueisAtivos + alugueisPendentes}
           icon={<BarChart3 />}
           variant="yellow"
         />
