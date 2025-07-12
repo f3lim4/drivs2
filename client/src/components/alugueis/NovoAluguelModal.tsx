@@ -159,9 +159,41 @@ export function NovoAluguelModal({
       const valorMensal = valorSemanalNum * 4; // 4 semanas por mês
       const valorTotal = valorMensal * data.tempoContrato;
 
-      // Cria novo aluguel
-      const novoAluguel: Aluguel = {
+      // Cria novo aluguel na API
+      const aluguelData = {
         id: generateId(),
+        locadoraId: '123456789', // TODO: Pegar do contexto de autenticação
+        motoristaId: data.motoristaId,
+        veiculoId: data.veiculoId,
+        dataInicio: format(dataInicio, 'yyyy-MM-dd'),
+        dataFim: format(dataFim, 'yyyy-MM-dd'),
+        tempoContrato: data.tempoContrato,
+        valorMensal: valorMensal.toString(),
+        valorTotal: valorTotal.toString(),
+        caucao: (typeof veiculo.caucao === 'string' ? 
+          parseFloat(veiculo.caucao.replace(',', '.')) : 
+          veiculo.caucao).toString(),
+        taxaAdministrativa: data.taxaAdministrativa ? data.taxaAdministrativa.toString() : '0',
+        status: 'pendente',
+      };
+
+      const response = await fetch('/api/alugueis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(aluguelData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao criar aluguel');
+      }
+
+      const aluguelCriado = await response.json();
+      
+      // Cria objeto compatível com a interface atual
+      const novoAluguel: Aluguel = {
+        id: aluguelCriado.id,
         motoristaId: data.motoristaId,
         motoristaNome: motorista.nome,
         motoristaContato: motorista.telefone,

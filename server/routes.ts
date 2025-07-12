@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -378,6 +378,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Motorista deleted successfully" });
     } catch (error) {
       console.error("Error deleting motorista:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Aluguéis routes
+  app.get("/api/alugueis", async (req, res) => {
+    try {
+      const { locadoraId } = req.query;
+      
+      let alugueis;
+      if (locadoraId) {
+        alugueis = await storage.getAlugueisByLocadora(locadoraId as string);
+      } else {
+        alugueis = await storage.getAllAlugueis();
+      }
+      
+      res.json(alugueis);
+    } catch (error) {
+      console.error("Error fetching alugueis:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/alugueis/:id", async (req, res) => {
+    try {
+      const aluguel = await storage.getAluguel(req.params.id);
+      if (!aluguel) {
+        return res.status(404).json({ message: "Aluguel not found" });
+      }
+      res.json(aluguel);
+    } catch (error) {
+      console.error("Error fetching aluguel:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/alugueis", async (req, res) => {
+    try {
+      const result = insertAluguelSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
+      }
+      
+      const aluguel = await storage.createAluguel(result.data);
+      res.json(aluguel);
+    } catch (error) {
+      console.error("Error creating aluguel:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/alugueis/:id", async (req, res) => {
+    try {
+      const aluguel = await storage.updateAluguel(req.params.id, req.body);
+      res.json(aluguel);
+    } catch (error) {
+      console.error("Error updating aluguel:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/alugueis/:id", async (req, res) => {
+    try {
+      await storage.deleteAluguel(req.params.id);
+      res.json({ message: "Aluguel deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting aluguel:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

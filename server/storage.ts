@@ -1,10 +1,11 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas,
+  users, profiles, locadoras, veiculos, motoristas, alugueis,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
   type Veiculo, type InsertVeiculo,
-  type Motorista, type InsertMotorista
+  type Motorista, type InsertMotorista,
+  type Aluguel, type InsertAluguel
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -47,6 +48,14 @@ export interface IStorage {
   createMotorista(motorista: InsertMotorista): Promise<Motorista>;
   updateMotorista(id: string, updates: Partial<InsertMotorista>): Promise<Motorista>;
   deleteMotorista(id: string): Promise<void>;
+  
+  // Aluguel operations
+  getAllAlugueis(): Promise<Aluguel[]>;
+  getAlugueisByLocadora(locadoraId: string): Promise<Aluguel[]>;
+  getAluguel(id: string): Promise<Aluguel | undefined>;
+  createAluguel(aluguel: InsertAluguel): Promise<Aluguel>;
+  updateAluguel(id: string, updates: Partial<InsertAluguel>): Promise<Aluguel>;
+  deleteAluguel(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -207,6 +216,37 @@ export class DatabaseStorage implements IStorage {
   async deleteMotorista(id: string): Promise<void> {
     await db.delete(motoristas).where(eq(motoristas.id, id));
   }
+
+  // Aluguel operations
+  async getAllAlugueis(): Promise<Aluguel[]> {
+    return await db.select().from(alugueis);
+  }
+
+  async getAlugueisByLocadora(locadoraId: string): Promise<Aluguel[]> {
+    return await db.select().from(alugueis).where(eq(alugueis.locadoraId, locadoraId));
+  }
+
+  async getAluguel(id: string): Promise<Aluguel | undefined> {
+    const [aluguel] = await db.select().from(alugueis).where(eq(alugueis.id, id));
+    return aluguel || undefined;
+  }
+
+  async createAluguel(aluguel: InsertAluguel): Promise<Aluguel> {
+    const [created] = await db.insert(alugueis).values(aluguel).returning();
+    return created;
+  }
+
+  async updateAluguel(id: string, updates: Partial<InsertAluguel>): Promise<Aluguel> {
+    const [updated] = await db.update(alugueis)
+      .set(updates)
+      .where(eq(alugueis.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteAluguel(id: string): Promise<void> {
+    await db.delete(alugueis).where(eq(alugueis.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -215,6 +255,7 @@ export class MemStorage implements IStorage {
   private locadorasMap: Map<string, Locadora>;
   private veiculosMap: Map<string, Veiculo>;
   private motoristasMap: Map<string, Motorista>;
+  private alugueisMap: Map<string, Aluguel>;
   currentId: number;
 
   constructor() {
@@ -223,6 +264,7 @@ export class MemStorage implements IStorage {
     this.locadorasMap = new Map();
     this.veiculosMap = new Map();
     this.motoristasMap = new Map();
+    this.alugueisMap = new Map();
     this.currentId = 1;
   }
 
@@ -433,6 +475,51 @@ export class MemStorage implements IStorage {
       user.password = hashedPassword;
       this.users.set(userId, user);
     }
+  }
+
+  // Aluguel operations
+  async getAllAlugueis(): Promise<Aluguel[]> {
+    return Array.from(this.alugueisMap.values());
+  }
+
+  async getAlugueisByLocadora(locadoraId: string): Promise<Aluguel[]> {
+    return Array.from(this.alugueisMap.values()).filter(a => a.locadoraId === locadoraId);
+  }
+
+  async getAluguel(id: string): Promise<Aluguel | undefined> {
+    return this.alugueisMap.get(id);
+  }
+
+  async createAluguel(aluguel: InsertAluguel): Promise<Aluguel> {
+    const id = aluguel.id || crypto.randomUUID();
+    const newAluguel: Aluguel = { 
+      ...aluguel, 
+      id,
+      status: aluguel.status || "pendente",
+      observacoes: aluguel.observacoes || null,
+      taxaAdministrativa: aluguel.taxaAdministrativa || "0",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.alugueisMap.set(id, newAluguel);
+    return newAluguel;
+  }
+
+  async updateAluguel(id: string, updates: Partial<InsertAluguel>): Promise<Aluguel> {
+    const existing = this.alugueisMap.get(id);
+    if (!existing) throw new Error('Aluguel not found');
+    
+    const updated: Aluguel = { 
+      ...existing, 
+      ...updates, 
+      updatedAt: new Date()
+    };
+    this.alugueisMap.set(id, updated);
+    return updated;
+  }
+
+  async deleteAluguel(id: string): Promise<void> {
+    this.alugueisMap.delete(id);
   }
 }
 
