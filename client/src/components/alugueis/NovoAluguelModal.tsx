@@ -137,7 +137,7 @@ export function NovoAluguelModal({
     
     try {
       // Simula delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Busca dados do motorista e veículo selecionados
       const motorista = motoristas.find(m => m.id === data.motoristaId);
@@ -186,7 +186,9 @@ export function NovoAluguelModal({
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao criar aluguel');
+        const errorData = await response.json();
+        console.error('Erro ao criar aluguel:', errorData);
+        throw new Error(errorData.message || 'Erro ao criar aluguel');
       }
 
       const aluguelCriado = await response.json();
