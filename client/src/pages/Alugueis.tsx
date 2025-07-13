@@ -57,6 +57,7 @@ export default function Alugueis() {
         let url = '/api/alugueis';
         if (isLocadora && profile?.locadoraId) {
           url += `?locadoraId=${profile.locadoraId}`;
+          console.log('Alugueis - Fazendo requisição para locadora:', profile.locadoraId);
         }
         
         const response = await fetch(url, {
