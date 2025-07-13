@@ -16,27 +16,16 @@ export function useVeiculos() {
       let url = '/api/veiculos';
       
       // Se for locadora, só carregar seus veículos
-      console.log('🔍 Profile info:', { 
-        isLocadora, 
-        profile: profile,
-        locadoraId: profile?.locadoraId 
-      });
-      
       if (isLocadora && profile?.locadoraId) {
         url += `?locadoraId=${profile.locadoraId}`;
-        console.log('🔍 Locadora loading vehicles for locadoraId:', profile.locadoraId);
-      } else {
-        console.log('🔍 Admin loading all vehicles');
       }
 
-      console.log('🔍 Fetching vehicles from:', url);
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Erro ao carregar veículos');
       }
 
       const data = await response.json();
-      console.log('🔍 Received vehicles data:', data);
 
       // Converter dados do banco para formato esperado
       const veiculosFormatados: Veiculo[] = data.map((v: any) => ({
