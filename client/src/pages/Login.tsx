@@ -86,8 +86,8 @@ export default function Login() {
       
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <img src={logoPath} alt="DRIVS Logo" className="w-8 h-8" />
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <img src={logoPath} alt="DRIVS Logo" className="w-12 h-12" />
             <h1 className="text-3xl font-bold text-white">DRIVS</h1>
           </div>
           <p className="text-white/80">Sistema de Gestão de Locação</p>
