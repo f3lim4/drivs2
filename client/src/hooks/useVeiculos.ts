@@ -8,44 +8,34 @@ export function useVeiculos() {
   const { isLocadora, profile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Criar chave única para query baseada no perfil do usuário
-  const getQueryKey = () => {
-    if (isLocadora && profile?.locadoraId) {
-      return ['veiculos', 'locadora', profile.locadoraId];
-    }
-    return ['veiculos', 'admin'];
-  };
-
-  // Função para buscar veículos com isolamento total
-  const fetchVeiculos = async (): Promise<Veiculo[]> => {
-    // Se não tem perfil ainda, retorna array vazio
-    if (!profile) {
-      console.log('useVeiculos - Aguardando perfil carregar...');
-      return [];
-    }
-
-    // CRITIAL SECURITY: SEMPRE usar filtro se for locadora - nunca carregar todos os dados
-    let url = '/api/veiculos';
-    if (isLocadora && profile?.locadoraId) {
-      url += `?locadoraId=${profile.locadoraId}`;
-    }
-
-    // Log apenas para debug se necessário
-    // console.log('useVeiculos - Fazendo requisição para:', url);
-
-    const response = await fetch(url, {
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    });
+  // Função para buscar veículos
+  const fetchVeiculos = async () => {
+    if (!profile) return;
     
-    if (!response.ok) {
-      throw new Error('Erro ao carregar veículos');
-    }
+    setLoading(true);
+    try {
+      let url = '/api/veiculos';
+      if (isLocadora && profile?.locadoraId) {
+        url += `?locadoraId=${profile.locadoraId}`;
+      }
 
-    const data = await response.json();
+      console.log('useVeiculos - Fazendo requisição para:', url);
+
+      const response = await fetch(url, {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao carregar veículos');
+      }
+
+      const data = await response.json();
     
     // FILTRO TRIPLO DE SEGURANÇA: Sempre filtrar no frontend também
     let veiculosFiltrados = data;
@@ -115,57 +105,37 @@ export function useVeiculos() {
       });
     }
     
-    return veiculosFormatados;
+    setVeiculos(veiculosFormatados);
+    setLoading(false);
+    } catch (error) {
+      console.error('Erro ao carregar veículos:', error);
+      setLoading(false);
+    }
   };
 
-  // Use React Query com chave específica para isolamento
-  const { data: veiculos = [], isLoading: loading, refetch: carregarVeiculos, error } = useQuery({
-    queryKey: getQueryKey(),
-    queryFn: fetchVeiculos,
-    staleTime: 0, // Sempre buscar dados frescos
-    gcTime: 0, // Não manter cache (substituí cacheTime por gcTime)
-    enabled: !!profile, // Só executar quando tiver perfil
-    retry: false, // Não tentar novamente em caso de erro de segurança
-  });
-
-  // Log para debug apenas em caso de problemas
-  if (error || (profile && veiculos.length === 0 && !loading)) {
-    console.log('useVeiculos - Debug:', {
-      profile: profile?.locadoraId,
-      isLocadora,
-      veiculosLength: veiculos.length,
-      loading,
-      error: error?.message,
-      hasProfile: !!profile
-    });
-  }
-
-  // Log para debug
-  if (error) {
-    console.error('Erro ao carregar veículos:', error);
-  }
+  // Carregar veículos quando o perfil estiver disponível
+  useEffect(() => {
+    if (profile) {
+      fetchVeiculos();
+    }
+  }, [profile, isLocadora]);
 
   const adicionarVeiculo = (novoVeiculo: Veiculo) => {
-    queryClient.invalidateQueries({ queryKey: getQueryKey() });
+    fetchVeiculos();
   };
 
   const atualizarVeiculo = (veiculoAtualizado: Veiculo) => {
-    queryClient.invalidateQueries({ queryKey: getQueryKey() });
+    fetchVeiculos();
   };
 
   const removerVeiculo = (veiculoId: string) => {
-    queryClient.invalidateQueries({ queryKey: getQueryKey() });
+    fetchVeiculos();
   };
-
-  // Limpar cache quando o perfil muda
-  useEffect(() => {
-    queryClient.removeQueries({ queryKey: ['veiculos'] });
-  }, [profile?.locadoraId, queryClient]);
 
   return {
     veiculos,
     loading,
-    carregarVeiculos,
+    carregarVeiculos: fetchVeiculos,
     adicionarVeiculo,
     atualizarVeiculo,
     removerVeiculo,
