@@ -19,11 +19,20 @@ export function useVeiculos() {
 
   // Função para buscar veículos com isolamento total
   const fetchVeiculos = async (): Promise<Veiculo[]> => {
+    // Se não tem perfil ainda, retorna array vazio
+    if (!profile) {
+      console.log('useVeiculos - Aguardando perfil carregar...');
+      return [];
+    }
+
     // CRITIAL SECURITY: SEMPRE usar filtro se for locadora - nunca carregar todos os dados
     let url = '/api/veiculos';
     if (isLocadora && profile?.locadoraId) {
       url += `?locadoraId=${profile.locadoraId}`;
     }
+
+    // Log apenas para debug se necessário
+    // console.log('useVeiculos - Fazendo requisição para:', url);
 
     const response = await fetch(url, {
       headers: {
@@ -115,19 +124,21 @@ export function useVeiculos() {
     queryFn: fetchVeiculos,
     staleTime: 0, // Sempre buscar dados frescos
     gcTime: 0, // Não manter cache (substituí cacheTime por gcTime)
-    enabled: true, // Sempre executar - o fetchVeiculos tem sua própria lógica de autorização
+    enabled: !!profile, // Só executar quando tiver perfil
     retry: false, // Não tentar novamente em caso de erro de segurança
   });
 
-  // Log para debug detalhado
-  console.log('useVeiculos - Estado atual:', {
-    profile: profile?.locadoraId,
-    isLocadora,
-    veiculosLength: veiculos.length,
-    loading,
-    error: error?.message,
-    hasProfile: !!profile
-  });
+  // Log para debug apenas em caso de problemas
+  if (error || (profile && veiculos.length === 0 && !loading)) {
+    console.log('useVeiculos - Debug:', {
+      profile: profile?.locadoraId,
+      isLocadora,
+      veiculosLength: veiculos.length,
+      loading,
+      error: error?.message,
+      hasProfile: !!profile
+    });
+  }
 
   // Log para debug
   if (error) {
