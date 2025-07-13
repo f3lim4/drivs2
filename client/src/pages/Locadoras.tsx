@@ -4,13 +4,15 @@
  */
 
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Search, Filter, Building, CheckCircle, AlertTriangle, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DrivsHeader } from '@/components/layout/DrivsHeader';
+import { StatCard } from '@/components/dashboard/StatCard';
 import { useLocadoras } from '@/hooks/useLocadoras';
 import { Locadora } from '@/types/locadora';
 import { convertToModalFormat, filterLocadoras } from '@/utils/locadoraHelpers';
-import { LocadorasStats } from '@/components/locadoras/LocadorasStats';
-import { LocadorasSearch } from '@/components/locadoras/LocadorasSearch';
 import { LocadorasTable } from '@/components/locadoras/LocadorasTable';
 import { NovaLocadoraModal } from '@/components/locadoras/NovaLocadoraModal';
 import { EditarLocadoraModal } from '@/components/locadoras/EditarLocadoraModal';
@@ -51,35 +53,91 @@ export default function Locadoras() {
     }
   };
 
+  // Calcula estatísticas
+  const stats = {
+    total: locadoras.length,
+    ativas: locadoras.filter(l => l.status === 'ativa').length,
+    pendentes: locadoras.filter(l => l.status === 'pendente').length,
+    inativas: locadoras.filter(l => l.status === 'inativa').length,
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Gerenciar Locadoras</h1>
-          <p className="text-muted-foreground">
-            Cadastre e gerencie as locadoras do sistema
-          </p>
-        </div>
-        <Button onClick={() => setShowNovaModal(true)} className="gap-2">
-          <Plus className="w-4 h-4" />
-          Nova Locadora
-        </Button>
+    <div className="flex-1 space-y-6 p-6">
+      {/* Header da página */}
+      <DrivsHeader 
+        title="Locadoras"
+        subtitle="Sistema Drivs - Gerencie as locadoras do sistema"
+      />
+
+      {/* Cards de estatísticas */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <StatCard
+          title="Total de Locadoras"
+          value={stats.total}
+          icon={<BarChart3 />}
+          variant="blue"
+        />
+        <StatCard
+          title="Ativas"
+          value={stats.ativas}
+          icon={<CheckCircle />}
+          variant="green"
+        />
+        <StatCard
+          title="Pendentes"
+          value={stats.pendentes}
+          icon={<AlertTriangle />}
+          variant="yellow"
+        />
+        <StatCard
+          title="Inativas"
+          value={stats.inativas}
+          icon={<Building />}
+          variant="red"
+        />
       </div>
 
-      {/* Stats Cards */}
-      <LocadorasStats locadoras={locadoras} />
+      {/* Controles de busca e filtros */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            {/* Busca */}
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Buscar locadora..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
-      {/* Search and Filters */}
-      <LocadorasSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+            {/* Botão Nova Locadora */}
+            <Button 
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              onClick={() => setShowNovaModal(true)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Locadora
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Table */}
-      <LocadorasTable
-        locadoras={filteredLocadoras}
-        onView={handleView}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {/* Tabela de locadoras */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Locadoras Cadastradas</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <LocadorasTable
+            locadoras={filteredLocadoras}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </CardContent>
+      </Card>
 
       {/* Modals */}
       <NovaLocadoraModal
