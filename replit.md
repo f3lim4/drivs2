@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-13: Melhorias de Interface e Filtragem - CONCLUÍDO
+### 2025-07-13: Personalização Visual e Correções - CONCLUÍDO
 - ✅ Botão "Gerar Contrato" movido para dentro do card na página de contratos
 - ✅ Implementado coluna "LOCADORA" na página de veículos para admin
 - ✅ Backend enriquecido com nome da locadora nos dados dos veículos
@@ -21,6 +21,10 @@ Preferred communication style: Simple, everyday language.
 - ✅ Imagem de fundo com tema de conexão e tecnologia adicionada na tela de login
 - ✅ Sistema de filtragem corrigido - locadoras veem apenas seus veículos
 - ✅ Admin visualiza todos os veículos com identificação da locadora
+- ✅ Novo favicon com ícone de setas bidirecionais implementado
+- ✅ Imagem de fundo do login substituída por rede de conexões em azul
+- ✅ Logo DRIVS personalizado implementado na tela de login
+- ✅ Permissões de arquivos corrigidas para deploy
 
 ### 2025-07-12: Sistema de Aluguéis Completo - CONCLUÍDO
 - ✅ Configurado sistema para usar CNPJ como ID principal das locadoras
