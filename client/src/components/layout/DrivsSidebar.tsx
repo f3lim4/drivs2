@@ -15,7 +15,7 @@ import {
   Menu,
   User
 } from 'lucide-react';
-import logoPath from "@assets/icone_1752421051513.png";
+import logoPath from "@assets/icone_1752434737434.png";
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';

@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import logoPath from "@assets/icone_1752421051513.png";
+import logoPath from "@assets/icone_1752434737434.png";
 import driverBackground from "@/assets/driver-background.svg";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
