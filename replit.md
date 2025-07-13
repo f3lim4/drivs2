@@ -16,6 +16,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ Backend enriquecido com nome da locadora nos dados dos veículos
 - ✅ Substituído ícone do carro pelo logo personalizado na tela de login
 - ✅ Substituído ícone do carro pelo logo personalizado no menu sidebar
+- ✅ Logo aumentado na tela de login para melhor visualização
+- ✅ Favicon configurado com o logo personalizado
+- ✅ Imagem de fundo com motorista de aplicativo adicionada na tela de login
 - ✅ Sistema de filtragem corrigido - locadoras veem apenas seus veículos
 - ✅ Admin visualiza todos os veículos com identificação da locadora
 
