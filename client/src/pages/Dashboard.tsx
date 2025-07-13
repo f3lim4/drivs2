@@ -30,28 +30,49 @@ export default function Dashboard() {
     : '/api/alugueis';
   
   // Buscar dados dos motoristas
-  const { data: motoristas = [], isLoading: loadingMotoristas } = useQuery<Motorista[]>({
-    queryKey: [motoristasUrl],
+  const { data: motoristasRaw = [], isLoading: loadingMotoristas } = useQuery<Motorista[]>({
+    queryKey: [motoristasUrl, profile?.locadoraId],
     enabled: true,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0,
   });
+
+  // FILTRO DE SEGURANÇA: Garantir que locadora veja apenas seus motoristas
+  const motoristas = isLocadora && profile?.locadoraId 
+    ? motoristasRaw.filter(m => m.locadoraId === profile.locadoraId)
+    : motoristasRaw;
 
   // Buscar dados dos veículos
-  const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery<Veiculo[]>({
-    queryKey: [veiculosUrl],
+  const { data: veiculosRaw = [], isLoading: loadingVeiculos } = useQuery<Veiculo[]>({
+    queryKey: [veiculosUrl, profile?.locadoraId],
     enabled: true,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0,
   });
 
+  // FILTRO DE SEGURANÇA: Garantir que locadora veja apenas seus veículos
+  const veiculos = isLocadora && profile?.locadoraId 
+    ? veiculosRaw.filter(v => v.locadoraId === profile.locadoraId)
+    : veiculosRaw;
+
   // Buscar dados dos aluguéis
-  const { data: alugueis = [], isLoading: loadingAlugueis } = useQuery({
-    queryKey: [alugueisUrl],
+  const { data: alugueisRaw = [], isLoading: loadingAlugueis } = useQuery({
+    queryKey: [alugueisUrl, profile?.locadoraId],
     enabled: true,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0,
   });
+
+  // FILTRO DE SEGURANÇA: Garantir que locadora veja apenas seus aluguéis
+  const alugueis = isLocadora && profile?.locadoraId 
+    ? alugueisRaw.filter((a: any) => a.locadoraId === profile.locadoraId)
+    : alugueisRaw;
 
   const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis;
 
@@ -62,6 +83,8 @@ export default function Dashboard() {
     alugueis: alugueis.length,
     loading,
     profile: profile?.type,
+    locadoraId: profile?.locadoraId,
+    isLocadora,
     motoristasSample: motoristas[0] || 'nenhum',
     veiculosSample: veiculos[0] || 'nenhum',
     aluguelSample: alugueis[0] || 'nenhum'
