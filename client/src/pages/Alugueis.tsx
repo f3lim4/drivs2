@@ -36,7 +36,7 @@ import { EditarAluguelModal } from '@/components/alugueis/EditarAluguelModal';
 import { ExcluirAluguelDialog } from '@/components/alugueis/ExcluirAluguelDialog';
 
 export default function Alugueis() {
-  const { isAdmin, isLocadora } = useAuth();
+  const { isAdmin, isLocadora, profile } = useAuth();
   const { toast } = useToast();
   const [alugueis, setAlugueis] = useState<Aluguel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,12 +52,25 @@ export default function Alugueis() {
     const loadAlugueis = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/alugueis');
+        
+        // Para locadora, usar filtro específico
+        let url = '/api/alugueis';
+        if (isLocadora && profile?.locadoraId) {
+          url += `?locadoraId=${profile.locadoraId}`;
+        }
+        
+        const response = await fetch(url);
         if (response.ok) {
           const alugueisData = await response.json();
           
           // Converte dados da API para formato da interface
-          const alugueisFormatados = alugueisData.map((aluguel: any) => ({
+          // FILTRO DE SEGURANÇA ADICIONAL: Garantir que locadora vê apenas seus aluguéis
+          let alugueisParaProcessar = alugueisData;
+          if (isLocadora && profile?.locadoraId) {
+            alugueisParaProcessar = alugueisData.filter((aluguel: any) => aluguel.locadoraId === profile.locadoraId);
+          }
+          
+          const alugueisFormatados = alugueisParaProcessar.map((aluguel: any) => ({
             id: aluguel.id,
             motoristaId: aluguel.motoristaId,
             motoristaNome: aluguel.motoristaNome || 'Nome não encontrado',
@@ -79,6 +92,16 @@ export default function Alugueis() {
             status: aluguel.status,
           }));
           
+          // Debug log
+          console.log('Alugueis - Dados carregados:', {
+            isLocadora,
+            locadoraId: profile?.locadoraId,
+            totalAlugueis: alugueisData.length,
+            alugueisFiltrados: alugueisParaProcessar.length,
+            primeiroAluguel: alugueisParaProcessar[0]?.id,
+            locadoraDoPrimeiro: alugueisParaProcessar[0]?.locadoraId
+          });
+          
           setAlugueis(alugueisFormatados);
         }
       } catch (error) {
@@ -89,7 +112,7 @@ export default function Alugueis() {
     };
     
     loadAlugueis();
-  }, []);
+  }, [isLocadora, profile?.locadoraId]);
 
   // Filtra aluguéis baseado na busca e filtros
   const filteredAlugueis = alugueis.filter(aluguel => {
