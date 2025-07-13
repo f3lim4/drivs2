@@ -250,7 +250,7 @@ export default function Contratos() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <p className="font-medium">R$ {contrato.valor.toFixed(2)}</p>
+                        <p className="font-medium">R$ {parseFloat(contrato.valor).toFixed(2)}</p>
                       </TableCell>
                       <TableCell>
                         <p>{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
