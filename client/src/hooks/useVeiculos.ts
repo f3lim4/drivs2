@@ -15,14 +15,9 @@ export function useVeiculos() {
       
       let url = '/api/veiculos';
       
-      console.log('Profile dados:', { isLocadora, profile });
-      
       // Se for locadora, só carregar seus veículos
       if (isLocadora && profile?.locadoraId) {
         url += `?locadoraId=${profile.locadoraId}`;
-        console.log('Carregando veículos para locadora:', profile.locadoraId, 'URL:', url);
-      } else {
-        console.log('Carregando todos os veículos (admin)');
       }
 
       const response = await fetch(url);
