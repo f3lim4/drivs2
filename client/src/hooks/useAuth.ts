@@ -82,6 +82,8 @@ export function useAuth() {
   const logout = async () => {
     setProfile(null);
     localStorage.removeItem('drivs_profile');
+    // Força reload da página para limpar cache
+    window.location.reload();
   };
 
   const isAdmin = profile?.type === 'admin';

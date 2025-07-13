@@ -20,15 +20,26 @@ export function useVeiculos() {
         url += `?locadoraId=${profile.locadoraId}`;
       }
 
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (!response.ok) {
         throw new Error('Erro ao carregar veículos');
       }
 
       const data = await response.json();
+      
+      // FILTRO DE SEGURANÇA: Se for locadora, filtrar apenas veículos da sua locadora
+      let veiculosFiltrados = data;
+      if (isLocadora && profile?.locadoraId) {
+        veiculosFiltrados = data.filter((v: any) => v.locadoraId === profile.locadoraId);
+      }
 
       // Converter dados do banco para formato esperado
-      const veiculosFormatados: Veiculo[] = data.map((v: any) => ({
+      const veiculosFormatados: Veiculo[] = veiculosFiltrados.map((v: any) => ({
         id: v.id,
         placa: v.placa,
         marca: v.marca,
