@@ -54,9 +54,9 @@ const veiculoSchema = z.object({
   
   // Características Técnicas
   combustivel: z.string().min(1, 'Tipo de combustível é obrigatório'),
-  quilometragem: z.number().min(0, 'Quilometragem deve ser positiva'),
-  valorSemanal: z.number().min(0, 'Valor deve ser positivo'),
-  caucao: z.number().min(0, 'Caução deve ser positiva'),
+  quilometragem: z.number().min(0, 'Quilometragem deve ser positiva').optional(),
+  valorSemanal: z.number().min(0, 'Valor deve ser positivo').optional(),
+  caucao: z.number().min(0, 'Caução deve ser positiva').optional(),
   taxaAdministrativa: z.number().min(0).optional(),
   limiteQuilometragem: z.string().min(1, 'Limite de quilometragem é obrigatório'),
   
@@ -106,19 +106,19 @@ export function NovoVeiculoModal({
       renavam: '',
       chassi: '',
       combustivel: '',
-      quilometragem: 0,
-      valorSemanal: 0,
-      caucao: 0,
-      taxaAdministrativa: 0,
+      quilometragem: undefined,
+      valorSemanal: undefined,
+      caucao: undefined,
+      taxaAdministrativa: undefined,
       limiteQuilometragem: '',
       ultimaRevisao: '',
       proximaRevisao: '',
       seguradora: '',
       numeroApolice: '',
       vigenciaSeguro: '',
-      valorSeguroMensal: 0,
+      valorSeguroMensal: undefined,
       status: 'disponivel',
-      valorLimiteKm: 0,
+      valorLimiteKm: undefined,
     },
   });
 
@@ -446,7 +446,8 @@ export function NovoVeiculoModal({
                           type="number" 
                           placeholder="0" 
                           {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -512,7 +513,8 @@ export function NovoVeiculoModal({
                           step="0.01"
                           placeholder="0" 
                           {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -532,7 +534,8 @@ export function NovoVeiculoModal({
                           step="0.01"
                           placeholder="0" 
                           {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -552,6 +555,7 @@ export function NovoVeiculoModal({
                           step="0.01"
                           placeholder="0" 
                           {...field}
+                          value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
                       </FormControl>
@@ -662,6 +666,7 @@ export function NovoVeiculoModal({
                           step="0.01"
                           placeholder="0" 
                           {...field}
+                          value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
                       </FormControl>
