@@ -1,11 +1,12 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
   type Veiculo, type InsertVeiculo,
   type Motorista, type InsertMotorista,
-  type Aluguel, type InsertAluguel
+  type Aluguel, type InsertAluguel,
+  type Contrato, type InsertContrato
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -56,6 +57,14 @@ export interface IStorage {
   createAluguel(aluguel: InsertAluguel): Promise<Aluguel>;
   updateAluguel(id: string, updates: Partial<InsertAluguel>): Promise<Aluguel>;
   deleteAluguel(id: string): Promise<void>;
+  
+  // Contrato operations
+  getAllContratos(): Promise<Contrato[]>;
+  getContratosByLocadora(locadoraId: string): Promise<Contrato[]>;
+  getContrato(id: string): Promise<Contrato | undefined>;
+  createContrato(contrato: InsertContrato): Promise<Contrato>;
+  updateContrato(id: string, updates: Partial<InsertContrato>): Promise<Contrato>;
+  deleteContrato(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -377,6 +386,41 @@ export class DatabaseStorage implements IStorage {
   async deleteAluguel(id: string): Promise<void> {
     await db.delete(alugueis).where(eq(alugueis.id, id));
   }
+
+  // Contrato operations
+  async getAllContratos(): Promise<Contrato[]> {
+    return await db.select().from(contratos);
+  }
+
+  async getContratosByLocadora(locadoraId: string): Promise<Contrato[]> {
+    return await db.select().from(contratos).where(eq(contratos.locadoraId, locadoraId));
+  }
+
+  async getContrato(id: string): Promise<Contrato | undefined> {
+    const result = await db.select().from(contratos).where(eq(contratos.id, id));
+    return result[0];
+  }
+
+  async createContrato(contrato: InsertContrato): Promise<Contrato> {
+    const contratoData = {
+      ...contrato,
+      id: crypto.randomUUID(),
+    };
+    const result = await db.insert(contratos).values(contratoData).returning();
+    return result[0];
+  }
+
+  async updateContrato(id: string, updates: Partial<InsertContrato>): Promise<Contrato> {
+    const result = await db.update(contratos)
+      .set(updates)
+      .where(eq(contratos.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteContrato(id: string): Promise<void> {
+    await db.delete(contratos).where(eq(contratos.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -386,6 +430,7 @@ export class MemStorage implements IStorage {
   private veiculosMap: Map<string, Veiculo>;
   private motoristasMap: Map<string, Motorista>;
   private alugueisMap: Map<string, Aluguel>;
+  private contratosMap: Map<string, Contrato>;
   currentId: number;
 
   constructor() {
@@ -395,6 +440,7 @@ export class MemStorage implements IStorage {
     this.veiculosMap = new Map();
     this.motoristasMap = new Map();
     this.alugueisMap = new Map();
+    this.contratosMap = new Map();
     this.currentId = 1;
   }
 
@@ -650,6 +696,50 @@ export class MemStorage implements IStorage {
 
   async deleteAluguel(id: string): Promise<void> {
     this.alugueisMap.delete(id);
+  }
+
+  // Contrato operations
+  async getAllContratos(): Promise<Contrato[]> {
+    return Array.from(this.contratosMap.values());
+  }
+
+  async getContratosByLocadora(locadoraId: string): Promise<Contrato[]> {
+    return Array.from(this.contratosMap.values()).filter(
+      c => c.locadoraId === locadoraId
+    );
+  }
+
+  async getContrato(id: string): Promise<Contrato | undefined> {
+    return this.contratosMap.get(id);
+  }
+
+  async createContrato(contrato: InsertContrato): Promise<Contrato> {
+    const id = crypto.randomUUID();
+    const newContrato: Contrato = { 
+      ...contrato, 
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.contratosMap.set(id, newContrato);
+    return newContrato;
+  }
+
+  async updateContrato(id: string, updates: Partial<InsertContrato>): Promise<Contrato> {
+    const existing = this.contratosMap.get(id);
+    if (!existing) throw new Error('Contrato not found');
+    
+    const updated: Contrato = { 
+      ...existing, 
+      ...updates, 
+      updatedAt: new Date()
+    };
+    this.contratosMap.set(id, updated);
+    return updated;
+  }
+
+  async deleteContrato(id: string): Promise<void> {
+    this.contratosMap.delete(id);
   }
 }
 

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Plus, Upload, FileText, Download, Eye, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useContratos } from '@/hooks/useContratos';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -28,19 +29,27 @@ import jsPDF from 'jspdf';
 export default function Contratos() {
   const { isAdmin, isLocadora } = useAuth();
   const { toast } = useToast();
+  const { contratos, isLoading, createContrato, updateContrato, deleteContrato } = useContratos();
   const [templates, setTemplates] = useState<any[]>([]);
-  const [contratos, setContratos] = useState<Contrato[]>([]);
   const [showNovoContratoModal, setShowNovoContratoModal] = useState(false);
   const [showVisualizarModal, setShowVisualizarModal] = useState(false);
   const [showEditarModal, setShowEditarModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
 
-  const handleContratoGerado = (novoContrato: Contrato) => {
-    setContratos(prev => [...prev, novoContrato]);
-    toast({
-      title: "Contrato Gerado",
-      description: `Contrato para ${novoContrato.cliente} foi gerado com sucesso!`,
-    });
+  const handleContratoGerado = async (novoContrato: Contrato) => {
+    try {
+      await createContrato.mutateAsync(novoContrato);
+      toast({
+        title: "Contrato Gerado",
+        description: `Contrato para ${novoContrato.cliente} foi gerado com sucesso!`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao gerar contrato. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleVisualizarContrato = (contrato: Contrato) => {
@@ -53,23 +62,37 @@ export default function Contratos() {
     setShowEditarModal(true);
   };
 
-  const handleContratoEditado = (contratoAtualizado: Contrato) => {
-    setContratos(prev => 
-      prev.map(c => c.id === contratoAtualizado.id ? contratoAtualizado : c)
-    );
-    toast({
-      title: "Contrato Atualizado",
-      description: `Contrato de ${contratoAtualizado.cliente} foi atualizado com sucesso!`,
-    });
+  const handleContratoEditado = async (contratoAtualizado: Contrato) => {
+    try {
+      await updateContrato.mutateAsync(contratoAtualizado);
+      toast({
+        title: "Contrato Atualizado",
+        description: `Contrato de ${contratoAtualizado.cliente} foi atualizado com sucesso!`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar contrato. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleExcluirContrato = (contrato: Contrato) => {
-    setContratos(prev => prev.filter(c => c.id !== contrato.id));
-    toast({
-      title: "Contrato Excluído",
-      description: `Contrato de ${contrato.cliente} foi excluído.`,
-      variant: "destructive",
-    });
+  const handleExcluirContrato = async (contrato: Contrato) => {
+    try {
+      await deleteContrato.mutateAsync(contrato.id);
+      toast({
+        title: "Contrato Excluído",
+        description: `Contrato de ${contrato.cliente} foi excluído.`,
+        variant: "destructive",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Falha ao excluir contrato. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleBaixarPDF = async (contrato: Contrato) => {
