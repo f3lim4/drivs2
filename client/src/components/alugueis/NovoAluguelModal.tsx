@@ -10,6 +10,7 @@ import * as z from 'zod';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -73,6 +74,7 @@ export function NovoAluguelModal({
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const { isLocadora, profile } = useAuth();
 
   // Função para obter a data de amanhã
   const getAmanha = () => {
@@ -92,25 +94,68 @@ export function NovoAluguelModal({
     },
   });
 
-  // Carrega dados dos motoristas e veículos
+  // Carrega dados dos motoristas e veículos com isolamento de segurança
   useEffect(() => {
-    if (open) {
+    if (open && profile) {
       const carregarDados = async () => {
         try {
           setLoadingData(true);
           
+          // CRITICAL SECURITY: Sempre usar filtro se for locadora
+          let motoristaUrl = '/api/motoristas';
+          let veiculoUrl = '/api/veiculos';
+          
+          if (isLocadora && profile?.locadoraId) {
+            motoristaUrl += `?locadoraId=${profile.locadoraId}`;
+            veiculoUrl += `?locadoraId=${profile.locadoraId}`;
+          }
+          
           // Carrega motoristas
-          const motoristaResponse = await fetch('/api/motoristas');
+          const motoristaResponse = await fetch(motoristaUrl, {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
           if (motoristaResponse.ok) {
             const motoristasData = await motoristaResponse.json();
-            setMotoristas(motoristasData);
+            
+            // FILTRO DE SEGURANÇA: Verificar se todos os motoristas pertencem à locadora
+            if (isLocadora && profile?.locadoraId) {
+              const todosMotoristasCorretos = motoristasData.every(m => m.locadoraId === profile.locadoraId);
+              if (!todosMotoristasCorretos) {
+                console.error('SECURITY ALERT: Motoristas de outras locadoras detectados');
+                setMotoristas([]);
+              } else {
+                setMotoristas(motoristasData);
+              }
+            } else {
+              setMotoristas(motoristasData);
+            }
           }
           
           // Carrega veículos
-          const veiculoResponse = await fetch('/api/veiculos');
+          const veiculoResponse = await fetch(veiculoUrl, {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
           if (veiculoResponse.ok) {
             const veiculosData = await veiculoResponse.json();
-            setVeiculos(veiculosData);
+            
+            // FILTRO DE SEGURANÇA: Verificar se todos os veículos pertencem à locadora
+            if (isLocadora && profile?.locadoraId) {
+              const todosVeiculosCorretos = veiculosData.every(v => v.locadoraId === profile.locadoraId);
+              if (!todosVeiculosCorretos) {
+                console.error('SECURITY ALERT: Veículos de outras locadoras detectados');
+                setVeiculos([]);
+              } else {
+                setVeiculos(veiculosData);
+              }
+            } else {
+              setVeiculos(veiculosData);
+            }
           }
           
         } catch (error) {
@@ -122,7 +167,7 @@ export function NovoAluguelModal({
       
       carregarDados();
     }
-  }, [open]);
+  }, [open, profile?.locadoraId, isLocadora]);
 
   // Filtra apenas veículos disponíveis
   const veiculosDisponiveis = veiculos.filter(veiculo => 
