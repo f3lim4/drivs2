@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import logoPath from "@assets/icone_1752434737434.png";
-import driverBackground from "@/assets/driver-background.svg";
+import networkBackground from "@/assets/network-background.jpg";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -80,16 +80,16 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800"
+      className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700"
       style={{
-        backgroundImage: `url(${driverBackground})`,
+        backgroundImage: `url(${networkBackground})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Overlay escuro para melhor contraste */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+      {/* Overlay azul para melhor contraste e integração */}
+      <div className="absolute inset-0 bg-blue-900/60 backdrop-blur-sm"></div>
       
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
