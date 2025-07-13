@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -483,6 +483,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Aluguel deleted successfully" });
     } catch (error) {
       console.error("Error deleting aluguel:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Contratos routes
+  app.get("/api/contratos", async (req, res) => {
+    try {
+      const { locadoraId } = req.query;
+      
+      if (locadoraId) {
+        const contratos = await storage.getContratosByLocadora(locadoraId as string);
+        res.json(contratos);
+      } else {
+        const contratos = await storage.getAllContratos();
+        res.json(contratos);
+      }
+    } catch (error) {
+      console.error("Error fetching contratos:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/contratos/:id", async (req, res) => {
+    try {
+      const contrato = await storage.getContrato(req.params.id);
+      if (!contrato) {
+        return res.status(404).json({ message: "Contrato not found" });
+      }
+      res.json(contrato);
+    } catch (error) {
+      console.error("Error fetching contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/contratos", async (req, res) => {
+    try {
+      const result = insertContratoSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
+      }
+      
+      const contrato = await storage.createContrato(result.data);
+      res.json(contrato);
+    } catch (error) {
+      console.error("Error creating contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/contratos/:id", async (req, res) => {
+    try {
+      const contrato = await storage.updateContrato(req.params.id, req.body);
+      res.json(contrato);
+    } catch (error) {
+      console.error("Error updating contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/contratos/:id", async (req, res) => {
+    try {
+      await storage.deleteContrato(req.params.id);
+      res.json({ message: "Contrato deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting contrato:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

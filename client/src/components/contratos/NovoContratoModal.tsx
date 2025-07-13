@@ -165,6 +165,7 @@ export function NovoContratoModal({
       // Cria novo contrato
       const novoContrato: Contrato = {
         id: generateId(),
+        locadoraId: userProfile.locadoraId,
         tipo: 'locacao',
         titulo: `Contrato de Locação - ${motorista.nome}`,
         cliente: motorista.nome,
