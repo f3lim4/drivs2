@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
-import logoPath from "@assets/icone_1752434737434.png";
+import drivsLogo from "@/assets/drivs-logo.png";
 import networkBackground from "@/assets/network-background.jpg";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -93,9 +93,8 @@ export default function Login() {
       
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <img src={logoPath} alt="DRIVS Logo" className="w-12 h-12" />
-            <h1 className="text-3xl font-bold text-white">DRIVS</h1>
+          <div className="flex items-center justify-center mb-4">
+            <img src={drivsLogo} alt="DRIVS Logo" className="h-16" />
           </div>
           <p className="text-white/80">Sistema de Gestão de Locação</p>
         </div>
