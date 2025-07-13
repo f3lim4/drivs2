@@ -35,6 +35,12 @@ export function useVeiculos() {
       let veiculosFiltrados = data;
       if (isLocadora && profile?.locadoraId) {
         veiculosFiltrados = data.filter((v: any) => v.locadoraId === profile.locadoraId);
+        
+        // PROTEÇÃO EXTRA: Se ainda houver veículos de outras locadoras, limpar tudo
+        const temVeiculosDeOutrasLocadoras = veiculosFiltrados.some(v => v.locadoraId !== profile.locadoraId);
+        if (temVeiculosDeOutrasLocadoras) {
+          veiculosFiltrados = [];
+        }
       }
 
       // Converter dados do banco para formato esperado
@@ -73,6 +79,16 @@ export function useVeiculos() {
         locadoraNome: v.locadoraNome,
       }));
 
+      // Debug log
+      console.log('useVeiculos - Dados carregados:', {
+        isLocadora,
+        locadoraId: profile?.locadoraId,
+        totalVeiculos: data.length,
+        veiculosFiltrados: veiculosFiltrados.length,
+        primeirVeiculo: veiculosFiltrados[0]?.id,
+        locadoraDoPrimeiro: veiculosFiltrados[0]?.locadoraId
+      });
+      
       setVeiculos(veiculosFormatados);
     } catch (error) {
       console.error('Erro ao carregar veículos:', error);
