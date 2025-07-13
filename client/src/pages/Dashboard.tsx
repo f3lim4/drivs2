@@ -14,11 +14,24 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function Dashboard() {
-  const { profile } = useAuth();
+  const { profile, isLocadora } = useAuth();
+  
+  // Construir URLs com filtro de locadora se necessário
+  const motoristasUrl = isLocadora && profile?.locadoraId 
+    ? `/api/motoristas?locadoraId=${profile.locadoraId}`
+    : '/api/motoristas';
+  
+  const veiculosUrl = isLocadora && profile?.locadoraId 
+    ? `/api/veiculos?locadoraId=${profile.locadoraId}`
+    : '/api/veiculos';
+  
+  const alugueisUrl = isLocadora && profile?.locadoraId 
+    ? `/api/alugueis?locadoraId=${profile.locadoraId}`
+    : '/api/alugueis';
   
   // Buscar dados dos motoristas
   const { data: motoristas = [], isLoading: loadingMotoristas } = useQuery<Motorista[]>({
-    queryKey: ['/api/motoristas'],
+    queryKey: [motoristasUrl],
     enabled: true,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
@@ -26,7 +39,7 @@ export default function Dashboard() {
 
   // Buscar dados dos veículos
   const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery<Veiculo[]>({
-    queryKey: ['/api/veiculos'],
+    queryKey: [veiculosUrl],
     enabled: true,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
@@ -34,7 +47,7 @@ export default function Dashboard() {
 
   // Buscar dados dos aluguéis
   const { data: alugueis = [], isLoading: loadingAlugueis } = useQuery({
-    queryKey: ['/api/alugueis'],
+    queryKey: [alugueisUrl],
     enabled: true,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
