@@ -115,23 +115,23 @@ export function useVeiculos() {
     queryFn: fetchVeiculos,
     staleTime: 0, // Sempre buscar dados frescos
     gcTime: 0, // Não manter cache (substituí cacheTime por gcTime)
-    enabled: !!profile, // Só executar se tiver perfil
+    enabled: true, // Sempre executar - o fetchVeiculos tem sua própria lógica de autorização
     retry: false, // Não tentar novamente em caso de erro de segurança
+  });
+
+  // Log para debug detalhado
+  console.log('useVeiculos - Estado atual:', {
+    profile: profile?.locadoraId,
+    isLocadora,
+    veiculosLength: veiculos.length,
+    loading,
+    error: error?.message,
+    hasProfile: !!profile
   });
 
   // Log para debug
   if (error) {
     console.error('Erro ao carregar veículos:', error);
-  }
-  
-  if (profile && veiculos.length === 0 && !loading) {
-    console.log('useVeiculos - Debug:', {
-      profile: profile?.locadoraId,
-      isLocadora,
-      veiculosLength: veiculos.length,
-      loading,
-      error: error?.message
-    });
   }
 
   const adicionarVeiculo = (novoVeiculo: Veiculo) => {
