@@ -25,6 +25,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ Imagem de fundo do login substituída por rede de conexões em azul
 - ✅ Logo DRIVS personalizado implementado na tela de login
 - ✅ Permissões de arquivos corrigidas para deploy
+- ✅ Página de Locadoras padronizada com layout consistente
+- ✅ Menu mobile agora fecha automaticamente ao clicar em links
 
 ### 2025-07-12: Sistema de Aluguéis Completo - CONCLUÍDO
 - ✅ Configurado sistema para usar CNPJ como ID principal das locadoras

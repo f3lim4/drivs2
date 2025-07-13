@@ -29,6 +29,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 
 // Itens de navegação do sistema
@@ -76,6 +77,7 @@ export function DrivsSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   const { profile, isAdmin, isLocadora } = useAuth();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   // Filtrar itens baseado no tipo de usuário
   const filteredNavigationItems = navigationItems.filter(item => {
@@ -107,6 +109,14 @@ export function DrivsSidebar() {
     return `${baseClasses} text-white hover:bg-blue-500/50 hover:text-white`;
   };
 
+  // Função para lidar com cliques em links do menu
+  const handleLinkClick = () => {
+    // Fechar o menu mobile quando um link for clicado
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   return (
     <Sidebar className="border-r transition-all duration-300 bg-blue-600 border-blue-500">
       <SidebarContent className="bg-blue-600">
@@ -135,6 +145,7 @@ export function DrivsSidebar() {
                       to={item.url}
                       className={getLinkClasses(item.url)}
                       title={item.description}
+                      onClick={handleLinkClick}
                     >
                       <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                         <item.icon className="w-full h-full" />
