@@ -4,7 +4,8 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Car } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
+import logoPath from "@assets/icone_1752421051513.png";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -86,7 +87,7 @@ export default function Login() {
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Car className="w-8 h-8 text-primary text-white" />
+            <img src={logoPath} alt="DRIVS Logo" className="w-8 h-8" />
             <h1 className="text-3xl font-bold text-white">DRIVS</h1>
           </div>
           <p className="text-white/80">Sistema de Gestão de Locação</p>

@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-13: Melhorias de Interface e Filtragem - CONCLUÍDO
+- ✅ Botão "Gerar Contrato" movido para dentro do card na página de contratos
+- ✅ Implementado coluna "LOCADORA" na página de veículos para admin
+- ✅ Backend enriquecido com nome da locadora nos dados dos veículos
+- ✅ Substituído ícone do carro pelo logo personalizado na tela de login
+- ✅ Substituído ícone do carro pelo logo personalizado no menu sidebar
+- ✅ Sistema de filtragem corrigido - locadoras veem apenas seus veículos
+- ✅ Admin visualiza todos os veículos com identificação da locadora
+
 ### 2025-07-12: Sistema de Aluguéis Completo - CONCLUÍDO
 - ✅ Configurado sistema para usar CNPJ como ID principal das locadoras
 - ✅ Migrado schema do banco para suportar CNPJ como chave primária

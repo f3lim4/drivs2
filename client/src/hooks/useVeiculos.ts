@@ -26,8 +26,6 @@ export function useVeiculos() {
       }
 
       const data = await response.json();
-      
-      console.log('Dados recebidos do backend:', data);
 
       // Converter dados do banco para formato esperado
       const veiculosFormatados: Veiculo[] = data.map((v: any) => ({
