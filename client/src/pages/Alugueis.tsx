@@ -59,15 +59,35 @@ export default function Alugueis() {
           url += `?locadoraId=${profile.locadoraId}`;
         }
         
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
         if (response.ok) {
           const alugueisData = await response.json();
           
-          // Converte dados da API para formato da interface
-          // FILTRO DE SEGURANÇA ADICIONAL: Garantir que locadora vê apenas seus aluguéis
+          // FILTRO TRIPLO DE SEGURANÇA: Garantir que locadora vê apenas seus aluguéis
           let alugueisParaProcessar = alugueisData;
           if (isLocadora && profile?.locadoraId) {
             alugueisParaProcessar = alugueisData.filter((aluguel: any) => aluguel.locadoraId === profile.locadoraId);
+            
+            // PROTEÇÃO EXTRA: Se ainda houver aluguéis de outras locadoras, limpar tudo
+            const temAlugueisDeOutrasLocadoras = alugueisParaProcessar.some(a => a.locadoraId !== profile.locadoraId);
+            if (temAlugueisDeOutrasLocadoras) {
+              console.error('SECURITY ALERT: Aluguéis de outras locadoras detectados, limpando array');
+              alugueisParaProcessar = [];
+            }
+          }
+          
+          // VALIDAÇÃO ADICIONAL: Garantir que todos os aluguéis pertencem à locadora correta
+          if (isLocadora && profile?.locadoraId && alugueisParaProcessar.length > 0) {
+            const todosAlugueisCorretos = alugueisParaProcessar.every(a => a.locadoraId === profile.locadoraId);
+            if (!todosAlugueisCorretos) {
+              console.error('SECURITY ALERT: Aluguéis de outras locadoras detectados, retornando array vazio');
+              alugueisParaProcessar = [];
+            }
           }
           
           const alugueisFormatados = alugueisParaProcessar.map((aluguel: any) => ({
