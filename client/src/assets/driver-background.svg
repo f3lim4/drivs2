@@ -27,7 +27,7 @@
   <rect width="1200" height="800" fill="url(#bgGradient)"/>
   
   <!-- Connection network -->
-  <g opacity="0.4">
+  <g opacity="0.7">
     <!-- Network nodes -->
     <circle cx="200" cy="150" r="8" fill="url(#nodeGradient)"/>
     <circle cx="400" cy="100" r="6" fill="url(#nodeGradient)"/>
@@ -123,9 +123,9 @@
   
   <!-- Central hub -->
   <g transform="translate(600, 400)">
-    <circle cx="0" cy="0" r="80" fill="url(#glowGradient)" opacity="0.3"/>
-    <circle cx="0" cy="0" r="40" fill="url(#nodeGradient)" opacity="0.8"/>
-    <circle cx="0" cy="0" r="25" fill="#ffffff" opacity="0.9"/>
+    <circle cx="0" cy="0" r="80" fill="url(#glowGradient)" opacity="0.5"/>
+    <circle cx="0" cy="0" r="40" fill="url(#nodeGradient)" opacity="0.9"/>
+    <circle cx="0" cy="0" r="25" fill="#ffffff" opacity="1"/>
     
     <!-- Central icon -->
     <g transform="scale(0.8)">
@@ -146,7 +146,7 @@
   </g>
   
   <!-- Floating data particles -->
-  <g opacity="0.6">
+  <g opacity="0.8">
     <circle cx="100" cy="200" r="3" fill="#60a5fa">
       <animate attributeName="cy" values="200;180;200" dur="4s" repeatCount="indefinite"/>
     </circle>
@@ -168,7 +168,7 @@
   </g>
   
   <!-- Signal waves -->
-  <g transform="translate(600, 400)" opacity="0.3">
+  <g transform="translate(600, 400)" opacity="0.5">
     <circle cx="0" cy="0" r="100" fill="none" stroke="#3b82f6" stroke-width="3">
       <animate attributeName="r" values="100;200;100" dur="4s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite"/>
@@ -184,7 +184,7 @@
   </g>
   
   <!-- Bottom connection indicators -->
-  <g transform="translate(0, 700)" opacity="0.4">
+  <g transform="translate(0, 700)" opacity="0.6">
     <rect x="100" y="0" width="40" height="8" rx="4" fill="#3b82f6">
       <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite"/>
     </rect>
