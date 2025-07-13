@@ -92,15 +92,14 @@ export default function Alugueis() {
             status: aluguel.status,
           }));
           
-          // Debug log
-          console.log('Alugueis - Dados carregados:', {
-            isLocadora,
-            locadoraId: profile?.locadoraId,
-            totalAlugueis: alugueisData.length,
-            alugueisFiltrados: alugueisParaProcessar.length,
-            primeiroAluguel: alugueisParaProcessar[0]?.id,
-            locadoraDoPrimeiro: alugueisParaProcessar[0]?.locadoraId
-          });
+          // Log apenas se houver problemas para debug
+          if (isLocadora && alugueisParaProcessar.length > 0) {
+            console.log('Alugueis - Verificando isolamento:', {
+              locadoraId: profile?.locadoraId,
+              alugueisTotal: alugueisParaProcessar.length,
+              primeiroAluguel: alugueisParaProcessar[0]?.locadoraId
+            });
+          }
           
           setAlugueis(alugueisFormatados);
         }

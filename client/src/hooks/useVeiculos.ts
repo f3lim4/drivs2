@@ -79,15 +79,15 @@ export function useVeiculos() {
         locadoraNome: v.locadoraNome,
       }));
 
-      // Debug log
-      console.log('useVeiculos - Dados carregados:', {
-        isLocadora,
-        locadoraId: profile?.locadoraId,
-        totalVeiculos: data.length,
-        veiculosFiltrados: veiculosFiltrados.length,
-        primeirVeiculo: veiculosFiltrados[0]?.id,
-        locadoraDoPrimeiro: veiculosFiltrados[0]?.locadoraId
-      });
+      // Log apenas se houver problemas para debug
+      if (isLocadora && veiculosFiltrados.length > 1) {
+        console.log('useVeiculos - Verificando isolamento:', {
+          locadoraId: profile?.locadoraId,
+          veiculosTotal: veiculosFiltrados.length,
+          primeiroVeiculo: veiculosFiltrados[0]?.locadoraId,
+          segundoVeiculo: veiculosFiltrados[1]?.locadoraId
+        });
+      }
       
       setVeiculos(veiculosFormatados);
     } catch (error) {
