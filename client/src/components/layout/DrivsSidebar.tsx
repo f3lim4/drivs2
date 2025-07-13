@@ -15,6 +15,7 @@ import {
   Menu,
   User
 } from 'lucide-react';
+import logoPath from "@assets/icone_1752421051513.png";
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -112,8 +113,8 @@ export function DrivsSidebar() {
         {/* Header da sidebar com logo DRIVS */}
         <div className="p-6 border-b border-blue-500 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center p-1">
-              <Car className="w-full h-full text-white" />
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1">
+              <img src={logoPath} alt="DRIVS Logo" className="w-full h-full" />
             </div>
             <div>
               <h1 className="text-lg font-bold text-white">Drivs</h1>
