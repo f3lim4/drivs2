@@ -91,19 +91,15 @@ export default function Dashboard() {
 
   const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis;
 
-  // Debug: log dos dados carregados
-  console.log('Dashboard - Dados carregados:', {
-    motoristas: motoristasSeguro.length,
-    veiculos: veiculosSeguro.length,
-    alugueis: alugueisSeguro.length,
-    loading,
-    profile: profile?.type,
-    locadoraId: profile?.locadoraId,
-    isLocadora,
-    motoristasSample: motoristasSeguro[0] || 'nenhum',
-    veiculosSample: veiculosSeguro[0] || 'nenhum',
-    aluguelSample: alugueisSeguro[0] || 'nenhum'
-  });
+  // Log apenas se houver problemas para debug
+  if (isLocadora && veiculosSeguro.length > 1) {
+    console.log('Dashboard - Verificando isolamento:', {
+      locadoraId: profile?.locadoraId,
+      veiculosTotal: veiculosSeguro.length,
+      primeiroVeiculo: veiculosSeguro[0]?.locadoraId,
+      segundoVeiculo: veiculosSeguro[1]?.locadoraId
+    });
+  }
 
   // Função para formatar valores monetários
   const formatCurrency = (value: number) => {
@@ -148,7 +144,7 @@ export default function Dashboard() {
   // Calcular receita mensal baseada nos aluguéis ativos
   const receitaMensal = alugueisSeguro
     .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
-    .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorMensal || '0'), 0);
+    .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorTotal || '0'), 0);
 
   // Gerar alertas baseados nos dados
   const alertas: Alert[] = [];
@@ -220,9 +216,9 @@ export default function Dashboard() {
           icon={<Activity />}
           variant="blue"
           trend={{
-            value: "12%",
-            isPositive: true,
-            label: "vs mês anterior"
+            value: motoristasAtivos > 0 ? `${motoristasAtivos} ativos` : "0 ativos",
+            isPositive: motoristasAtivos > 0,
+            label: "motoristas ativos"
           }}
         />
 
@@ -232,6 +228,11 @@ export default function Dashboard() {
           value={veiculosDisponiveis}
           icon={<Car />}
           variant="green"
+          trend={{
+            value: `${totalVeiculos} total`,
+            isPositive: veiculosDisponiveis > 0,
+            label: "veículos na frota"
+          }}
         />
 
         {/* Aluguéis Ativos */}
@@ -240,6 +241,11 @@ export default function Dashboard() {
           value={alugueisAtivos + alugueisPendentes}
           icon={<BarChart3 />}
           variant="yellow"
+          trend={{
+            value: `${totalAlugueis} total`,
+            isPositive: alugueisAtivos > 0,
+            label: "contratos"
+          }}
         />
 
         {/* Receita Mensal */}
@@ -249,9 +255,9 @@ export default function Dashboard() {
           icon={<DollarSign />}
           variant="green"
           trend={{
-            value: "8%",
-            isPositive: true,
-            label: "vs mês anterior"
+            value: receitaMensal > 0 ? "Receita ativa" : "Sem receita",
+            isPositive: receitaMensal > 0,
+            label: "baseada em aluguéis ativos"
           }}
         />
       </div>
@@ -269,7 +275,7 @@ export default function Dashboard() {
           <CardContent>
             {totalAlugueis > 0 ? (
               <div className="space-y-4">
-                {alugueis.slice(0, 3).map((aluguel: any) => (
+                {alugueisSeguro.slice(0, 3).map((aluguel: any) => (
                   <div key={aluguel.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
@@ -281,7 +287,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-sm">{formatCurrency(parseFloat(aluguel.valorMensal))}</p>
+                      <p className="font-medium text-sm">{formatCurrency(parseFloat(aluguel.valorTotal))}</p>
                       <Badge variant={aluguel.status === 'ativo' ? 'default' : 'secondary'} className="text-xs">
                         {aluguel.status}
                       </Badge>
