@@ -145,7 +145,28 @@ export class DatabaseStorage implements IStorage {
 
   // Veiculo operations
   async getAllVeiculos(): Promise<Veiculo[]> {
-    return await db.select().from(veiculos);
+    const veiculosData = await db.select().from(veiculos);
+    
+    // Enriquecer com dados da locadora
+    const enrichedVeiculos = await Promise.all(
+      veiculosData.map(async (veiculo) => {
+        try {
+          const locadora = await this.getLocadora(veiculo.locadoraId);
+          return {
+            ...veiculo,
+            locadoraNome: locadora?.nome || 'Locadora não encontrada',
+          };
+        } catch (error) {
+          console.error('Erro ao buscar locadora para veículo:', error);
+          return {
+            ...veiculo,
+            locadoraNome: 'Erro ao carregar',
+          };
+        }
+      })
+    );
+    
+    return enrichedVeiculos;
   }
 
   async getVeiculosByLocadora(locadoraId: string): Promise<Veiculo[]> {
