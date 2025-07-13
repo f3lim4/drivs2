@@ -176,22 +176,23 @@ export default function Contratos() {
                   Gerencie templates e gere contratos personalizados
                 </p>
               </div>
-              
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Upload className="w-4 h-4" />
-                  Subir seu contrato
-                </Button>
-                <Button 
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
-                  onClick={() => setShowNovoContratoModal(true)}
-                >
-                  <Plus className="w-4 h-4" />
-                  Gerar Contrato
-                </Button>
-              </div>
             </div>
           </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex items-center gap-2">
+                <Upload className="w-4 h-4" />
+                Subir seu contrato
+              </Button>
+              <Button 
+                className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
+                onClick={() => setShowNovoContratoModal(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Gerar Contrato
+              </Button>
+            </div>
+          </CardContent>
         </Card>
 
         {/* Seção de templates */}
