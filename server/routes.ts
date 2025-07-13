@@ -254,11 +254,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { locadoraId } = req.query;
       
+      console.log('🔍 Backend received request for veiculos with locadoraId:', locadoraId);
+      
       if (locadoraId) {
         const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
+        console.log('🔍 Backend returning filtered veiculos:', veiculos.length, 'vehicles');
         res.json(veiculos);
       } else {
         const veiculos = await storage.getAllVeiculos();
+        console.log('🔍 Backend returning all veiculos:', veiculos.length, 'vehicles');
         res.json(veiculos);
       }
     } catch (error) {
