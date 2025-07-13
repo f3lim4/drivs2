@@ -256,6 +256,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (locadoraId) {
         const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
+        
+        // SECURITY: Validar que todos os veículos pertencem à locadora solicitada
+        const todosVeiculosCorretos = veiculos.every(v => v.locadoraId === locadoraId);
+        if (!todosVeiculosCorretos) {
+          console.error('SECURITY ALERT: Veículos de outras locadoras detectados no backend');
+          return res.status(403).json({ message: "Acesso negado: dados inconsistentes" });
+        }
+        
         res.json(veiculos);
       } else {
         const veiculos = await storage.getAllVeiculos();
