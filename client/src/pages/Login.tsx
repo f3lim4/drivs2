@@ -89,7 +89,7 @@ export default function Login() {
       }}
     >
       {/* Overlay escuro para melhor contraste */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
       
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
