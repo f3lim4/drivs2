@@ -145,53 +145,80 @@ export class DatabaseStorage implements IStorage {
 
   // Veiculo operations
   async getAllVeiculos(): Promise<Veiculo[]> {
-    const veiculosData = await db.select().from(veiculos);
-    
-    // Enriquecer com dados da locadora
-    const enrichedVeiculos = await Promise.all(
-      veiculosData.map(async (veiculo) => {
-        try {
-          const locadora = await this.getLocadora(veiculo.locadoraId);
-          return {
-            ...veiculo,
-            locadoraNome: locadora?.nome || 'Locadora não encontrada',
-          };
-        } catch (error) {
-          console.error('Erro ao buscar locadora para veículo:', error);
-          return {
-            ...veiculo,
-            locadoraNome: 'Erro ao carregar',
-          };
-        }
+    // Use JOIN para buscar veículos e locadora em uma única query
+    const veiculosData = await db
+      .select({
+        id: veiculos.id,
+        locadoraId: veiculos.locadoraId,
+        placa: veiculos.placa,
+        marca: veiculos.marca,
+        modelo: veiculos.modelo,
+        ano: veiculos.ano,
+        cor: veiculos.cor,
+        categoria: veiculos.categoria,
+        renavam: veiculos.renavam,
+        chassi: veiculos.chassi,
+        combustivel: veiculos.combustivel,
+        quilometragem: veiculos.quilometragem,
+        valorSemanal: veiculos.valorSemanal,
+        caucao: veiculos.caucao,
+        taxaAdministrativa: veiculos.taxaAdministrativa,
+        limiteQuilometragem: veiculos.limiteQuilometragem,
+        valorLimiteKm: veiculos.valorLimiteKm,
+        ultimaRevisao: veiculos.ultimaRevisao,
+        proximaRevisao: veiculos.proximaRevisao,
+        seguradora: veiculos.seguradora,
+        numeroApolice: veiculos.numeroApolice,
+        vigenciaSeguro: veiculos.vigenciaSeguro,
+        valorSeguroMensal: veiculos.valorSeguroMensal,
+        status: veiculos.status,
+        createdAt: veiculos.createdAt,
+        updatedAt: veiculos.updatedAt,
+        locadoraNome: locadoras.nome,
       })
-    );
+      .from(veiculos)
+      .innerJoin(locadoras, eq(veiculos.locadoraId, locadoras.id));
     
-    return enrichedVeiculos;
+    return veiculosData;
   }
 
   async getVeiculosByLocadora(locadoraId: string): Promise<Veiculo[]> {
-    const veiculosData = await db.select().from(veiculos).where(eq(veiculos.locadoraId, locadoraId));
-    
-    // Enriquecer com dados da locadora
-    const enrichedVeiculos = await Promise.all(
-      veiculosData.map(async (veiculo) => {
-        try {
-          const locadora = await this.getLocadora(veiculo.locadoraId);
-          return {
-            ...veiculo,
-            locadoraNome: locadora?.nome || 'Locadora não encontrada',
-          };
-        } catch (error) {
-          console.error('Erro ao buscar locadora para veículo:', error);
-          return {
-            ...veiculo,
-            locadoraNome: 'Erro ao carregar',
-          };
-        }
+    // Use JOIN para buscar veículos e locadora em uma única query
+    const veiculosData = await db
+      .select({
+        id: veiculos.id,
+        locadoraId: veiculos.locadoraId,
+        placa: veiculos.placa,
+        marca: veiculos.marca,
+        modelo: veiculos.modelo,
+        ano: veiculos.ano,
+        cor: veiculos.cor,
+        categoria: veiculos.categoria,
+        renavam: veiculos.renavam,
+        chassi: veiculos.chassi,
+        combustivel: veiculos.combustivel,
+        quilometragem: veiculos.quilometragem,
+        valorSemanal: veiculos.valorSemanal,
+        caucao: veiculos.caucao,
+        taxaAdministrativa: veiculos.taxaAdministrativa,
+        limiteQuilometragem: veiculos.limiteQuilometragem,
+        valorLimiteKm: veiculos.valorLimiteKm,
+        ultimaRevisao: veiculos.ultimaRevisao,
+        proximaRevisao: veiculos.proximaRevisao,
+        seguradora: veiculos.seguradora,
+        numeroApolice: veiculos.numeroApolice,
+        vigenciaSeguro: veiculos.vigenciaSeguro,
+        valorSeguroMensal: veiculos.valorSeguroMensal,
+        status: veiculos.status,
+        createdAt: veiculos.createdAt,
+        updatedAt: veiculos.updatedAt,
+        locadoraNome: locadoras.nome,
       })
-    );
+      .from(veiculos)
+      .innerJoin(locadoras, eq(veiculos.locadoraId, locadoras.id))
+      .where(eq(veiculos.locadoraId, locadoraId));
     
-    return enrichedVeiculos;
+    return veiculosData;
   }
 
   async getVeiculo(id: string): Promise<Veiculo | undefined> {
