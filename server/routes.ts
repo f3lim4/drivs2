@@ -395,14 +395,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { locadoraId } = req.query;
       
-      let alugueis;
       if (locadoraId) {
-        alugueis = await storage.getAlugueisByLocadora(locadoraId as string);
+        const alugueis = await storage.getAlugueisByLocadora(locadoraId as string);
+        
+        // SECURITY: Validar que todos os aluguéis pertencem à locadora solicitada
+        const todosAlugueisCorretos = alugueis.every(a => a.locadoraId === locadoraId);
+        if (!todosAlugueisCorretos) {
+          console.error('SECURITY ALERT: Aluguéis de outras locadoras detectados no backend');
+          return res.status(403).json({ message: "Acesso negado: dados inconsistentes" });
+        }
+        
+        res.json(alugueis);
       } else {
-        alugueis = await storage.getAllAlugueis();
+        const alugueis = await storage.getAllAlugueis();
+        res.json(alugueis);
       }
-      
-      res.json(alugueis);
     } catch (error) {
       console.error("Error fetching alugueis:", error);
       res.status(500).json({ message: "Internal server error" });

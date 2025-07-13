@@ -288,40 +288,72 @@ export class DatabaseStorage implements IStorage {
 
   // Aluguel operations
   async getAllAlugueis(): Promise<Aluguel[]> {
-    const alugueisData = await db.select().from(alugueis);
-    
-    // Enriquecer com dados do motorista e veículo
-    const enrichedAlugueis = await Promise.all(
-      alugueisData.map(async (aluguel) => {
-        try {
-          const motorista = await this.getMotorista(aluguel.motoristaId);
-          const veiculo = await this.getVeiculo(aluguel.veiculoId);
-          
-          return {
-            ...aluguel,
-            motoristaNome: motorista?.nome || 'Motorista não encontrado',
-            motoristaContato: motorista?.telefone || 'Contato não encontrado',
-            veiculoModelo: veiculo ? `${veiculo.marca} ${veiculo.modelo}` : 'Veículo não encontrado',
-            veiculoPlaca: veiculo?.placa || 'Placa não encontrada',
-          };
-        } catch (error) {
-          console.error('Erro ao buscar dados do aluguel:', error);
-          return {
-            ...aluguel,
-            motoristaNome: 'Erro ao carregar',
-            motoristaContato: 'Erro ao carregar',
-            veiculoModelo: 'Erro ao carregar',
-            veiculoPlaca: 'Erro ao carregar',
-          };
-        }
+    // Use JOIN para buscar aluguéis com dados do motorista e veículo em uma única query
+    const alugueisData = await db
+      .select({
+        id: alugueis.id,
+        locadoraId: alugueis.locadoraId,
+        motoristaId: alugueis.motoristaId,
+        veiculoId: alugueis.veiculoId,
+        dataInicio: alugueis.dataInicio,
+        dataFim: alugueis.dataFim,
+        valorTotal: alugueis.valorTotal,
+        valorMensal: alugueis.valorMensal,
+        caucao: alugueis.caucao,
+        taxaAdministrativa: alugueis.taxaAdministrativa,
+        tempoContrato: alugueis.tempoContrato,
+        status: alugueis.status,
+        createdAt: alugueis.createdAt,
+        updatedAt: alugueis.updatedAt,
+        motoristaNome: motoristas.nome,
+        motoristaContato: motoristas.telefone,
+        veiculoModelo: veiculos.modelo,
+        veiculoMarca: veiculos.marca,
+        veiculoPlaca: veiculos.placa,
       })
-    );
+      .from(alugueis)
+      .innerJoin(motoristas, eq(alugueis.motoristaId, motoristas.id))
+      .innerJoin(veiculos, eq(alugueis.veiculoId, veiculos.id));
     
-    return enrichedAlugueis;
+    return alugueisData.map(aluguel => ({
+      ...aluguel,
+      veiculoModelo: `${aluguel.veiculoMarca} ${aluguel.veiculoModelo}`,
+    }));
   }
 
   async getAlugueisByLocadora(locadoraId: string): Promise<Aluguel[]> {
-    return await db.select().from(alugueis).where(eq(alugueis.locadoraId, locadoraId));
+    // Use JOIN para buscar aluguéis com dados do motorista e veículo em uma única query
+    const alugueisData = await db
+      .select({
+        id: alugueis.id,
+        locadoraId: alugueis.locadoraId,
+        motoristaId: alugueis.motoristaId,
+        veiculoId: alugueis.veiculoId,
+        dataInicio: alugueis.dataInicio,
+        dataFim: alugueis.dataFim,
+        valorTotal: alugueis.valorTotal,
+        valorMensal: alugueis.valorMensal,
+        caucao: alugueis.caucao,
+        taxaAdministrativa: alugueis.taxaAdministrativa,
+        tempoContrato: alugueis.tempoContrato,
+        status: alugueis.status,
+        createdAt: alugueis.createdAt,
+        updatedAt: alugueis.updatedAt,
+        motoristaNome: motoristas.nome,
+        motoristaContato: motoristas.telefone,
+        veiculoModelo: veiculos.modelo,
+        veiculoMarca: veiculos.marca,
+        veiculoPlaca: veiculos.placa,
+      })
+      .from(alugueis)
+      .innerJoin(motoristas, eq(alugueis.motoristaId, motoristas.id))
+      .innerJoin(veiculos, eq(alugueis.veiculoId, veiculos.id))
+      .where(eq(alugueis.locadoraId, locadoraId));
+    
+    return alugueisData.map(aluguel => ({
+      ...aluguel,
+      veiculoModelo: `${aluguel.veiculoMarca} ${aluguel.veiculoModelo}`,
+    }));
   }
 
   async getAluguel(id: string): Promise<Aluguel | undefined> {
