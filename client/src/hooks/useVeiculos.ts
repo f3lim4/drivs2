@@ -110,7 +110,7 @@ export function useVeiculos() {
   };
 
   // Use React Query com chave específica para isolamento
-  const { data: veiculos = [], isLoading: loading, refetch: carregarVeiculos } = useQuery({
+  const { data: veiculos = [], isLoading: loading, refetch: carregarVeiculos, error } = useQuery({
     queryKey: getQueryKey(),
     queryFn: fetchVeiculos,
     staleTime: 0, // Sempre buscar dados frescos
@@ -118,6 +118,21 @@ export function useVeiculos() {
     enabled: !!profile, // Só executar se tiver perfil
     retry: false, // Não tentar novamente em caso de erro de segurança
   });
+
+  // Log para debug
+  if (error) {
+    console.error('Erro ao carregar veículos:', error);
+  }
+  
+  if (profile && veiculos.length === 0 && !loading) {
+    console.log('useVeiculos - Debug:', {
+      profile: profile?.locadoraId,
+      isLocadora,
+      veiculosLength: veiculos.length,
+      loading,
+      error: error?.message
+    });
+  }
 
   const adicionarVeiculo = (novoVeiculo: Veiculo) => {
     queryClient.invalidateQueries({ queryKey: getQueryKey() });
