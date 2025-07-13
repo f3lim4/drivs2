@@ -80,7 +80,7 @@ export default function Login() {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700"
+      className="min-h-screen flex items-center justify-center p-4 relative bg-blue-900"
       style={{
         backgroundImage: `url(${networkBackground})`,
         backgroundSize: 'cover',
@@ -88,8 +88,8 @@ export default function Login() {
         backgroundRepeat: 'no-repeat'
       }}
     >
-      {/* Overlay azul para melhor contraste e integração */}
-      <div className="absolute inset-0 bg-blue-900/60 backdrop-blur-sm"></div>
+      {/* Overlay sutil para melhor contraste */}
+      <div className="absolute inset-0 bg-black/10"></div>
       
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
