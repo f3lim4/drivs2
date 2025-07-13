@@ -8,7 +8,8 @@ import { Contrato } from '@/types';
 import { useAuth } from './useAuth';
 
 export function useContratos() {
-  const { locadoraId } = useAuth();
+  const { profile } = useAuth();
+  const locadoraId = profile?.locadoraId;
   const queryClient = useQueryClient();
 
   // Buscar contratos
