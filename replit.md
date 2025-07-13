@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-13: Correção Crítica de Isolamento de Dados - CONCLUÍDO
+- ✅ **CRÍTICO: Violação de segurança corrigida** - Eliminado vazamento de dados entre locadoras
+- ✅ **Sistema de isolamento reforçado** - Implementado filtro quádruplo de segurança
+- ✅ **React Query com chaves específicas** - Cache isolado por locadora
+- ✅ **Validação de segurança no backend** - Verificação de consistência nos dados
+- ✅ **Proteção contra vazamentos** - Erro imediato se dados mistos forem detectados
+- ✅ **Cache desabilitado** - Evita contaminação cruzada entre sessões
+- ✅ Sistema de isolamento entre locadoras 100% funcionando
+
 ### 2025-07-13: Personalização Visual e Correções - CONCLUÍDO
 - ✅ **CRÍTICO: Isolamento 100% CORRIGIDO** - Eliminado "flash" de dados de outras locadoras
 - ✅ **Filtro triplo de segurança** - Backend + Frontend + Validação de consistência
