@@ -36,6 +36,8 @@ export function useContratos() {
         locadoraId,
       };
       
+      console.log('Enviando dados do contrato:', contratoData);
+      
       const response = await fetch('/api/contratos', {
         method: 'POST',
         headers: {
@@ -45,7 +47,9 @@ export function useContratos() {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to create contrato');
+        const errorData = await response.text();
+        console.error('Erro na resposta:', errorData);
+        throw new Error(`Failed to create contrato: ${response.status} - ${errorData}`);
       }
       
       return response.json();
