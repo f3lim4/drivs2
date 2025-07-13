@@ -436,6 +436,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
+      // CRITICAL SECURITY: Validar integridade dos dados antes de criar aluguel
+      const { locadoraId, motoristaId, veiculoId } = result.data;
+      
+      // Verificar se motorista pertence à mesma locadora
+      const motorista = await storage.getMotorista(motoristaId);
+      if (!motorista || motorista.locadoraId !== locadoraId) {
+        console.error('SECURITY ALERT: Tentativa de criar aluguel com motorista de outra locadora');
+        return res.status(403).json({ 
+          message: "Acesso negado: motorista não pertence à sua locadora",
+          details: `Motorista ${motoristaId} não encontrado ou pertence à outra locadora`
+        });
+      }
+      
+      // Verificar se veículo pertence à mesma locadora
+      const veiculo = await storage.getVeiculo(veiculoId);
+      if (!veiculo || veiculo.locadoraId !== locadoraId) {
+        console.error('SECURITY ALERT: Tentativa de criar aluguel com veículo de outra locadora');
+        return res.status(403).json({ 
+          message: "Acesso negado: veículo não pertence à sua locadora",
+          details: `Veículo ${veiculoId} não encontrado ou pertence à outra locadora`
+        });
+      }
+      
       const aluguel = await storage.createAluguel(result.data);
       res.json(aluguel);
     } catch (error) {
