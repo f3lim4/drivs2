@@ -45,6 +45,7 @@ import { cn } from '@/lib/utils';
 import { Contrato, Motorista, Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
 import { useAuth } from '@/hooks/useAuth';
+import { useContratos } from '../../hooks/useContratos';
 
 // Schema de validação
 const contratoSchema = z.object({
@@ -71,11 +72,14 @@ export function NovoContratoModal({
   onOpenChange, 
   onContratoGerado 
 }: NovoContratoModalProps) {
-  const [loading, setLoading] = useState(false);
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const { profile } = useAuth();
+  const userProfile = profile;
+  
+  // Hook para gerenciar contratos
+  const { createContrato } = useContratos();
 
   // Função para obter a data de amanhã
   const getAmanha = () => {
@@ -140,12 +144,7 @@ export function NovoContratoModal({
   };
 
   const onSubmit = async (data: ContratoFormData) => {
-    setLoading(true);
-    
     try {
-      // Simula delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
       // Busca dados do motorista e veículo selecionados
       const motorista = motoristas.find(m => m.id === data.motoristaId);
       const veiculo = veiculos.find(v => v.id === data.veiculoId);
@@ -163,16 +162,14 @@ export function NovoContratoModal({
       const valorTotal = valorMensal * data.tempoContrato;
 
       // Cria novo contrato
-      const novoContrato: Contrato = {
-        id: generateId(),
-        locadoraId: userProfile.locadoraId,
-        tipo: 'locacao',
+      const novoContrato = {
+        tipo: 'locacao' as const,
         titulo: `Contrato de Locação - ${motorista.nome}`,
         cliente: motorista.nome,
-        valor: valorTotal,
+        valor: valorTotal.toString(),
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFim, 'yyyy-MM-dd'),
-        status: 'ativo',
+        status: 'ativo' as const,
         template: `CONTRATO DE LOCAÇÃO DE VEÍCULO
 
 LOCADOR: DRIVS LOCADORA DE VEÍCULOS LTDA, Ramo de atividade: Locação de Veículos, portador do CNPJ: 12.345.678/0001-90, cuja
@@ -275,14 +272,19 @@ contratadas, assinam o presente instrumento em Embu das Artes - SP, ${format(dat
 Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
       };
 
-      onContratoGerado(novoContrato);
+      // Usa o hook para criar o contrato
+      const contratoCriado = await createContrato.mutateAsync(novoContrato);
+      
+      onContratoGerado(contratoCriado);
       onOpenChange(false);
       form.reset();
       
     } catch (error) {
       console.error('Erro ao gerar contrato:', error);
+      console.error('Stack trace:', error.stack);
+      console.error('Dados do contrato:', { motorista, veiculo, data, userProfile });
     } finally {
-      setLoading(false);
+      // setLoading(false); // Removido porque não usamos mais loading local
     }
   };
 
@@ -503,12 +505,12 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                   type="button"
                   variant="outline"
                   onClick={() => onOpenChange(false)}
-                  disabled={loading}
+                  disabled={createContrato.isPending}
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Gerando...' : 'Gerar Contrato'}
+                <Button type="submit" disabled={createContrato.isPending}>
+                  {createContrato.isPending ? 'Gerando...' : 'Gerar Contrato'}
                 </Button>
               </DialogFooter>
             </form>
