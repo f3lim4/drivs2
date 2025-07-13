@@ -7,182 +7,201 @@
       <stop offset="100%" style="stop-color:#334155;stop-opacity:0.85" />
     </linearGradient>
     
-    <linearGradient id="carBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+    <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:0.9" />
     </linearGradient>
     
-    <linearGradient id="driverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#92400e;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#a16207;stop-opacity:1" />
+    <linearGradient id="connectGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.7" />
+      <stop offset="100%" style="stop-color:#047857;stop-opacity:0.8" />
     </linearGradient>
     
-    <linearGradient id="phoneGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
-    </linearGradient>
-    
-    <radialGradient id="windshieldGradient" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
-      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:0.5" />
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:0.1" />
     </radialGradient>
   </defs>
   
   <!-- Background -->
   <rect width="1200" height="800" fill="url(#bgGradient)"/>
   
-  <!-- City skyline background -->
-  <g opacity="0.15">
-    <rect x="0" y="300" width="80" height="200" fill="#1e293b"/>
-    <rect x="100" y="250" width="60" height="250" fill="#1e293b"/>
-    <rect x="180" y="280" width="90" height="220" fill="#1e293b"/>
-    <rect x="290" y="200" width="70" height="300" fill="#1e293b"/>
-    <rect x="380" y="320" width="50" height="180" fill="#1e293b"/>
-    <rect x="450" y="240" width="80" height="260" fill="#1e293b"/>
-    <rect x="850" y="270" width="60" height="230" fill="#1e293b"/>
-    <rect x="930" y="200" width="90" height="300" fill="#1e293b"/>
-    <rect x="1040" y="300" width="70" height="200" fill="#1e293b"/>
-    <rect x="1130" y="250" width="60" height="250" fill="#1e293b"/>
-  </g>
-  
-  <!-- Car body (sedan style) -->
-  <g transform="translate(200, 400)">
-    <!-- Main body -->
-    <ellipse cx="300" cy="80" rx="280" ry="60" fill="url(#carBodyGradient)"/>
+  <!-- Connection network -->
+  <g opacity="0.4">
+    <!-- Network nodes -->
+    <circle cx="200" cy="150" r="8" fill="url(#nodeGradient)"/>
+    <circle cx="400" cy="100" r="6" fill="url(#nodeGradient)"/>
+    <circle cx="600" cy="200" r="10" fill="url(#nodeGradient)"/>
+    <circle cx="800" cy="120" r="7" fill="url(#nodeGradient)"/>
+    <circle cx="1000" cy="180" r="9" fill="url(#nodeGradient)"/>
     
-    <!-- Car roof -->
-    <ellipse cx="300" cy="40" rx="200" ry="35" fill="#cbd5e1"/>
+    <circle cx="150" cy="300" r="6" fill="url(#nodeGradient)"/>
+    <circle cx="350" cy="250" r="8" fill="url(#nodeGradient)"/>
+    <circle cx="550" cy="350" r="7" fill="url(#nodeGradient)"/>
+    <circle cx="750" cy="280" r="9" fill="url(#nodeGradient)"/>
+    <circle cx="950" cy="320" r="6" fill="url(#nodeGradient)"/>
     
-    <!-- Windshield -->
-    <path d="M150 40 Q300 10 450 40 Q430 70 300 75 Q170 70 150 40" fill="url(#windshieldGradient)"/>
+    <circle cx="250" cy="450" r="9" fill="url(#nodeGradient)"/>
+    <circle cx="450" cy="400" r="7" fill="url(#nodeGradient)"/>
+    <circle cx="650" cy="500" r="8" fill="url(#nodeGradient)"/>
+    <circle cx="850" cy="420" r="6" fill="url(#nodeGradient)"/>
+    <circle cx="1050" cy="480" r="10" fill="url(#nodeGradient)"/>
     
-    <!-- Side windows -->
-    <ellipse cx="200" cy="45" rx="30" ry="15" fill="#3b82f6" opacity="0.4"/>
-    <ellipse cx="400" cy="45" rx="30" ry="15" fill="#3b82f6" opacity="0.4"/>
-    
-    <!-- Door handles -->
-    <rect x="180" y="70" width="8" height="4" rx="2" fill="#64748b"/>
-    <rect x="380" y="70" width="8" height="4" rx="2" fill="#64748b"/>
-    
-    <!-- Headlights -->
-    <ellipse cx="50" cy="75" rx="15" ry="8" fill="#fbbf24"/>
-    <ellipse cx="550" cy="75" rx="15" ry="8" fill="#fbbf24"/>
-    
-    <!-- Wheels -->
-    <circle cx="120" cy="140" r="35" fill="#1f2937"/>
-    <circle cx="480" cy="140" r="35" fill="#1f2937"/>
-    <circle cx="120" cy="140" r="20" fill="#4b5563"/>
-    <circle cx="480" cy="140" r="20" fill="#4b5563"/>
-    
-    <!-- Wheel rims -->
-    <circle cx="120" cy="140" r="12" fill="#9ca3af"/>
-    <circle cx="480" cy="140" r="12" fill="#9ca3af"/>
-  </g>
-  
-  <!-- Driver figure (more detailed) -->
-  <g transform="translate(320, 350)">
-    <!-- Head -->
-    <circle cx="0" cy="0" r="25" fill="url(#driverGradient)"/>
-    
-    <!-- Hair -->
-    <path d="M-20 -15 Q0 -35 20 -15 Q15 -25 0 -25 Q-15 -25 -20 -15" fill="#1f2937"/>
-    
-    <!-- Face features -->
-    <circle cx="-8" cy="-3" r="2" fill="#1f2937"/>
-    <circle cx="8" cy="-3" r="2" fill="#1f2937"/>
-    <path d="M-5 5 Q0 8 5 5" stroke="#1f2937" stroke-width="1.5" fill="none"/>
-    
-    <!-- Body/shirt -->
-    <rect x="-20" y="25" width="40" height="50" rx="8" fill="#3b82f6"/>
-    
-    <!-- Arms -->
-    <ellipse cx="-35" cy="40" rx="8" ry="20" fill="url(#driverGradient)"/>
-    <ellipse cx="35" cy="40" rx="8" ry="20" fill="url(#driverGradient)"/>
-    
-    <!-- Hands on steering wheel -->
-    <circle cx="-25" cy="55" r="5" fill="url(#driverGradient)"/>
-    <circle cx="25" cy="55" r="5" fill="url(#driverGradient)"/>
-    
-    <!-- Steering wheel -->
-    <circle cx="0" cy="55" r="20" fill="#1f2937"/>
-    <circle cx="0" cy="55" r="15" fill="none" stroke="#4b5563" stroke-width="2"/>
-    <circle cx="0" cy="55" r="3" fill="#6b7280"/>
-  </g>
-  
-  <!-- Dashboard -->
-  <g transform="translate(250, 460)">
-    <rect x="0" y="0" width="300" height="30" rx="5" fill="#1e293b"/>
-    <rect x="20" y="8" width="60" height="15" rx="3" fill="#3b82f6"/>
-    <rect x="100" y="8" width="80" height="15" rx="3" fill="#1f2937"/>
-    <rect x="200" y="8" width="40" height="15" rx="3" fill="#ef4444"/>
-  </g>
-  
-  <!-- Phone with ride-share app -->
-  <g transform="translate(580, 420)">
-    <rect x="0" y="0" width="60" height="100" rx="12" fill="url(#phoneGradient)"/>
-    <rect x="5" y="15" width="50" height="70" rx="8" fill="#f8fafc"/>
-    
-    <!-- App interface -->
-    <rect x="10" y="20" width="40" height="12" rx="2" fill="#3b82f6"/>
-    <text x="30" y="29" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="#ffffff">UBER</text>
-    
-    <rect x="10" y="38" width="40" height="20" rx="3" fill="#10b981"/>
-    <circle cx="30" cy="48" r="6" fill="#ffffff"/>
-    <circle cx="30" cy="48" r="2" fill="#10b981"/>
-    
-    <rect x="10" y="63" width="40" height="8" rx="2" fill="#e5e7eb"/>
-    <rect x="10" y="74" width="25" height="6" rx="1" fill="#e5e7eb"/>
-  </g>
-  
-  <!-- GPS route visualization -->
-  <g transform="translate(100, 200)">
-    <!-- Route line -->
-    <path d="M50 100 Q200 50 350 100 Q500 150 650 100 Q800 50 950 100" 
-          stroke="#10b981" stroke-width="4" fill="none" stroke-dasharray="10,5">
-      <animate attributeName="stroke-dashoffset" values="0;-15" dur="2s" repeatCount="indefinite"/>
+    <!-- Connection lines -->
+    <path d="M200 150 Q300 125 400 100" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M400 100 Q500 150 600 200" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="2.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M600 200 Q700 160 800 120" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M800 120 Q900 150 1000 180" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="3.5s" repeatCount="indefinite"/>
     </path>
     
-    <!-- Start location pin -->
-    <g transform="translate(50, 80)">
-      <path d="M15 10 C15 4.5 11.5 0 7 0 C2.5 0 -1 4.5 -1 10 C-1 15.5 7 25 7 25 C7 25 15 15.5 15 10 Z" fill="#3b82f6"/>
-      <circle cx="7" cy="10" r="3" fill="#ffffff"/>
-    </g>
+    <path d="M150 300 Q250 275 350 250" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="4s" repeatCount="indefinite"/>
+    </path>
+    <path d="M350 250 Q450 300 550 350" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="2.2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M550 350 Q650 315 750 280" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="3.8s" repeatCount="indefinite"/>
+    </path>
+    <path d="M750 280 Q850 300 950 320" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="2.8s" repeatCount="indefinite"/>
+    </path>
     
-    <!-- End location pin -->
-    <g transform="translate(950, 80)">
-      <path d="M15 10 C15 4.5 11.5 0 7 0 C2.5 0 -1 4.5 -1 10 C-1 15.5 7 25 7 25 C7 25 15 15.5 15 10 Z" fill="#ef4444"/>
-      <circle cx="7" cy="10" r="3" fill="#ffffff"/>
-    </g>
-  </g>
-  
-  <!-- App branding elements -->
-  <g transform="translate(800, 150)">
-    <!-- App logo background -->
-    <circle cx="0" cy="0" r="30" fill="#000000"/>
-    <circle cx="0" cy="0" r="25" fill="#ffffff"/>
+    <path d="M250 450 Q350 425 450 400" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="3.2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M450 400 Q550 450 650 500" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="2.7s" repeatCount="indefinite"/>
+    </path>
+    <path d="M650 500 Q750 460 850 420" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="3.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M850 420 Q950 450 1050 480" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="2.5s" repeatCount="indefinite"/>
+    </path>
     
-    <!-- Stylized car icon -->
-    <rect x="-15" y="-5" width="30" height="8" rx="4" fill="#000000"/>
-    <circle cx="-10" cy="5" r="3" fill="#000000"/>
-    <circle cx="10" cy="5" r="3" fill="#000000"/>
+    <!-- Vertical connections -->
+    <path d="M200 150 Q175 225 150 300" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="4.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M400 100 Q375 175 350 250" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M600 200 Q575 275 550 350" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="3.7s" repeatCount="indefinite"/>
+    </path>
+    <path d="M800 120 Q775 200 750 280" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="2.3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M1000 180 Q975 250 950 320" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="4.2s" repeatCount="indefinite"/>
+    </path>
+    
+    <path d="M150 300 Q200 375 250 450" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="3.3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M350 250 Q400 325 450 400" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="2.9s" repeatCount="indefinite"/>
+    </path>
+    <path d="M550 350 Q600 425 650 500" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="3.6s" repeatCount="indefinite"/>
+    </path>
+    <path d="M750 280 Q800 350 850 420" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="2.4s" repeatCount="indefinite"/>
+    </path>
+    <path d="M950 320 Q1000 400 1050 480" stroke="url(#connectGradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,100;20,80;0,100" dur="4.1s" repeatCount="indefinite"/>
+    </path>
   </g>
   
-  <!-- Ambient lighting effects -->
-  <g opacity="0.3">
-    <circle cx="400" cy="200" r="100" fill="#3b82f6" opacity="0.1"/>
-    <circle cx="800" cy="300" r="150" fill="#10b981" opacity="0.1"/>
-    <circle cx="200" cy="400" r="80" fill="#f59e0b" opacity="0.1"/>
-  </g>
-  
-  <!-- Rating stars -->
-  <g transform="translate(650, 350)">
+  <!-- Central hub -->
+  <g transform="translate(600, 400)">
+    <circle cx="0" cy="0" r="80" fill="url(#glowGradient)" opacity="0.3"/>
+    <circle cx="0" cy="0" r="40" fill="url(#nodeGradient)" opacity="0.8"/>
+    <circle cx="0" cy="0" r="25" fill="#ffffff" opacity="0.9"/>
+    
+    <!-- Central icon -->
     <g transform="scale(0.8)">
-      <polygon points="12,2 15,8 22,8 17,12 19,18 12,15 5,18 7,12 2,8 9,8" fill="#fbbf24"/>
-      <polygon points="32,2 35,8 42,8 37,12 39,18 32,15 25,18 27,12 22,8 29,8" fill="#fbbf24"/>
-      <polygon points="52,2 55,8 62,8 57,12 59,18 52,15 45,18 47,12 42,8 49,8" fill="#fbbf24"/>
-      <polygon points="72,2 75,8 82,8 77,12 79,18 72,15 65,18 67,12 62,8 69,8" fill="#fbbf24"/>
-      <polygon points="92,2 95,8 102,8 97,12 99,18 92,15 85,18 87,12 82,8 89,8" fill="#fbbf24"/>
+      <path d="M-15 -15 Q0 -25 15 -15 Q25 0 15 15 Q0 25 -15 15 Q-25 0 -15 -15" fill="#3b82f6"/>
+      <circle cx="0" cy="0" r="8" fill="#ffffff"/>
+      <circle cx="0" cy="0" r="4" fill="#3b82f6"/>
     </g>
-    <text x="50" y="35" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#fbbf24">5.0</text>
+    
+    <!-- Pulse effect -->
+    <circle cx="0" cy="0" r="50" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.6">
+      <animate attributeName="r" values="50;70;50" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#10b981" stroke-width="2" opacity="0.4">
+      <animate attributeName="r" values="60;80;60" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.4;0.1;0.4" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Floating data particles -->
+  <g opacity="0.6">
+    <circle cx="100" cy="200" r="3" fill="#60a5fa">
+      <animate attributeName="cy" values="200;180;200" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="350" r="2" fill="#34d399">
+      <animate attributeName="cy" values="350;330;350" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="500" cy="150" r="4" fill="#f59e0b">
+      <animate attributeName="cy" values="150;130;150" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="700" cy="550" r="3" fill="#ef4444">
+      <animate attributeName="cy" values="550;530;550" dur="3.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="900" cy="250" r="2" fill="#8b5cf6">
+      <animate attributeName="cy" values="250;230;250" dur="4.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="1100" cy="400" r="3" fill="#06b6d4">
+      <animate attributeName="cy" values="400;380;400" dur="3.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Signal waves -->
+  <g transform="translate(600, 400)" opacity="0.3">
+    <circle cx="0" cy="0" r="100" fill="none" stroke="#3b82f6" stroke-width="3">
+      <animate attributeName="r" values="100;200;100" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="0" cy="0" r="120" fill="none" stroke="#10b981" stroke-width="2">
+      <animate attributeName="r" values="120;220;120" dur="5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="0" cy="0" r="140" fill="none" stroke="#f59e0b" stroke-width="2">
+      <animate attributeName="r" values="140;240;140" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="6s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Bottom connection indicators -->
+  <g transform="translate(0, 700)" opacity="0.4">
+    <rect x="100" y="0" width="40" height="8" rx="4" fill="#3b82f6">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="200" y="0" width="60" height="8" rx="4" fill="#10b981">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.5s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="300" y="0" width="80" height="8" rx="4" fill="#f59e0b">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="800" y="0" width="50" height="8" rx="4" fill="#ef4444">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.2s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="900" y="0" width="70" height="8" rx="4" fill="#8b5cf6">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.8s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="1000" y="0" width="45" height="8" rx="4" fill="#06b6d4">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3.3s" repeatCount="indefinite"/>
+    </rect>
   </g>
 </svg>
