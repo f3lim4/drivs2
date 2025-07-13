@@ -19,6 +19,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Performance mantida** - Consultas rápidas (<200ms) e isolamento seguro
 - ✅ **Sistema 100% funcional** - Todas as páginas carregando corretamente
 - ✅ **Isolamento perfeito** - Cada locadora vê apenas seus próprios dados
+- ✅ **Modal de aluguel melhorado** - Mensagens claras quando faltam motoristas/veículos
+- ✅ **Status de aluguéis corrigido** - Novos aluguéis entram como "ativo" automaticamente
+- ✅ **Validação de data flexível** - Permite selecionar datas passadas na criação de aluguéis
 - ✅ Sistema completamente operacional e seguro
 
 ### 2025-07-13: Correção Crítica de Isolamento de Dados - CONCLUÍDO
