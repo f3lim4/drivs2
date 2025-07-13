@@ -52,6 +52,12 @@ const aluguelSchema = z.object({
   veiculoId: z.string().min(1, 'Veículo é obrigatório'),
   dataInicio: z.date({
     required_error: 'Data de início é obrigatória',
+  }).refine((date) => {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    return date >= hoje;
+  }, {
+    message: 'Data de início deve ser hoje ou uma data futura',
   }),
   tempoContrato: z.number().min(1, 'Tempo de contrato deve ser maior que 0'),
   taxaAdministrativa: z.number().optional(),
@@ -207,7 +213,7 @@ export function NovoAluguelModal({
       // Cria novo aluguel na API
       const aluguelData = {
         id: generateId(),
-        locadoraId: '123456789', // TODO: Pegar do contexto de autenticação
+        locadoraId: profile?.locadoraId || '', // Usar o ID da locadora autenticada
         motoristaId: data.motoristaId,
         veiculoId: data.veiculoId,
         dataInicio: format(dataInicio, 'yyyy-MM-dd'),
@@ -287,6 +293,42 @@ export function NovoAluguelModal({
         {loadingData ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : motoristasAtivos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <div className="text-muted-foreground mb-4">
+              <svg className="h-12 w-12 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <p className="text-lg font-medium">Nenhum motorista cadastrado</p>
+              <p className="text-sm mt-1">
+                Você precisa cadastrar pelo menos um motorista ativo antes de criar um aluguel.
+              </p>
+            </div>
+            <Button 
+              onClick={() => onOpenChange(false)} 
+              variant="outline"
+            >
+              Fechar
+            </Button>
+          </div>
+        ) : veiculosDisponiveis.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <div className="text-muted-foreground mb-4">
+              <svg className="h-12 w-12 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              <p className="text-lg font-medium">Nenhum veículo disponível</p>
+              <p className="text-sm mt-1">
+                Todos os veículos estão alugados ou em manutenção.
+              </p>
+            </div>
+            <Button 
+              onClick={() => onOpenChange(false)} 
+              variant="outline"
+            >
+              Fechar
+            </Button>
           </div>
         ) : (
           <Form {...form}>
