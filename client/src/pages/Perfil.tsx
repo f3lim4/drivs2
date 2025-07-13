@@ -1,6 +1,6 @@
 /**
- * Página de perfil da locadora
- * Permite visualizar e editar informações da locadora
+ * Página de perfil do usuário
+ * Permite visualizar e editar informações do usuário (admin ou locadora)
  */
 
 import { useState, useEffect } from 'react';
@@ -79,7 +79,7 @@ interface LocadoraData {
 }
 
 export default function Perfil() {
-  const { profile, isLocadora } = useAuth();
+  const { profile, isLocadora, isAdmin } = useAuth();
   const { toast } = useToast();
   const [locadora, setLocadora] = useState<LocadoraData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -129,60 +129,69 @@ export default function Perfil() {
     },
   });
 
-  // Carregar dados da locadora
+  // Carregar dados do usuário
   useEffect(() => {
-    const carregarLocadora = async () => {
-      let currentProfile = profile;
-      
-      // Se não tem locadoraId, tentar recarregar o perfil do servidor
-      if (!profile?.locadoraId) {
-        const reloadedProfile = await reloadProfile();
-        if (reloadedProfile?.locadoraId) {
-          currentProfile = reloadedProfile;
-        } else {
-          setLoading(false);
-          return;
-        }
+    const carregarDados = async () => {
+      // Se é admin, não precisa carregar dados de locadora
+      if (isAdmin) {
+        setLoading(false);
+        return;
       }
 
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/locadoras/${currentProfile.locadoraId}`);
+      // Se é locadora, carregar dados da locadora
+      if (isLocadora) {
+        let currentProfile = profile;
         
-        if (!response.ok) {
-          throw new Error(`Erro ao carregar dados da locadora: ${response.status}`);
+        // Se não tem locadoraId, tentar recarregar o perfil do servidor
+        if (!profile?.locadoraId) {
+          const reloadedProfile = await reloadProfile();
+          if (reloadedProfile?.locadoraId) {
+            currentProfile = reloadedProfile;
+          } else {
+            setLoading(false);
+            return;
+          }
         }
 
-        const data = await response.json();
-        setLocadora(data);
-        
-        // Atualizar form com os dados
-        form.reset({
-          nome: data.nome,
-          razaoSocial: data.razaoSocial,
-          cnpj: data.cnpj,
-          email: data.email,
-          telefone: data.telefone,
-          endereco: data.endereco,
-          cidade: data.cidade,
-          estado: data.estado,
-          cep: data.cep,
-          responsavel: data.responsavel,
-        });
-      } catch (error) {
-        console.error('Erro ao carregar locadora:', error);
-        toast({
-          title: "Erro ao carregar dados",
-          description: "Não foi possível carregar os dados da locadora.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
+        try {
+          setLoading(true);
+          const response = await fetch(`/api/locadoras/${currentProfile.locadoraId}`);
+          
+          if (!response.ok) {
+            throw new Error(`Erro ao carregar dados da locadora: ${response.status}`);
+          }
+
+          const data = await response.json();
+          setLocadora(data);
+          
+          // Atualizar form com os dados
+          form.reset({
+            nome: data.nome,
+            razaoSocial: data.razaoSocial,
+            cnpj: data.cnpj,
+            email: data.email,
+            telefone: data.telefone,
+            endereco: data.endereco,
+            cidade: data.cidade,
+            estado: data.estado,
+            cep: data.cep,
+            responsavel: data.responsavel,
+          });
+        } catch (error) {
+          console.error('Erro ao carregar locadora:', error);
+          toast({
+            title: "Erro ao carregar dados",
+            description: "Não foi possível carregar os dados da locadora.",
+            variant: "destructive",
+          });
+        } finally {
+          setLoading(false);
+        }
       }
     };
 
-    carregarLocadora();
-  }, [profile?.locadoraId, profile?.email, form, toast]);
+    carregarDados();
+  }, [profile?.locadoraId, profile?.email, form, toast, isAdmin, isLocadora]);
 
   const onSubmit = async (data: PerfilFormData) => {
     if (!profile?.locadoraId) return;
@@ -263,23 +272,8 @@ export default function Perfil() {
     }
   };
 
-  if (!isLocadora) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-96">
-          <CardHeader>
-            <CardTitle>Acesso Negado</CardTitle>
-            <CardDescription>
-              Esta página é apenas para locadoras.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
-
-  // Se não tem locadoraId, mostrar opção para recarregar
-  if (!profile?.locadoraId && !loading) {
+  // Se é locadora mas não tem locadoraId, mostrar opção para recarregar
+  if (isLocadora && !profile?.locadoraId && !loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-96">
@@ -310,6 +304,128 @@ export default function Perfil() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Se é admin, mostrar perfil do admin
+  if (isAdmin) {
+    return (
+      <div className="flex-1 space-y-6 p-6">
+        <DrivsHeader 
+          title="Perfil do Administrador"
+          subtitle="Informações do administrador do sistema"
+        />
+
+        <div className="grid gap-6">
+          {/* Card de Informações do Admin */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center space-x-2">
+                <div className="h-5 w-5 flex items-center justify-center text-muted-foreground">
+                  <User className="w-full h-full" />
+                </div>
+                <CardTitle>Informações do Administrador</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Nome</Label>
+                    <Input value={profile?.name || 'Administrador'} disabled />
+                  </div>
+                  <div>
+                    <Label>Email</Label>
+                    <Input value={profile?.email || ''} disabled />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Tipo de Usuário</Label>
+                    <Input value="Administrador" disabled />
+                  </div>
+                  <div>
+                    <Label>Status</Label>
+                    <Badge variant="default">Ativo</Badge>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card de Troca de Senha */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center space-x-2">
+                <div className="h-5 w-5 flex items-center justify-center text-muted-foreground">
+                  <Lock className="w-full h-full" />
+                </div>
+                <CardTitle>Alterar Senha</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={() => setShowPasswordForm(!showPasswordForm)}
+                variant="outline"
+                className="w-full"
+              >
+                {showPasswordForm ? 'Cancelar' : 'Trocar Senha'}
+              </Button>
+              
+              {showPasswordForm && (
+                <div className="mt-4">
+                  <Form {...senhaForm}>
+                    <form onSubmit={senhaForm.handleSubmit(onTrocarSenha)} className="space-y-4">
+                      <FormField
+                        control={senhaForm.control}
+                        name="senhaAtual"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Senha Atual</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="password" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={senhaForm.control}
+                        name="novaSenha"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nova Senha</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="password" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={senhaForm.control}
+                        name="confirmarSenha"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirmar Nova Senha</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="password" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button type="submit" disabled={changingPassword} className="w-full">
+                        {changingPassword ? 'Alterando...' : 'Alterar Senha'}
+                      </Button>
+                    </form>
+                  </Form>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
