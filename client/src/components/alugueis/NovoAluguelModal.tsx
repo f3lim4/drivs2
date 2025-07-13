@@ -52,12 +52,6 @@ const aluguelSchema = z.object({
   veiculoId: z.string().min(1, 'Veículo é obrigatório'),
   dataInicio: z.date({
     required_error: 'Data de início é obrigatória',
-  }).refine((date) => {
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-    return date >= hoje;
-  }, {
-    message: 'Data de início deve ser hoje ou uma data futura',
   }),
   tempoContrato: z.number().min(1, 'Tempo de contrato deve ser maior que 0'),
   taxaAdministrativa: z.number().optional(),
@@ -82,11 +76,9 @@ export function NovoAluguelModal({
   const [loadingData, setLoadingData] = useState(true);
   const { isLocadora, profile } = useAuth();
 
-  // Função para obter a data de amanhã
-  const getAmanha = () => {
-    const amanha = new Date();
-    amanha.setDate(amanha.getDate() + 1);
-    return amanha;
+  // Função para obter a data de hoje
+  const getHoje = () => {
+    return new Date();
   };
 
   const form = useForm<AluguelFormData>({
@@ -94,7 +86,7 @@ export function NovoAluguelModal({
     defaultValues: {
       motoristaId: '',
       veiculoId: '',
-      dataInicio: getAmanha(),
+      dataInicio: getHoje(),
       tempoContrato: 1,
       taxaAdministrativa: undefined,
     },
@@ -225,7 +217,7 @@ export function NovoAluguelModal({
           parseFloat(veiculo.caucao.replace(',', '.')) : 
           veiculo.caucao).toString(),
         taxaAdministrativa: data.taxaAdministrativa ? data.taxaAdministrativa.toString() : '0',
-        status: 'pendente',
+        status: 'ativo',
       };
 
       const response = await fetch('/api/alugueis', {
@@ -266,7 +258,7 @@ export function NovoAluguelModal({
             veiculo.caucao,
           taxaAdmin: data.taxaAdministrativa,
         },
-        status: 'pendente',
+        status: 'ativo',
       };
 
       onAluguelAdicionado(novoAluguel);
