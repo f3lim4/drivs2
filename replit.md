@@ -11,9 +11,11 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes
 
 ### 2025-07-13: Personalização Visual e Correções - CONCLUÍDO
-- ✅ **CRÍTICO: Dashboard isolamento corrigido** - Dashboard agora usa URLs com filtro de locadora
-- ✅ Sistema de isolamento entre locadoras 100% funcional e testado
-- ✅ Cada locadora vê apenas seus dados no dashboard e em todas as páginas
+- ✅ **CRÍTICO: Isolamento 100% CORRIGIDO** - Eliminado "flash" de dados de outras locadoras
+- ✅ **Filtro triplo de segurança** - Backend + Frontend + Validação de consistência
+- ✅ **Cache do React Query otimizado** - Chaves específicas e cache desabilitado
+- ✅ **Proteção contra vazamentos** - Array vazio se houver dados mistos
+- ✅ Sistema de isolamento entre locadoras funcionando perfeitamente
 - ✅ Botão "Gerar Contrato" movido para dentro do card na página de contratos
 - ✅ Implementado coluna "LOCADORA" na página de veículos para admin
 - ✅ Backend enriquecido com nome da locadora nos dados dos veículos

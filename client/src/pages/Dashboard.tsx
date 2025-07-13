@@ -31,23 +31,28 @@ export default function Dashboard() {
   
   // Buscar dados dos motoristas
   const { data: motoristasRaw = [], isLoading: loadingMotoristas } = useQuery<Motorista[]>({
-    queryKey: [motoristasUrl, profile?.locadoraId],
-    enabled: true,
+    queryKey: [motoristasUrl, profile?.locadoraId, isLocadora],
+    enabled: !!profile,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     staleTime: 0,
     gcTime: 0,
   });
 
-  // FILTRO DE SEGURANÇA: Garantir que locadora veja apenas seus motoristas
+  // FILTRO DE SEGURANÇA: Garantir que locadora veja apenas seus motoristas  
   const motoristas = isLocadora && profile?.locadoraId 
     ? motoristasRaw.filter(m => m.locadoraId === profile.locadoraId)
     : motoristasRaw;
+  
+  // PROTEÇÃO EXTRA: Se for locadora e tiver dados de outras locadoras, mostrar array vazio
+  const motoristasSeguro = isLocadora && profile?.locadoraId 
+    ? motoristas.every(m => m.locadoraId === profile.locadoraId) ? motoristas : []
+    : motoristas;
 
   // Buscar dados dos veículos
   const { data: veiculosRaw = [], isLoading: loadingVeiculos } = useQuery<Veiculo[]>({
-    queryKey: [veiculosUrl, profile?.locadoraId],
-    enabled: true,
+    queryKey: [veiculosUrl, profile?.locadoraId, isLocadora],
+    enabled: !!profile,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     staleTime: 0,
@@ -58,11 +63,16 @@ export default function Dashboard() {
   const veiculos = isLocadora && profile?.locadoraId 
     ? veiculosRaw.filter(v => v.locadoraId === profile.locadoraId)
     : veiculosRaw;
+  
+  // PROTEÇÃO EXTRA: Se for locadora e tiver dados de outras locadoras, mostrar array vazio
+  const veiculosSeguro = isLocadora && profile?.locadoraId 
+    ? veiculos.every(v => v.locadoraId === profile.locadoraId) ? veiculos : []
+    : veiculos;
 
   // Buscar dados dos aluguéis
   const { data: alugueisRaw = [], isLoading: loadingAlugueis } = useQuery({
-    queryKey: [alugueisUrl, profile?.locadoraId],
-    enabled: true,
+    queryKey: [alugueisUrl, profile?.locadoraId, isLocadora],
+    enabled: !!profile,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     staleTime: 0,
@@ -73,21 +83,26 @@ export default function Dashboard() {
   const alugueis = isLocadora && profile?.locadoraId 
     ? alugueisRaw.filter((a: any) => a.locadoraId === profile.locadoraId)
     : alugueisRaw;
+  
+  // PROTEÇÃO EXTRA: Se for locadora e tiver dados de outras locadoras, mostrar array vazio
+  const alugueisSeguro = isLocadora && profile?.locadoraId 
+    ? alugueis.every((a: any) => a.locadoraId === profile.locadoraId) ? alugueis : []
+    : alugueis;
 
   const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis;
 
   // Debug: log dos dados carregados
   console.log('Dashboard - Dados carregados:', {
-    motoristas: motoristas.length,
-    veiculos: veiculos.length,
-    alugueis: alugueis.length,
+    motoristas: motoristasSeguro.length,
+    veiculos: veiculosSeguro.length,
+    alugueis: alugueisSeguro.length,
     loading,
     profile: profile?.type,
     locadoraId: profile?.locadoraId,
     isLocadora,
-    motoristasSample: motoristas[0] || 'nenhum',
-    veiculosSample: veiculos[0] || 'nenhum',
-    aluguelSample: alugueis[0] || 'nenhum'
+    motoristasSample: motoristasSeguro[0] || 'nenhum',
+    veiculosSample: veiculosSeguro[0] || 'nenhum',
+    aluguelSample: alugueisSeguro[0] || 'nenhum'
   });
 
   // Função para formatar valores monetários
@@ -104,34 +119,34 @@ export default function Dashboard() {
   proximoMes.setMonth(proximoMes.getMonth() + 1);
 
   // Estatísticas de motoristas
-  const totalMotoristas = motoristas.length;
-  const motoristasAtivos = motoristas.filter(m => m.status === 'ativo').length;
+  const totalMotoristas = motoristasSeguro.length;
+  const motoristasAtivos = motoristasSeguro.filter(m => m.status === 'ativo').length;
   
   // CNH vencendo nos próximos 30 dias
-  const cnhVencendo = motoristas.filter(m => {
+  const cnhVencendo = motoristasSeguro.filter(m => {
     const vencimento = new Date(m.vencimentoCnh);
     return vencimento >= hoje && vencimento <= proximoMes;
   }).length;
 
   // CNH já vencida
-  const cnhVencida = motoristas.filter(m => {
+  const cnhVencida = motoristasSeguro.filter(m => {
     const vencimento = new Date(m.vencimentoCnh);
     return vencimento < hoje;
   }).length;
 
   // Estatísticas de veículos
-  const totalVeiculos = veiculos.length;
-  const veiculosDisponiveis = veiculos.filter(v => v.status === 'disponivel').length;
-  const veiculosAlugados = veiculos.filter(v => v.status === 'alugado').length;
-  const veiculosManutencao = veiculos.filter(v => v.status === 'manutencao').length;
+  const totalVeiculos = veiculosSeguro.length;
+  const veiculosDisponiveis = veiculosSeguro.filter(v => v.status === 'disponivel').length;
+  const veiculosAlugados = veiculosSeguro.filter(v => v.status === 'alugado').length;
+  const veiculosManutencao = veiculosSeguro.filter(v => v.status === 'manutencao').length;
 
   // Estatísticas de aluguéis
-  const totalAlugueis = alugueis.length;
-  const alugueisAtivos = alugueis.filter((a: any) => a.status === 'ativo').length;
-  const alugueisPendentes = alugueis.filter((a: any) => a.status === 'pendente').length;
+  const totalAlugueis = alugueisSeguro.length;
+  const alugueisAtivos = alugueisSeguro.filter((a: any) => a.status === 'ativo').length;
+  const alugueisPendentes = alugueisSeguro.filter((a: any) => a.status === 'pendente').length;
   
   // Calcular receita mensal baseada nos aluguéis ativos
-  const receitaMensal = alugueis
+  const receitaMensal = alugueisSeguro
     .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
     .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorMensal || '0'), 0);
 
