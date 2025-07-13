@@ -13,9 +13,8 @@ export function useVeiculos() {
     try {
       setLoading(true);
       
+      // SEMPRE usar filtro se for locadora - nunca carregar todos os dados
       let url = '/api/veiculos';
-      
-      // Se for locadora, só carregar seus veículos
       if (isLocadora && profile?.locadoraId) {
         url += `?locadoraId=${profile.locadoraId}`;
       }
@@ -32,7 +31,7 @@ export function useVeiculos() {
 
       const data = await response.json();
       
-      // FILTRO DE SEGURANÇA: Se for locadora, filtrar apenas veículos da sua locadora
+      // FILTRO DUPLO DE SEGURANÇA: Sempre filtrar no frontend também
       let veiculosFiltrados = data;
       if (isLocadora && profile?.locadoraId) {
         veiculosFiltrados = data.filter((v: any) => v.locadoraId === profile.locadoraId);
