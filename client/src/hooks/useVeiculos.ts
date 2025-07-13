@@ -114,17 +114,9 @@ export function useVeiculos() {
     queryKey: getQueryKey(),
     queryFn: fetchVeiculos,
     staleTime: 0, // Sempre buscar dados frescos
-    cacheTime: 0, // Não manter cache
+    gcTime: 0, // Não manter cache (substituí cacheTime por gcTime)
     enabled: !!profile, // Só executar se tiver perfil
     retry: false, // Não tentar novamente em caso de erro de segurança
-    onError: (error) => {
-      console.error('Erro ao carregar veículos:', error);
-      toast({
-        title: "Erro ao carregar veículos",
-        description: "Não foi possível carregar a lista de veículos.",
-        variant: "destructive",
-      });
-    }
   });
 
   const adicionarVeiculo = (novoVeiculo: Veiculo) => {
