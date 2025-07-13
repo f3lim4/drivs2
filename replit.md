@@ -29,6 +29,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ Menu mobile agora fecha automaticamente ao clicar em links
 - ✅ Página de perfil adaptada para admin e locadora
 - ✅ Link "Perfil" removido do menu lateral, mantido apenas no menu superior
+- ✅ Favicon atualizado com o novo ícone de setas bidirecionais
 
 ### 2025-07-12: Sistema de Aluguéis Completo - CONCLUÍDO
 - ✅ Configurado sistema para usar CNPJ como ID principal das locadoras
