@@ -32,10 +32,6 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
         return <Badge variant="default" className="bg-green-100 text-green-800">Disponível</Badge>;
       case 'alugado':
         return <Badge variant="default" className="bg-blue-100 text-blue-800">Alugado</Badge>;
-      case 'manutencao':
-        return <Badge variant="destructive" className="bg-orange-100 text-orange-800">Manutenção</Badge>;
-      case 'parado':
-        return <Badge variant="destructive" className="bg-red-100 text-red-800">Parado</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
