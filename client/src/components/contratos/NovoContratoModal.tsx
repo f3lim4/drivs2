@@ -145,11 +145,17 @@ export function NovoContratoModal({
 
   const onSubmit = async (data: ContratoFormData) => {
     try {
+      console.log('Iniciando envio do formulário com dados:', data);
+      
       // Busca dados do motorista e veículo selecionados
       const motorista = motoristas.find(m => m.id === data.motoristaId);
       const veiculo = veiculos.find(v => v.id === data.veiculoId);
 
+      console.log('Motorista encontrado:', motorista);
+      console.log('Veículo encontrado:', veiculo);
+
       if (!motorista || !veiculo) {
+        console.error('Motorista ou veículo não encontrado');
         throw new Error('Motorista ou veículo não encontrado');
       }
 
@@ -531,7 +537,16 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={createContrato.isPending}>
+                <Button 
+                  type="submit" 
+                  disabled={createContrato.isPending}
+                  onClick={() => {
+                    console.log('Botão clicado');
+                    console.log('Valores do formulário:', form.getValues());
+                    console.log('Erros do formulário:', form.formState.errors);
+                    console.log('isValid:', form.formState.isValid);
+                  }}
+                >
                   {createContrato.isPending ? 'Gerando...' : 'Gerar Contrato'}
                 </Button>
               </DialogFooter>
