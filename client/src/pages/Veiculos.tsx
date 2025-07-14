@@ -138,8 +138,8 @@ export default function Veiculos() {
         return <Badge variant="default" className="bg-primary text-primary-foreground">Alugado</Badge>;
       case 'manutencao':
         return <Badge variant="default" className="bg-warning text-warning-foreground">Manutenção</Badge>;
-      case 'indisponivel':
-        return <Badge variant="destructive">Indisponível</Badge>;
+      case 'parado':
+        return <Badge variant="destructive">Parado</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }

@@ -72,7 +72,7 @@ export const veiculos = pgTable("veiculos", {
   vigenciaSeguro: date("vigencia_seguro"),
   valorSeguroMensal: decimal("valor_seguro_mensal", { precision: 10, scale: 2 }),
   // Status
-  status: text("status").notNull().default("disponivel"), // 'disponivel', 'alugado', 'manutencao', 'indisponivel'
+  status: text("status").notNull().default("disponivel"), // 'disponivel', 'alugado', 'manutencao', 'parado'
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

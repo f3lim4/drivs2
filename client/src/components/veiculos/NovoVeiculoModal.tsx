@@ -70,8 +70,7 @@ const veiculoSchema = z.object({
   vigenciaSeguro: z.string().optional(),
   valorSeguroMensal: z.number().min(0).optional(),
   
-  // Status
-  status: z.enum(['disponivel', 'indisponivel']),
+  // Status será sempre "disponível" no cadastro
   
   // Campo condicional para limite específico
   valorLimiteKm: z.number().optional(),
@@ -117,7 +116,7 @@ export function NovoVeiculoModal({
       numeroApolice: '',
       vigenciaSeguro: '',
       valorSeguroMensal: undefined,
-      status: 'disponivel',
+      // Status será definido automaticamente como "disponível"
       valorLimiteKm: undefined,
     },
   });
@@ -179,7 +178,7 @@ export function NovoVeiculoModal({
         numeroApolice: data.numeroApolice,
         vigenciaSeguro: data.vigenciaSeguro || null,
         valorSeguroMensal: data.valorSeguroMensal?.toString(),
-        status: data.status,
+        status: 'disponivel', // Sempre "disponível" no cadastro
       };
 
       const response = await fetch('/api/veiculos', {
@@ -677,34 +676,7 @@ export function NovoVeiculoModal({
               </div>
             </div>
 
-            {/* STATUS */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Status
-              </h3>
-              
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="disponivel">Disponível</SelectItem>
-                        <SelectItem value="indisponivel">Indisponível</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/* STATUS: Veículos são cadastrados automaticamente como "disponível" */}
 
             <DialogFooter>
               <Button
