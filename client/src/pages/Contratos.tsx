@@ -23,6 +23,8 @@ import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { NovoContratoModal } from '@/components/contratos/NovoContratoModal';
 import { VisualizarContratoModal } from '@/components/contratos/VisualizarContratoModal';
 import { EditarContratoModal } from '@/components/contratos/EditarContratoModal';
+import { UploadTemplateModal } from '@/components/contratos/UploadTemplateModal';
+import { useTemplateContratos } from '@/hooks/useTemplateContratos';
 import { Contrato } from '@/types';
 import jsPDF from 'jspdf';
 
@@ -30,10 +32,11 @@ export default function Contratos() {
   const { isAdmin, isLocadora, profile } = useAuth();
   const { toast } = useToast();
   const { contratos, isLoading, createContrato, updateContrato, deleteContrato } = useContratos();
-  const [templates, setTemplates] = useState<any[]>([]);
+  const { templates, isLoading: isLoadingTemplates } = useTemplateContratos();
   const [showNovoContratoModal, setShowNovoContratoModal] = useState(false);
   const [showVisualizarModal, setShowVisualizarModal] = useState(false);
   const [showEditarModal, setShowEditarModal] = useState(false);
+  const [showUploadTemplateModal, setShowUploadTemplateModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
 
   const handleContratoGerado = (novoContrato: Contrato) => {
@@ -278,7 +281,11 @@ export default function Contratos() {
           </CardHeader>
           <CardContent>
             <div className="flex gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => setShowUploadTemplateModal(true)}
+              >
                 <Upload className="w-4 h-4" />
                 Subir seu contrato
               </Button>
@@ -562,6 +569,15 @@ export default function Contratos() {
         onOpenChange={setShowEditarModal}
         contrato={selectedContrato}
         onContratoEditado={handleContratoEditado}
+      />
+
+      {/* Modal Upload Template */}
+      <UploadTemplateModal
+        open={showUploadTemplateModal}
+        onOpenChange={setShowUploadTemplateModal}
+        onTemplateUploaded={() => {
+          // Refresh dos templates será feito automaticamente pelo hook
+        }}
       />
     </div>
   );

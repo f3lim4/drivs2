@@ -46,6 +46,7 @@ import { Contrato, Motorista, Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
 import { useAuth } from '@/hooks/useAuth';
 import { useContratos } from '../../hooks/useContratos';
+import { useTemplateContratos } from '../../hooks/useTemplateContratos';
 
 // Schema de validação
 const contratoSchema = z.object({
@@ -57,6 +58,7 @@ const contratoSchema = z.object({
   tempoContrato: z.number().min(1, 'Tempo de contrato deve ser maior que 0'),
   valorSemanal: z.number().min(0.01, 'Valor semanal deve ser maior que 0'),
   caucao: z.number().min(0, 'Caução deve ser maior ou igual a 0'),
+  templateId: z.string().optional(),
 });
 
 type ContratoFormData = z.infer<typeof contratoSchema>;
@@ -80,6 +82,9 @@ export function NovoContratoModal({
   
   // Hook para gerenciar contratos
   const { createContrato } = useContratos();
+  
+  // Hook para gerenciar templates
+  const { templates } = useTemplateContratos();
 
   // Função para obter a data de amanhã
   const getAmanha = () => {
@@ -97,6 +102,7 @@ export function NovoContratoModal({
       tempoContrato: 1,
       valorSemanal: 0,
       caucao: 0,
+      templateId: '',
     },
   });
 
@@ -409,6 +415,35 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                             Nenhum veículo disponível
                           </SelectItem>
                         )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* TEMPLATE */}
+              <FormField
+                control={form.control}
+                name="templateId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Template de Contrato</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Usar template padrão" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">
+                          Template Padrão DRIVS
+                        </SelectItem>
+                        {templates.map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.nome}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />

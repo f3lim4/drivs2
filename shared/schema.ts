@@ -149,6 +149,17 @@ export const contratos = pgTable("contratos", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Templates de contratos table
+export const templateContratos = pgTable("template_contratos", {
+  id: text("id").primaryKey(),
+  locadoraId: text("locadora_id").notNull(),
+  nome: text("nome").notNull(),
+  conteudo: text("conteudo").notNull(),
+  ativo: boolean("ativo").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -187,6 +198,12 @@ export const insertContratoSchema = createInsertSchema(contratos).omit({
   updatedAt: true,
 });
 
+export const insertTemplateContratoSchema = createInsertSchema(templateContratos).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -213,3 +230,6 @@ export type Aluguel = typeof alugueis.$inferSelect & {
 
 export type InsertContrato = z.infer<typeof insertContratoSchema>;
 export type Contrato = typeof contratos.$inferSelect;
+
+export type InsertTemplateContrato = z.infer<typeof insertTemplateContratoSchema>;
+export type TemplateContrato = typeof templateContratos.$inferSelect;

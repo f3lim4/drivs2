@@ -582,6 +582,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Template Contratos routes
+  app.get("/api/template-contratos", async (req, res) => {
+    try {
+      const locadoraId = req.query.locadoraId as string;
+      const templates = locadoraId 
+        ? await storage.getTemplateContratosByLocadora(locadoraId)
+        : await storage.getAllTemplateContratos();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching template contratos:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/template-contratos/:id", async (req, res) => {
+    try {
+      const template = await storage.getTemplateContrato(req.params.id);
+      if (!template) {
+        return res.status(404).json({ message: "Template not found" });
+      }
+      res.json(template);
+    } catch (error) {
+      console.error("Error fetching template contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/template-contratos", async (req, res) => {
+    try {
+      const template = await storage.createTemplateContrato(req.body);
+      res.json(template);
+    } catch (error) {
+      console.error("Error creating template contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/template-contratos/:id", async (req, res) => {
+    try {
+      const template = await storage.updateTemplateContrato(req.params.id, req.body);
+      res.json(template);
+    } catch (error) {
+      console.error("Error updating template contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/template-contratos/:id", async (req, res) => {
+    try {
+      await storage.deleteTemplateContrato(req.params.id);
+      res.json({ message: "Template deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting template contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
