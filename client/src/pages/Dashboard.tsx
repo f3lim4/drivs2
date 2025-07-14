@@ -144,7 +144,7 @@ export default function Dashboard() {
   // Calcular receita mensal baseada nos aluguéis ativos
   const receitaMensal = alugueisSeguro
     .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
-    .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorTotal || '0'), 0);
+    .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorMensal || '0'), 0);
 
   // Gerar alertas baseados nos dados
   const alertas: Alert[] = [];
