@@ -187,7 +187,7 @@ export default function CadastroLocadora() {
                     id="nome"
                     value={formData.nome}
                     onChange={(e) => updateFormData('nome', e.target.value)}
-                    placeholder="AutoRent Premium"
+                    placeholder=""
                     required
                   />
                 </div>
@@ -198,7 +198,7 @@ export default function CadastroLocadora() {
                     id="responsavel"
                     value={formData.responsavel}
                     onChange={(e) => updateFormData('responsavel', e.target.value)}
-                    placeholder="João Silva"
+                    placeholder=""
                     required
                   />
                 </div>
@@ -209,7 +209,7 @@ export default function CadastroLocadora() {
                     id="razaoSocial"
                     value={formData.razaoSocial}
                     onChange={(e) => updateFormData('razaoSocial', e.target.value)}
-                    placeholder="AutoRent Premium Locadora Ltda"
+                    placeholder=""
                     required
                   />
                 </div>
@@ -220,7 +220,7 @@ export default function CadastroLocadora() {
                     id="cnpj"
                     value={formData.cnpj}
                     onChange={(e) => updateFormData('cnpj', e.target.value)}
-                    placeholder="12.345.678/0001-90"
+                    placeholder=""
                     required
                   />
                 </div>
@@ -232,7 +232,7 @@ export default function CadastroLocadora() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => updateFormData('email', e.target.value)}
-                    placeholder="contato@autorent.com"
+                    placeholder=""
                     required
                   />
                 </div>
@@ -243,7 +243,7 @@ export default function CadastroLocadora() {
                     id="telefone"
                     value={formData.telefone}
                     onChange={(e) => updateFormData('telefone', e.target.value)}
-                    placeholder="(11) 98765-4321"
+                    placeholder=""
                     required
                   />
                 </div>
@@ -255,7 +255,7 @@ export default function CadastroLocadora() {
                     type="password"
                     value={formData.senha}
                     onChange={(e) => updateFormData('senha', e.target.value)}
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder=""
                     required
                     minLength={6}
                   />
@@ -268,7 +268,7 @@ export default function CadastroLocadora() {
                     type="password"
                     value={formData.confirmarSenha}
                     onChange={(e) => updateFormData('confirmarSenha', e.target.value)}
-                    placeholder="Digite a senha novamente"
+                    placeholder=""
                     required
                     minLength={6}
                   />
@@ -280,7 +280,7 @@ export default function CadastroLocadora() {
                     id="endereco"
                     value={formData.endereco}
                     onChange={(e) => updateFormData('endereco', e.target.value)}
-                    placeholder="Av. Paulista, 1000"
+                    placeholder=""
                     required
                   />
                 </div>
@@ -291,7 +291,7 @@ export default function CadastroLocadora() {
                     id="cidade"
                     value={formData.cidade}
                     onChange={(e) => updateFormData('cidade', e.target.value)}
-                    placeholder="São Paulo"
+                    placeholder=""
                     required
                   />
                 </div>
@@ -343,7 +343,7 @@ export default function CadastroLocadora() {
                     id="cep"
                     value={formData.cep}
                     onChange={(e) => updateFormData('cep', e.target.value)}
-                    placeholder="01310-100"
+                    placeholder=""
                     required
                   />
                 </div>

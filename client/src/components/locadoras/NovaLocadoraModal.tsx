@@ -131,7 +131,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 id="nome"
                 value={formData.nome}
                 onChange={(e) => updateFormData('nome', e.target.value)}
-                placeholder="AutoRent Premium"
+                placeholder=""
                 required
               />
             </div>
@@ -142,7 +142,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 id="responsavel"
                 value={formData.responsavel}
                 onChange={(e) => updateFormData('responsavel', e.target.value)}
-                placeholder="João Silva"
+                placeholder=""
                 required
               />
             </div>
@@ -153,7 +153,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 id="razaoSocial"
                 value={formData.razaoSocial}
                 onChange={(e) => updateFormData('razaoSocial', e.target.value)}
-                placeholder="AutoRent Premium Locadora Ltda"
+                placeholder=""
                 required
               />
             </div>
@@ -164,7 +164,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 id="cnpj"
                 value={formData.cnpj}
                 onChange={(e) => updateFormData('cnpj', e.target.value)}
-                placeholder="12.345.678/0001-90"
+                placeholder=""
                 required
               />
             </div>
@@ -190,7 +190,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 type="email"
                 value={formData.email}
                 onChange={(e) => updateFormData('email', e.target.value)}
-                placeholder="contato@autorent.com"
+                placeholder=""
                 required
               />
             </div>
@@ -201,7 +201,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 id="telefone"
                 value={formData.telefone}
                 onChange={(e) => updateFormData('telefone', e.target.value)}
-                placeholder="(11) 98765-4321"
+                placeholder=""
                 required
               />
             </div>
@@ -212,7 +212,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 id="endereco"
                 value={formData.endereco}
                 onChange={(e) => updateFormData('endereco', e.target.value)}
-                placeholder="Av. Paulista, 1000"
+                placeholder=""
                 required
               />
             </div>
@@ -223,7 +223,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 id="cidade"
                 value={formData.cidade}
                 onChange={(e) => updateFormData('cidade', e.target.value)}
-                placeholder="São Paulo"
+                placeholder=""
                 required
               />
             </div>
@@ -275,7 +275,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 id="cep"
                 value={formData.cep}
                 onChange={(e) => updateFormData('cep', e.target.value)}
-                placeholder="01310-100"
+                placeholder=""
                 required
               />
             </div>
