@@ -160,7 +160,7 @@ export default function Contratos() {
       pdf.text(`Cliente: ${contrato.cliente}`, margin, yPosition);
       yPosition += 6;
       
-      pdf.text(`Valor: R$ ${contrato.valor.toFixed(2)}`, margin, yPosition);
+      pdf.text(`Valor: R$ ${Number(contrato.valor).toFixed(2)}`, margin, yPosition);
       yPosition += 6;
       
       pdf.text(`Data de Início: ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}`, margin, yPosition);
