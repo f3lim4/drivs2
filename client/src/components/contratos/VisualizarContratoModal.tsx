@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Printer, Edit, Download } from 'lucide-react';
 import { Contrato } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 import jsPDF from 'jspdf';
 
 interface VisualizarContratoModalProps {
@@ -27,11 +28,33 @@ export function VisualizarContratoModal({
   contrato,
   onEditar
 }: VisualizarContratoModalProps) {
-  const handleImprimir = () => {
+  const { profile } = useAuth();
+  const handleImprimir = async () => {
     if (!contrato) return;
+    
+    // Buscar dados da locadora
+    const locadoraId = profile?.locadoraId;
+    
+    let dadosLocadora = null;
+    if (locadoraId) {
+      const response = await fetch(`/api/locadoras/${locadoraId}`);
+      if (response.ok) {
+        dadosLocadora = await response.json();
+      }
+    }
     
     const printWindow = window.open('', '_blank');
     if (printWindow) {
+      const cabecalhoEmpresa = dadosLocadora ? `
+        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
+          <h2 style="margin: 0; font-size: 18px; font-weight: bold;">${dadosLocadora.nome}</h2>
+          <p style="margin: 2px 0; font-size: 10px;">CNPJ: ${dadosLocadora.cnpj}</p>
+          <p style="margin: 2px 0; font-size: 10px;">${dadosLocadora.rua}, ${dadosLocadora.numero} - ${dadosLocadora.bairro}</p>
+          <p style="margin: 2px 0; font-size: 10px;">${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}</p>
+          <p style="margin: 2px 0; font-size: 10px;">Tel: ${dadosLocadora.telefone} | Email: ${dadosLocadora.email}</p>
+        </div>
+      ` : '';
+      
       printWindow.document.write(`
         <html>
           <head>
@@ -49,9 +72,31 @@ export function VisualizarContratoModal({
                 font-size: 16px;
                 margin-bottom: 20px;
               }
+              .contract-info {
+                margin-bottom: 20px;
+                border: 1px solid #ddd;
+                padding: 10px;
+                background-color: #f9f9f9;
+              }
               .contract-content {
                 white-space: pre-line;
                 text-align: justify;
+              }
+              .signatures {
+                margin-top: 40px;
+                display: flex;
+                justify-content: space-between;
+                border-top: 1px solid #000;
+                padding-top: 20px;
+              }
+              .signature-field {
+                width: 45%;
+                text-align: center;
+              }
+              .signature-line {
+                border-bottom: 1px solid #000;
+                margin-bottom: 5px;
+                height: 30px;
               }
               @media print {
                 body { margin: 0; }
@@ -60,7 +105,27 @@ export function VisualizarContratoModal({
             </style>
           </head>
           <body>
+            ${cabecalhoEmpresa}
+            <h1>CONTRATO DE LOCAÇÃO DE VEÍCULO</h1>
+            <div class="contract-info">
+              <p><strong>Cliente:</strong> ${contrato.cliente}</p>
+              <p><strong>Valor:</strong> R$ ${contrato.valor.toFixed(2)}</p>
+              <p><strong>Data de Início:</strong> ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
+              ${contrato.dataFim ? `<p><strong>Data de Término:</strong> ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}</p>` : ''}
+            </div>
             <div class="contract-content">${contrato.template}</div>
+            <div class="signatures">
+              <div class="signature-field">
+                <div class="signature-line"></div>
+                <p>Assinatura do Locador</p>
+                <p>${dadosLocadora ? dadosLocadora.responsavel : ''}</p>
+              </div>
+              <div class="signature-field">
+                <div class="signature-line"></div>
+                <p>Assinatura do Locatário</p>
+                <p>${contrato.cliente}</p>
+              </div>
+            </div>
           </body>
         </html>
       `);
@@ -73,6 +138,17 @@ export function VisualizarContratoModal({
     if (!contrato) return;
     
     try {
+      // Buscar dados da locadora
+      const locadoraId = profile?.locadoraId;
+      
+      let dadosLocadora = null;
+      if (locadoraId) {
+        const response = await fetch(`/api/locadoras/${locadoraId}`);
+        if (response.ok) {
+          dadosLocadora = await response.json();
+        }
+      }
+      
       // Cria um novo documento PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
       
@@ -83,18 +159,62 @@ export function VisualizarContratoModal({
       const lineHeight = 5;
       const maxWidth = pageWidth - (margin * 2);
       
+      let yPosition = margin;
+      
+      // Cabeçalho com dados da empresa
+      if (dadosLocadora) {
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(dadosLocadora.nome, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 6;
+        
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`CNPJ: ${dadosLocadora.cnpj}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 4;
+        
+        pdf.text(`${dadosLocadora.rua}, ${dadosLocadora.numero} - ${dadosLocadora.bairro}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 4;
+        
+        pdf.text(`${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 4;
+        
+        pdf.text(`Tel: ${dadosLocadora.telefone} | Email: ${dadosLocadora.email}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 8;
+        
+        // Linha separadora
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+        yPosition += 6;
+      }
+      
       // Título
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('CONTRATO DE LOCAÇÃO DE VEÍCULO', pageWidth / 2, margin + 10, { align: 'center' });
+      pdf.text('CONTRATO DE LOCAÇÃO DE VEÍCULO', pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 10;
       
-      // Conteúdo
+      // Informações do contrato
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       
-      let yPosition = margin + 25;
+      pdf.text(`Cliente: ${contrato.cliente}`, margin, yPosition);
+      yPosition += 6;
       
-      // Divide o conteúdo em linhas
+      pdf.text(`Valor: R$ ${contrato.valor.toFixed(2)}`, margin, yPosition);
+      yPosition += 6;
+      
+      pdf.text(`Data de Início: ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}`, margin, yPosition);
+      yPosition += 6;
+      
+      if (contrato.dataFim) {
+        pdf.text(`Data de Término: ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}`, margin, yPosition);
+        yPosition += 6;
+      }
+      
+      yPosition += 4;
+      
+      // Conteúdo do contrato
       const lines = contrato.template.split('\n');
       
       for (const line of lines) {
@@ -122,6 +242,34 @@ export function VisualizarContratoModal({
           yPosition += lineHeight;
         }
       }
+      
+      // Rodapé com assinaturas
+      if (yPosition > pageHeight - 60) {
+        pdf.addPage();
+        yPosition = margin;
+      }
+      
+      yPosition = pageHeight - 40;
+      
+      // Linha separadora
+      pdf.setLineWidth(0.5);
+      pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+      yPosition += 10;
+      
+      // Campos de assinatura
+      pdf.setFontSize(9);
+      pdf.text('_________________________________', margin, yPosition);
+      pdf.text('_________________________________', pageWidth - margin - 60, yPosition);
+      yPosition += 4;
+      
+      pdf.text('Assinatura do Locador', margin, yPosition);
+      pdf.text('Assinatura do Locatário', pageWidth - margin - 60, yPosition);
+      yPosition += 6;
+      
+      if (dadosLocadora) {
+        pdf.text(dadosLocadora.responsavel, margin, yPosition);
+      }
+      pdf.text(contrato.cliente, pageWidth - margin - 60, yPosition);
       
       // Salva o PDF
       const fileName = `Contrato_${contrato.cliente.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
