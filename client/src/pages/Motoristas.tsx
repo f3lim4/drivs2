@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Edit, Trash2, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useMotoristas } from '@/hooks/useMotoristas';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -40,8 +41,7 @@ import { addDays, isAfter, isBefore, parseISO } from 'date-fns';
 export default function Motoristas() {
   const { toast } = useToast();
   const { isAdmin, isLocadora, profile } = useAuth();
-  const [motoristas, setMotoristas] = useState<Motorista[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { motoristas, isLoading, deleteMotorista } = useMotoristas();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [modalOpen, setModalOpen] = useState(false);
@@ -139,11 +139,11 @@ export default function Motoristas() {
   };
 
   const handleMotoristaAdicionado = (novoMotorista: Motorista) => {
-    setMotoristas(prev => [...prev, novoMotorista]);
     toast({
       title: "Motorista Cadastrado",
       description: `${novoMotorista.nome} foi cadastrado com sucesso!`,
     });
+    // A atualização da lista é feita automaticamente pelo hook
   };
 
   const handleEditarMotorista = (motorista: Motorista) => {
@@ -152,13 +152,11 @@ export default function Motoristas() {
   };
 
   const handleMotoristaEditado = (motoristaAtualizado: Motorista) => {
-    setMotoristas(prev => 
-      prev.map(m => m.id === motoristaAtualizado.id ? motoristaAtualizado : m)
-    );
     toast({
       title: "Motorista Atualizado",
       description: `${motoristaAtualizado.nome} foi atualizado com sucesso!`,
     });
+    // A atualização da lista é feita automaticamente pelo hook
   };
 
   const handleExcluirMotorista = (motorista: Motorista) => {
@@ -168,16 +166,7 @@ export default function Motoristas() {
 
   const handleConfirmarExclusao = async (motorista: Motorista) => {
     try {
-      const response = await fetch(`/api/motoristas/${motorista.id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Erro ao excluir motorista');
-      }
-      
-      // Remove do estado local após sucesso na API
-      setMotoristas(prev => prev.filter(m => m.id !== motorista.id));
+      await deleteMotorista.mutateAsync(motorista.id);
       
       toast({
         title: "Motorista Excluído",
@@ -221,7 +210,7 @@ export default function Motoristas() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
