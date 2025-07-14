@@ -153,6 +153,28 @@ export function NovoContratoModal({
         throw new Error('Motorista ou veículo não encontrado');
       }
 
+      // Buscar dados da locadora
+      let dadosLocadora = null;
+      if (profile?.locadoraId) {
+        const response = await fetch(`/api/locadoras/${profile.locadoraId}`);
+        if (response.ok) {
+          dadosLocadora = await response.json();
+        }
+      }
+      
+      // Usar dados reais da locadora ou dados padrão
+      const locadorInfo = dadosLocadora ? {
+        nome: dadosLocadora.nome,
+        cnpj: dadosLocadora.cnpj,
+        endereco: `${dadosLocadora.rua}, ${dadosLocadora.numero} - ${dadosLocadora.bairro}, ${dadosLocadora.cidade}/${dadosLocadora.estado}`,
+        responsavel: dadosLocadora.responsavel
+      } : {
+        nome: "DRIVS LOCADORA DE VEÍCULOS LTDA",
+        cnpj: "12.345.678/0001-90",
+        endereco: "Rua das Empresas, 123 - Centro, Embu das Artes/SP",
+        responsavel: "Responsável da Locadora"
+      };
+
       // Calcula data final
       const dataFim = new Date(data.dataInicio);
       dataFim.setMonth(dataFim.getMonth() + data.tempoContrato);
@@ -172,8 +194,8 @@ export function NovoContratoModal({
         status: 'ativo' as const,
         template: `CONTRATO DE LOCAÇÃO DE VEÍCULO
 
-LOCADOR: DRIVS LOCADORA DE VEÍCULOS LTDA, Ramo de atividade: Locação de Veículos, portador do CNPJ: 12.345.678/0001-90, cuja
-sede se encontra na Rua das Empresas, 123 - Centro, Embu das Artes/SP. 
+LOCADOR: ${locadorInfo.nome}, Ramo de atividade: Locação de Veículos, portador do CNPJ: ${locadorInfo.cnpj}, cuja
+sede se encontra na ${locadorInfo.endereco}. 
 
 LOCATÁRIO: ${motorista.nome}, nascido em ${motorista.dataNascimento},
 profissão: Motorista de Aplicativo, portador (a) do CPF nº ${motorista.cpf} - RG: ${motorista.rg} CNH: ${motorista.cnh} Telefone: ${motorista.telefone}
@@ -266,7 +288,7 @@ contratadas, assinam o presente instrumento em Embu das Artes - SP, ${format(dat
 
 
             __________________                          __________________
-            ${motorista.nome}                          DRIVS LOCADORA DE VEÍCULOS LTDA
+            ${motorista.nome}                          ${locadorInfo.responsavel}
                 LOCATÁRIO                                    LOCADORA
 
 Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
