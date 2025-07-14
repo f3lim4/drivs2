@@ -66,8 +66,8 @@ const veiculoSchema = z.object({
   vigenciaSeguro: z.string().optional(),
   valorSeguroMensal: z.number().optional(),
   
-  // Status
-  status: z.enum(['disponivel', 'alugado', 'manutencao', 'indisponivel']),
+  // Status - apenas manutenção e parado podem ser escolhidos manualmente
+  status: z.enum(['disponivel', 'alugado', 'manutencao', 'parado']),
   
   // Campo condicional para limite específico
   valorLimiteKm: z.number().optional(),
@@ -529,9 +529,9 @@ export function EditarVeiculoModal({
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="disponivel">Disponível</SelectItem>
-                        <SelectItem value="alugado">Alugado</SelectItem>
+                        <SelectItem value="alugado" disabled>Alugado (automático)</SelectItem>
                         <SelectItem value="manutencao">Manutenção</SelectItem>
-                        <SelectItem value="indisponivel">Indisponível</SelectItem>
+                        <SelectItem value="parado">Parado</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

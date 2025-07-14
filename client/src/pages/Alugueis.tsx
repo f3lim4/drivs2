@@ -175,11 +175,24 @@ export default function Alugueis() {
       });
 
       if (response.ok) {
+        // Restaurar status do veículo para "disponível"
+        const updateVeiculoResponse = await fetch(`/api/veiculos/${aluguel.veiculoId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: 'disponivel' }),
+        });
+
+        if (!updateVeiculoResponse.ok) {
+          console.error('Erro ao restaurar status do veículo');
+        }
+
         // Remove da lista local
         setAlugueis(prev => prev.filter(a => a.id !== aluguel.id));
         toast({
           title: "Aluguel excluído",
-          description: "O aluguel foi removido com sucesso.",
+          description: "O aluguel foi removido e o veículo está disponível novamente.",
         });
       } else {
         toast({
