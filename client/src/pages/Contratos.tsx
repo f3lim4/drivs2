@@ -36,20 +36,12 @@ export default function Contratos() {
   const [showEditarModal, setShowEditarModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
 
-  const handleContratoGerado = async (novoContrato: Contrato) => {
-    try {
-      await createContrato.mutateAsync(novoContrato);
-      toast({
-        title: "Contrato Gerado",
-        description: `Contrato para ${novoContrato.cliente} foi gerado com sucesso!`,
-      });
-    } catch (error) {
-      toast({
-        title: "Erro",
-        description: "Falha ao gerar contrato. Tente novamente.",
-        variant: "destructive",
-      });
-    }
+  const handleContratoGerado = (novoContrato: Contrato) => {
+    // O contrato já foi criado no modal, só precisamos mostrar o toast de sucesso
+    toast({
+      title: "Contrato Gerado",
+      description: `Contrato para ${novoContrato.cliente} foi gerado com sucesso!`,
+    });
   };
 
   const handleVisualizarContrato = (contrato: Contrato) => {
