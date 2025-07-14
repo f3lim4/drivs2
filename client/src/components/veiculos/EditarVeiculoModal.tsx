@@ -151,6 +151,9 @@ export function EditarVeiculoModal({
   const onSubmit = async (data: VeiculoFormData) => {
     if (!veiculo) return;
 
+    console.log('Iniciando edição do veículo:', veiculo.id);
+    console.log('Dados do formulário:', data);
+    
     setLoading(true);
     
     try {
@@ -180,6 +183,8 @@ export function EditarVeiculoModal({
         status: data.status,
       };
 
+      console.log('Dados preparados para API:', veiculoData);
+
       // Fazer chamada à API
       const response = await fetch(`/api/veiculos/${veiculo.id}`, {
         method: 'PUT',
@@ -189,12 +194,16 @@ export function EditarVeiculoModal({
         body: JSON.stringify(veiculoData),
       });
 
+      console.log('Resposta da API:', response.status, response.statusText);
+
       if (!response.ok) {
         const error = await response.json();
+        console.error('Erro da API:', error);
         throw new Error(error.message || 'Erro ao atualizar veículo');
       }
 
       const veiculoAtualizado = await response.json();
+      console.log('Veículo atualizado:', veiculoAtualizado);
       onVeiculoEditado(veiculoAtualizado);
       onOpenChange(false);
       
@@ -540,7 +549,15 @@ export function EditarVeiculoModal({
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={loading}>
+              <Button 
+                type="submit" 
+                disabled={loading}
+                onClick={() => {
+                  console.log('Botão salvar clicado');
+                  console.log('Erros do formulário:', form.formState.errors);
+                  console.log('Dados do formulário antes do submit:', form.getValues());
+                }}
+              >
                 {loading ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
             </DialogFooter>
