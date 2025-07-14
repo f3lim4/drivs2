@@ -10,7 +10,7 @@ import {
   type TemplateContrato, type InsertTemplateContrato
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 // Storage interface for database operations
@@ -77,6 +77,38 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Função para sincronizar status dos veículos com aluguéis ativos
+  private async syncVeiculosStatus(): Promise<void> {
+    try {
+      // Atualizar veículos para 'disponivel' que não têm aluguel ativo
+      await db.execute(sql`
+        UPDATE veiculos 
+        SET status = 'disponivel' 
+        WHERE status = 'alugado' 
+        AND id NOT IN (
+          SELECT DISTINCT veiculo_id 
+          FROM alugueis 
+          WHERE status = 'ativo'
+        )
+      `);
+
+      // Atualizar veículos para 'alugado' que têm aluguel ativo
+      await db.execute(sql`
+        UPDATE veiculos 
+        SET status = 'alugado' 
+        WHERE status = 'disponivel' 
+        AND id IN (
+          SELECT DISTINCT veiculo_id 
+          FROM alugueis 
+          WHERE status = 'ativo'
+        )
+      `);
+
+      console.log('[STATUS SYNC] Status dos veículos sincronizado com aluguéis');
+    } catch (error) {
+      console.error('[STATUS SYNC] Erro ao sincronizar status:', error);
+    }
+  }
   // User operations
   async getUser(id: number): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id));
@@ -163,6 +195,9 @@ export class DatabaseStorage implements IStorage {
 
   // Veiculo operations
   async getAllVeiculos(): Promise<Veiculo[]> {
+    // Sincronizar status antes de buscar
+    await this.syncVeiculosStatus();
+    
     // Use JOIN para buscar veículos e locadora em uma única query
     const veiculosData = await db
       .select({
@@ -201,6 +236,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getVeiculosByLocadora(locadoraId: string): Promise<Veiculo[]> {
+    // Sincronizar status antes de buscar
+    await this.syncVeiculosStatus();
+    
     // Use JOIN para buscar veículos e locadora em uma única query
     const veiculosData = await db
       .select({
