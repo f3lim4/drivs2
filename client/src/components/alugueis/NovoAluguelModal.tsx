@@ -142,6 +142,9 @@ export function NovoAluguelModal({
           if (veiculoResponse.ok) {
             const veiculosData = await veiculoResponse.json();
             
+            console.log('NovoAluguelModal - Veículos carregados:', veiculosData);
+            console.log('NovoAluguelModal - URL usada:', veiculoUrl);
+            
             // FILTRO DE SEGURANÇA: Verificar se todos os veículos pertencem à locadora
             if (isLocadora && profile?.locadoraId) {
               const todosVeiculosCorretos = veiculosData.every(v => v.locadoraId === profile.locadoraId);
@@ -154,6 +157,8 @@ export function NovoAluguelModal({
             } else {
               setVeiculos(veiculosData);
             }
+          } else {
+            console.error('Erro ao carregar veículos:', veiculoResponse.status);
           }
           
         } catch (error) {
@@ -171,6 +176,10 @@ export function NovoAluguelModal({
   const veiculosDisponiveis = veiculos.filter(veiculo => 
     veiculo.status === 'disponivel' || veiculo.status === 'ativo'
   );
+  
+  console.log('NovoAluguelModal - Veículos totais:', veiculos.length);
+  console.log('NovoAluguelModal - Veículos disponíveis:', veiculosDisponiveis.length);
+  console.log('NovoAluguelModal - Status dos veículos:', veiculos.map(v => ({id: v.id, status: v.status})));
 
   // Filtra apenas motoristas ativos
   const motoristasAtivos = motoristas.filter(motorista => motorista.status === 'ativo');
