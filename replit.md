@@ -18,6 +18,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Erro de SelectItem corrigido** - Valor vazio substituído por "default"
 - ✅ **Cache otimizado** - Dados carregados sem interferência entre sessões
 - ✅ **Logs de segurança adicionados** - Monitoramento de violações de isolamento
+- ✅ **NOVO: Página de templates organizada** - Abas separadas para contratos e templates
+- ✅ **NOVO: Gerenciamento de templates** - Visualização e exclusão de templates personalizados
+- ✅ **NOVO: Interface melhorada** - Layout com abas para melhor organização do conteúdo
 
 ### 2025-07-14: Dados da Empresa em Contratos - CONCLUÍDO
 - ✅ **Sistema de contratos com dados reais da empresa** - PDFs agora incluem informações da locadora
