@@ -277,10 +277,29 @@ export default function Contratos() {
   return (
     <div className="flex-1 space-y-6 p-6">
       {/* Header da página */}
-      <DrivsHeader 
-        title="Contratos"
-        subtitle="Sistema Drivs - Gerencie sua locadora de forma eficiente"
-      />
+      <div className="flex items-center justify-between">
+        <DrivsHeader 
+          title="Contratos"
+          subtitle="Sistema Drivs - Gerencie sua locadora de forma eficiente"
+        />
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => setShowUploadTemplateModal(true)}
+          >
+            <Upload className="w-4 h-4" />
+            Subir Template
+          </Button>
+          <Button 
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
+            onClick={() => setShowNovoContratoModal(true)}
+          >
+            <Plus className="w-4 h-4" />
+            Gerar Contrato
+          </Button>
+        </div>
+      </div>
 
       {/* Tabs para organizar contratos e templates */}
       <Tabs defaultValue="contratos" className="w-full">
@@ -291,37 +310,6 @@ export default function Contratos() {
         
         {/* Aba de Contratos */}
         <TabsContent value="contratos" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl">Gerenciamento de Contratos</CardTitle>
-                  <p className="text-muted-foreground mt-1">
-                    Gerencie templates e gere contratos personalizados
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  className="flex items-center gap-2"
-                  onClick={() => setShowUploadTemplateModal(true)}
-                >
-                  <Upload className="w-4 h-4" />
-                  Subir Template
-                </Button>
-                <Button 
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
-                  onClick={() => setShowNovoContratoModal(true)}
-                >
-                  <Plus className="w-4 h-4" />
-                  Gerar Contrato
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Tabela de contratos */}
           {contratos.length === 0 ? (
