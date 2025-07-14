@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-14: Sistema de Status Simplificado - CONCLUÍDO
+- ✅ **Status 100% automático implementado** - Veículos só têm "disponível" ou "alugado"
+- ✅ **Campo de status removido da edição** - Não é mais possível editar status manualmente
+- ✅ **Interface informativa** - Modal de edição explica como funciona o controle automático
+- ✅ **Workflow simplificado** - disponível ↔ alugado (apenas via criação/exclusão de aluguel)
+- ✅ **Status "manutenção" e "parado" removidos** - Sistema focado apenas no essencial
+- ✅ **Badges atualizados** - Todos os componentes mostram apenas status válidos
+- ✅ **Schema atualizado** - Documentação reflete apenas status automáticos
+
 ### 2025-07-14: Sistema de Templates e Correção de Flash de Dados - CONCLUÍDO
 - ✅ **Sistema de templates de contrato implementado** - Upload, edição e seleção de templates personalizados
 - ✅ **Modal de upload com campos disponíveis** - 25 variáveis organizadas por categoria

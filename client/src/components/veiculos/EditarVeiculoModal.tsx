@@ -66,8 +66,7 @@ const veiculoSchema = z.object({
   vigenciaSeguro: z.string().optional(),
   valorSeguroMensal: z.number().optional(),
   
-  // Status - apenas manutenção e parado podem ser escolhidos manualmente
-  status: z.enum(['disponivel', 'alugado', 'manutencao', 'parado']),
+  // Status será controlado automaticamente
   
   // Campo condicional para limite específico
   valorLimiteKm: z.number().optional(),
@@ -113,7 +112,7 @@ export function EditarVeiculoModal({
       numeroApolice: '',
       vigenciaSeguro: '',
       valorSeguroMensal: undefined,
-      status: 'disponivel',
+      // Status será controlado automaticamente
       valorLimiteKm: undefined,
     },
   });
@@ -142,7 +141,7 @@ export function EditarVeiculoModal({
         numeroApolice: veiculo.numeroApolice || '',
         vigenciaSeguro: veiculo.vigenciaSeguro || '',
         valorSeguroMensal: Number(veiculo.valorSeguroMensal) || undefined,
-        status: veiculo.status,
+        // Status não será editável
         valorLimiteKm: veiculo.valorLimiteKm,
       });
     }
@@ -180,7 +179,7 @@ export function EditarVeiculoModal({
         numeroApolice: data.numeroApolice,
         vigenciaSeguro: data.vigenciaSeguro || null,
         valorSeguroMensal: data.valorSeguroMensal?.toString(),
-        status: data.status,
+        // Status não será enviado na edição
       };
 
       console.log('Dados preparados para API:', veiculoData);
@@ -509,35 +508,21 @@ export function EditarVeiculoModal({
               </div>
             </div>
 
-            {/* STATUS */}
+            {/* STATUS - Controlado automaticamente pelo sistema */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-foreground border-b pb-2">
                 Status
               </h3>
               
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status do Veículo *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-48">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="disponivel">Disponível</SelectItem>
-                        <SelectItem value="alugado" disabled>Alugado (automático)</SelectItem>
-                        <SelectItem value="manutencao">Manutenção</SelectItem>
-                        <SelectItem value="parado">Parado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  O status do veículo é controlado automaticamente:
+                </p>
+                <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                  <li>• <strong>Disponível:</strong> quando não há aluguel ativo</li>
+                  <li>• <strong>Alugado:</strong> quando há aluguel ativo</li>
+                </ul>
+              </div>
             </div>
 
             <DialogFooter>
