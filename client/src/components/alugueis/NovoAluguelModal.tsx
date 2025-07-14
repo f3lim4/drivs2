@@ -173,7 +173,7 @@ export function NovoAluguelModal({
 
   // Filtra apenas veículos disponíveis
   const veiculosDisponiveis = veiculos.filter(veiculo => 
-    veiculo.status === 'disponivel' || veiculo.status === 'ativo'
+    veiculo.status === 'disponivel'
   );
   
 
@@ -241,6 +241,19 @@ export function NovoAluguelModal({
       }
 
       const aluguelCriado = await response.json();
+
+      // Atualiza status do veículo para "alugado"
+      const updateVeiculoResponse = await fetch(`/api/veiculos/${data.veiculoId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: 'alugado' }),
+      });
+
+      if (!updateVeiculoResponse.ok) {
+        console.error('Erro ao atualizar status do veículo');
+      }
       
       // Cria objeto compatível com a interface atual
       const novoAluguel: Aluguel = {

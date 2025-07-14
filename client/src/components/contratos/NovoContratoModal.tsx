@@ -50,6 +50,7 @@ import { useTemplateContratos } from '../../hooks/useTemplateContratos';
 
 // Schema de validação
 const contratoSchema = z.object({
+  aluguelId: z.string().min(1, 'Aluguel é obrigatório'),
   motoristaId: z.string().min(1, 'Motorista é obrigatório'),
   veiculoId: z.string().min(1, 'Veículo é obrigatório'),
   dataInicio: z.date({
@@ -74,8 +75,7 @@ export function NovoContratoModal({
   onOpenChange, 
   onContratoGerado 
 }: NovoContratoModalProps) {
-  const [motoristas, setMotoristas] = useState<Motorista[]>([]);
-  const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
+  const [alugueis, setAlugueis] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const { profile } = useAuth();
   const userProfile = profile;
@@ -101,6 +101,7 @@ export function NovoContratoModal({
   const form = useForm<ContratoFormData>({
     resolver: zodResolver(contratoSchema),
     defaultValues: {
+      aluguelId: '',
       motoristaId: '',
       veiculoId: '',
       dataInicio: getAmanha(),
@@ -111,7 +112,7 @@ export function NovoContratoModal({
     },
   });
 
-  // Carrega dados dos motoristas e veículos
+  // Carrega dados dos aluguéis (veículos alugados com dados dos motoristas)
   useEffect(() => {
     const loadData = async () => {
       if (!open || !profile?.locadoraId) return;
@@ -119,18 +120,13 @@ export function NovoContratoModal({
       setLoadingData(true);
       
       try {
-        // Carrega motoristas
-        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${profile.locadoraId}`);
-        if (motoristasResponse.ok) {
-          const motoristasData = await motoristasResponse.json();
-          setMotoristas(motoristasData);
-        }
-        
-        // Carrega veículos
-        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${profile.locadoraId}`);
-        if (veiculosResponse.ok) {
-          const veiculosData = await veiculosResponse.json();
-          setVeiculos(veiculosData);
+        // Carrega aluguéis ativos (veículos alugados)
+        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${profile.locadoraId}`);
+        if (alugueisResponse.ok) {
+          const alugueisData = await alugueisResponse.json();
+          // Filtra apenas aluguéis ativos
+          const alugueisAtivos = alugueisData.filter((aluguel: any) => aluguel.status === 'ativo');
+          setAlugueis(alugueisAtivos);
         }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -142,15 +138,15 @@ export function NovoContratoModal({
     loadData();
   }, [open, profile?.locadoraId]);
 
-  // Filtra apenas veículos disponíveis
-  const veiculosDisponiveis = veiculos.filter(veiculo => veiculo.status === 'disponivel');
-
-  // Altera automaticamente o valor semanal quando um veículo é selecionado
-  const handleVeiculoChange = (veiculoId: string) => {
-    const veiculo = veiculos.find(v => v.id === veiculoId);
-    if (veiculo) {
-      form.setValue('valorSemanal', Number(veiculo.valorSemanal) || 0);
-      form.setValue('caucao', Number(veiculo.caucao) || 0);
+  // Altera automaticamente os valores quando um aluguel é selecionado
+  const handleAluguelChange = (aluguelId: string) => {
+    const aluguel = alugueis.find(a => a.id === aluguelId);
+    if (aluguel) {
+      form.setValue('aluguelId', aluguelId);
+      form.setValue('valorSemanal', Number(aluguel.valorMensal) / 4 || 0); // Converte mensal para semanal
+      form.setValue('caucao', Number(aluguel.caucao) || 0);
+      form.setValue('motoristaId', aluguel.motoristaId);
+      form.setValue('veiculoId', aluguel.veiculoId);
     }
   };
 
@@ -158,16 +154,14 @@ export function NovoContratoModal({
     try {
       console.log('Iniciando envio do formulário com dados:', data);
       
-      // Busca dados do motorista e veículo selecionados
-      const motorista = motoristas.find(m => m.id === data.motoristaId);
-      const veiculo = veiculos.find(v => v.id === data.veiculoId);
+      // Busca dados do aluguel selecionado
+      const aluguel = alugueis.find(a => a.id === data.aluguelId);
 
-      console.log('Motorista encontrado:', motorista);
-      console.log('Veículo encontrado:', veiculo);
+      console.log('Aluguel encontrado:', aluguel);
 
-      if (!motorista || !veiculo) {
-        console.error('Motorista ou veículo não encontrado');
-        throw new Error('Motorista ou veículo não encontrado');
+      if (!aluguel) {
+        console.error('Aluguel não encontrado');
+        throw new Error('Aluguel não encontrado');
       }
 
       // Buscar dados da locadora
@@ -203,8 +197,8 @@ export function NovoContratoModal({
       // Cria novo contrato
       const novoContrato = {
         tipo: 'locacao' as const,
-        titulo: `Contrato de Locação - ${motorista.nome}`,
-        cliente: motorista.nome,
+        titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
+        cliente: aluguel.motoristaNome,
         valor: valorTotal.toString(),
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFim, 'yyyy-MM-dd'),
@@ -214,15 +208,12 @@ export function NovoContratoModal({
 LOCADOR: ${locadorInfo.nome}, Ramo de atividade: Locação de Veículos, portador do CNPJ: ${locadorInfo.cnpj}, cuja
 sede se encontra na ${locadorInfo.endereco}. 
 
-LOCATÁRIO: ${motorista.nome}, nascido em ${motorista.dataNascimento},
-profissão: Motorista de Aplicativo, portador (a) do CPF nº ${motorista.cpf} - RG: ${motorista.rg} CNH: ${motorista.cnh} Telefone: ${motorista.telefone}
-SSP/SP, residente e domiciliado: ${motorista.rua}, ${motorista.numero} - ${motorista.bairro}, ${motorista.cidade}/${motorista.estado} - CEP: ${motorista.cep}. As partes acima identificadas têm, entre si, justo e acertado o presente Contrato de Locação de
+LOCATÁRIO: ${aluguel.motoristaNome}, Telefone: ${aluguel.motoristaContato}
+profissão: Motorista de Aplicativo. As partes acima identificadas têm, entre si, justo e acertado o presente Contrato de Locação de
 Automóvel que se regerá pelas cláusulas seguintes e pelas condições descritas no presente.
 
 1. CLÁUSULA PRIMEIRA – DO OBJETO, PRAZO E USO
-1.1. O LOCADOR declara ser o legítimo possuidor e/ou proprietário do veículo de modelo ${veiculo.modelo}, marca ${veiculo.marca}, ano
-${veiculo.ano}, cor ${veiculo.cor}, placa ${veiculo.placa}, licenciado no Estado de São Paulo, chassi ${veiculo.chassi} e
-Renavam ${veiculo.renavam}, Vistoriado com fotos e video no dia da retirada, e que resolveu dá-lo em locação ao LOCATÁRIO pelo prazo de ${data.tempoContrato} mês(es)
+1.1. O LOCADOR declara ser o legítimo possuidor e/ou proprietário do veículo de modelo ${aluguel.veiculoModelo}, placa ${aluguel.veiculoPlaca}, Vistoriado com fotos e video no dia da retirada, e que resolveu dá-lo em locação ao LOCATÁRIO pelo prazo de ${data.tempoContrato} mês(es)
 contados a partir da assinatura do presente contrato.
 
 1.2. Findo o prazo acima estipulado, o contrato poderá ser renovado automaticamente, desde que seja do desejo de
@@ -345,79 +336,42 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               
-              {/* MOTORISTA */}
+              {/* ALUGUEL ATIVO */}
               <FormField
                 control={form.control}
-                name="motoristaId"
+                name="aluguelId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Motorista *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um motorista" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {motoristas.length > 0 ? (
-                          motoristas.map((motorista) => (
-                            <SelectItem key={motorista.id} value={motorista.id}>
-                              <div className="flex flex-col">
-                                <span className="font-medium">{motorista.nome}</span>
-                                <span className="text-sm text-muted-foreground">
-                                  {motorista.cpf} • CNH: {motorista.cnh}
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="none" disabled>
-                            Nenhum motorista disponível
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* VEÍCULO */}
-              <FormField
-                control={form.control}
-                name="veiculoId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Veículo *</FormLabel>
+                    <FormLabel>Aluguel Ativo *</FormLabel>
                     <Select 
                       onValueChange={(value) => {
                         field.onChange(value);
-                        handleVeiculoChange(value);
+                        handleAluguelChange(value);
                       }} 
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione um veículo" />
+                          <SelectValue placeholder="Selecione um aluguel para gerar contrato" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {veiculosDisponiveis.length > 0 ? (
-                          veiculosDisponiveis.map((veiculo) => (
-                            <SelectItem key={veiculo.id} value={veiculo.id}>
+                        {alugueis.length > 0 ? (
+                          alugueis.map((aluguel) => (
+                            <SelectItem key={aluguel.id} value={aluguel.id}>
                               <div className="flex flex-col">
                                 <span className="font-medium">
-                                  {veiculo.marca} {veiculo.modelo} - {veiculo.placa}
+                                  {aluguel.motoristaNome} • {aluguel.veiculoModelo}
                                 </span>
                                 <span className="text-sm text-muted-foreground">
-                                  R$ {Number(veiculo.valorSemanal).toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
+                                  Placa: {aluguel.veiculoPlaca} • R$ {Number(aluguel.valorMensal).toFixed(2)}/mês
                                 </span>
                               </div>
                             </SelectItem>
                           ))
                         ) : (
                           <SelectItem value="none" disabled>
-                            Nenhum veículo disponível
+                            Nenhum aluguel ativo disponível
                           </SelectItem>
                         )}
                       </SelectContent>
