@@ -460,6 +460,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const aluguel = await storage.createAluguel(result.data);
+      
+      // Atualizar status do veículo para "alugado"
+      await storage.updateVeiculo(veiculoId, { status: 'alugado' });
+      
       res.json(aluguel);
     } catch (error) {
       console.error("Error creating aluguel:", error);
@@ -469,7 +473,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/alugueis/:id", async (req, res) => {
     try {
+      // Buscar dados do aluguel antes de atualizar
+      const aluguelAnterior = await storage.getAluguel(req.params.id);
+      if (!aluguelAnterior) {
+        return res.status(404).json({ message: "Aluguel not found" });
+      }
+      
       const aluguel = await storage.updateAluguel(req.params.id, req.body);
+      
+      // Atualizar status do veículo baseado no status do aluguel
+      if (req.body.status) {
+        const novoStatusVeiculo = req.body.status === 'ativo' ? 'alugado' : 'disponivel';
+        await storage.updateVeiculo(aluguel.veiculoId, { status: novoStatusVeiculo });
+      }
+      
       res.json(aluguel);
     } catch (error) {
       console.error("Error updating aluguel:", error);
@@ -479,7 +496,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/alugueis/:id", async (req, res) => {
     try {
+      // Buscar dados do aluguel antes de deletar para atualizar o veículo
+      const aluguel = await storage.getAluguel(req.params.id);
+      if (!aluguel) {
+        return res.status(404).json({ message: "Aluguel not found" });
+      }
+      
       await storage.deleteAluguel(req.params.id);
+      
+      // Atualizar status do veículo para "disponivel"
+      await storage.updateVeiculo(aluguel.veiculoId, { status: 'disponivel' });
+      
       res.json({ message: "Aluguel deleted successfully" });
     } catch (error) {
       console.error("Error deleting aluguel:", error);
