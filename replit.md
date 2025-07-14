@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-14: Dados da Empresa em Contratos - CONCLUÍDO
+- ✅ **Sistema de contratos com dados reais da empresa** - PDFs agora incluem informações da locadora
+- ✅ **Cabeçalho corporativo nos contratos** - Nome, CNPJ, endereço, telefone e email da empresa
+- ✅ **PDF profissional com layout completo** - Incluindo campos de assinatura do locador e locatário
+- ✅ **Impressão melhorada** - Função de impressão também mostra dados da empresa
+- ✅ **Integração com dados reais** - Busca automática das informações da locadora no banco
+- ✅ **Layout padronizado** - Contratos com identidade visual consistente
+- ✅ **Campos de assinatura** - Espaços para assinaturas do locador e locatário com nomes
+
 ### 2025-07-14: Sistema de Contratos e Atualização Automática de Status - CONCLUÍDO
 - ✅ **Sistema de contratos 100% funcional** - Criação, visualização e exclusão funcionando
 - ✅ **Problema de locadoraId corrigido** - Hook useContratos agora obtém ID do perfil corretamente

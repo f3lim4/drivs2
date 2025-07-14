@@ -27,7 +27,7 @@ import { Contrato } from '@/types';
 import jsPDF from 'jspdf';
 
 export default function Contratos() {
-  const { isAdmin, isLocadora } = useAuth();
+  const { isAdmin, isLocadora, profile } = useAuth();
   const { toast } = useToast();
   const { contratos, isLoading, createContrato, updateContrato, deleteContrato } = useContratos();
   const [templates, setTemplates] = useState<any[]>([]);
@@ -97,6 +97,17 @@ export default function Contratos() {
 
   const handleBaixarPDF = async (contrato: Contrato) => {
     try {
+      // Buscar dados da locadora
+      const locadoraId = profile?.locadoraId;
+      
+      let dadosLocadora = null;
+      if (locadoraId) {
+        const response = await fetch(`/api/locadoras/${locadoraId}`);
+        if (response.ok) {
+          dadosLocadora = await response.json();
+        }
+      }
+      
       // Cria um novo documento PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
       
@@ -107,18 +118,62 @@ export default function Contratos() {
       const lineHeight = 5;
       const maxWidth = pageWidth - (margin * 2);
       
+      let yPosition = margin;
+      
+      // Cabeçalho com dados da empresa
+      if (dadosLocadora) {
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(dadosLocadora.nome, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 6;
+        
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`CNPJ: ${dadosLocadora.cnpj}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 4;
+        
+        pdf.text(`${dadosLocadora.rua}, ${dadosLocadora.numero} - ${dadosLocadora.bairro}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 4;
+        
+        pdf.text(`${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 4;
+        
+        pdf.text(`Tel: ${dadosLocadora.telefone} | Email: ${dadosLocadora.email}`, pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 8;
+        
+        // Linha separadora
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+        yPosition += 6;
+      }
+      
       // Título
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('CONTRATO DE LOCAÇÃO DE VEÍCULO', pageWidth / 2, margin + 10, { align: 'center' });
+      pdf.text('CONTRATO DE LOCAÇÃO DE VEÍCULO', pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 10;
       
-      // Conteúdo
+      // Informações do contrato
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       
-      let yPosition = margin + 25;
+      pdf.text(`Cliente: ${contrato.cliente}`, margin, yPosition);
+      yPosition += 6;
       
-      // Divide o conteúdo em linhas
+      pdf.text(`Valor: R$ ${contrato.valor.toFixed(2)}`, margin, yPosition);
+      yPosition += 6;
+      
+      pdf.text(`Data de Início: ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}`, margin, yPosition);
+      yPosition += 6;
+      
+      if (contrato.dataFim) {
+        pdf.text(`Data de Término: ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}`, margin, yPosition);
+        yPosition += 6;
+      }
+      
+      yPosition += 4;
+      
+      // Conteúdo do contrato
       const lines = (contrato.template || '').split('\n');
       
       for (const line of lines) {
@@ -146,6 +201,34 @@ export default function Contratos() {
           yPosition += lineHeight;
         }
       }
+      
+      // Rodapé com assinaturas
+      if (yPosition > pageHeight - 60) {
+        pdf.addPage();
+        yPosition = margin;
+      }
+      
+      yPosition = pageHeight - 40;
+      
+      // Linha separadora
+      pdf.setLineWidth(0.5);
+      pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+      yPosition += 10;
+      
+      // Campos de assinatura
+      pdf.setFontSize(9);
+      pdf.text('_________________________________', margin, yPosition);
+      pdf.text('_________________________________', pageWidth - margin - 60, yPosition);
+      yPosition += 4;
+      
+      pdf.text('Assinatura do Locador', margin, yPosition);
+      pdf.text('Assinatura do Locatário', pageWidth - margin - 60, yPosition);
+      yPosition += 6;
+      
+      if (dadosLocadora) {
+        pdf.text(dadosLocadora.responsavel, margin, yPosition);
+      }
+      pdf.text(contrato.cliente, pageWidth - margin - 60, yPosition);
       
       // Salva o PDF
       const fileName = `Contrato_${contrato.cliente.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
