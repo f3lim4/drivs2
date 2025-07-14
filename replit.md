@@ -18,6 +18,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Integração com dados reais** - Busca automática das informações da locadora no banco
 - ✅ **Layout padronizado** - Contratos com identidade visual consistente
 - ✅ **Campos de assinatura** - Espaços para assinaturas do locador e locatário com nomes
+- ✅ **NOVO: Template de contrato com dados reais** - Substitui placeholders pelos dados verdadeiros da empresa
+- ✅ **NOVO: Correção de bugs de formatação** - Resolvido erro `valor.toFixed is not a function`
+- ✅ **NOVO: Dados dinâmicos no template** - Nome, CNPJ, endereço e responsável vêm do banco de dados
 
 ### 2025-07-14: Sistema de Contratos e Atualização Automática de Status - CONCLUÍDO
 - ✅ **Sistema de contratos 100% funcional** - Criação, visualização e exclusão funcionando
