@@ -71,7 +71,7 @@ const veiculoSchema = z.object({
   valorSeguroMensal: z.number().min(0).optional(),
   
   // Status
-  status: z.enum(['disponivel', 'alugado', 'manutencao', 'indisponivel']),
+  status: z.enum(['disponivel', 'indisponivel']),
   
   // Campo condicional para limite específico
   valorLimiteKm: z.number().optional(),
@@ -697,8 +697,6 @@ export function NovoVeiculoModal({
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="disponivel">Disponível</SelectItem>
-                        <SelectItem value="alugado">Alugado</SelectItem>
-                        <SelectItem value="manutencao">Em Manutenção</SelectItem>
                         <SelectItem value="indisponivel">Indisponível</SelectItem>
                       </SelectContent>
                     </Select>
