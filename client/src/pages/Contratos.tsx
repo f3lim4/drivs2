@@ -283,19 +283,15 @@ export default function Contratos() {
       />
 
       {/* Botão de ação no topo */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex justify-end">
-            <Button 
-              className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
-              onClick={() => setShowNovoContratoModal(true)}
-            >
-              <Plus className="w-4 h-4" />
-              Gerar Contrato
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex justify-end">
+        <Button 
+          className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
+          onClick={() => setShowNovoContratoModal(true)}
+        >
+          <Plus className="w-4 h-4" />
+          Gerar Contrato
+        </Button>
+      </div>
 
       {/* Tabs para organizar contratos e templates */}
       <Tabs defaultValue="contratos" className="w-full">
