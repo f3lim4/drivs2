@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-14: Sistema de Contratos Totalmente Operacional - CONCLUÍDO
+- ✅ **Sistema de contratos 100% funcional** - Criação, visualização e exclusão funcionando
+- ✅ **Problema de locadoraId corrigido** - Hook useContratos agora obtém ID do perfil corretamente
+- ✅ **Formatação de valores corrigida** - Conversão string-número para exibição monetária
+- ✅ **Persistência completa no PostgreSQL** - Todos os dados salvos e recuperados do banco
+- ✅ **Sistema de aluguéis investigado** - Veículos não aparecem porque estão com status "alugado"
+- ✅ **Filtro de status funcionando** - Modal mostra apenas veículos disponíveis/ativos
+- ✅ Sistema completamente operacional com isolamento de dados perfeito
+
 ### 2025-07-13: Correção Final de Bugs e Validação Completa - CONCLUÍDO
 - ✅ **CRÍTICO: Aluguel inválido removido** - Excluído aluguel com motorista/veículo de outras locadoras
 - ✅ **Validação de integridade implementada** - Backend agora impede criação de aluguéis com dados mistos
