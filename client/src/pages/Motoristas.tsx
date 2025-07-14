@@ -50,40 +50,7 @@ export default function Motoristas() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedMotorista, setSelectedMotorista] = useState<Motorista | null>(null);
 
-  // Carrega dados dos motoristas
-  useEffect(() => {
-    const carregarMotoristas = async () => {
-      try {
-        setLoading(true);
-        
-        let url = '/api/motoristas';
-        
-        // Se for locadora, só carregar seus motoristas
-        if (isLocadora && profile?.locadoraId) {
-          url += `?locadoraId=${profile.locadoraId}`;
-        }
-
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Erro ao carregar motoristas');
-        }
-
-        const data = await response.json();
-        setMotoristas(data);
-      } catch (error) {
-        console.error('Erro ao carregar motoristas:', error);
-        toast({
-          title: "Erro ao carregar motoristas",
-          description: "Não foi possível carregar a lista de motoristas.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    carregarMotoristas();
-  }, [isLocadora, profile?.locadoraId, toast]);
+  // Carregamento agora é feito automaticamente pelo hook useMotoristas
 
   // Função para calcular status da CNH baseado na data de vencimento
   const getStatusFromVencimento = (vencimentoCnh: string) => {
