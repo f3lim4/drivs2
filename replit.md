@@ -21,6 +21,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **NOVO: Status automático de veículos** - Veículos são automaticamente marcados como "alugado" quando aluguel é criado
 - ✅ **NOVO: Restauração automática de status** - Veículos voltam para "disponível" quando aluguel é excluído
 - ✅ **NOVO: Sincronização de status** - Status do veículo acompanha mudanças no status do aluguel
+- ✅ **Deploy iniciado** - Build ID #910da204-6ad1-4602-a790-9c1e5fdb91b8 em progresso
 - ✅ Sistema completamente operacional com isolamento de dados perfeito
 
 ### 2025-07-13: Correção Final de Bugs e Validação Completa - CONCLUÍDO
