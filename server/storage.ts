@@ -10,7 +10,7 @@ import {
   type TemplateContrato, type InsertTemplateContrato
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 // Storage interface for database operations
@@ -340,7 +340,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAlugueisByLocadora(locadoraId: string): Promise<Aluguel[]> {
-    // Use JOIN para buscar aluguéis com dados do motorista e veículo em uma única query
+    // CORREÇÃO CRÍTICA: Usar AND para garantir que motorista E veículo pertencem à mesma locadora
     const alugueisData = await db
       .select({
         id: alugueis.id,
@@ -364,9 +364,17 @@ export class DatabaseStorage implements IStorage {
         veiculoPlaca: veiculos.placa,
       })
       .from(alugueis)
-      .innerJoin(motoristas, eq(alugueis.motoristaId, motoristas.id))
-      .innerJoin(veiculos, eq(alugueis.veiculoId, veiculos.id))
+      .innerJoin(motoristas, and(
+        eq(alugueis.motoristaId, motoristas.id),
+        eq(motoristas.locadoraId, locadoraId)
+      ))
+      .innerJoin(veiculos, and(
+        eq(alugueis.veiculoId, veiculos.id),
+        eq(veiculos.locadoraId, locadoraId)
+      ))
       .where(eq(alugueis.locadoraId, locadoraId));
+    
+    console.log(`[SECURITY] Aluguéis encontrados para locadora ${locadoraId}:`, alugueisData.length);
     
     return alugueisData.map(aluguel => ({
       ...aluguel,
