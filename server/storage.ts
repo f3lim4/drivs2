@@ -1,12 +1,13 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
   type Veiculo, type InsertVeiculo,
   type Motorista, type InsertMotorista,
   type Aluguel, type InsertAluguel,
-  type Contrato, type InsertContrato
+  type Contrato, type InsertContrato,
+  type TemplateContrato, type InsertTemplateContrato
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -65,6 +66,14 @@ export interface IStorage {
   createContrato(contrato: InsertContrato): Promise<Contrato>;
   updateContrato(id: string, updates: Partial<InsertContrato>): Promise<Contrato>;
   deleteContrato(id: string): Promise<void>;
+  
+  // Template Contrato operations
+  getAllTemplateContratos(): Promise<TemplateContrato[]>;
+  getTemplateContratosByLocadora(locadoraId: string): Promise<TemplateContrato[]>;
+  getTemplateContrato(id: string): Promise<TemplateContrato | undefined>;
+  createTemplateContrato(template: InsertTemplateContrato): Promise<TemplateContrato>;
+  updateTemplateContrato(id: string, updates: Partial<InsertTemplateContrato>): Promise<TemplateContrato>;
+  deleteTemplateContrato(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -420,6 +429,41 @@ export class DatabaseStorage implements IStorage {
 
   async deleteContrato(id: string): Promise<void> {
     await db.delete(contratos).where(eq(contratos.id, id));
+  }
+  
+  // Template Contrato operations
+  async getAllTemplateContratos(): Promise<TemplateContrato[]> {
+    return await db.select().from(templateContratos);
+  }
+
+  async getTemplateContratosByLocadora(locadoraId: string): Promise<TemplateContrato[]> {
+    return await db.select().from(templateContratos).where(eq(templateContratos.locadoraId, locadoraId));
+  }
+
+  async getTemplateContrato(id: string): Promise<TemplateContrato | undefined> {
+    const result = await db.select().from(templateContratos).where(eq(templateContratos.id, id));
+    return result[0];
+  }
+
+  async createTemplateContrato(template: InsertTemplateContrato): Promise<TemplateContrato> {
+    const templateData = {
+      ...template,
+      id: crypto.randomUUID(),
+    };
+    const result = await db.insert(templateContratos).values(templateData).returning();
+    return result[0];
+  }
+
+  async updateTemplateContrato(id: string, updates: Partial<InsertTemplateContrato>): Promise<TemplateContrato> {
+    const result = await db.update(templateContratos)
+      .set(updates)
+      .where(eq(templateContratos.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteTemplateContrato(id: string): Promise<void> {
+    await db.delete(templateContratos).where(eq(templateContratos.id, id));
   }
 }
 
