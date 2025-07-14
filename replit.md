@@ -21,6 +21,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **NOVO: Template de contrato com dados reais** - Substitui placeholders pelos dados verdadeiros da empresa
 - ✅ **NOVO: Correção de bugs de formatação** - Resolvido erro `valor.toFixed is not a function`
 - ✅ **NOVO: Dados dinâmicos no template** - Nome, CNPJ, endereço e responsável vêm do banco de dados
+- ✅ **NOVO: Melhorias no formulário de locadora** - Campo Razão Social reduzido e dropdown de estados implementado
 
 ### 2025-07-14: Sistema de Contratos e Atualização Automática de Status - CONCLUÍDO
 - ✅ **Sistema de contratos 100% funcional** - Criação, visualização e exclusão funcionando
