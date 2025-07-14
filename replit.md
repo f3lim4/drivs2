@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-14: Sistema de Templates e Correção de Flash de Dados - CONCLUÍDO
+- ✅ **Sistema de templates de contrato implementado** - Upload, edição e seleção de templates personalizados
+- ✅ **Modal de upload com campos disponíveis** - 25 variáveis organizadas por categoria
+- ✅ **Correção do flash de dados em motoristas** - Hook useMotoristas com React Query implementado
+- ✅ **Filtro de segurança reforçado** - Isolamento perfeito entre locadoras
+- ✅ **Erro de SelectItem corrigido** - Valor vazio substituído por "default"
+- ✅ **Cache otimizado** - Dados carregados sem interferência entre sessões
+- ✅ **Logs de segurança adicionados** - Monitoramento de violações de isolamento
+
 ### 2025-07-14: Dados da Empresa em Contratos - CONCLUÍDO
 - ✅ **Sistema de contratos com dados reais da empresa** - PDFs agora incluem informações da locadora
 - ✅ **Cabeçalho corporativo nos contratos** - Nome, CNPJ, endereço, telefone e email da empresa

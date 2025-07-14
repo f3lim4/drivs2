@@ -102,7 +102,7 @@ export function NovoContratoModal({
       tempoContrato: 1,
       valorSemanal: 0,
       caucao: 0,
-      templateId: '',
+      templateId: 'default',
     },
   });
 
@@ -436,7 +436,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">
+                        <SelectItem value="default">
                           Template Padrão DRIVS
                         </SelectItem>
                         {templates.map((template) => (
