@@ -85,6 +85,11 @@ export function NovoContratoModal({
   
   // Hook para gerenciar templates
   const { templates } = useTemplateContratos();
+  
+  // Debug: Log dos templates carregados
+  useEffect(() => {
+    console.log('Templates no modal:', templates);
+  }, [templates]);
 
   // Função para obter a data de amanhã
   const getAmanha = () => {

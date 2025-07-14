@@ -30,11 +30,13 @@ export function useTemplateContratos() {
     queryFn: async () => {
       const response = await fetch(`/api/template-contratos?locadoraId=${locadoraId}`);
       if (!response.ok) throw new Error('Failed to fetch templates');
-      return response.json();
+      const data = await response.json();
+      console.log('Templates carregados:', data);
+      return data;
     },
     enabled: !!locadoraId,
-    staleTime: 30000,
-    cacheTime: 60000,
+    staleTime: 0,
+    cacheTime: 0,
   });
 
   // Criar template
