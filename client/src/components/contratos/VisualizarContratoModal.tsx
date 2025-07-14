@@ -109,7 +109,7 @@ export function VisualizarContratoModal({
             <h1>CONTRATO DE LOCAÇÃO DE VEÍCULO</h1>
             <div class="contract-info">
               <p><strong>Cliente:</strong> ${contrato.cliente}</p>
-              <p><strong>Valor:</strong> R$ ${contrato.valor.toFixed(2)}</p>
+              <p><strong>Valor:</strong> R$ ${Number(contrato.valor).toFixed(2)}</p>
               <p><strong>Data de Início:</strong> ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
               ${contrato.dataFim ? `<p><strong>Data de Término:</strong> ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}</p>` : ''}
             </div>
@@ -201,7 +201,7 @@ export function VisualizarContratoModal({
       pdf.text(`Cliente: ${contrato.cliente}`, margin, yPosition);
       yPosition += 6;
       
-      pdf.text(`Valor: R$ ${contrato.valor.toFixed(2)}`, margin, yPosition);
+      pdf.text(`Valor: R$ ${Number(contrato.valor).toFixed(2)}`, margin, yPosition);
       yPosition += 6;
       
       pdf.text(`Data de Início: ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}`, margin, yPosition);
@@ -329,7 +329,7 @@ export function VisualizarContratoModal({
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Valor Total</p>
-              <p className="font-medium">R$ {contrato.valor.toFixed(2)}</p>
+              <p className="font-medium">R$ {Number(contrato.valor).toFixed(2)}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Data de Início</p>
