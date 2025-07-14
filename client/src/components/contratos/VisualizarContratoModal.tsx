@@ -49,7 +49,7 @@ export function VisualizarContratoModal({
         <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
           <h2 style="margin: 0; font-size: 18px; font-weight: bold;">${dadosLocadora.nome}</h2>
           <p style="margin: 2px 0; font-size: 10px;">CNPJ: ${dadosLocadora.cnpj}</p>
-          <p style="margin: 2px 0; font-size: 10px;">${dadosLocadora.rua}, ${dadosLocadora.numero} - ${dadosLocadora.bairro}</p>
+          <p style="margin: 2px 0; font-size: 10px;">${dadosLocadora.endereco}</p>
           <p style="margin: 2px 0; font-size: 10px;">${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}</p>
           <p style="margin: 2px 0; font-size: 10px;">Tel: ${dadosLocadora.telefone} | Email: ${dadosLocadora.email}</p>
         </div>
@@ -173,7 +173,7 @@ export function VisualizarContratoModal({
         pdf.text(`CNPJ: ${dadosLocadora.cnpj}`, pageWidth / 2, yPosition, { align: 'center' });
         yPosition += 4;
         
-        pdf.text(`${dadosLocadora.rua}, ${dadosLocadora.numero} - ${dadosLocadora.bairro}`, pageWidth / 2, yPosition, { align: 'center' });
+        pdf.text(`${dadosLocadora.endereco}`, pageWidth / 2, yPosition, { align: 'center' });
         yPosition += 4;
         
         pdf.text(`${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}`, pageWidth / 2, yPosition, { align: 'center' });

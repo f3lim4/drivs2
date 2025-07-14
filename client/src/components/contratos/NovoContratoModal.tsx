@@ -166,7 +166,7 @@ export function NovoContratoModal({
       const locadorInfo = dadosLocadora ? {
         nome: dadosLocadora.nome,
         cnpj: dadosLocadora.cnpj,
-        endereco: `${dadosLocadora.rua}, ${dadosLocadora.numero} - ${dadosLocadora.bairro}, ${dadosLocadora.cidade}/${dadosLocadora.estado}`,
+        endereco: `${dadosLocadora.endereco}, ${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}`,
         responsavel: dadosLocadora.responsavel
       } : {
         nome: "DRIVS LOCADORA DE VEÍCULOS LTDA",

@@ -132,7 +132,7 @@ export default function Contratos() {
         pdf.text(`CNPJ: ${dadosLocadora.cnpj}`, pageWidth / 2, yPosition, { align: 'center' });
         yPosition += 4;
         
-        pdf.text(`${dadosLocadora.rua}, ${dadosLocadora.numero} - ${dadosLocadora.bairro}`, pageWidth / 2, yPosition, { align: 'center' });
+        pdf.text(`${dadosLocadora.endereco}`, pageWidth / 2, yPosition, { align: 'center' });
         yPosition += 4;
         
         pdf.text(`${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}`, pageWidth / 2, yPosition, { align: 'center' });
