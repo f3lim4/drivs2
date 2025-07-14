@@ -282,18 +282,10 @@ export default function Contratos() {
         subtitle="Sistema Drivs - Gerencie sua locadora de forma eficiente"
       />
 
-      {/* Botões de ação no topo */}
+      {/* Botão de ação no topo */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={() => setShowUploadTemplateModal(true)}
-            >
-              <Upload className="w-4 h-4" />
-              Subir Template
-            </Button>
+          <div className="flex justify-end">
             <Button 
               className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
               onClick={() => setShowNovoContratoModal(true)}
