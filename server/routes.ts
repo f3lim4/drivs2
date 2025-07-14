@@ -305,7 +305,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/veiculos/:id", async (req, res) => {
     try {
+      console.log("Atualizando veículo:", req.params.id, "com dados:", req.body);
       const veiculo = await storage.updateVeiculo(req.params.id, req.body);
+      console.log("Veículo atualizado:", veiculo);
       res.json(veiculo);
     } catch (error) {
       console.error("Error updating veiculo:", error);
