@@ -24,6 +24,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **NOVO: Melhorias no formulário de locadora** - Campo Razão Social reduzido e dropdown de estados implementado
 - ✅ **NOVO: Placeholders removidos** - Todos os campos do cadastro agora estão sem exemplos/placeholders
 - ✅ **NOVO: Perfil com todos os campos editáveis** - Página de perfil da locadora permite editar todos os campos do cadastro
+- ✅ **CRÍTICO: Duplicação de contratos corrigida** - Resolvido problema que gerava 2 contratos ao invés de 1
 
 ### 2025-07-14: Sistema de Contratos e Atualização Automática de Status - CONCLUÍDO
 - ✅ **Sistema de contratos 100% funcional** - Criação, visualização e exclusão funcionando
