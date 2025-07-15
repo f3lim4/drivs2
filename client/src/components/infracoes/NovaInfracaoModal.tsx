@@ -142,9 +142,6 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         estado: '',
         orgaoAutuador: '',
         agente: '',
-        status: 'pendente',
-        situacao: 'ativo',
-        responsavel: 'motorista',
         observacoes: '',
       });
       // Reset estados locais
@@ -182,6 +179,10 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         aluguelId: data.aluguelId === 'sem-aluguel' ? null : data.aluguelId,
         agente: data.agente || null,
         observacoes: data.observacoes || null,
+        // Valores fixos que não aparecem na interface
+        status: 'pendente',
+        situacao: 'ativo', 
+        responsavel: 'motorista',
       };
 
       createInfracao(infracaoData);
@@ -647,77 +648,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               />
             </div>
 
-            {/* Status e Controle */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="pendente">Pendente</SelectItem>
-                        <SelectItem value="pago">Pago</SelectItem>
-                        <SelectItem value="contestado">Contestado</SelectItem>
-                        <SelectItem value="cancelado">Cancelado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              <FormField
-                control={form.control}
-                name="situacao"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Situação</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione a situação" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="ativo">Ativo</SelectItem>
-                        <SelectItem value="prescrito">Prescrito</SelectItem>
-                        <SelectItem value="cancelado">Cancelado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="responsavel"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Responsável</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o responsável" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="motorista">Motorista</SelectItem>
-                        <SelectItem value="locadora">Locadora</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             {/* Observações */}
             <FormField
