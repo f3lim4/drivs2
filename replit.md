@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-14: Sistema de Status Simplificado - CONCLUÍDO
+### 2025-07-14: Sistema de Status Simplificado e Receita Mensal - CONCLUÍDO
 - ✅ **Status 100% automático implementado** - Veículos só têm "disponível" ou "alugado"
 - ✅ **Campo de status removido da edição** - Não é mais possível editar status manualmente
 - ✅ **Interface informativa** - Modal de edição explica como funciona o controle automático
@@ -18,6 +18,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Status "manutenção" e "parado" removidos** - Sistema focado apenas no essencial
 - ✅ **Badges atualizados** - Todos os componentes mostram apenas status válidos
 - ✅ **Schema atualizado** - Documentação reflete apenas status automáticos
+- ✅ **Sincronização automática** - 5 veículos com status incorreto corrigidos no banco
+- ✅ **Receita mensal implementada** - Página de aluguéis mostra receita mensal de aluguéis ativos
+- ✅ **Valores corrigidos na tabela** - Exibição de valor mensal e diário atualizada
 
 ### 2025-07-14: Sistema de Templates e Correção de Flash de Dados - CONCLUÍDO
 - ✅ **Sistema de templates de contrato implementado** - Upload, edição e seleção de templates personalizados
