@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Calendar, DollarSign, FileText, User, AlertCircle, Check, Car } from 'lucide-react';
+import { Calendar, DollarSign, FileText, User, AlertCircle, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -204,41 +204,14 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
               />
             </div>
 
-            {/* Informações do Aluguel Automático (apenas se tipo for aluguel) */}
-            {tipoSelecionado === 'aluguel' && motoristaId && (
-              <Card className="bg-blue-50 border-blue-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-blue-800">Informações do Aluguel</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {alugueisDoMotorista.length > 0 ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Car className="h-4 w-4 text-blue-600" />
-                        <span className="font-medium">
-                          {alugueisDoMotorista[0].veiculoModelo} - {alugueisDoMotorista[0].veiculoPlaca}
-                        </span>
-                      </div>
-                      {valorSemanal && (
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4 text-green-600" />
-                          <span className="text-sm">
-                            Valor Semanal: {new Intl.NumberFormat('pt-BR', {
-                              style: 'currency',
-                              currency: 'BRL',
-                            }).format(valorSemanal)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-amber-600 flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4" />
-                      Nenhum aluguel ativo encontrado para este motorista
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+            {/* Aviso se não há aluguéis ativos (apenas se tipo for aluguel) */}
+            {tipoSelecionado === 'aluguel' && motoristaId && alugueisDoMotorista.length === 0 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm text-amber-800 flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" />
+                  Nenhum aluguel ativo encontrado para este motorista
+                </p>
+              </div>
             )}
 
             {/* Descrição */}
