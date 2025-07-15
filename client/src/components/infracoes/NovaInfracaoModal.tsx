@@ -335,49 +335,51 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   </div>
                 )}
 
-                {/* Campos de Tipo e Pontuação */}
-                <FormField
-                  control={form.control}
-                  name="tipoInfracao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">Tipo da Infração</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-9">
-                            <SelectValue placeholder="Selecione o tipo" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="leve">Leve</SelectItem>
-                          <SelectItem value="media">Média</SelectItem>
-                          <SelectItem value="grave">Grave</SelectItem>
-                          <SelectItem value="gravissima">Gravíssima</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Campos de Tipo e Pontuação lado a lado */}
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={form.control}
+                    name="tipoInfracao"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">Tipo da Infração</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Selecione o tipo" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="leve">Leve</SelectItem>
+                            <SelectItem value="media">Média</SelectItem>
+                            <SelectItem value="grave">Grave</SelectItem>
+                            <SelectItem value="gravissima">Gravíssima</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="pontuacao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">Pontuação</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          className="h-9"
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="pontuacao"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">Pontuação</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            className="h-9"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 {/* Campo oculto para aluguelId */}
                 <FormField
