@@ -30,6 +30,7 @@ export function useInfracoes() {
       return response.json();
     },
     onSuccess: () => {
+      console.log('Infração criada com sucesso, invalidando cache...');
       queryClient.invalidateQueries({ queryKey: ['infracoes', user?.locadoraId] });
     },
   });
@@ -68,9 +69,9 @@ export function useInfracoes() {
     infracoes: query.data || [],
     isLoading: query.isLoading,
     error: query.error,
-    createInfracao: createMutation.mutate,
-    updateInfracao: updateMutation.mutate,
-    deleteInfracao: deleteMutation.mutate,
+    createInfracao: createMutation.mutateAsync,
+    updateInfracao: updateMutation.mutateAsync,
+    deleteInfracao: deleteMutation.mutateAsync,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
