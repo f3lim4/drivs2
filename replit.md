@@ -18,6 +18,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Padding compensatório** - Conteúdo ajustado para não ficar atrás do header
 - ✅ **Headers duplicados removidos** - Limpeza de componentes redundantes
 - ✅ **Estrutura centralizada** - Header gerenciado no layout principal
+- ✅ **Botão hambúrguer no header** - Ícone com 3 tracinhos movido para o topo
+- ✅ **Sidebar limpo** - Removido botão trigger do menu lateral
 
 ### 2025-07-14: Sistema de Status Simplificado e Receita Mensal - CONCLUÍDO
 - ✅ **Status 100% automático implementado** - Veículos só têm "disponível" ou "alugado"
