@@ -435,7 +435,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   <FormLabel>Descrição da Infração</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Descreva detalhadamente a infração..." 
+                      placeholder="" 
                       {...field} 
                       rows={3}
                     />
@@ -457,7 +457,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                       <Input 
                         type="number" 
                         step="0.01" 
-                        placeholder="0.00" 
+                        placeholder="" 
                         {...field}
                       />
                     </FormControl>
@@ -476,7 +476,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                       <Input 
                         type="number" 
                         step="0.01" 
-                        placeholder="0.00" 
+                        placeholder="" 
                         {...field}
                       />
                     </FormControl>
@@ -495,7 +495,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                       <Input 
                         type="number" 
                         step="0.01" 
-                        placeholder="0.00" 
+                        placeholder="" 
                         {...field}
                         readOnly
                         className="bg-gray-50"
@@ -575,7 +575,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   <FormItem>
                     <FormLabel>Local da Infração</FormLabel>
                     <FormControl>
-                      <Input placeholder="Endereço onde ocorreu" {...field} />
+                      <Input placeholder="" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -589,7 +589,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   <FormItem>
                     <FormLabel>Cidade</FormLabel>
                     <FormControl>
-                      <Input placeholder="Cidade" {...field} />
+                      <Input placeholder="" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -631,7 +631,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   <FormItem>
                     <FormLabel>Órgão Autuador</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: DETRAN, PRF, PM" {...field} />
+                      <Input placeholder="" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
