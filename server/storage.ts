@@ -811,13 +811,19 @@ export class DatabaseStorage implements IStorage {
 
   async createInfracao(infracao: InsertInfracao): Promise<Infracao> {
     try {
+      console.log('Criando infração com dados:', infracao);
+      
       const infracaoData = {
         ...infracao,
         id: infracao.id || crypto.randomUUID(),
       };
       
+      console.log('Dados processados para inserção:', infracaoData);
+      
       // Inserir diretamente sem returning para evitar problemas com joins
       await db.insert(infracoes).values(infracaoData);
+      
+      console.log('Infração inserida com sucesso no banco de dados');
       
       // Retornar o objeto construído manualmente
       return {
