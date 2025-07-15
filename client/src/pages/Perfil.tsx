@@ -312,11 +312,6 @@ export default function Perfil() {
   if (isAdmin) {
     return (
       <div className="flex-1 space-y-6 p-6">
-        <DrivsHeader 
-          title="Perfil do Administrador"
-          subtitle="Informações do administrador do sistema"
-        />
-
         <div className="grid gap-6">
           {/* Card de Informações do Admin */}
           <Card>
@@ -432,11 +427,6 @@ export default function Perfil() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      <DrivsHeader 
-        title="Perfil da Locadora"
-        subtitle="Gerencie as informações da sua locadora"
-      />
-
       <div className="grid gap-6">
         {/* Card de Informações Principais */}
         <Card>

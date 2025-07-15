@@ -63,12 +63,6 @@ export default function Locadoras() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      {/* Header da página */}
-      <DrivsHeader 
-        title="Locadoras"
-        subtitle="Sistema Drivs - Gerencie as locadoras do sistema"
-      />
-
       {/* Cards de estatísticas */}
       <div className="grid gap-4 md:grid-cols-4">
         <StatCard

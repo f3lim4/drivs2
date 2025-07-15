@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-15: Header Fixo Mobile e Melhorias UX - CONCLUÍDO
+- ✅ **Header fixo no mobile** - Cabeçalho permanece fixo no topo em dispositivos móveis
+- ✅ **Layout responsivo otimizado** - Navegação melhorada em telas pequenas
+- ✅ **Títulos dinâmicos** - Header mostra título da página atual automaticamente
+- ✅ **Busca escondida em mobile** - Barra de busca oculta em telas pequenas
+- ✅ **Padding compensatório** - Conteúdo ajustado para não ficar atrás do header
+- ✅ **Headers duplicados removidos** - Limpeza de componentes redundantes
+- ✅ **Estrutura centralizada** - Header gerenciado no layout principal
+
 ### 2025-07-14: Sistema de Status Simplificado e Receita Mensal - CONCLUÍDO
 - ✅ **Status 100% automático implementado** - Veículos só têm "disponível" ou "alugado"
 - ✅ **Campo de status removido da edição** - Não é mais possível editar status manualmente

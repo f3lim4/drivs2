@@ -276,12 +276,6 @@ export default function Contratos() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      {/* Header da página */}
-      <DrivsHeader 
-        title="Contratos"
-        subtitle="Sistema Drivs - Gerencie sua locadora de forma eficiente"
-      />
-
       {/* Botão de ação no topo */}
       <div className="flex justify-end">
         <Button 
