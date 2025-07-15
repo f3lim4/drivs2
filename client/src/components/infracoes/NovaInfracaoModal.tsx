@@ -644,7 +644,16 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isCreating}>
+              <Button 
+                type="submit" 
+                disabled={isCreating}
+                onClick={(e) => {
+                  console.log('Botão clicado');
+                  console.log('Form valid:', form.formState.isValid);
+                  console.log('Form errors:', form.formState.errors);
+                  console.log('Form values:', form.getValues());
+                }}
+              >
                 {isCreating ? 'Criando...' : 'Criar Infração'}
               </Button>
             </div>
