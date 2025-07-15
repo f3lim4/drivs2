@@ -317,7 +317,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
                   <FormLabel>Descrição da Infração</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Descreva detalhadamente a infração..." 
+                      placeholder="" 
                       {...field} 
                       rows={3}
                     />
@@ -339,7 +339,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
                       <Input 
                         type="number" 
                         step="0.01" 
-                        placeholder="0.00" 
+                        placeholder="" 
                         {...field}
                       />
                     </FormControl>
@@ -358,7 +358,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
                       <Input 
                         type="number" 
                         step="0.01" 
-                        placeholder="0.00" 
+                        placeholder="" 
                         {...field}
                       />
                     </FormControl>
@@ -377,7 +377,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
                       <Input 
                         type="number" 
                         step="0.01" 
-                        placeholder="0.00" 
+                        placeholder="" 
                         {...field}
                         readOnly
                         className="bg-gray-50"
@@ -457,7 +457,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
                   <FormItem>
                     <FormLabel>Local da Infração</FormLabel>
                     <FormControl>
-                      <Input placeholder="Endereço onde ocorreu" {...field} />
+                      <Input placeholder="" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -471,7 +471,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
                   <FormItem>
                     <FormLabel>Cidade</FormLabel>
                     <FormControl>
-                      <Input placeholder="Cidade" {...field} />
+                      <Input placeholder="" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -513,7 +513,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
                   <FormItem>
                     <FormLabel>Órgão Autuador</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: DETRAN, PRF, PM" {...field} />
+                      <Input placeholder="" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -19,6 +19,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Integração com pagamentos** - Infrações aparecerão na seção de pagamentos
 - ✅ **Interface intuitiva** - Área destacada para seleção manual quando necessário
 - ✅ **Taxa Admin % implementada** - Campo opcional que calcula automaticamente o valor final
+- ✅ **Campos limpos** - Removidos placeholders para facilitar entrada de dados
 
 ### 2025-07-15: Header Fixo Mobile e Melhorias UX - CONCLUÍDO
 - ✅ **Header fixo no mobile** - Cabeçalho permanece fixo no topo em dispositivos móveis
