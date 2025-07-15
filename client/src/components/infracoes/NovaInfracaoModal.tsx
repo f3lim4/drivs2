@@ -74,6 +74,43 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
     },
   });
 
+  // Estados para controlar o modo de seleção
+  const [selecaoManual, setSelecaoManual] = React.useState(false);
+  const [aluguelSelecionado, setAluguelSelecionado] = React.useState<string>('');
+
+  // Filtrar motoristas com aluguéis ativos
+  const motoristasComAluguel = React.useMemo(() => {
+    return alugueis.filter(aluguel => aluguel.status === 'ativo').map(aluguel => ({
+      aluguelId: aluguel.id,
+      motoristaId: aluguel.motoristaId,
+      motoristaNome: aluguel.motoristaNome,
+      veiculoId: aluguel.veiculoId,
+      veiculoModelo: aluguel.veiculoModelo,
+      veiculoPlaca: aluguel.veiculoPlaca,
+    }));
+  }, [alugueis]);
+
+  // Função para selecionar aluguel ativo
+  const handleSelectAluguel = (aluguelId: string) => {
+    const aluguel = motoristasComAluguel.find(a => a.aluguelId === aluguelId);
+    if (aluguel) {
+      setAluguelSelecionado(aluguelId);
+      form.setValue('aluguelId', aluguelId);
+      form.setValue('motoristaId', aluguel.motoristaId);
+      form.setValue('veiculoId', aluguel.veiculoId);
+    }
+  };
+
+  // Reset quando muda o modo de seleção
+  React.useEffect(() => {
+    if (selecaoManual) {
+      setAluguelSelecionado('');
+      form.setValue('aluguelId', 'sem-aluguel');
+      form.setValue('motoristaId', '');
+      form.setValue('veiculoId', '');
+    }
+  }, [selecaoManual, form]);
+
   const watchedValues = form.watch(['valorOriginal', 'valorDesconto']);
 
   // Reset formulário quando o modal abrir
@@ -110,6 +147,9 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         responsavel: 'motorista',
         observacoes: '',
       });
+      // Reset estados locais
+      setSelecaoManual(false);
+      setAluguelSelecionado('');
     }
   }, [open, motoristas, veiculos, alugueis, form, user?.locadoraId]);
 
@@ -187,91 +227,118 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Dados do Motorista e Veículo</h3>
                 
-                <FormField
-                  control={form.control}
-                  name="motoristaId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Motorista</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value} defaultValue="">
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione o motorista" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {motoristas.length > 0 ? (
-                            motoristas.map((motorista) => (
-                              <SelectItem key={motorista.id} value={motorista.id}>
-                                {motorista.nome} - {motorista.id}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="loading" disabled>
-                              Carregando motoristas...
+                {/* Seleção de Motorista com Aluguel Ativo */}
+                {!selecaoManual && (
+                  <div className="space-y-3">
+                    <FormLabel>Motorista com Aluguel Ativo</FormLabel>
+                    <Select onValueChange={handleSelectAluguel} value={aluguelSelecionado}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o motorista com aluguel ativo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {motoristasComAluguel.length > 0 ? (
+                          motoristasComAluguel.map((item) => (
+                            <SelectItem key={item.aluguelId} value={item.aluguelId}>
+                              {item.motoristaNome} - {item.veiculoModelo} ({item.veiculoPlaca})
                             </SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                          ))
+                        ) : (
+                          <SelectItem value="loading" disabled>
+                            Nenhum motorista com aluguel ativo
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
-                <FormField
-                  control={form.control}
-                  name="veiculoId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Veículo</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value} defaultValue="">
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione o veículo" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {veiculos.length > 0 ? (
-                            veiculos.map((veiculo) => (
-                              <SelectItem key={veiculo.id} value={veiculo.id}>
-                                {veiculo.modelo} - {veiculo.placa}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="loading" disabled>
-                              Carregando veículos...
-                            </SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Checkbox para seleção manual */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="selecaoManual"
+                    checked={selecaoManual}
+                    onChange={(e) => setSelecaoManual(e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="selecaoManual" className="text-sm font-medium text-gray-900">
+                    Motorista não tem aluguel ativo (seleção manual)
+                  </label>
+                </div>
 
+                {/* Campos manuais quando checkbox marcado */}
+                {selecaoManual && (
+                  <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+                    <FormField
+                      control={form.control}
+                      name="motoristaId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Motorista</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value} defaultValue="">
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o motorista" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {motoristas.length > 0 ? (
+                                motoristas.map((motorista) => (
+                                  <SelectItem key={motorista.id} value={motorista.id}>
+                                    {motorista.nome} - {motorista.id}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="loading" disabled>
+                                  Carregando motoristas...
+                                </SelectItem>
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="veiculoId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Veículo</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value} defaultValue="">
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o veículo" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {veiculos.length > 0 ? (
+                                veiculos.map((veiculo) => (
+                                  <SelectItem key={veiculo.id} value={veiculo.id}>
+                                    {veiculo.modelo} - {veiculo.placa}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="loading" disabled>
+                                  Carregando veículos...
+                                </SelectItem>
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+                {/* Campo oculto para aluguelId */}
                 <FormField
                   control={form.control}
                   name="aluguelId"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Aluguel (Opcional)</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione o aluguel" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="sem-aluguel">Sem aluguel</SelectItem>
-                          {alugueis.map((aluguel) => (
-                            <SelectItem key={aluguel.id} value={aluguel.id}>
-                              {aluguel.motoristaNome} - {aluguel.veiculoPlaca}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                    <input type="hidden" {...field} />
                   )}
                 />
               </div>
