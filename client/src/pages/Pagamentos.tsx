@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { Plus, Eye, Edit, Trash2, Calendar, DollarSign, User, AlertCircle } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Plus, Eye, Edit, Trash2, Calendar, DollarSign, User, AlertCircle, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePagamentos } from '@/hooks/usePagamentos';
 import { useMotoristas } from '@/hooks/useMotoristas';
 import { useAuth } from '@/hooks/useAuth';
@@ -23,6 +25,11 @@ export default function Pagamentos() {
   const [showEditar, setShowEditar] = useState(false);
   const [showExcluir, setShowExcluir] = useState(false);
   const [pagamentoSelecionado, setPagamentoSelecionado] = useState<Pagamento | null>(null);
+  
+  // Estados para filtros
+  const [filtroTexto, setFiltroTexto] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState('todos');
+  const [filtroTipo, setFiltroTipo] = useState('todos');
 
   const handleVerDetalhes = (pagamento: Pagamento) => {
     setPagamentoSelecionado(pagamento);
@@ -83,16 +90,42 @@ export default function Pagamentos() {
     return new Date(date).toLocaleDateString('pt-BR');
   };
 
-  // Estatísticas
-  const totalPendente = pagamentos
+  // Filtrar pagamentos
+  const pagamentosFiltrados = useMemo(() => {
+    let filtered = pagamentos;
+
+    // Filtro por texto (nome do motorista, descrição, observações)
+    if (filtroTexto) {
+      filtered = filtered.filter(p => 
+        p.motoristaNome.toLowerCase().includes(filtroTexto.toLowerCase()) ||
+        p.descricao?.toLowerCase().includes(filtroTexto.toLowerCase()) ||
+        p.observacoes?.toLowerCase().includes(filtroTexto.toLowerCase())
+      );
+    }
+
+    // Filtro por status
+    if (filtroStatus !== 'todos') {
+      filtered = filtered.filter(p => p.status === filtroStatus);
+    }
+
+    // Filtro por tipo
+    if (filtroTipo !== 'todos') {
+      filtered = filtered.filter(p => p.tipo === filtroTipo);
+    }
+
+    return filtered;
+  }, [pagamentos, filtroTexto, filtroStatus, filtroTipo]);
+
+  // Estatísticas (baseado nos dados filtrados)
+  const totalPendente = pagamentosFiltrados
     .filter(p => p.status === 'pendente' || p.status === 'parcial')
     .reduce((sum, p) => sum + parseFloat(p.valorRestante), 0);
 
-  const totalRecebido = pagamentos
+  const totalRecebido = pagamentosFiltrados
     .filter(p => p.status === 'pago')
     .reduce((sum, p) => sum + parseFloat(p.valorPago), 0);
 
-  const totalParcial = pagamentos
+  const totalParcial = pagamentosFiltrados
     .filter(p => p.status === 'parcial')
     .reduce((sum, p) => sum + parseFloat(p.valorPago), 0);
 
@@ -105,7 +138,7 @@ export default function Pagamentos() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 border border-gray-200 rounded-lg bg-white space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -118,6 +151,56 @@ export default function Pagamentos() {
         </Button>
       </div>
 
+      {/* Filtros */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="h-4 w-4" />
+            Filtros
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Buscar por motorista, descrição..."
+                value={filtroTexto}
+                onChange={(e) => setFiltroTexto(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os Status</SelectItem>
+                <SelectItem value="pago">Pago</SelectItem>
+                <SelectItem value="parcial">Parcial</SelectItem>
+                <SelectItem value="pendente">Pendente</SelectItem>
+                <SelectItem value="atrasado">Atrasado</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+              <SelectTrigger>
+                <SelectValue placeholder="Tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os Tipos</SelectItem>
+                <SelectItem value="aluguel">Aluguel</SelectItem>
+                <SelectItem value="infrações">Infrações</SelectItem>
+                <SelectItem value="manutenção">Manutenção</SelectItem>
+                <SelectItem value="danos">Danos</SelectItem>
+                <SelectItem value="outros">Outros</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -127,7 +210,7 @@ export default function Pagamentos() {
           <CardContent>
             <div className="text-2xl font-bold text-red-600">{formatCurrency(totalPendente)}</div>
             <div className="text-xs text-gray-500 mt-1">
-              {pagamentos.filter(p => p.status === 'pendente' || p.status === 'parcial').length} pagamentos
+              {pagamentosFiltrados.filter(p => p.status === 'pendente' || p.status === 'parcial').length} pagamentos
             </div>
           </CardContent>
         </Card>
@@ -139,7 +222,7 @@ export default function Pagamentos() {
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{formatCurrency(totalRecebido)}</div>
             <div className="text-xs text-gray-500 mt-1">
-              {pagamentos.filter(p => p.status === 'pago').length} pagamentos
+              {pagamentosFiltrados.filter(p => p.status === 'pago').length} pagamentos
             </div>
           </CardContent>
         </Card>
@@ -151,7 +234,7 @@ export default function Pagamentos() {
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">{formatCurrency(totalParcial)}</div>
             <div className="text-xs text-gray-500 mt-1">
-              {pagamentos.filter(p => p.status === 'parcial').length} pagamentos
+              {pagamentosFiltrados.filter(p => p.status === 'parcial').length} pagamentos
             </div>
           </CardContent>
         </Card>
@@ -162,10 +245,10 @@ export default function Pagamentos() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {formatCurrency(pagamentos.reduce((sum, p) => sum + parseFloat(p.valorTotal), 0))}
+              {formatCurrency(pagamentosFiltrados.reduce((sum, p) => sum + parseFloat(p.valorTotal), 0))}
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              {pagamentos.length} pagamentos
+              {pagamentosFiltrados.length} pagamentos
             </div>
           </CardContent>
         </Card>
@@ -176,22 +259,30 @@ export default function Pagamentos() {
         <CardHeader>
           <CardTitle>Todos os Pagamentos</CardTitle>
           <CardDescription>
-            {pagamentos.length === 0 
+            {pagamentosFiltrados.length === 0 
               ? 'Nenhum pagamento encontrado' 
-              : `${pagamentos.length} pagamento${pagamentos.length > 1 ? 's' : ''} encontrado${pagamentos.length > 1 ? 's' : ''}`
+              : `${pagamentosFiltrados.length} pagamento${pagamentosFiltrados.length > 1 ? 's' : ''} encontrado${pagamentosFiltrados.length > 1 ? 's' : ''}`
             }
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {pagamentos.length === 0 ? (
+          {pagamentosFiltrados.length === 0 ? (
             <div className="text-center py-8">
               <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Nenhum pagamento cadastrado ainda.</p>
-              <p className="text-sm text-gray-500 mt-1">Clique em "Novo Pagamento" para começar.</p>
+              <p className="text-gray-600">
+                {pagamentos.length === 0 
+                  ? 'Nenhum pagamento cadastrado ainda.' 
+                  : 'Nenhum pagamento encontrado com os filtros aplicados.'}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                {pagamentos.length === 0 
+                  ? 'Clique em "Novo Pagamento" para começar.' 
+                  : 'Tente ajustar os filtros para encontrar pagamentos.'}
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
-              {pagamentos.map((pagamento) => (
+              {pagamentosFiltrados.map((pagamento) => (
                 <div key={pagamento.id} className="border rounded-lg p-4 hover:bg-gray-50">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
