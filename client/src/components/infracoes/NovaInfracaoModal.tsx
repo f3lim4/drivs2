@@ -335,47 +335,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   </div>
                 )}
 
-                {/* Campo oculto para aluguelId */}
-                <FormField
-                  control={form.control}
-                  name="aluguelId"
-                  render={({ field }) => (
-                    <input type="hidden" {...field} />
-                  )}
-                />
-              </div>
-
-              {/* Dados da Infração */}
-              <div className="space-y-3">
-
-                <FormField
-                  control={form.control}
-                  name="numeroAuto"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">Número do Auto</FormLabel>
-                      <FormControl>
-                        <Input className="h-9" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="codigoInfracao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">Código da Infração</FormLabel>
-                      <FormControl>
-                        <Input className="h-9" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
+                {/* Campos de Tipo e Pontuação */}
                 <FormField
                   control={form.control}
                   name="tipoInfracao"
@@ -413,6 +373,47 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Campo oculto para aluguelId */}
+                <FormField
+                  control={form.control}
+                  name="aluguelId"
+                  render={({ field }) => (
+                    <input type="hidden" {...field} />
+                  )}
+                />
+              </div>
+
+              {/* Dados da Infração */}
+              <div className="space-y-3">
+
+                <FormField
+                  control={form.control}
+                  name="numeroAuto"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm">Número do Auto</FormLabel>
+                      <FormControl>
+                        <Input className="h-9" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="codigoInfracao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm">Código da Infração</FormLabel>
+                      <FormControl>
+                        <Input className="h-9" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
