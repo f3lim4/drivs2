@@ -215,23 +215,26 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
+      <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto">
+        <DialogHeader className="pb-6 border-b">
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <AlertTriangle className="h-6 w-6 text-red-500" />
             Nova Infração de Trânsito
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-base text-gray-600">
             Registre uma nova infração de trânsito no sistema
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Dados do Motorista e Veículo */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Dados do Motorista e Veículo</h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <h3 className="text-lg font-semibold text-gray-800">Dados do Motorista e Veículo</h3>
+                </div>
                 
                 {/* Seleção de Motorista com Aluguel Ativo */}
                 {!selecaoManual && (
@@ -350,8 +353,11 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               </div>
 
               {/* Dados da Infração */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Dados da Infração</h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                  <h3 className="text-lg font-semibold text-gray-800">Dados da Infração</h3>
+                </div>
 
                 <FormField
                   control={form.control}
@@ -427,26 +433,40 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
             </div>
 
             {/* Descrição da Infração */}
-            <FormField
-              control={form.control}
-              name="descricaoInfracao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição da Infração</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="" 
-                      {...field} 
-                      rows={3}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <h3 className="text-lg font-semibold text-gray-800">Descrição da Infração</h3>
+              </div>
+              
+              <FormField
+                control={form.control}
+                name="descricaoInfracao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição Detalhada</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="" 
+                        {...field} 
+                        rows={4}
+                        className="resize-none"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Valores Financeiros */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <h3 className="text-lg font-semibold text-gray-800">Valores Financeiros</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="valorOriginal"
@@ -505,57 +525,64 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   </FormItem>
                 )}
               />
+              </div>
             </div>
 
             {/* Datas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="dataInfracao"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data da Infração</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                <h3 className="text-lg font-semibold text-gray-800">Datas Importantes</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="dataInfracao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data da Infração</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="dataVencimento"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data de Vencimento</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="dataVencimento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data de Vencimento</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="dataNotificacao"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data de Notificação (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="dataNotificacao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data de Notificação (Opcional)</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="dataPagamento"
-                render={({ field }) => (
-                  <FormItem>
+                <FormField
+                  control={form.control}
+                  name="dataPagamento"
+                  render={({ field }) => (
+                    <FormItem>
                     <FormLabel>Data do Pagamento (Opcional)</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
@@ -564,115 +591,136 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   </FormItem>
                 )}
               />
+              </div>
             </div>
 
             {/* Local da Infração */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="localInfracao"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Local da Infração</FormLabel>
-                    <FormControl>
-                      <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="cidade"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cidade</FormLabel>
-                    <FormControl>
-                      <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="estado"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Estado</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                <h3 className="text-lg font-semibold text-gray-800">Local da Infração</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="localInfracao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Local da Infração</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o estado" />
-                        </SelectTrigger>
+                        <Input placeholder="" {...field} />
                       </FormControl>
-                      <SelectContent>
-                        {estados.map((estado) => (
-                          <SelectItem key={estado} value={estado}>
-                            {estado}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="cidade"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cidade</FormLabel>
+                      <FormControl>
+                        <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="estado"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Estado</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o estado" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {estados.map((estado) => (
+                            <SelectItem key={estado} value={estado}>
+                              {estado}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             {/* Órgão Autuador */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="orgaoAutuador"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Órgão Autuador</FormLabel>
-                    <FormControl>
-                      <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                <h3 className="text-lg font-semibold text-gray-800">Órgão Autuador</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="orgaoAutuador"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Órgão Autuador</FormLabel>
+                      <FormControl>
+                        <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
+                <FormField
+                  control={form.control}
+                  name="agente"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Agente (Opcional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Observações */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                <h3 className="text-lg font-semibold text-gray-800">Observações</h3>
+              </div>
+              
               <FormField
                 control={form.control}
-                name="agente"
+                name="observacoes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Agente (Opcional)</FormLabel>
+                    <FormLabel>Observações Adicionais (Opcional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome do agente" {...field} />
+                      <Textarea 
+                        placeholder="" 
+                        {...field} 
+                        rows={3}
+                        className="resize-none"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-
-
-
-            {/* Observações */}
-            <FormField
-              control={form.control}
-              name="observacoes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Observações (Opcional)</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Observações adicionais..." 
-                      {...field} 
-                      rows={3}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             {/* Botões */}
             <div className="flex justify-end space-x-2">
