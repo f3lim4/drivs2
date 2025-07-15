@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -717,6 +717,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Pagamento deleted successfully" });
     } catch (error) {
       console.error("Error deleting pagamento:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Infrações routes
+  app.get("/api/infracoes", async (req, res) => {
+    try {
+      const { locadoraId } = req.query;
+      
+      if (locadoraId) {
+        const infracoes = await storage.getInfracoesByLocadora(locadoraId as string);
+        res.json(infracoes);
+      } else {
+        const infracoes = await storage.getAllInfracoes();
+        res.json(infracoes);
+      }
+    } catch (error) {
+      console.error("Error fetching infracoes:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/infracoes/:id", async (req, res) => {
+    try {
+      const infracao = await storage.getInfracao(req.params.id);
+      if (!infracao) {
+        return res.status(404).json({ message: "Infracao not found" });
+      }
+      res.json(infracao);
+    } catch (error) {
+      console.error("Error fetching infracao:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/infracoes", async (req, res) => {
+    try {
+      const validatedData = insertInfracaoSchema.parse(req.body);
+      const infracao = await storage.createInfracao(validatedData);
+      res.json(infracao);
+    } catch (error) {
+      console.error("Error creating infracao:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/infracoes/:id", async (req, res) => {
+    try {
+      const validatedData = insertInfracaoSchema.partial().parse(req.body);
+      const infracao = await storage.updateInfracao(req.params.id, validatedData);
+      res.json(infracao);
+    } catch (error) {
+      console.error("Error updating infracao:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/infracoes/:id", async (req, res) => {
+    try {
+      await storage.deleteInfracao(req.params.id);
+      res.json({ message: "Infracao deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting infracao:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

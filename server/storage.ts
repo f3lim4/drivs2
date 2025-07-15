@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -8,7 +8,8 @@ import {
   type Aluguel, type InsertAluguel,
   type Contrato, type InsertContrato,
   type TemplateContrato, type InsertTemplateContrato,
-  type Pagamento, type InsertPagamento
+  type Pagamento, type InsertPagamento,
+  type Infracao, type InsertInfracao
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -85,6 +86,16 @@ export interface IStorage {
   updatePagamento(id: string, updates: Partial<InsertPagamento>): Promise<Pagamento>;
   deletePagamento(id: string): Promise<void>;
   getAluguelValorSemanal(aluguelId: string): Promise<number | undefined>;
+  
+  // Infracao operations
+  getAllInfracoes(): Promise<Infracao[]>;
+  getInfracoesByLocadora(locadoraId: string): Promise<Infracao[]>;
+  getInfracoesByMotorista(motoristaId: string): Promise<Infracao[]>;
+  getInfracoesByVeiculo(veiculoId: string): Promise<Infracao[]>;
+  getInfracao(id: string): Promise<Infracao | undefined>;
+  createInfracao(infracao: InsertInfracao): Promise<Infracao>;
+  updateInfracao(id: string, updates: Partial<InsertInfracao>): Promise<Infracao>;
+  deleteInfracao(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -661,6 +672,221 @@ export class DatabaseStorage implements IStorage {
     
     return result[0] ? parseFloat(result[0].valorSemanal) : undefined;
   }
+
+  // Infracao operations
+  async getAllInfracoes(): Promise<Infracao[]> {
+    try {
+      const result = await db.select().from(infracoes);
+      
+      // Enriquecer com dados de motorista e veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (infracao) => {
+          const motorista = await db.select().from(motoristas).where(eq(motoristas.id, infracao.motoristaId)).limit(1);
+          const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, infracao.veiculoId)).limit(1);
+          
+          return {
+            ...infracao,
+            motoristaNome: motorista[0]?.nome || '',
+            motoristaContato: motorista[0]?.contato || '',
+            veiculoModelo: veiculo[0]?.modelo || '',
+            veiculoPlaca: veiculo[0]?.placa || ''
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting all infracoes:', error);
+      return [];
+    }
+  }
+
+  async getInfracoesByLocadora(locadoraId: string): Promise<Infracao[]> {
+    try {
+      const result = await db.select().from(infracoes).where(eq(infracoes.locadoraId, locadoraId));
+      
+      // Enriquecer com dados de motorista e veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (infracao) => {
+          const motorista = await db.select().from(motoristas).where(eq(motoristas.id, infracao.motoristaId)).limit(1);
+          const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, infracao.veiculoId)).limit(1);
+          
+          return {
+            ...infracao,
+            motoristaNome: motorista[0]?.nome || '',
+            motoristaContato: motorista[0]?.contato || '',
+            veiculoModelo: veiculo[0]?.modelo || '',
+            veiculoPlaca: veiculo[0]?.placa || ''
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting infracoes by locadora:', error);
+      return [];
+    }
+  }
+
+  async getInfracoesByMotorista(motoristaId: string): Promise<Infracao[]> {
+    try {
+      const result = await db.select().from(infracoes).where(eq(infracoes.motoristaId, motoristaId));
+      
+      // Enriquecer com dados de motorista e veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (infracao) => {
+          const motorista = await db.select().from(motoristas).where(eq(motoristas.id, infracao.motoristaId)).limit(1);
+          const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, infracao.veiculoId)).limit(1);
+          
+          return {
+            ...infracao,
+            motoristaNome: motorista[0]?.nome || '',
+            motoristaContato: motorista[0]?.contato || '',
+            veiculoModelo: veiculo[0]?.modelo || '',
+            veiculoPlaca: veiculo[0]?.placa || ''
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting infracoes by motorista:', error);
+      return [];
+    }
+  }
+
+  async getInfracoesByVeiculo(veiculoId: string): Promise<Infracao[]> {
+    try {
+      const result = await db.select().from(infracoes).where(eq(infracoes.veiculoId, veiculoId));
+      
+      // Enriquecer com dados de motorista e veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (infracao) => {
+          const motorista = await db.select().from(motoristas).where(eq(motoristas.id, infracao.motoristaId)).limit(1);
+          const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, infracao.veiculoId)).limit(1);
+          
+          return {
+            ...infracao,
+            motoristaNome: motorista[0]?.nome || '',
+            motoristaContato: motorista[0]?.contato || '',
+            veiculoModelo: veiculo[0]?.modelo || '',
+            veiculoPlaca: veiculo[0]?.placa || ''
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting infracoes by veiculo:', error);
+      return [];
+    }
+  }
+
+  async getInfracao(id: string): Promise<Infracao | undefined> {
+    try {
+      const result = await db.select().from(infracoes).where(eq(infracoes.id, id));
+      
+      if (result.length === 0) {
+        return undefined;
+      }
+      
+      const infracao = result[0];
+      
+      // Buscar dados do motorista e veículo separadamente
+      const motorista = await db.select().from(motoristas).where(eq(motoristas.id, infracao.motoristaId)).limit(1);
+      const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, infracao.veiculoId)).limit(1);
+      
+      return {
+        ...infracao,
+        motoristaNome: motorista[0]?.nome || '',
+        motoristaContato: motorista[0]?.contato || '',
+        veiculoModelo: veiculo[0]?.modelo || '',
+        veiculoPlaca: veiculo[0]?.placa || ''
+      };
+    } catch (error) {
+      console.error('Error getting infracao:', error);
+      return undefined;
+    }
+  }
+
+  async createInfracao(infracao: InsertInfracao): Promise<Infracao> {
+    try {
+      const infracaoData = {
+        ...infracao,
+        id: infracao.id || crypto.randomUUID(),
+      };
+      
+      // Inserir diretamente sem returning para evitar problemas com joins
+      await db.insert(infracoes).values(infracaoData);
+      
+      // Retornar o objeto construído manualmente
+      return {
+        id: infracaoData.id,
+        locadoraId: infracaoData.locadoraId,
+        motoristaId: infracaoData.motoristaId,
+        veiculoId: infracaoData.veiculoId,
+        aluguelId: infracaoData.aluguelId || null,
+        numeroAuto: infracaoData.numeroAuto,
+        codigoInfracao: infracaoData.codigoInfracao,
+        descricaoInfracao: infracaoData.descricaoInfracao,
+        tipoInfracao: infracaoData.tipoInfracao,
+        pontuacao: infracaoData.pontuacao,
+        valorOriginal: infracaoData.valorOriginal,
+        valorDesconto: infracaoData.valorDesconto || "0.00",
+        valorFinal: infracaoData.valorFinal,
+        dataInfracao: infracaoData.dataInfracao,
+        dataVencimento: infracaoData.dataVencimento,
+        dataNotificacao: infracaoData.dataNotificacao || null,
+        dataPagamento: infracaoData.dataPagamento || null,
+        localInfracao: infracaoData.localInfracao,
+        cidade: infracaoData.cidade,
+        estado: infracaoData.estado,
+        orgaoAutuador: infracaoData.orgaoAutuador,
+        agente: infracaoData.agente || null,
+        status: infracaoData.status,
+        situacao: infracaoData.situacao,
+        responsavel: infracaoData.responsavel,
+        observacoes: infracaoData.observacoes || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        motoristaNome: '',
+        motoristaContato: '',
+        veiculoModelo: '',
+        veiculoPlaca: ''
+      };
+    } catch (error) {
+      console.error('Error creating infracao:', error);
+      throw error;
+    }
+  }
+
+  async updateInfracao(id: string, updates: Partial<InsertInfracao>): Promise<Infracao> {
+    try {
+      const [updated] = await db.update(infracoes)
+        .set(updates)
+        .where(eq(infracoes.id, id))
+        .returning();
+      
+      // Buscar dados do motorista e veículo
+      const motorista = await db.select().from(motoristas).where(eq(motoristas.id, updated.motoristaId)).limit(1);
+      const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, updated.veiculoId)).limit(1);
+      
+      return {
+        ...updated,
+        motoristaNome: motorista[0]?.nome || '',
+        motoristaContato: motorista[0]?.contato || '',
+        veiculoModelo: veiculo[0]?.modelo || '',
+        veiculoPlaca: veiculo[0]?.placa || ''
+      };
+    } catch (error) {
+      console.error('Error updating infracao:', error);
+      throw error;
+    }
+  }
+
+  async deleteInfracao(id: string): Promise<void> {
+    await db.delete(infracoes).where(eq(infracoes.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -671,6 +897,7 @@ export class MemStorage implements IStorage {
   private motoristasMap: Map<string, Motorista>;
   private alugueisMap: Map<string, Aluguel>;
   private contratosMap: Map<string, Contrato>;
+  private infracoesMap: Map<string, Infracao>;
   currentId: number;
 
   constructor() {
@@ -681,6 +908,7 @@ export class MemStorage implements IStorage {
     this.motoristasMap = new Map();
     this.alugueisMap = new Map();
     this.contratosMap = new Map();
+    this.infracoesMap = new Map();
     this.currentId = 1;
   }
 
@@ -1013,6 +1241,39 @@ export class MemStorage implements IStorage {
 
   async getAluguelValorSemanal(aluguelId: string): Promise<number | undefined> {
     return undefined;
+  }
+
+  // Infracao operations (memoria - não implementados)
+  async getAllInfracoes(): Promise<Infracao[]> {
+    return [];
+  }
+
+  async getInfracoesByLocadora(locadoraId: string): Promise<Infracao[]> {
+    return [];
+  }
+
+  async getInfracoesByMotorista(motoristaId: string): Promise<Infracao[]> {
+    return [];
+  }
+
+  async getInfracoesByVeiculo(veiculoId: string): Promise<Infracao[]> {
+    return [];
+  }
+
+  async getInfracao(id: string): Promise<Infracao | undefined> {
+    return undefined;
+  }
+
+  async createInfracao(infracao: InsertInfracao): Promise<Infracao> {
+    throw new Error('Infrações não implementadas no MemStorage');
+  }
+
+  async updateInfracao(id: string, updates: Partial<InsertInfracao>): Promise<Infracao> {
+    throw new Error('Infrações não implementadas no MemStorage');
+  }
+
+  async deleteInfracao(id: string): Promise<void> {
+    throw new Error('Infrações não implementadas no MemStorage');
   }
 }
 
