@@ -18,6 +18,9 @@ import { insertInfracaoSchema } from '@shared/schema';
 import { Calendar, AlertTriangle } from 'lucide-react';
 
 const formSchema = insertInfracaoSchema.extend({
+  numeroAuto: z.string().min(1, 'Número do auto é obrigatório'),
+  codigoInfracao: z.string().min(1, 'Código da infração é obrigatório'),
+  tipoInfracao: z.string().min(1, 'Tipo da infração é obrigatório'),
   dataInfracao: z.string().min(1, 'Data da infração é obrigatória'),
   dataVencimento: z.string().min(1, 'Data de vencimento é obrigatória'),
   dataNotificacao: z.string().optional(),
@@ -25,6 +28,12 @@ const formSchema = insertInfracaoSchema.extend({
   valorOriginal: z.string().min(1, 'Valor original é obrigatório'),
   valorDesconto: z.string().optional(),
   valorFinal: z.string().min(1, 'Valor final é obrigatório'),
+  localInfracao: z.string().min(1, 'Local da infração é obrigatório'),
+  cidade: z.string().min(1, 'Cidade é obrigatória'),
+  estado: z.string().min(1, 'Estado é obrigatório'),
+  orgaoAutuador: z.string().min(1, 'Órgão autuador é obrigatório'),
+  motoristaId: z.string().min(1, 'Motorista é obrigatório'),
+  veiculoId: z.string().min(1, 'Veículo é obrigatório'),
 }).omit({ id: true, pontuacao: true, agente: true });
 
 type FormData = z.infer<typeof formSchema>;
