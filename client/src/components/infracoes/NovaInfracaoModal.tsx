@@ -346,16 +346,16 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               </div>
 
               {/* Dados da Infração */}
-              <div className="space-y-4">
+              <div className="space-y-3">
 
                 <FormField
                   control={form.control}
                   name="numeroAuto"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Número do Auto</FormLabel>
+                      <FormLabel className="text-sm">Número do Auto</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: 123456789" {...field} />
+                        <Input className="h-9" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -367,9 +367,9 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   name="codigoInfracao"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Código da Infração</FormLabel>
+                      <FormLabel className="text-sm">Código da Infração</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: 554-20" {...field} />
+                        <Input className="h-9" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -381,10 +381,10 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   name="tipoInfracao"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tipo da Infração</FormLabel>
+                      <FormLabel className="text-sm">Tipo da Infração</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-9">
                             <SelectValue placeholder="Selecione o tipo" />
                           </SelectTrigger>
                         </FormControl>
@@ -405,11 +405,11 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   name="pontuacao"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Pontuação</FormLabel>
+                      <FormLabel className="text-sm">Pontuação</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
-                          placeholder="Ex: 3" 
+                          className="h-9"
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
