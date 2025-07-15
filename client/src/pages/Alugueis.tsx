@@ -105,6 +105,7 @@ export default function Alugueis() {
               dias: aluguel.tempoContrato,
             },
             valores: {
+              mensal: parseFloat(aluguel.valorMensal),
               diario: parseFloat(aluguel.valorMensal) / 30,
               total: parseFloat(aluguel.valorTotal),
               caucao: parseFloat(aluguel.caucao),
@@ -216,7 +217,9 @@ export default function Alugueis() {
     total: alugueis.length,
     ativos: alugueis.filter(a => a.status === 'ativo').length,
     pendentes: alugueis.filter(a => a.status === 'pendente').length,
-    receita: alugueis.reduce((sum, a) => sum + a.valores.total, 0),
+    receitaMensal: alugueis
+      .filter(a => a.status === 'ativo')
+      .reduce((sum, a) => sum + a.valores.mensal, 0),
   };
 
   // Retorna badge de status com cor apropriada
@@ -280,8 +283,8 @@ export default function Alugueis() {
           variant="yellow"
         />
         <StatCard
-          title="Receita Total"
-          value={stats.receita}
+          title="Receita Mensal"
+          value={formatCurrency(stats.receitaMensal)}
           icon={<DollarSign />}
           variant="green"
         />
@@ -389,9 +392,9 @@ export default function Alugueis() {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium">{formatCurrency(aluguel.valores.total)}</p>
+                        <p className="font-medium">{formatCurrency(aluguel.valores.mensal)}</p>
                         <p className="text-sm text-muted-foreground">
-                          {formatCurrency(aluguel.valores.diario)}/mês
+                          {formatCurrency(aluguel.valores.diario)}/dia
                         </p>
                       </div>
                     </TableCell>
