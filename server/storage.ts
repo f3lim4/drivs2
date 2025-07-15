@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -7,7 +7,8 @@ import {
   type Motorista, type InsertMotorista,
   type Aluguel, type InsertAluguel,
   type Contrato, type InsertContrato,
-  type TemplateContrato, type InsertTemplateContrato
+  type TemplateContrato, type InsertTemplateContrato,
+  type Pagamento, type InsertPagamento
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -74,6 +75,16 @@ export interface IStorage {
   createTemplateContrato(template: InsertTemplateContrato): Promise<TemplateContrato>;
   updateTemplateContrato(id: string, updates: Partial<InsertTemplateContrato>): Promise<TemplateContrato>;
   deleteTemplateContrato(id: string): Promise<void>;
+  
+  // Pagamento operations
+  getAllPagamentos(): Promise<Pagamento[]>;
+  getPagamentosByLocadora(locadoraId: string): Promise<Pagamento[]>;
+  getPagamentosByMotorista(motoristaId: string): Promise<Pagamento[]>;
+  getPagamento(id: string): Promise<Pagamento | undefined>;
+  createPagamento(pagamento: InsertPagamento): Promise<Pagamento>;
+  updatePagamento(id: string, updates: Partial<InsertPagamento>): Promise<Pagamento>;
+  deletePagamento(id: string): Promise<void>;
+  getAluguelValorSemanal(aluguelId: string): Promise<number | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -511,6 +522,149 @@ export class DatabaseStorage implements IStorage {
   async deleteTemplateContrato(id: string): Promise<void> {
     await db.delete(templateContratos).where(eq(templateContratos.id, id));
   }
+
+  // Pagamento operations
+  async getAllPagamentos(): Promise<Pagamento[]> {
+    const result = await db.select({
+      id: pagamentos.id,
+      locadoraId: pagamentos.locadoraId,
+      motoristaId: pagamentos.motoristaId,
+      aluguelId: pagamentos.aluguelId,
+      tipo: pagamentos.tipo,
+      descricao: pagamentos.descricao,
+      valorTotal: pagamentos.valorTotal,
+      valorPago: pagamentos.valorPago,
+      valorRestante: pagamentos.valorRestante,
+      dataPagamento: pagamentos.dataPagamento,
+      status: pagamentos.status,
+      observacoes: pagamentos.observacoes,
+      createdAt: pagamentos.createdAt,
+      updatedAt: pagamentos.updatedAt,
+      motoristaNome: motoristas.nome,
+      motoristaContato: motoristas.contato,
+    })
+    .from(pagamentos)
+    .innerJoin(motoristas, eq(pagamentos.motoristaId, motoristas.id));
+    
+    return result;
+  }
+
+  async getPagamentosByLocadora(locadoraId: string): Promise<Pagamento[]> {
+    const result = await db.select({
+      id: pagamentos.id,
+      locadoraId: pagamentos.locadoraId,
+      motoristaId: pagamentos.motoristaId,
+      aluguelId: pagamentos.aluguelId,
+      tipo: pagamentos.tipo,
+      descricao: pagamentos.descricao,
+      valorTotal: pagamentos.valorTotal,
+      valorPago: pagamentos.valorPago,
+      valorRestante: pagamentos.valorRestante,
+      dataPagamento: pagamentos.dataPagamento,
+      status: pagamentos.status,
+      observacoes: pagamentos.observacoes,
+      createdAt: pagamentos.createdAt,
+      updatedAt: pagamentos.updatedAt,
+      motoristaNome: motoristas.nome,
+      motoristaContato: motoristas.contato,
+    })
+    .from(pagamentos)
+    .innerJoin(motoristas, and(
+      eq(pagamentos.motoristaId, motoristas.id),
+      eq(motoristas.locadoraId, locadoraId)
+    ))
+    .where(eq(pagamentos.locadoraId, locadoraId));
+    
+    return result;
+  }
+
+  async getPagamentosByMotorista(motoristaId: string): Promise<Pagamento[]> {
+    const result = await db.select({
+      id: pagamentos.id,
+      locadoraId: pagamentos.locadoraId,
+      motoristaId: pagamentos.motoristaId,
+      aluguelId: pagamentos.aluguelId,
+      tipo: pagamentos.tipo,
+      descricao: pagamentos.descricao,
+      valorTotal: pagamentos.valorTotal,
+      valorPago: pagamentos.valorPago,
+      valorRestante: pagamentos.valorRestante,
+      dataPagamento: pagamentos.dataPagamento,
+      status: pagamentos.status,
+      observacoes: pagamentos.observacoes,
+      createdAt: pagamentos.createdAt,
+      updatedAt: pagamentos.updatedAt,
+      motoristaNome: motoristas.nome,
+      motoristaContato: motoristas.contato,
+    })
+    .from(pagamentos)
+    .innerJoin(motoristas, eq(pagamentos.motoristaId, motoristas.id))
+    .where(eq(pagamentos.motoristaId, motoristaId));
+    
+    return result;
+  }
+
+  async getPagamento(id: string): Promise<Pagamento | undefined> {
+    const result = await db.select({
+      id: pagamentos.id,
+      locadoraId: pagamentos.locadoraId,
+      motoristaId: pagamentos.motoristaId,
+      aluguelId: pagamentos.aluguelId,
+      tipo: pagamentos.tipo,
+      descricao: pagamentos.descricao,
+      valorTotal: pagamentos.valorTotal,
+      valorPago: pagamentos.valorPago,
+      valorRestante: pagamentos.valorRestante,
+      dataPagamento: pagamentos.dataPagamento,
+      status: pagamentos.status,
+      observacoes: pagamentos.observacoes,
+      createdAt: pagamentos.createdAt,
+      updatedAt: pagamentos.updatedAt,
+      motoristaNome: motoristas.nome,
+      motoristaContato: motoristas.contato,
+    })
+    .from(pagamentos)
+    .innerJoin(motoristas, eq(pagamentos.motoristaId, motoristas.id))
+    .where(eq(pagamentos.id, id));
+    
+    return result[0];
+  }
+
+  async createPagamento(pagamento: InsertPagamento): Promise<Pagamento> {
+    const pagamentoData = {
+      ...pagamento,
+      id: crypto.randomUUID(),
+    };
+    const [created] = await db.insert(pagamentos).values(pagamentoData).returning();
+    
+    // Buscar dados do motorista para retornar completo
+    const result = await this.getPagamento(created.id);
+    return result!;
+  }
+
+  async updatePagamento(id: string, updates: Partial<InsertPagamento>): Promise<Pagamento> {
+    await db.update(pagamentos)
+      .set(updates)
+      .where(eq(pagamentos.id, id));
+    
+    const result = await this.getPagamento(id);
+    return result!;
+  }
+
+  async deletePagamento(id: string): Promise<void> {
+    await db.delete(pagamentos).where(eq(pagamentos.id, id));
+  }
+
+  async getAluguelValorSemanal(aluguelId: string): Promise<number | undefined> {
+    const result = await db.select({
+      valorSemanal: veiculos.valorSemanal
+    })
+    .from(alugueis)
+    .innerJoin(veiculos, eq(alugueis.veiculoId, veiculos.id))
+    .where(eq(alugueis.id, aluguelId));
+    
+    return result[0] ? parseFloat(result[0].valorSemanal) : undefined;
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -830,6 +984,39 @@ export class MemStorage implements IStorage {
 
   async deleteContrato(id: string): Promise<void> {
     this.contratosMap.delete(id);
+  }
+
+  // Pagamento operations (memoria - não implementados)
+  async getAllPagamentos(): Promise<Pagamento[]> {
+    return [];
+  }
+
+  async getPagamentosByLocadora(locadoraId: string): Promise<Pagamento[]> {
+    return [];
+  }
+
+  async getPagamentosByMotorista(motoristaId: string): Promise<Pagamento[]> {
+    return [];
+  }
+
+  async getPagamento(id: string): Promise<Pagamento | undefined> {
+    return undefined;
+  }
+
+  async createPagamento(pagamento: InsertPagamento): Promise<Pagamento> {
+    throw new Error('Pagamentos não implementados no MemStorage');
+  }
+
+  async updatePagamento(id: string, updates: Partial<InsertPagamento>): Promise<Pagamento> {
+    throw new Error('Pagamentos não implementados no MemStorage');
+  }
+
+  async deletePagamento(id: string): Promise<void> {
+    throw new Error('Pagamentos não implementados no MemStorage');
+  }
+
+  async getAluguelValorSemanal(aluguelId: string): Promise<number | undefined> {
+    return undefined;
   }
 }
 
