@@ -49,8 +49,36 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       console.log('Motoristas carregados:', motoristas);
       console.log('Veículos carregados:', veiculos);
       console.log('Aluguéis carregados:', alugueis);
+      // Reset formulário quando o modal abrir
+      form.reset({
+        locadoraId: user?.locadoraId || '',
+        motoristaId: '',
+        veiculoId: '',
+        aluguelId: 'sem-aluguel',
+        numeroAuto: '',
+        codigoInfracao: '',
+        descricaoInfracao: '',
+        tipoInfracao: '',
+        pontuacao: 0,
+        valorOriginal: '',
+        valorDesconto: '0.00',
+        valorFinal: '',
+        dataInfracao: '',
+        dataVencimento: '',
+        dataNotificacao: '',
+        dataPagamento: '',
+        localInfracao: '',
+        cidade: '',
+        estado: '',
+        orgaoAutuador: '',
+        agente: '',
+        status: 'pendente',
+        situacao: 'ativo',
+        responsavel: 'motorista',
+        observacoes: '',
+      });
     }
-  }, [open, motoristas, veiculos, alugueis]);
+  }, [open, motoristas, veiculos, alugueis, form, user?.locadoraId]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -165,18 +193,24 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Motorista</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value} defaultValue="">
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione o motorista" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {motoristas.map((motorista) => (
-                            <SelectItem key={motorista.id} value={motorista.id}>
-                              {motorista.nome} - {motorista.id}
+                          {motoristas.length > 0 ? (
+                            motoristas.map((motorista) => (
+                              <SelectItem key={motorista.id} value={motorista.id}>
+                                {motorista.nome} - {motorista.id}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="loading" disabled>
+                              Carregando motoristas...
                             </SelectItem>
-                          ))}
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -190,18 +224,24 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Veículo</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value} defaultValue="">
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione o veículo" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {veiculos.map((veiculo) => (
-                            <SelectItem key={veiculo.id} value={veiculo.id}>
-                              {veiculo.modelo} - {veiculo.placa}
+                          {veiculos.length > 0 ? (
+                            veiculos.map((veiculo) => (
+                              <SelectItem key={veiculo.id} value={veiculo.id}>
+                                {veiculo.modelo} - {veiculo.placa}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="loading" disabled>
+                              Carregando veículos...
                             </SelectItem>
-                          ))}
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
