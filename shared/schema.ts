@@ -227,6 +227,59 @@ export const insertPagamentoSchema = createInsertSchema(pagamentos).omit({
   updatedAt: true,
 });
 
+// Infrações table
+export const infracoes = pgTable("infracoes", {
+  id: text("id").primaryKey(),
+  locadoraId: text("locadora_id").notNull(),
+  motoristaId: text("motorista_id").notNull(),
+  veiculoId: text("veiculo_id").notNull(),
+  aluguelId: text("aluguel_id"), // Opcional - referência ao aluguel
+  
+  // Dados da infração
+  numeroAuto: text("numero_auto").notNull().unique(), // Número do auto de infração
+  codigoInfracao: text("codigo_infracao").notNull(), // Código da infração (ex: 554-20)
+  descricaoInfracao: text("descricao_infracao").notNull(), // Descrição da infração
+  tipoInfracao: text("tipo_infracao").notNull(), // 'leve', 'media', 'grave', 'gravissima'
+  pontuacao: integer("pontuacao").notNull().default(0), // Pontos na carteira
+  
+  // Valores financeiros
+  valorOriginal: decimal("valor_original", { precision: 10, scale: 2 }).notNull(),
+  valorDesconto: decimal("valor_desconto", { precision: 10, scale: 2 }).default("0.00"),
+  valorFinal: decimal("valor_final", { precision: 10, scale: 2 }).notNull(),
+  
+  // Datas importantes
+  dataInfracao: date("data_infracao").notNull(), // Data da infração
+  dataVencimento: date("data_vencimento").notNull(), // Data de vencimento
+  dataNotificacao: date("data_notificacao"), // Data que foi notificado
+  dataPagamento: date("data_pagamento"), // Data do pagamento
+  
+  // Local da infração
+  localInfracao: text("local_infracao").notNull(), // Endereço onde ocorreu
+  cidade: text("cidade").notNull(),
+  estado: text("estado").notNull(),
+  
+  // Órgão autuador
+  orgaoAutuador: text("orgao_autuador").notNull(), // DETRAN, PRF, etc.
+  agente: text("agente"), // Nome do agente
+  
+  // Status e controle
+  status: text("status").notNull().default("pendente"), // 'pendente', 'pago', 'contestado', 'cancelado'
+  situacao: text("situacao").notNull().default("ativo"), // 'ativo', 'prescrito', 'cancelado'
+  responsavel: text("responsavel").notNull().default("motorista"), // 'motorista', 'locadora'
+  
+  // Observações
+  observacoes: text("observacoes"),
+  
+  // Controle interno
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertInfracaoSchema = createInsertSchema(infracoes).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -263,4 +316,12 @@ export type Pagamento = typeof pagamentos.$inferSelect & {
   motoristaContato?: string;
   aluguelVeiculoModelo?: string;
   aluguelVeiculoPlaca?: string;
+};
+
+export type InsertInfracao = z.infer<typeof insertInfracaoSchema>;
+export type Infracao = typeof infracoes.$inferSelect & {
+  motoristaNome?: string;
+  motoristaContato?: string;
+  veiculoModelo?: string;
+  veiculoPlaca?: string;
 };

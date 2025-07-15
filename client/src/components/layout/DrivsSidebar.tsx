@@ -14,7 +14,8 @@ import {
   Building2,
   Menu,
   User,
-  CreditCard
+  CreditCard,
+  AlertTriangle
 } from 'lucide-react';
 import logoPath from "@assets/icone_1752434737434.png";
 import { useState } from 'react';
@@ -69,6 +70,12 @@ const navigationItems = [
     url: '/pagamentos',
     icon: CreditCard,
     description: 'Gestão de pagamentos'
+  },
+  {
+    title: 'Infrações',
+    url: '/infracoes',
+    icon: AlertTriangle,
+    description: 'Gestão de infrações'
   },
   {
     title: 'Locadoras',
