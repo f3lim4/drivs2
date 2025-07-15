@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Calendar, DollarSign, FileText, User, AlertCircle } from 'lucide-react';
+import { Calendar, DollarSign, FileText, User, AlertCircle, Check, Car } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { useAlugueis } from '@/hooks/useAlugueis';
 import { useAluguelValorSemanal } from '@/hooks/usePagamentos';
@@ -21,9 +22,10 @@ const formSchema = z.object({
   aluguelId: z.string().optional(),
   descricao: z.string().optional(),
   valorTotal: z.string().min(1, 'Valor total é obrigatório'),
-  valorPago: z.string().min(1, 'Valor pago é obrigatório'),
+  valorPago: z.string().optional(),
   dataPagamento: z.string().min(1, 'Data é obrigatória'),
   observacoes: z.string().optional(),
+  isPagamentoParcial: z.boolean().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -52,6 +54,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
       valorPago: '',
       dataPagamento: new Date().toISOString().split('T')[0],
       observacoes: '',
+      isPagamentoParcial: false,
     },
   });
 
@@ -59,18 +62,43 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
   const valorTotalInput = form.watch('valorTotal');
   const valorPagoInput = form.watch('valorPago');
   const motoristaId = form.watch('motoristaId');
+  const isPagamentoParcial = form.watch('isPagamentoParcial');
 
   // Filtrar aluguéis ativos do motorista selecionado
   const alugueisDoMotorista = alugueis.filter(
     aluguel => aluguel.motoristaId === motoristaId && aluguel.status === 'ativo'
   );
 
+  // Selecionar automaticamente o primeiro aluguel ativo quando tipo for aluguel
+  useEffect(() => {
+    if (tipoSelecionado === 'aluguel' && alugueisDoMotorista.length > 0) {
+      const primeiroAluguel = alugueisDoMotorista[0];
+      form.setValue('aluguelId', primeiroAluguel.id);
+      setAluguelSelecionado(primeiroAluguel.id);
+    }
+  }, [tipoSelecionado, alugueisDoMotorista, form]);
+
   // Atualizar valor semanal quando selecionar aluguel
   useEffect(() => {
     if (tipoSelecionado === 'aluguel' && valorSemanal) {
       form.setValue('valorTotal', valorSemanal.toString());
+      // Se não é pagamento parcial, define valorPago igual ao valorTotal
+      if (!isPagamentoParcial) {
+        form.setValue('valorPago', valorSemanal.toString());
+      }
     }
-  }, [valorSemanal, tipoSelecionado, form]);
+  }, [valorSemanal, tipoSelecionado, isPagamentoParcial, form]);
+
+  // Ajustar valor pago quando checkbox muda
+  useEffect(() => {
+    if (tipoSelecionado === 'aluguel' && valorTotalInput) {
+      if (isPagamentoParcial) {
+        form.setValue('valorPago', '');
+      } else {
+        form.setValue('valorPago', valorTotalInput);
+      }
+    }
+  }, [isPagamentoParcial, valorTotalInput, tipoSelecionado, form]);
 
   // Calcular valor restante
   const valorTotal = parseFloat(valorTotalInput) || 0;
@@ -85,6 +113,8 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
   };
 
   const handleSubmit = (data: FormData) => {
+    const valorPagoFinal = data.valorPago || data.valorTotal;
+    
     const pagamento: InsertPagamento = {
       id: crypto.randomUUID(),
       locadoraId: profile?.locadoraId || '',
@@ -93,8 +123,8 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
       tipo: data.tipo,
       descricao: data.descricao || undefined,
       valorTotal: data.valorTotal,
-      valorPago: data.valorPago,
-      valorRestante: valorRestante.toString(),
+      valorPago: valorPagoFinal,
+      valorRestante: (parseFloat(data.valorTotal) - parseFloat(valorPagoFinal)).toString(),
       dataPagamento: data.dataPagamento,
       status: getStatus(),
       observacoes: data.observacoes || undefined,
@@ -174,41 +204,41 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
               />
             </div>
 
-            {/* Aluguel (apenas se tipo for aluguel) */}
+            {/* Informações do Aluguel Automático (apenas se tipo for aluguel) */}
             {tipoSelecionado === 'aluguel' && motoristaId && (
-              <FormField
-                control={form.control}
-                name="aluguelId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Aluguel</FormLabel>
-                    <Select onValueChange={(value) => {
-                      field.onChange(value);
-                      setAluguelSelecionado(value);
-                    }} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o aluguel" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {alugueisDoMotorista.map((aluguel) => (
-                          <SelectItem key={aluguel.id} value={aluguel.id}>
-                            {aluguel.veiculoModelo} - {aluguel.veiculoPlaca}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                    {alugueisDoMotorista.length === 0 && (
-                      <p className="text-sm text-amber-600 flex items-center gap-2">
-                        <AlertCircle className="h-4 w-4" />
-                        Nenhum aluguel ativo encontrado para este motorista
-                      </p>
-                    )}
-                  </FormItem>
-                )}
-              />
+              <Card className="bg-blue-50 border-blue-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-blue-800">Informações do Aluguel</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {alugueisDoMotorista.length > 0 ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Car className="h-4 w-4 text-blue-600" />
+                        <span className="font-medium">
+                          {alugueisDoMotorista[0].veiculoModelo} - {alugueisDoMotorista[0].veiculoPlaca}
+                        </span>
+                      </div>
+                      {valorSemanal && (
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-green-600" />
+                          <span className="text-sm">
+                            Valor Semanal: {new Intl.NumberFormat('pt-BR', {
+                              style: 'currency',
+                              currency: 'BRL',
+                            }).format(valorSemanal)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-amber-600 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4" />
+                      Nenhum aluguel ativo encontrado para este motorista
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
             )}
 
             {/* Descrição */}
@@ -229,64 +259,89 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Valor Total */}
-              <FormField
-                control={form.control}
-                name="valorTotal"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor Total</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Valor Total */}
+                <FormField
+                  control={form.control}
+                  name="valorTotal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor Total</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {/* Valor Pago */}
-              <FormField
-                control={form.control}
-                name="valorPago"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor Pago</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                {/* Data */}
+                <FormField
+                  control={form.control}
+                  name="dataPagamento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data do Pagamento</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-              {/* Data */}
-              <FormField
-                control={form.control}
-                name="dataPagamento"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data do Pagamento</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Checkbox para pagamento parcial */}
+              <div className="flex items-center space-x-2">
+                <FormField
+                  control={form.control}
+                  name="isPagamentoParcial"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel className="text-sm font-medium">
+                        Pagamento Parcial
+                      </FormLabel>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Valor Pago (apenas se pagamento parcial estiver marcado) */}
+              {isPagamentoParcial && (
+                <FormField
+                  control={form.control}
+                  name="valorPago"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor Pago Parcial</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             {/* Resumo */}

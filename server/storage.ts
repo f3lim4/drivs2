@@ -525,57 +525,40 @@ export class DatabaseStorage implements IStorage {
 
   // Pagamento operations
   async getAllPagamentos(): Promise<Pagamento[]> {
-    const result = await db.select({
-      id: pagamentos.id,
-      locadoraId: pagamentos.locadoraId,
-      motoristaId: pagamentos.motoristaId,
-      aluguelId: pagamentos.aluguelId,
-      tipo: pagamentos.tipo,
-      descricao: pagamentos.descricao,
-      valorTotal: pagamentos.valorTotal,
-      valorPago: pagamentos.valorPago,
-      valorRestante: pagamentos.valorRestante,
-      dataPagamento: pagamentos.dataPagamento,
-      status: pagamentos.status,
-      observacoes: pagamentos.observacoes,
-      createdAt: pagamentos.createdAt,
-      updatedAt: pagamentos.updatedAt,
-      motoristaNome: motoristas.nome,
-      motoristaContato: motoristas.contato,
-    })
-    .from(pagamentos)
-    .innerJoin(motoristas, eq(pagamentos.motoristaId, motoristas.id));
-    
-    return result;
+    try {
+      const result = await db.select().from(pagamentos);
+      return result.map(pagamento => ({
+        ...pagamento,
+        motoristaNome: '',
+        motoristaContato: ''
+      }));
+    } catch (error) {
+      console.error('Error in getAllPagamentos:', error);
+      return [];
+    }
   }
 
   async getPagamentosByLocadora(locadoraId: string): Promise<Pagamento[]> {
-    const result = await db.select({
-      id: pagamentos.id,
-      locadoraId: pagamentos.locadoraId,
-      motoristaId: pagamentos.motoristaId,
-      aluguelId: pagamentos.aluguelId,
-      tipo: pagamentos.tipo,
-      descricao: pagamentos.descricao,
-      valorTotal: pagamentos.valorTotal,
-      valorPago: pagamentos.valorPago,
-      valorRestante: pagamentos.valorRestante,
-      dataPagamento: pagamentos.dataPagamento,
-      status: pagamentos.status,
-      observacoes: pagamentos.observacoes,
-      createdAt: pagamentos.createdAt,
-      updatedAt: pagamentos.updatedAt,
-      motoristaNome: motoristas.nome,
-      motoristaContato: motoristas.contato,
-    })
-    .from(pagamentos)
-    .innerJoin(motoristas, and(
-      eq(pagamentos.motoristaId, motoristas.id),
-      eq(motoristas.locadoraId, locadoraId)
-    ))
-    .where(eq(pagamentos.locadoraId, locadoraId));
-    
-    return result;
+    try {
+      const result = await db.select().from(pagamentos).where(eq(pagamentos.locadoraId, locadoraId));
+      
+      // Buscar dados dos motoristas separadamente para evitar problemas com joins
+      const pagamentosComMotoristas = await Promise.all(
+        result.map(async (pagamento) => {
+          const motorista = await db.select().from(motoristas).where(eq(motoristas.id, pagamento.motoristaId)).limit(1);
+          return {
+            ...pagamento,
+            motoristaNome: motorista[0]?.nome || '',
+            motoristaContato: motorista[0]?.contato || ''
+          };
+        })
+      );
+      
+      return pagamentosComMotoristas;
+    } catch (error) {
+      console.error('Error in getPagamentosByLocadora:', error);
+      return [];
+    }
   }
 
   async getPagamentosByMotorista(motoristaId: string): Promise<Pagamento[]> {
