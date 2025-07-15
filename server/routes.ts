@@ -754,7 +754,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/infracoes", async (req, res) => {
     try {
-      const validatedData = insertInfracaoSchema.parse(req.body);
+      const validatedData = insertInfracaoSchema.omit({ id: true }).parse(req.body);
       const infracao = await storage.createInfracao(validatedData);
       res.json(infracao);
     } catch (error) {
