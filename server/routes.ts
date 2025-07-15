@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -635,6 +635,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Template deleted successfully" });
     } catch (error) {
       console.error("Error deleting template contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Pagamentos routes
+  app.get("/api/pagamentos", async (req, res) => {
+    try {
+      const { locadoraId } = req.query;
+      const pagamentos = locadoraId
+        ? await storage.getPagamentosByLocadora(locadoraId as string)
+        : await storage.getAllPagamentos();
+      res.json(pagamentos);
+    } catch (error) {
+      console.error("Error fetching pagamentos:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/pagamentos/:id", async (req, res) => {
+    try {
+      const pagamento = await storage.getPagamento(req.params.id);
+      if (!pagamento) {
+        return res.status(404).json({ message: "Pagamento not found" });
+      }
+      res.json(pagamento);
+    } catch (error) {
+      console.error("Error fetching pagamento:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/pagamentos/motorista/:motoristaId", async (req, res) => {
+    try {
+      const pagamentos = await storage.getPagamentosByMotorista(req.params.motoristaId);
+      res.json(pagamentos);
+    } catch (error) {
+      console.error("Error fetching pagamentos by motorista:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/aluguel/:aluguelId/valor-semanal", async (req, res) => {
+    try {
+      const valorSemanal = await storage.getAluguelValorSemanal(req.params.aluguelId);
+      if (valorSemanal === undefined) {
+        return res.status(404).json({ message: "Aluguel not found" });
+      }
+      res.json({ valorSemanal });
+    } catch (error) {
+      console.error("Error fetching aluguel valor semanal:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/pagamentos", async (req, res) => {
+    try {
+      const validatedData = insertPagamentoSchema.parse(req.body);
+      const pagamento = await storage.createPagamento(validatedData);
+      res.json(pagamento);
+    } catch (error) {
+      console.error("Error creating pagamento:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/pagamentos/:id", async (req, res) => {
+    try {
+      const validatedData = insertPagamentoSchema.partial().parse(req.body);
+      const pagamento = await storage.updatePagamento(req.params.id, validatedData);
+      res.json(pagamento);
+    } catch (error) {
+      console.error("Error updating pagamento:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/pagamentos/:id", async (req, res) => {
+    try {
+      await storage.deletePagamento(req.params.id);
+      res.json({ message: "Pagamento deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting pagamento:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

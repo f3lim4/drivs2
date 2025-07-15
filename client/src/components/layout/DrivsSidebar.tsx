@@ -13,7 +13,8 @@ import {
   TrendingUp,
   Building2,
   Menu,
-  User
+  User,
+  CreditCard
 } from 'lucide-react';
 import logoPath from "@assets/icone_1752434737434.png";
 import { useState } from 'react';
@@ -62,6 +63,12 @@ const navigationItems = [
     url: '/contratos',
     icon: File,
     description: 'Gestão de contratos'
+  },
+  {
+    title: 'Pagamentos',
+    url: '/pagamentos',
+    icon: CreditCard,
+    description: 'Gestão de pagamentos'
   },
   {
     title: 'Locadoras',

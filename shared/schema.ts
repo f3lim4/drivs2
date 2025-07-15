@@ -204,6 +204,29 @@ export const insertTemplateContratoSchema = createInsertSchema(templateContratos
   updatedAt: true,
 });
 
+// Pagamentos table
+export const pagamentos = pgTable("pagamentos", {
+  id: text("id").primaryKey(),
+  locadoraId: text("locadora_id").notNull(),
+  motoristaId: text("motorista_id").notNull(),
+  aluguelId: text("aluguel_id"), // Opcional - apenas para pagamentos de aluguel
+  tipo: text("tipo").notNull(), // 'aluguel', 'infrações', 'manutenção', 'danos', 'outros'
+  descricao: text("descricao"), // Descrição adicional do pagamento
+  valorTotal: decimal("valor_total", { precision: 10, scale: 2 }).notNull(),
+  valorPago: decimal("valor_pago", { precision: 10, scale: 2 }).notNull(),
+  valorRestante: decimal("valor_restante", { precision: 10, scale: 2 }).notNull(),
+  dataPagamento: date("data_pagamento").notNull(),
+  status: text("status").notNull().default("pendente"), // 'pendente', 'parcial', 'pago', 'atrasado'
+  observacoes: text("observacoes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertPagamentoSchema = createInsertSchema(pagamentos).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -233,3 +256,11 @@ export type Contrato = typeof contratos.$inferSelect;
 
 export type InsertTemplateContrato = z.infer<typeof insertTemplateContratoSchema>;
 export type TemplateContrato = typeof templateContratos.$inferSelect;
+
+export type InsertPagamento = z.infer<typeof insertPagamentoSchema>;
+export type Pagamento = typeof pagamentos.$inferSelect & {
+  motoristaNome?: string;
+  motoristaContato?: string;
+  aluguelVeiculoModelo?: string;
+  aluguelVeiculoPlaca?: string;
+};

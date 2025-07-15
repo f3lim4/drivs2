@@ -29,6 +29,8 @@ export function DrivsLayout({ children }: DrivsLayoutProps) {
         return { title: 'Motoristas', subtitle: 'Gerencie motoristas cadastrados' };
       case '/contratos':
         return { title: 'Contratos', subtitle: 'Gerencie contratos e templates' };
+      case '/pagamentos':
+        return { title: 'Pagamentos', subtitle: 'Gerencie pagamentos dos motoristas' };
       case '/locadoras':
         return { title: 'Locadoras', subtitle: 'Gerencie locadoras do sistema' };
       case '/perfil':
