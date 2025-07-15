@@ -201,7 +201,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         responsavel: 'motorista',
       };
 
-      createInfracao(infracaoData);
+      await createInfracao(infracaoData);
       
       toast({
         title: "Infração criada com sucesso!",
