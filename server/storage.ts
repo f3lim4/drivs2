@@ -562,67 +562,80 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPagamentosByMotorista(motoristaId: string): Promise<Pagamento[]> {
-    const result = await db.select({
-      id: pagamentos.id,
-      locadoraId: pagamentos.locadoraId,
-      motoristaId: pagamentos.motoristaId,
-      aluguelId: pagamentos.aluguelId,
-      tipo: pagamentos.tipo,
-      descricao: pagamentos.descricao,
-      valorTotal: pagamentos.valorTotal,
-      valorPago: pagamentos.valorPago,
-      valorRestante: pagamentos.valorRestante,
-      dataPagamento: pagamentos.dataPagamento,
-      status: pagamentos.status,
-      observacoes: pagamentos.observacoes,
-      createdAt: pagamentos.createdAt,
-      updatedAt: pagamentos.updatedAt,
-      motoristaNome: motoristas.nome,
-      motoristaContato: motoristas.contato,
-    })
-    .from(pagamentos)
-    .innerJoin(motoristas, eq(pagamentos.motoristaId, motoristas.id))
-    .where(eq(pagamentos.motoristaId, motoristaId));
-    
-    return result;
+    try {
+      const result = await db.select().from(pagamentos).where(eq(pagamentos.motoristaId, motoristaId));
+      
+      // Buscar dados do motorista separadamente
+      const motorista = await db.select().from(motoristas).where(eq(motoristas.id, motoristaId)).limit(1);
+      
+      return result.map(pagamento => ({
+        ...pagamento,
+        motoristaNome: motorista[0]?.nome || '',
+        motoristaContato: motorista[0]?.contato || ''
+      }));
+    } catch (error) {
+      console.error('Error getting pagamentos by motorista:', error);
+      return [];
+    }
   }
 
   async getPagamento(id: string): Promise<Pagamento | undefined> {
-    const result = await db.select({
-      id: pagamentos.id,
-      locadoraId: pagamentos.locadoraId,
-      motoristaId: pagamentos.motoristaId,
-      aluguelId: pagamentos.aluguelId,
-      tipo: pagamentos.tipo,
-      descricao: pagamentos.descricao,
-      valorTotal: pagamentos.valorTotal,
-      valorPago: pagamentos.valorPago,
-      valorRestante: pagamentos.valorRestante,
-      dataPagamento: pagamentos.dataPagamento,
-      status: pagamentos.status,
-      observacoes: pagamentos.observacoes,
-      createdAt: pagamentos.createdAt,
-      updatedAt: pagamentos.updatedAt,
-      motoristaNome: motoristas.nome,
-      motoristaContato: motoristas.contato,
-    })
-    .from(pagamentos)
-    .innerJoin(motoristas, eq(pagamentos.motoristaId, motoristas.id))
-    .where(eq(pagamentos.id, id));
-    
-    return result[0];
+    try {
+      const result = await db.select().from(pagamentos).where(eq(pagamentos.id, id));
+      
+      if (result.length === 0) {
+        return undefined;
+      }
+      
+      const pagamento = result[0];
+      
+      // Buscar dados do motorista separadamente
+      const motorista = await db.select().from(motoristas).where(eq(motoristas.id, pagamento.motoristaId)).limit(1);
+      
+      return {
+        ...pagamento,
+        motoristaNome: motorista[0]?.nome || '',
+        motoristaContato: motorista[0]?.contato || ''
+      };
+    } catch (error) {
+      console.error('Error getting pagamento:', error);
+      return undefined;
+    }
   }
 
   async createPagamento(pagamento: InsertPagamento): Promise<Pagamento> {
-    const pagamentoData = {
-      ...pagamento,
-      id: crypto.randomUUID(),
-    };
-    const [created] = await db.insert(pagamentos).values(pagamentoData).returning();
-    
-    // Buscar dados do motorista para retornar completo
-    const result = await this.getPagamento(created.id);
-    return result!;
+    try {
+      const pagamentoData = {
+        ...pagamento,
+        id: pagamento.id || crypto.randomUUID(),
+      };
+      
+      // Inserir diretamente sem returning para evitar problemas com joins
+      await db.insert(pagamentos).values(pagamentoData);
+      
+      // Retornar o objeto construído manualmente
+      return {
+        id: pagamentoData.id,
+        locadoraId: pagamentoData.locadoraId,
+        motoristaId: pagamentoData.motoristaId,
+        aluguelId: pagamentoData.aluguelId || null,
+        tipo: pagamentoData.tipo,
+        descricao: pagamentoData.descricao || null,
+        valorTotal: pagamentoData.valorTotal,
+        valorPago: pagamentoData.valorPago,
+        valorRestante: pagamentoData.valorRestante,
+        dataPagamento: pagamentoData.dataPagamento,
+        status: pagamentoData.status,
+        observacoes: pagamentoData.observacoes || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        motoristaNome: '',
+        motoristaContato: ''
+      };
+    } catch (error) {
+      console.error('Error creating pagamento:', error);
+      throw error;
+    }
   }
 
   async updatePagamento(id: string, updates: Partial<InsertPagamento>): Promise<Pagamento> {
