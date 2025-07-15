@@ -101,7 +101,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Pagamento</DialogTitle>
         </DialogHeader>
