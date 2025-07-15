@@ -227,11 +227,11 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Dados do Motorista e Veículo */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 
                 {/* Seleção de Motorista com Aluguel Ativo */}
                 {!selecaoManual && (
-                  <div className="space-y-2 mb-2">
+                  <div className="space-y-2">
                     <FormLabel className="text-sm">Motorista com Aluguel Ativo</FormLabel>
                     <Select onValueChange={handleSelectAluguel} value={aluguelSelecionado}>
                       <SelectTrigger className="h-9">
@@ -255,7 +255,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                 )}
 
                 {/* Checkbox para seleção manual */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 -mt-2">
                   <input
                     type="checkbox"
                     id="selecaoManual"
