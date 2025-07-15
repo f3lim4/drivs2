@@ -231,11 +231,11 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                 
                 {/* Seleção de Motorista com Aluguel Ativo */}
                 {!selecaoManual && (
-                  <div className="space-y-3">
-                    <FormLabel>Motorista com Aluguel Ativo</FormLabel>
+                  <div className="space-y-2">
+                    <FormLabel className="text-sm">Motorista com Aluguel Ativo</FormLabel>
                     <Select onValueChange={handleSelectAluguel} value={aluguelSelecionado}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o motorista com aluguel ativo" />
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="Selecione o motorista" />
                       </SelectTrigger>
                       <SelectContent>
                         {motoristasComAluguel.length > 0 ? (
@@ -255,31 +255,31 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                 )}
 
                 {/* Checkbox para seleção manual */}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 py-1">
                   <input
                     type="checkbox"
                     id="selecaoManual"
                     checked={selecaoManual}
                     onChange={(e) => setSelecaoManual(e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="selecaoManual" className="text-sm font-medium text-gray-900">
-                    Motorista não tem aluguel ativo (seleção manual)
+                  <label htmlFor="selecaoManual" className="text-xs text-gray-600">
+                    Seleção manual
                   </label>
                 </div>
 
                 {/* Campos manuais quando checkbox marcado */}
                 {selecaoManual && (
-                  <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+                  <div className="space-y-3 bg-gray-50 p-3 rounded border">
                     <FormField
                       control={form.control}
                       name="motoristaId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Motorista</FormLabel>
+                          <FormLabel className="text-sm">Motorista</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value} defaultValue="">
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="h-9">
                                 <SelectValue placeholder="Selecione o motorista" />
                               </SelectTrigger>
                             </FormControl>
@@ -307,10 +307,10 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                       name="veiculoId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Veículo</FormLabel>
+                          <FormLabel className="text-sm">Veículo</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value} defaultValue="">
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="h-9">
                                 <SelectValue placeholder="Selecione o veículo" />
                               </SelectTrigger>
                             </FormControl>
