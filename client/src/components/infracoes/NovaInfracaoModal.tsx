@@ -54,7 +54,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      locadoraId: user?.locadoraId || '',
+      locadoraId: profile?.locadoraId || '',
       motoristaId: '',
       veiculoId: '',
       aluguelId: 'sem-aluguel',
