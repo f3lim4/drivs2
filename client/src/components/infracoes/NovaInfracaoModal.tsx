@@ -54,7 +54,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       codigoInfracao: '',
       descricaoInfracao: '',
       tipoInfracao: '',
-      pontuacao: 0,
+
       valorOriginal: '',
       valorDesconto: '0.00',
       valorFinal: '',
@@ -66,7 +66,6 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       cidade: '',
       estado: '',
       orgaoAutuador: '',
-      agente: '',
       status: 'pendente',
       situacao: 'ativo',
       responsavel: 'motorista',
@@ -129,7 +128,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         codigoInfracao: '',
         descricaoInfracao: '',
         tipoInfracao: '',
-        pontuacao: 0,
+
         valorOriginal: '',
         valorDesconto: '0.00',
         valorFinal: '',
@@ -164,22 +163,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
     calculateValorFinal();
   }, [watchedValues]);
 
-  // Mapear tipos de infração para pontos
-  const tipoInfracaoToPontos = {
-    'leve': 3,
-    'media': 4,
-    'grave': 5,
-    'gravissima': 7
-  };
 
-  // Atualizar pontuação automaticamente quando tipo de infração muda
-  const watchedTipoInfracao = form.watch('tipoInfracao');
-  React.useEffect(() => {
-    if (watchedTipoInfracao && tipoInfracaoToPontos[watchedTipoInfracao as keyof typeof tipoInfracaoToPontos]) {
-      const pontos = tipoInfracaoToPontos[watchedTipoInfracao as keyof typeof tipoInfracaoToPontos];
-      form.setValue('pontuacao', pontos);
-    }
-  }, [watchedTipoInfracao, form]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -193,7 +177,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         valorOriginal: valorOriginal.toFixed(2),
         valorDesconto: taxaAdminValor.toFixed(2), // Salva o valor calculado da taxa, não a porcentagem
         valorFinal: parseFloat(data.valorFinal).toFixed(2),
-        pontuacao: Number(data.pontuacao),
+
         dataInfracao: data.dataInfracao,
         dataVencimento: data.dataVencimento,
         dataNotificacao: data.dataNotificacao || null,
@@ -352,52 +336,30 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   </div>
                 )}
 
-                {/* Campos de Tipo e Pontuação lado a lado */}
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="tipoInfracao"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">Tipo da Infração</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="h-9">
-                              <SelectValue placeholder="Selecione o tipo" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="leve">Leve (3 pontos)</SelectItem>
-                            <SelectItem value="media">Média (4 pontos)</SelectItem>
-                            <SelectItem value="grave">Grave (5 pontos)</SelectItem>
-                            <SelectItem value="gravissima">Gravíssima (7 pontos)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="pontuacao"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm">Pontuação</FormLabel>
+                {/* Campo de Tipo da Infração */}
+                <FormField
+                  control={form.control}
+                  name="tipoInfracao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm">Tipo da Infração</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <Input 
-                            type="number" 
-                            className="h-9"
-                            {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                            readOnly
-                          />
+                          <SelectTrigger className="h-9">
+                            <SelectValue placeholder="Selecione o tipo" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                        <SelectContent>
+                          <SelectItem value="leve">Leve (3 pontos)</SelectItem>
+                          <SelectItem value="media">Média (4 pontos)</SelectItem>
+                          <SelectItem value="grave">Grave (5 pontos)</SelectItem>
+                          <SelectItem value="gravissima">Gravíssima (7 pontos)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 {/* Campo oculto para aluguelId */}
                 <FormField
@@ -583,8 +545,8 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               />
               </div>
 
-            {/* Local da Infração */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Local da Infração e Órgão Autuador */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="localInfracao"
@@ -599,6 +561,23 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="orgaoAutuador"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Órgão Autuador</FormLabel>
+                      <FormControl>
+                        <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+            {/* Cidade e Estado */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="cidade"
@@ -633,37 +612,6 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-            {/* Órgão Autuador */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="orgaoAutuador"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Órgão Autuador</FormLabel>
-                      <FormControl>
-                        <Input placeholder="" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="agente"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Agente (Opcional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="" {...field} />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
