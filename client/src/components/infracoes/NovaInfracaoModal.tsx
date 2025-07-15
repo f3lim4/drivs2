@@ -49,7 +49,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       locadoraId: user?.locadoraId || '',
       motoristaId: '',
       veiculoId: '',
-      aluguelId: '',
+      aluguelId: 'sem-aluguel',
       numeroAuto: '',
       codigoInfracao: '',
       descricaoInfracao: '',
@@ -102,7 +102,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         dataVencimento: data.dataVencimento,
         dataNotificacao: data.dataNotificacao || null,
         dataPagamento: data.dataPagamento || null,
-        aluguelId: data.aluguelId || null,
+        aluguelId: data.aluguelId === 'sem-aluguel' ? null : data.aluguelId,
         agente: data.agente || null,
         observacoes: data.observacoes || null,
       };
@@ -213,7 +213,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Sem aluguel</SelectItem>
+                          <SelectItem value="sem-aluguel">Sem aluguel</SelectItem>
                           {alugueis.map((aluguel) => (
                             <SelectItem key={aluguel.id} value={aluguel.id}>
                               {aluguel.motoristaNome} - {aluguel.veiculoPlaca}

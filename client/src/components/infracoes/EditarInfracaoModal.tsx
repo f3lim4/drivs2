@@ -49,7 +49,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
       locadoraId: infracao.locadoraId,
       motoristaId: infracao.motoristaId,
       veiculoId: infracao.veiculoId,
-      aluguelId: infracao.aluguelId || '',
+      aluguelId: infracao.aluguelId || 'sem-aluguel',
       numeroAuto: infracao.numeroAuto,
       codigoInfracao: infracao.codigoInfracao,
       descricaoInfracao: infracao.descricaoInfracao,
@@ -102,7 +102,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
         dataVencimento: data.dataVencimento,
         dataNotificacao: data.dataNotificacao || null,
         dataPagamento: data.dataPagamento || null,
-        aluguelId: data.aluguelId || null,
+        aluguelId: data.aluguelId === 'sem-aluguel' ? null : data.aluguelId,
         agente: data.agente || null,
         observacoes: data.observacoes || null,
       };
@@ -212,7 +212,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">Sem aluguel</SelectItem>
+                          <SelectItem value="sem-aluguel">Sem aluguel</SelectItem>
                           {alugueis.map((aluguel) => (
                             <SelectItem key={aluguel.id} value={aluguel.id}>
                               {aluguel.motoristaNome} - {aluguel.veiculoPlaca}
