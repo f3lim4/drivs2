@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-15: Sistema de Infrações com Seleção Inteligente - CONCLUÍDO
+- ✅ **Seleção inteligente implementada** - Motoristas com aluguel ativo aparecem primeiro
+- ✅ **Preenchimento automático** - Veículo selecionado automaticamente baseado no aluguel
+- ✅ **Modo manual alternativo** - Checkbox para casos sem aluguel ativo
+- ✅ **Campos simplificados** - Removidos Status, Situação e Responsável da interface
+- ✅ **Valores fixos no backend** - Status sempre "pendente", situação "ativo", responsável "motorista"
+- ✅ **Integração com pagamentos** - Infrações aparecerão na seção de pagamentos
+- ✅ **Interface intuitiva** - Área destacada para seleção manual quando necessário
+
 ### 2025-07-15: Header Fixo Mobile e Melhorias UX - CONCLUÍDO
 - ✅ **Header fixo no mobile** - Cabeçalho permanece fixo no topo em dispositivos móveis
 - ✅ **Layout responsivo otimizado** - Navegação melhorada em telas pequenas
