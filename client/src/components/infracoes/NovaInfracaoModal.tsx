@@ -25,7 +25,7 @@ const formSchema = insertInfracaoSchema.extend({
   valorOriginal: z.string().min(1, 'Valor original é obrigatório'),
   valorDesconto: z.string().optional(),
   valorFinal: z.string().min(1, 'Valor final é obrigatório'),
-}).omit({ pontuacao: true, agente: true });
+}).omit({ id: true, pontuacao: true, agente: true });
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -139,7 +139,6 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         cidade: '',
         estado: '',
         orgaoAutuador: '',
-        agente: '',
         observacoes: '',
       });
       // Reset estados locais
@@ -176,6 +175,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       
       const infracaoData = {
         ...data,
+        locadoraId: user?.locadoraId || '',
         valorOriginal: valorOriginal.toFixed(2),
         valorDesconto: taxaAdminValor.toFixed(2), // Salva o valor calculado da taxa, não a porcentagem
         valorFinal: parseFloat(data.valorFinal).toFixed(2),
