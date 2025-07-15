@@ -20,7 +20,6 @@ const formSchema = z.object({
   motoristaId: z.string().min(1, 'Selecione um motorista'),
   tipo: z.enum(['aluguel', 'infrações', 'manutenção', 'danos', 'outros']),
   aluguelId: z.string().optional(),
-  descricao: z.string().optional(),
   valorTotal: z.string().min(1, 'Valor total é obrigatório'),
   valorPago: z.string().optional(),
   dataPagamento: z.string().min(1, 'Data é obrigatória'),
@@ -49,7 +48,6 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
       motoristaId: '',
       tipo: 'aluguel',
       aluguelId: '',
-      descricao: '',
       valorTotal: '',
       valorPago: '',
       dataPagamento: new Date().toISOString().split('T')[0],
@@ -121,7 +119,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
       motoristaId: data.motoristaId,
       aluguelId: tipoSelecionado === 'aluguel' ? aluguelSelecionado : undefined,
       tipo: data.tipo,
-      descricao: data.descricao || undefined,
+      descricao: data.observacoes || undefined,
       valorTotal: data.valorTotal,
       valorPago: valorPagoFinal,
       valorRestante: (parseFloat(data.valorTotal) - parseFloat(valorPagoFinal)).toString(),
@@ -143,7 +141,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Novo Pagamento</DialogTitle>
         </DialogHeader>
@@ -214,23 +212,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
               </div>
             )}
 
-            {/* Descrição */}
-            <FormField
-              control={form.control}
-              name="descricao"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Descrição do pagamento..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
