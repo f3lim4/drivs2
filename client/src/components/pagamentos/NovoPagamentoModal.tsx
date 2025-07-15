@@ -299,49 +299,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
               )}
             </div>
 
-            {/* Resumo */}
-            {valorTotal > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Resumo do Pagamento</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-500">Valor Total:</span>
-                      <p className="font-medium text-lg">
-                        {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                        }).format(valorTotal)}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Valor Pago:</span>
-                      <p className="font-medium text-lg text-green-600">
-                        {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                        }).format(valorPago)}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Valor Restante:</span>
-                      <p className="font-medium text-lg text-red-600">
-                        {new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                        }).format(valorRestante)}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Status:</span>
-                      <p className="font-medium text-lg capitalize">{getStatus()}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+
 
             {/* Observações */}
             <FormField
