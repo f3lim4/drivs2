@@ -43,7 +43,40 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Debug: log dados para verificar o que está sendo carregado
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      locadoraId: user?.locadoraId || '',
+      motoristaId: '',
+      veiculoId: '',
+      aluguelId: 'sem-aluguel',
+      numeroAuto: '',
+      codigoInfracao: '',
+      descricaoInfracao: '',
+      tipoInfracao: '',
+      pontuacao: 0,
+      valorOriginal: '',
+      valorDesconto: '0.00',
+      valorFinal: '',
+      dataInfracao: '',
+      dataVencimento: '',
+      dataNotificacao: '',
+      dataPagamento: '',
+      localInfracao: '',
+      cidade: '',
+      estado: '',
+      orgaoAutuador: '',
+      agente: '',
+      status: 'pendente',
+      situacao: 'ativo',
+      responsavel: 'motorista',
+      observacoes: '',
+    },
+  });
+
+  const watchedValues = form.watch(['valorOriginal', 'valorDesconto']);
+
+  // Reset formulário quando o modal abrir
   React.useEffect(() => {
     if (open) {
       console.log('Motoristas carregados:', motoristas);
@@ -79,39 +112,6 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       });
     }
   }, [open, motoristas, veiculos, alugueis, form, user?.locadoraId]);
-
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      locadoraId: user?.locadoraId || '',
-      motoristaId: '',
-      veiculoId: '',
-      aluguelId: 'sem-aluguel',
-      numeroAuto: '',
-      codigoInfracao: '',
-      descricaoInfracao: '',
-      tipoInfracao: '',
-      pontuacao: 0,
-      valorOriginal: '',
-      valorDesconto: '0.00',
-      valorFinal: '',
-      dataInfracao: '',
-      dataVencimento: '',
-      dataNotificacao: '',
-      dataPagamento: '',
-      localInfracao: '',
-      cidade: '',
-      estado: '',
-      orgaoAutuador: '',
-      agente: '',
-      status: 'pendente',
-      situacao: 'ativo',
-      responsavel: 'motorista',
-      observacoes: '',
-    },
-  });
-
-  const watchedValues = form.watch(['valorOriginal', 'valorDesconto']);
 
   // Calcular valor final automaticamente
   const calculateValorFinal = () => {
