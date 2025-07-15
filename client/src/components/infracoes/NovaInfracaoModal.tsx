@@ -153,8 +153,9 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   // Calcular valor final automaticamente
   const calculateValorFinal = () => {
     const valorOriginal = parseFloat(watchedValues[0] || '0');
-    const valorDesconto = parseFloat(watchedValues[1] || '0');
-    const valorFinal = valorOriginal - valorDesconto;
+    const taxaAdminPercent = parseFloat(watchedValues[1] || '0');
+    const taxaAdminValor = (valorOriginal * taxaAdminPercent) / 100;
+    const valorFinal = valorOriginal + taxaAdminValor;
     form.setValue('valorFinal', valorFinal.toFixed(2));
   };
 
@@ -166,10 +167,14 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   const onSubmit = async (data: FormData) => {
     try {
       // Converter valores para decimal
+      const taxaAdminPercent = parseFloat(data.valorDesconto || '0');
+      const valorOriginal = parseFloat(data.valorOriginal);
+      const taxaAdminValor = (valorOriginal * taxaAdminPercent) / 100;
+      
       const infracaoData = {
         ...data,
-        valorOriginal: parseFloat(data.valorOriginal).toFixed(2),
-        valorDesconto: parseFloat(data.valorDesconto || '0').toFixed(2),
+        valorOriginal: valorOriginal.toFixed(2),
+        valorDesconto: taxaAdminValor.toFixed(2), // Salva o valor calculado da taxa, não a porcentagem
         valorFinal: parseFloat(data.valorFinal).toFixed(2),
         pontuacao: Number(data.pontuacao),
         dataInfracao: data.dataInfracao,
@@ -466,7 +471,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                 name="valorDesconto"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Valor Desconto (R$)</FormLabel>
+                    <FormLabel>Taxa Admin % (Opcional)</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
