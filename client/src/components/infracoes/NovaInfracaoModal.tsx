@@ -22,11 +22,10 @@ const formSchema = insertInfracaoSchema.extend({
   dataVencimento: z.string().min(1, 'Data de vencimento é obrigatória'),
   dataNotificacao: z.string().optional(),
   dataPagamento: z.string().optional(),
-  pontuacao: z.number().min(0, 'Pontuação deve ser um número positivo'),
   valorOriginal: z.string().min(1, 'Valor original é obrigatório'),
   valorDesconto: z.string().optional(),
   valorFinal: z.string().min(1, 'Valor final é obrigatório'),
-});
+}).omit({ pontuacao: true, agente: true });
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -166,6 +165,9 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
 
 
   const onSubmit = async (data: FormData) => {
+    console.log('OnSubmit chamado com dados:', data);
+    console.log('Erros do formulário:', form.formState.errors);
+    
     try {
       // Converter valores para decimal
       const taxaAdminPercent = parseFloat(data.valorDesconto || '0');
@@ -183,7 +185,6 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         dataNotificacao: data.dataNotificacao || null,
         dataPagamento: data.dataPagamento || null,
         aluguelId: data.aluguelId === 'sem-aluguel' ? null : data.aluguelId,
-        agente: data.agente || null,
         observacoes: data.observacoes || null,
         // Valores fixos que não aparecem na interface
         status: 'pendente',
