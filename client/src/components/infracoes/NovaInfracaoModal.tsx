@@ -43,6 +43,15 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Debug: log dados para verificar o que está sendo carregado
+  React.useEffect(() => {
+    if (open) {
+      console.log('Motoristas carregados:', motoristas);
+      console.log('Veículos carregados:', veiculos);
+      console.log('Aluguéis carregados:', alugueis);
+    }
+  }, [open, motoristas, veiculos, alugueis]);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
