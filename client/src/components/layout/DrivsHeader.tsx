@@ -17,8 +17,8 @@ interface DrivsHeaderProps {
 
 export function DrivsHeader({ title, subtitle }: DrivsHeaderProps) {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center gap-4">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:sticky md:left-auto">
+      <div className="container flex h-16 items-center gap-4 px-4 md:px-6">
         {/* Botão para colapsar/expandir sidebar */}
         <SidebarTrigger className="lg:hidden" />
         
@@ -28,8 +28,10 @@ export function DrivsHeader({ title, subtitle }: DrivsHeaderProps) {
         {/* Spacer para empurrar elementos para a direita */}
         <div className="flex-1" />
 
-        {/* Barra de busca global */}
-        <SearchBar />
+        {/* Barra de busca global - escondida em mobile */}
+        <div className="hidden md:block">
+          <SearchBar />
+        </div>
 
         {/* Notificações com badge */}
         <NotificationsDropdown />

@@ -201,12 +201,6 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      {/* Header da página */}
-      <DrivsHeader 
-        title="Dashboard"
-        subtitle="Sistema Drivs - Gerencie sua locadora de forma eficiente"
-      />
-
       {/* Grid de estatísticas principais */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Total de Motoristas */}
