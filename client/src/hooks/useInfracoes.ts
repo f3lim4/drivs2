@@ -3,19 +3,19 @@ import { useAuth } from './useAuth';
 import type { Infracao, InsertInfracao } from '@shared/schema';
 
 export function useInfracoes() {
-  const { user } = useAuth();
+  const { profile } = useAuth();
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['infracoes', user?.locadoraId],
+    queryKey: ['infracoes', profile?.locadoraId],
     queryFn: async () => {
-      const response = await fetch(`/api/infracoes?locadoraId=${user?.locadoraId}`);
+      const response = await fetch(`/api/infracoes?locadoraId=${profile?.locadoraId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch infracoes');
       }
       return response.json() as Promise<Infracao[]>;
     },
-    enabled: !!user?.locadoraId,
+    enabled: !!profile?.locadoraId,
   });
 
   const createMutation = useMutation({
@@ -31,7 +31,7 @@ export function useInfracoes() {
     },
     onSuccess: () => {
       console.log('Infração criada com sucesso, invalidando cache...');
-      queryClient.invalidateQueries({ queryKey: ['infracoes', user?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['infracoes', profile?.locadoraId] });
     },
   });
 
@@ -47,7 +47,7 @@ export function useInfracoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['infracoes', user?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['infracoes', profile?.locadoraId] });
     },
   });
 
@@ -61,7 +61,7 @@ export function useInfracoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['infracoes', user?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['infracoes', profile?.locadoraId] });
     },
   });
 

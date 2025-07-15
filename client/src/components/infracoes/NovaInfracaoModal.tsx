@@ -48,7 +48,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   const { motoristas } = useMotoristas();
   const { veiculos } = useVeiculos();
   const { alugueis } = useAlugueis();
-  const { user } = useAuth();
+  const { profile } = useAuth();
   const { toast } = useToast();
 
   const form = useForm<FormData>({
@@ -128,7 +128,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       console.log('Aluguéis carregados:', alugueis);
       // Reset formulário quando o modal abrir
       form.reset({
-        locadoraId: user?.locadoraId || '',
+        locadoraId: profile?.locadoraId || '',
         motoristaId: '',
         veiculoId: '',
         aluguelId: 'sem-aluguel',
@@ -154,7 +154,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       setSelecaoManual(false);
       setAluguelSelecionado('');
     }
-  }, [open, motoristas, veiculos, alugueis, form, user?.locadoraId]);
+  }, [open, motoristas, veiculos, alugueis, form, profile?.locadoraId]);
 
   // Calcular valor final automaticamente
   const calculateValorFinal = () => {
@@ -175,7 +175,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   const onSubmit = async (data: FormData) => {
     console.log('OnSubmit chamado com dados:', data);
     console.log('Erros do formulário:', form.formState.errors);
-    console.log('Dados do usuário:', user);
+    console.log('Dados do usuário:', profile);
     
     try {
       // Converter valores para decimal
@@ -185,7 +185,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       
       const infracaoData = {
         ...data,
-        locadoraId: user?.locadoraId || user?.id || '',
+        locadoraId: profile?.locadoraId || profile?.id || '',
         valorOriginal: valorOriginal.toFixed(2),
         valorDesconto: taxaAdminValor.toFixed(2), // Salva o valor calculado da taxa, não a porcentagem
         valorFinal: parseFloat(data.valorFinal).toFixed(2),
