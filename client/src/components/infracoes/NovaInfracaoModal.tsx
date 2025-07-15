@@ -164,6 +164,23 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
     calculateValorFinal();
   }, [watchedValues]);
 
+  // Mapear tipos de infração para pontos
+  const tipoInfracaoToPontos = {
+    'leve': 3,
+    'media': 4,
+    'grave': 5,
+    'gravissima': 7
+  };
+
+  // Atualizar pontuação automaticamente quando tipo de infração muda
+  const watchedTipoInfracao = form.watch('tipoInfracao');
+  React.useEffect(() => {
+    if (watchedTipoInfracao && tipoInfracaoToPontos[watchedTipoInfracao as keyof typeof tipoInfracaoToPontos]) {
+      const pontos = tipoInfracaoToPontos[watchedTipoInfracao as keyof typeof tipoInfracaoToPontos];
+      form.setValue('pontuacao', pontos);
+    }
+  }, [watchedTipoInfracao, form]);
+
   const onSubmit = async (data: FormData) => {
     try {
       // Converter valores para decimal
@@ -350,10 +367,10 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="leve">Leve</SelectItem>
-                            <SelectItem value="media">Média</SelectItem>
-                            <SelectItem value="grave">Grave</SelectItem>
-                            <SelectItem value="gravissima">Gravíssima</SelectItem>
+                            <SelectItem value="leve">Leve (3 pontos)</SelectItem>
+                            <SelectItem value="media">Média (4 pontos)</SelectItem>
+                            <SelectItem value="grave">Grave (5 pontos)</SelectItem>
+                            <SelectItem value="gravissima">Gravíssima (7 pontos)</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -373,6 +390,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                             className="h-9"
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
+                            readOnly
                           />
                         </FormControl>
                         <FormMessage />
