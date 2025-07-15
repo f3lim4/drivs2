@@ -175,6 +175,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   const onSubmit = async (data: FormData) => {
     console.log('OnSubmit chamado com dados:', data);
     console.log('Erros do formulário:', form.formState.errors);
+    console.log('Dados do usuário:', user);
     
     try {
       // Converter valores para decimal
@@ -184,7 +185,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       
       const infracaoData = {
         ...data,
-        locadoraId: user?.locadoraId || '',
+        locadoraId: user?.locadoraId || user?.id || '',
         valorOriginal: valorOriginal.toFixed(2),
         valorDesconto: taxaAdminValor.toFixed(2), // Salva o valor calculado da taxa, não a porcentagem
         valorFinal: parseFloat(data.valorFinal).toFixed(2),
