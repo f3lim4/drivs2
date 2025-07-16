@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Calendar, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +47,18 @@ export default function Alugueis() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedAluguel, setSelectedAluguel] = useState<Aluguel | null>(null);
+
+  // Buscar locadoras para exibir nome na coluna (somente para admin)
+  const { data: locadoras = [] } = useQuery({
+    queryKey: ['/api/locadoras'],
+    enabled: isAdmin,
+  });
+
+  // Função para encontrar o nome da locadora
+  const getLocadoraName = (locadoraId: string) => {
+    const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
+    return locadora ? locadora.nome : locadoraId;
+  };
 
   // Carrega dados dos aluguéis
   useEffect(() => {
@@ -364,9 +377,11 @@ export default function Alugueis() {
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 bg-purple-100 rounded flex items-center justify-center">
-                            <span className="text-purple-600 text-xs font-medium">MR</span>
+                            <span className="text-purple-600 text-xs font-medium">
+                              {getLocadoraName(aluguel.locadoraId).substring(0, 2).toUpperCase()}
+                            </span>
                           </div>
-                          <span className="text-sm">MoveRent</span>
+                          <span className="text-sm">{getLocadoraName(aluguel.locadoraId)}</span>
                         </div>
                       </TableCell>
                     )}
