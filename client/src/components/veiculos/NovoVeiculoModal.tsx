@@ -70,6 +70,14 @@ const veiculoSchema = z.object({
   vigenciaSeguro: z.string().optional(),
   valorSeguroMensal: z.number().min(0).optional(),
   
+  // Valor do Veículo e IPVA
+  valorVeiculo: z.number().min(0).optional(),
+  ipva: z.number().min(0).optional(),
+  
+  // Rastreador
+  rastreador: z.string().optional(),
+  valorRastreadorMensal: z.number().min(0).optional(),
+  
   // Status será sempre "disponível" no cadastro
   
   // Campo condicional para limite específico
@@ -116,6 +124,10 @@ export function NovoVeiculoModal({
       numeroApolice: '',
       vigenciaSeguro: '',
       valorSeguroMensal: undefined,
+      valorVeiculo: undefined,
+      ipva: undefined,
+      rastreador: '',
+      valorRastreadorMensal: undefined,
       // Status será definido automaticamente como "disponível"
       valorLimiteKm: undefined,
     },
@@ -178,6 +190,10 @@ export function NovoVeiculoModal({
         numeroApolice: data.numeroApolice,
         vigenciaSeguro: data.vigenciaSeguro || null,
         valorSeguroMensal: data.valorSeguroMensal?.toString(),
+        valorVeiculo: data.valorVeiculo?.toString(),
+        ipva: data.ipva?.toString(),
+        rastreador: data.rastreador,
+        valorRastreadorMensal: data.valorRastreadorMensal?.toString(),
         status: 'disponivel', // Sempre "disponível" no cadastro
       };
 
@@ -664,6 +680,112 @@ export function NovoVeiculoModal({
                           type="number" 
                           step="0.01"
                           placeholder="0" 
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* VALOR DO VEÍCULO E IPVA */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                Valor do Veículo e IPVA
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="valorVeiculo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor do Veículo (R$)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="0"
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => {
+                            const valor = parseFloat(e.target.value) || 0;
+                            field.onChange(valor);
+                            // Calcular IPVA automaticamente (4% do valor)
+                            if (valor > 0) {
+                              const ipva = valor * 0.04;
+                              form.setValue('ipva', ipva);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ipva"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>IPVA (R$) <span className="text-xs text-green-600">(4% do valor)</span></FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="0"
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* RASTREADOR */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                Rastreador
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="rastreador"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Empresa do Rastreador</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Positron, Pósitron, etc."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="valorRastreadorMensal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor Mensal do Rastreador (R$)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="0"
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
