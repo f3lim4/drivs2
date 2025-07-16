@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe } from 'lucide-react';
+import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,7 @@ import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useAnunciosAtivos } from '@/hooks/useAnuncios';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 
 export default function Dashboard() {
   const { profile, isLocadora, isAdmin } = useAuth();
@@ -174,6 +175,38 @@ export default function Dashboard() {
   // Calcular receita semanal (mensal dividido por 4 semanas)
   const receitaSemanal = receitaMensal / 4;
 
+  // Dados para os gráficos
+  const performanceData = [
+    { name: 'Jan', cpu: 12, memoria: 45, queries: 180 },
+    { name: 'Fev', cpu: 15, memoria: 52, queries: 165 },
+    { name: 'Mar', cpu: 18, memoria: 48, queries: 195 },
+    { name: 'Abr', cpu: 14, memoria: 44, queries: 170 },
+    { name: 'Mai', cpu: 16, memoria: 49, queries: 185 },
+    { name: 'Jun', cpu: 15, memoria: 46, queries: 175 },
+  ];
+
+  const receitaData = [
+    { name: 'Jan', receita: 45000, alugueis: 12 },
+    { name: 'Fev', receita: 52000, alugueis: 15 },
+    { name: 'Mar', receita: 48000, alugueis: 14 },
+    { name: 'Abr', receita: 58000, alugueis: 18 },
+    { name: 'Mai', receita: 62000, alugueis: 20 },
+    { name: 'Jun', receita: receitaMensal, alugueis: alugueisSeguro.filter(a => a.status === 'ativo').length },
+  ];
+
+  const statusData = [
+    { name: 'Alugado', value: veiculosSeguro.filter(v => v.status === 'alugado').length, color: '#3b82f6' },
+    { name: 'Disponível', value: veiculosSeguro.filter(v => v.status === 'disponivel').length, color: '#10b981' },
+    { name: 'Manutenção', value: veiculosSeguro.filter(v => v.status === 'manutencao').length, color: '#f59e0b' },
+  ];
+
+  const metricasData = [
+    { name: 'Locadoras', value: locadoras.length, growth: '+12%' },
+    { name: 'Veículos', value: veiculosSeguro.length, growth: '+8%' },
+    { name: 'Motoristas', value: motoristasSeguro.length, growth: '+15%' },
+    { name: 'Receita', value: receitaMensal, growth: '+22%' },
+  ];
+
   // Gerar alertas baseados nos dados
   const alertas: Alert[] = [];
   
@@ -269,298 +302,182 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Seção específica para Admin - Estatísticas Globais */}
+      {/* Dashboard Futurista para Admin */}
       {isAdmin && (
         <div className="space-y-6">
-          {/* Estatísticas Globais do Sistema */}
-          <Card className="border border-gray-200 bg-white shadow-sm">
+          {/* Métricas Principais */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {metricasData.map((metric, index) => (
+              <Card key={metric.name} className="border-0 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-slate-300">{metric.name}</p>
+                      <p className="text-2xl font-bold text-white">
+                        {metric.name === 'Receita' ? formatCurrency(metric.value) : metric.value}
+                      </p>
+                      <p className="text-xs text-green-400 flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" />
+                        {metric.growth}
+                      </p>
+                    </div>
+                    <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      {metric.name === 'Locadoras' && <Building2 className="w-6 h-6 text-blue-400" />}
+                      {metric.name === 'Veículos' && <Car className="w-6 h-6 text-blue-400" />}
+                      {metric.name === 'Motoristas' && <Users className="w-6 h-6 text-blue-400" />}
+                      {metric.name === 'Receita' && <DollarSign className="w-6 h-6 text-blue-400" />}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Gráficos Principais */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Receita e Aluguéis */}
+            <Card className="border-0 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-green-400" />
+                  Evolução da Receita
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={receitaData}>
+                      <defs>
+                        <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="name" stroke="#9ca3af" />
+                      <YAxis stroke="#9ca3af" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#1f2937', 
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                        formatter={(value: any) => [formatCurrency(value), 'Receita']}
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="receita" 
+                        stroke="#10b981" 
+                        fillOpacity={1}
+                        fill="url(#colorReceita)"
+                        strokeWidth={2}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Performance do Sistema */}
+            <Card className="border-0 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-blue-400" />
+                  Performance do Sistema
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={performanceData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="name" stroke="#9ca3af" />
+                      <YAxis stroke="#9ca3af" />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#1f2937', 
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="cpu" 
+                        stroke="#3b82f6" 
+                        strokeWidth={2}
+                        dot={{ fill: '#3b82f6', strokeWidth: 0, r: 4 }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="memoria" 
+                        stroke="#8b5cf6" 
+                        strokeWidth={2}
+                        dot={{ fill: '#8b5cf6', strokeWidth: 0, r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Status dos Veículos */}
+          <Card className="border-0 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
-                Estatísticas Globais do Sistema
+              <CardTitle className="text-white flex items-center gap-2">
+                <Car className="w-5 h-5 text-yellow-400" />
+                Status da Frota
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {/* Total de Locadoras */}
-                <div className="p-4 border rounded-lg bg-blue-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="w-5 h-5 text-blue-600" />
-                      <h4 className="font-medium text-foreground">Locadoras</h4>
-                    </div>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {locadoras.length}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      empresas cadastradas
-                    </p>
-                  </div>
+              <div className="grid gap-6 lg:grid-cols-2">
+                {/* Gráfico de Pizza */}
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={statusData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {statusData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#1f2937', 
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
 
-                {/* Total de Veículos */}
-                <div className="p-4 border rounded-lg bg-green-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Car className="w-5 h-5 text-green-600" />
-                      <h4 className="font-medium text-foreground">Veículos</h4>
+                {/* Legenda e Status */}
+                <div className="flex flex-col justify-center space-y-4">
+                  {statusData.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-4 h-4 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        <span className="text-slate-300">{item.name}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xl font-bold text-white">{item.value}</span>
+                        <p className="text-xs text-slate-400">veículos</p>
+                      </div>
                     </div>
-                    <p className="text-2xl font-bold text-green-600">
-                      {veiculosSeguro.length}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      carros cadastrados
-                    </p>
-                  </div>
-                </div>
-
-                {/* Total de Motoristas */}
-                <div className="p-4 border rounded-lg bg-purple-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-5 h-5 text-purple-600" />
-                      <h4 className="font-medium text-foreground">Motoristas</h4>
-                    </div>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {motoristasSeguro.length}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      motoristas cadastrados
-                    </p>
-                  </div>
-                </div>
-
-                {/* Receita Total */}
-                <div className="p-4 border rounded-lg bg-yellow-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-5 h-5 text-yellow-600" />
-                      <h4 className="font-medium text-foreground">Receita Total</h4>
-                    </div>
-                    <p className="text-2xl font-bold text-yellow-600">
-                      {formatCurrency(alugueisSeguro.reduce((total, aluguel) => total + parseFloat(aluguel.valorTotal || '0'), 0))}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      receita de todas as locadoras
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Métricas de Desempenho */}
-          <Card className="border border-gray-200 bg-white shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-green-600" />
-                Métricas de Desempenho
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {/* Tempo de Atividade */}
-                <div className="p-4 border rounded-lg bg-green-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">Uptime</h4>
-                    </div>
-                    <p className="text-lg font-bold text-green-600">
-                      {Math.floor(Date.now() / 1000 / 3600)}h {Math.floor((Date.now() / 1000 / 60) % 60)}m
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Sistema online
-                    </p>
-                  </div>
-                </div>
-
-                {/* Taxa de Erros */}
-                <div className="p-4 border rounded-lg bg-blue-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">Taxa de Erros</h4>
-                    </div>
-                    <p className="text-lg font-bold text-blue-600">
-                      0.1%
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Últimas 24h
-                    </p>
-                  </div>
-                </div>
-
-                {/* Uso de CPU */}
-                <div className="p-4 border rounded-lg bg-yellow-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">CPU</h4>
-                    </div>
-                    <p className="text-lg font-bold text-yellow-600">
-                      15%
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Uso médio
-                    </p>
-                  </div>
-                </div>
-
-                {/* Performance DB */}
-                <div className="p-4 border rounded-lg bg-purple-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">DB Query</h4>
-                    </div>
-                    <p className="text-lg font-bold text-purple-600">
-                      ~180ms
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Tempo médio
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Métricas Financeiras */}
-          <Card className="border border-gray-200 bg-white shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-green-600" />
-                Métricas Financeiras
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {/* Receita Mensal Total */}
-                <div className="p-4 border rounded-lg bg-green-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-green-600" />
-                      <h4 className="font-medium text-foreground">Receita Mensal</h4>
-                    </div>
-                    <p className="text-lg font-bold text-green-600">
-                      {formatCurrency(alugueisSeguro.filter(a => a.status === 'ativo').reduce((total, aluguel) => total + parseFloat(aluguel.valorMensal || '0'), 0))}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Todas as locadoras
-                    </p>
-                  </div>
-                </div>
-
-                {/* Aluguéis Ativos */}
-                <div className="p-4 border rounded-lg bg-blue-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Car className="w-4 h-4 text-blue-600" />
-                      <h4 className="font-medium text-foreground">Aluguéis Ativos</h4>
-                    </div>
-                    <p className="text-lg font-bold text-blue-600">
-                      {alugueisSeguro.filter(a => a.status === 'ativo').length}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Contratos em andamento
-                    </p>
-                  </div>
-                </div>
-
-                {/* Taxa de Ocupação */}
-                <div className="p-4 border rounded-lg bg-yellow-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-yellow-600" />
-                      <h4 className="font-medium text-foreground">Taxa Ocupação</h4>
-                    </div>
-                    <p className="text-lg font-bold text-yellow-600">
-                      {veiculosSeguro.length > 0 ? Math.round((veiculosSeguro.filter(v => v.status === 'alugado').length / veiculosSeguro.length) * 100) : 0}%
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Veículos alugados
-                    </p>
-                  </div>
-                </div>
-
-                {/* Receita por Veículo */}
-                <div className="p-4 border rounded-lg bg-purple-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-purple-600" />
-                      <h4 className="font-medium text-foreground">Receita/Veículo</h4>
-                    </div>
-                    <p className="text-lg font-bold text-purple-600">
-                      {formatCurrency(veiculosSeguro.length > 0 ? 
-                        alugueisSeguro.filter(a => a.status === 'ativo').reduce((total, aluguel) => total + parseFloat(aluguel.valorMensal || '0'), 0) / veiculosSeguro.length 
-                        : 0)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Média mensal
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Status do Sistema */}
-          <Card className="border border-gray-200 bg-white shadow-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="w-5 h-5 text-green-600" />
-                Status do Sistema
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {/* Status Online */}
-                <div className="p-4 border rounded-lg bg-green-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">Sistema Online</h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Servidor funcionando normalmente
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      PostgreSQL conectado
-                    </p>
-                  </div>
-                </div>
-
-                {/* Armazenamento */}
-                <div className="p-4 border rounded-lg bg-blue-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">Armazenamento</h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {motoristasSeguro.length + veiculosSeguro.length + alugueisSeguro.length} registros
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Banco otimizado
-                    </p>
-                  </div>
-                </div>
-
-                {/* Memória */}
-                <div className="p-4 border rounded-lg bg-yellow-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">Memória</h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      85% disponível
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Uso otimizado
-                    </p>
-                  </div>
+                  ))}
                 </div>
               </div>
             </CardContent>
