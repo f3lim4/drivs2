@@ -559,8 +559,9 @@ export default function RelatoriosFinanceiros() {
         </Card>
       )}
 
-      {/* Cards de Resumo Financeiro */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Cards de Resumo Financeiro - apenas para locadoras */}
+      {!isAdmin && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="border-l-4 border-l-green-500">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -628,9 +629,8 @@ export default function RelatoriosFinanceiros() {
             </div>
           </CardContent>
         </Card>
-      </div>
-
-
+        </div>
+      )}
 
       {/* Tabs de Análise */}
       <Tabs defaultValue="veiculos" className="space-y-4">
