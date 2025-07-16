@@ -206,44 +206,80 @@ export default function Dashboard() {
     <div className="flex-1 space-y-6 p-6">
       {/* Grid de estatísticas principais */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {/* Total de Motoristas */}
-        <StatCard
-          title="Total de Motoristas"
-          value={totalMotoristas}
-          icon={<Activity />}
-          variant="blue"
-          trend={{
-            value: motoristasAtivos > 0 ? `${motoristasAtivos} ativos` : "0 ativos",
-            isPositive: motoristasAtivos > 0,
-            label: "motoristas ativos"
-          }}
-        />
+        {/* Total de Motoristas - Card Personalizado */}
+        <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-blue-100">
+                  <Users className="w-4 h-4 text-blue-600" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total de Motoristas
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-xl font-bold text-foreground">
+                  {totalMotoristas}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {motoristasAtivos > 0 ? `${motoristasAtivos} ativos` : "0 ativos"}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Veículos Disponíveis */}
-        <StatCard
-          title="Veículos Disponíveis"
-          value={veiculosDisponiveis}
-          icon={<Car />}
-          variant="green"
-          trend={{
-            value: `${totalVeiculos} total`,
-            isPositive: veiculosDisponiveis > 0,
-            label: "veículos na frota"
-          }}
-        />
+        {/* Veículos Disponíveis - Card Personalizado */}
+        <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-green-100">
+                  <Car className="w-4 h-4 text-green-600" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Veículos Disponíveis
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-xl font-bold text-foreground">
+                  {veiculosDisponiveis}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {totalVeiculos} total na frota
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Aluguéis Ativos */}
-        <StatCard
-          title="Aluguéis Ativos"
-          value={alugueisAtivos + alugueisPendentes}
-          icon={<BarChart3 />}
-          variant="yellow"
-          trend={{
-            value: `${totalAlugueis} total`,
-            isPositive: alugueisAtivos > 0,
-            label: "contratos"
-          }}
-        />
+        {/* Aluguéis Ativos - Card Personalizado */}
+        <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-purple-100">
+                  <TrendingUp className="w-4 h-4 text-purple-600" />
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Aluguéis Ativos
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-xl font-bold text-foreground">
+                  {alugueisAtivos + alugueisPendentes}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {totalAlugueis} total de contratos
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Receita Mensal - Card Personalizado */}
         <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
