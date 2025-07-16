@@ -75,6 +75,11 @@ const veiculoSchema = z.object({
   // Data de Compra
   dataCompra: z.string().optional(),
   
+  // Financiamento
+  financiado: z.boolean().default(false),
+  valorFinanciamento: z.number().min(0).optional(),
+  quantidadeParcelas: z.number().min(1).optional(),
+  
   // Status será controlado automaticamente
   
   // Campo condicional para limite específico
@@ -124,6 +129,9 @@ export function EditarVeiculoModal({
       rastreador: '',
       valorRastreadorMensal: undefined,
       dataCompra: '',
+      financiado: false,
+      valorFinanciamento: undefined,
+      quantidadeParcelas: undefined,
       // Status será controlado automaticamente
       valorLimiteKm: undefined,
     },
@@ -156,6 +164,9 @@ export function EditarVeiculoModal({
         rastreador: veiculo.rastreador || '',
         valorRastreadorMensal: Number(veiculo.valorRastreadorMensal) || undefined,
         dataCompra: veiculo.dataCompra || '',
+        financiado: veiculo.financiado || false,
+        valorFinanciamento: Number(veiculo.valorFinanciamento) || undefined,
+        quantidadeParcelas: veiculo.quantidadeParcelas || undefined,
         // Status não será editável
         valorLimiteKm: veiculo.valorLimiteKm,
       });
@@ -197,6 +208,9 @@ export function EditarVeiculoModal({
         rastreador: data.rastreador,
         valorRastreadorMensal: data.valorRastreadorMensal?.toString(),
         dataCompra: data.dataCompra || null,
+        financiado: data.financiado,
+        valorFinanciamento: data.valorFinanciamento?.toString(),
+        quantidadeParcelas: data.quantidadeParcelas,
         // Status não será enviado na edição
       };
 
@@ -733,6 +747,81 @@ export function EditarVeiculoModal({
                   </FormItem>
                 )}
               />
+            </div>
+
+            {/* FINANCIAMENTO */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                Financiamento
+              </h3>
+              
+              <FormField
+                control={form.control}
+                name="financiado"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Veículo Financiado</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        O veículo está sendo financiado?
+                      </p>
+                    </div>
+                    <FormControl>
+                      <input
+                        type="checkbox"
+                        checked={field.value}
+                        onChange={field.onChange}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {form.watch('financiado') && (
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="valorFinanciamento"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Valor do Financiamento (R$)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.01"
+                            placeholder="0"
+                            {...field}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="quantidadeParcelas"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantidade de Parcelas</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number"
+                            placeholder="48"
+                            {...field}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
             </div>
 
             {/* STATUS - Controlado automaticamente pelo sistema */}

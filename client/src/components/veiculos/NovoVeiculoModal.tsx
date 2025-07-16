@@ -79,6 +79,11 @@ const veiculoSchema = z.object({
   // Data de Compra
   dataCompra: z.string().optional(),
   
+  // Financiamento
+  financiado: z.boolean().default(false),
+  valorFinanciamento: z.number().min(0).optional(),
+  quantidadeParcelas: z.number().min(1).optional(),
+  
   // Status será sempre "disponível" no cadastro
   
   // Campo condicional para limite específico
@@ -128,6 +133,9 @@ export function NovoVeiculoModal({
       rastreador: '',
       valorRastreadorMensal: undefined,
       dataCompra: '',
+      financiado: false,
+      valorFinanciamento: undefined,
+      quantidadeParcelas: undefined,
       // Status será definido automaticamente como "disponível"
       valorLimiteKm: undefined,
     },
@@ -761,6 +769,77 @@ export function NovoVeiculoModal({
                   </FormItem>
                 )}
               />
+            </div>
+
+            {/* FINANCIAMENTO */}
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="financiado"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-base">Veículo Financiado</FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        O veículo está sendo financiado?
+                      </p>
+                    </div>
+                    <FormControl>
+                      <input
+                        type="checkbox"
+                        checked={field.value}
+                        onChange={field.onChange}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {form.watch('financiado') && (
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="valorFinanciamento"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Valor do Financiamento (R$)</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.01"
+                            placeholder="0"
+                            {...field}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="quantidadeParcelas"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantidade de Parcelas</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number"
+                            placeholder="48"
+                            {...field}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
             </div>
 
             {/* STATUS: Veículos são cadastrados automaticamente como "disponível" */}
