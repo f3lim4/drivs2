@@ -14,7 +14,9 @@ import { usePagamentos } from '@/hooks/usePagamentos';
 import { useInfracoes } from '@/hooks/useInfracoes';
 import { useDespesas } from '@/hooks/useDespesas';
 import { useVeiculos } from '@/hooks/useVeiculos';
+import { useMotoristas } from '@/hooks/useMotoristas';
 import { NovaDespesaModal } from '@/components/despesas/NovaDespesaModal';
+import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
 import { formatCurrency } from '@/lib/utils';
 
 export default function RelatoriosFinanceiros() {
@@ -24,6 +26,7 @@ export default function RelatoriosFinanceiros() {
   const { infracoes } = useInfracoes();
   const { despesas } = useDespesas();
   const { veiculos } = useVeiculos();
+  const { motoristas } = useMotoristas();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   // Cálculos para o período selecionado
@@ -140,6 +143,66 @@ export default function RelatoriosFinanceiros() {
   const variacaoReceita = receitaMesAnterior > 0 ? ((receitaTotal - receitaMesAnterior) / receitaMesAnterior) * 100 : 0;
   const variacaoDespesas = despesasMesAnterior > 0 ? ((totalDespesas - despesasMesAnterior) / despesasMesAnterior) * 100 : 0;
   const variacaoLucro = (receitaMesAnterior - despesasMesAnterior) > 0 ? ((lucroLiquido - (receitaMesAnterior - despesasMesAnterior)) / (receitaMesAnterior - despesasMesAnterior)) * 100 : 0;
+
+  // Função para gerar dados detalhados do veículo
+  const gerarDadosDetalhados = (veiculo: any) => {
+    const aluguelVeiculo = alugueis.find(a => a.veiculoId === veiculo.id && a.status === 'ativo');
+    const motorista = aluguelVeiculo ? motoristas.find(m => m.id === aluguelVeiculo.motoristaId) : null;
+    const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
+    
+    const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
+    const despesasMensais = despesasVeiculo
+      .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+      .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+    
+    const lucro = receitaMensal - despesasMensais;
+    const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
+    const status = aluguelVeiculo ? 'Lucrativo' : 'Parado';
+
+    // Detalhamento por categoria
+    const categorias = ['manutencao', 'seguro', 'combustivel', 'financiamento', 'ipva', 'outros'];
+    const despesasDetalhadas = categorias.map(categoria => {
+      const valor = despesasVeiculo
+        .filter(d => d.categoria === categoria && d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+      
+      const percentual = despesasMensais > 0 ? (valor / despesasMensais) * 100 : 0;
+      return { categoria, valor, percentual };
+    }).filter(item => item.valor > 0);
+
+    // Evolução dos últimos 6 meses
+    const evolucaoMensal = Array.from({ length: 6 }, (_, i) => {
+      const mes = subMonths(new Date(), i);
+      const mesStart = startOfMonth(mes);
+      const mesEnd = endOfMonth(mes);
+      
+      const receitaMes = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
+      const despesasMes = despesasVeiculo
+        .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: mesStart, end: mesEnd }))
+        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+      
+      return {
+        mes: format(mes, 'MMM', { locale: pt }),
+        receita: receitaMes,
+        despesas: despesasMes,
+        lucro: receitaMes - despesasMes
+      };
+    }).reverse();
+
+    return {
+      veiculo,
+      analiseFinanceira: {
+        receitaMensal,
+        despesasMensais,
+        lucro,
+        margem,
+        status
+      },
+      motorista,
+      despesasDetalhadas,
+      evolucaoMensal
+    };
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -315,9 +378,21 @@ export default function RelatoriosFinanceiros() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Button variant="ghost" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                          {(() => {
+                            const veiculoEncontrado = veiculos.find(v => v.placa === item.veiculo);
+                            if (!veiculoEncontrado) {
+                              return (
+                                <Button variant="ghost" size="sm" disabled>
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              );
+                            }
+                            return (
+                              <DetalhesVeiculoModal
+                                {...gerarDadosDetalhados(veiculoEncontrado)}
+                              />
+                            );
+                          })()}
                         </TableCell>
                       </TableRow>
                     ))}
