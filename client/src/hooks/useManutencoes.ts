@@ -27,17 +27,28 @@ export function useManutencoes() {
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertManutencao) => {
+      console.log('Enviando dados para API:', data);
+      
       const response = await fetch('/api/manutencoes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
       
-      if (!response.ok) throw new Error('Failed to create manutencao');
-      return response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Erro na resposta da API:', errorText);
+        throw new Error(`Erro ao criar manutenção: ${response.status} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('Resposta da API:', result);
+      return result;
     },
     onSuccess: () => {
+      console.log('Manutenção criada com sucesso, invalidando cache...');
       queryClient.invalidateQueries({ queryKey: ['manutencoes'] });
+      queryClient.refetchQueries({ queryKey: ['manutencoes'] });
     },
   });
 
