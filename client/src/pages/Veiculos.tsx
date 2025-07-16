@@ -261,8 +261,8 @@ export default function Veiculos() {
                       <div>
                         <p className="font-medium">{veiculo.placa} • {veiculo.marca} {veiculo.modelo}</p>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>{veiculo.ano} • {veiculo.cor}</span>
-                          <Badge variant="outline" className="capitalize text-xs">{veiculo.categoria}</Badge>
+                          <span>{veiculo.ano} • {veiculo.cor} • </span>
+                          <Badge variant="outline" className="capitalize text-xs px-1 py-0 h-4">{veiculo.categoria}</Badge>
                         </div>
                       </div>
                     </div>
