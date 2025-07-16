@@ -730,12 +730,29 @@ export class DatabaseStorage implements IStorage {
 
   async getInfracoesByMotorista(motoristaId: string): Promise<Infracao[]> {
     try {
-      const result = await db.select().from(infracoes).where(eq(infracoes.motoristaId, motoristaId));
+      // Primeiro buscar o motorista para verificar sua locadora
+      const motorista = await db.select().from(motoristas).where(eq(motoristas.id, motoristaId)).limit(1);
+      if (!motorista.length) {
+        console.log('Motorista não encontrado:', motoristaId);
+        return [];
+      }
+      
+      const locadoraId = motorista[0].locadoraId;
+      console.log('Buscando infrações para motorista:', motoristaId, 'locadora:', locadoraId);
+      
+      // Buscar infrações filtrando por motorista E locadora
+      const result = await db.select().from(infracoes).where(
+        and(
+          eq(infracoes.motoristaId, motoristaId),
+          eq(infracoes.locadoraId, locadoraId)
+        )
+      );
+      
+      console.log('Infrações encontradas:', result.length);
       
       // Enriquecer com dados de motorista e veículo
       const enrichedResults = await Promise.all(
         result.map(async (infracao) => {
-          const motorista = await db.select().from(motoristas).where(eq(motoristas.id, infracao.motoristaId)).limit(1);
           const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, infracao.veiculoId)).limit(1);
           
           return {
