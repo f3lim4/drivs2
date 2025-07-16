@@ -263,9 +263,6 @@ export function EditarVeiculoModal({
             
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Informações Básicas
-              </h3>
               
               <div className="grid grid-cols-3 gap-4">
                 <FormField
@@ -389,9 +386,6 @@ export function EditarVeiculoModal({
 
             {/* CARACTERÍSTICAS TÉCNICAS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Características Técnicas
-              </h3>
               
               <div className="grid grid-cols-3 gap-4">
                 <FormField
@@ -549,9 +543,6 @@ export function EditarVeiculoModal({
 
             {/* SEGURO */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Seguro
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -631,9 +622,6 @@ export function EditarVeiculoModal({
 
             {/* VALOR DO VEÍCULO E IPVA */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Valor do Veículo e IPVA
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -688,9 +676,6 @@ export function EditarVeiculoModal({
 
             {/* RASTREADOR */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Rastreador
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -734,9 +719,6 @@ export function EditarVeiculoModal({
 
             {/* DATA DE COMPRA */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Data de Compra
-              </h3>
               
               <FormField
                 control={form.control}
@@ -758,9 +740,6 @@ export function EditarVeiculoModal({
 
             {/* FINANCIAMENTO */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Financiamento
-              </h3>
               
               <FormField
                 control={form.control}
@@ -833,9 +812,6 @@ export function EditarVeiculoModal({
 
             {/* STATUS - Controlado automaticamente pelo sistema */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Status
-              </h3>
               
               <div className="p-4 bg-muted rounded-lg">
                 <p className="text-sm text-muted-foreground">
