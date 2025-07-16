@@ -260,10 +260,9 @@ export default function Veiculos() {
                       </div>
                       <div>
                         <p className="font-medium">{veiculo.placa} • {veiculo.marca} {veiculo.modelo}</p>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>{veiculo.ano} • {veiculo.cor} • </span>
-                          <Badge variant="outline" className="capitalize text-xs px-1 py-0 h-4">{veiculo.categoria}</Badge>
-                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {veiculo.ano} • {veiculo.cor} • {veiculo.categoria}
+                        </p>
                       </div>
                     </div>
                   </TableCell>
