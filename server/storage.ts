@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -10,7 +10,8 @@ import {
   type TemplateContrato, type InsertTemplateContrato,
   type Pagamento, type InsertPagamento,
   type Infracao, type InsertInfracao,
-  type Despesa, type InsertDespesa
+  type Despesa, type InsertDespesa,
+  type Manutencao, type InsertManutencao
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -106,6 +107,15 @@ export interface IStorage {
   createDespesa(despesa: InsertDespesa): Promise<Despesa>;
   updateDespesa(id: string, updates: Partial<InsertDespesa>): Promise<Despesa>;
   deleteDespesa(id: string): Promise<void>;
+  
+  // Manutencao operations
+  getAllManutencoes(): Promise<Manutencao[]>;
+  getManutencoesByLocadora(locadoraId: string): Promise<Manutencao[]>;
+  getManutencoesByVeiculo(veiculoId: string): Promise<Manutencao[]>;
+  getManutencao(id: string): Promise<Manutencao | undefined>;
+  createManutencao(manutencao: InsertManutencao): Promise<Manutencao>;
+  updateManutencao(id: string, updates: Partial<InsertManutencao>): Promise<Manutencao>;
+  deleteManutencao(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1101,6 +1111,169 @@ export class DatabaseStorage implements IStorage {
 
   async deleteDespesa(id: string): Promise<void> {
     await db.delete(despesas).where(eq(despesas.id, id));
+  }
+
+  // Manutencao operations
+  async getAllManutencoes(): Promise<Manutencao[]> {
+    try {
+      const result = await db.select().from(manutencoes);
+      
+      // Enriquecer com dados do veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (manutencao) => {
+          const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, manutencao.veiculoId)).limit(1);
+          
+          return {
+            ...manutencao,
+            veiculoModelo: veiculo[0]?.modelo || '',
+            veiculoPlaca: veiculo[0]?.placa || ''
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting all manutencoes:', error);
+      return [];
+    }
+  }
+
+  async getManutencoesByLocadora(locadoraId: string): Promise<Manutencao[]> {
+    try {
+      const result = await db.select().from(manutencoes).where(eq(manutencoes.locadoraId, locadoraId));
+      
+      // Enriquecer com dados do veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (manutencao) => {
+          const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, manutencao.veiculoId)).limit(1);
+          
+          return {
+            ...manutencao,
+            veiculoModelo: veiculo[0]?.modelo || '',
+            veiculoPlaca: veiculo[0]?.placa || ''
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting manutencoes by locadora:', error);
+      return [];
+    }
+  }
+
+  async getManutencoesByVeiculo(veiculoId: string): Promise<Manutencao[]> {
+    try {
+      const result = await db.select().from(manutencoes).where(eq(manutencoes.veiculoId, veiculoId));
+      
+      // Enriquecer com dados do veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (manutencao) => {
+          const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, manutencao.veiculoId)).limit(1);
+          
+          return {
+            ...manutencao,
+            veiculoModelo: veiculo[0]?.modelo || '',
+            veiculoPlaca: veiculo[0]?.placa || ''
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting manutencoes by veiculo:', error);
+      return [];
+    }
+  }
+
+  async getManutencao(id: string): Promise<Manutencao | undefined> {
+    try {
+      const result = await db.select().from(manutencoes).where(eq(manutencoes.id, id)).limit(1);
+      
+      if (result.length === 0) {
+        return undefined;
+      }
+      
+      const manutencao = result[0];
+      
+      // Buscar dados do veículo
+      const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, manutencao.veiculoId)).limit(1);
+      
+      return {
+        ...manutencao,
+        veiculoModelo: veiculo[0]?.modelo || '',
+        veiculoPlaca: veiculo[0]?.placa || ''
+      };
+    } catch (error) {
+      console.error('Error getting manutencao:', error);
+      return undefined;
+    }
+  }
+
+  async createManutencao(manutencao: InsertManutencao): Promise<Manutencao> {
+    try {
+      const manutencaoData = {
+        ...manutencao,
+        id: manutencao.id || crypto.randomUUID(),
+      };
+      
+      await db.insert(manutencoes).values(manutencaoData);
+      
+      // Retornar o objeto construído manualmente
+      return {
+        id: manutencaoData.id,
+        locadoraId: manutencaoData.locadoraId,
+        veiculoId: manutencaoData.veiculoId,
+        tipo: manutencaoData.tipo,
+        descricao: manutencaoData.descricao,
+        oficina: manutencaoData.oficina,
+        contato: manutencaoData.contato || null,
+        valorOrcamento: manutencaoData.valorOrcamento || null,
+        valorFinal: manutencaoData.valorFinal || null,
+        dataInicio: manutencaoData.dataInicio,
+        dataPrevisao: manutencaoData.dataPrevisao,
+        dataConclusao: manutencaoData.dataConclusao || null,
+        quilometragemInicio: manutencaoData.quilometragemInicio || null,
+        quilometragemFim: manutencaoData.quilometragemFim || null,
+        status: manutencaoData.status,
+        prioridade: manutencaoData.prioridade,
+        observacoes: manutencaoData.observacoes || null,
+        pecasSubstituidas: manutencaoData.pecasSubstituidas || null,
+        proximaManutencao: manutencaoData.proximaManutencao || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        veiculoModelo: '',
+        veiculoPlaca: ''
+      };
+    } catch (error) {
+      console.error('Error creating manutencao:', error);
+      throw error;
+    }
+  }
+
+  async updateManutencao(id: string, updates: Partial<InsertManutencao>): Promise<Manutencao> {
+    try {
+      const [updated] = await db.update(manutencoes)
+        .set(updates)
+        .where(eq(manutencoes.id, id))
+        .returning();
+      
+      // Buscar dados do veículo
+      const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, updated.veiculoId)).limit(1);
+      
+      return {
+        ...updated,
+        veiculoModelo: veiculo[0]?.modelo || '',
+        veiculoPlaca: veiculo[0]?.placa || ''
+      };
+    } catch (error) {
+      console.error('Error updating manutencao:', error);
+      throw error;
+    }
+  }
+
+  async deleteManutencao(id: string): Promise<void> {
+    await db.delete(manutencoes).where(eq(manutencoes.id, id));
   }
 }
 
