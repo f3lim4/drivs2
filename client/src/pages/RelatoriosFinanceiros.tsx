@@ -7,7 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Search, Trash2 } from 'lucide-react';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Search, Trash2, Plus } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,6 +25,19 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
 import { formatCurrency } from '@/lib/utils';
+
+// Schema para formulário de nova despesa
+const novaDespesaSchema = z.object({
+  veiculoId: z.string().min(1, "Selecione um veículo"),
+  categoria: z.string().min(1, "Selecione uma categoria"),
+  descricao: z.string().min(1, "Descrição é obrigatória"),
+  valor: z.string().min(1, "Valor é obrigatório"),
+  data: z.string().min(1, "Data é obrigatória"),
+  status: z.enum(['pendente', 'pago']).default('pendente'),
+  formaPagamento: z.enum(['dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'transferencia', 'boleto']).optional()
+});
+
+type NovaDespesaData = z.infer<typeof novaDespesaSchema>;
 
 export default function RelatoriosFinanceiros() {
   const { profile } = useAuth();
@@ -36,6 +53,60 @@ export default function RelatoriosFinanceiros() {
   const [termoBusca, setTermoBusca] = useState<string>('');
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
   const [despesaParaExcluir, setDespesaParaExcluir] = useState<string | null>(null);
+  const [modalNovaDespesa, setModalNovaDespesa] = useState(false);
+
+  // Formulário para nova despesa
+  const formNovaDespesa = useForm<NovaDespesaData>({
+    resolver: zodResolver(novaDespesaSchema),
+    defaultValues: {
+      veiculoId: '',
+      categoria: '',
+      descricao: '',
+      valor: '',
+      data: format(new Date(), 'yyyy-MM-dd'),
+      status: 'pendente',
+      formaPagamento: 'dinheiro'
+    }
+  });
+
+  // Função para criar nova despesa
+  const criarNovaDespesa = async (data: NovaDespesaData) => {
+    try {
+      const response = await fetch('/api/despesas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...data,
+          locadoraId: profile?.id,
+          tipo: 'despesa'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao criar despesa');
+      }
+
+      // Invalidar cache e fechar modal
+      queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
+      setModalNovaDespesa(false);
+      formNovaDespesa.reset();
+      
+      toast({
+        title: "Despesa criada",
+        description: "A despesa foi criada com sucesso.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error('Erro ao criar despesa:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao criar despesa. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Função para mostrar confirmação de exclusão
   const handleClickExcluir = (despesaId: string) => {
@@ -706,10 +777,18 @@ export default function RelatoriosFinanceiros() {
         <TabsContent value="despesas" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Despesas Registradas</CardTitle>
-              <CardDescription>
-                Todas as despesas manuais registradas no sistema
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Despesas Registradas</CardTitle>
+                  <CardDescription>
+                    Todas as despesas manuais registradas no sistema
+                  </CardDescription>
+                </div>
+                <Button onClick={() => setModalNovaDespesa(true)} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Nova Despesa
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -1015,6 +1094,169 @@ export default function RelatoriosFinanceiros() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modal de nova despesa */}
+      <Dialog open={modalNovaDespesa} onOpenChange={setModalNovaDespesa}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Nova Despesa</DialogTitle>
+            <DialogDescription>
+              Registre uma nova despesa para um veículo
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...formNovaDespesa}>
+            <form onSubmit={formNovaDespesa.handleSubmit(criarNovaDespesa)} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={formNovaDespesa.control}
+                  name="veiculoId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Veículo</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um veículo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {veiculos.map((veiculo) => (
+                            <SelectItem key={veiculo.id} value={veiculo.id}>
+                              {veiculo.placa} - {veiculo.marca} {veiculo.modelo}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formNovaDespesa.control}
+                  name="categoria"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoria</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione uma categoria" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="manutencao">Manutenção</SelectItem>
+                          <SelectItem value="multa">Multa</SelectItem>
+                          <SelectItem value="licenciamento">Licenciamento</SelectItem>
+                          <SelectItem value="lavagem">Lavagem</SelectItem>
+                          <SelectItem value="outros">Outros</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={formNovaDespesa.control}
+                name="descricao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Descrição da despesa" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={formNovaDespesa.control}
+                  name="valor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" placeholder="0,00" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formNovaDespesa.control}
+                  name="data"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={formNovaDespesa.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Status do pagamento" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="pendente">Pendente</SelectItem>
+                          <SelectItem value="pago">Pago</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formNovaDespesa.control}
+                  name="formaPagamento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Forma de Pagamento</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Forma de pagamento" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                          <SelectItem value="cartao_credito">Cartão de Crédito</SelectItem>
+                          <SelectItem value="cartao_debito">Cartão de Débito</SelectItem>
+                          <SelectItem value="pix">PIX</SelectItem>
+                          <SelectItem value="transferencia">Transferência</SelectItem>
+                          <SelectItem value="boleto">Boleto</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setModalNovaDespesa(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={formNovaDespesa.formState.isSubmitting}>
+                  {formNovaDespesa.formState.isSubmitting ? 'Criando...' : 'Criar Despesa'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal de confirmação de exclusão */}
       <Dialog open={!!despesaParaExcluir} onOpenChange={() => setDespesaParaExcluir(null)}>
