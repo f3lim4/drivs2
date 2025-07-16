@@ -520,6 +520,88 @@ export function EditarVeiculoModal({
               </div>
             </div>
 
+            {/* SEGURO */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                Seguro
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="seguradora"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Seguradora</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Allianz, Porto Seguro, etc."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="numeroApolice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número da Apólice</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Número da apólice"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="vigenciaSeguro"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vigência do Seguro</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="date"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="valorSeguroMensal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor do Seguro Mensal (R$)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="0"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
             {/* VALOR DO VEÍCULO E IPVA */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-foreground border-b pb-2">
