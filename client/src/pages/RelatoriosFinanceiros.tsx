@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Search, Trash2, Plus } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Trash2, Plus } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
@@ -50,7 +50,7 @@ export default function RelatoriosFinanceiros() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
-  const [termoBusca, setTermoBusca] = useState<string>('');
+
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
   const [despesaParaExcluir, setDespesaParaExcluir] = useState<string | null>(null);
   const [modalNovaDespesa, setModalNovaDespesa] = useState(false);
@@ -164,64 +164,24 @@ export default function RelatoriosFinanceiros() {
   const filteredData = useMemo(() => {
     const isInPeriod = (date: Date) => isWithinInterval(date, { start: monthStart, end: monthEnd });
 
-    let alugueisAtivos = alugueis.filter(aluguel => 
+    const alugueisAtivos = alugueis.filter(aluguel => 
       aluguel.status === 'ativo'
     );
 
-    let pagamentosRealizados = pagamentos.filter(pagamento => 
+    const pagamentosRealizados = pagamentos.filter(pagamento => 
       pagamento.status === 'realizado' && isInPeriod(new Date(pagamento.dataPagamento))
     );
 
-    let infracoesPeriodo = infracoes.filter(infracao => 
+    const infracoesPeriodo = infracoes.filter(infracao => 
       isInPeriod(new Date(infracao.dataInfracao))
     );
 
-    let despesasPeriodo = despesas.filter(despesa => 
+    const despesasPeriodo = despesas.filter(despesa => 
       isInPeriod(new Date(despesa.data))
     );
 
-    // Aplicar busca
-    if (termoBusca.trim()) {
-      const termo = termoBusca.toLowerCase().trim();
-      
-      // Buscar por veículo (placa, marca, modelo)
-      const veiculosFiltrados = veiculos.filter(veiculo => 
-        veiculo.placa.toLowerCase().includes(termo) ||
-        veiculo.marca.toLowerCase().includes(termo) ||
-        veiculo.modelo.toLowerCase().includes(termo)
-      );
-      const veiculosIds = veiculosFiltrados.map(v => v.id);
-      
-      // Buscar por motorista (nome, CPF)
-      const motoristasFiltrados = motoristas.filter(motorista => 
-        motorista.nome.toLowerCase().includes(termo) ||
-        motorista.id.includes(termo)
-      );
-      const motoristasIds = motoristasFiltrados.map(m => m.id);
-      
-      // Buscar por categoria de despesa
-      const categoriaMatch = ['manutencao', 'seguro', 'ipva', 'multa', 'licenciamento', 'lavagem', 'financiamento', 'outros']
-        .some(categoria => categoria.toLowerCase().includes(termo));
-      
-      // Aplicar filtros baseados na busca
-      alugueisAtivos = alugueisAtivos.filter(aluguel => 
-        veiculosIds.includes(aluguel.veiculoId) || 
-        motoristasIds.includes(aluguel.motoristaId)
-      );
-      
-      despesasPeriodo = despesasPeriodo.filter(despesa => 
-        veiculosIds.includes(despesa.veiculoId) || 
-        (categoriaMatch && despesa.categoria.toLowerCase().includes(termo))
-      );
-      
-      infracoesPeriodo = infracoesPeriodo.filter(infracao => 
-        veiculosIds.includes(infracao.veiculoId) || 
-        motoristasIds.includes(infracao.motoristaId)
-      );
-    }
-
     return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo };
-  }, [alugueis, pagamentos, infracoes, despesas, veiculos, motoristas, monthStart, monthEnd, termoBusca]);
+  }, [alugueis, pagamentos, infracoes, despesas, monthStart, monthEnd]);
 
   // Cálculos de despesas fixas dos veículos
   const despesasFixasVeiculos = useMemo(() => {
@@ -603,27 +563,7 @@ export default function RelatoriosFinanceiros() {
         </Card>
       </div>
 
-      {/* Campo de Busca */}
-      <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-          <Input
-            placeholder="Buscar por veículo, motorista ou categoria..."
-            value={termoBusca}
-            onChange={(e) => setTermoBusca(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        {termoBusca && (
-          <Button 
-            variant="outline" 
-            onClick={() => setTermoBusca('')}
-            className="text-sm"
-          >
-            Limpar
-          </Button>
-        )}
-      </div>
+
 
       {/* Tabs de Análise */}
       <Tabs defaultValue="veiculos" className="space-y-4">
