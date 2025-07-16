@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone } from 'lucide-react';
+import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,10 +15,20 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAnunciosAtivos } from '@/hooks/useAnuncios';
 
 export default function Dashboard() {
-  const { profile, isLocadora } = useAuth();
+  const { profile, isLocadora, isAdmin } = useAuth();
   
   // Buscar anúncios ativos
   const { data: anuncios = [], isLoading: loadingAnuncios } = useAnunciosAtivos();
+
+  // Buscar dados das locadoras (apenas para admin)
+  const { data: locadoras = [], isLoading: loadingLocadoras } = useQuery<any[]>({
+    queryKey: ['/api/locadoras'],
+    enabled: isAdmin,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0,
+  });
   
   // Construir URLs com filtro de locadora se necessário
   const motoristasUrl = isLocadora && profile?.locadoraId 
@@ -256,6 +266,150 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Seção específica para Admin - Informações do Sistema */}
+      {isAdmin && (
+        <div className="space-y-6">
+          {/* Grid de estatísticas do sistema (Admin) */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {/* Total de Locadoras */}
+            <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-blue-100">
+                      <Building2 className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Total de Locadoras
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <p className="text-xl font-bold text-foreground">
+                      {locadoras.length}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Empresas ativas no sistema
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Total de Veículos no Sistema */}
+            <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-green-100">
+                      <Car className="w-4 h-4 text-green-600" />
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Total de Veículos
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <p className="text-xl font-bold text-foreground">
+                      {veiculosSeguro.length}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Veículos cadastrados no sistema
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Total de Motoristas no Sistema */}
+            <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-purple-100">
+                      <Users className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Total de Motoristas
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <p className="text-xl font-bold text-foreground">
+                      {motoristasSeguro.length}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Motoristas cadastrados no sistema
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Anúncios Ativos */}
+            <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-orange-100">
+                      <Megaphone className="w-4 h-4 text-orange-600" />
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Anúncios Ativos
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <p className="text-xl font-bold text-foreground">
+                      {anuncios.length}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Comunicados publicados
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Informações das Locadoras */}
+          {locadoras.length > 0 && (
+            <Card className="border border-gray-200 bg-white shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-blue-600" />
+                  Locadoras Cadastradas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {locadoras.map((locadora) => (
+                    <div key={locadora.id} className="p-4 border rounded-lg bg-gray-50">
+                      <div className="space-y-2">
+                        <h4 className="font-medium text-foreground">{locadora.nome}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          CNPJ: {locadora.id}
+                        </p>
+                        {locadora.cidade && locadora.estado && (
+                          <p className="text-sm text-muted-foreground">
+                            {locadora.cidade}, {locadora.estado}
+                          </p>
+                        )}
+                        {locadora.telefone && (
+                          <p className="text-sm text-muted-foreground">
+                            Tel: {locadora.telefone}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
