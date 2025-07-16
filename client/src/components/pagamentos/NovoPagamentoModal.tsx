@@ -196,7 +196,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="aluguel">Aluguel Semanal</SelectItem>
+                        <SelectItem value="aluguel">Aluguel</SelectItem>
                         <SelectItem value="infrações">Infrações</SelectItem>
                         <SelectItem value="manutenção">Manutenção</SelectItem>
                         <SelectItem value="danos">Danos</SelectItem>
