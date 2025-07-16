@@ -1229,12 +1229,21 @@ export class DatabaseStorage implements IStorage {
 
   async createManutencao(manutencao: InsertManutencao): Promise<Manutencao> {
     try {
+      console.log('Criando manutenção com dados:', manutencao);
+      
       const manutencaoData = {
         ...manutencao,
         id: manutencao.id || crypto.randomUUID(),
       };
       
+      console.log('Dados processados para inserção:', manutencaoData);
+      
       await db.insert(manutencoes).values(manutencaoData);
+      
+      console.log('Manutenção inserida com sucesso no banco de dados');
+      
+      // Buscar dados do veículo para retornar objeto completo
+      const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, manutencaoData.veiculoId)).limit(1);
       
       // Retornar o objeto construído manualmente
       return {
@@ -1260,8 +1269,8 @@ export class DatabaseStorage implements IStorage {
         proximaManutencao: manutencaoData.proximaManutencao || null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        veiculoModelo: '',
-        veiculoPlaca: ''
+        veiculoModelo: veiculo[0]?.modelo || '',
+        veiculoPlaca: veiculo[0]?.placa || ''
       };
     } catch (error) {
       console.error('Error creating manutencao:', error);
