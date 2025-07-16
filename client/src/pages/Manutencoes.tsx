@@ -1,9 +1,26 @@
 import { useState } from 'react';
-import { Plus, Eye, Edit, Trash2, Wrench, Calendar, Clock, MapPin, Building2, Phone, Mail } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, Wrench, Calendar, Clock, MapPin, Building2, Phone, Mail, Search, Filter, CheckCircle, AlertTriangle, BarChart3, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { StatCard } from '@/components/dashboard/StatCard';
 import { useManutencoes } from '@/hooks/useManutencoes';
 import { useLocais } from '@/hooks/useLocais';
 import { NovaManutencaoModal } from '@/components/manutencoes/NovaManutencaoModal';
@@ -17,6 +34,8 @@ export default function Manutencoes() {
   const { manutencoes, isLoading, deleteManutencao, isDeleting } = useManutencoes();
   const { locais, isLoading: isLoadingLocais, deleteLocal } = useLocais();
   const [activeTab, setActiveTab] = useState("manutencoes");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [novaManutencaoModalOpen, setNovaManutencaoModalOpen] = useState(false);
   const [novoLocalModalOpen, setNovoLocalModalOpen] = useState(false);
   const [editarManutencaoModal, setEditarManutencaoModal] = useState<{ open: boolean; manutencao: Manutencao | null }>({ open: false, manutencao: null });
@@ -34,235 +53,275 @@ export default function Manutencoes() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  // Filtra manutenções baseado na busca e filtros
+  const filteredManutencoes = manutencoes.filter(manutencao => {
+    const matchesSearch = manutencao.veiculoModelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         manutencao.veiculoPlaca.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         manutencao.oficina.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         manutencao.descricao.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'todos' || manutencao.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  // Calcula estatísticas
+  const stats = {
+    total: manutencoes.length,
+    agendadas: manutencoes.filter(m => m.status === 'agendada').length,
+    em_andamento: manutencoes.filter(m => m.status === 'em_andamento').length,
+    concluidas: manutencoes.filter(m => m.status === 'concluida').length,
+    valor_total: manutencoes.reduce((acc, m) => acc + (m.valorFinal || m.valorOrcamento || 0), 0),
+    pagas: manutencoes.filter(m => m.statusPagamento === 'pago').length,
+    em_aberto: manutencoes.filter(m => m.statusPagamento === 'em_aberto').length,
+  };
+
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case 'agendada':
-        return 'bg-yellow-100 text-yellow-800';
+        return <Badge className="bg-yellow-100 text-yellow-800">Agendada</Badge>;
       case 'em_andamento':
-        return 'bg-blue-100 text-blue-800';
+        return <Badge className="bg-blue-100 text-blue-800">Em Andamento</Badge>;
       case 'concluida':
-        return 'bg-green-100 text-green-800';
+        return <Badge className="bg-green-100 text-green-800">Concluída</Badge>;
       case 'cancelada':
-        return 'bg-red-100 text-red-800';
+        return <Badge className="bg-red-100 text-red-800">Cancelada</Badge>;
       default:
-        return 'bg-gray-100 text-gray-800';
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'agendada':
-        return 'Agendada';
-      case 'em_andamento':
-        return 'Em Andamento';
-      case 'concluida':
-        return 'Concluída';
-      case 'cancelada':
-        return 'Cancelada';
-      default:
-        return status;
-    }
-  };
-
-  const getPrioridadeColor = (prioridade: string) => {
+  const getPrioridadeBadge = (prioridade: string) => {
     switch (prioridade) {
       case 'baixa':
-        return 'bg-green-100 text-green-800';
+        return <Badge variant="outline" className="text-green-600">Baixa</Badge>;
       case 'normal':
-        return 'bg-gray-100 text-gray-800';
+        return <Badge variant="outline" className="text-blue-600">Normal</Badge>;
       case 'alta':
-        return 'bg-orange-100 text-orange-800';
+        return <Badge variant="outline" className="text-yellow-600">Alta</Badge>;
       case 'urgente':
-        return 'bg-red-100 text-red-800';
+        return <Badge variant="outline" className="text-red-600">Urgente</Badge>;
       default:
-        return 'bg-gray-100 text-gray-800';
+        return <Badge variant="outline">{prioridade}</Badge>;
     }
   };
 
-  const getPrioridadeLabel = (prioridade: string) => {
-    switch (prioridade) {
-      case 'baixa':
-        return 'Baixa';
-      case 'normal':
-        return 'Normal';
-      case 'alta':
-        return 'Alta';
-      case 'urgente':
-        return 'Urgente';
-      default:
-        return prioridade;
-    }
-  };
-
-  const getTipoLabel = (tipo: string) => {
-    switch (tipo) {
-      case 'preventiva':
-        return 'Preventiva';
-      case 'corretiva':
-        return 'Corretiva';
-      case 'revisao':
-        return 'Revisão';
-      case 'outros':
-        return 'Outros';
-      default:
-        return tipo;
-    }
-  };
-
-  const getTipoLocalLabel = (tipo: string) => {
-    switch (tipo) {
-      case 'oficina':
-        return 'Oficina';
-      case 'concessionaria':
-        return 'Concessionária';
-      case 'lava_jato':
-        return 'Lava Jato';
-      case 'outros':
-        return 'Outros';
-      default:
-        return tipo;
-    }
+  const formatCurrency = (value: number | null) => {
+    if (!value) return '-';
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   };
 
   if (isLoading) {
     return (
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Manutenções</h1>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-4">
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Wrench className="h-6 w-6" />
-          Manutenções
-        </h1>
-      </div>
-
+    <div className="flex-1 space-y-6 p-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="manutencoes">Manutenções</TabsTrigger>
           <TabsTrigger value="locais">Locais</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="manutencoes" className="space-y-4">
-          <div className="flex justify-end">
-            <Button onClick={() => setNovaManutencaoModalOpen(true)} className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Nova Manutenção
-            </Button>
+        <TabsContent value="manutencoes" className="space-y-6">
+          {/* Cards de estatísticas */}
+          <div className="grid gap-4 md:grid-cols-4">
+            <StatCard
+              title="Total de Manutenções"
+              value={stats.total}
+              icon={<BarChart3 />}
+              variant="blue"
+            />
+            <StatCard
+              title="Agendadas"
+              value={stats.agendadas}
+              icon={<Calendar />}
+              variant="yellow"
+            />
+            <StatCard
+              title="Em Andamento"
+              value={stats.em_andamento}
+              icon={<Wrench />}
+              variant="blue"
+            />
+            <StatCard
+              title="Concluídas"
+              value={stats.concluidas}
+              icon={<CheckCircle />}
+              variant="green"
+            />
           </div>
 
-          {manutencoes.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <Wrench className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Nenhuma manutenção encontrada</h3>
-                <p className="text-gray-500">Clique no botão acima para agendar uma nova manutenção</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {manutencoes.map((manutencao) => (
-                <Card key={manutencao.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">{manutencao.veiculoModelo}</CardTitle>
-                        <p className="text-sm text-gray-500">{manutencao.veiculoPlaca}</p>
-                      </div>
-                      <div className="flex gap-1">
-                        <Badge className={getStatusColor(manutencao.status)}>
-                          {getStatusLabel(manutencao.status)}
-                        </Badge>
-                        <Badge className={getPrioridadeColor(manutencao.prioridade)}>
-                          {getPrioridadeLabel(manutencao.prioridade)}
-                        </Badge>
-                        <Badge className={manutencao.statusPagamento === 'pago' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                          {manutencao.statusPagamento === 'pago' ? 'Pago' : 'Em Aberto'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Wrench className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm font-medium">{getTipoLabel(manutencao.tipo)}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm">{formatDate(manutencao.dataInicio)}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm">Previsão: {formatDate(manutencao.dataPrevisao)}</span>
-                      </div>
-                      
-                      <p className="text-sm text-gray-600 line-clamp-2">{manutencao.descricao}</p>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-700">Oficina:</span>
-                        <span className="text-sm">{manutencao.oficina}</span>
-                      </div>
-                      
-                      {manutencao.valor && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-700">Valor:</span>
-                          <span className="text-sm font-medium text-green-600">R$ {manutencao.valor.toFixed(2)}</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex justify-end gap-2 mt-4 pt-3 border-t">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setVisualizarManutencaoModal({ open: true, manutencao })}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditarManutencaoModal({ open: true, manutencao })}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteManutencao(manutencao.id)}
-                        disabled={isDeleting}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          {/* Controles de busca e filtros */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                {/* Busca */}
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Buscar manutenção..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+
+                {/* Filtros */}
+                <div className="flex gap-2">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-48">
+                      <Filter className="w-4 h-4 mr-2" />
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todos">Todos os Status</SelectItem>
+                      <SelectItem value="agendada">Agendada</SelectItem>
+                      <SelectItem value="em_andamento">Em Andamento</SelectItem>
+                      <SelectItem value="concluida">Concluída</SelectItem>
+                      <SelectItem value="cancelada">Cancelada</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Button 
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={() => setNovaManutencaoModalOpen(true)}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Nova Manutenção
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Tabela de manutenções */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Manutenções da Frota</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {filteredManutencoes.length === 0 ? (
+                <div className="p-8 text-center">
+                  <Wrench className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Nenhuma manutenção encontrada</h3>
+                  <p className="text-gray-500">Clique no botão "Nova Manutenção" para criar uma</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>VEÍCULO</TableHead>
+                      <TableHead>TIPO</TableHead>
+                      <TableHead>OFICINA</TableHead>
+                      <TableHead>DATA</TableHead>
+                      <TableHead>VALOR</TableHead>
+                      <TableHead>STATUS</TableHead>
+                      <TableHead>PAGAMENTO</TableHead>
+                      <TableHead>AÇÕES</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredManutencoes.map((manutencao) => (
+                      <TableRow key={manutencao.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                              <Wrench className="w-5 h-5 text-primary-foreground" />
+                            </div>
+                            <div>
+                              <p className="font-medium">{manutencao.veiculoModelo}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {manutencao.veiculoPlaca}
+                              </p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium capitalize">{manutencao.tipo}</p>
+                            <div className="flex items-center gap-1 mt-1">
+                              {getPrioridadeBadge(manutencao.prioridade)}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{manutencao.oficina}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {manutencao.contato || 'Sem contato'}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{formatDate(manutencao.dataInicio)}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Previsão: {formatDate(manutencao.dataPrevisao)}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{formatCurrency(manutencao.valorFinal || manutencao.valorOrcamento)}</p>
+                            {manutencao.valorFinal && manutencao.valorOrcamento && (
+                              <p className="text-sm text-muted-foreground">
+                                Orçamento: {formatCurrency(manutencao.valorOrcamento)}
+                              </p>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(manutencao.status)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={manutencao.statusPagamento === 'pago' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                            {manutencao.statusPagamento === 'pago' ? 'Pago' : 'Em Aberto'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => setVisualizarManutencaoModal({ open: true, manutencao })}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => setEditarManutencaoModal({ open: true, manutencao })}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleDeleteManutencao(manutencao.id)}
+                              disabled={isDeleting}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        <TabsContent value="locais" className="space-y-4">
+        <TabsContent value="locais" className="space-y-6">
           <div className="flex justify-end">
             <Button onClick={() => setNovoLocalModalOpen(true)} className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
@@ -284,11 +343,18 @@ export default function Manutencoes() {
                 <Card key={local.id} className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
-                      <div className="flex-1">
+                      <div>
                         <CardTitle className="text-lg">{local.nome}</CardTitle>
-                        <Badge variant="outline" className="mt-1">
-                          {getTipoLocalLabel(local.tipo)}
-                        </Badge>
+                        <p className="text-sm text-gray-500 capitalize">{local.tipo}</p>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteLocal(local.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </CardHeader>
@@ -314,34 +380,10 @@ export default function Manutencoes() {
                           <span className="text-sm">{local.endereco}</span>
                         </div>
                       )}
-
-                      {local.cidade && local.estado && (
-                        <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm">{local.cidade}, {local.estado}</span>
-                        </div>
-                      )}
-
-                      {local.cep && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-700">CEP:</span>
-                          <span className="text-sm">{local.cep}</span>
-                        </div>
-                      )}
-
+                      
                       {local.observacoes && (
-                        <p className="text-sm text-gray-600 line-clamp-2">{local.observacoes}</p>
+                        <p className="text-sm text-gray-600 mt-2">{local.observacoes}</p>
                       )}
-                    </div>
-                    
-                    <div className="flex justify-end gap-2 mt-4 pt-3 border-t">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteLocal(local.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -351,6 +393,7 @@ export default function Manutencoes() {
         </TabsContent>
       </Tabs>
 
+      {/* Modais */}
       <NovaManutencaoModal
         open={novaManutencaoModalOpen}
         onClose={() => setNovaManutencaoModalOpen(false)}
