@@ -160,14 +160,24 @@ export default function RelatoriosFinanceiros() {
     const status = aluguelVeiculo ? 'Lucrativo' : 'Parado';
 
     // Detalhamento por categoria
-    const categorias = ['manutencao', 'seguro', 'combustivel', 'financiamento', 'ipva', 'outros'];
+    const categorias = [
+      { key: 'combustivel', nome: 'Combustível' },
+      { key: 'manutencao', nome: 'Manutenção' },
+      { key: 'seguro', nome: 'Seguro' },
+      { key: 'ipva', nome: 'IPVA' },
+      { key: 'licenciamento', nome: 'Licenciamento' },
+      { key: 'multa', nome: 'Multas' },
+      { key: 'lavagem', nome: 'Lavagem' },
+      { key: 'outros', nome: 'Outros' }
+    ];
+    
     const despesasDetalhadas = categorias.map(categoria => {
       const valor = despesasVeiculo
-        .filter(d => d.categoria === categoria && d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+        .filter(d => d.categoria === categoria.key && d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
       
       const percentual = despesasMensais > 0 ? (valor / despesasMensais) * 100 : 0;
-      return { categoria, valor, percentual };
+      return { categoria: categoria.nome, valor, percentual };
     }).filter(item => item.valor > 0);
 
     // Evolução dos últimos 6 meses
@@ -182,7 +192,7 @@ export default function RelatoriosFinanceiros() {
         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
       
       return {
-        mes: format(mes, 'MMM', { locale: pt }),
+        mes: format(mes, 'MMM/yy', { locale: pt }),
         receita: receitaMes,
         despesas: despesasMes,
         lucro: receitaMes - despesasMes
