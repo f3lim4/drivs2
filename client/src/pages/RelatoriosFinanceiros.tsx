@@ -797,43 +797,7 @@ export default function RelatoriosFinanceiros() {
                   </div>
                 )}
 
-                {/* Resumo das despesas */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                  <div className="p-4 border rounded-lg bg-red-50">
-                    <h4 className="font-medium mb-2">Total de Despesas</h4>
-                    <p className="text-2xl font-bold text-red-600">
-                      {formatCurrency(filteredData.despesasPeriodo
-                        .filter(d => d.tipo === 'despesa')
-                        .reduce((total, d) => total + parseFloat(d.valor || '0'), 0)
-                      )}
-                    </p>
-                    <p className="text-sm text-gray-500">Período atual</p>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Despesas Pagas</h4>
-                    <p className="text-2xl font-bold text-green-600">
-                      {formatCurrency(filteredData.despesasPeriodo
-                        .filter(d => d.tipo === 'despesa' && d.status === 'pago')
-                        .reduce((total, d) => total + parseFloat(d.valor || '0'), 0)
-                      )}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.status === 'pago').length} despesas
-                    </p>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Despesas Pendentes</h4>
-                    <p className="text-2xl font-bold text-yellow-600">
-                      {formatCurrency(filteredData.despesasPeriodo
-                        .filter(d => d.tipo === 'despesa' && d.status === 'pendente')
-                        .reduce((total, d) => total + parseFloat(d.valor || '0'), 0)
-                      )}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.status === 'pendente').length} despesas
-                    </p>
-                  </div>
-                </div>
+
               </div>
             </CardContent>
           </Card>
