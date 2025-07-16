@@ -249,9 +249,6 @@ export function NovoVeiculoModal({
             
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Informações Básicas
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -368,9 +365,6 @@ export function NovoVeiculoModal({
 
             {/* DOCUMENTAÇÃO */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Documentação
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -419,9 +413,6 @@ export function NovoVeiculoModal({
 
             {/* CARACTERÍSTICAS TÉCNICAS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Características Técnicas
-              </h3>
               
               <div className="grid grid-cols-3 gap-4">
                 <FormField
@@ -583,9 +574,6 @@ export function NovoVeiculoModal({
 
             {/* MANUTENÇÃO */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Manutenção
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -620,9 +608,6 @@ export function NovoVeiculoModal({
 
             {/* SEGURO */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Seguro
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -694,9 +679,6 @@ export function NovoVeiculoModal({
 
             {/* VALOR DO VEÍCULO E IPVA */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Valor do Veículo e IPVA
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -753,9 +735,6 @@ export function NovoVeiculoModal({
 
             {/* RASTREADOR */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Rastreador
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
