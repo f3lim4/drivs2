@@ -27,6 +27,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Indicadores visuais** - Bolinhas coloridas para status de cada componente do sistema
 - ✅ **Dados dinâmicos** - Uptime, número de registros, tempo de resposta e versão atual
 - ✅ **Interface técnica** - Informações relevantes para administração e monitoramento
+- ✅ **Cards de estatísticas globais removidos** - Removidos cards de totais de locadoras, veículos, motoristas e anúncios
+- ✅ **Dashboard admin simplificado** - Mantido apenas seção "Status do Sistema" com informações técnicas
+- ✅ **Interface limpa** - Dashboard admin focado apenas em monitoramento técnico do sistema
 
 ### 2025-07-16: Sistema de Anúncios Integrado ao Dashboard - CONCLUÍDO
 - ✅ **Anúncios exibidos no dashboard das locadoras** - Seção dedicada para anúncios ativos
