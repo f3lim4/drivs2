@@ -140,7 +140,6 @@ export function EditarVeiculoModal({
   // Preenche o formulário quando o veículo é selecionado
   useEffect(() => {
     if (veiculo && open) {
-      console.log('Carregando dados do veículo no formulário:', veiculo);
       form.reset({
         placa: veiculo.placa,
         marca: veiculo.marca,
