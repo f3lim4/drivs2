@@ -102,30 +102,30 @@ export default function RelatoriosFinanceiros() {
       const despesasFixas = [];
       
       // IPVA (divide anual por 12 meses)
-      if (veiculo.ipva) {
+      if (veiculo.ipva && veiculo.ipva > 0) {
         despesasFixas.push({
           tipo: 'IPVA',
-          valor: veiculo.ipva / 12,
+          valor: parseFloat(veiculo.ipva) / 12,
           descricao: `IPVA mensal - ${veiculo.placa}`,
           veiculo: veiculo.placa
         });
       }
       
       // Seguro mensal
-      if (veiculo.valorSeguroMensal) {
+      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
         despesasFixas.push({
           tipo: 'Seguro',
-          valor: veiculo.valorSeguroMensal,
+          valor: parseFloat(veiculo.valorSeguroMensal),
           descricao: `Seguro ${veiculo.seguradora || 'não informado'} - ${veiculo.placa}`,
           veiculo: veiculo.placa
         });
       }
       
       // Rastreador mensal
-      if (veiculo.valorRastreadorMensal) {
+      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
         despesasFixas.push({
           tipo: 'Rastreador',
-          valor: veiculo.valorRastreadorMensal,
+          valor: parseFloat(veiculo.valorRastreadorMensal),
           descricao: `Rastreador ${veiculo.rastreador || 'não informado'} - ${veiculo.placa}`,
           veiculo: veiculo.placa
         });
