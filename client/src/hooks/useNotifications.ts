@@ -15,45 +15,74 @@ export interface Notification {
 export function useNotifications() {
   const { profile } = useAuth();
   
-  // Buscar todos os dados necessários para gerar notificações
-  const { data: motoristas = [] } = useQuery({
-    queryKey: ['/api/motoristas'],
+  // Buscar todos os dados necessários para gerar notificações com isolamento por locadora
+  const motoristasUrl = profile?.locadoraId ? `/api/motoristas?locadoraId=${profile.locadoraId}` : '/api/motoristas';
+  const alugueisUrl = profile?.locadoraId ? `/api/alugueis?locadoraId=${profile.locadoraId}` : '/api/alugueis';
+  const veiculosUrl = profile?.locadoraId ? `/api/veiculos?locadoraId=${profile.locadoraId}` : '/api/veiculos';
+  const manutencoesUrl = profile?.locadoraId ? `/api/manutencoes?locadoraId=${profile.locadoraId}` : '/api/manutencoes';
+  const despesasUrl = profile?.locadoraId ? `/api/despesas?locadoraId=${profile.locadoraId}` : '/api/despesas';
+  const infracoesUrl = profile?.locadoraId ? `/api/infracoes?locadoraId=${profile.locadoraId}` : '/api/infracoes';
+  const pagamentosUrl = profile?.locadoraId ? `/api/pagamentos?locadoraId=${profile.locadoraId}` : '/api/pagamentos';
+
+  const { data: motoristasRaw = [] } = useQuery({
+    queryKey: [motoristasUrl],
     enabled: !!profile?.locadoraId,
   });
 
-  const { data: alugueis = [] } = useQuery({
-    queryKey: ['/api/alugueis'],
+  const { data: alugueisRaw = [] } = useQuery({
+    queryKey: [alugueisUrl],
     enabled: !!profile?.locadoraId,
   });
 
-  const { data: veiculos = [] } = useQuery({
-    queryKey: ['/api/veiculos'],
+  const { data: veiculosRaw = [] } = useQuery({
+    queryKey: [veiculosUrl],
     enabled: !!profile?.locadoraId,
   });
 
-  const { data: manutencoes = [] } = useQuery({
-    queryKey: ['/api/manutencoes'],
+  const { data: manutencoesRaw = [] } = useQuery({
+    queryKey: [manutencoesUrl],
     enabled: !!profile?.locadoraId,
   });
 
-  const { data: despesas = [] } = useQuery({
-    queryKey: ['/api/despesas'],
+  const { data: despesasRaw = [] } = useQuery({
+    queryKey: [despesasUrl],
     enabled: !!profile?.locadoraId,
   });
 
-  const { data: infracoes = [] } = useQuery({
-    queryKey: ['/api/infracoes'],
+  const { data: infracoesRaw = [] } = useQuery({
+    queryKey: [infracoesUrl],
     enabled: !!profile?.locadoraId,
   });
 
-  const { data: pagamentos = [] } = useQuery({
-    queryKey: ['/api/pagamentos'],
+  const { data: pagamentosRaw = [] } = useQuery({
+    queryKey: [pagamentosUrl],
     enabled: !!profile?.locadoraId,
   });
+
+  // Filtrar dados com isolamento de segurança
+  const motoristas = profile?.locadoraId ? motoristasRaw.filter((m: any) => m.locadoraId === profile.locadoraId) : motoristasRaw;
+  const alugueis = profile?.locadoraId ? alugueisRaw.filter((a: any) => a.locadoraId === profile.locadoraId) : alugueisRaw;
+  const veiculos = profile?.locadoraId ? veiculosRaw.filter((v: any) => v.locadoraId === profile.locadoraId) : veiculosRaw;
+  const manutencoes = profile?.locadoraId ? manutencoesRaw.filter((m: any) => m.locadoraId === profile.locadoraId) : manutencoesRaw;
+  const despesas = profile?.locadoraId ? despesasRaw.filter((d: any) => d.locadoraId === profile.locadoraId) : despesasRaw;
+  const infracoes = profile?.locadoraId ? infracoesRaw.filter((i: any) => i.locadoraId === profile.locadoraId) : infracoesRaw;
+  const pagamentos = profile?.locadoraId ? pagamentosRaw.filter((p: any) => p.locadoraId === profile.locadoraId) : pagamentosRaw;
 
   // Gerar notificações baseadas nos dados reais
   const notifications: Notification[] = [];
   const today = new Date();
+
+  // Log para debug - verificar dados carregados
+  console.log('Notificações - Dados carregados:', {
+    motoristas: motoristas.length,
+    alugueis: alugueis.length,
+    veiculos: veiculos.length,
+    manutencoes: manutencoes.length,
+    despesas: despesas.length,
+    infracoes: infracoes.length,
+    pagamentos: pagamentos.length,
+    locadoraId: profile?.locadoraId
+  });
 
   if (motoristas.length > 0) {
     motoristas.forEach((motorista: any) => {
@@ -132,6 +161,17 @@ export function useNotifications() {
 
   // Notificações de manutenções
   if (manutencoes.length > 0) {
+    console.log('Notificações - Verificando manutenções:', manutencoes.map(m => ({
+      id: m.id,
+      status: m.status,
+      statusPagamento: m.statusPagamento,
+      valor: m.valor,
+      tipoManutencao: m.tipoManutencao,
+      dataAgendada: m.dataAgendada,
+      dataInicio: m.dataInicio,
+      dataFinalizacao: m.dataFinalizacao
+    })));
+    
     manutencoes.forEach((manutencao: any) => {
       if (manutencao.status === 'agendada') {
         notifications.push({
@@ -165,6 +205,23 @@ export function useNotifications() {
           isRead: false,
         });
       }
+
+      // Manutenções concluídas recentemente (últimos 7 dias)
+      if (manutencao.status === 'concluida' && manutencao.dataFinalizacao) {
+        const dataFinalizacao = new Date(manutencao.dataFinalizacao);
+        const diasAtras = differenceInDays(today, dataFinalizacao);
+        
+        if (diasAtras <= 7) {
+          notifications.push({
+            id: `manutencao-concluida-${manutencao.id}`,
+            type: 'success',
+            title: 'Manutenção Concluída',
+            message: `Manutenção ${manutencao.tipoManutencao} finalizada com sucesso`,
+            timestamp: dataFinalizacao,
+            isRead: false,
+          });
+        }
+      }
     });
   }
 
@@ -173,16 +230,17 @@ export function useNotifications() {
     const despesasRecentes = despesas.filter((despesa: any) => {
       const dataDespesa = new Date(despesa.data);
       const diasAtras = differenceInDays(today, dataDespesa);
-      return diasAtras <= 7; // Despesas dos últimos 7 dias
+      return diasAtras <= 30; // Despesas dos últimos 30 dias
     });
 
     despesasRecentes.forEach((despesa: any) => {
-      if (despesa.valor > 500) { // Despesas acima de R$ 500
+      const valor = parseFloat(despesa.valor);
+      if (valor > 200) { // Despesas acima de R$ 200
         notifications.push({
           id: `despesa-alta-${despesa.id}`,
           type: 'warning',
-          title: 'Despesa Alta Registrada',
-          message: `Despesa de R$ ${despesa.valor.toFixed(2)} em ${despesa.categoria}`,
+          title: 'Despesa Significativa',
+          message: `Despesa de R$ ${valor.toFixed(2)} em ${despesa.categoria}`,
           timestamp: new Date(despesa.data),
           isRead: false,
         });
@@ -238,6 +296,13 @@ export function useNotifications() {
   );
 
   const unreadCount = sortedNotifications.filter(n => !n.isRead).length;
+
+  // Log final das notificações geradas
+  console.log('Notificações - Geradas:', {
+    total: sortedNotifications.length,
+    unread: unreadCount,
+    tipos: sortedNotifications.map(n => ({ id: n.id, type: n.type, title: n.title }))
+  });
 
   return {
     notifications: sortedNotifications,
