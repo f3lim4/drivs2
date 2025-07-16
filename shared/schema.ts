@@ -77,6 +77,8 @@ export const veiculos = pgTable("veiculos", {
   // Rastreador
   rastreador: text("rastreador"),
   valorRastreadorMensal: decimal("valor_rastreador_mensal", { precision: 10, scale: 2 }),
+  // Data de Compra
+  dataCompra: date("data_compra"),
   // Status
   status: text("status").notNull().default("disponivel"), // 'disponivel', 'alugado' (controlado automaticamente)
   // Timestamps
