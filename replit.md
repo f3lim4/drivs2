@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-16: Correção Coluna Locadora em Motoristas - CONCLUÍDO
+- ✅ **Nome real da locadora** - Substituído hardcode "AutoRent Premium" por nome real do banco
+- ✅ **Integração com API** - Busca dados das locadoras via React Query 
+- ✅ **Função de mapeamento** - getLocadoraName() encontra nome da locadora pelo ID
+- ✅ **Iniciais dinâmicas** - Círculo azul mostra primeiras letras do nome real
+- ✅ **Exibição condicional** - Dados carregados apenas para usuários admin
+- ✅ **Performance otimizada** - Query habilitada apenas quando necessário
+
 ### 2025-07-16: Dashboard Admin Futurista com Gráficos Interativos - CONCLUÍDO
 - ✅ **Interface futurista** - Cards escuros com gradientes substituindo cards coloridos
 - ✅ **Gráficos interativos** - Integração com biblioteca Recharts para visualizações avançadas

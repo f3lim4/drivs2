@@ -8,6 +8,7 @@ import { Plus, Search, Filter, Edit, Trash2, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useMotoristas } from '@/hooks/useMotoristas';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -49,6 +50,18 @@ export default function Motoristas() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedMotorista, setSelectedMotorista] = useState<Motorista | null>(null);
+
+  // Buscar locadoras para exibir nome na coluna
+  const { data: locadoras = [] } = useQuery({
+    queryKey: ['/api/locadoras'],
+    enabled: isAdmin, // Só busca se for admin
+  });
+
+  // Função para encontrar o nome da locadora
+  const getLocadoraName = (locadoraId: string) => {
+    const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
+    return locadora ? locadora.nome : locadoraId;
+  };
 
   // Carregamento agora é feito automaticamente pelo hook useMotoristas
 
@@ -300,9 +313,11 @@ export default function Motoristas() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
-                          <span className="text-blue-600 text-xs font-medium">AL</span>
+                          <span className="text-blue-600 text-xs font-medium">
+                            {getLocadoraName(motorista.locadoraId).substring(0, 2).toUpperCase()}
+                          </span>
                         </div>
-                        <span className="text-sm">AutoRent Premium</span>
+                        <span className="text-sm">{getLocadoraName(motorista.locadoraId)}</span>
                       </div>
                     </TableCell>
                   )}
