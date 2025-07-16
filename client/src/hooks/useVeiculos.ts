@@ -88,6 +88,10 @@ export function useVeiculos() {
         ipva: v.ipva ? parseFloat(v.ipva) : null,
         rastreador: v.rastreador,
         valorRastreadorMensal: v.valorRastreadorMensal ? parseFloat(v.valorRastreadorMensal) : null,
+        dataCompra: v.dataCompra,
+        financiado: v.financiado,
+        valorFinanciamento: v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : null,
+        quantidadeParcelas: v.quantidadeParcelas,
         status: v.status as 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel',
         // Campos de compatibilidade
         valorDiario: parseFloat(v.valorSemanal) / 7,

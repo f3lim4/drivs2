@@ -140,11 +140,6 @@ export function EditarVeiculoModal({
   // Preenche o formulário quando o veículo é selecionado
   useEffect(() => {
     if (veiculo && open) {
-      console.log('Dados do veículo carregados:', veiculo);
-      console.log('Financiado:', veiculo.financiado);
-      console.log('Valor financiamento:', veiculo.valorFinanciamento);
-      console.log('Quantidade parcelas:', veiculo.quantidadeParcelas);
-      console.log('Data compra:', veiculo.dataCompra);
       form.reset({
         placa: veiculo.placa,
         marca: veiculo.marca,
