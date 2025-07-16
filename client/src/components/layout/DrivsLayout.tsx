@@ -35,6 +35,8 @@ export function DrivsLayout({ children }: DrivsLayoutProps) {
         return { title: 'Infrações', subtitle: 'Gerencie infrações de trânsito' };
       case '/relatorios-financeiros':
         return { title: 'Relatórios Financeiros', subtitle: 'Análise completa da situação financeira' };
+      case '/manutencoes':
+        return { title: 'Manutenções', subtitle: 'Gerencie manutenções dos veículos' };
       case '/locadoras':
         return { title: 'Locadoras', subtitle: 'Gerencie locadoras do sistema' };
       case '/perfil':

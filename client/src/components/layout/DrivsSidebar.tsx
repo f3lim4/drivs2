@@ -15,7 +15,8 @@ import {
   Menu,
   User,
   CreditCard,
-  AlertTriangle
+  AlertTriangle,
+  Wrench
 } from 'lucide-react';
 import logoPath from "@assets/icone_1752434737434.png";
 import { useState } from 'react';
@@ -76,6 +77,12 @@ const navigationItems = [
     url: '/infracoes',
     icon: AlertTriangle,
     description: 'Gestão de infrações'
+  },
+  {
+    title: 'Manutenções',
+    url: '/manutencoes',
+    icon: Wrench,
+    description: 'Gestão de manutenções'
   },
   {
     title: 'Financeiro',

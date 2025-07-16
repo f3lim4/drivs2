@@ -301,6 +301,50 @@ export const insertDespesaSchema = createInsertSchema(despesas).omit({
   updatedAt: true,
 });
 
+// Manutencoes table
+export const manutencoes = pgTable("manutencoes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  locadoraId: text("locadora_id").notNull(), // Referência ao CNPJ da locadora
+  veiculoId: text("veiculo_id").notNull(), // Referência ao veículo
+  
+  // Informações da manutenção
+  tipo: text("tipo").notNull(), // 'preventiva', 'corretiva', 'revisao', 'outros'
+  descricao: text("descricao").notNull(),
+  oficina: text("oficina").notNull(),
+  contato: text("contato"), // Telefone da oficina
+  
+  // Valores
+  valorOrcamento: decimal("valor_orcamento", { precision: 10, scale: 2 }),
+  valorFinal: decimal("valor_final", { precision: 10, scale: 2 }),
+  
+  // Datas
+  dataInicio: date("data_inicio").notNull(),
+  dataPrevisao: date("data_previsao").notNull(),
+  dataConclusao: date("data_conclusao"),
+  
+  // Quilometragem
+  quilometragemInicio: integer("quilometragem_inicio"),
+  quilometragemFim: integer("quilometragem_fim"),
+  
+  // Status
+  status: text("status").notNull().default("agendada"), // 'agendada', 'em_andamento', 'concluida', 'cancelada'
+  prioridade: text("prioridade").notNull().default("normal"), // 'baixa', 'normal', 'alta', 'urgente'
+  
+  // Observações
+  observacoes: text("observacoes"),
+  pecasSubstituidas: text("pecas_substituidas"), // Lista de peças
+  proximaManutencao: date("proxima_manutencao"),
+  
+  // Controle interno
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertManutencaoSchema = createInsertSchema(manutencoes).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -349,6 +393,12 @@ export type Infracao = typeof infracoes.$inferSelect & {
 
 export type InsertDespesa = z.infer<typeof insertDespesaSchema>;
 export type Despesa = typeof despesas.$inferSelect & {
+  veiculoModelo?: string;
+  veiculoPlaca?: string;
+};
+
+export type InsertManutencao = z.infer<typeof insertManutencaoSchema>;
+export type Manutencao = typeof manutencoes.$inferSelect & {
   veiculoModelo?: string;
   veiculoPlaca?: string;
 };

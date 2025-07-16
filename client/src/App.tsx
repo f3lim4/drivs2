@@ -14,6 +14,7 @@ import Locadoras from "./pages/Locadoras";
 import Pagamentos from "./pages/Pagamentos";
 import Infracoes from "./pages/Infracoes";
 import RelatoriosFinanceiros from "./pages/RelatoriosFinanceiros";
+import Manutencoes from "./pages/Manutencoes";
 import Perfil from "./pages/Perfil";
 import Login from "./pages/Login";
 import CadastroLocadora from "./pages/CadastroLocadora";
@@ -92,6 +93,11 @@ const App = () => (
           <Route path="/relatorios-financeiros" element={
             <AuthGuard>
               <DrivsLayout><RelatoriosFinanceiros /></DrivsLayout>
+            </AuthGuard>
+          } />
+          <Route path="/manutencoes" element={
+            <AuthGuard>
+              <DrivsLayout><Manutencoes /></DrivsLayout>
             </AuthGuard>
           } />
           <Route path="/perfil" element={

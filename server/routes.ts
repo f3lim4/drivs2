@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -849,6 +849,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Despesa deleted successfully" });
     } catch (error) {
       console.error("Error deleting despesa:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Manutencao routes
+  app.get("/api/manutencoes", async (req, res) => {
+    try {
+      const { locadoraId, veiculoId } = req.query;
+      
+      if (veiculoId) {
+        const manutencoes = await storage.getManutencoesByVeiculo(veiculoId as string);
+        res.json(manutencoes);
+      } else if (locadoraId) {
+        const manutencoes = await storage.getManutencoesByLocadora(locadoraId as string);
+        res.json(manutencoes);
+      } else {
+        const manutencoes = await storage.getAllManutencoes();
+        res.json(manutencoes);
+      }
+    } catch (error) {
+      console.error("Error fetching manutencoes:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/manutencoes/:id", async (req, res) => {
+    try {
+      const manutencao = await storage.getManutencao(req.params.id);
+      if (!manutencao) {
+        return res.status(404).json({ message: "Manutencao not found" });
+      }
+      res.json(manutencao);
+    } catch (error) {
+      console.error("Error fetching manutencao:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/manutencoes", async (req, res) => {
+    try {
+      const validatedData = insertManutencaoSchema.omit({ id: true }).parse(req.body);
+      const manutencao = await storage.createManutencao(validatedData);
+      res.json(manutencao);
+    } catch (error) {
+      console.error("Error creating manutencao:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/manutencoes/:id", async (req, res) => {
+    try {
+      const validatedData = insertManutencaoSchema.partial().parse(req.body);
+      const manutencao = await storage.updateManutencao(req.params.id, validatedData);
+      res.json(manutencao);
+    } catch (error) {
+      console.error("Error updating manutencao:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/manutencoes/:id", async (req, res) => {
+    try {
+      await storage.deleteManutencao(req.params.id);
+      res.json({ message: "Manutencao deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting manutencao:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
