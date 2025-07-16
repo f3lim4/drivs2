@@ -27,6 +27,9 @@ export default function RelatoriosFinanceiros() {
   const { veiculos } = useVeiculos();
   const { motoristas } = useMotoristas();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [filtroVeiculo, setFiltroVeiculo] = useState<string>('todos');
+  const [filtroMotorista, setFiltroMotorista] = useState<string>('todos');
+  const [filtroCategoria, setFiltroCategoria] = useState<string>('todos');
 
   // Cálculos para o período selecionado
   const monthStart = startOfMonth(selectedMonth);
@@ -35,24 +38,40 @@ export default function RelatoriosFinanceiros() {
   const filteredData = useMemo(() => {
     const isInPeriod = (date: Date) => isWithinInterval(date, { start: monthStart, end: monthEnd });
 
-    const alugueisAtivos = alugueis.filter(aluguel => 
+    let alugueisAtivos = alugueis.filter(aluguel => 
       aluguel.status === 'ativo'
     );
 
-    const pagamentosRealizados = pagamentos.filter(pagamento => 
+    let pagamentosRealizados = pagamentos.filter(pagamento => 
       pagamento.status === 'realizado' && isInPeriod(new Date(pagamento.dataPagamento))
     );
 
-    const infracoesPeriodo = infracoes.filter(infracao => 
+    let infracoesPeriodo = infracoes.filter(infracao => 
       isInPeriod(new Date(infracao.dataInfracao))
     );
 
-    const despesasPeriodo = despesas.filter(despesa => 
+    let despesasPeriodo = despesas.filter(despesa => 
       isInPeriod(new Date(despesa.data))
     );
 
+    // Aplicar filtros
+    if (filtroVeiculo !== 'todos') {
+      alugueisAtivos = alugueisAtivos.filter(aluguel => aluguel.veiculoId === filtroVeiculo);
+      despesasPeriodo = despesasPeriodo.filter(despesa => despesa.veiculoId === filtroVeiculo);
+      infracoesPeriodo = infracoesPeriodo.filter(infracao => infracao.veiculoId === filtroVeiculo);
+    }
+
+    if (filtroMotorista !== 'todos') {
+      alugueisAtivos = alugueisAtivos.filter(aluguel => aluguel.motoristaId === filtroMotorista);
+      infracoesPeriodo = infracoesPeriodo.filter(infracao => infracao.motoristaId === filtroMotorista);
+    }
+
+    if (filtroCategoria !== 'todos') {
+      despesasPeriodo = despesasPeriodo.filter(despesa => despesa.categoria === filtroCategoria);
+    }
+
     return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo };
-  }, [alugueis, pagamentos, infracoes, despesas, monthStart, monthEnd]);
+  }, [alugueis, pagamentos, infracoes, despesas, monthStart, monthEnd, filtroVeiculo, filtroMotorista, filtroCategoria]);
 
   // Cálculos de despesas fixas dos veículos
   const despesasFixasVeiculos = useMemo(() => {
@@ -299,25 +318,99 @@ export default function RelatoriosFinanceiros() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex justify-end items-center space-x-4">
-        <Select 
-          value={format(selectedMonth, 'yyyy-MM')} 
-          onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {Array.from({ length: 12 }, (_, i) => {
-              const date = subMonths(new Date(), i);
-              return (
-                <SelectItem key={i} value={format(date, 'yyyy-MM')}>
-                  {format(date, 'MMMM yyyy', { locale: pt })}
+      {/* Filtros */}
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <div className="flex flex-wrap gap-4 items-center">
+          <Select value={filtroVeiculo} onValueChange={setFiltroVeiculo}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filtrar por veículo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os veículos</SelectItem>
+              {veiculos.map(veiculo => (
+                <SelectItem key={veiculo.id} value={veiculo.id}>
+                  {veiculo.placa} - {veiculo.marca} {veiculo.modelo}
                 </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={filtroMotorista} onValueChange={setFiltroMotorista}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filtrar por motorista" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os motoristas</SelectItem>
+              {motoristas.map(motorista => (
+                <SelectItem key={motorista.id} value={motorista.id}>
+                  {motorista.nome}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filtrar por categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as categorias</SelectItem>
+              <SelectItem value="manutencao">Manutenção</SelectItem>
+              <SelectItem value="seguro">Seguro</SelectItem>
+              <SelectItem value="ipva">IPVA</SelectItem>
+              <SelectItem value="multa">Multa</SelectItem>
+              <SelectItem value="licenciamento">Licenciamento</SelectItem>
+              <SelectItem value="lavagem">Lavagem</SelectItem>
+              <SelectItem value="outros">Outros</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          {(() => {
+            const filtrosAtivos = [
+              filtroVeiculo !== 'todos' ? 1 : 0,
+              filtroMotorista !== 'todos' ? 1 : 0,
+              filtroCategoria !== 'todos' ? 1 : 0
+            ].reduce((a, b) => a + b, 0);
+            
+            return filtrosAtivos > 0 ? (
+              <Badge variant="secondary" className="text-xs">
+                {filtrosAtivos} filtro{filtrosAtivos > 1 ? 's' : ''} aplicado{filtrosAtivos > 1 ? 's' : ''}
+              </Badge>
+            ) : null;
+          })()}
+          
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setFiltroVeiculo('todos');
+              setFiltroMotorista('todos');
+              setFiltroCategoria('todos');
+            }}
+          >
+            Limpar Filtros
+          </Button>
+
+          <Select 
+            value={format(selectedMonth, 'yyyy-MM')} 
+            onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
+          >
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 12 }, (_, i) => {
+                const date = subMonths(new Date(), i);
+                return (
+                  <SelectItem key={i} value={format(date, 'yyyy-MM')}>
+                    {format(date, 'MMMM yyyy', { locale: pt })}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Cards de Resumo Financeiro */}
