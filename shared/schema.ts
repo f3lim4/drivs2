@@ -79,6 +79,10 @@ export const veiculos = pgTable("veiculos", {
   valorRastreadorMensal: decimal("valor_rastreador_mensal", { precision: 10, scale: 2 }),
   // Data de Compra
   dataCompra: date("data_compra"),
+  // Financiamento
+  financiado: boolean("financiado").notNull().default(false),
+  valorFinanciamento: decimal("valor_financiamento", { precision: 10, scale: 2 }),
+  quantidadeParcelas: integer("quantidade_parcelas"),
   // Status
   status: text("status").notNull().default("disponivel"), // 'disponivel', 'alugado' (controlado automaticamente)
   // Timestamps
