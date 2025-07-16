@@ -528,7 +528,22 @@ export default function RelatoriosFinanceiros() {
                     {analiseVeiculos.map((item) => (
                       <TableRow key={item.veiculo}>
                         <TableCell className="text-center">
-                          <Eye className="h-4 w-4 text-gray-500 mx-auto" />
+                          {(() => {
+                            const veiculoEncontrado = veiculos.find(v => v.placa === item.veiculo);
+                            if (!veiculoEncontrado) {
+                              return <Eye className="h-4 w-4 text-gray-400 mx-auto" />;
+                            }
+                            return (
+                              <DetalhesVeiculoModal
+                                {...gerarDadosDetalhados(veiculoEncontrado)}
+                                trigger={
+                                  <Button variant="ghost" size="sm" className="p-0 h-auto">
+                                    <Eye className="h-4 w-4 text-blue-600 hover:text-blue-800" />
+                                  </Button>
+                                }
+                              />
+                            );
+                          })()}
                         </TableCell>
                         <TableCell className="font-medium">
                           <div>
