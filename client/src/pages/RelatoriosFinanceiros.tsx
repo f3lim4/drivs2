@@ -322,6 +322,14 @@ export default function RelatoriosFinanceiros() {
       const mesStart = startOfMonth(mes);
       const mesEnd = endOfMonth(mes);
       
+      // Verificar se o veículo já havia sido cadastrado neste período
+      const dataCadastroVeiculo = new Date(veiculo.createdAt);
+      const veiculoExistia = mesEnd >= dataCadastroVeiculo;
+      
+      if (!veiculoExistia) {
+        return null; // Pular meses anteriores ao cadastro
+      }
+      
       // Verificar se existe aluguel ativo neste período
       const aluguelPeriodo = alugueis.find(a => 
         a.veiculoId === veiculo.id && 
@@ -345,7 +353,7 @@ export default function RelatoriosFinanceiros() {
         despesas: despesasTotalMes,
         lucro: receitaMes - despesasTotalMes
       };
-    }).reverse().filter(item => item.receita > 0 || item.despesas > 0); // Mostrar apenas meses com dados reais
+    }).reverse().filter(item => item !== null && (item.receita > 0 || item.despesas > 0)); // Mostrar apenas meses com dados reais
 
     return {
       veiculo,
