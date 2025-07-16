@@ -193,6 +193,9 @@ export default function Manutencoes() {
                         <Badge className={getPrioridadeColor(manutencao.prioridade)}>
                           {getPrioridadeLabel(manutencao.prioridade)}
                         </Badge>
+                        <Badge className={manutencao.statusPagamento === 'pago' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                          {manutencao.statusPagamento === 'pago' ? 'Pago' : 'Em Aberto'}
+                        </Badge>
                       </div>
                     </div>
                   </CardHeader>
