@@ -303,12 +303,6 @@ export default function Dashboard() {
                   <p className="text-sm text-muted-foreground">
                     <span className="font-medium">Semanal:</span> {formatCurrency(receitaSemanal)}
                   </p>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <span className={`font-medium ${receitaMensal > 0 ? "text-green-600" : "text-red-600"}`}>
-                      {receitaMensal > 0 ? "Receita ativa" : "Sem receita"}
-                    </span>
-                    <span>baseada em aluguéis ativos</span>
-                  </div>
                 </div>
               </div>
             </div>
