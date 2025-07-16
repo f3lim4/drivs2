@@ -22,7 +22,7 @@ export function useManutencoes() {
     },
     enabled: !!profile?.locadoraId,
     staleTime: 0, // Sem cache para debug
-    cacheTime: 0, // Sem cache para debug
+    gcTime: 0, // Sem cache para debug
   });
 
   const createMutation = useMutation({
