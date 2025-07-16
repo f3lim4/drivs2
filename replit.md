@@ -20,6 +20,10 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Dados salvos no PostgreSQL** - Financiamento e data de compra persistem corretamente
 - ✅ **Formulário otimizado** - Melhor controle de estado e validação
 - ✅ **Interface compacta** - Layout mais direto e funcional para edição de veículos
+- ✅ **Campos de financiamento corrigidos** - Dados agora carregam corretamente no modal de edição
+- ✅ **Formatação de valor do veículo** - Implementado padrão brasileiro (00.000,00)
+- ✅ **Valor final do financiamento** - Campo calculado automaticamente na interface
+- ✅ **Layout de 3 colunas** - Valor financiamento, quantidade parcelas e valor final
 
 ### 2025-07-16: Sistema de Manutenções com Controle de Pagamento - CONCLUÍDO
 - ✅ **Campos de pagamento implementados** - StatusPagamento e FormaPagamento adicionados ao schema
