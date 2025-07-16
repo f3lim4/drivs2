@@ -219,9 +219,6 @@ export default function RelatoriosFinanceiros() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">RELATÓRIOS FINANCEIROS</h1>
-          <p className="text-muted-foreground mt-2">
-            Análise completa da performance financeira da sua locadora
-          </p>
         </div>
         
         <div className="flex items-center space-x-4">
