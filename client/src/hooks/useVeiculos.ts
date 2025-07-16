@@ -83,6 +83,10 @@ export function useVeiculos() {
       numeroApolice: v.numeroApolice,
       vigenciaSeguro: v.vigenciaSeguro,
       valorSeguroMensal: v.valorSeguroMensal ? parseFloat(v.valorSeguroMensal) : null,
+      valorVeiculo: v.valorVeiculo ? parseFloat(v.valorVeiculo) : null,
+      ipva: v.ipva ? parseFloat(v.ipva) : null,
+      rastreador: v.rastreador,
+      valorRastreadorMensal: v.valorRastreadorMensal ? parseFloat(v.valorRastreadorMensal) : null,
       status: v.status as 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel',
       // Campos de compatibilidade
       valorDiario: parseFloat(v.valorSemanal) / 7,
