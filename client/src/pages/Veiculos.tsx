@@ -245,7 +245,6 @@ export default function Veiculos() {
                 <TableHead>PLACA</TableHead>
                 {isAdmin && <TableHead>LOCADORA</TableHead>}
                 <TableHead>VALORES</TableHead>
-                <TableHead>LIMITE KM</TableHead>
                 <TableHead>STATUS</TableHead>
                 <TableHead>AÇÕES</TableHead>
               </TableRow>
@@ -288,9 +287,6 @@ export default function Veiculos() {
                         Caução: {formatCurrency(veiculo.caucao)}
                       </p>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <p className="capitalize">{veiculo.kmLimite}</p>
                   </TableCell>
                   <TableCell>
                     {getStatusBadge(veiculo.status)}
