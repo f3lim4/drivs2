@@ -34,6 +34,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Botão "Limpar Filtros"** - Reseta todos os filtros com um clique
 - ✅ **Filtros aplicados aos dados** - Aluguéis, despesas e infrações filtrados corretamente
 - ✅ **Filtros reposicionados** - Movidos para baixo dos cards principais com fundo destacado
+- ✅ **Campo de busca único** - Substituído filtros múltiplos por campo de busca universal
+- ✅ **Busca inteligente** - Busca por veículo (placa, marca, modelo), motorista (nome, CPF) e categoria
+- ✅ **Interface simplificada** - Botão "Limpar" aparece apenas quando há texto na busca
 
 ### 2025-07-15: Sistema de Infrações com Seleção Inteligente - CONCLUÍDO
 - ✅ **Seleção inteligente implementada** - Motoristas com aluguel ativo aparecem primeiro
