@@ -96,9 +96,9 @@ export function NotificationsDropdown() {
               <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
                 <Bell className="w-6 h-6 text-muted-foreground" />
               </div>
-              <p className="text-sm text-muted-foreground">Nenhuma notificação</p>
+              <p className="text-sm text-muted-foreground">Sem nenhum alerta no momento</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Você está em dia com tudo!
+                Tudo em dia com CNHs, multas e pagamentos!
               </p>
             </div>
           )}

@@ -291,7 +291,7 @@ export function useNotifications() {
   if (pagamentos.length > 0) {
     pagamentos.forEach((pagamento: any) => {
       if (pagamento.status === 'pendente') {
-        const dataPagamento = new Date(pagamento.data);
+        const dataPagamento = new Date(pagamento.dataPagamento || pagamento.data);
         const diasAtras = differenceInDays(today, dataPagamento);
         
         // Pagamentos pendentes (sem limite de dias)
