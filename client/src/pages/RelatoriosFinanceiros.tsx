@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Search, Trash2 } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { pt } from 'date-fns/locale';
@@ -34,13 +35,21 @@ export default function RelatoriosFinanceiros() {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [termoBusca, setTermoBusca] = useState<string>('');
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
+  const [despesaParaExcluir, setDespesaParaExcluir] = useState<string | null>(null);
 
-  // Função para excluir despesa
-  const handleExcluirDespesa = async (despesaId: string) => {
+  // Função para mostrar confirmação de exclusão
+  const handleClickExcluir = (despesaId: string) => {
+    setDespesaParaExcluir(despesaId);
+  };
+
+  // Função para confirmar exclusão
+  const confirmarExclusao = async () => {
+    if (!despesaParaExcluir) return;
+    
     try {
-      setDespesaExcluindo(despesaId);
+      setDespesaExcluindo(despesaParaExcluir);
       
-      const response = await fetch(`/api/despesas/${despesaId}`, {
+      const response = await fetch(`/api/despesas/${despesaParaExcluir}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +77,13 @@ export default function RelatoriosFinanceiros() {
       });
     } finally {
       setDespesaExcluindo(null);
+      setDespesaParaExcluir(null);
     }
+  };
+
+  // Função para cancelar exclusão
+  const cancelarExclusao = () => {
+    setDespesaParaExcluir(null);
   };
 
   // Cálculos para o período selecionado
@@ -833,11 +848,7 @@ export default function RelatoriosFinanceiros() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => {
-                                      if (confirm('Tem certeza que deseja excluir esta despesa?')) {
-                                        handleExcluirDespesa(despesa.id);
-                                      }
-                                    }}
+                                    onClick={() => handleClickExcluir(despesa.id)}
                                     disabled={despesaExcluindo === despesa.id}
                                     className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
                                   >
@@ -996,6 +1007,34 @@ export default function RelatoriosFinanceiros() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modal de confirmação de exclusão */}
+      <Dialog open={!!despesaParaExcluir} onOpenChange={() => setDespesaParaExcluir(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirmar exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={cancelarExclusao}
+              disabled={!!despesaExcluindo}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmarExclusao}
+              disabled={!!despesaExcluindo}
+            >
+              {despesaExcluindo ? 'Excluindo...' : 'Excluir'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
