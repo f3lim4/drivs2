@@ -766,7 +766,7 @@ export function EditarVeiculoModal({
               />
 
               {form.watch('financiado') && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="valorFinanciamento"
@@ -807,6 +807,21 @@ export function EditarVeiculoModal({
                       </FormItem>
                     )}
                   />
+
+                  <div className="space-y-2">
+                    <FormLabel>Valor Final (R$)</FormLabel>
+                    <div className="flex items-center h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background">
+                      {(() => {
+                        const valor = form.watch('valorFinanciamento') || 0;
+                        const parcelas = form.watch('quantidadeParcelas') || 0;
+                        const valorFinal = valor * parcelas;
+                        return valorFinal > 0 ? valorFinal.toLocaleString('pt-BR', { 
+                          style: 'currency', 
+                          currency: 'BRL' 
+                        }) : 'R$ 0,00';
+                      })()}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
