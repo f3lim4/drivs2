@@ -5,17 +5,20 @@ import type { Infracao, InsertInfracao } from '@shared/schema';
 export function useInfracoes() {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
+  const isAdmin = profile?.tipo === 'admin';
 
   const query = useQuery({
-    queryKey: ['infracoes', profile?.locadoraId],
+    queryKey: ['infracoes', isAdmin ? 'admin' : profile?.locadoraId],
     queryFn: async () => {
-      const response = await fetch(`/api/infracoes?locadoraId=${profile?.locadoraId}`);
+      // Se for admin, buscar todas as infrações, caso contrário filtrar por locadora
+      const url = isAdmin ? '/api/infracoes' : `/api/infracoes?locadoraId=${profile?.locadoraId}`;
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch infracoes');
       }
       return response.json() as Promise<Infracao[]>;
     },
-    enabled: !!profile?.locadoraId,
+    enabled: !!profile && (isAdmin || !!profile?.locadoraId),
   });
 
 
@@ -33,7 +36,7 @@ export function useInfracoes() {
     },
     onSuccess: () => {
       console.log('Infração criada com sucesso, invalidando cache...');
-      queryClient.invalidateQueries({ queryKey: ['infracoes', profile?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['infracoes', isAdmin ? 'admin' : profile?.locadoraId] });
     },
   });
 
@@ -49,7 +52,7 @@ export function useInfracoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['infracoes', profile?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['infracoes', isAdmin ? 'admin' : profile?.locadoraId] });
     },
   });
 
@@ -63,7 +66,7 @@ export function useInfracoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['infracoes', profile?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['infracoes', isAdmin ? 'admin' : profile?.locadoraId] });
     },
   });
 
