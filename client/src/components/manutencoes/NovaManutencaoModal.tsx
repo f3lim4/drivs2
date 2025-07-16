@@ -55,6 +55,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
     resolver: zodResolver(formSchema),
     defaultValues: {
       locadoraId: profile?.locadoraId || '',
+      veiculoId: '',
       tipo: 'preventiva',
       descricao: '',
       oficina: '',
@@ -70,6 +71,9 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      console.log('Dados do formulário:', data);
+      console.log('Validação do formulário:', form.formState.errors);
+      
       await createManutencao(data);
       toast({
         title: 'Manutenção criada com sucesso!',
@@ -78,6 +82,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
       form.reset();
       onClose();
     } catch (error) {
+      console.error('Erro ao criar manutenção:', error);
       toast({
         title: 'Erro ao criar manutenção',
         description: 'Ocorreu um erro ao criar a manutenção. Tente novamente.',
