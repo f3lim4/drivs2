@@ -205,11 +205,11 @@ export default function RelatoriosFinanceiros() {
       const receitaAnual = receitaMensal * 12;
       
       const despesasManuaisMensais = despesasVeiculo
-        .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+        .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
       
       const despesasManuaisAnuais = despesasVeiculo
-        .filter(d => d.tipo === 'despesa')
+        .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento')
         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
       
       // Somar despesas manuais + fixas
@@ -271,21 +271,12 @@ export default function RelatoriosFinanceiros() {
     
     const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
     const despesasManuais = despesasVeiculo
-      .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+      .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
       .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
     
     const despesasMensais = despesasManuais + despesasFixasMensais;
     const lucro = receitaMensal - despesasMensais;
     const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
-    
-    // Debug para verificar valores
-    console.log('Debug despesas:', {
-      veiculo: veiculo.placa,
-      despesasManuais,
-      despesasFixasMensais,
-      despesasMensais,
-      despesasFixasDetalhadas: despesaFixaVeiculo?.despesas
-    });
     
     // Status baseado em dados reais
     let status = 'Parado';
