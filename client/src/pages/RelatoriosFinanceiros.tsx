@@ -318,99 +318,26 @@ export default function RelatoriosFinanceiros() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-4 items-center justify-between">
-        <div className="flex flex-wrap gap-4 items-center">
-          <Select value={filtroVeiculo} onValueChange={setFiltroVeiculo}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filtrar por veículo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos os veículos</SelectItem>
-              {veiculos.map(veiculo => (
-                <SelectItem key={veiculo.id} value={veiculo.id}>
-                  {veiculo.placa} - {veiculo.marca} {veiculo.modelo}
+      {/* Seletor de mês */}
+      <div className="flex justify-end items-center">
+        <Select 
+          value={format(selectedMonth, 'yyyy-MM')} 
+          onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
+        >
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {Array.from({ length: 12 }, (_, i) => {
+              const date = subMonths(new Date(), i);
+              return (
+                <SelectItem key={i} value={format(date, 'yyyy-MM')}>
+                  {format(date, 'MMMM yyyy', { locale: pt })}
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={filtroMotorista} onValueChange={setFiltroMotorista}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filtrar por motorista" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos os motoristas</SelectItem>
-              {motoristas.map(motorista => (
-                <SelectItem key={motorista.id} value={motorista.id}>
-                  {motorista.nome}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filtrar por categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todas as categorias</SelectItem>
-              <SelectItem value="manutencao">Manutenção</SelectItem>
-              <SelectItem value="seguro">Seguro</SelectItem>
-              <SelectItem value="ipva">IPVA</SelectItem>
-              <SelectItem value="multa">Multa</SelectItem>
-              <SelectItem value="licenciamento">Licenciamento</SelectItem>
-              <SelectItem value="lavagem">Lavagem</SelectItem>
-              <SelectItem value="outros">Outros</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center space-x-4">
-          {(() => {
-            const filtrosAtivos = [
-              filtroVeiculo !== 'todos' ? 1 : 0,
-              filtroMotorista !== 'todos' ? 1 : 0,
-              filtroCategoria !== 'todos' ? 1 : 0
-            ].reduce((a, b) => a + b, 0);
-            
-            return filtrosAtivos > 0 ? (
-              <Badge variant="secondary" className="text-xs">
-                {filtrosAtivos} filtro{filtrosAtivos > 1 ? 's' : ''} aplicado{filtrosAtivos > 1 ? 's' : ''}
-              </Badge>
-            ) : null;
-          })()}
-          
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              setFiltroVeiculo('todos');
-              setFiltroMotorista('todos');
-              setFiltroCategoria('todos');
-            }}
-          >
-            Limpar Filtros
-          </Button>
-
-          <Select 
-            value={format(selectedMonth, 'yyyy-MM')} 
-            onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 12 }, (_, i) => {
-                const date = subMonths(new Date(), i);
-                return (
-                  <SelectItem key={i} value={format(date, 'yyyy-MM')}>
-                    {format(date, 'MMMM yyyy', { locale: pt })}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-        </div>
+              );
+            })}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Cards de Resumo Financeiro */}
@@ -482,6 +409,82 @@ export default function RelatoriosFinanceiros() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Filtros */}
+      <div className="flex flex-wrap gap-4 items-center justify-between bg-gray-50 p-4 rounded-lg">
+        <div className="flex flex-wrap gap-4 items-center">
+          <Select value={filtroVeiculo} onValueChange={setFiltroVeiculo}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filtrar por veículo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os veículos</SelectItem>
+              {veiculos.map(veiculo => (
+                <SelectItem key={veiculo.id} value={veiculo.id}>
+                  {veiculo.placa} - {veiculo.marca} {veiculo.modelo}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={filtroMotorista} onValueChange={setFiltroMotorista}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filtrar por motorista" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os motoristas</SelectItem>
+              {motoristas.map(motorista => (
+                <SelectItem key={motorista.id} value={motorista.id}>
+                  {motorista.nome}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filtrar por categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as categorias</SelectItem>
+              <SelectItem value="manutencao">Manutenção</SelectItem>
+              <SelectItem value="seguro">Seguro</SelectItem>
+              <SelectItem value="ipva">IPVA</SelectItem>
+              <SelectItem value="multa">Multa</SelectItem>
+              <SelectItem value="licenciamento">Licenciamento</SelectItem>
+              <SelectItem value="lavagem">Lavagem</SelectItem>
+              <SelectItem value="outros">Outros</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          {(() => {
+            const filtrosAtivos = [
+              filtroVeiculo !== 'todos' ? 1 : 0,
+              filtroMotorista !== 'todos' ? 1 : 0,
+              filtroCategoria !== 'todos' ? 1 : 0
+            ].reduce((a, b) => a + b, 0);
+            
+            return filtrosAtivos > 0 ? (
+              <Badge variant="secondary" className="text-xs">
+                {filtrosAtivos} filtro{filtrosAtivos > 1 ? 's' : ''} aplicado{filtrosAtivos > 1 ? 's' : ''}
+              </Badge>
+            ) : null;
+          })()}
+          
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setFiltroVeiculo('todos');
+              setFiltroMotorista('todos');
+              setFiltroCategoria('todos');
+            }}
+          >
+            Limpar Filtros
+          </Button>
+        </div>
       </div>
 
       {/* Tabs de Análise */}
