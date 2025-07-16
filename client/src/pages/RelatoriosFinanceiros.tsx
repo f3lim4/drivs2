@@ -656,19 +656,48 @@ export default function RelatoriosFinanceiros() {
             <CardContent>
               <div className="space-y-4">
                 {(() => {
-                  const categoriasComDados = ['manutencao', 'seguro', 'ipva', 'multa', 'licenciamento', 'lavagem', 'financiamento', 'outros']
-                    .map((categoria) => {
-                      const despesasCategoria = filteredData.despesasPeriodo
-                        .filter(d => d.categoria === categoria && d.tipo === 'despesa');
-                      
-                      const valor = despesasCategoria
-                        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
-                      
+                  const categoriasComDados = [];
+                  
+                  // Adicionar despesas fixas
+                  const despesasFixasTotal = {
+                    'ipva': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'IPVA')?.valor || 0), 0),
+                    'seguro': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Seguro')?.valor || 0), 0),
+                    'rastreador': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0), 0),
+                    'financiamento': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Financiamento')?.valor || 0), 0)
+                  };
+                  
+                  // Adicionar despesas manuais
+                  const despesasManuaisTotal = {
+                    'manutencao': filteredData.despesasPeriodo.filter(d => d.categoria === 'manutencao' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
+                    'multa': filteredData.despesasPeriodo.filter(d => d.categoria === 'multa' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
+                    'licenciamento': filteredData.despesasPeriodo.filter(d => d.categoria === 'licenciamento' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
+                    'lavagem': filteredData.despesasPeriodo.filter(d => d.categoria === 'lavagem' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
+                    'outros': filteredData.despesasPeriodo.filter(d => d.categoria === 'outros' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0)
+                  };
+                  
+                  // Combinar todas as categorias
+                  const todasCategorias = {
+                    'IPVA': despesasFixasTotal.ipva,
+                    'Seguro': despesasFixasTotal.seguro,
+                    'Rastreador': despesasFixasTotal.rastreador,
+                    'Financiamento': despesasFixasTotal.financiamento,
+                    'Manutenção': despesasManuaisTotal.manutencao,
+                    'Multas': despesasManuaisTotal.multa,
+                    'Licenciamento': despesasManuaisTotal.licenciamento,
+                    'Lavagem': despesasManuaisTotal.lavagem,
+                    'Outros': despesasManuaisTotal.outros
+                  };
+                  
+                  // Filtrar apenas categorias com valores reais
+                  Object.entries(todasCategorias).forEach(([categoria, valor]) => {
+                    if (valor > 0) {
                       const percentage = totalDespesas > 0 ? (valor / totalDespesas) * 100 : 0;
-                      
-                      return { categoria, valor, percentage };
-                    })
-                    .filter(item => item.valor > 0); // Só mostrar categorias com dados reais
+                      categoriasComDados.push({ categoria, valor, percentage });
+                    }
+                  });
+                  
+                  // Ordenar por valor (maior primeiro)
+                  categoriasComDados.sort((a, b) => b.valor - a.valor);
                   
                   if (categoriasComDados.length === 0) {
                     return (
