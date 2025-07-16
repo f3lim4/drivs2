@@ -207,7 +207,7 @@ export function EditarVeiculoModal({
         ipva: data.ipva?.toString(),
         rastreador: data.rastreador,
         valorRastreadorMensal: data.valorRastreadorMensal?.toString(),
-        dataCompra: data.dataCompra || null,
+        dataCompra: data.dataCompra && data.dataCompra.trim() !== '' ? data.dataCompra : null,
         financiado: data.financiado,
         valorFinanciamento: data.valorFinanciamento?.toString(),
         quantidadeParcelas: data.quantidadeParcelas,
@@ -755,8 +755,8 @@ export function EditarVeiculoModal({
                     <FormControl>
                       <input
                         type="checkbox"
-                        checked={field.value}
-                        onChange={field.onChange}
+                        checked={field.value || false}
+                        onChange={(e) => field.onChange(e.target.checked)}
                         className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                       />
                     </FormControl>
