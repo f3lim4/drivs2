@@ -78,7 +78,7 @@ const navigationItems = [
     description: 'Gestão de infrações'
   },
   {
-    title: 'Relatórios Financeiros',
+    title: 'Financeiro',
     url: '/relatorios-financeiros',
     icon: FileText,
     description: 'Análise financeira completa'
