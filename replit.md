@@ -41,6 +41,10 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Despesas fixas no modal** - IPVA, seguro e rastreador incluídos no detalhamento por categoria
 - ✅ **Evolução mensal atualizada** - Gráfico de evolução inclui despesas fixas nos cálculos
 - ✅ **Cálculos precisos** - Lucro e margem calculados com despesas fixas + despesas manuais
+- ✅ **Pagamentos otimizados** - Modal novo pagamento mostra apenas motoristas com aluguéis ativos
+- ✅ **Informações do veículo** - Placa do veículo exibida junto ao nome do motorista
+- ✅ **Mensagem informativa** - Aviso quando não há motoristas com aluguéis ativos
+- ✅ **Funcionalidade mantida** - Todos os tipos de pagamento funcionando corretamente
 
 ### 2025-07-15: Sistema de Infrações com Seleção Inteligente - CONCLUÍDO
 - ✅ **Seleção inteligente implementada** - Motoristas com aluguel ativo aparecem primeiro
