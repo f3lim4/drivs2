@@ -150,12 +150,7 @@ export default function RelatoriosFinanceiros() {
     const motorista = aluguelVeiculo ? motoristas.find(m => m.id === aluguelVeiculo.motoristaId) : null;
     const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
     
-    // Log para debug
-    console.log(`Dados do veículo ${veiculo.placa}:`, {
-      aluguelVeiculo,
-      despesasVeiculo: despesasVeiculo.length,
-      periodoAtual: { monthStart, monthEnd }
-    });
+
     
     const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
     const despesasMensais = despesasVeiculo
