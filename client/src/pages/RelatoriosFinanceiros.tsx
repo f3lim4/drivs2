@@ -16,6 +16,8 @@ import { useInfracoes } from '@/hooks/useInfracoes';
 import { useDespesas } from '@/hooks/useDespesas';
 import { useVeiculos } from '@/hooks/useVeiculos';
 import { useMotoristas } from '@/hooks/useMotoristas';
+import { useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
 import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
 import { formatCurrency } from '@/lib/utils';
 
@@ -27,6 +29,8 @@ export default function RelatoriosFinanceiros() {
   const { despesas } = useDespesas();
   const { veiculos } = useVeiculos();
   const { motoristas } = useMotoristas();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [termoBusca, setTermoBusca] = useState<string>('');
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
@@ -47,11 +51,21 @@ export default function RelatoriosFinanceiros() {
         throw new Error('Erro ao excluir despesa');
       }
 
-      // Força a atualização da lista
-      window.location.reload();
+      // Invalidar cache do React Query para atualizar os dados
+      queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
+      
+      toast({
+        title: "Despesa excluída",
+        description: "A despesa foi excluída com sucesso.",
+        variant: "default",
+      });
     } catch (error) {
       console.error('Erro ao excluir despesa:', error);
-      alert('Erro ao excluir despesa');
+      toast({
+        title: "Erro",
+        description: "Erro ao excluir despesa. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setDespesaExcluindo(null);
     }
