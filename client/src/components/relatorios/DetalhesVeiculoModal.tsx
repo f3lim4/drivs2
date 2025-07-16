@@ -201,20 +201,26 @@ export function DetalhesVeiculoModal({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {despesasDetalhadas.map((despesa) => (
-                  <div key={despesa.categoria} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                      <span className="font-medium">
-                        {categoriasLabels[despesa.categoria as keyof typeof categoriasLabels] || despesa.categoria}
-                      </span>
+                {despesasDetalhadas.length > 0 ? (
+                  despesasDetalhadas.map((despesa) => (
+                    <div key={despesa.categoria} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        <span className="font-medium">
+                          {categoriasLabels[despesa.categoria as keyof typeof categoriasLabels] || despesa.categoria}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">{despesa.percentual.toFixed(0)}% das despesas</p>
+                        <p className="font-bold text-red-600">{formatCurrency(despesa.valor)}</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-600">{despesa.percentual.toFixed(0)}% das despesas</p>
-                      <p className="font-bold text-red-600">{formatCurrency(despesa.valor)}</p>
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    Nenhuma despesa registrada para este veículo no período selecionado.
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
@@ -226,27 +232,33 @@ export function DetalhesVeiculoModal({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {evolucaoMensal.map((mes) => (
-                  <div key={mes.mes} className="p-4 border rounded-lg">
-                    <h4 className="font-semibold mb-2">{mes.mes}</h4>
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <p className="text-sm text-gray-600">Receita</p>
-                        <p className="font-bold text-green-600">{formatCurrency(mes.receita)}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Despesas</p>
-                        <p className="font-bold text-red-600">{formatCurrency(mes.despesas)}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Lucro</p>
-                        <p className={`font-bold ${mes.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {formatCurrency(mes.lucro)}
-                        </p>
+                {evolucaoMensal.length > 0 ? (
+                  evolucaoMensal.map((mes) => (
+                    <div key={mes.mes} className="p-4 border rounded-lg">
+                      <h4 className="font-semibold mb-2">{mes.mes}</h4>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-sm text-gray-600">Receita</p>
+                          <p className="font-bold text-green-600">{formatCurrency(mes.receita)}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Despesas</p>
+                          <p className="font-bold text-red-600">{formatCurrency(mes.despesas)}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-600">Lucro</p>
+                          <p className={`font-bold ${mes.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatCurrency(mes.lucro)}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    Nenhum histórico financeiro disponível para este veículo.
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
