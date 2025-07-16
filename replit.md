@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-16: Dashboard Admin com Informações das Locadoras - CONCLUÍDO
+- ✅ **Seção específica para admin no dashboard** - Informações relevantes do sistema
+- ✅ **Cards de estatísticas globais** - Total de locadoras, veículos, motoristas e anúncios
+- ✅ **Informações detalhadas das locadoras** - Nome, CNPJ, localização e telefone
+- ✅ **Layout organizado** - Grid responsivo para visualizar dados das empresas
+- ✅ **Acesso condicional** - Seção aparece apenas para usuários admin
+- ✅ **Integração com API** - Dados reais vindos do banco de dados
+- ✅ **Página "Manutenções" removida do menu admin** - Usando filtro locadoraOnly
+- ✅ **Interface limpa** - Cards com ícones e informações organizadas
+- ✅ **Dados do sistema** - Visão geral completa para administração
+- ✅ **Posicionamento otimizado** - Seção aparece após anúncios, antes das estatísticas normais
+
 ### 2025-07-16: Sistema de Anúncios Integrado ao Dashboard - CONCLUÍDO
 - ✅ **Anúncios exibidos no dashboard das locadoras** - Seção dedicada para anúncios ativos
 - ✅ **Interface elegante com ícone de megafone** - Visual destacado com cores azuis
