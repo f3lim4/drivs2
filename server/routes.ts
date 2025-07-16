@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -978,6 +978,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Local deleted successfully" });
     } catch (error) {
       console.error("Error deleting local:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Anuncios routes
+  app.get("/api/anuncios", async (req, res) => {
+    try {
+      const anuncios = await storage.getAllAnuncios();
+      res.json(anuncios);
+    } catch (error) {
+      console.error("Error fetching anuncios:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/anuncios/ativos", async (req, res) => {
+    try {
+      const anuncios = await storage.getAnunciosAtivos();
+      res.json(anuncios);
+    } catch (error) {
+      console.error("Error fetching anuncios ativos:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/anuncios/:id", async (req, res) => {
+    try {
+      const anuncio = await storage.getAnuncio(req.params.id);
+      if (!anuncio) {
+        return res.status(404).json({ message: "Anúncio não encontrado" });
+      }
+      res.json(anuncio);
+    } catch (error) {
+      console.error("Error fetching anuncio:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/anuncios", async (req, res) => {
+    try {
+      const validatedData = insertAnuncioSchema.parse(req.body);
+      const anuncio = await storage.createAnuncio(validatedData);
+      res.json(anuncio);
+    } catch (error) {
+      console.error("Error creating anuncio:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/anuncios/:id", async (req, res) => {
+    try {
+      const validatedData = insertAnuncioSchema.partial().parse(req.body);
+      const anuncio = await storage.updateAnuncio(req.params.id, validatedData);
+      res.json(anuncio);
+    } catch (error) {
+      console.error("Error updating anuncio:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/anuncios/:id", async (req, res) => {
+    try {
+      await storage.deleteAnuncio(req.params.id);
+      res.json({ message: "Anúncio deletado com sucesso" });
+    } catch (error) {
+      console.error("Error deleting anuncio:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
