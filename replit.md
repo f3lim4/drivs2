@@ -10,6 +10,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-16: Sistema de Despesas Fixas Automáticas - CONCLUÍDO
+- ✅ **Despesas fixas automáticas implementadas** - Sistema calcula automaticamente IPVA, seguro e rastreador
+- ✅ **Integração com dados dos veículos** - Valores vêm diretamente do cadastro de veículos
+- ✅ **IPVA mensal automatizado** - Divide valor anual por 12 meses automaticamente
+- ✅ **Seguro mensal integrado** - Valor mensal do seguro incluído nas despesas fixas
+- ✅ **Rastreador mensal** - Valor mensal do rastreador incluído automaticamente
+- ✅ **Nova aba "Despesas Fixas"** - Interface dedicada para visualizar despesas automáticas
+- ✅ **Cálculo total atualizado** - Despesas fixas incluídas no total geral de despesas
+- ✅ **Análise por veículo melhorada** - Despesas fixas separadas das despesas manuais
+- ✅ **Tabela detalhada** - Mostra IPVA, seguro e rastreador por veículo
+- ✅ **Resumos por categoria** - Totais de IPVA, seguros e rastreadores separados
+- ✅ **Correção de mapeamento** - Campos valorVeiculo e valorRastreadorMensal corrigidos
+- ✅ **Seção de seguro adicionada** - Modal de edição inclui todos os campos de seguro
+
 ### 2025-07-15: Sistema de Infrações com Seleção Inteligente - CONCLUÍDO
 - ✅ **Seleção inteligente implementada** - Motoristas com aluguel ativo aparecem primeiro
 - ✅ **Preenchimento automático** - Veículo selecionado automaticamente baseado no aluguel

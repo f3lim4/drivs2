@@ -55,6 +55,56 @@ export default function RelatoriosFinanceiros() {
     return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo };
   }, [alugueis, pagamentos, infracoes, despesas, monthStart, monthEnd]);
 
+  // Cálculos de despesas fixas dos veículos
+  const despesasFixasVeiculos = useMemo(() => {
+    return veiculos.map(veiculo => {
+      const despesasFixas = [];
+      
+      // IPVA (divide anual por 12 meses)
+      if (veiculo.ipva) {
+        despesasFixas.push({
+          tipo: 'IPVA',
+          valor: veiculo.ipva / 12,
+          descricao: `IPVA mensal - ${veiculo.placa}`,
+          veiculo: veiculo.placa
+        });
+      }
+      
+      // Seguro mensal
+      if (veiculo.valorSeguroMensal) {
+        despesasFixas.push({
+          tipo: 'Seguro',
+          valor: veiculo.valorSeguroMensal,
+          descricao: `Seguro ${veiculo.seguradora || 'não informado'} - ${veiculo.placa}`,
+          veiculo: veiculo.placa
+        });
+      }
+      
+      // Rastreador mensal
+      if (veiculo.valorRastreadorMensal) {
+        despesasFixas.push({
+          tipo: 'Rastreador',
+          valor: veiculo.valorRastreadorMensal,
+          descricao: `Rastreador ${veiculo.rastreador || 'não informado'} - ${veiculo.placa}`,
+          veiculo: veiculo.placa
+        });
+      }
+      
+      return {
+        veiculo: veiculo.placa,
+        marca: veiculo.marca,
+        modelo: veiculo.modelo,
+        despesas: despesasFixas,
+        totalMensal: despesasFixas.reduce((sum, desp) => sum + desp.valor, 0)
+      };
+    });
+  }, [veiculos]);
+
+  // Total das despesas fixas mensais
+  const totalDespesasFixas = useMemo(() => {
+    return despesasFixasVeiculos.reduce((total, veiculo) => total + veiculo.totalMensal, 0);
+  }, [despesasFixasVeiculos]);
+
   // Cálculos financeiros
   const receitaAlugueis = useMemo(() => {
     return filteredData.alugueisAtivos.reduce((total, aluguel) => {
@@ -71,10 +121,13 @@ export default function RelatoriosFinanceiros() {
   }, [filteredData.pagamentosRealizados]);
 
   const totalDespesas = useMemo(() => {
-    return filteredData.despesasPeriodo
+    const despesasManuais = filteredData.despesasPeriodo
       .filter(despesa => despesa.tipo === 'despesa')
       .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
-  }, [filteredData.despesasPeriodo]);
+    
+    // Somar despesas fixas dos veículos
+    return despesasManuais + totalDespesasFixas;
+  }, [filteredData.despesasPeriodo, totalDespesasFixas]);
 
   const totalReceitas = useMemo(() => {
     return filteredData.despesasPeriodo
@@ -92,16 +145,24 @@ export default function RelatoriosFinanceiros() {
       const aluguelVeiculo = alugueis.find(a => a.veiculoId === veiculo.id && a.status === 'ativo');
       const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
       
+      // Buscar despesas fixas para este veículo
+      const despesasFixasVeiculo = despesasFixasVeiculos.find(dfv => dfv.veiculo === veiculo.placa);
+      const despesasFixasMensais = despesasFixasVeiculo ? despesasFixasVeiculo.totalMensal : 0;
+      
       const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
       const receitaAnual = receitaMensal * 12;
       
-      const despesasMensais = despesasVeiculo
+      const despesasManuaisMensais = despesasVeiculo
         .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
       
-      const despesasAnuais = despesasVeiculo
+      const despesasManuaisAnuais = despesasVeiculo
         .filter(d => d.tipo === 'despesa')
         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+      
+      // Somar despesas manuais + fixas
+      const despesasMensais = despesasManuaisMensais + despesasFixasMensais;
+      const despesasAnuais = despesasManuaisAnuais + (despesasFixasMensais * 12);
       
       const lucro = receitaMensal - despesasMensais;
       const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
@@ -112,6 +173,8 @@ export default function RelatoriosFinanceiros() {
         modelo: veiculo.modelo,
         receitaMensal,
         despesasMensais,
+        despesasFixasMensais,
+        despesasManuaisMensais,
         receitaAnual,
         despesasAnuais,
         lucro,
@@ -119,7 +182,7 @@ export default function RelatoriosFinanceiros() {
         status
       };
     });
-  }, [veiculos, alugueis, despesas, monthStart, monthEnd]);
+  }, [veiculos, alugueis, despesas, despesasFixasVeiculos, monthStart, monthEnd]);
 
   // Cálculo de mês anterior para comparação
   const mesAnterior = subMonths(selectedMonth, 1);
@@ -333,10 +396,11 @@ export default function RelatoriosFinanceiros() {
 
       {/* Tabs de Análise */}
       <Tabs defaultValue="veiculos" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
           <TabsTrigger value="categorias">Despesas por Categoria</TabsTrigger>
+          <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
           <TabsTrigger value="tendencias">Tendências</TabsTrigger>
         </TabsList>
 
@@ -493,6 +557,103 @@ export default function RelatoriosFinanceiros() {
                     </div>
                   );
                 })}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="despesas-fixas" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Despesas Fixas dos Veículos</CardTitle>
+              <CardDescription>
+                Despesas automáticas baseadas no cadastro dos veículos (IPVA, Seguro, Rastreador)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Resumo das despesas fixas */}
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-2">Total das Despesas Fixas Mensais</h4>
+                  <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalDespesasFixas)}</p>
+                  <p className="text-sm text-gray-600">Projeção anual: {formatCurrency(totalDespesasFixas * 12)}</p>
+                </div>
+
+                {/* Tabela de despesas por veículo */}
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Veículo</TableHead>
+                        <TableHead>IPVA (Mensal)</TableHead>
+                        <TableHead>Seguro</TableHead>
+                        <TableHead>Rastreador</TableHead>
+                        <TableHead>Total Mensal</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {despesasFixasVeiculos.map((veiculo, index) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{veiculo.veiculo}</p>
+                              <p className="text-sm text-gray-500">{veiculo.marca} {veiculo.modelo}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {veiculo.despesas.find(d => d.tipo === 'IPVA') ? 
+                              formatCurrency(veiculo.despesas.find(d => d.tipo === 'IPVA')?.valor || 0) : 
+                              <span className="text-gray-400">-</span>
+                            }
+                          </TableCell>
+                          <TableCell>
+                            {veiculo.despesas.find(d => d.tipo === 'Seguro') ? 
+                              formatCurrency(veiculo.despesas.find(d => d.tipo === 'Seguro')?.valor || 0) : 
+                              <span className="text-gray-400">-</span>
+                            }
+                          </TableCell>
+                          <TableCell>
+                            {veiculo.despesas.find(d => d.tipo === 'Rastreador') ? 
+                              formatCurrency(veiculo.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0) : 
+                              <span className="text-gray-400">-</span>
+                            }
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {formatCurrency(veiculo.totalMensal)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Detalhamento por tipo de despesa */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">IPVA Total</h4>
+                    <p className="text-2xl font-bold text-orange-600">
+                      {formatCurrency(despesasFixasVeiculos.reduce((total, v) => 
+                        total + (v.despesas.find(d => d.tipo === 'IPVA')?.valor || 0), 0))}
+                    </p>
+                    <p className="text-sm text-gray-500">Mensal</p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Seguros Total</h4>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {formatCurrency(despesasFixasVeiculos.reduce((total, v) => 
+                        total + (v.despesas.find(d => d.tipo === 'Seguro')?.valor || 0), 0))}
+                    </p>
+                    <p className="text-sm text-gray-500">Mensal</p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Rastreadores Total</h4>
+                    <p className="text-2xl font-bold text-green-600">
+                      {formatCurrency(despesasFixasVeiculos.reduce((total, v) => 
+                        total + (v.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0), 0))}
+                    </p>
+                    <p className="text-sm text-gray-500">Mensal</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
