@@ -219,8 +219,8 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
               </div>
             )}
 
-            {/* Infrações em aberto quando motorista for selecionado */}
-            {motoristaId && infracoesEmAberto.length > 0 && (
+            {/* Infrações em aberto quando tipo infrações for selecionado */}
+            {tipoSelecionado === 'infrações' && motoristaId && infracoesEmAberto.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertCircle className="h-4 w-4 text-red-600" />
@@ -247,6 +247,16 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                     </p>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Aviso se não há infrações em aberto (apenas se tipo for infrações) */}
+            {tipoSelecionado === 'infrações' && motoristaId && infracoesEmAberto.length === 0 && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-sm text-green-800 flex items-center gap-2">
+                  <Check className="h-4 w-4" />
+                  Este motorista não possui infrações em aberto
+                </p>
               </div>
             )}
 
