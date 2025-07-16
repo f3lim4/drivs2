@@ -150,6 +150,13 @@ export default function RelatoriosFinanceiros() {
     const motorista = aluguelVeiculo ? motoristas.find(m => m.id === aluguelVeiculo.motoristaId) : null;
     const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
     
+    // Log para debug
+    console.log(`Dados do veículo ${veiculo.placa}:`, {
+      aluguelVeiculo,
+      despesasVeiculo: despesasVeiculo.length,
+      periodoAtual: { monthStart, monthEnd }
+    });
+    
     const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
     const despesasMensais = despesasVeiculo
       .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
@@ -157,7 +164,18 @@ export default function RelatoriosFinanceiros() {
     
     const lucro = receitaMensal - despesasMensais;
     const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
-    const status = aluguelVeiculo ? 'Lucrativo' : 'Parado';
+    
+    // Status baseado em dados reais
+    let status = 'Parado';
+    if (aluguelVeiculo && receitaMensal > 0) {
+      if (lucro > 0) {
+        status = 'Lucrativo';
+      } else if (lucro === 0) {
+        status = 'Equilibrado';
+      } else {
+        status = 'Prejuízo';
+      }
+    }
 
     // Detalhamento por categoria
     const categorias = [
@@ -180,13 +198,22 @@ export default function RelatoriosFinanceiros() {
       return { categoria: categoria.nome, valor, percentual };
     }).filter(item => item.valor > 0);
 
-    // Evolução dos últimos 6 meses
+    // Evolução dos últimos 6 meses - apenas meses com dados reais
     const evolucaoMensal = Array.from({ length: 6 }, (_, i) => {
       const mes = subMonths(new Date(), i);
       const mesStart = startOfMonth(mes);
       const mesEnd = endOfMonth(mes);
       
-      const receitaMes = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
+      // Verificar se existe aluguel ativo neste período
+      const aluguelPeriodo = alugueis.find(a => 
+        a.veiculoId === veiculo.id && 
+        a.status === 'ativo' &&
+        new Date(a.dataInicio) <= mesEnd &&
+        new Date(a.dataFim) >= mesStart
+      );
+      
+      // Só mostrar receita se há aluguel ativo no período
+      const receitaMes = aluguelPeriodo ? parseFloat(aluguelPeriodo.valorMensal || 0) : 0;
       const despesasMes = despesasVeiculo
         .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: mesStart, end: mesEnd }))
         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
@@ -197,7 +224,7 @@ export default function RelatoriosFinanceiros() {
         despesas: despesasMes,
         lucro: receitaMes - despesasMes
       };
-    }).reverse();
+    }).reverse().filter(item => item.receita > 0 || item.despesas > 0); // Mostrar apenas meses com dados reais
 
     return {
       veiculo,
