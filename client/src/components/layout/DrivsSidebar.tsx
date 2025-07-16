@@ -83,7 +83,8 @@ const navigationItems = [
     title: 'Manutenções',
     url: '/manutencoes',
     icon: Wrench,
-    description: 'Gestão de manutenções'
+    description: 'Gestão de manutenções',
+    locadoraOnly: true  // Só locadoras podem ver este item
   },
   {
     title: 'Financeiro',
