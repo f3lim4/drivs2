@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -69,12 +69,28 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
     },
   });
 
+  // Atualizar locadoraId quando o profile mudar
+  React.useEffect(() => {
+    if (profile?.locadoraId) {
+      form.setValue('locadoraId', profile.locadoraId);
+    }
+  }, [profile?.locadoraId, form]);
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       console.log('Dados do formulário:', data);
+      console.log('Profile locadoraId:', profile?.locadoraId);
       console.log('Validação do formulário:', form.formState.errors);
       
-      await createManutencao(data);
+      // Garantir que o locadoraId está correto
+      const dataComLocadora = {
+        ...data,
+        locadoraId: profile?.locadoraId || data.locadoraId
+      };
+      
+      console.log('Dados finais:', dataComLocadora);
+      
+      await createManutencao(dataComLocadora);
       toast({
         title: 'Manutenção criada com sucesso!',
         description: 'A manutenção foi agendada no sistema.',
