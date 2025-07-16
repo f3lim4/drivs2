@@ -666,7 +666,7 @@ export default function RelatoriosFinanceiros() {
                     'financiamento': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Financiamento')?.valor || 0), 0)
                   };
                   
-                  // Adicionar despesas manuais
+                  // Adicionar despesas manuais (excluindo categorias que já estão nas despesas fixas)
                   const despesasManuaisTotal = {
                     'manutencao': filteredData.despesasPeriodo.filter(d => d.categoria === 'manutencao' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
                     'multa': filteredData.despesasPeriodo.filter(d => d.categoria === 'multa' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
