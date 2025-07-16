@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3 } from 'lucide-react';
+import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,9 +12,13 @@ import { DashboardStats, Alert, Motorista, Veiculo } from '@/types';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { useAnunciosAtivos } from '@/hooks/useAnuncios';
 
 export default function Dashboard() {
   const { profile, isLocadora } = useAuth();
+  
+  // Buscar anúncios ativos
+  const { data: anuncios = [], isLoading: loadingAnuncios } = useAnunciosAtivos();
   
   // Construir URLs com filtro de locadora se necessário
   const motoristasUrl = isLocadora && profile?.locadoraId 
@@ -309,6 +313,45 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Seção de Anúncios */}
+      {isLocadora && anuncios.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-foreground">Anúncios do Sistema</h2>
+          <div className="grid gap-4">
+            {anuncios.map((anuncio) => (
+              <Card key={anuncio.id} className="border-l-4 border-l-blue-500 bg-blue-50/50">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 rounded-lg bg-blue-100">
+                      <Megaphone className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-medium text-foreground">{anuncio.titulo}</h3>
+                        <Badge variant="secondary" className="text-xs">
+                          {anuncio.tipo}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {anuncio.conteudo}
+                      </p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span>
+                          Válido até: {new Date(anuncio.dataFim || anuncio.dataInicio).toLocaleDateString('pt-BR')}
+                        </span>
+                        <span>
+                          Publicado: {new Date(anuncio.dataInicio).toLocaleDateString('pt-BR')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Seção inferior com alertas e aluguéis recentes */}
       <div className="grid gap-6 md:grid-cols-2">
