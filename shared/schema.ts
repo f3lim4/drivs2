@@ -457,3 +457,25 @@ export type Manutencao = typeof manutencoes.$inferSelect & {
 
 export type InsertLocal = z.infer<typeof insertLocalSchema>;
 export type Local = typeof locais.$inferSelect;
+
+// Anúncios do sistema (visíveis para todas as locadoras)
+export const anuncios = pgTable("anuncios", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  titulo: text("titulo").notNull(),
+  conteudo: text("conteudo").notNull(),
+  tipo: text("tipo").notNull().default("info"), // 'info', 'warning', 'success', 'error'
+  ativo: boolean("ativo").notNull().default(true),
+  prioridade: integer("prioridade").notNull().default(0), // 0=baixa, 1=média, 2=alta
+  dataExpiracao: timestamp("data_expiracao"),
+  autorId: uuid("autor_id").notNull(), // ID do admin que criou
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertAnuncioSchema = createInsertSchema(anuncios).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAnuncio = z.infer<typeof insertAnuncioSchema>;
+export type Anuncio = typeof anuncios.$inferSelect;

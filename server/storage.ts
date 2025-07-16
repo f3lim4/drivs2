@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -12,7 +12,8 @@ import {
   type Infracao, type InsertInfracao,
   type Despesa, type InsertDespesa,
   type Manutencao, type InsertManutencao,
-  type Local, type InsertLocal
+  type Local, type InsertLocal,
+  type Anuncio, type InsertAnuncio
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -125,6 +126,14 @@ export interface IStorage {
   createLocal(local: InsertLocal): Promise<Local>;
   updateLocal(id: string, updates: Partial<InsertLocal>): Promise<Local>;
   deleteLocal(id: string): Promise<void>;
+  
+  // Anuncio operations
+  getAllAnuncios(): Promise<Anuncio[]>;
+  getAnunciosAtivos(): Promise<Anuncio[]>;
+  getAnuncio(id: string): Promise<Anuncio | undefined>;
+  createAnuncio(anuncio: InsertAnuncio): Promise<Anuncio>;
+  updateAnuncio(id: string, updates: Partial<InsertAnuncio>): Promise<Anuncio>;
+  deleteAnuncio(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1373,6 +1382,75 @@ export class DatabaseStorage implements IStorage {
 
   async deleteLocal(id: string): Promise<void> {
     await db.delete(locais).where(eq(locais.id, id));
+  }
+
+  // Anuncio operations
+  async getAllAnuncios(): Promise<Anuncio[]> {
+    try {
+      const result = await db.select().from(anuncios);
+      return result;
+    } catch (error) {
+      console.error('Error getting all anuncios:', error);
+      return [];
+    }
+  }
+
+  async getAnunciosAtivos(): Promise<Anuncio[]> {
+    try {
+      const result = await db.select()
+        .from(anuncios)
+        .where(and(
+          eq(anuncios.ativo, true),
+          sql`(${anuncios.dataExpiracao} IS NULL OR ${anuncios.dataExpiracao} > NOW())`
+        ));
+      return result;
+    } catch (error) {
+      console.error('Error getting anuncios ativos:', error);
+      return [];
+    }
+  }
+
+  async getAnuncio(id: string): Promise<Anuncio | undefined> {
+    try {
+      const result = await db.select().from(anuncios).where(eq(anuncios.id, id));
+      return result[0];
+    } catch (error) {
+      console.error('Error getting anuncio:', error);
+      return undefined;
+    }
+  }
+
+  async createAnuncio(anuncio: InsertAnuncio): Promise<Anuncio> {
+    try {
+      const anuncioData = {
+        ...anuncio,
+        id: anuncio.id || crypto.randomUUID(),
+      };
+      
+      const [created] = await db.insert(anuncios).values(anuncioData).returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating anuncio:', error);
+      throw error;
+    }
+  }
+
+  async updateAnuncio(id: string, updates: Partial<InsertAnuncio>): Promise<Anuncio> {
+    try {
+      const [updated] = await db.update(anuncios)
+        .set(updates)
+        .where(eq(anuncios.id, id))
+        .returning();
+      
+      return updated;
+    } catch (error) {
+      console.error('Error updating anuncio:', error);
+      throw error;
+    }
+  }
+
+  async deleteAnuncio(id: string): Promise<void> {
+    await db.delete(anuncios).where(eq(anuncios.id, id));
   }
 }
 

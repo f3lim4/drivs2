@@ -16,7 +16,8 @@ import {
   User,
   CreditCard,
   AlertTriangle,
-  Wrench
+  Wrench,
+  Megaphone
 } from 'lucide-react';
 import logoPath from "@assets/icone_1752434737434.png";
 import { useState } from 'react';
@@ -89,6 +90,13 @@ const navigationItems = [
     url: '/relatorios-financeiros',
     icon: FileText,
     description: 'Análise financeira completa'
+  },
+  {
+    title: 'Anúncios',
+    url: '/anuncios',
+    icon: Megaphone,
+    description: 'Gerenciar anúncios do sistema',
+    adminOnly: true  // Só admins podem ver este item
   },
   {
     title: 'Locadoras',
