@@ -724,9 +724,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Infrações routes
   app.get("/api/infracoes", async (req, res) => {
     try {
-      const { locadoraId } = req.query;
+      const { locadoraId, motoristaId } = req.query;
       
-      if (locadoraId) {
+      if (motoristaId) {
+        const infracoes = await storage.getInfracoesByMotorista(motoristaId as string);
+        res.json(infracoes);
+      } else if (locadoraId) {
         const infracoes = await storage.getInfracoesByLocadora(locadoraId as string);
         res.json(infracoes);
       } else {

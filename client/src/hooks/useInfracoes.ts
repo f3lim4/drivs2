@@ -18,6 +18,8 @@ export function useInfracoes() {
     enabled: !!profile?.locadoraId,
   });
 
+
+
   const createMutation = useMutation({
     mutationFn: async (data: InsertInfracao) => {
       const response = await fetch('/api/infracoes', {
@@ -75,5 +77,21 @@ export function useInfracoes() {
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+
   };
+}
+
+// Hook específico para buscar infrações por motorista
+export function useInfracoesByMotorista(motoristaId: string) {
+  return useQuery({
+    queryKey: ['infracoes', 'motorista', motoristaId],
+    queryFn: async () => {
+      const response = await fetch(`/api/infracoes?motoristaId=${motoristaId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch infracoes by motorista');
+      }
+      return response.json() as Promise<Infracao[]>;
+    },
+    enabled: !!motoristaId,
+  });
 }
