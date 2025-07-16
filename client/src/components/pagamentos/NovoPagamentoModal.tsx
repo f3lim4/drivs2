@@ -132,6 +132,13 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
     aluguel => aluguel.motoristaId === motoristaId && aluguel.status === 'ativo'
   );
 
+  // Filtrar apenas motoristas que têm aluguéis ativos
+  const motoristasComAlugueis = motoristas.filter(motorista => 
+    alugueis.some(aluguel => 
+      aluguel.motoristaId === motorista.id && aluguel.status === 'ativo'
+    )
+  );
+
   // Selecionar automaticamente o primeiro aluguel ativo quando tipo for aluguel
   useEffect(() => {
     if (tipoSelecionado === 'aluguel' && alugueisDoMotorista.length > 0) {
@@ -254,11 +261,22 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {motoristas.map((motorista) => (
-                          <SelectItem key={motorista.id} value={motorista.id}>
-                            {motorista.nome}
+                        {motoristasComAlugueis.length > 0 ? (
+                          motoristasComAlugueis.map((motorista) => {
+                            const aluguelAtivo = alugueis.find(a => 
+                              a.motoristaId === motorista.id && a.status === 'ativo'
+                            );
+                            return (
+                              <SelectItem key={motorista.id} value={motorista.id}>
+                                {motorista.nome} {aluguelAtivo?.veiculo ? `(${aluguelAtivo.veiculo})` : ''}
+                              </SelectItem>
+                            );
+                          })
+                        ) : (
+                          <SelectItem value="sem-motoristas" disabled>
+                            Nenhum motorista com aluguel ativo
                           </SelectItem>
-                        ))}
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
