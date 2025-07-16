@@ -2,10 +2,11 @@ import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Search } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
@@ -27,9 +28,7 @@ export default function RelatoriosFinanceiros() {
   const { veiculos } = useVeiculos();
   const { motoristas } = useMotoristas();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
-  const [filtroVeiculo, setFiltroVeiculo] = useState<string>('todos');
-  const [filtroMotorista, setFiltroMotorista] = useState<string>('todos');
-  const [filtroCategoria, setFiltroCategoria] = useState<string>('todos');
+  const [termoBusca, setTermoBusca] = useState<string>('');
 
   // Cálculos para o período selecionado
   const monthStart = startOfMonth(selectedMonth);
@@ -54,24 +53,48 @@ export default function RelatoriosFinanceiros() {
       isInPeriod(new Date(despesa.data))
     );
 
-    // Aplicar filtros
-    if (filtroVeiculo !== 'todos') {
-      alugueisAtivos = alugueisAtivos.filter(aluguel => aluguel.veiculoId === filtroVeiculo);
-      despesasPeriodo = despesasPeriodo.filter(despesa => despesa.veiculoId === filtroVeiculo);
-      infracoesPeriodo = infracoesPeriodo.filter(infracao => infracao.veiculoId === filtroVeiculo);
-    }
-
-    if (filtroMotorista !== 'todos') {
-      alugueisAtivos = alugueisAtivos.filter(aluguel => aluguel.motoristaId === filtroMotorista);
-      infracoesPeriodo = infracoesPeriodo.filter(infracao => infracao.motoristaId === filtroMotorista);
-    }
-
-    if (filtroCategoria !== 'todos') {
-      despesasPeriodo = despesasPeriodo.filter(despesa => despesa.categoria === filtroCategoria);
+    // Aplicar busca
+    if (termoBusca.trim()) {
+      const termo = termoBusca.toLowerCase().trim();
+      
+      // Buscar por veículo (placa, marca, modelo)
+      const veiculosFiltrados = veiculos.filter(veiculo => 
+        veiculo.placa.toLowerCase().includes(termo) ||
+        veiculo.marca.toLowerCase().includes(termo) ||
+        veiculo.modelo.toLowerCase().includes(termo)
+      );
+      const veiculosIds = veiculosFiltrados.map(v => v.id);
+      
+      // Buscar por motorista (nome, CPF)
+      const motoristasFiltrados = motoristas.filter(motorista => 
+        motorista.nome.toLowerCase().includes(termo) ||
+        motorista.id.includes(termo)
+      );
+      const motoristasIds = motoristasFiltrados.map(m => m.id);
+      
+      // Buscar por categoria de despesa
+      const categoriaMatch = ['manutencao', 'seguro', 'ipva', 'multa', 'licenciamento', 'lavagem', 'outros']
+        .some(categoria => categoria.toLowerCase().includes(termo));
+      
+      // Aplicar filtros baseados na busca
+      alugueisAtivos = alugueisAtivos.filter(aluguel => 
+        veiculosIds.includes(aluguel.veiculoId) || 
+        motoristasIds.includes(aluguel.motoristaId)
+      );
+      
+      despesasPeriodo = despesasPeriodo.filter(despesa => 
+        veiculosIds.includes(despesa.veiculoId) || 
+        (categoriaMatch && despesa.categoria.toLowerCase().includes(termo))
+      );
+      
+      infracoesPeriodo = infracoesPeriodo.filter(infracao => 
+        veiculosIds.includes(infracao.veiculoId) || 
+        motoristasIds.includes(infracao.motoristaId)
+      );
     }
 
     return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo };
-  }, [alugueis, pagamentos, infracoes, despesas, monthStart, monthEnd, filtroVeiculo, filtroMotorista, filtroCategoria]);
+  }, [alugueis, pagamentos, infracoes, despesas, veiculos, motoristas, monthStart, monthEnd, termoBusca]);
 
   // Cálculos de despesas fixas dos veículos
   const despesasFixasVeiculos = useMemo(() => {
@@ -411,80 +434,26 @@ export default function RelatoriosFinanceiros() {
         </Card>
       </div>
 
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-4 items-center justify-between bg-gray-50 p-4 rounded-lg">
-        <div className="flex flex-wrap gap-4 items-center">
-          <Select value={filtroVeiculo} onValueChange={setFiltroVeiculo}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filtrar por veículo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos os veículos</SelectItem>
-              {veiculos.map(veiculo => (
-                <SelectItem key={veiculo.id} value={veiculo.id}>
-                  {veiculo.placa} - {veiculo.marca} {veiculo.modelo}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={filtroMotorista} onValueChange={setFiltroMotorista}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filtrar por motorista" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos os motoristas</SelectItem>
-              {motoristas.map(motorista => (
-                <SelectItem key={motorista.id} value={motorista.id}>
-                  {motorista.nome}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Filtrar por categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todas as categorias</SelectItem>
-              <SelectItem value="manutencao">Manutenção</SelectItem>
-              <SelectItem value="seguro">Seguro</SelectItem>
-              <SelectItem value="ipva">IPVA</SelectItem>
-              <SelectItem value="multa">Multa</SelectItem>
-              <SelectItem value="licenciamento">Licenciamento</SelectItem>
-              <SelectItem value="lavagem">Lavagem</SelectItem>
-              <SelectItem value="outros">Outros</SelectItem>
-            </SelectContent>
-          </Select>
+      {/* Campo de Busca */}
+      <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Buscar por veículo, motorista ou categoria..."
+            value={termoBusca}
+            onChange={(e) => setTermoBusca(e.target.value)}
+            className="pl-10"
+          />
         </div>
-
-        <div className="flex items-center space-x-4">
-          {(() => {
-            const filtrosAtivos = [
-              filtroVeiculo !== 'todos' ? 1 : 0,
-              filtroMotorista !== 'todos' ? 1 : 0,
-              filtroCategoria !== 'todos' ? 1 : 0
-            ].reduce((a, b) => a + b, 0);
-            
-            return filtrosAtivos > 0 ? (
-              <Badge variant="secondary" className="text-xs">
-                {filtrosAtivos} filtro{filtrosAtivos > 1 ? 's' : ''} aplicado{filtrosAtivos > 1 ? 's' : ''}
-              </Badge>
-            ) : null;
-          })()}
-          
+        {termoBusca && (
           <Button 
             variant="outline" 
-            onClick={() => {
-              setFiltroVeiculo('todos');
-              setFiltroMotorista('todos');
-              setFiltroCategoria('todos');
-            }}
+            onClick={() => setTermoBusca('')}
+            className="text-sm"
           >
-            Limpar Filtros
+            Limpar
           </Button>
-        </div>
+        )}
       </div>
 
       {/* Tabs de Análise */}
