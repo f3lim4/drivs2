@@ -56,7 +56,10 @@ export default function Alugueis() {
 
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
+    console.log('Buscando locadora para ID:', locadoraId);
+    console.log('Locadoras disponíveis:', locadoras);
     const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
+    console.log('Locadora encontrada:', locadora);
     return locadora ? locadora.nome : locadoraId || 'Locadora';
   };
 
