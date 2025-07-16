@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { useAlugueis } from '@/hooks/useAlugueis';
+import { useVeiculos } from '@/hooks/useVeiculos';
 import { useAluguelValorSemanal } from '@/hooks/usePagamentos';
 import { useInfracoesByMotorista, useInfracoes } from '@/hooks/useInfracoes';
 import type { Motorista, InsertPagamento, Infracao } from '@shared/schema';
@@ -49,6 +50,7 @@ interface InfracaoSelecionada {
 export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: NovoPagamentoModalProps) {
   const { profile } = useAuth();
   const { alugueis } = useAlugueis();
+  const { veiculos } = useVeiculos();
   const [aluguelSelecionado, setAluguelSelecionado] = useState<string | null>(null);
   const { data: valorSemanal } = useAluguelValorSemanal(aluguelSelecionado);
   const { updateInfracao } = useInfracoes();
@@ -266,9 +268,10 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                             const aluguelAtivo = alugueis.find(a => 
                               a.motoristaId === motorista.id && a.status === 'ativo'
                             );
+                            const veiculo = veiculos.find(v => v.id === aluguelAtivo?.veiculoId);
                             return (
                               <SelectItem key={motorista.id} value={motorista.id}>
-                                {motorista.nome} {aluguelAtivo?.veiculo ? `(${aluguelAtivo.veiculo})` : ''}
+                                {motorista.nome} - {veiculo?.placa || 'Placa não informada'}
                               </SelectItem>
                             );
                           })
