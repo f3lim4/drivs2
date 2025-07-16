@@ -56,9 +56,7 @@ const veiculoSchema = z.object({
   taxaAdministrativa: z.number().optional(),
   limiteQuilometragem: z.string().min(1, 'Limite de quilometragem é obrigatório'),
   
-  // Manutenção
-  ultimaRevisao: z.string().optional(),
-  proximaRevisao: z.string().optional(),
+
   
   // Seguro
   seguradora: z.string().optional(),
@@ -114,8 +112,6 @@ export function EditarVeiculoModal({
       caucao: 0,
       taxaAdministrativa: undefined,
       limiteQuilometragem: '',
-      ultimaRevisao: '',
-      proximaRevisao: '',
       seguradora: '',
       numeroApolice: '',
       vigenciaSeguro: '',
@@ -147,8 +143,6 @@ export function EditarVeiculoModal({
         caucao: Number(veiculo.caucao) || 0,
         taxaAdministrativa: Number(veiculo.taxaAdministrativa) || undefined,
         limiteQuilometragem: veiculo.limiteQuilometragem,
-        ultimaRevisao: veiculo.ultimaRevisao || '',
-        proximaRevisao: veiculo.proximaRevisao || '',
         seguradora: veiculo.seguradora || '',
         numeroApolice: veiculo.numeroApolice || '',
         vigenciaSeguro: veiculo.vigenciaSeguro || '',
@@ -189,8 +183,6 @@ export function EditarVeiculoModal({
         taxaAdministrativa: data.taxaAdministrativa?.toString(),
         limiteQuilometragem: data.limiteQuilometragem,
         valorLimiteKm: data.valorLimiteKm,
-        ultimaRevisao: data.ultimaRevisao || null,
-        proximaRevisao: data.proximaRevisao || null,
         seguradora: data.seguradora,
         numeroApolice: data.numeroApolice,
         vigenciaSeguro: data.vigenciaSeguro || null,

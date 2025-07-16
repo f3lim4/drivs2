@@ -60,9 +60,7 @@ const veiculoSchema = z.object({
   taxaAdministrativa: z.number().min(0).optional(),
   limiteQuilometragem: z.string().min(1, 'Limite de quilometragem é obrigatório'),
   
-  // Manutenção
-  ultimaRevisao: z.string().optional(),
-  proximaRevisao: z.string().optional(),
+
   
   // Seguro
   seguradora: z.string().optional(),
@@ -118,8 +116,6 @@ export function NovoVeiculoModal({
       caucao: undefined,
       taxaAdministrativa: undefined,
       limiteQuilometragem: '',
-      ultimaRevisao: '',
-      proximaRevisao: '',
       seguradora: '',
       numeroApolice: '',
       vigenciaSeguro: '',
@@ -184,8 +180,6 @@ export function NovoVeiculoModal({
         taxaAdministrativa: data.taxaAdministrativa?.toString(),
         limiteQuilometragem: data.limiteQuilometragem,
         valorLimiteKm: data.valorLimiteKm,
-        ultimaRevisao: data.ultimaRevisao || null,
-        proximaRevisao: data.proximaRevisao || null,
         seguradora: data.seguradora,
         numeroApolice: data.numeroApolice,
         vigenciaSeguro: data.vigenciaSeguro || null,
@@ -572,39 +566,7 @@ export function NovoVeiculoModal({
               </div>
             </div>
 
-            {/* MANUTENÇÃO */}
-            <div className="space-y-4">
-              
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="ultimaRevisao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Última Revisão</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
-                <FormField
-                  control={form.control}
-                  name="proximaRevisao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Próxima Revisão</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
 
             {/* SEGURO */}
             <div className="space-y-4">
