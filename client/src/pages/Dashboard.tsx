@@ -269,10 +269,87 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Seção específica para Admin - Informações do Sistema */}
+      {/* Seção específica para Admin - Estatísticas Globais */}
       {isAdmin && (
         <div className="space-y-6">
-          {/* Informações do Sistema */}
+          {/* Estatísticas Globais do Sistema */}
+          <Card className="border border-gray-200 bg-white shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-blue-600" />
+                Estatísticas Globais do Sistema
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {/* Total de Locadoras */}
+                <div className="p-4 border rounded-lg bg-blue-50">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-5 h-5 text-blue-600" />
+                      <h4 className="font-medium text-foreground">Locadoras</h4>
+                    </div>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {locadoras.length}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      empresas cadastradas
+                    </p>
+                  </div>
+                </div>
+
+                {/* Total de Veículos */}
+                <div className="p-4 border rounded-lg bg-green-50">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Car className="w-5 h-5 text-green-600" />
+                      <h4 className="font-medium text-foreground">Veículos</h4>
+                    </div>
+                    <p className="text-2xl font-bold text-green-600">
+                      {veiculosSeguro.length}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      carros cadastrados
+                    </p>
+                  </div>
+                </div>
+
+                {/* Total de Motoristas */}
+                <div className="p-4 border rounded-lg bg-purple-50">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-5 h-5 text-purple-600" />
+                      <h4 className="font-medium text-foreground">Motoristas</h4>
+                    </div>
+                    <p className="text-2xl font-bold text-purple-600">
+                      {motoristasSeguro.length}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      motoristas cadastrados
+                    </p>
+                  </div>
+                </div>
+
+                {/* Receita Total */}
+                <div className="p-4 border rounded-lg bg-yellow-50">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5 text-yellow-600" />
+                      <h4 className="font-medium text-foreground">Receita Total</h4>
+                    </div>
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {formatCurrency(alugueisSeguro.reduce((total, aluguel) => total + parseFloat(aluguel.valorTotal || '0'), 0))}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      receita de todas as locadoras
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Status do Sistema */}
           <Card className="border border-gray-200 bg-white shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -314,22 +391,6 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* Utilização de Dados */}
-                <div className="p-4 border rounded-lg bg-purple-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">Utilização</h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {motoristasSeguro.length + veiculosSeguro.length} registros
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {locadoras.length} locadoras ativas
-                    </p>
-                  </div>
-                </div>
-
                 {/* Performance */}
                 <div className="p-4 border rounded-lg bg-yellow-50">
                   <div className="space-y-2">
@@ -342,38 +403,6 @@ export default function Dashboard() {
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Queries otimizadas
-                    </p>
-                  </div>
-                </div>
-
-                {/* Recursos */}
-                <div className="p-4 border rounded-lg bg-orange-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">Recursos</h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Node.js + Express
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      React + TypeScript
-                    </p>
-                  </div>
-                </div>
-
-                {/* Versão */}
-                <div className="p-4 border rounded-lg bg-gray-50">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
-                      <h4 className="font-medium text-foreground">Versão</h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      DRIVS v1.0
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Build: {new Date().toLocaleDateString()}
                     </p>
                   </div>
                 </div>
