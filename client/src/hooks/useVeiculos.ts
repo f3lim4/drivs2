@@ -60,44 +60,53 @@ export function useVeiculos() {
     }
 
     // Converter dados do banco para formato esperado
-    const veiculosFormatados: Veiculo[] = veiculosFiltrados.map((v: any) => ({
-      id: v.id,
-      placa: v.placa,
-      marca: v.marca,
-      modelo: v.modelo,
-      ano: v.ano,
-      cor: v.cor,
-      categoria: v.categoria,
-      renavam: v.renavam,
-      chassi: v.chassi,
-      combustivel: v.combustivel,
-      quilometragem: v.quilometragem,
-      valorSemanal: parseFloat(v.valorSemanal),
-      caucao: parseFloat(v.caucao),
-      taxaAdministrativa: v.taxaAdministrativa ? parseFloat(v.taxaAdministrativa) : null,
-      limiteQuilometragem: v.limiteQuilometragem,
-      valorLimiteKm: v.valorLimiteKm,
-      ultimaRevisao: v.ultimaRevisao,
-      proximaRevisao: v.proximaRevisao,
-      seguradora: v.seguradora,
-      numeroApolice: v.numeroApolice,
-      vigenciaSeguro: v.vigenciaSeguro,
-      valorSeguroMensal: v.valorSeguroMensal ? parseFloat(v.valorSeguroMensal) : null,
-      valorVeiculo: v.valor_veiculo ? parseFloat(v.valor_veiculo) : null,
-      ipva: v.ipva ? parseFloat(v.ipva) : null,
-      rastreador: v.rastreador,
-      valorRastreadorMensal: v.valor_rastreador_mensal ? parseFloat(v.valor_rastreador_mensal) : null,
-      status: v.status as 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel',
-      // Campos de compatibilidade
-      valorDiario: parseFloat(v.valorSemanal) / 7,
-      valorCaucao: parseFloat(v.caucao),
-      kmLimite: v.limiteQuilometragem === 'limitada' && v.valorLimiteKm 
-        ? `${v.valorLimiteKm} km/semana` 
-        : v.limiteQuilometragem,
-      seguro: v.seguradora || 'Não informado',
-      // Dados da locadora
-      locadoraNome: v.locadoraNome,
-    }));
+    const veiculosFormatados: Veiculo[] = veiculosFiltrados.map((v: any) => {
+      console.log('Mapeando veículo:', v.placa, {
+        valor_veiculo: v.valor_veiculo,
+        ipva: v.ipva,
+        valor_rastreador_mensal: v.valor_rastreador_mensal,
+        rastreador: v.rastreador
+      });
+      
+      return {
+        id: v.id,
+        placa: v.placa,
+        marca: v.marca,
+        modelo: v.modelo,
+        ano: v.ano,
+        cor: v.cor,
+        categoria: v.categoria,
+        renavam: v.renavam,
+        chassi: v.chassi,
+        combustivel: v.combustivel,
+        quilometragem: v.quilometragem,
+        valorSemanal: parseFloat(v.valorSemanal),
+        caucao: parseFloat(v.caucao),
+        taxaAdministrativa: v.taxaAdministrativa ? parseFloat(v.taxaAdministrativa) : null,
+        limiteQuilometragem: v.limiteQuilometragem,
+        valorLimiteKm: v.valorLimiteKm,
+        ultimaRevisao: v.ultimaRevisao,
+        proximaRevisao: v.proximaRevisao,
+        seguradora: v.seguradora,
+        numeroApolice: v.numeroApolice,
+        vigenciaSeguro: v.vigenciaSeguro,
+        valorSeguroMensal: v.valorSeguroMensal ? parseFloat(v.valorSeguroMensal) : null,
+        valorVeiculo: v.valor_veiculo ? parseFloat(v.valor_veiculo) : null,
+        ipva: v.ipva ? parseFloat(v.ipva) : null,
+        rastreador: v.rastreador,
+        valorRastreadorMensal: v.valor_rastreador_mensal ? parseFloat(v.valor_rastreador_mensal) : null,
+        status: v.status as 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel',
+        // Campos de compatibilidade
+        valorDiario: parseFloat(v.valorSemanal) / 7,
+        valorCaucao: parseFloat(v.caucao),
+        kmLimite: v.limiteQuilometragem === 'limitada' && v.valorLimiteKm 
+          ? `${v.valorLimiteKm} km/semana` 
+          : v.limiteQuilometragem,
+        seguro: v.seguradora || 'Não informado',
+        // Dados da locadora
+        locadoraNome: v.locadoraNome,
+      };
+    });
 
     // Log apenas se houver problemas para debug
     if (isLocadora && veiculosFiltrados.length > 1) {
