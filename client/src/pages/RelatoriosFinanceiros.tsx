@@ -267,7 +267,7 @@ export default function RelatoriosFinanceiros() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">RECEITA TOTAL</p>
-                <p className="text-3xl font-bold text-green-600">
+                <p className="text-2xl font-bold text-green-600">
                   {formatCurrency(receitaTotal)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -284,7 +284,7 @@ export default function RelatoriosFinanceiros() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">DESPESAS TOTAIS</p>
-                <p className="text-3xl font-bold text-red-600">
+                <p className="text-2xl font-bold text-red-600">
                   {formatCurrency(totalDespesas)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -301,7 +301,7 @@ export default function RelatoriosFinanceiros() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">LUCRO LÍQUIDO</p>
-                <p className={`text-3xl font-bold ${lucroLiquido >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                <p className={`text-2xl font-bold ${lucroLiquido >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
                   {formatCurrency(lucroLiquido)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -318,7 +318,7 @@ export default function RelatoriosFinanceiros() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">MARGEM DE LUCRO</p>
-                <p className={`text-3xl font-bold ${margemLucro >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
+                <p className={`text-2xl font-bold ${margemLucro >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
                   {margemLucro.toFixed(1)}%
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
