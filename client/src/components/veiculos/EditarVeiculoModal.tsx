@@ -72,6 +72,9 @@ const veiculoSchema = z.object({
   rastreador: z.string().optional(),
   valorRastreadorMensal: z.number().optional(),
   
+  // Data de Compra
+  dataCompra: z.string().optional(),
+  
   // Status será controlado automaticamente
   
   // Campo condicional para limite específico
@@ -120,6 +123,7 @@ export function EditarVeiculoModal({
       ipva: undefined,
       rastreador: '',
       valorRastreadorMensal: undefined,
+      dataCompra: '',
       // Status será controlado automaticamente
       valorLimiteKm: undefined,
     },
@@ -151,6 +155,7 @@ export function EditarVeiculoModal({
         ipva: Number(veiculo.ipva) || undefined,
         rastreador: veiculo.rastreador || '',
         valorRastreadorMensal: Number(veiculo.valorRastreadorMensal) || undefined,
+        dataCompra: veiculo.dataCompra || '',
         // Status não será editável
         valorLimiteKm: veiculo.valorLimiteKm,
       });
@@ -191,6 +196,7 @@ export function EditarVeiculoModal({
         ipva: data.ipva?.toString(),
         rastreador: data.rastreador,
         valorRastreadorMensal: data.valorRastreadorMensal?.toString(),
+        dataCompra: data.dataCompra || null,
         // Status não será enviado na edição
       };
 
@@ -703,6 +709,30 @@ export function EditarVeiculoModal({
                   )}
                 />
               </div>
+            </div>
+
+            {/* DATA DE COMPRA */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                Data de Compra
+              </h3>
+              
+              <FormField
+                control={form.control}
+                name="dataCompra"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data de Compra (Opcional)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="date"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* STATUS - Controlado automaticamente pelo sistema */}

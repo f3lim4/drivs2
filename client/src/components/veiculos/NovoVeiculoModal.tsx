@@ -76,6 +76,9 @@ const veiculoSchema = z.object({
   rastreador: z.string().optional(),
   valorRastreadorMensal: z.number().min(0).optional(),
   
+  // Data de Compra
+  dataCompra: z.string().optional(),
+  
   // Status será sempre "disponível" no cadastro
   
   // Campo condicional para limite específico
@@ -124,6 +127,7 @@ export function NovoVeiculoModal({
       ipva: undefined,
       rastreador: '',
       valorRastreadorMensal: undefined,
+      dataCompra: '',
       // Status será definido automaticamente como "disponível"
       valorLimiteKm: undefined,
     },
@@ -737,6 +741,26 @@ export function NovoVeiculoModal({
                   )}
                 />
               </div>
+            </div>
+
+            {/* DATA DE COMPRA */}
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="dataCompra"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data de Compra (Opcional)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="date"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* STATUS: Veículos são cadastrados automaticamente como "disponível" */}
