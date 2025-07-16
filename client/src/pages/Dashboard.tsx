@@ -146,6 +146,9 @@ export default function Dashboard() {
     .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
     .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorMensal || '0'), 0);
 
+  // Calcular receita semanal (mensal dividido por 4 semanas)
+  const receitaSemanal = receitaMensal / 4;
+
   // Gerar alertas baseados nos dados
   const alertas: Alert[] = [];
   
@@ -242,18 +245,40 @@ export default function Dashboard() {
           }}
         />
 
-        {/* Receita Mensal */}
-        <StatCard
-          title="Receita Mensal"
-          value={formatCurrency(receitaMensal)}
-          icon={<DollarSign />}
-          variant="green"
-          trend={{
-            value: receitaMensal > 0 ? "Receita ativa" : "Sem receita",
-            isPositive: receitaMensal > 0,
-            label: "baseada em aluguéis ativos"
-          }}
-        />
+        {/* Receita Mensal - Card Personalizado */}
+        <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Receita Mensal
+                </p>
+                
+                <p className="text-2xl font-bold text-foreground">
+                  {formatCurrency(receitaMensal)}
+                </p>
+                
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium">Semanal:</span> {formatCurrency(receitaSemanal)}
+                  </p>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <span className={`font-medium ${receitaMensal > 0 ? "text-green-600" : "text-red-600"}`}>
+                      {receitaMensal > 0 ? "Receita ativa" : "Sem receita"}
+                    </span>
+                    <span>baseada em aluguéis ativos</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-green-100">
+                <div className="w-6 h-6 text-green-600">
+                  <DollarSign />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Seção inferior com alertas e aluguéis recentes */}
