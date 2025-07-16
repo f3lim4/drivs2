@@ -131,6 +131,17 @@ export default function RelatoriosFinanceiros() {
         });
       }
       
+      // Financiamento mensal
+      if (veiculo.financiado && veiculo.valorFinanciamento && veiculo.quantidadeParcelas) {
+        const valorMensal = parseFloat(veiculo.valorFinanciamento) / veiculo.quantidadeParcelas;
+        despesasFixas.push({
+          tipo: 'Financiamento',
+          valor: valorMensal,
+          descricao: `Financiamento - ${veiculo.placa}`,
+          veiculo: veiculo.placa
+        });
+      }
+      
       return {
         veiculo: veiculo.placa,
         marca: veiculo.marca,
