@@ -267,7 +267,7 @@ export function EditarVeiculoModal({
                 Informações Básicas
               </h3>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="placa"
@@ -302,9 +302,7 @@ export function EditarVeiculoModal({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="modelo"
