@@ -14,8 +14,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { useAlugueis } from '@/hooks/useAlugueis';
 import { useAluguelValorSemanal } from '@/hooks/usePagamentos';
-import { useInfracoesByMotorista } from '@/hooks/useInfracoes';
-import type { Motorista, InsertPagamento } from '@shared/schema';
+import { useInfracoesByMotorista, useInfracoes } from '@/hooks/useInfracoes';
+import type { Motorista, InsertPagamento, Infracao } from '@shared/schema';
 
 const formSchema = z.object({
   motoristaId: z.string().min(1, 'Selecione um motorista'),
@@ -40,11 +40,18 @@ interface NovoPagamentoModalProps {
   motoristas: Motorista[];
 }
 
+interface InfracaoSelecionada {
+  id: string;
+  selecionada: boolean;
+  valorPago: number;
+}
+
 export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: NovoPagamentoModalProps) {
   const { profile } = useAuth();
   const { alugueis } = useAlugueis();
   const [aluguelSelecionado, setAluguelSelecionado] = useState<string | null>(null);
   const { data: valorSemanal } = useAluguelValorSemanal(aluguelSelecionado);
+  const { updateInfracao } = useInfracoes();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -71,6 +78,54 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
   const infracoesEmAberto = infracoesByMotorista.filter(infracao => 
     infracao.status === 'pendente' && !infracao.dataPagamento
   );
+
+  // Estado para controlar infrações selecionadas
+  const [infracoesSelecionadas, setInfracoesSelecionadas] = useState<InfracaoSelecionada[]>([]);
+
+  // Sincronizar infrações selecionadas quando as infrações mudarem
+  useEffect(() => {
+    if (infracoesEmAberto.length > 0) {
+      setInfracoesSelecionadas(infracoesEmAberto.map(infracao => ({
+        id: infracao.id,
+        selecionada: false,
+        valorPago: 0
+      })));
+    }
+  }, [infracoesEmAberto.length]);
+
+  // Calcular valor total das infrações selecionadas
+  const valorTotalInfracoesSelecionadas = infracoesSelecionadas
+    .filter(inf => inf.selecionada)
+    .reduce((total, inf) => {
+      const infracao = infracoesEmAberto.find(i => i.id === inf.id);
+      return total + (infracao ? parseFloat(infracao.valorFinal) : 0);
+    }, 0);
+
+  // Função para toggle seleção de infração
+  const toggleInfracaoSelecionada = (infracaoId: string) => {
+    setInfracoesSelecionadas(prev => 
+      prev.map(inf => 
+        inf.id === infracaoId 
+          ? { ...inf, selecionada: !inf.selecionada }
+          : inf
+      )
+    );
+  };
+
+  // Função para selecionar todas as infrações
+  const toggleTodasInfracoes = () => {
+    const todasSelecionadas = infracoesSelecionadas.every(inf => inf.selecionada);
+    setInfracoesSelecionadas(prev => 
+      prev.map(inf => ({ ...inf, selecionada: !todasSelecionadas }))
+    );
+  };
+
+  // Atualizar valor total quando infrações são selecionadas
+  useEffect(() => {
+    if (tipoSelecionado === 'infrações' && valorTotalInfracoesSelecionadas > 0) {
+      form.setValue('valorTotal', valorTotalInfracoesSelecionadas.toFixed(2));
+    }
+  }, [valorTotalInfracoesSelecionadas, tipoSelecionado, form]);
 
   // Filtrar aluguéis ativos do motorista selecionado
   const alugueisDoMotorista = alugueis.filter(
@@ -120,7 +175,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
     return 'parcial';
   };
 
-  const handleSubmit = (data: FormData) => {
+  const handleSubmit = async (data: FormData) => {
     const valorPagoFinal = data.valorPago || data.valorTotal;
     
     const pagamento: InsertPagamento = {
@@ -138,15 +193,41 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
       observacoes: data.observacoes || undefined,
     };
 
+    // Se for pagamento de infrações, processar as infrações selecionadas
+    if (tipoSelecionado === 'infrações') {
+      const infracoesSelecionadasParaPagamento = infracoesSelecionadas.filter(inf => inf.selecionada);
+      const valorTotalSelecionado = valorTotalInfracoesSelecionadas;
+      const valorPagoTotal = parseFloat(valorPagoFinal);
+      
+      // Determinar se o pagamento é total ou parcial
+      const isPagamentoTotal = valorPagoTotal >= valorTotalSelecionado;
+      
+      // Atualizar cada infração selecionada
+      for (const infracaoSelecionada of infracoesSelecionadasParaPagamento) {
+        try {
+          const updateData = {
+            status: isPagamentoTotal ? 'pago' : 'pendente',
+            dataPagamento: isPagamentoTotal ? data.dataPagamento : null,
+          };
+          
+          await updateInfracao({ id: infracaoSelecionada.id, data: updateData });
+        } catch (error) {
+          console.error('Erro ao atualizar infração:', error);
+        }
+      }
+    }
+
     onSubmit(pagamento);
     onClose();
     form.reset();
+    setInfracoesSelecionadas([]);
   };
 
   const handleClose = () => {
     onClose();
     form.reset();
     setAluguelSelecionado(null);
+    setInfracoesSelecionadas([]);
   };
 
   return (
@@ -225,28 +306,48 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
             {/* Infrações em aberto quando tipo infrações for selecionado */}
             {tipoSelecionado === 'infrações' && motoristaId && infracoesEmAberto.length > 0 && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertCircle className="h-4 w-4 text-red-600" />
-                  <h4 className="text-sm font-medium text-red-800">Infrações em Aberto</h4>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-red-600" />
+                    <h4 className="text-sm font-medium text-red-800">Infrações em Aberto</h4>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox 
+                      id="selecionar-todas"
+                      checked={infracoesSelecionadas.every(inf => inf.selecionada)}
+                      onCheckedChange={toggleTodasInfracoes}
+                    />
+                    <label htmlFor="selecionar-todas" className="text-xs text-gray-600">
+                      Selecionar todas
+                    </label>
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  {infracoesEmAberto.map((infracao) => (
-                    <div key={infracao.id} className="flex justify-between items-center text-sm bg-white p-2 rounded">
-                      <div>
-                        <p className="font-medium">Auto: {infracao.numeroAuto}</p>
-                        <p className="text-gray-600">
-                          {infracao.descricaoInfracao || infracao.codigoInfracao} - {infracao.tipoInfracao}
-                        </p>
-                        <p className="text-gray-500">Vencimento: {new Date(infracao.dataVencimento).toLocaleDateString()}</p>
+                  {infracoesEmAberto.map((infracao) => {
+                    const infracaoSelecionada = infracoesSelecionadas.find(inf => inf.id === infracao.id);
+                    return (
+                      <div key={infracao.id} className="flex items-center gap-2 text-sm bg-white p-2 rounded">
+                        <Checkbox 
+                          id={`infracao-${infracao.id}`}
+                          checked={infracaoSelecionada?.selecionada || false}
+                          onCheckedChange={() => toggleInfracaoSelecionada(infracao.id)}
+                        />
+                        <div className="flex-1">
+                          <p className="font-medium">Auto: {infracao.numeroAuto}</p>
+                          <p className="text-gray-600">
+                            {infracao.descricaoInfracao || infracao.codigoInfracao} - {infracao.tipoInfracao}
+                          </p>
+                          <p className="text-gray-500">Vencimento: {new Date(infracao.dataVencimento).toLocaleDateString()}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium text-red-600">R$ {parseFloat(infracao.valorFinal).toFixed(2)}</p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium text-red-600">R$ {parseFloat(infracao.valorFinal).toFixed(2)}</p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <div className="border-t pt-2">
                     <p className="text-sm font-medium text-red-800">
-                      Total em multas: R$ {infracoesEmAberto.reduce((total, infracao) => total + parseFloat(infracao.valorFinal), 0).toFixed(2)}
+                      Total selecionado: R$ {valorTotalInfracoesSelecionadas.toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -279,6 +380,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                           type="number"
                           step="0.01"
                           placeholder="0.00"
+                          readOnly={tipoSelecionado === 'infrações'}
                           {...field}
                         />
                       </FormControl>
@@ -306,35 +408,39 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                 />
               </div>
 
-              {/* Checkbox para pagamento parcial */}
-              <div className="flex items-center space-x-2">
-                <FormField
-                  control={form.control}
-                  name="isPagamentoParcial"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormLabel className="text-sm font-medium">
-                        Pagamento Parcial
-                      </FormLabel>
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {/* Checkbox para pagamento parcial (apenas para aluguéis) */}
+              {tipoSelecionado === 'aluguel' && (
+                <div className="flex items-center space-x-2">
+                  <FormField
+                    control={form.control}
+                    name="isPagamentoParcial"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-medium">
+                          Pagamento Parcial
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
 
-              {/* Valor Pago (apenas se pagamento parcial estiver marcado) */}
-              {isPagamentoParcial && (
+              {/* Valor Pago (para pagamento parcial de aluguel OU para infrações) */}
+              {(isPagamentoParcial || tipoSelecionado === 'infrações') && (
                 <FormField
                   control={form.control}
                   name="valorPago"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor Pago Parcial</FormLabel>
+                      <FormLabel>
+                        {tipoSelecionado === 'infrações' ? 'Valor Pago' : 'Valor Pago Parcial'}
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
