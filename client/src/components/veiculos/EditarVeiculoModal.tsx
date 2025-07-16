@@ -128,6 +128,11 @@ export function EditarVeiculoModal({
   // Preenche o formulário quando o veículo é selecionado
   useEffect(() => {
     if (veiculo && open) {
+      console.log('Valor do veículo recebido:', veiculo.valorVeiculo, typeof veiculo.valorVeiculo);
+      console.log('IPVA recebido:', veiculo.ipva, typeof veiculo.ipva);
+      console.log('Rastreador:', veiculo.rastreador);
+      console.log('Valor rastreador mensal:', veiculo.valorRastreadorMensal, typeof veiculo.valorRastreadorMensal);
+      
       form.reset({
         placa: veiculo.placa,
         marca: veiculo.marca,
