@@ -37,6 +37,10 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Campo de busca único** - Substituído filtros múltiplos por campo de busca universal
 - ✅ **Busca inteligente** - Busca por veículo (placa, marca, modelo), motorista (nome, CPF) e categoria
 - ✅ **Interface simplificada** - Botão "Limpar" aparece apenas quando há texto na busca
+- ✅ **Modal de detalhes corrigido** - Dados reais incluindo despesas fixas no modal de análise por veículo
+- ✅ **Despesas fixas no modal** - IPVA, seguro e rastreador incluídos no detalhamento por categoria
+- ✅ **Evolução mensal atualizada** - Gráfico de evolução inclui despesas fixas nos cálculos
+- ✅ **Cálculos precisos** - Lucro e margem calculados com despesas fixas + despesas manuais
 
 ### 2025-07-15: Sistema de Infrações com Seleção Inteligente - CONCLUÍDO
 - ✅ **Seleção inteligente implementada** - Motoristas com aluguel ativo aparecem primeiro
