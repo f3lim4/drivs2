@@ -133,7 +133,7 @@ export default function RelatoriosFinanceiros() {
       
       // Financiamento mensal
       if (veiculo.financiado && veiculo.valorFinanciamento && veiculo.quantidadeParcelas) {
-        const valorMensal = parseFloat(veiculo.valorFinanciamento) / veiculo.quantidadeParcelas;
+        const valorMensal = parseFloat(veiculo.valorFinanciamento);
         despesasFixas.push({
           tipo: 'Financiamento',
           valor: valorMensal,
