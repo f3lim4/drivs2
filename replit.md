@@ -32,6 +32,10 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Campos detalhados** - Oficina, contato, valores, quilometragem, peças substituídas
 - ✅ **Navegação integrada** - Item "Manutenções" no menu lateral
 - ✅ **UI limpa** - Botão único no header, sem elementos redundantes
+- ✅ **Sistema de locais/oficinas** - Botão "Cadastrar Locais" para gerenciar oficinas
+- ✅ **Modal de cadastro de locais** - Campos completos para nome, tipo, contato, endereço
+- ✅ **Integração com manutenções** - Locais ficam disponíveis para seleção nas manutenções
+- ✅ **Tamanho de texto otimizado** - Valores nos cards financeiros reduzidos para melhor legibilidade
 
 ### 2025-07-15: Header Fixo Mobile e Melhorias UX - CONCLUÍDO
 - ✅ **Header fixo no mobile** - Cabeçalho permanece fixo no topo em dispositivos móveis
