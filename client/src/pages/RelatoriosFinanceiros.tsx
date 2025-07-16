@@ -852,6 +852,7 @@ export default function RelatoriosFinanceiros() {
                         <TableHead>IPVA (Mensal)</TableHead>
                         <TableHead>Seguro</TableHead>
                         <TableHead>Rastreador</TableHead>
+                        <TableHead>Financiamento</TableHead>
                         <TableHead>Total Mensal</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -882,6 +883,12 @@ export default function RelatoriosFinanceiros() {
                               <span className="text-gray-400">-</span>
                             }
                           </TableCell>
+                          <TableCell>
+                            {veiculo.despesas.find(d => d.tipo === 'Financiamento') ? 
+                              formatCurrency(veiculo.despesas.find(d => d.tipo === 'Financiamento')?.valor || 0) : 
+                              <span className="text-gray-400">-</span>
+                            }
+                          </TableCell>
                           <TableCell className="font-medium">
                             {formatCurrency(veiculo.totalMensal)}
                           </TableCell>
@@ -892,7 +899,7 @@ export default function RelatoriosFinanceiros() {
                 </div>
 
                 {/* Detalhamento por tipo de despesa */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-medium mb-2">IPVA Total</h4>
                     <p className="text-2xl font-bold text-orange-600">
@@ -914,6 +921,14 @@ export default function RelatoriosFinanceiros() {
                     <p className="text-2xl font-bold text-green-600">
                       {formatCurrency(despesasFixasVeiculos.reduce((total, v) => 
                         total + (v.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0), 0))}
+                    </p>
+                    <p className="text-sm text-gray-500">Mensal</p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Financiamento Total</h4>
+                    <p className="text-2xl font-bold text-purple-600">
+                      {formatCurrency(despesasFixasVeiculos.reduce((total, v) => 
+                        total + (v.despesas.find(d => d.tipo === 'Financiamento')?.valor || 0), 0))}
                     </p>
                     <p className="text-sm text-gray-500">Mensal</p>
                   </div>
