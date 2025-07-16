@@ -61,13 +61,6 @@ export function useVeiculos() {
 
     // Converter dados do banco para formato esperado
     const veiculosFormatados: Veiculo[] = veiculosFiltrados.map((v: any) => {
-      console.log('Mapeando veículo:', v.placa, {
-        valor_veiculo: v.valor_veiculo,
-        ipva: v.ipva,
-        valor_rastreador_mensal: v.valor_rastreador_mensal,
-        rastreador: v.rastreador
-      });
-      
       return {
         id: v.id,
         placa: v.placa,
