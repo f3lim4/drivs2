@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-16: Sistema de Anúncios Integrado ao Dashboard - CONCLUÍDO
+- ✅ **Anúncios exibidos no dashboard das locadoras** - Seção dedicada para anúncios ativos
+- ✅ **Interface elegante com ícone de megafone** - Visual destacado com cores azuis
+- ✅ **Formatação de datas segura** - Função formatDate para evitar datas inválidas
+- ✅ **Validação de dados** - Campos opcionais tratados corretamente
+- ✅ **Título removido** - Interface mais limpa sem "Anúncios do Sistema"
+- ✅ **Posicionamento otimizado** - Anúncios aparecem após as estatísticas principais
+- ✅ **Integração com useAnunciosAtivos** - Hook funcionando corretamente
+- ✅ **Datas condicionais** - Exibe apenas datas válidas (publicado/válido até)
+- ✅ **Badge de tipo** - Identificação do tipo de anúncio
+- ✅ **Responsividade** - Layout adaptável para diferentes telas
+
 ### 2025-07-16: Sistema de Notificações Inteligente Completo - CONCLUÍDO
 - ✅ **Detecção de CNH vencida/vencendo** - Alertas para CNHs que vencem em 30 dias
 - ✅ **Alertas de multas por prazo** - Notificações para multas vencendo em 15 dias
