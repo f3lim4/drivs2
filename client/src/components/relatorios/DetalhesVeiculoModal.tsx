@@ -90,15 +90,17 @@ export function DetalhesVeiculoModal({
     return { label: 'Alto', color: 'text-red-600' };
   };
 
-  const getRecomendacao = (margem: number) => {
-    if (margem >= 25) return 'Manter operação atual';
-    if (margem >= 10) return 'Revisar despesas e otimizar custos';
-    return 'Análise urgente de viabilidade';
+  const getRecomendacao = (margem: number, status: string) => {
+    if (status === 'Parado') return 'Colocar veículo em operação para gerar receita';
+    if (margem >= 25) return 'Manter operação atual - Performance excelente';
+    if (margem >= 15) return 'Revisar despesas e otimizar custos operacionais';
+    if (margem >= 5) return 'Análise detalhada de viabilidade necessária';
+    return 'Considerar retirada do veículo de operação';
   };
 
   const eficiencia = getEficiencia(analiseFinanceira.margem);
   const risco = getRisco(analiseFinanceira.margem);
-  const recomendacao = getRecomendacao(analiseFinanceira.margem);
+  const recomendacao = getRecomendacao(analiseFinanceira.margem, analiseFinanceira.status);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
