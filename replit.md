@@ -10,6 +10,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-16: Sistema de Manutenções com Controle de Pagamento - CONCLUÍDO
+- ✅ **Campos de pagamento implementados** - StatusPagamento e FormaPagamento adicionados ao schema
+- ✅ **Interface tabular padronizada** - Página reformulada seguindo padrão da página de veículos
+- ✅ **Sistema de busca e filtros** - Busca por veículo, oficina, descrição e filtro por status
+- ✅ **Cards de estatísticas** - Totais por status (agendada, em andamento, concluída)
+- ✅ **Indicadores visuais** - Badges para status, prioridade e situação de pagamento
+- ✅ **Dados reais implementados** - 5 manutenções de exemplo com valores reais
+- ✅ **Formatação monetária** - Valores exibidos em reais brasileiros
+- ✅ **Cache corrigido** - Query keys específicas para invalidação correta
+- ✅ **Campo observação removido** - Simplificação da interface conforme solicitado
+- ✅ **Status de pagamento** - "Em Aberto" e "Pago" com cores diferenciadas
+- ✅ **Formas de pagamento** - Dinheiro, cartão, PIX, transferência, boleto
+- ✅ **Tabela organizada** - Colunas: Veículo, Tipo, Oficina, Data, Valor, Status, Pagamento
+- ✅ **Ações por linha** - Visualizar, editar e excluir cada manutenção
+
 ### 2025-07-16: Sistema de Despesas Fixas Automáticas - CONCLUÍDO
 - ✅ **Despesas fixas automáticas implementadas** - Sistema calcula automaticamente IPVA, seguro e rastreador
 - ✅ **Integração com dados dos veículos** - Valores vêm diretamente do cadastro de veículos
