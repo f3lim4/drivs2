@@ -56,8 +56,16 @@ export default function Alugueis() {
 
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
+    console.log('[ALUGUEIS] DEBUG - locadoraId:', locadoraId);
+    console.log('[ALUGUEIS] DEBUG - locadoras:', locadoras);
+    console.log('[ALUGUEIS] DEBUG - locadoras loading:', locadorasLoading);
+    
     if (!locadoraId) return 'Locadora';
+    if (locadorasLoading) return 'Carregando...';
+    if (!locadoras || locadoras.length === 0) return 'Sem dados';
+    
     const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
+    console.log('[ALUGUEIS] DEBUG - locadora encontrada:', locadora);
     return locadora ? locadora.nome : locadoraId;
   };
 
@@ -383,6 +391,7 @@ export default function Alugueis() {
                             </span>
                           </div>
                           <span className="text-sm">{getLocadoraName(aluguel.locadoraId)}</span>
+                          <span className="text-xs text-gray-500">(ID: {aluguel.locadoraId})</span>
                         </div>
                       </TableCell>
                     )}
