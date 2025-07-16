@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
-import type { Despesa, InsertDespesa } from '@shared/schema';
+import type { Despesa, InsertDespesa, Manutencao } from '@shared/schema';
+import { format } from 'date-fns';
 
 export function useDespesas() {
   const { profile } = useAuth();
@@ -13,18 +14,47 @@ export function useDespesas() {
     queryFn: async () => {
       if (!locadoraId) return [];
       
-      const response = await fetch(`/api/despesas?locadoraId=${locadoraId}`);
-      if (!response.ok) throw new Error('Failed to fetch despesas');
+      // Buscar despesas manuais
+      const despesasResponse = await fetch(`/api/despesas?locadoraId=${locadoraId}`);
+      if (!despesasResponse.ok) throw new Error('Failed to fetch despesas');
+      const despesasManuais = await despesasResponse.json();
       
-      const data = await response.json();
+      // Buscar manutenções para incluir como despesas
+      const manutencoesResponse = await fetch(`/api/manutencoes?locadoraId=${locadoraId}`);
+      if (!manutencoesResponse.ok) throw new Error('Failed to fetch manutencoes');
+      const manutencoes = await manutencoesResponse.json();
+      
+      // Converter manutenções em despesas
+      const despesasManutencao = manutencoes
+        .filter((manutencao: Manutencao) => manutencao.valorOrcamento && parseFloat(manutencao.valorOrcamento) > 0)
+        .map((manutencao: Manutencao) => ({
+          id: `manutencao_${manutencao.id}`,
+          locadoraId: manutencao.locadoraId,
+          veiculoId: manutencao.veiculoId,
+          veiculoModelo: manutencao.veiculoModelo,
+          veiculoPlaca: manutencao.veiculoPlaca,
+          categoria: 'manutencao',
+          descricao: `Manutenção - ${manutencao.tipo} - ${manutencao.oficina}`,
+          valor: manutencao.valorOrcamento,
+          data: manutencao.dataInicio,
+          tipo: 'despesa',
+          fonte: 'manutencao',
+          manutencaoId: manutencao.id,
+          createdAt: manutencao.createdAt,
+          updatedAt: manutencao.updatedAt,
+        }));
+      
+      const todasDespesas = [...despesasManuais, ...despesasManutencao];
       
       console.log('Despesas - Verificando isolamento:', {
         locadoraId,
-        despesasTotal: data.length,
-        primeiraDespesa: data[0]?.locadoraId
+        despesasTotal: todasDespesas.length,
+        despesasManuais: despesasManuais.length,
+        despesasManutencao: despesasManutencao.length,
+        primeiraDespesa: todasDespesas[0]?.locadoraId
       });
       
-      return data as Despesa[];
+      return todasDespesas as Despesa[];
     },
     enabled: !!locadoraId,
   });
