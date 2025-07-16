@@ -312,12 +312,12 @@ export default function Dashboard() {
 
       {/* Seção inferior com alertas e aluguéis recentes */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Card de Aluguéis Recentes */}
+        {/* Card de Atividade Recentes */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5" />
-              Aluguéis Recentes
+              Atividade Recentes
             </CardTitle>
           </CardHeader>
           <CardContent>
