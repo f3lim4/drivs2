@@ -437,6 +437,7 @@ export class DatabaseStorage implements IStorage {
         status: alugueis.status,
         createdAt: alugueis.createdAt,
         updatedAt: alugueis.updatedAt,
+        observacoes: alugueis.observacoes,
         motoristaNome: motoristas.nome,
         motoristaContato: motoristas.telefone,
         veiculoModelo: veiculos.modelo,
@@ -471,6 +472,7 @@ export class DatabaseStorage implements IStorage {
         status: alugueis.status,
         createdAt: alugueis.createdAt,
         updatedAt: alugueis.updatedAt,
+        observacoes: alugueis.observacoes,
         motoristaNome: motoristas.nome,
         motoristaContato: motoristas.telefone,
         veiculoModelo: veiculos.modelo,
@@ -614,7 +616,7 @@ export class DatabaseStorage implements IStorage {
           return {
             ...pagamento,
             motoristaNome: motorista[0]?.nome || '',
-            motoristaContato: motorista[0]?.contato || ''
+            motoristaContato: motorista[0]?.telefone || ''
           };
         })
       );
@@ -636,7 +638,7 @@ export class DatabaseStorage implements IStorage {
       return result.map(pagamento => ({
         ...pagamento,
         motoristaNome: motorista[0]?.nome || '',
-        motoristaContato: motorista[0]?.contato || ''
+        motoristaContato: motorista[0]?.telefone || ''
       }));
     } catch (error) {
       console.error('Error getting pagamentos by motorista:', error);
@@ -660,7 +662,7 @@ export class DatabaseStorage implements IStorage {
       return {
         ...pagamento,
         motoristaNome: motorista[0]?.nome || '',
-        motoristaContato: motorista[0]?.contato || ''
+        motoristaContato: motorista[0]?.telefone || ''
       };
     } catch (error) {
       console.error('Error getting pagamento:', error);
@@ -690,7 +692,7 @@ export class DatabaseStorage implements IStorage {
         valorPago: pagamentoData.valorPago,
         valorRestante: pagamentoData.valorRestante,
         dataPagamento: pagamentoData.dataPagamento,
-        status: pagamentoData.status,
+        status: pagamentoData.status || 'em_aberto',
         observacoes: pagamentoData.observacoes || null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -741,7 +743,7 @@ export class DatabaseStorage implements IStorage {
           return {
             ...infracao,
             motoristaNome: motorista[0]?.nome || '',
-            motoristaContato: motorista[0]?.contato || '',
+            motoristaContato: motorista[0]?.telefone || '',
             veiculoModelo: veiculo[0]?.modelo || '',
             veiculoPlaca: veiculo[0]?.placa || ''
           };
@@ -768,7 +770,7 @@ export class DatabaseStorage implements IStorage {
           return {
             ...infracao,
             motoristaNome: motorista[0]?.nome || '',
-            motoristaContato: motorista[0]?.contato || '',
+            motoristaContato: motorista[0]?.telefone || '',
             veiculoModelo: veiculo[0]?.modelo || '',
             veiculoPlaca: veiculo[0]?.placa || ''
           };
@@ -812,7 +814,7 @@ export class DatabaseStorage implements IStorage {
           return {
             ...infracao,
             motoristaNome: motorista[0]?.nome || '',
-            motoristaContato: motorista[0]?.contato || '',
+            motoristaContato: motorista[0]?.telefone || '',
             veiculoModelo: veiculo[0]?.modelo || '',
             veiculoPlaca: veiculo[0]?.placa || ''
           };
@@ -839,7 +841,7 @@ export class DatabaseStorage implements IStorage {
           return {
             ...infracao,
             motoristaNome: motorista[0]?.nome || '',
-            motoristaContato: motorista[0]?.contato || '',
+            motoristaContato: motorista[0]?.telefone || '',
             veiculoModelo: veiculo[0]?.modelo || '',
             veiculoPlaca: veiculo[0]?.placa || ''
           };
@@ -870,7 +872,7 @@ export class DatabaseStorage implements IStorage {
       return {
         ...infracao,
         motoristaNome: motorista[0]?.nome || '',
-        motoristaContato: motorista[0]?.contato || '',
+        motoristaContato: motorista[0]?.telefone || '',
         veiculoModelo: veiculo[0]?.modelo || '',
         veiculoPlaca: veiculo[0]?.placa || ''
       };
@@ -907,7 +909,7 @@ export class DatabaseStorage implements IStorage {
         codigoInfracao: infracaoData.codigoInfracao,
         descricaoInfracao: infracaoData.descricaoInfracao,
         tipoInfracao: infracaoData.tipoInfracao,
-        pontuacao: infracaoData.pontuacao,
+        pontuacao: infracaoData.pontuacao || 0,
         valorOriginal: infracaoData.valorOriginal,
         valorDesconto: infracaoData.valorDesconto || "0.00",
         valorFinal: infracaoData.valorFinal,
@@ -920,9 +922,9 @@ export class DatabaseStorage implements IStorage {
         estado: infracaoData.estado,
         orgaoAutuador: infracaoData.orgaoAutuador,
         agente: infracaoData.agente || null,
-        status: infracaoData.status,
-        situacao: infracaoData.situacao,
-        responsavel: infracaoData.responsavel,
+        status: infracaoData.status || 'pendente',
+        situacao: infracaoData.situacao || 'ativo',
+        responsavel: infracaoData.responsavel || 'motorista',
         observacoes: infracaoData.observacoes || null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -951,7 +953,7 @@ export class DatabaseStorage implements IStorage {
       return {
         ...updated,
         motoristaNome: motorista[0]?.nome || '',
-        motoristaContato: motorista[0]?.contato || '',
+        motoristaContato: motorista[0]?.telefone || '',
         veiculoModelo: veiculo[0]?.modelo || '',
         veiculoPlaca: veiculo[0]?.placa || ''
       };
@@ -1101,8 +1103,8 @@ export class DatabaseStorage implements IStorage {
         descricao: despesaData.descricao,
         valor: despesaData.valor,
         data: despesaData.data,
-        tipo: despesaData.tipo,
-        status: despesaData.status,
+        tipo: despesaData.tipo || 'despesa',
+        status: despesaData.status || 'pendente',
         observacoes: despesaData.observacoes || null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -1278,9 +1280,9 @@ export class DatabaseStorage implements IStorage {
         dataConclusao: manutencaoData.dataConclusao || null,
         quilometragemInicio: manutencaoData.quilometragemInicio || null,
         quilometragemFim: manutencaoData.quilometragemFim || null,
-        status: manutencaoData.status,
-        prioridade: manutencaoData.prioridade,
-        statusPagamento: manutencaoData.statusPagamento,
+        status: manutencaoData.status || 'agendada',
+        prioridade: manutencaoData.prioridade || 'normal',
+        statusPagamento: manutencaoData.statusPagamento || 'em_aberto',
         formaPagamento: manutencaoData.formaPagamento || null,
         pecasSubstituidas: manutencaoData.pecasSubstituidas || null,
         proximaManutencao: manutencaoData.proximaManutencao || null,
