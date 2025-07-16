@@ -36,7 +36,7 @@ export function useManutencoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/manutencoes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/manutencoes', profile?.locadoraId] });
     },
   });
 
@@ -52,7 +52,7 @@ export function useManutencoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/manutencoes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/manutencoes', profile?.locadoraId] });
     },
   });
 
@@ -66,7 +66,7 @@ export function useManutencoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/manutencoes'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/manutencoes', profile?.locadoraId] });
     },
   });
 
