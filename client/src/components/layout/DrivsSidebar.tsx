@@ -65,13 +65,15 @@ const navigationItems = [
     title: 'Contratos',
     url: '/contratos',
     icon: File,
-    description: 'Gestão de contratos'
+    description: 'Gestão de contratos',
+    locadoraOnly: true  // Só locadoras podem ver este item
   },
   {
     title: 'Pagamentos',
     url: '/pagamentos',
     icon: CreditCard,
-    description: 'Gestão de pagamentos'
+    description: 'Gestão de pagamentos',
+    locadoraOnly: true  // Só locadoras podem ver este item
   },
   {
     title: 'Infrações',
