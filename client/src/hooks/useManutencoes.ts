@@ -7,7 +7,7 @@ export function useManutencoes() {
   const queryClient = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['/api/manutencoes', profile?.locadoraId],
+    queryKey: ['manutencoes', profile?.locadoraId],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (profile?.locadoraId) {
@@ -21,7 +21,8 @@ export function useManutencoes() {
       return response.json() as Promise<Manutencao[]>;
     },
     enabled: !!profile?.locadoraId,
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 0, // Sem cache para debug
+    cacheTime: 0, // Sem cache para debug
   });
 
   const createMutation = useMutation({
@@ -36,7 +37,7 @@ export function useManutencoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/manutencoes', profile?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['manutencoes'] });
     },
   });
 
@@ -52,7 +53,7 @@ export function useManutencoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/manutencoes', profile?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['manutencoes'] });
     },
   });
 
@@ -66,7 +67,7 @@ export function useManutencoes() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/manutencoes', profile?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['manutencoes'] });
     },
   });
 
@@ -85,7 +86,7 @@ export function useManutencoes() {
 
 export function useManutencoesByVeiculo(veiculoId: string) {
   const query = useQuery({
-    queryKey: ['/api/manutencoes', 'veiculo', veiculoId],
+    queryKey: ['manutencoes', 'veiculo', veiculoId],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append('veiculoId', veiculoId);
