@@ -24,6 +24,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Correção de mapeamento** - Campos valorVeiculo e valorRastreadorMensal corrigidos
 - ✅ **Seção de seguro adicionada** - Modal de edição inclui todos os campos de seguro
 - ✅ **Aba "Tendências" removida** - Interface simplificada com 4 abas principais
+- ✅ **Categoria "Combustível" removida** - Aba despesas por categoria mostra apenas dados reais
+- ✅ **Filtro de dados reais** - Apenas categorias com valores reais são exibidas
 
 ### 2025-07-15: Sistema de Infrações com Seleção Inteligente - CONCLUÍDO
 - ✅ **Seleção inteligente implementada** - Motoristas com aluguel ativo aparecem primeiro

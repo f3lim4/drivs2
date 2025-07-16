@@ -532,30 +532,45 @@ export default function RelatoriosFinanceiros() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {['combustivel', 'manutencao', 'seguro', 'ipva', 'multa', 'outros'].map((categoria) => {
-                  const valor = filteredData.despesasPeriodo
-                    .filter(d => d.categoria === categoria && d.tipo === 'despesa')
-                    .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+                {(() => {
+                  const categoriasComDados = ['manutencao', 'seguro', 'ipva', 'multa', 'outros']
+                    .map((categoria) => {
+                      const valor = filteredData.despesasPeriodo
+                        .filter(d => d.categoria === categoria && d.tipo === 'despesa')
+                        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+                      
+                      const percentage = totalDespesas > 0 ? (valor / totalDespesas) * 100 : 0;
+                      
+                      return { categoria, valor, percentage };
+                    })
+                    .filter(item => item.valor > 0); // Só mostrar categorias com dados reais
                   
-                  const percentage = totalDespesas > 0 ? (valor / totalDespesas) * 100 : 0;
+                  if (categoriasComDados.length === 0) {
+                    return (
+                      <div className="text-center py-8 text-gray-500">
+                        <p>Nenhuma despesa encontrada para o período selecionado</p>
+                        <p className="text-sm mt-2">Adicione despesas para visualizar as categorias</p>
+                      </div>
+                    );
+                  }
                   
-                  return (
-                    <div key={categoria} className="space-y-2">
+                  return categoriasComDados.map((item) => (
+                    <div key={item.categoria} className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium capitalize">{categoria}</span>
+                        <span className="text-sm font-medium capitalize">{item.categoria}</span>
                         <span className="text-sm font-bold text-red-600">
-                          {formatCurrency(valor)} ({percentage.toFixed(1)}%)
+                          {formatCurrency(item.valor)} ({item.percentage.toFixed(1)}%)
                         </span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
                           className="bg-red-500 h-2 rounded-full" 
-                          style={{ width: `${percentage}%` }}
+                          style={{ width: `${item.percentage}%` }}
                         />
                       </div>
                     </div>
-                  );
-                })}
+                  ));
+                })()}
               </div>
             </CardContent>
           </Card>
