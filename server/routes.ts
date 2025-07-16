@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -783,6 +783,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Infracao deleted successfully" });
     } catch (error) {
       console.error("Error deleting infracao:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Despesa routes
+  app.get("/api/despesas", async (req, res) => {
+    try {
+      const { locadoraId, veiculoId } = req.query;
+      
+      if (veiculoId) {
+        const despesas = await storage.getDespesasByVeiculo(veiculoId as string);
+        res.json(despesas);
+      } else if (locadoraId) {
+        const despesas = await storage.getDespesasByLocadora(locadoraId as string);
+        res.json(despesas);
+      } else {
+        const despesas = await storage.getAllDespesas();
+        res.json(despesas);
+      }
+    } catch (error) {
+      console.error("Error fetching despesas:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/despesas/:id", async (req, res) => {
+    try {
+      const despesa = await storage.getDespesa(req.params.id);
+      if (!despesa) {
+        return res.status(404).json({ message: "Despesa not found" });
+      }
+      res.json(despesa);
+    } catch (error) {
+      console.error("Error fetching despesa:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/despesas", async (req, res) => {
+    try {
+      const validatedData = insertDespesaSchema.omit({ id: true }).parse(req.body);
+      const despesa = await storage.createDespesa(validatedData);
+      res.json(despesa);
+    } catch (error) {
+      console.error("Error creating despesa:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/despesas/:id", async (req, res) => {
+    try {
+      const validatedData = insertDespesaSchema.partial().parse(req.body);
+      const despesa = await storage.updateDespesa(req.params.id, validatedData);
+      res.json(despesa);
+    } catch (error) {
+      console.error("Error updating despesa:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/despesas/:id", async (req, res) => {
+    try {
+      await storage.deleteDespesa(req.params.id);
+      res.json({ message: "Despesa deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting despesa:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

@@ -31,6 +31,10 @@ export function DrivsLayout({ children }: DrivsLayoutProps) {
         return { title: 'Contratos', subtitle: 'Gerencie contratos e templates' };
       case '/pagamentos':
         return { title: 'Pagamentos', subtitle: 'Gerencie pagamentos dos motoristas' };
+      case '/infracoes':
+        return { title: 'Infrações', subtitle: 'Gerencie infrações de trânsito' };
+      case '/relatorios-financeiros':
+        return { title: 'Relatórios Financeiros', subtitle: 'Análise completa da situação financeira' };
       case '/locadoras':
         return { title: 'Locadoras', subtitle: 'Gerencie locadoras do sistema' };
       case '/perfil':

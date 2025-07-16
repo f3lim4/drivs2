@@ -280,6 +280,27 @@ export const insertInfracaoSchema = createInsertSchema(infracoes).omit({
   updatedAt: true,
 });
 
+// Despesas table
+export const despesas = pgTable("despesas", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  locadoraId: text("locadora_id").notNull(), // Referência ao CNPJ da locadora
+  veiculoId: text("veiculo_id"), // Referência ao veículo (opcional)
+  categoria: text("categoria").notNull(), // 'manutencao', 'seguro', 'financiamento', 'outros'
+  descricao: text("descricao").notNull(),
+  valor: decimal("valor", { precision: 10, scale: 2 }).notNull(),
+  data: date("data").notNull(),
+  tipo: text("tipo").notNull().default("operacional"), // 'operacional', 'administrativo', 'financeiro'
+  status: text("status").notNull().default("pago"), // 'pendente', 'pago', 'vencido'
+  observacoes: text("observacoes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertDespesaSchema = createInsertSchema(despesas).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -322,6 +343,12 @@ export type InsertInfracao = z.infer<typeof insertInfracaoSchema>;
 export type Infracao = typeof infracoes.$inferSelect & {
   motoristaNome?: string;
   motoristaContato?: string;
+  veiculoModelo?: string;
+  veiculoPlaca?: string;
+};
+
+export type InsertDespesa = z.infer<typeof insertDespesaSchema>;
+export type Despesa = typeof despesas.$inferSelect & {
   veiculoModelo?: string;
   veiculoPlaca?: string;
 };

@@ -1,0 +1,82 @@
+PÁGINA FINANCEIRO - CONTEÚDO COMPLETO
+Cabeçalho Principal
+Título: "RELATÓRIOS FINANCEIROS"
+Subtítulo: "Análise completa da performance financeira da sua locadora"
+Botões de Ação:
+Gerar Relatório
+Nova Despesa
+Configurar Alertas
+Download Relatório
+Cards de Resumo Financeiro
+Receita Total: R$ 45.000,00
+Despesas Totais: R$ 32.000,00
+Lucro Líquido: R$ 13.000,00
+Margem de Lucro: 28,9%
+Abas Principais
+Análise por Veículo
+Análise por Motorista
+Despesas por Categoria
+Tendências
+INFORMAÇÕES AO CLICAR NO ÍCONE OLHO
+Modal de Análise Financeira Detalhada do Veículo
+Informações Básicas
+Modelo: Honda Civic / Toyota Corolla
+Motorista: João Silva / Maria Santos
+Placa: ABC-1234 / DEF-5678
+Status: Lucrativo/Prejuízo
+Resumo Financeiro (Cards)
+Receita Mensal: R$ 3.200,00
+Despesas Mensais: R$ 2.100,00
+Lucro Líquido: R$ 1.100,00
+Margem de Lucro: 34,4%
+Detalhamento de Despesas Mensais
+Manutenção: 35% das despesas (R$ 735,00)
+Seguro: 30% das despesas (R$ 630,00)
+Financiamento: 25% das despesas (R$ 525,00)
+Outros: 10% das despesas (R$ 210,00)
+Evolução Financeira (Últimos 6 Meses)
+Janeiro: Receita R$ 2.880,00 | Despesas R$ 1.995,00 | Lucro R$ 885,00
+Fevereiro: Receita R$ 3.040,00 | Despesas R$ 2.058,00 | Lucro R$ 982,00
+Março: Receita R$ 3.200,00 | Despesas R$ 2.100,00 | Lucro R$ 1.100,00
+Abril: Receita R$ 3.360,00 | Despesas R$ 2.142,00 | Lucro R$ 1.218,00
+Maio: Receita R$ 3.520,00 | Despesas R$ 2.205,00 | Lucro R$ 1.315,00
+Junho: Receita R$ 3.456,00 | Despesas R$ 2.163,00 | Lucro R$ 1.293,00
+Análise de Performance
+Eficiência: Alta/Média/Baixa
+Nível de Risco: Baixo/Médio/Alto
+Recomendação: "Manter operação atual" / "Otimizar custos" / "Rever estratégia operacional"
+Modal de Análise Detalhada do Motorista
+Informações do Contrato
+Veículo: Honda Civic
+Data de Início: Data formatada
+Duração: Número de meses
+Pagamento Semanal: R$ 500,00
+Resumo Financeiro do Motorista
+Receita Total: Valor acumulado
+Despesas Totais: Valor acumulado
+Lucro Total: Valor calculado
+Margem de Lucro: Percentual
+Histórico Mensal de Pagamentos
+Jun/24: Receita R$ 3.500 | Despesas R$ 2.100 | Manutenção R$ 350 | Lucro R$ 1.400
+Mai/24: Receita R$ 3.400 | Despesas R$ 2.050 | Manutenção R$ 450 | Lucro R$ 1.350
+Abr/24: Receita R$ 3.300 | Despesas R$ 2.200 | Manutenção R$ 300 | Lucro R$ 1.100
+Mar/24: Receita R$ 3.600 | Despesas R$ 2.000 | Manutenção R$ 400 | Lucro R$ 1.600
+Fev/24: Receita R$ 3.500 | Despesas R$ 2.100 | Manutenção R$ 350 | Lucro R$ 1.400
+Jan/24: Receita R$ 3.200 | Despesas R$ 2.150 | Manutenção R$ 250 | Lucro R$ 1.050
+Histórico de Manutenção
+10/06/2024: Troca de óleo e filtros - R$ 180,00
+15/05/2024: Alinhamento e balanceamento - R$ 120,00
+20/04/2024: Troca de pastilhas de freio - R$ 350,00
+25/03/2024: Revisão geral - R$ 450,00
+Performance de Pagamentos
+Pagamentos em dia: 100%
+Pagamentos em atraso: 0
+Taxa de pontualidade: 100%
+Recomendações
+Motorista Excelente: Alta lucratividade e boa performance (margem > 30%)
+Performance Regular: Considerar otimização de custos (margem 15-30%)
+Atenção Necessária: Revisar estratégia operacional (margem < 15%)
+Botões de Ação nos Modais
+Fechar: Fecha o modal
+Baixar Relatório Detalhado: Gera arquivo JSON com todos os dados
+Todas as informações incluem formatação em moeda brasileira (R$) e cálculos automáticos de percentuais e métricas financeiras.
