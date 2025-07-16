@@ -53,7 +53,7 @@ export function useDespesas() {
       const despesasFinanciamento = veiculos
         .filter((veiculo: any) => veiculo.financiado && veiculo.valorFinanciamento && veiculo.quantidadeParcelas)
         .map((veiculo: any) => {
-          const valorMensal = parseFloat(veiculo.valorFinanciamento) / veiculo.quantidadeParcelas;
+          const valorMensal = parseFloat(veiculo.valorFinanciamento);
           return {
             id: `financiamento_${veiculo.id}`,
             locadoraId: veiculo.locadoraId,
