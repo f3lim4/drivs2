@@ -512,6 +512,7 @@ export default function RelatoriosFinanceiros() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-10"></TableHead>
                       <TableHead>Veículo</TableHead>
                       <TableHead>Receita Mensal</TableHead>
                       <TableHead>Despesas Mensais</TableHead>
@@ -526,6 +527,9 @@ export default function RelatoriosFinanceiros() {
                   <TableBody>
                     {analiseVeiculos.map((item) => (
                       <TableRow key={item.veiculo}>
+                        <TableCell className="text-center">
+                          <Eye className="h-4 w-4 text-gray-500 mx-auto" />
+                        </TableCell>
                         <TableCell className="font-medium">
                           <div>
                             <p className="font-semibold">{item.veiculo}</p>
