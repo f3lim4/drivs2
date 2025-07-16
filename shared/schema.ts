@@ -336,8 +336,11 @@ export const manutencoes = pgTable("manutencoes", {
   status: text("status").notNull().default("agendada"), // 'agendada', 'em_andamento', 'concluida', 'cancelada'
   prioridade: text("prioridade").notNull().default("normal"), // 'baixa', 'normal', 'alta', 'urgente'
   
+  // Pagamento
+  statusPagamento: text("status_pagamento").notNull().default("em_aberto"), // 'em_aberto', 'pago'
+  formaPagamento: text("forma_pagamento"), // 'dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'transferencia', 'boleto'
+  
   // Observações
-  observacoes: text("observacoes"),
   pecasSubstituidas: text("pecas_substituidas"), // Lista de peças
   proximaManutencao: date("proxima_manutencao"),
   

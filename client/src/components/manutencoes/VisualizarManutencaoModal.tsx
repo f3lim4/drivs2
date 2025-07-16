@@ -270,17 +270,39 @@ export function VisualizarManutencaoModal({ open, onClose, manutencao }: Visuali
             </Card>
           )}
 
-          {/* Observações */}
-          {manutencao.observacoes && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Observações</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">{manutencao.observacoes}</p>
-              </CardContent>
-            </Card>
-          )}
+          {/* Pagamento */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                Pagamento
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Status:</span>
+                <span className={`text-sm font-medium ${
+                  manutencao.statusPagamento === 'pago' ? 'text-green-600' : 'text-yellow-600'
+                }`}>
+                  {manutencao.statusPagamento === 'pago' ? 'Pago' : 'Em Aberto'}
+                </span>
+              </div>
+              {manutencao.formaPagamento && (
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-600">Forma de Pagamento:</span>
+                  <span className="text-sm font-medium">
+                    {manutencao.formaPagamento === 'dinheiro' ? 'Dinheiro' :
+                     manutencao.formaPagamento === 'cartao_credito' ? 'Cartão de Crédito' :
+                     manutencao.formaPagamento === 'cartao_debito' ? 'Cartão de Débito' :
+                     manutencao.formaPagamento === 'pix' ? 'PIX' :
+                     manutencao.formaPagamento === 'transferencia' ? 'Transferência' :
+                     manutencao.formaPagamento === 'boleto' ? 'Boleto' :
+                     manutencao.formaPagamento}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Botão de fechar */}
           <div className="flex justify-end">

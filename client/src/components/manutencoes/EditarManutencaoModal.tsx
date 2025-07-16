@@ -40,7 +40,8 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
       dataPrevisao: '',
       status: 'agendada',
       prioridade: 'normal',
-      observacoes: '',
+      statusPagamento: 'em_aberto',
+      formaPagamento: null,
     },
   });
 
@@ -62,7 +63,8 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
         quilometragemFim: manutencao.quilometragemFim || undefined,
         status: manutencao.status,
         prioridade: manutencao.prioridade,
-        observacoes: manutencao.observacoes || '',
+        statusPagamento: manutencao.statusPagamento || 'em_aberto',
+        formaPagamento: manutencao.formaPagamento || null,
         pecasSubstituidas: manutencao.pecasSubstituidas || '',
         proximaManutencao: manutencao.proximaManutencao || undefined,
       });
@@ -305,14 +307,42 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="observacoes">Observações</Label>
-            <Textarea
-              id="observacoes"
-              {...form.register('observacoes')}
-              placeholder="Observações adicionais"
-              rows={3}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="statusPagamento">Status do Pagamento</Label>
+              <Select 
+                value={form.watch('statusPagamento')} 
+                onValueChange={(value) => form.setValue('statusPagamento', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="em_aberto">Em Aberto</SelectItem>
+                  <SelectItem value="pago">Pago</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="formaPagamento">Forma de Pagamento</Label>
+              <Select 
+                value={form.watch('formaPagamento') || ''} 
+                onValueChange={(value) => form.setValue('formaPagamento', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a forma" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                  <SelectItem value="cartao_credito">Cartão de Crédito</SelectItem>
+                  <SelectItem value="cartao_debito">Cartão de Débito</SelectItem>
+                  <SelectItem value="pix">PIX</SelectItem>
+                  <SelectItem value="transferencia">Transferência</SelectItem>
+                  <SelectItem value="boleto">Boleto</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2">
