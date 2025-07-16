@@ -19,7 +19,10 @@ import type { Motorista, InsertPagamento } from '@shared/schema';
 
 const formSchema = z.object({
   motoristaId: z.string().min(1, 'Selecione um motorista'),
-  tipo: z.enum(['aluguel', 'infrações', 'manutenção', 'danos', 'outros']),
+  tipo: z.string().min(1, 'Selecione um tipo de pagamento').refine(val => 
+    ['aluguel', 'infrações', 'manutenção', 'danos', 'outros'].includes(val), {
+    message: 'Tipo de pagamento inválido'
+  }),
   aluguelId: z.string().optional(),
   valorTotal: z.string().min(1, 'Valor total é obrigatório'),
   valorPago: z.string().optional(),
@@ -47,7 +50,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
     resolver: zodResolver(formSchema),
     defaultValues: {
       motoristaId: '',
-      tipo: 'aluguel',
+      tipo: '',
       aluguelId: '',
       valorTotal: '',
       valorPago: '',
