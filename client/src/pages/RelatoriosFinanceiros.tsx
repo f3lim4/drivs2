@@ -656,7 +656,7 @@ export default function RelatoriosFinanceiros() {
             <CardContent>
               <div className="space-y-4">
                 {(() => {
-                  const categoriasComDados = ['manutencao', 'seguro', 'ipva', 'multa', 'licenciamento', 'lavagem', 'outros']
+                  const categoriasComDados = ['manutencao', 'seguro', 'ipva', 'multa', 'licenciamento', 'lavagem', 'financiamento', 'outros']
                     .map((categoria) => {
                       const despesasCategoria = filteredData.despesasPeriodo
                         .filter(d => d.categoria === categoria && d.tipo === 'despesa');
