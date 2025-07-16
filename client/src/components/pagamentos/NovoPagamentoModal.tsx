@@ -375,7 +375,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                 Cancelar
               </Button>
               <Button type="submit">
-                Criar Pagamento
+                Confirmar Pagamento
               </Button>
             </DialogFooter>
           </form>
