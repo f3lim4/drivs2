@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,6 +13,7 @@ import { useAlugueis } from '@/hooks/useAlugueis';
 import { usePagamentos } from '@/hooks/usePagamentos';
 import { useInfracoes } from '@/hooks/useInfracoes';
 import { useDespesas } from '@/hooks/useDespesas';
+import { useVeiculos } from '@/hooks/useVeiculos';
 import { NovaDespesaModal } from '@/components/despesas/NovaDespesaModal';
 import { formatCurrency } from '@/lib/utils';
 
@@ -21,6 +23,7 @@ export default function RelatoriosFinanceiros() {
   const { pagamentos } = usePagamentos();
   const { infracoes } = useInfracoes();
   const { despesas } = useDespesas();
+  const { veiculos } = useVeiculos();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   // Cálculos para o período selecionado
@@ -31,7 +34,7 @@ export default function RelatoriosFinanceiros() {
     const isInPeriod = (date: Date) => isWithinInterval(date, { start: monthStart, end: monthEnd });
 
     const alugueisAtivos = alugueis.filter(aluguel => 
-      aluguel.status === 'ativo' && isInPeriod(new Date(aluguel.dataInicio))
+      aluguel.status === 'ativo'
     );
 
     const pagamentosRealizados = pagamentos.filter(pagamento => 
@@ -78,49 +81,73 @@ export default function RelatoriosFinanceiros() {
 
   const receitaTotal = receitaAlugueis + receitaPagamentos + totalReceitas;
   const lucroLiquido = receitaTotal - totalDespesas;
+  const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
-  // Análise por categoria de despesas
-  const despesasPorCategoria = useMemo(() => {
-    const categorias = filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'despesa')
-      .reduce((acc, despesa) => {
-        const categoria = despesa.categoria || 'outros';
-        acc[categoria] = (acc[categoria] || 0) + parseFloat(despesa.valor || '0');
-        return acc;
-      }, {} as Record<string, number>);
+  // Análise por veículo
+  const analiseVeiculos = useMemo(() => {
+    return veiculos.map(veiculo => {
+      const aluguelVeiculo = alugueis.find(a => a.veiculoId === veiculo.id && a.status === 'ativo');
+      const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
+      
+      const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
+      const receitaAnual = receitaMensal * 12;
+      
+      const despesasMensais = despesasVeiculo
+        .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+      
+      const despesasAnuais = despesasVeiculo
+        .filter(d => d.tipo === 'despesa')
+        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+      
+      const lucro = receitaMensal - despesasMensais;
+      const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
+      const status = aluguelVeiculo ? 'Lucrativo' : 'Parado';
+      
+      return {
+        veiculo: veiculo.placa,
+        modelo: veiculo.modelo,
+        receitaMensal,
+        despesasMensais,
+        receitaAnual,
+        despesasAnuais,
+        lucro,
+        margem,
+        status
+      };
+    });
+  }, [veiculos, alugueis, despesas, monthStart, monthEnd]);
 
-    return Object.entries(categorias)
-      .map(([categoria, valor]) => ({ categoria, valor }))
-      .sort((a, b) => b.valor - a.valor);
-  }, [filteredData.despesasPeriodo]);
+  // Cálculo de mês anterior para comparação
+  const mesAnterior = subMonths(selectedMonth, 1);
+  const mesAnteriorStart = startOfMonth(mesAnterior);
+  const mesAnteriorEnd = endOfMonth(mesAnterior);
 
-  const categoriasLabels = {
-    combustivel: 'Combustível',
-    manutencao: 'Manutenção',
-    seguro: 'Seguro',
-    licenciamento: 'Licenciamento',
-    ipva: 'IPVA',
-    multa: 'Multa',
-    lavagem: 'Lavagem',
-    pneus: 'Pneus',
-    revisao: 'Revisão',
-    reparo: 'Reparo',
-    outros: 'Outros'
-  };
+  const receitaMesAnterior = useMemo(() => {
+    const alugueisAnterior = alugueis.filter(aluguel => 
+      aluguel.status === 'ativo' && isWithinInterval(new Date(aluguel.dataInicio), { start: mesAnteriorStart, end: mesAnteriorEnd })
+    );
+    return alugueisAnterior.reduce((total, aluguel) => total + parseFloat(aluguel.valorMensal || aluguel.valorDiario), 0);
+  }, [alugueis, mesAnteriorStart, mesAnteriorEnd]);
 
-  const statusBadgeVariants = {
-    pago: 'default',
-    pendente: 'secondary',
-    cancelado: 'destructive'
-  } as const;
+  const despesasMesAnterior = useMemo(() => {
+    const despesasAnterior = despesas.filter(despesa => 
+      despesa.tipo === 'despesa' && isWithinInterval(new Date(despesa.data), { start: mesAnteriorStart, end: mesAnteriorEnd })
+    );
+    return despesasAnterior.reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+  }, [despesas, mesAnteriorStart, mesAnteriorEnd]);
+
+  const variacaoReceita = receitaMesAnterior > 0 ? ((receitaTotal - receitaMesAnterior) / receitaMesAnterior) * 100 : 0;
+  const variacaoDespesas = despesasMesAnterior > 0 ? ((totalDespesas - despesasMesAnterior) / despesasMesAnterior) * 100 : 0;
+  const variacaoLucro = (receitaMesAnterior - despesasMesAnterior) > 0 ? ((lucroLiquido - (receitaMesAnterior - despesasMesAnterior)) / (receitaMesAnterior - despesasMesAnterior)) * 100 : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Relatórios Financeiros</h1>
-          <p className="text-muted-foreground">
-            Análise completa da situação financeira
+          <h1 className="text-3xl font-bold">RELATÓRIOS FINANCEIROS</h1>
+          <p className="text-muted-foreground mt-2">
+            Análise completa da performance financeira da sua locadora
           </p>
         </div>
         
@@ -148,294 +175,180 @@ export default function RelatoriosFinanceiros() {
         </div>
       </div>
 
-      {/* Cards de Resumo */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(receitaTotal)}
+      {/* Cards de Resumo Financeiro */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="border-l-4 border-l-green-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">RECEITA TOTAL</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {formatCurrency(receitaTotal)}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {variacaoReceita > 0 ? '+' : ''}{variacaoReceita.toFixed(1)}% em relação ao mês anterior
+                </p>
+              </div>
+              <TrendingUp className="h-6 w-6 text-green-600" />
             </div>
-            <p className="text-xs text-muted-foreground">
-              {format(selectedMonth, 'MMMM yyyy', { locale: pt })}
-            </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Despesas</CardTitle>
-            <TrendingDown className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {formatCurrency(totalDespesas)}
+        <Card className="border-l-4 border-l-red-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">DESPESAS TOTAIS</p>
+                <p className="text-3xl font-bold text-red-600">
+                  {formatCurrency(totalDespesas)}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {variacaoDespesas > 0 ? '+' : ''}{variacaoDespesas.toFixed(1)}% em relação ao mês anterior
+                </p>
+              </div>
+              <TrendingDown className="h-6 w-6 text-red-600" />
             </div>
-            <p className="text-xs text-muted-foreground">
-              {format(selectedMonth, 'MMMM yyyy', { locale: pt })}
-            </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Lucro Líquido</CardTitle>
-            <DollarSign className={`h-4 w-4 ${lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}`} />
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {formatCurrency(lucroLiquido)}
+        <Card className="border-l-4 border-l-blue-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">LUCRO LÍQUIDO</p>
+                <p className={`text-3xl font-bold ${lucroLiquido >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                  {formatCurrency(lucroLiquido)}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {variacaoLucro > 0 ? '+' : ''}{variacaoLucro.toFixed(1)}% em relação ao mês anterior
+                </p>
+              </div>
+              <DollarSign className={`h-6 w-6 ${lucroLiquido >= 0 ? 'text-blue-600' : 'text-red-600'}`} />
             </div>
-            <p className="text-xs text-muted-foreground">
-              {format(selectedMonth, 'MMMM yyyy', { locale: pt })}
-            </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aluguéis Ativos</CardTitle>
-            <Car className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {filteredData.alugueisAtivos.length}
+        <Card className="border-l-4 border-l-purple-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">MARGEM DE LUCRO</p>
+                <p className={`text-3xl font-bold ${margemLucro >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
+                  {margemLucro.toFixed(1)}%
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Meta: 30%
+                </p>
+              </div>
+              <TrendingUp className={`h-6 w-6 ${margemLucro >= 0 ? 'text-purple-600' : 'text-red-600'}`} />
             </div>
-            <p className="text-xs text-muted-foreground">
-              Contratos ativos
-            </p>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="despesas" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="despesas">Despesas</TabsTrigger>
-          <TabsTrigger value="receitas">Receitas</TabsTrigger>
-          <TabsTrigger value="infracoes">Infrações</TabsTrigger>
-          <TabsTrigger value="alugueis">Aluguéis</TabsTrigger>
+      {/* Tabs de Análise */}
+      <Tabs defaultValue="veiculos" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
+          <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
+          <TabsTrigger value="categorias">Despesas por Categoria</TabsTrigger>
+          <TabsTrigger value="tendencias">Tendências</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="despesas" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Despesas por Categoria</CardTitle>
-                <CardDescription>
-                  Análise das despesas por tipo no período selecionado
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {despesasPorCategoria.map(({ categoria, valor }) => (
-                    <div key={categoria} className="flex justify-between items-center">
-                      <span className="text-sm font-medium">
-                        {categoriasLabels[categoria as keyof typeof categoriasLabels] || categoria}
-                      </span>
-                      <span className="text-sm font-bold text-red-600">
-                        {formatCurrency(valor)}
-                      </span>
-                    </div>
-                  ))}
-                  {despesasPorCategoria.length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      Nenhuma despesa registrada neste período
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Últimas Despesas</CardTitle>
-                <CardDescription>
-                  Despesas mais recentes do período
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {filteredData.despesasPeriodo
-                    .filter(despesa => despesa.tipo === 'despesa')
-                    .slice(0, 5)
-                    .map((despesa) => (
-                      <div key={despesa.id} className="flex justify-between items-center">
-                        <div>
-                          <p className="text-sm font-medium">{despesa.descricao}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {format(new Date(despesa.data), 'dd/MM/yyyy', { locale: pt })}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-bold text-red-600">
-                            {formatCurrency(parseFloat(despesa.valor || '0'))}
-                          </p>
-                          <Badge variant={statusBadgeVariants[despesa.status as keyof typeof statusBadgeVariants]}>
-                            {despesa.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  {filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa').length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      Nenhuma despesa registrada neste período
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="receitas" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Receitas por Fonte</CardTitle>
-                <CardDescription>
-                  Análise das receitas por origem
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Aluguéis</span>
-                    <span className="text-sm font-bold text-green-600">
-                      {formatCurrency(receitaAlugueis)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Pagamentos de Infrações</span>
-                    <span className="text-sm font-bold text-green-600">
-                      {formatCurrency(receitaPagamentos)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Outras Receitas</span>
-                    <span className="text-sm font-bold text-green-600">
-                      {formatCurrency(totalReceitas)}
-                    </span>
-                  </div>
-                  <div className="border-t pt-2">
-                    <div className="flex justify-between items-center font-bold">
-                      <span>Total</span>
-                      <span className="text-green-600">
-                        {formatCurrency(receitaTotal)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Últimas Receitas</CardTitle>
-                <CardDescription>
-                  Receitas mais recentes do período
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {filteredData.despesasPeriodo
-                    .filter(despesa => despesa.tipo === 'receita')
-                    .slice(0, 5)
-                    .map((receita) => (
-                      <div key={receita.id} className="flex justify-between items-center">
-                        <div>
-                          <p className="text-sm font-medium">{receita.descricao}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {format(new Date(receita.data), 'dd/MM/yyyy', { locale: pt })}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-bold text-green-600">
-                            {formatCurrency(parseFloat(receita.valor || '0'))}
-                          </p>
-                          <Badge variant={statusBadgeVariants[receita.status as keyof typeof statusBadgeVariants]}>
-                            {receita.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  {filteredData.despesasPeriodo.filter(d => d.tipo === 'receita').length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      Nenhuma receita registrada neste período
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="infracoes" className="space-y-4">
+        <TabsContent value="veiculos" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Infrações do Período</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Car className="h-5 w-5" />
+                ANÁLISE FINANCEIRA POR VEÍCULO
+              </CardTitle>
               <CardDescription>
-                Infrações registradas em {format(selectedMonth, 'MMMM yyyy', { locale: pt })}
+                Performance financeira detalhada de cada veículo da frota
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {filteredData.infracoesPeriodo.map((infracao) => (
-                  <div key={infracao.id} className="flex justify-between items-center p-3 border rounded-lg">
-                    <div>
-                      <p className="text-sm font-medium">{infracao.descricaoInfracao}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {infracao.motoristaNome} - {infracao.veiculoPlaca}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(infracao.dataInfracao), 'dd/MM/yyyy', { locale: pt })}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold">
-                        {formatCurrency(parseFloat(infracao.valorFinal || '0'))}
-                      </p>
-                      <Badge variant={infracao.status === 'pago' ? 'default' : 'secondary'}>
-                        {infracao.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-                {filteredData.infracoesPeriodo.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    Nenhuma infração registrada neste período
-                  </p>
-                )}
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Veículo</TableHead>
+                      <TableHead>Receita Mensal</TableHead>
+                      <TableHead>Despesas Mensais</TableHead>
+                      <TableHead>Receita Anual</TableHead>
+                      <TableHead>Despesas Anuais</TableHead>
+                      <TableHead>Lucro</TableHead>
+                      <TableHead>Margem</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {analiseVeiculos.map((item) => (
+                      <TableRow key={item.veiculo}>
+                        <TableCell className="font-medium">
+                          <div>
+                            <p className="font-semibold">{item.veiculo}</p>
+                            <p className="text-sm text-gray-500">{item.modelo}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-green-600 font-bold">
+                          {formatCurrency(item.receitaMensal)}
+                        </TableCell>
+                        <TableCell className="text-red-600 font-bold">
+                          {formatCurrency(item.despesasMensais)}
+                        </TableCell>
+                        <TableCell className="text-green-600 font-bold">
+                          {formatCurrency(item.receitaAnual)}
+                        </TableCell>
+                        <TableCell className="text-red-600 font-bold">
+                          {formatCurrency(item.despesasAnuais)}
+                        </TableCell>
+                        <TableCell className={`font-bold ${item.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatCurrency(item.lucro)}
+                        </TableCell>
+                        <TableCell className={`font-bold ${item.margem >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {item.margem.toFixed(1)}%
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={item.status === 'Lucrativo' ? 'default' : 'secondary'}>
+                            {item.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="alugueis" className="space-y-4">
+        <TabsContent value="motoristas" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Aluguéis Ativos</CardTitle>
+              <CardTitle>Análise por Motorista</CardTitle>
               <CardDescription>
-                Contratos de aluguel ativos no período
+                Performance financeira de cada motorista
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {filteredData.alugueisAtivos.map((aluguel) => (
-                  <div key={aluguel.id} className="flex justify-between items-center p-3 border rounded-lg">
+                  <div key={aluguel.id} className="flex justify-between items-center p-4 border rounded-lg">
                     <div>
-                      <p className="text-sm font-medium">{aluguel.motoristaNome}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {aluguel.veiculoModelo} - {aluguel.veiculoPlaca}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="font-semibold">{aluguel.motoristaNome}</p>
+                      <p className="text-sm text-gray-500">{aluguel.veiculoModelo} - {aluguel.veiculoPlaca}</p>
+                      <p className="text-xs text-gray-400">
                         Início: {format(new Date(aluguel.dataInicio), 'dd/MM/yyyy', { locale: pt })}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-green-600">
+                      <p className="text-lg font-bold text-green-600">
                         {formatCurrency(parseFloat(aluguel.valorMensal || aluguel.valorDiario))}
                       </p>
                       <Badge variant="default">
@@ -444,11 +357,77 @@ export default function RelatoriosFinanceiros() {
                     </div>
                   </div>
                 ))}
-                {filteredData.alugueisAtivos.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    Nenhum aluguel ativo neste período
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="categorias" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Despesas por Categoria</CardTitle>
+              <CardDescription>
+                Análise detalhada das despesas por categoria
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {['combustivel', 'manutencao', 'seguro', 'ipva', 'multa', 'outros'].map((categoria) => {
+                  const valor = filteredData.despesasPeriodo
+                    .filter(d => d.categoria === categoria && d.tipo === 'despesa')
+                    .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+                  
+                  const percentage = totalDespesas > 0 ? (valor / totalDespesas) * 100 : 0;
+                  
+                  return (
+                    <div key={categoria} className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium capitalize">{categoria}</span>
+                        <span className="text-sm font-bold text-red-600">
+                          {formatCurrency(valor)} ({percentage.toFixed(1)}%)
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-red-500 h-2 rounded-full" 
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tendencias" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tendências Financeiras</CardTitle>
+              <CardDescription>
+                Análise de tendências e projeções
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-medium mb-2">Receita Mensal</h4>
+                  <p className="text-2xl font-bold text-green-600">{formatCurrency(receitaAlugueis)}</p>
+                  <p className="text-sm text-gray-500">Projeção anual: {formatCurrency(receitaAlugueis * 12)}</p>
+                </div>
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-medium mb-2">Despesas Mensais</h4>
+                  <p className="text-2xl font-bold text-red-600">{formatCurrency(totalDespesas)}</p>
+                  <p className="text-sm text-gray-500">Projeção anual: {formatCurrency(totalDespesas * 12)}</p>
+                </div>
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-medium mb-2">Lucro Mensal</h4>
+                  <p className={`text-2xl font-bold ${lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatCurrency(lucroLiquido)}
                   </p>
-                )}
+                  <p className="text-sm text-gray-500">Projeção anual: {formatCurrency(lucroLiquido * 12)}</p>
+                </div>
               </div>
             </CardContent>
           </Card>
