@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { useAlugueis } from '@/hooks/useAlugueis';
 import { useAluguelValorSemanal } from '@/hooks/usePagamentos';
+import { useInfracoesByMotorista } from '@/hooks/useInfracoes';
 import type { Motorista, InsertPagamento } from '@shared/schema';
 
 const formSchema = z.object({
@@ -61,6 +62,12 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
   const valorPagoInput = form.watch('valorPago');
   const motoristaId = form.watch('motoristaId');
   const isPagamentoParcial = form.watch('isPagamentoParcial');
+
+  // Buscar infrações em aberto do motorista selecionado
+  const { data: infracoesByMotorista = [] } = useInfracoesByMotorista(motoristaId);
+  const infracoesEmAberto = infracoesByMotorista.filter(infracao => 
+    infracao.status === 'pendente' && !infracao.dataPagamento
+  );
 
   // Filtrar aluguéis ativos do motorista selecionado
   const alugueisDoMotorista = alugueis.filter(
@@ -209,6 +216,37 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                   <AlertCircle className="h-4 w-4" />
                   Nenhum aluguel ativo encontrado para este motorista
                 </p>
+              </div>
+            )}
+
+            {/* Infrações em aberto quando motorista for selecionado */}
+            {motoristaId && infracoesEmAberto.length > 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <h4 className="text-sm font-medium text-red-800">Infrações em Aberto</h4>
+                </div>
+                <div className="space-y-2">
+                  {infracoesEmAberto.map((infracao) => (
+                    <div key={infracao.id} className="flex justify-between items-center text-sm bg-white p-2 rounded">
+                      <div>
+                        <p className="font-medium">Auto: {infracao.numeroAuto}</p>
+                        <p className="text-gray-600">
+                          {infracao.descricaoInfracao || infracao.codigoInfracao} - {infracao.tipoInfracao}
+                        </p>
+                        <p className="text-gray-500">Vencimento: {new Date(infracao.dataVencimento).toLocaleDateString()}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-red-600">R$ {parseFloat(infracao.valorFinal).toFixed(2)}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="border-t pt-2">
+                    <p className="text-sm font-medium text-red-800">
+                      Total em multas: R$ {infracoesEmAberto.reduce((total, infracao) => total + parseFloat(infracao.valorFinal), 0).toFixed(2)}
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
 
