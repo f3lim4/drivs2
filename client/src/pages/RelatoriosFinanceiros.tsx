@@ -742,7 +742,6 @@ export default function RelatoriosFinanceiros() {
                           <TableHead>Categoria</TableHead>
                           <TableHead>Descrição</TableHead>
                           <TableHead>Valor</TableHead>
-                          <TableHead>Status</TableHead>
                           <TableHead>Ações</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -773,11 +772,6 @@ export default function RelatoriosFinanceiros() {
                                 </TableCell>
                                 <TableCell className="font-medium text-red-600">
                                   {formatCurrency(parseFloat(despesa.valor || '0'))}
-                                </TableCell>
-                                <TableCell>
-                                  <Badge variant={despesa.status === 'pago' ? 'default' : 'secondary'}>
-                                    {despesa.status}
-                                  </Badge>
                                 </TableCell>
                                 <TableCell>
                                   <Button
