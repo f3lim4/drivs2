@@ -556,10 +556,9 @@ export default function RelatoriosFinanceiros() {
 
       {/* Tabs de Análise */}
       <Tabs defaultValue="veiculos" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
-          <TabsTrigger value="categorias">Despesas por Categoria</TabsTrigger>
           <TabsTrigger value="despesas">Despesas</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
         </TabsList>
@@ -702,90 +701,7 @@ export default function RelatoriosFinanceiros() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="categorias" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Despesas por Categoria</CardTitle>
-              <CardDescription>
-                Análise detalhada das despesas por categoria
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {(() => {
-                  const categoriasComDados = [];
-                  
-                  // Adicionar despesas fixas
-                  const despesasFixasTotal = {
-                    'ipva': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'IPVA')?.valor || 0), 0),
-                    'seguro': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Seguro')?.valor || 0), 0),
-                    'rastreador': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0), 0),
-                    'financiamento': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Financiamento')?.valor || 0), 0)
-                  };
-                  
-                  // Adicionar despesas manuais (excluindo categorias que já estão nas despesas fixas)
-                  const despesasManuaisTotal = {
-                    'manutencao': filteredData.despesasPeriodo.filter(d => d.categoria === 'manutencao' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
-                    'multa': filteredData.despesasPeriodo.filter(d => d.categoria === 'multa' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
-                    'licenciamento': filteredData.despesasPeriodo.filter(d => d.categoria === 'licenciamento' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
-                    'lavagem': filteredData.despesasPeriodo.filter(d => d.categoria === 'lavagem' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
-                    'outros': filteredData.despesasPeriodo.filter(d => d.categoria === 'outros' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0)
-                  };
-                  
-                  // Combinar todas as categorias
-                  const todasCategorias = {
-                    'IPVA': despesasFixasTotal.ipva,
-                    'Seguro': despesasFixasTotal.seguro,
-                    'Rastreador': despesasFixasTotal.rastreador,
-                    'Financiamento': despesasFixasTotal.financiamento,
-                    'Manutenção': despesasManuaisTotal.manutencao,
-                    'Multas': despesasManuaisTotal.multa,
-                    'Licenciamento': despesasManuaisTotal.licenciamento,
-                    'Lavagem': despesasManuaisTotal.lavagem,
-                    'Outros': despesasManuaisTotal.outros
-                  };
-                  
-                  // Filtrar apenas categorias com valores reais
-                  Object.entries(todasCategorias).forEach(([categoria, valor]) => {
-                    if (valor > 0) {
-                      const percentage = totalDespesas > 0 ? (valor / totalDespesas) * 100 : 0;
-                      categoriasComDados.push({ categoria, valor, percentage });
-                    }
-                  });
-                  
-                  // Ordenar por valor (maior primeiro)
-                  categoriasComDados.sort((a, b) => b.valor - a.valor);
-                  
-                  if (categoriasComDados.length === 0) {
-                    return (
-                      <div className="text-center py-8 text-gray-500">
-                        <p>Nenhuma despesa encontrada para o período selecionado</p>
-                        <p className="text-sm mt-2">Adicione despesas para visualizar as categorias</p>
-                      </div>
-                    );
-                  }
-                  
-                  return categoriasComDados.map((item) => (
-                    <div key={item.categoria} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium capitalize">{item.categoria}</span>
-                        <span className="text-sm font-bold text-red-600">
-                          {formatCurrency(item.valor)} ({item.percentage.toFixed(1)}%)
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-red-500 h-2 rounded-full" 
-                          style={{ width: `${item.percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  ));
-                })()}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+
 
         <TabsContent value="despesas" className="space-y-4">
           <Card>
@@ -1000,6 +916,83 @@ export default function RelatoriosFinanceiros() {
                         total + (v.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0), 0))}
                     </p>
                     <p className="text-sm text-gray-500">Mensal</p>
+                  </div>
+                </div>
+
+                {/* Análise por categoria */}
+                <div className="mt-8">
+                  <h3 className="text-lg font-semibold mb-4">Análise por Categoria</h3>
+                  <div className="space-y-4">
+                    {(() => {
+                      const categoriasComDados = [];
+                      
+                      // Adicionar despesas fixas
+                      const despesasFixasTotal = {
+                        'ipva': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'IPVA')?.valor || 0), 0),
+                        'seguro': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Seguro')?.valor || 0), 0),
+                        'rastreador': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0), 0),
+                        'financiamento': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Financiamento')?.valor || 0), 0)
+                      };
+                      
+                      // Adicionar despesas manuais (excluindo categorias que já estão nas despesas fixas)
+                      const despesasManuaisTotal = {
+                        'manutencao': filteredData.despesasPeriodo.filter(d => d.categoria === 'manutencao' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
+                        'multa': filteredData.despesasPeriodo.filter(d => d.categoria === 'multa' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
+                        'licenciamento': filteredData.despesasPeriodo.filter(d => d.categoria === 'licenciamento' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
+                        'lavagem': filteredData.despesasPeriodo.filter(d => d.categoria === 'lavagem' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0),
+                        'outros': filteredData.despesasPeriodo.filter(d => d.categoria === 'outros' && d.tipo === 'despesa').reduce((total, d) => total + parseFloat(d.valor || '0'), 0)
+                      };
+                      
+                      // Combinar todas as categorias
+                      const todasCategorias = {
+                        'IPVA': despesasFixasTotal.ipva,
+                        'Seguro': despesasFixasTotal.seguro,
+                        'Rastreador': despesasFixasTotal.rastreador,
+                        'Financiamento': despesasFixasTotal.financiamento,
+                        'Manutenção': despesasManuaisTotal.manutencao,
+                        'Multas': despesasManuaisTotal.multa,
+                        'Licenciamento': despesasManuaisTotal.licenciamento,
+                        'Lavagem': despesasManuaisTotal.lavagem,
+                        'Outros': despesasManuaisTotal.outros
+                      };
+                      
+                      // Filtrar apenas categorias com valores reais
+                      Object.entries(todasCategorias).forEach(([categoria, valor]) => {
+                        if (valor > 0) {
+                          const percentage = totalDespesas > 0 ? (valor / totalDespesas) * 100 : 0;
+                          categoriasComDados.push({ categoria, valor, percentage });
+                        }
+                      });
+                      
+                      // Ordenar por valor (maior primeiro)
+                      categoriasComDados.sort((a, b) => b.valor - a.valor);
+                      
+                      if (categoriasComDados.length === 0) {
+                        return (
+                          <div className="text-center py-8 text-gray-500">
+                            <p>Nenhuma despesa encontrada para o período selecionado</p>
+                            <p className="text-sm mt-2">Adicione despesas para visualizar as categorias</p>
+                          </div>
+                        );
+                      }
+                      
+                      return categoriasComDados.map((item) => (
+                        <div key={item.categoria} className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm font-medium capitalize">{item.categoria}</span>
+                            <span className="text-sm font-bold text-red-600">
+                              {formatCurrency(item.valor)} ({item.percentage.toFixed(1)}%)
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-red-500 h-2 rounded-full" 
+                              style={{ width: `${item.percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      ));
+                    })()}
                   </div>
                 </div>
               </div>

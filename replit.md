@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-16: Modal de Confirmação Personalizado e Reorganização de Abas - CONCLUÍDO
+- ✅ **Modal de confirmação elegante** - Substituído alert do navegador por modal bonito na tela
+- ✅ **Botões estilizados** - Botão "Cancelar" outline e "Excluir" destrutivo com cores apropriadas
+- ✅ **Estado de carregamento** - Botão mostra "Excluindo..." durante o processo
+- ✅ **Atualização automática** - React Query invalida cache após exclusão
+- ✅ **Notificação toast** - Mensagem de sucesso/erro após exclusão
+- ✅ **Aba "Despesas por Categoria" removida** - Conteúdo movido para aba "Despesas Fixas"
+- ✅ **Análise por categoria integrada** - Seção "Análise por Categoria" na parte inferior das despesas fixas
+- ✅ **Layout reorganizado** - 4 abas ao invés de 5 (Análise por Veículo, Motorista, Despesas, Despesas Fixas)
+- ✅ **Interface mais limpa** - Barras de progresso e percentuais das categorias mantidos
+- ✅ **Dados combinados** - Despesas fixas e manuais unificadas na análise por categoria
+
 ### 2025-07-16: Layout dos Modais de Veículos e Correções de Financiamento - CONCLUÍDO
 - ✅ **Layout reorganizado nos modais** - Placa, marca e modelo na primeira linha
 - ✅ **Segunda linha otimizada** - Ano, cor e categoria organizados lado a lado
