@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -11,7 +11,8 @@ import {
   type Pagamento, type InsertPagamento,
   type Infracao, type InsertInfracao,
   type Despesa, type InsertDespesa,
-  type Manutencao, type InsertManutencao
+  type Manutencao, type InsertManutencao,
+  type Local, type InsertLocal
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -116,6 +117,14 @@ export interface IStorage {
   createManutencao(manutencao: InsertManutencao): Promise<Manutencao>;
   updateManutencao(id: string, updates: Partial<InsertManutencao>): Promise<Manutencao>;
   deleteManutencao(id: string): Promise<void>;
+  
+  // Local operations
+  getAllLocais(): Promise<Local[]>;
+  getLocaisByLocadora(locadoraId: string): Promise<Local[]>;
+  getLocal(id: string): Promise<Local | undefined>;
+  createLocal(local: InsertLocal): Promise<Local>;
+  updateLocal(id: string, updates: Partial<InsertLocal>): Promise<Local>;
+  deleteLocal(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1274,6 +1283,70 @@ export class DatabaseStorage implements IStorage {
 
   async deleteManutencao(id: string): Promise<void> {
     await db.delete(manutencoes).where(eq(manutencoes.id, id));
+  }
+
+  // Local operations
+  async getAllLocais(): Promise<Local[]> {
+    try {
+      const result = await db.select().from(locais);
+      return result;
+    } catch (error) {
+      console.error('Error getting all locais:', error);
+      return [];
+    }
+  }
+
+  async getLocaisByLocadora(locadoraId: string): Promise<Local[]> {
+    try {
+      const result = await db.select().from(locais).where(eq(locais.locadoraId, locadoraId));
+      return result;
+    } catch (error) {
+      console.error('Error getting locais by locadora:', error);
+      return [];
+    }
+  }
+
+  async getLocal(id: string): Promise<Local | undefined> {
+    try {
+      const result = await db.select().from(locais).where(eq(locais.id, id));
+      return result[0];
+    } catch (error) {
+      console.error('Error getting local:', error);
+      return undefined;
+    }
+  }
+
+  async createLocal(local: InsertLocal): Promise<Local> {
+    try {
+      const localData = {
+        ...local,
+        id: local.id || crypto.randomUUID(),
+      };
+      
+      const [created] = await db.insert(locais).values(localData).returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating local:', error);
+      throw error;
+    }
+  }
+
+  async updateLocal(id: string, updates: Partial<InsertLocal>): Promise<Local> {
+    try {
+      const [updated] = await db.update(locais)
+        .set(updates)
+        .where(eq(locais.id, id))
+        .returning();
+      
+      return updated;
+    } catch (error) {
+      console.error('Error updating local:', error);
+      throw error;
+    }
+  }
+
+  async deleteLocal(id: string): Promise<void> {
+    await db.delete(locais).where(eq(locais.id, id));
   }
 }
 

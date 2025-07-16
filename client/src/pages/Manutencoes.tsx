@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Eye, Edit, Trash2, Wrench, Calendar, Clock } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, Wrench, Calendar, Clock, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,12 +7,14 @@ import { useManutencoes } from '@/hooks/useManutencoes';
 import { NovaManutencaoModal } from '@/components/manutencoes/NovaManutencaoModal';
 import { EditarManutencaoModal } from '@/components/manutencoes/EditarManutencaoModal';
 import { VisualizarManutencaoModal } from '@/components/manutencoes/VisualizarManutencaoModal';
+import { NovoLocalModal } from '@/components/locais/NovoLocalModal';
 import { formatDate } from '@/lib/utils';
 import type { Manutencao } from '@shared/schema';
 
 export default function Manutencoes() {
   const { manutencoes, isLoading, deleteManutencao, isDeleting } = useManutencoes();
   const [novaManutencaoModalOpen, setNovaManutencaoModalOpen] = useState(false);
+  const [novoLocalModalOpen, setNovoLocalModalOpen] = useState(false);
   const [editarManutencaoModal, setEditarManutencaoModal] = useState<{ open: boolean; manutencao: Manutencao | null }>({ open: false, manutencao: null });
   const [visualizarManutencaoModal, setVisualizarManutencaoModal] = useState<{ open: boolean; manutencao: Manutencao | null }>({ open: false, manutencao: null });
 
@@ -125,10 +127,16 @@ export default function Manutencoes() {
           <Wrench className="h-6 w-6" />
           Manutenções
         </h1>
-        <Button onClick={() => setNovaManutencaoModalOpen(true)} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Nova Manutenção
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setNovoLocalModalOpen(true)} variant="outline" className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            Cadastrar Locais
+          </Button>
+          <Button onClick={() => setNovaManutencaoModalOpen(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Nova Manutenção
+          </Button>
+        </div>
       </div>
 
       {manutencoes.length === 0 ? (
@@ -238,6 +246,11 @@ export default function Manutencoes() {
         open={visualizarManutencaoModal.open}
         onClose={() => setVisualizarManutencaoModal({ open: false, manutencao: null })}
         manutencao={visualizarManutencaoModal.manutencao}
+      />
+
+      <NovoLocalModal
+        open={novoLocalModalOpen}
+        onClose={() => setNovoLocalModalOpen(false)}
       />
     </div>
   );

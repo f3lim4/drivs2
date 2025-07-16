@@ -345,6 +345,43 @@ export const insertManutencaoSchema = createInsertSchema(manutencoes).omit({
   updatedAt: true,
 });
 
+// Locais table (oficinas/locais de manutenção)
+export const locais = pgTable("locais", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  locadoraId: text("locadora_id").notNull(), // Referência ao CNPJ da locadora
+  
+  // Informações básicas
+  nome: text("nome").notNull(),
+  tipo: text("tipo").notNull(), // 'oficina', 'concessionaria', 'borracharia', 'lavagem', 'outros'
+  
+  // Contato
+  telefone: text("telefone"),
+  email: text("email"),
+  contato: text("contato"), // Nome do contato
+  
+  // Endereço
+  endereco: text("endereco"),
+  cidade: text("cidade"),
+  estado: text("estado"),
+  cep: text("cep"),
+  
+  // Informações adicionais
+  especialidade: text("especialidade"), // Ex: "Mecânica geral", "Funilaria", "Elétrica"
+  observacoes: text("observacoes"),
+  
+  // Status
+  status: text("status").notNull().default("ativo"), // 'ativo', 'inativo'
+  
+  // Controle interno
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertLocalSchema = createInsertSchema(locais).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -402,3 +439,6 @@ export type Manutencao = typeof manutencoes.$inferSelect & {
   veiculoModelo?: string;
   veiculoPlaca?: string;
 };
+
+export type InsertLocal = z.infer<typeof insertLocalSchema>;
+export type Local = typeof locais.$inferSelect;

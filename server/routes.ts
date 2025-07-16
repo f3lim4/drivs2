@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -915,6 +915,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Manutencao deleted successfully" });
     } catch (error) {
       console.error("Error deleting manutencao:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Locais (Oficinas/Locais) API routes
+  app.get("/api/locais", async (req, res) => {
+    try {
+      const { locadoraId } = req.query;
+      
+      if (locadoraId) {
+        const locais = await storage.getLocaisByLocadora(locadoraId as string);
+        res.json(locais);
+      } else {
+        const locais = await storage.getAllLocais();
+        res.json(locais);
+      }
+    } catch (error) {
+      console.error("Error fetching locais:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/locais/:id", async (req, res) => {
+    try {
+      const local = await storage.getLocal(req.params.id);
+      if (!local) {
+        return res.status(404).json({ message: "Local not found" });
+      }
+      res.json(local);
+    } catch (error) {
+      console.error("Error fetching local:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/locais", async (req, res) => {
+    try {
+      const validatedData = insertLocalSchema.omit({ id: true }).parse(req.body);
+      const local = await storage.createLocal(validatedData);
+      res.json(local);
+    } catch (error) {
+      console.error("Error creating local:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/locais/:id", async (req, res) => {
+    try {
+      const validatedData = insertLocalSchema.partial().parse(req.body);
+      const local = await storage.updateLocal(req.params.id, validatedData);
+      res.json(local);
+    } catch (error) {
+      console.error("Error updating local:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/locais/:id", async (req, res) => {
+    try {
+      await storage.deleteLocal(req.params.id);
+      res.json({ message: "Local deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting local:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
