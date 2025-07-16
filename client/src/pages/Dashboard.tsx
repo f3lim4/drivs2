@@ -248,13 +248,18 @@ export default function Dashboard() {
         {/* Receita Mensal - Card Personalizado */}
         <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-2">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-green-100">
+                  <DollarSign className="w-4 h-4 text-green-600" />
+                </div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Receita Mensal
                 </p>
-                
-                <p className="text-2xl font-bold text-foreground">
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-xl font-bold text-foreground">
                   {formatCurrency(receitaMensal)}
                 </p>
                 
@@ -268,12 +273,6 @@ export default function Dashboard() {
                     </span>
                     <span>baseada em aluguéis ativos</span>
                   </div>
-                </div>
-              </div>
-
-              <div className="p-3 rounded-xl bg-green-100">
-                <div className="w-6 h-6 text-green-600">
-                  <DollarSign />
                 </div>
               </div>
             </div>
