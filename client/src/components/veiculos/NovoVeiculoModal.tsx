@@ -305,66 +305,74 @@ export function NovoVeiculoModal({
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="ano"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ano *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          placeholder="2025" 
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="cor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cor *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Branco, Preto, etc." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
 
-              <FormField
-                control={form.control}
-                name="categoria"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Categoria *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Hatch" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="hatch">Hatch</SelectItem>
-                        <SelectItem value="sedan">Sedan</SelectItem>
-                        <SelectItem value="suv">SUV</SelectItem>
-                        <SelectItem value="pickup">Pickup</SelectItem>
-                        <SelectItem value="van">Van</SelectItem>
-                        <SelectItem value="conversivel">Conversível</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-6 gap-4">
+                <div className="col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="ano"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ano *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            placeholder="2025" 
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="cor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cor *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Branco, Preto, etc." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="col-span-2">
+                  <FormField
+                    control={form.control}
+                    name="categoria"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Categoria *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Hatch" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="hatch">Hatch</SelectItem>
+                            <SelectItem value="sedan">Sedan</SelectItem>
+                            <SelectItem value="suv">SUV</SelectItem>
+                            <SelectItem value="pickup">Pickup</SelectItem>
+                            <SelectItem value="van">Van</SelectItem>
+                            <SelectItem value="conversivel">Conversível</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
             </div>
 
             {/* DOCUMENTAÇÃO */}
