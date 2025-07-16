@@ -24,6 +24,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Formatação de valor do veículo** - Implementado padrão brasileiro (00.000,00)
 - ✅ **Valor final do financiamento** - Campo calculado automaticamente na interface
 - ✅ **Layout de 3 colunas** - Valor financiamento, quantidade parcelas e valor final
+- ✅ **Despesas de financiamento** - Valor mensal do financiamento aparece como despesa fixa
+- ✅ **Categoria "financiamento"** - Nova categoria para despesas de financiamento
+- ✅ **Ícone "ver" na primeira coluna** - Adicionado ícone de visualização nos relatórios
 
 ### 2025-07-16: Sistema de Manutenções com Controle de Pagamento - CONCLUÍDO
 - ✅ **Campos de pagamento implementados** - StatusPagamento e FormaPagamento adicionados ao schema
