@@ -113,6 +113,17 @@ export default function Dashboard() {
     }).format(value);
   };
 
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return null;
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return null;
+      return date.toLocaleDateString('pt-BR');
+    } catch {
+      return null;
+    }
+  };
+
   // Calcular estatísticas diretamente
   const hoje = new Date();
   const proximoMes = new Date(hoje);
@@ -337,12 +348,16 @@ export default function Dashboard() {
                         {anuncio.conteudo}
                       </p>
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span>
-                          Válido até: {new Date(anuncio.dataFim || anuncio.dataInicio).toLocaleDateString('pt-BR')}
-                        </span>
-                        <span>
-                          Publicado: {new Date(anuncio.dataInicio).toLocaleDateString('pt-BR')}
-                        </span>
+                        {formatDate(anuncio.dataFim) && (
+                          <span>
+                            Válido até: {formatDate(anuncio.dataFim)}
+                          </span>
+                        )}
+                        {formatDate(anuncio.dataInicio) && (
+                          <span>
+                            Publicado: {formatDate(anuncio.dataInicio)}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
