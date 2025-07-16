@@ -632,12 +632,13 @@ export function EditarVeiculoModal({
                       <FormLabel>Valor do Veículo (R$)</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
-                          step="0.01"
-                          placeholder="0"
+                          type="text" 
+                          placeholder="00.000,00"
                           {...field}
+                          value={field.value ? field.value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}
                           onChange={(e) => {
-                            const valor = parseFloat(e.target.value) || 0;
+                            // Remove formatação e converte para número
+                            const valor = parseFloat(e.target.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
                             field.onChange(valor);
                             // Calcular IPVA automaticamente (4% do valor)
                             if (valor > 0) {
