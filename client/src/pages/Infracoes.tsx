@@ -7,17 +7,36 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useInfracoes } from '@/hooks/useInfracoes';
+import { useAuth } from '@/hooks/useAuth';
+import { useLocadoras } from '@/hooks/useLocadoras';
 import type { Infracao } from '@shared/schema';
 import { NovaInfracaoModal } from '@/components/infracoes/NovaInfracaoModal';
 import { EditarInfracaoModal } from '@/components/infracoes/EditarInfracaoModal';
 
 export default function Infracoes() {
   const { infracoes, isLoading, isDeleting, deleteInfracao } = useInfracoes();
+  const { profile } = useAuth();
+  const { locadoras } = useLocadoras();
+  const isAdmin = profile?.tipo === 'admin';
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [tipoFilter, setTipoFilter] = useState('all');
   const [showNovaInfracao, setShowNovaInfracao] = useState(false);
   const [editingInfracao, setEditingInfracao] = useState<Infracao | null>(null);
+
+  // Função para obter o nome da locadora pelo ID
+  const getLocadoraName = (locadoraId: string) => {
+    const locadora = locadoras.find(loc => loc.id === locadoraId);
+    return locadora?.nome || 'Locadora';
+  };
+
+  // Função para formatar data
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+  };
+
+
 
   // Filtros
   const filteredInfracoes = infracoes.filter(infracao => {
@@ -82,9 +101,7 @@ export default function Infracoes() {
     }).format(value);
   };
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('pt-BR');
-  };
+
 
   if (isLoading) {
     return (
@@ -218,6 +235,7 @@ export default function Infracoes() {
                   <TableHead>Nº Auto</TableHead>
                   <TableHead>Motorista</TableHead>
                   <TableHead>Veículo</TableHead>
+                  {isAdmin && <TableHead>Locadora</TableHead>}
                   <TableHead>Tipo</TableHead>
                   <TableHead>Descrição</TableHead>
                   <TableHead>Data</TableHead>
@@ -229,7 +247,7 @@ export default function Infracoes() {
               <TableBody>
                 {filteredInfracoes.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8">
+                    <TableCell colSpan={isAdmin ? 10 : 9} className="text-center py-8">
                       <div className="text-center">
                         <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                         <p className="text-lg font-medium text-gray-900">Nenhuma infração encontrada</p>
@@ -248,6 +266,16 @@ export default function Infracoes() {
                       <TableCell className="font-medium">{infracao.numeroAuto}</TableCell>
                       <TableCell>{infracao.motoristaNome}</TableCell>
                       <TableCell>{infracao.veiculoPlaca}</TableCell>
+                      {isAdmin && (
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                              {getLocadoraName(infracao.locadoraId).charAt(0)}
+                            </div>
+                            <span className="text-sm">{getLocadoraName(infracao.locadoraId)}</span>
+                          </div>
+                        </TableCell>
+                      )}
                       <TableCell>{getTipoBadge(infracao.tipoInfracao)}</TableCell>
                       <TableCell className="max-w-48 truncate">{infracao.descricaoInfracao}</TableCell>
                       <TableCell>{formatDate(infracao.dataInfracao)}</TableCell>
