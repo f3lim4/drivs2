@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-16: Layout dos Modais de Veículos e Correções de Financiamento - CONCLUÍDO
+- ✅ **Layout reorganizado nos modais** - Placa, marca e modelo na primeira linha
+- ✅ **Segunda linha otimizada** - Ano, cor e categoria organizados lado a lado
+- ✅ **Categoria com tamanho reduzido** - Campo categoria ocupa menos espaço (2 colunas de 6)
+- ✅ **Títulos das seções removidos** - Interface mais limpa sem divisórias entre seções
+- ✅ **Checkbox de financiamento corrigido** - Agora mantém valor selecionado corretamente
+- ✅ **Validação de data de compra** - Tratamento melhorado para campos vazios
+- ✅ **Dados salvos no PostgreSQL** - Financiamento e data de compra persistem corretamente
+- ✅ **Formulário otimizado** - Melhor controle de estado e validação
+- ✅ **Interface compacta** - Layout mais direto e funcional para edição de veículos
+
 ### 2025-07-16: Sistema de Manutenções com Controle de Pagamento - CONCLUÍDO
 - ✅ **Campos de pagamento implementados** - StatusPagamento e FormaPagamento adicionados ao schema
 - ✅ **Interface tabular padronizada** - Página reformulada seguindo padrão da página de veículos
