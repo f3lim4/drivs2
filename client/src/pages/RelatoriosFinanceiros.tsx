@@ -278,6 +278,15 @@ export default function RelatoriosFinanceiros() {
     const lucro = receitaMensal - despesasMensais;
     const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
     
+    // Debug para verificar valores
+    console.log('Debug despesas:', {
+      veiculo: veiculo.placa,
+      despesasManuais,
+      despesasFixasMensais,
+      despesasMensais,
+      despesasFixasDetalhadas: despesaFixaVeiculo?.despesas
+    });
+    
     // Status baseado em dados reais
     let status = 'Parado';
     if (aluguelVeiculo && receitaMensal > 0) {
