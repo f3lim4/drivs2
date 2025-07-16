@@ -44,6 +44,33 @@ export function NovaDespesaModal() {
     },
   });
 
+  // Função para preencher automaticamente o valor do seguro
+  const preencherValorSeguro = () => {
+    const categoria = form.watch('categoria');
+    const veiculoId = form.watch('veiculoId');
+    
+    if (categoria === 'seguro' && veiculoId && veiculoId !== 'sem-veiculo') {
+      const veiculo = veiculos.find(v => v.id === veiculoId);
+      if (veiculo && veiculo.valorSeguroMensal) {
+        form.setValue('valor', veiculo.valorSeguroMensal);
+        form.setValue('descricao', `Seguro ${veiculo.seguradora || 'mensal'} - ${veiculo.placa}`);
+      }
+    }
+  };
+
+  // Observar mudanças nos campos categoria e veiculoId
+  const categoria = form.watch('categoria');
+  const veiculoId = form.watch('veiculoId');
+  
+  // Executar o preenchimento automático quando categoria ou veículo mudam
+  if (categoria === 'seguro' && veiculoId && veiculoId !== 'sem-veiculo') {
+    const veiculo = veiculos.find(v => v.id === veiculoId);
+    if (veiculo && veiculo.valorSeguroMensal && form.getValues('valor') !== veiculo.valorSeguroMensal) {
+      form.setValue('valor', veiculo.valorSeguroMensal);
+      form.setValue('descricao', `Seguro ${veiculo.seguradora || 'mensal'} - ${veiculo.placa}`);
+    }
+  }
+
   const onSubmit = async (data: z.infer<typeof despesaFormSchema>) => {
     try {
       await createDespesa(data);
@@ -179,7 +206,12 @@ export function NovaDespesaModal() {
                 name="valor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Valor</FormLabel>
+                    <FormLabel>
+                      Valor
+                      {categoria === 'seguro' && veiculoId && veiculoId !== 'sem-veiculo' && (
+                        <span className="text-xs text-green-600 ml-2">(preenchido automaticamente)</span>
+                      )}
+                    </FormLabel>
                     <FormControl>
                       <Input {...field} placeholder="0,00" />
                     </FormControl>

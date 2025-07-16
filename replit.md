@@ -36,6 +36,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Modal de cadastro de locais** - Campos completos para nome, tipo, contato, endereço
 - ✅ **Integração com manutenções** - Locais ficam disponíveis para seleção nas manutenções
 - ✅ **Tamanho de texto otimizado** - Valores nos cards financeiros reduzidos para melhor legibilidade
+- ✅ **Preenchimento automático de seguro** - Valores de seguro preenchidos automaticamente do cadastro do veículo
+- ✅ **Indicador visual** - Mostra quando valor é preenchido automaticamente
+- ✅ **Dados atualizados** - Veículos com valores de seguro configurados no banco
 
 ### 2025-07-15: Header Fixo Mobile e Melhorias UX - CONCLUÍDO
 - ✅ **Header fixo no mobile** - Cabeçalho permanece fixo no topo em dispositivos móveis
