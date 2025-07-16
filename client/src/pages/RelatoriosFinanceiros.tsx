@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Search } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Search, Trash2 } from 'lucide-react';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
@@ -29,6 +29,33 @@ export default function RelatoriosFinanceiros() {
   const { motoristas } = useMotoristas();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [termoBusca, setTermoBusca] = useState<string>('');
+  const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
+
+  // Função para excluir despesa
+  const handleExcluirDespesa = async (despesaId: string) => {
+    try {
+      setDespesaExcluindo(despesaId);
+      
+      const response = await fetch(`/api/despesas/${despesaId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao excluir despesa');
+      }
+
+      // Força a atualização da lista
+      window.location.reload();
+    } catch (error) {
+      console.error('Erro ao excluir despesa:', error);
+      alert('Erro ao excluir despesa');
+    } finally {
+      setDespesaExcluindo(null);
+    }
+  };
 
   // Cálculos para o período selecionado
   const monthStart = startOfMonth(selectedMonth);
@@ -752,6 +779,7 @@ export default function RelatoriosFinanceiros() {
                           <TableHead>Descrição</TableHead>
                           <TableHead>Valor</TableHead>
                           <TableHead>Status</TableHead>
+                          <TableHead>Ações</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -786,6 +814,21 @@ export default function RelatoriosFinanceiros() {
                                   <Badge variant={despesa.status === 'pago' ? 'default' : 'secondary'}>
                                     {despesa.status}
                                   </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      if (confirm('Tem certeza que deseja excluir esta despesa?')) {
+                                        handleExcluirDespesa(despesa.id);
+                                      }
+                                    }}
+                                    disabled={despesaExcluindo === despesa.id}
+                                    className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
                                 </TableCell>
                               </TableRow>
                             );
