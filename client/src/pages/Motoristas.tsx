@@ -60,7 +60,7 @@ export default function Motoristas() {
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
     const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
-    return locadora ? locadora.nome : locadoraId;
+    return locadora ? locadora.nome : locadoraId || 'Locadora';
   };
 
   // Carregamento agora é feito automaticamente pelo hook useMotoristas
@@ -314,7 +314,7 @@ export default function Motoristas() {
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
                           <span className="text-blue-600 text-xs font-medium">
-                            {getLocadoraName(motorista.locadoraId).substring(0, 2).toUpperCase()}
+                            {(getLocadoraName(motorista.locadoraId) || 'L').substring(0, 2).toUpperCase()}
                           </span>
                         </div>
                         <span className="text-sm">{getLocadoraName(motorista.locadoraId)}</span>

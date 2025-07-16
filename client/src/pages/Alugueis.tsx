@@ -57,7 +57,7 @@ export default function Alugueis() {
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
     const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
-    return locadora ? locadora.nome : locadoraId;
+    return locadora ? locadora.nome : locadoraId || 'Locadora';
   };
 
   // Carrega dados dos aluguéis
@@ -378,7 +378,7 @@ export default function Alugueis() {
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 bg-purple-100 rounded flex items-center justify-center">
                             <span className="text-purple-600 text-xs font-medium">
-                              {getLocadoraName(aluguel.locadoraId).substring(0, 2).toUpperCase()}
+                              {(getLocadoraName(aluguel.locadoraId) || 'L').substring(0, 2).toUpperCase()}
                             </span>
                           </div>
                           <span className="text-sm">{getLocadoraName(aluguel.locadoraId)}</span>
