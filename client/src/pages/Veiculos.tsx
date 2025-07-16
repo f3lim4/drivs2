@@ -242,10 +242,10 @@ export default function Veiculos() {
             <TableHeader>
               <TableRow>
                 <TableHead>VEÍCULO</TableHead>
+                <TableHead>PLACA</TableHead>
                 {isAdmin && <TableHead>LOCADORA</TableHead>}
                 <TableHead>VALORES</TableHead>
                 <TableHead>LIMITE KM</TableHead>
-                <TableHead>SEGURO</TableHead>
                 <TableHead>STATUS</TableHead>
                 <TableHead>AÇÕES</TableHead>
               </TableRow>
@@ -259,12 +259,15 @@ export default function Veiculos() {
                         <Car className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-                        <p className="font-medium">{veiculo.placa} • {veiculo.marca} {veiculo.modelo}</p>
+                        <p className="font-medium">{veiculo.marca} {veiculo.modelo}</p>
                         <p className="text-sm text-muted-foreground">
                           {veiculo.ano} • {veiculo.cor} • {veiculo.categoria}
                         </p>
                       </div>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <p className="font-medium">{veiculo.placa}</p>
                   </TableCell>
                    {isAdmin && (
                      <TableCell>
@@ -288,9 +291,6 @@ export default function Veiculos() {
                   </TableCell>
                   <TableCell>
                     <p className="capitalize">{veiculo.kmLimite}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p>{veiculo.seguro}</p>
                   </TableCell>
                   <TableCell>
                     {getStatusBadge(veiculo.status)}
