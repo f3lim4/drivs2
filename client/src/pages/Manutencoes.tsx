@@ -136,11 +136,7 @@ export default function Manutencoes() {
           <CardContent className="p-8 text-center">
             <Wrench className="h-12 w-12 mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-semibold mb-2">Nenhuma manutenção encontrada</h3>
-            <p className="text-gray-500 mb-4">Clique no botão acima para agendar uma nova manutenção</p>
-            <Button onClick={() => setNovaManutencaoModalOpen(true)} className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Nova Manutenção
-            </Button>
+            <p className="text-gray-500">Clique no botão acima para agendar uma nova manutenção</p>
           </CardContent>
         </Card>
       ) : (
