@@ -470,8 +470,12 @@ export default function RelatoriosFinanceiros() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Seletor de mês */}
-      <div className="flex justify-end items-center">
+      {/* Seletor de mês e botão Nova Despesa */}
+      <div className="flex justify-between items-center">
+        <Button onClick={() => setModalNovaDespesa(true)} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          Nova Despesa
+        </Button>
         <Select 
           value={format(selectedMonth, 'yyyy-MM')} 
           onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
@@ -570,7 +574,7 @@ export default function RelatoriosFinanceiros() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
-          <TabsTrigger value="despesas">Despesas</TabsTrigger>
+          <TabsTrigger value="despesas">Histórico</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
         </TabsList>
 
@@ -717,18 +721,10 @@ export default function RelatoriosFinanceiros() {
         <TabsContent value="despesas" className="space-y-4">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Despesas Registradas</CardTitle>
-                  <CardDescription>
-                    Todas as despesas manuais registradas no sistema
-                  </CardDescription>
-                </div>
-                <Button onClick={() => setModalNovaDespesa(true)} className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Nova Despesa
-                </Button>
-              </div>
+              <CardTitle>Histórico de Despesas</CardTitle>
+              <CardDescription>
+                Todas as despesas manuais registradas no sistema
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
