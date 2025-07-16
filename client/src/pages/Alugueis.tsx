@@ -49,24 +49,19 @@ export default function Alugueis() {
   const [selectedAluguel, setSelectedAluguel] = useState<Aluguel | null>(null);
 
   // Buscar locadoras para exibir nome na coluna (somente para admin)
-  const { data: locadoras = [] } = useQuery({
+  const { data: locadoras = [], isLoading: locadorasLoading } = useQuery({
     queryKey: ['/api/locadoras'],
     enabled: isAdmin,
   });
 
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
-    console.log('[ALUGUEIS] DEBUG - locadoraId:', locadoraId);
-    console.log('[ALUGUEIS] DEBUG - locadoras:', locadoras);
-    console.log('[ALUGUEIS] DEBUG - locadoras loading:', locadorasLoading);
-    
     if (!locadoraId) return 'Locadora';
     if (locadorasLoading) return 'Carregando...';
     if (!locadoras || locadoras.length === 0) return 'Sem dados';
     
     const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
-    console.log('[ALUGUEIS] DEBUG - locadora encontrada:', locadora);
-    return locadora ? locadora.nome : locadoraId;
+    return locadora ? locadora.nome : `ID: ${locadoraId}`;
   };
 
   // Carrega dados dos aluguéis
@@ -391,7 +386,6 @@ export default function Alugueis() {
                             </span>
                           </div>
                           <span className="text-sm">{getLocadoraName(aluguel.locadoraId)}</span>
-                          <span className="text-xs text-gray-500">(ID: {aluguel.locadoraId})</span>
                         </div>
                       </TableCell>
                     )}
