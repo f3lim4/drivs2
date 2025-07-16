@@ -15,7 +15,6 @@ import { useInfracoes } from '@/hooks/useInfracoes';
 import { useDespesas } from '@/hooks/useDespesas';
 import { useVeiculos } from '@/hooks/useVeiculos';
 import { useMotoristas } from '@/hooks/useMotoristas';
-import { NovaDespesaModal } from '@/components/despesas/NovaDespesaModal';
 import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
 import { formatCurrency } from '@/lib/utils';
 
@@ -319,8 +318,6 @@ export default function RelatoriosFinanceiros() {
             })}
           </SelectContent>
         </Select>
-        
-        <NovaDespesaModal />
       </div>
 
       {/* Cards de Resumo Financeiro */}
