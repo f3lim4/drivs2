@@ -44,13 +44,42 @@ export function useDespesas() {
           updatedAt: manutencao.updatedAt,
         }));
       
-      const todasDespesas = [...despesasManuais, ...despesasManutencao];
+      // Buscar veículos para incluir despesas de financiamento
+      const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
+      if (!veiculosResponse.ok) throw new Error('Failed to fetch veiculos');
+      const veiculos = await veiculosResponse.json();
+      
+      // Converter financiamentos em despesas mensais
+      const despesasFinanciamento = veiculos
+        .filter((veiculo: any) => veiculo.financiado && veiculo.valorFinanciamento && veiculo.quantidadeParcelas)
+        .map((veiculo: any) => {
+          const valorMensal = parseFloat(veiculo.valorFinanciamento) / veiculo.quantidadeParcelas;
+          return {
+            id: `financiamento_${veiculo.id}`,
+            locadoraId: veiculo.locadoraId,
+            veiculoId: veiculo.id,
+            veiculoModelo: `${veiculo.marca} ${veiculo.modelo}`,
+            veiculoPlaca: veiculo.placa,
+            categoria: 'financiamento',
+            descricao: `Financiamento - ${veiculo.marca} ${veiculo.modelo} (${veiculo.placa})`,
+            valor: valorMensal.toFixed(2),
+            data: format(new Date(), 'yyyy-MM-dd'), // Data atual para despesas fixas
+            tipo: 'despesa',
+            fonte: 'financiamento',
+            veiculoFinanciado: veiculo.id,
+            createdAt: veiculo.createdAt,
+            updatedAt: veiculo.updatedAt,
+          };
+        });
+      
+      const todasDespesas = [...despesasManuais, ...despesasManutencao, ...despesasFinanciamento];
       
       console.log('Despesas - Verificando isolamento:', {
         locadoraId,
         despesasTotal: todasDespesas.length,
         despesasManuais: despesasManuais.length,
         despesasManutencao: despesasManutencao.length,
+        despesasFinanciamento: despesasFinanciamento.length,
         primeiraDespesa: todasDespesas[0]?.locadoraId
       });
       
