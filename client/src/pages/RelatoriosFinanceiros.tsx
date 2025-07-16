@@ -73,7 +73,7 @@ export default function RelatoriosFinanceiros() {
       const motoristasIds = motoristasFiltrados.map(m => m.id);
       
       // Buscar por categoria de despesa
-      const categoriaMatch = ['manutencao', 'seguro', 'ipva', 'multa', 'licenciamento', 'lavagem', 'outros']
+      const categoriaMatch = ['manutencao', 'seguro', 'ipva', 'multa', 'licenciamento', 'lavagem', 'financiamento', 'outros']
         .some(categoria => categoria.toLowerCase().includes(termo));
       
       // Aplicar filtros baseados na busca
