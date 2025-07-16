@@ -29,6 +29,10 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Dados simulados removidos** - Eliminadas despesas falsas de manutenção e combustível
 - ✅ **Categorias atualizadas** - Adicionadas licenciamento e lavagem às categorias disponíveis
 - ✅ **Botão "Nova Despesa" removido** - Interface financeira focada apenas em relatórios
+- ✅ **Sistema de filtros implementado** - Filtros por veículo, motorista e categoria de despesa
+- ✅ **Indicador visual de filtros** - Badge mostra quantos filtros estão aplicados
+- ✅ **Botão "Limpar Filtros"** - Reseta todos os filtros com um clique
+- ✅ **Filtros aplicados aos dados** - Aluguéis, despesas e infrações filtrados corretamente
 
 ### 2025-07-15: Sistema de Infrações com Seleção Inteligente - CONCLUÍDO
 - ✅ **Seleção inteligente implementada** - Motoristas com aluguel ativo aparecem primeiro
