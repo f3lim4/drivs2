@@ -533,15 +533,7 @@ export default function RelatoriosFinanceiros() {
             <CardContent>
               <div className="space-y-4">
                 {(() => {
-                  // Debug: verificar dados de despesas
-                  console.log('Debug despesas por categoria:', {
-                    totalDespesas: filteredData.despesasPeriodo.length,
-                    despesasPeriodo: filteredData.despesasPeriodo,
-                    monthStart: format(monthStart, 'yyyy-MM-dd'),
-                    monthEnd: format(monthEnd, 'yyyy-MM-dd')
-                  });
-                  
-                  const categoriasComDados = ['manutencao', 'seguro', 'ipva', 'multa', 'outros']
+                  const categoriasComDados = ['manutencao', 'seguro', 'ipva', 'multa', 'licenciamento', 'lavagem', 'outros']
                     .map((categoria) => {
                       const despesasCategoria = filteredData.despesasPeriodo
                         .filter(d => d.categoria === categoria && d.tipo === 'despesa');
@@ -550,12 +542,6 @@ export default function RelatoriosFinanceiros() {
                         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
                       
                       const percentage = totalDespesas > 0 ? (valor / totalDespesas) * 100 : 0;
-                      
-                      console.log(`Categoria ${categoria}:`, {
-                        despesasEncontradas: despesasCategoria.length,
-                        valor,
-                        percentage
-                      });
                       
                       return { categoria, valor, percentage };
                     })

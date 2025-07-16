@@ -26,6 +26,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Aba "Tendências" removida** - Interface simplificada com 4 abas principais
 - ✅ **Categoria "Combustível" removida** - Aba despesas por categoria mostra apenas dados reais
 - ✅ **Filtro de dados reais** - Apenas categorias com valores reais são exibidas
+- ✅ **Dados simulados removidos** - Eliminadas despesas falsas de manutenção e combustível
+- ✅ **Categorias atualizadas** - Adicionadas licenciamento e lavagem às categorias disponíveis
 
 ### 2025-07-15: Sistema de Infrações com Seleção Inteligente - CONCLUÍDO
 - ✅ **Seleção inteligente implementada** - Motoristas com aluguel ativo aparecem primeiro
