@@ -256,7 +256,7 @@ export function NovoVeiculoModal({
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="placa"
@@ -291,9 +291,7 @@ export function NovoVeiculoModal({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="modelo"
