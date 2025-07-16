@@ -174,7 +174,6 @@ export default function RelatoriosFinanceiros() {
 
     // Detalhamento por categoria
     const categorias = [
-      { key: 'combustivel', nome: 'Combustível' },
       { key: 'manutencao', nome: 'Manutenção' },
       { key: 'seguro', nome: 'Seguro' },
       { key: 'ipva', nome: 'IPVA' },
