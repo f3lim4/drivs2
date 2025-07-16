@@ -145,7 +145,7 @@ export function NovaDespesaModal() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Nenhum veículo</SelectItem>
+                        <SelectItem value="sem-veiculo">Nenhum veículo</SelectItem>
                         {veiculos.map((veiculo) => (
                           <SelectItem key={veiculo.id} value={veiculo.id}>
                             {veiculo.modelo} - {veiculo.placa}
