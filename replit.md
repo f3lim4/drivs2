@@ -33,6 +33,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Indicador visual de filtros** - Badge mostra quantos filtros estão aplicados
 - ✅ **Botão "Limpar Filtros"** - Reseta todos os filtros com um clique
 - ✅ **Filtros aplicados aos dados** - Aluguéis, despesas e infrações filtrados corretamente
+- ✅ **Filtros reposicionados** - Movidos para baixo dos cards principais com fundo destacado
 
 ### 2025-07-15: Sistema de Infrações com Seleção Inteligente - CONCLUÍDO
 - ✅ **Seleção inteligente implementada** - Motoristas com aluguel ativo aparecem primeiro
