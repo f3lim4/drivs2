@@ -60,6 +60,12 @@ export interface Veiculo {
   numeroApolice?: string;
   vigenciaSeguro?: string;
   valorSeguroMensal?: number;
+  // Valor do Veículo e IPVA
+  valorVeiculo?: number;
+  ipva?: number;
+  // Rastreador
+  rastreador?: string;
+  valorRastreadorMensal?: number;
   // Status
   status: 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel';
   // Campos legados para compatibilidade
