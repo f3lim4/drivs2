@@ -78,6 +78,12 @@ const navigationItems = [
     description: 'Gestão de infrações'
   },
   {
+    title: 'Relatórios Financeiros',
+    url: '/relatorios-financeiros',
+    icon: FileText,
+    description: 'Análise financeira completa'
+  },
+  {
     title: 'Locadoras',
     url: '/locadoras',
     icon: Building2,

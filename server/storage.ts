@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -9,7 +9,8 @@ import {
   type Contrato, type InsertContrato,
   type TemplateContrato, type InsertTemplateContrato,
   type Pagamento, type InsertPagamento,
-  type Infracao, type InsertInfracao
+  type Infracao, type InsertInfracao,
+  type Despesa, type InsertDespesa
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -96,6 +97,15 @@ export interface IStorage {
   createInfracao(infracao: InsertInfracao): Promise<Infracao>;
   updateInfracao(id: string, updates: Partial<InsertInfracao>): Promise<Infracao>;
   deleteInfracao(id: string): Promise<void>;
+  
+  // Despesa operations
+  getAllDespesas(): Promise<Despesa[]>;
+  getDespesasByLocadora(locadoraId: string): Promise<Despesa[]>;
+  getDespesasByVeiculo(veiculoId: string): Promise<Despesa[]>;
+  getDespesa(id: string): Promise<Despesa | undefined>;
+  createDespesa(despesa: InsertDespesa): Promise<Despesa>;
+  updateDespesa(id: string, updates: Partial<InsertDespesa>): Promise<Despesa>;
+  deleteDespesa(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -910,6 +920,188 @@ export class DatabaseStorage implements IStorage {
   async deleteInfracao(id: string): Promise<void> {
     await db.delete(infracoes).where(eq(infracoes.id, id));
   }
+
+  // Despesa operations
+  async getAllDespesas(): Promise<Despesa[]> {
+    try {
+      const result = await db.select().from(despesas);
+      
+      // Enriquecer com dados do veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (despesa) => {
+          let veiculoModelo = '';
+          let veiculoPlaca = '';
+          
+          if (despesa.veiculoId) {
+            const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, despesa.veiculoId)).limit(1);
+            veiculoModelo = veiculo[0]?.modelo || '';
+            veiculoPlaca = veiculo[0]?.placa || '';
+          }
+          
+          return {
+            ...despesa,
+            veiculoModelo,
+            veiculoPlaca
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting all despesas:', error);
+      return [];
+    }
+  }
+
+  async getDespesasByLocadora(locadoraId: string): Promise<Despesa[]> {
+    try {
+      const result = await db.select().from(despesas).where(eq(despesas.locadoraId, locadoraId));
+      
+      // Enriquecer com dados do veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (despesa) => {
+          let veiculoModelo = '';
+          let veiculoPlaca = '';
+          
+          if (despesa.veiculoId) {
+            const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, despesa.veiculoId)).limit(1);
+            veiculoModelo = veiculo[0]?.modelo || '';
+            veiculoPlaca = veiculo[0]?.placa || '';
+          }
+          
+          return {
+            ...despesa,
+            veiculoModelo,
+            veiculoPlaca
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting despesas by locadora:', error);
+      return [];
+    }
+  }
+
+  async getDespesasByVeiculo(veiculoId: string): Promise<Despesa[]> {
+    try {
+      const result = await db.select().from(despesas).where(eq(despesas.veiculoId, veiculoId));
+      
+      // Enriquecer com dados do veículo
+      const enrichedResults = await Promise.all(
+        result.map(async (despesa) => {
+          const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, despesa.veiculoId!)).limit(1);
+          
+          return {
+            ...despesa,
+            veiculoModelo: veiculo[0]?.modelo || '',
+            veiculoPlaca: veiculo[0]?.placa || ''
+          };
+        })
+      );
+      
+      return enrichedResults;
+    } catch (error) {
+      console.error('Error getting despesas by veiculo:', error);
+      return [];
+    }
+  }
+
+  async getDespesa(id: string): Promise<Despesa | undefined> {
+    try {
+      const result = await db.select().from(despesas).where(eq(despesas.id, id));
+      
+      if (result.length === 0) {
+        return undefined;
+      }
+      
+      const despesa = result[0];
+      
+      // Buscar dados do veículo se existir
+      let veiculoModelo = '';
+      let veiculoPlaca = '';
+      
+      if (despesa.veiculoId) {
+        const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, despesa.veiculoId)).limit(1);
+        veiculoModelo = veiculo[0]?.modelo || '';
+        veiculoPlaca = veiculo[0]?.placa || '';
+      }
+      
+      return {
+        ...despesa,
+        veiculoModelo,
+        veiculoPlaca
+      };
+    } catch (error) {
+      console.error('Error getting despesa:', error);
+      return undefined;
+    }
+  }
+
+  async createDespesa(despesa: InsertDespesa): Promise<Despesa> {
+    try {
+      const despesaData = {
+        ...despesa,
+        id: despesa.id || crypto.randomUUID(),
+      };
+      
+      await db.insert(despesas).values(despesaData);
+      
+      // Retornar o objeto construído manualmente
+      return {
+        id: despesaData.id,
+        locadoraId: despesaData.locadoraId,
+        veiculoId: despesaData.veiculoId || null,
+        categoria: despesaData.categoria,
+        descricao: despesaData.descricao,
+        valor: despesaData.valor,
+        data: despesaData.data,
+        tipo: despesaData.tipo,
+        status: despesaData.status,
+        observacoes: despesaData.observacoes || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        veiculoModelo: '',
+        veiculoPlaca: ''
+      };
+    } catch (error) {
+      console.error('Error creating despesa:', error);
+      throw error;
+    }
+  }
+
+  async updateDespesa(id: string, updates: Partial<InsertDespesa>): Promise<Despesa> {
+    try {
+      const [updated] = await db.update(despesas)
+        .set(updates)
+        .where(eq(despesas.id, id))
+        .returning();
+      
+      // Buscar dados do veículo se existir
+      let veiculoModelo = '';
+      let veiculoPlaca = '';
+      
+      if (updated.veiculoId) {
+        const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, updated.veiculoId)).limit(1);
+        veiculoModelo = veiculo[0]?.modelo || '';
+        veiculoPlaca = veiculo[0]?.placa || '';
+      }
+      
+      return {
+        ...updated,
+        veiculoModelo,
+        veiculoPlaca
+      };
+    } catch (error) {
+      console.error('Error updating despesa:', error);
+      throw error;
+    }
+  }
+
+  async deleteDespesa(id: string): Promise<void> {
+    await db.delete(despesas).where(eq(despesas.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -921,6 +1113,7 @@ export class MemStorage implements IStorage {
   private alugueisMap: Map<string, Aluguel>;
   private contratosMap: Map<string, Contrato>;
   private infracoesMap: Map<string, Infracao>;
+  private despesasMap: Map<string, Despesa>;
   currentId: number;
 
   constructor() {
