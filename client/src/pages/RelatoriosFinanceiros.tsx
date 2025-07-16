@@ -574,8 +574,8 @@ export default function RelatoriosFinanceiros() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
-          <TabsTrigger value="despesas">Histórico</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
+          <TabsTrigger value="despesas">Histórico</TabsTrigger>
         </TabsList>
 
         <TabsContent value="veiculos" className="space-y-4">
