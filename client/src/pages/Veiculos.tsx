@@ -243,8 +243,6 @@ export default function Veiculos() {
               <TableRow>
                 <TableHead>VEÍCULO</TableHead>
                 {isAdmin && <TableHead>LOCADORA</TableHead>}
-                <TableHead>PLACA</TableHead>
-                <TableHead>CATEGORIA</TableHead>
                 <TableHead>VALORES</TableHead>
                 <TableHead>LIMITE KM</TableHead>
                 <TableHead>SEGURO</TableHead>
@@ -261,10 +259,11 @@ export default function Veiculos() {
                         <Car className="w-5 h-5 text-primary-foreground" />
                       </div>
                       <div>
-                        <p className="font-medium">{veiculo.modelo}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {veiculo.ano} • {veiculo.cor}
-                        </p>
+                        <p className="font-medium">{veiculo.placa} • {veiculo.marca} {veiculo.modelo}</p>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span>{veiculo.ano} • {veiculo.cor}</span>
+                          <Badge variant="outline" className="capitalize text-xs">{veiculo.categoria}</Badge>
+                        </div>
                       </div>
                     </div>
                   </TableCell>
@@ -280,17 +279,6 @@ export default function Veiculos() {
                        </div>
                      </TableCell>
                    )}
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{veiculo.placa}</p>
-                      <p className="text-sm text-muted-foreground">{veiculo.combustivel || 'Flex'}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="capitalize">
-                      {veiculo.categoria}
-                    </Badge>
-                  </TableCell>
                   <TableCell>
                     <div>
                       <p className="font-medium">{formatCurrency(veiculo.valorSemanal)}/sem</p>
