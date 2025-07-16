@@ -383,8 +383,9 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Grid de estatísticas principais */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* Grid de estatísticas principais - apenas para locadoras */}
+      {isLocadora && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Total de Motoristas - Card Personalizado */}
         <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
           <CardContent className="p-6">
@@ -488,8 +489,10 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+      )}
 
-      {/* Seção inferior com alertas e aluguéis recentes */}
+      {/* Seção inferior com alertas e aluguéis recentes - apenas para locadoras */}
+      {isLocadora && (
       <div className="grid gap-6 md:grid-cols-2">
         {/* Card de Atividade Recentes */}
         <Card>
@@ -588,52 +591,53 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Estatísticas detalhadas em grid menor */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="border border-gray-200 bg-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">CNH Vencendo</p>
+                  <p className="text-2xl font-bold text-yellow-600">{cnhVencendo}</p>
+                </div>
+                <div className="p-2 rounded-lg bg-yellow-100">
+                  <Clock className="w-6 h-6 text-yellow-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 bg-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">CNH Vencida</p>
+                  <p className="text-2xl font-bold text-red-600">{cnhVencida}</p>
+                </div>
+                <div className="p-2 rounded-lg bg-red-100">
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-gray-200 bg-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Veículos em Manutenção</p>
+                  <p className="text-2xl font-bold text-gray-600">{veiculosManutencao}</p>
+                </div>
+                <div className="p-2 rounded-lg bg-gray-100">
+                  <Car className="w-6 h-6 text-gray-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-
-      {/* Estatísticas detalhadas em grid menor */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border border-gray-200 bg-white">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">CNH Vencendo</p>
-                <p className="text-2xl font-bold text-yellow-600">{cnhVencendo}</p>
-              </div>
-              <div className="p-2 rounded-lg bg-yellow-100">
-                <Clock className="w-6 h-6 text-yellow-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-gray-200 bg-white">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">CNH Vencida</p>
-                <p className="text-2xl font-bold text-red-600">{cnhVencida}</p>
-              </div>
-              <div className="p-2 rounded-lg bg-red-100">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-gray-200 bg-white">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Veículos em Manutenção</p>
-                <p className="text-2xl font-bold text-gray-600">{veiculosManutencao}</p>
-              </div>
-              <div className="p-2 rounded-lg bg-gray-100">
-                <Car className="w-6 h-6 text-gray-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      )}
     </div>
   );
 }
