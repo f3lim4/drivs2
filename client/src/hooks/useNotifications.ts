@@ -84,6 +84,13 @@ export function useNotifications() {
     locadoraId: profile?.locadoraId
   });
 
+  // Log detalhado dos dados
+  console.log('Notificações - Detalhes dos dados:', {
+    motoristas: motoristas.map(m => ({ id: m.id, nome: m.nome, vencimentoCnh: m.vencimentoCnh })),
+    infracoes: infracoes.map(i => ({ id: i.id, status: i.status, dataVencimento: i.dataVencimento, situacao: i.situacao })),
+    pagamentos: pagamentos.map(p => ({ id: p.id, status: p.status, valor: p.valor, motoristaNome: p.motoristaNome }))
+  });
+
   if (motoristas.length > 0) {
     motoristas.forEach((motorista: any) => {
       const vencimentoCnh = new Date(motorista.vencimentoCnh);
@@ -248,20 +255,31 @@ export function useNotifications() {
     });
   }
 
-  // Notificações de infrações
+  // Notificações de infrações - alertas de prazo de pagamento
   if (infracoes.length > 0) {
     infracoes.forEach((infracao: any) => {
-      if (infracao.situacao === 'ativo') {
-        const dataInfracao = new Date(infracao.data);
-        const diasAtras = differenceInDays(today, dataInfracao);
+      if (infracao.situacao === 'ativo' && infracao.status === 'pendente') {
+        const dataVencimento = new Date(infracao.dataVencimento);
+        const diasParaVencer = differenceInDays(dataVencimento, today);
         
-        if (diasAtras <= 3) { // Infrações dos últimos 3 dias
+        if (diasParaVencer < 0) {
+          // Multa vencida
           notifications.push({
-            id: `infracao-nova-${infracao.id}`,
+            id: `infracao-vencida-${infracao.id}`,
             type: 'danger',
-            title: 'Nova Infração',
-            message: `Infração de R$ ${infracao.valor.toFixed(2)} - ${infracao.descricao}`,
-            timestamp: dataInfracao,
+            title: 'Multa Vencida',
+            message: `Multa de R$ ${infracao.valorFinal} venceu em ${format(dataVencimento, 'dd/MM/yyyy', { locale: ptBR })}`,
+            timestamp: dataVencimento,
+            isRead: false,
+          });
+        } else if (diasParaVencer <= 15) {
+          // Multa próxima do vencimento (15 dias)
+          notifications.push({
+            id: `infracao-vencendo-${infracao.id}`,
+            type: 'warning',
+            title: 'Multa Vencendo',
+            message: `Multa de R$ ${infracao.valorFinal} vence em ${diasParaVencer} dias`,
+            timestamp: new Date(Date.now() - Math.random() * 3600000),
             isRead: false,
           });
         }
@@ -269,23 +287,22 @@ export function useNotifications() {
     });
   }
 
-  // Notificações de pagamentos
+  // Notificações de pagamentos pendentes
   if (pagamentos.length > 0) {
     pagamentos.forEach((pagamento: any) => {
       if (pagamento.status === 'pendente') {
         const dataPagamento = new Date(pagamento.data);
         const diasAtras = differenceInDays(today, dataPagamento);
         
-        if (diasAtras <= 7) { // Pagamentos pendentes dos últimos 7 dias
-          notifications.push({
-            id: `pagamento-pendente-${pagamento.id}`,
-            type: 'warning',
-            title: 'Pagamento Pendente',
-            message: `Pagamento de R$ ${pagamento.valor.toFixed(2)} para ${pagamento.motoristaNome}`,
-            timestamp: dataPagamento,
-            isRead: false,
-          });
-        }
+        // Pagamentos pendentes (sem limite de dias)
+        notifications.push({
+          id: `pagamento-pendente-${pagamento.id}`,
+          type: 'warning',
+          title: 'Pagamento Pendente',
+          message: `Pagamento de R$ ${pagamento.valorTotal || pagamento.valor} para ${pagamento.motoristaNome || 'Motorista'}`,
+          timestamp: dataPagamento,
+          isRead: false,
+        });
       }
     });
   }
