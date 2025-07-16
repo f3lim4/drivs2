@@ -216,33 +216,27 @@ export default function RelatoriosFinanceiros() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">RELATÓRIOS FINANCEIROS</h1>
-        </div>
+      <div className="flex justify-end items-center space-x-4">
+        <Select 
+          value={format(selectedMonth, 'yyyy-MM')} 
+          onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
+        >
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {Array.from({ length: 12 }, (_, i) => {
+              const date = subMonths(new Date(), i);
+              return (
+                <SelectItem key={i} value={format(date, 'yyyy-MM')}>
+                  {format(date, 'MMMM yyyy', { locale: pt })}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
         
-        <div className="flex items-center space-x-4">
-          <Select 
-            value={format(selectedMonth, 'yyyy-MM')} 
-            onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 12 }, (_, i) => {
-                const date = subMonths(new Date(), i);
-                return (
-                  <SelectItem key={i} value={format(date, 'yyyy-MM')}>
-                    {format(date, 'MMMM yyyy', { locale: pt })}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-          
-          <NovaDespesaModal />
-        </div>
+        <NovaDespesaModal />
       </div>
 
       {/* Cards de Resumo Financeiro */}
