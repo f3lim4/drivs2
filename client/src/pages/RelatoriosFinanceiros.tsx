@@ -500,10 +500,11 @@ export default function RelatoriosFinanceiros() {
 
       {/* Tabs de Análise */}
       <Tabs defaultValue="veiculos" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
           <TabsTrigger value="categorias">Despesas por Categoria</TabsTrigger>
+          <TabsTrigger value="despesas">Despesas</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
         </TabsList>
 
@@ -725,6 +726,117 @@ export default function RelatoriosFinanceiros() {
                     </div>
                   ));
                 })()}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="despesas" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Despesas Registradas</CardTitle>
+              <CardDescription>
+                Todas as despesas manuais registradas no sistema
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa').length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Data</TableHead>
+                          <TableHead>Veículo</TableHead>
+                          <TableHead>Categoria</TableHead>
+                          <TableHead>Descrição</TableHead>
+                          <TableHead>Valor</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredData.despesasPeriodo
+                          .filter(d => d.tipo === 'despesa')
+                          .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+                          .map((despesa) => {
+                            const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
+                            return (
+                              <TableRow key={despesa.id}>
+                                <TableCell>
+                                  {format(new Date(despesa.data), 'dd/MM/yyyy')}
+                                </TableCell>
+                                <TableCell>
+                                  <div>
+                                    <p className="font-medium">{veiculo?.placa || 'N/A'}</p>
+                                    <p className="text-sm text-gray-500">{veiculo?.marca} {veiculo?.modelo}</p>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="capitalize">
+                                    {despesa.categoria}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <p className="max-w-xs truncate">{despesa.descricao}</p>
+                                </TableCell>
+                                <TableCell className="font-medium text-red-600">
+                                  {formatCurrency(parseFloat(despesa.valor || '0'))}
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant={despesa.status === 'pago' ? 'default' : 'secondary'}>
+                                    {despesa.status}
+                                  </Badge>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Nenhuma despesa registrada para o período selecionado</p>
+                    <p className="text-sm mt-2">As despesas aparecerão aqui conforme forem registradas</p>
+                  </div>
+                )}
+
+                {/* Resumo das despesas */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                  <div className="p-4 border rounded-lg bg-red-50">
+                    <h4 className="font-medium mb-2">Total de Despesas</h4>
+                    <p className="text-2xl font-bold text-red-600">
+                      {formatCurrency(filteredData.despesasPeriodo
+                        .filter(d => d.tipo === 'despesa')
+                        .reduce((total, d) => total + parseFloat(d.valor || '0'), 0)
+                      )}
+                    </p>
+                    <p className="text-sm text-gray-500">Período atual</p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Despesas Pagas</h4>
+                    <p className="text-2xl font-bold text-green-600">
+                      {formatCurrency(filteredData.despesasPeriodo
+                        .filter(d => d.tipo === 'despesa' && d.status === 'pago')
+                        .reduce((total, d) => total + parseFloat(d.valor || '0'), 0)
+                      )}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.status === 'pago').length} despesas
+                    </p>
+                  </div>
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Despesas Pendentes</h4>
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {formatCurrency(filteredData.despesasPeriodo
+                        .filter(d => d.tipo === 'despesa' && d.status === 'pendente')
+                        .reduce((total, d) => total + parseFloat(d.valor || '0'), 0)
+                      )}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.status === 'pendente').length} despesas
+                    </p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
