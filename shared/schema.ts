@@ -71,6 +71,12 @@ export const veiculos = pgTable("veiculos", {
   numeroApolice: text("numero_apolice"),
   vigenciaSeguro: date("vigencia_seguro"),
   valorSeguroMensal: decimal("valor_seguro_mensal", { precision: 10, scale: 2 }),
+  // Valor do Veículo e IPVA
+  valorVeiculo: decimal("valor_veiculo", { precision: 10, scale: 2 }),
+  ipva: decimal("ipva", { precision: 10, scale: 2 }),
+  // Rastreador
+  rastreador: text("rastreador"),
+  valorRastreadorMensal: decimal("valor_rastreador_mensal", { precision: 10, scale: 2 }),
   // Status
   status: text("status").notNull().default("disponivel"), // 'disponivel', 'alugado' (controlado automaticamente)
   // Timestamps

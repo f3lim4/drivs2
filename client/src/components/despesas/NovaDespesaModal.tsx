@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -44,11 +44,12 @@ export function NovaDespesaModal() {
     },
   });
 
-  // Função para preencher automaticamente o valor do seguro
-  const preencherValorSeguro = () => {
-    const categoria = form.watch('categoria');
-    const veiculoId = form.watch('veiculoId');
-    
+  // Observar mudanças nos campos categoria e veiculoId
+  const categoria = form.watch('categoria');
+  const veiculoId = form.watch('veiculoId');
+
+  // Preenchimento automático quando categoria é seguro e veículo selecionado
+  useEffect(() => {
     if (categoria === 'seguro' && veiculoId && veiculoId !== 'sem-veiculo') {
       const veiculo = veiculos.find(v => v.id === veiculoId);
       if (veiculo && veiculo.valorSeguroMensal) {
@@ -56,20 +57,7 @@ export function NovaDespesaModal() {
         form.setValue('descricao', `Seguro ${veiculo.seguradora || 'mensal'} - ${veiculo.placa}`);
       }
     }
-  };
-
-  // Observar mudanças nos campos categoria e veiculoId
-  const categoria = form.watch('categoria');
-  const veiculoId = form.watch('veiculoId');
-  
-  // Executar o preenchimento automático quando categoria ou veículo mudam
-  if (categoria === 'seguro' && veiculoId && veiculoId !== 'sem-veiculo') {
-    const veiculo = veiculos.find(v => v.id === veiculoId);
-    if (veiculo && veiculo.valorSeguroMensal && form.getValues('valor') !== veiculo.valorSeguroMensal) {
-      form.setValue('valor', veiculo.valorSeguroMensal);
-      form.setValue('descricao', `Seguro ${veiculo.seguradora || 'mensal'} - ${veiculo.placa}`);
-    }
-  }
+  }, [categoria, veiculoId, veiculos, form]);
 
   const onSubmit = async (data: z.infer<typeof despesaFormSchema>) => {
     try {

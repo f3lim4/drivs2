@@ -66,6 +66,14 @@ const veiculoSchema = z.object({
   vigenciaSeguro: z.string().optional(),
   valorSeguroMensal: z.number().optional(),
   
+  // Valor do Veículo e IPVA
+  valorVeiculo: z.number().optional(),
+  ipva: z.number().optional(),
+  
+  // Rastreador
+  rastreador: z.string().optional(),
+  valorRastreadorMensal: z.number().optional(),
+  
   // Status será controlado automaticamente
   
   // Campo condicional para limite específico
@@ -112,6 +120,10 @@ export function EditarVeiculoModal({
       numeroApolice: '',
       vigenciaSeguro: '',
       valorSeguroMensal: undefined,
+      valorVeiculo: undefined,
+      ipva: undefined,
+      rastreador: '',
+      valorRastreadorMensal: undefined,
       // Status será controlado automaticamente
       valorLimiteKm: undefined,
     },
@@ -141,6 +153,10 @@ export function EditarVeiculoModal({
         numeroApolice: veiculo.numeroApolice || '',
         vigenciaSeguro: veiculo.vigenciaSeguro || '',
         valorSeguroMensal: Number(veiculo.valorSeguroMensal) || undefined,
+        valorVeiculo: Number(veiculo.valorVeiculo) || undefined,
+        ipva: Number(veiculo.ipva) || undefined,
+        rastreador: veiculo.rastreador || '',
+        valorRastreadorMensal: Number(veiculo.valorRastreadorMensal) || undefined,
         // Status não será editável
         valorLimiteKm: veiculo.valorLimiteKm,
       });
@@ -179,6 +195,10 @@ export function EditarVeiculoModal({
         numeroApolice: data.numeroApolice,
         vigenciaSeguro: data.vigenciaSeguro || null,
         valorSeguroMensal: data.valorSeguroMensal?.toString(),
+        valorVeiculo: data.valorVeiculo?.toString(),
+        ipva: data.ipva?.toString(),
+        rastreador: data.rastreador,
+        valorRastreadorMensal: data.valorRastreadorMensal?.toString(),
         // Status não será enviado na edição
       };
 
@@ -499,6 +519,109 @@ export function EditarVeiculoModal({
                           placeholder="0" 
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* VALOR DO VEÍCULO E IPVA */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                Valor do Veículo e IPVA
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="valorVeiculo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor do Veículo (R$)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="0"
+                          {...field}
+                          onChange={(e) => {
+                            const valor = parseFloat(e.target.value) || 0;
+                            field.onChange(valor);
+                            // Calcular IPVA automaticamente (4% do valor)
+                            if (valor > 0) {
+                              const ipva = valor * 0.04;
+                              form.setValue('ipva', ipva);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="ipva"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>IPVA (R$) <span className="text-xs text-green-600">(4% do valor)</span></FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="0"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* RASTREADOR */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                Rastreador
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="rastreador"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Empresa do Rastreador</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Positron, Pósitron, etc."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="valorRastreadorMensal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor Mensal do Rastreador (R$)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="0"
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
                       </FormControl>
                       <FormMessage />
