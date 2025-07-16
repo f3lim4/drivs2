@@ -396,12 +396,11 @@ export default function RelatoriosFinanceiros() {
 
       {/* Tabs de Análise */}
       <Tabs defaultValue="veiculos" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
           <TabsTrigger value="categorias">Despesas por Categoria</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
-          <TabsTrigger value="tendencias">Tendências</TabsTrigger>
         </TabsList>
 
         <TabsContent value="veiculos" className="space-y-4">
@@ -653,38 +652,6 @@ export default function RelatoriosFinanceiros() {
                     </p>
                     <p className="text-sm text-gray-500">Mensal</p>
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="tendencias" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tendências Financeiras</CardTitle>
-              <CardDescription>
-                Análise de tendências e projeções
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-medium mb-2">Receita Mensal</h4>
-                  <p className="text-2xl font-bold text-green-600">{formatCurrency(receitaAlugueis)}</p>
-                  <p className="text-sm text-gray-500">Projeção anual: {formatCurrency(receitaAlugueis * 12)}</p>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-medium mb-2">Despesas Mensais</h4>
-                  <p className="text-2xl font-bold text-red-600">{formatCurrency(totalDespesas)}</p>
-                  <p className="text-sm text-gray-500">Projeção anual: {formatCurrency(totalDespesas * 12)}</p>
-                </div>
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-medium mb-2">Lucro Mensal</h4>
-                  <p className={`text-2xl font-bold ${lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(lucroLiquido)}
-                  </p>
-                  <p className="text-sm text-gray-500">Projeção anual: {formatCurrency(lucroLiquido * 12)}</p>
                 </div>
               </div>
             </CardContent>
