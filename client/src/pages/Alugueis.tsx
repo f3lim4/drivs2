@@ -252,7 +252,24 @@ export default function Alugueis() {
     
     // Calcular receita real baseada nos pagamentos do mês
     const receitaReal = pagamentos
-      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
+      .filter(p => {
+        const dataPagamento = new Date(p.data);
+        const dentroDoMes = isWithinInterval(dataPagamento, { start: monthStart, end: monthEnd });
+        
+        console.log('Pagamento filtro:', {
+          id: p.id,
+          valor: p.valor,
+          status: p.status,
+          data: p.data,
+          dataPagamento: dataPagamento.toISOString(),
+          monthStart: monthStart.toISOString(),
+          monthEnd: monthEnd.toISOString(),
+          dentroDoMes,
+          statusPago: p.status === 'pago'
+        });
+        
+        return p.status === 'pago' && dentroDoMes;
+      })
       .reduce((total, pagamento) => {
         const valor = parseFloat(pagamento.valor || '0');
         return total + (isNaN(valor) ? 0 : valor);
