@@ -1119,11 +1119,30 @@ export default function RelatoriosFinanceiros() {
 
         <TabsContent value="despesas" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
-              <CardDescription>
-                Todas as despesas fixas e manutenções registradas no sistema - dados reais
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
+                <CardDescription>
+                  Todas as despesas fixas e manutenções registradas no sistema - dados reais
+                </CardDescription>
+              </div>
+              
+              {/* Ordenação */}
+              <Select value={sortHistorico} onValueChange={setSortHistorico}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mais-recente">Mais Recente</SelectItem>
+                  <SelectItem value="mais-antiga">Mais Antiga</SelectItem>
+                  <SelectItem value="maior-valor">Maior Valor</SelectItem>
+                  <SelectItem value="menor-valor">Menor Valor</SelectItem>
+                  <SelectItem value="tipo-az">Tipo (A-Z)</SelectItem>
+                  <SelectItem value="tipo-za">Tipo (Z-A)</SelectItem>
+                  <SelectItem value="categoria-az">Categoria (A-Z)</SelectItem>
+                  <SelectItem value="categoria-za">Categoria (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -1272,17 +1291,42 @@ export default function RelatoriosFinanceiros() {
                           });
                         });
                         
-                        // Ordenar por data (mais recente primeiro), depois por criação, depois por tipo
+                        // Aplicar ordenação baseada na seleção do usuário
                         todasDespesas.sort((a, b) => {
                           const dateA = new Date(a.data).getTime();
                           const dateB = new Date(b.data).getTime();
                           
-                          // Primeiro ordena por data (mais recente primeiro)
-                          if (dateB !== dateA) {
-                            return dateB - dateA;
+                          switch (sortHistorico) {
+                            case 'mais-recente':
+                              if (dateB !== dateA) return dateB - dateA;
+                              break;
+                            case 'mais-antiga':
+                              if (dateA !== dateB) return dateA - dateB;
+                              break;
+                            case 'maior-valor':
+                              if (b.valor !== a.valor) return b.valor - a.valor;
+                              break;
+                            case 'menor-valor':
+                              if (a.valor !== b.valor) return a.valor - b.valor;
+                              break;
+                            case 'tipo-az':
+                              if (a.tipo !== b.tipo) return a.tipo.localeCompare(b.tipo);
+                              break;
+                            case 'tipo-za':
+                              if (a.tipo !== b.tipo) return b.tipo.localeCompare(a.tipo);
+                              break;
+                            case 'categoria-az':
+                              if (a.categoria !== b.categoria) return a.categoria.localeCompare(b.categoria);
+                              break;
+                            case 'categoria-za':
+                              if (a.categoria !== b.categoria) return b.categoria.localeCompare(a.categoria);
+                              break;
+                            default:
+                              // Padrão: mais recente primeiro
+                              if (dateB !== dateA) return dateB - dateA;
                           }
                           
-                          // Em caso de empate na data, ordena por data de criação (mais recente primeiro)
+                          // Em caso de empate na ordenação primária, ordena por data de criação (mais recente primeiro)
                           if (a.createdAt && b.createdAt) {
                             const createdA = new Date(a.createdAt).getTime();
                             const createdB = new Date(b.createdAt).getTime();
@@ -1291,7 +1335,7 @@ export default function RelatoriosFinanceiros() {
                             }
                           }
                           
-                          // Em caso de empate, prioriza despesas manuais
+                          // Em caso de empate final, prioriza despesas manuais
                           const prioridadeTipo = {
                             'Despesa Manual': 1,
                             'Manutenção': 2,
