@@ -138,6 +138,18 @@ export default function Alugueis() {
     currentPage * itemsPerPage
   );
 
+  // Log para debug da paginação
+  console.log('Paginação DEBUG:', {
+    alugueisFormatados: alugueisFormatados.length,
+    filteredAlugueis: filteredAlugueis.length,
+    paginatedAlugueis: paginatedAlugueis.length,
+    currentPage,
+    itemsPerPage,
+    totalPages,
+    searchTerm,
+    statusFilter
+  });
+
   // Funções para controlar a paginação
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -520,14 +532,16 @@ export default function Alugueis() {
       </Card>
 
       {/* Paginação */}
-      {alugueisFormatados.length > 0 && (
-        <Pagination
-          currentPage={currentPage}
-          totalItems={filteredAlugueis.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={handlePageChange}
-          onItemsPerPageChange={handleItemsPerPageChange}
-        />
+      {filteredAlugueis.length > 0 && (
+        <div className="border-t pt-4 mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filteredAlugueis.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        </div>
       )}
 
       {/* Modais - apenas para locadoras */}
