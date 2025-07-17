@@ -9,7 +9,7 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DashboardStats, Alert, Motorista, Veiculo } from '@/types';
-import { DrivsHeader } from '@/components/layout/DrivsHeader';
+
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useAnunciosAtivos } from '@/hooks/useAnuncios';
@@ -262,10 +262,6 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex-1 space-y-6 p-6">
-        <DrivsHeader 
-          title="Dashboard"
-          subtitle="Sistema Drivs - Gerencie sua locadora de forma eficiente"
-        />
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
