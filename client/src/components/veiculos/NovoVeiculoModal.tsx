@@ -671,18 +671,20 @@ export function NovoVeiculoModal({
                       <FormLabel>Valor do Veículo (R$)</FormLabel>
                       <FormControl>
                         <Input 
-                          type="text" 
-                          placeholder="00.000,00"
+                          type="number" 
+                          step="0.01"
+                          placeholder=""
                           {...field}
-                          value={field.value ? field.value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}
+                          value={field.value || ''}
                           onChange={(e) => {
-                            // Remove formatação e converte para número
-                            const valor = parseFloat(e.target.value.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+                            const valor = parseFloat(e.target.value) || undefined;
                             field.onChange(valor);
                             // Calcular IPVA automaticamente (4% do valor)
-                            if (valor > 0) {
+                            if (valor && valor > 0) {
                               const ipva = valor * 0.04;
                               form.setValue('ipva', ipva);
+                            } else {
+                              form.setValue('ipva', undefined);
                             }
                           }}
                         />
