@@ -272,6 +272,91 @@ export default function Dashboard() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
+      {/* Grid de estatísticas principais - apenas para locadoras */}
+      {isLocadora && (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Total de Motoristas - Card Futurista */}
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-700">TOTAL DE MOTORISTAS</p>
+                <p className="text-2xl font-bold text-blue-800">
+                  {totalMotoristas}
+                </p>
+                <p className="text-xs text-blue-600">
+                  {motoristasAtivos > 0 ? `${motoristasAtivos} ativos` : "0 ativos"}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Veículos Disponíveis - Card Futurista */}
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-green-700">VEÍCULOS DISPONÍVEIS</p>
+                <p className="text-2xl font-bold text-green-800">
+                  {veiculosDisponiveis}
+                </p>
+                <p className="text-xs text-green-600">
+                  {totalVeiculos} total na frota
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                <Car className="w-6 h-6 text-green-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Aluguéis Ativos - Card Futurista */}
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-purple-700">ALUGUÉIS ATIVOS</p>
+                <p className="text-2xl font-bold text-purple-800">
+                  {alugueisAtivos + alugueisPendentes}
+                </p>
+                <p className="text-xs text-purple-600">
+                  {totalAlugueis} total de contratos
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-purple-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Receita Mensal - Card Futurista */}
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-yellow-700">RECEITA MENSAL</p>
+                <p className="text-2xl font-bold text-yellow-800">
+                  {formatCurrency(receitaMensal)}
+                </p>
+                <p className="text-xs text-yellow-600">
+                  {formatCurrency(receitaSemanal)} por semana
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-yellow-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      )}
+
       {/* Seção de Anúncios */}
       {isLocadora && anuncios.length > 0 && (
         <div className="grid gap-4">
@@ -515,90 +600,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Grid de estatísticas principais - apenas para locadoras */}
-      {isLocadora && (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {/* Total de Motoristas - Card Futurista */}
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-blue-700">TOTAL DE MOTORISTAS</p>
-                <p className="text-2xl font-bold text-blue-800">
-                  {totalMotoristas}
-                </p>
-                <p className="text-xs text-blue-600">
-                  {motoristasAtivos > 0 ? `${motoristasAtivos} ativos` : "0 ativos"}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-700" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Veículos Disponíveis - Card Futurista */}
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-green-700">VEÍCULOS DISPONÍVEIS</p>
-                <p className="text-2xl font-bold text-green-800">
-                  {veiculosDisponiveis}
-                </p>
-                <p className="text-xs text-green-600">
-                  {totalVeiculos} total na frota
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
-                <Car className="w-6 h-6 text-green-700" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Aluguéis Ativos - Card Futurista */}
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-purple-700">ALUGUÉIS ATIVOS</p>
-                <p className="text-2xl font-bold text-purple-800">
-                  {alugueisAtivos + alugueisPendentes}
-                </p>
-                <p className="text-xs text-purple-600">
-                  {totalAlugueis} total de contratos
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-700" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Receita Mensal - Card Futurista */}
-        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-yellow-700">RECEITA MENSAL</p>
-                <p className="text-2xl font-bold text-yellow-800">
-                  {formatCurrency(receitaMensal)}
-                </p>
-                <p className="text-xs text-yellow-600">
-                  <span className="font-medium">Semanal:</span> {formatCurrency(receitaSemanal)}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-yellow-700" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      )}
 
       {/* Seção inferior com alertas e aluguéis recentes - apenas para locadoras */}
       {isLocadora && (

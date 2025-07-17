@@ -27,6 +27,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Experiência simplificada** - Interface mais limpa e intuitiva sem sistema de abas
 - ✅ **Página de Pagamentos simplificada** - Removido título "Pagamentos" e descrição
 - ✅ **Botão "Novo Pagamento" na área de filtros** - Reposicionado ao lado dos filtros para melhor acessibilidade
+- ✅ **Cards principais acima dos anúncios** - Estatísticas do dashboard reposicionadas antes dos anúncios
 
 ### 2025-07-17: Sistema de Loading Spinner Unificado com Animação de Carro - CONCLUÍDO
 - ✅ **Componente LoadingSpinner criado** - Substituído spinners padrão por animação de carro
