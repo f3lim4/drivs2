@@ -448,9 +448,28 @@ export default function RelatoriosFinanceiros() {
       const aluguelVeiculo = alugueis.find(a => a.veiculoId === veiculo.id && a.status === 'ativo');
       const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
       
-      // Buscar despesas fixas para este veículo
-      const despesasFixasVeiculo = despesasFixasVeiculos.find(dfv => dfv.veiculo === veiculo.placa);
-      const despesasFixasMensais = despesasFixasVeiculo ? despesasFixasVeiculo.totalMensal : 0;
+      // Calcular despesas fixas puras para este veículo (sem manutenções)
+      let despesasFixasMensais = 0;
+      
+      // IPVA mensal
+      if (veiculo.ipva && veiculo.ipva > 0) {
+        despesasFixasMensais += parseFloat(veiculo.ipva) / 12;
+      }
+      
+      // Seguro mensal
+      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+        despesasFixasMensais += parseFloat(veiculo.valorSeguroMensal);
+      }
+      
+      // Rastreador mensal
+      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+        despesasFixasMensais += parseFloat(veiculo.valorRastreadorMensal);
+      }
+      
+      // Financiamento mensal
+      if (veiculo.financiado && veiculo.valorFinanciamento) {
+        despesasFixasMensais += parseFloat(veiculo.valorFinanciamento);
+      }
       
       // Calcular receita baseada nos pagamentos do motorista do veículo
       const pagamentosVeiculo = pagamentos.filter(p => {
@@ -555,9 +574,28 @@ export default function RelatoriosFinanceiros() {
     const motorista = aluguelVeiculo ? motoristas.find(m => m.id === aluguelVeiculo.motoristaId) : null;
     const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
     
-    // Incluir despesas fixas do veículo
-    const despesaFixaVeiculo = despesasFixasVeiculos.find(df => df.veiculo === veiculo.placa);
-    const despesasFixasMensais = despesaFixaVeiculo ? despesaFixaVeiculo.totalMensal : 0;
+    // Calcular despesas fixas puras do veículo (sem manutenções)
+    let despesasFixasMensais = 0;
+    
+    // IPVA mensal
+    if (veiculo.ipva && veiculo.ipva > 0) {
+      despesasFixasMensais += parseFloat(veiculo.ipva) / 12;
+    }
+    
+    // Seguro mensal
+    if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+      despesasFixasMensais += parseFloat(veiculo.valorSeguroMensal);
+    }
+    
+    // Rastreador mensal
+    if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+      despesasFixasMensais += parseFloat(veiculo.valorRastreadorMensal);
+    }
+    
+    // Financiamento mensal
+    if (veiculo.financiado && veiculo.valorFinanciamento) {
+      despesasFixasMensais += parseFloat(veiculo.valorFinanciamento);
+    }
     
     const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
     const despesasManuais = despesasVeiculo
@@ -584,11 +622,11 @@ export default function RelatoriosFinanceiros() {
     const despesasDetalhadas = [];
     
     // Despesas fixas simplificadas (valor total)
-    if (despesaFixaVeiculo && despesaFixaVeiculo.totalMensal > 0) {
+    if (despesasFixasMensais > 0) {
       despesasDetalhadas.push({
         categoria: 'Despesas Fixas',
-        valor: despesaFixaVeiculo.totalMensal,
-        percentual: despesasMensais > 0 ? (despesaFixaVeiculo.totalMensal / despesasMensais) * 100 : 0
+        valor: despesasFixasMensais,
+        percentual: despesasMensais > 0 ? (despesasFixasMensais / despesasMensais) * 100 : 0
       });
     }
     
