@@ -175,36 +175,49 @@ export default function Dashboard() {
   // Calcular receita semanal (mensal dividido por 4 semanas)
   const receitaSemanal = receitaMensal / 4;
 
-  // Dados para os gráficos
-  const performanceData = [
-    { name: 'Jan', cpu: 12, memoria: 45, queries: 180 },
-    { name: 'Fev', cpu: 15, memoria: 52, queries: 165 },
-    { name: 'Mar', cpu: 18, memoria: 48, queries: 195 },
-    { name: 'Abr', cpu: 14, memoria: 44, queries: 170 },
-    { name: 'Mai', cpu: 16, memoria: 49, queries: 185 },
-    { name: 'Jun', cpu: 15, memoria: 46, queries: 175 },
+  // Métricas importantes para admin de SaaS de locadoras
+  const locadorasAtivas = locadoras.filter(l => l.status === 'ativa').length;
+  const locadorasInativas = locadoras.filter(l => l.status === 'inativa').length;
+  const totalVeiculosGlobal = veiculosSeguro.length;
+  const totalMotoristasGlobal = motoristasSeguro.length;
+  const totalAlugueisGlobal = alugueisSeguro.length;
+  const receitaTotalGlobal = alugueisSeguro.reduce((sum, a) => sum + (a.valores?.mensal || 0), 0);
+
+  // Dados para gráficos de gestão de SaaS de locadoras
+  const crescimentoLocadorasData = [
+    { name: 'Jan', locadoras: 15, novasLocadoras: 3, churn: 1 },
+    { name: 'Fev', locadoras: 18, novasLocadoras: 4, churn: 1 },
+    { name: 'Mar', locadoras: 22, novasLocadoras: 5, churn: 1 },
+    { name: 'Abr', locadoras: 26, novasLocadoras: 6, churn: 2 },
+    { name: 'Mai', locadoras: 30, novasLocadoras: 5, churn: 1 },
+    { name: 'Jun', locadoras: locadoras.length, novasLocadoras: 4, churn: 1 },
   ];
 
-  const receitaData = [
-    { name: 'Jan', receita: 45000, alugueis: 12 },
-    { name: 'Fev', receita: 52000, alugueis: 15 },
-    { name: 'Mar', receita: 48000, alugueis: 14 },
-    { name: 'Abr', receita: 58000, alugueis: 18 },
-    { name: 'Mai', receita: 62000, alugueis: 20 },
-    { name: 'Jun', receita: receitaMensal, alugueis: alugueisSeguro.filter(a => a.status === 'ativo').length },
+  const receitaRecorrenteData = [
+    { name: 'Jan', receita: 45000, locadorasAtivas: 15, ticketMedio: 3000 },
+    { name: 'Fev', receita: 54000, locadorasAtivas: 18, ticketMedio: 3000 },
+    { name: 'Mar', receita: 66000, locadorasAtivas: 22, ticketMedio: 3000 },
+    { name: 'Abr', receita: 78000, locadorasAtivas: 26, ticketMedio: 3000 },
+    { name: 'Mai', receita: 90000, locadorasAtivas: 30, ticketMedio: 3000 },
+    { name: 'Jun', receita: receitaTotalGlobal, locadorasAtivas: locadorasAtivas, ticketMedio: locadorasAtivas > 0 ? Math.round(receitaTotalGlobal / locadorasAtivas) : 0 },
   ];
 
-  const statusData = [
-    { name: 'Alugado', value: veiculosSeguro.filter(v => v.status === 'alugado').length, color: '#64748b' },
-    { name: 'Disponível', value: veiculosSeguro.filter(v => v.status === 'disponivel').length, color: '#94a3b8' },
-    { name: 'Manutenção', value: veiculosSeguro.filter(v => v.status === 'manutencao').length, color: '#cbd5e1' },
+  // Dados para distribuição de planos das locadoras
+  const planoBasico = locadoras.filter(l => l.plano === 'basico').length;
+  const planoPremium = locadoras.filter(l => l.plano === 'premium').length;
+  const planoEnterprise = locadoras.filter(l => l.plano === 'enterprise').length;
+  
+  const planosData = [
+    { name: 'Básico', value: planoBasico, color: '#94a3b8' },
+    { name: 'Premium', value: planoPremium, color: '#64748b' },
+    { name: 'Enterprise', value: planoEnterprise, color: '#475569' },
   ];
-
+  
   const metricasData = [
-    { name: 'Locadoras', value: locadoras.length, growth: '+12%' },
-    { name: 'Veículos', value: veiculosSeguro.length, growth: '+8%' },
-    { name: 'Motoristas', value: motoristasSeguro.length, growth: '+15%' },
-    { name: 'Receita', value: receitaMensal, growth: '+22%' },
+    { name: 'Locadoras Ativas', value: locadorasAtivas, growth: '+12%', icon: Building2 },
+    { name: 'Total Veículos', value: totalVeiculosGlobal, growth: '+8%', icon: Car },
+    { name: 'Total Motoristas', value: totalMotoristasGlobal, growth: '+15%', icon: Users },
+    { name: 'Receita Total', value: receitaTotalGlobal, growth: '+22%', icon: DollarSign },
   ];
 
   // Gerar alertas baseados nos dados
@@ -346,7 +359,7 @@ export default function Dashboard() {
               <CardContent>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={receitaData}>
+                    <AreaChart data={receitaRecorrenteData}>
                       <defs>
                         <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor="#64748b" stopOpacity={0.8}/>
@@ -379,18 +392,18 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Performance do Sistema */}
+            {/* Crescimento de Locadoras */}
             <Card className="border border-slate-200 bg-white shadow-sm">
               <CardHeader>
                 <CardTitle className="text-slate-800 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-slate-600" />
-                  Performance do Sistema
+                  <TrendingUp className="w-5 h-5 text-slate-600" />
+                  Crescimento de Locadoras
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={performanceData}>
+                    <LineChart data={crescimentoLocadorasData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                       <XAxis dataKey="name" stroke="#64748b" />
                       <YAxis stroke="#64748b" />
@@ -404,14 +417,14 @@ export default function Dashboard() {
                       />
                       <Line 
                         type="monotone" 
-                        dataKey="cpu" 
+                        dataKey="locadoras" 
                         stroke="#64748b" 
                         strokeWidth={2}
                         dot={{ fill: '#64748b', strokeWidth: 0, r: 4 }}
                       />
                       <Line 
                         type="monotone" 
-                        dataKey="memoria" 
+                        dataKey="novasLocadoras" 
                         stroke="#94a3b8" 
                         strokeWidth={2}
                         dot={{ fill: '#94a3b8', strokeWidth: 0, r: 4 }}
@@ -423,12 +436,12 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* Status dos Veículos */}
+          {/* Distribuição de Planos */}
           <Card className="border border-slate-200 bg-white shadow-sm">
             <CardHeader>
               <CardTitle className="text-slate-800 flex items-center gap-2">
-                <Car className="w-5 h-5 text-slate-600" />
-                Status da Frota
+                <Building2 className="w-5 h-5 text-slate-600" />
+                Distribuição de Planos
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -438,14 +451,14 @@ export default function Dashboard() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={statusData}
+                        data={planosData}
                         cx="50%"
                         cy="50%"
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {statusData.map((entry, index) => (
+                        {planosData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
@@ -463,7 +476,7 @@ export default function Dashboard() {
 
                 {/* Legenda e Status */}
                 <div className="flex flex-col justify-center space-y-4">
-                  {statusData.map((item, index) => (
+                  {planosData.map((item, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div 
@@ -474,7 +487,7 @@ export default function Dashboard() {
                       </div>
                       <div className="text-right">
                         <span className="text-xl font-semibold text-slate-800">{item.value}</span>
-                        <p className="text-xs text-slate-600">veículos</p>
+                        <p className="text-xs text-slate-600">locadoras</p>
                       </div>
                     </div>
                   ))}
