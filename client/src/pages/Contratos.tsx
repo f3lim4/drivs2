@@ -44,6 +44,7 @@ export default function Contratos() {
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
+  const [sortOrder, setSortOrder] = useState<string>('mais-novos');
 
   const handleContratoGerado = (novoContrato: Contrato) => {
     // O contrato já foi criado no modal, só precisamos mostrar o toast de sucesso
@@ -266,17 +267,48 @@ export default function Contratos() {
     }
   };
 
-  // Filtrar contratos
-  const contratosFiltrados = contratos.filter(contrato => {
-    const passaBusca = busca === '' || 
-      contrato.cliente.toLowerCase().includes(busca.toLowerCase()) ||
-      contrato.tipo.toLowerCase().includes(busca.toLowerCase());
-    
-    const passaStatus = filtroStatus === 'todos' || contrato.status === filtroStatus;
-    const passaTipo = filtroTipo === 'todos' || contrato.tipo === filtroTipo;
-    
-    return passaBusca && passaStatus && passaTipo;
-  });
+  // Filtrar e ordenar contratos
+  const contratosFiltrados = contratos
+    .filter(contrato => {
+      const passaBusca = busca === '' || 
+        contrato.cliente.toLowerCase().includes(busca.toLowerCase()) ||
+        contrato.tipo.toLowerCase().includes(busca.toLowerCase());
+      
+      const passaStatus = filtroStatus === 'todos' || contrato.status === filtroStatus;
+      const passaTipo = filtroTipo === 'todos' || contrato.tipo === filtroTipo;
+      
+      return passaBusca && passaStatus && passaTipo;
+    })
+    .sort((a, b) => {
+      switch (sortOrder) {
+        case 'mais-novos':
+          // Ordena por data de criação decrescente (mais novos primeiro)
+          return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
+        case 'mais-antigos':
+          // Ordena por data de criação crescente (mais antigos primeiro)
+          return new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime();
+        case 'cliente-az':
+          // Ordena por nome do cliente A-Z
+          return a.cliente.localeCompare(b.cliente);
+        case 'cliente-za':
+          // Ordena por nome do cliente Z-A
+          return b.cliente.localeCompare(a.cliente);
+        case 'valor-maior':
+          // Ordena por valor decrescente (maior primeiro)
+          return (parseFloat(b.valor) || 0) - (parseFloat(a.valor) || 0);
+        case 'valor-menor':
+          // Ordena por valor crescente (menor primeiro)
+          return (parseFloat(a.valor) || 0) - (parseFloat(b.valor) || 0);
+        case 'data-inicio':
+          // Ordena por data de início mais recente
+          return new Date(b.dataInicio || '').getTime() - new Date(a.dataInicio || '').getTime();
+        case 'data-fim':
+          // Ordena por data de fim mais próxima
+          return new Date(a.dataFim || '').getTime() - new Date(b.dataFim || '').getTime();
+        default:
+          return 0;
+      }
+    });
 
   // Estatísticas
   const totalContratos = contratos.length;
@@ -486,8 +518,25 @@ export default function Contratos() {
             </Card>
           ) : (
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Contratos Gerados ({contratosFiltrados.length})</CardTitle>
+                
+                {/* Ordenação */}
+                <Select value={sortOrder} onValueChange={setSortOrder}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder="Ordenar por" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+                    <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+                    <SelectItem value="cliente-az">Cliente (A-Z)</SelectItem>
+                    <SelectItem value="cliente-za">Cliente (Z-A)</SelectItem>
+                    <SelectItem value="valor-maior">Valor (Maior)</SelectItem>
+                    <SelectItem value="valor-menor">Valor (Menor)</SelectItem>
+                    <SelectItem value="data-inicio">Data de Início</SelectItem>
+                    <SelectItem value="data-fim">Data de Fim</SelectItem>
+                  </SelectContent>
+                </Select>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
