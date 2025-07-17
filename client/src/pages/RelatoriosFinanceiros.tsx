@@ -990,32 +990,32 @@ export default function RelatoriosFinanceiros() {
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-medium mb-2">IPVA Total</h4>
                     <p className="text-2xl font-bold text-orange-600">
-                      {formatCurrency(despesasFixasVeiculos.reduce((total, v) => 
-                        total + (v.despesas.find(d => d.tipo === 'IPVA')?.valor || 0), 0))}
+                      {formatCurrency(veiculos.reduce((total, v) => 
+                        total + (v.ipva && v.ipva > 0 ? parseFloat(v.ipva) / 12 : 0), 0))}
                     </p>
                     <p className="text-sm text-gray-500">Mensal</p>
                   </div>
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-medium mb-2">Seguros Total</h4>
                     <p className="text-2xl font-bold text-blue-600">
-                      {formatCurrency(despesasFixasVeiculos.reduce((total, v) => 
-                        total + (v.despesas.find(d => d.tipo === 'Seguro')?.valor || 0), 0))}
+                      {formatCurrency(veiculos.reduce((total, v) => 
+                        total + (v.valorSeguroMensal && v.valorSeguroMensal > 0 ? parseFloat(v.valorSeguroMensal) : 0), 0))}
                     </p>
                     <p className="text-sm text-gray-500">Mensal</p>
                   </div>
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-medium mb-2">Rastreadores Total</h4>
                     <p className="text-2xl font-bold text-green-600">
-                      {formatCurrency(despesasFixasVeiculos.reduce((total, v) => 
-                        total + (v.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0), 0))}
+                      {formatCurrency(veiculos.reduce((total, v) => 
+                        total + (v.valorRastreadorMensal && v.valorRastreadorMensal > 0 ? parseFloat(v.valorRastreadorMensal) : 0), 0))}
                     </p>
                     <p className="text-sm text-gray-500">Mensal</p>
                   </div>
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-medium mb-2">Financiamento Total</h4>
                     <p className="text-2xl font-bold text-purple-600">
-                      {formatCurrency(despesasFixasVeiculos.reduce((total, v) => 
-                        total + (v.despesas.find(d => d.tipo === 'Financiamento')?.valor || 0), 0))}
+                      {formatCurrency(veiculos.reduce((total, v) => 
+                        total + (v.financiado && v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : 0), 0))}
                     </p>
                     <p className="text-sm text-gray-500">Mensal</p>
                   </div>
