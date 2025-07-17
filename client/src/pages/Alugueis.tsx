@@ -164,17 +164,7 @@ export default function Alugueis() {
     currentPage * itemsPerPage
   );
 
-  // Log para debug da paginação
-  console.log('Paginação DEBUG:', {
-    alugueisFormatados: alugueisFormatados.length,
-    filteredAlugueis: filteredAlugueis.length,
-    paginatedAlugueis: paginatedAlugueis.length,
-    currentPage,
-    itemsPerPage,
-    totalPages,
-    searchTerm,
-    statusFilter
-  });
+
 
   // Funções para controlar a paginação
   const handlePageChange = (page: number) => {
