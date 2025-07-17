@@ -3,7 +3,7 @@
  * Permite visualizar e gerenciar contratos de locação ativos
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Plus, Search, Filter, Calendar, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +30,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { StatCard } from '@/components/dashboard/StatCard';
+import { startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
 import { Aluguel } from '@/types';
 import { FileCheck, Clock, DollarSign, AlertCircle, Edit, Trash2, Eye, TrendingUp as Trending } from 'lucide-react';
@@ -53,6 +54,12 @@ export default function Alugueis() {
   const { data: locadoras = [], isLoading: locadorasLoading } = useQuery({
     queryKey: ['/api/locadoras'],
     enabled: isAdmin || isLocadora,
+  });
+
+  // Buscar pagamentos para cálculo da receita real
+  const { data: pagamentos = [] } = useQuery({
+    queryKey: ['/api/pagamentos'],
+    enabled: isLocadora,
   });
 
   // Função para encontrar o nome da locadora
@@ -234,14 +241,25 @@ export default function Alugueis() {
   };
 
   // Calcula estatísticas
-  const stats = {
-    total: alugueis.length,
-    ativos: alugueis.filter(a => a.status === 'ativo').length,
-    pendentes: alugueis.filter(a => a.status === 'pendente').length,
-    receitaMensal: alugueis
-      .filter(a => a.status === 'ativo')
-      .reduce((sum, a) => sum + a.valores.mensal, 0),
-  };
+  const stats = useMemo(() => {
+    const monthStart = startOfMonth(new Date());
+    const monthEnd = endOfMonth(new Date());
+    
+    // Calcular receita mensal baseada nos pagamentos reais
+    const receitaMensalPagamentos = pagamentos
+      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
+      .reduce((total, pagamento) => {
+        const valor = parseFloat(pagamento.valor || '0');
+        return total + (isNaN(valor) ? 0 : valor);
+      }, 0);
+    
+    return {
+      total: alugueis.length,
+      ativos: alugueis.filter(a => a.status === 'ativo').length,
+      pendentes: alugueis.filter(a => a.status === 'pendente').length,
+      receitaMensal: receitaMensalPagamentos,
+    };
+  }, [alugueis, pagamentos]);
 
   // Retorna badge de status com cor apropriada
   const getStatusBadge = (status: string) => {
