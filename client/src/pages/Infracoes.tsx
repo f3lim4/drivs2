@@ -196,7 +196,10 @@ export default function Infracoes() {
                 <SelectItem value="cancelado">Cancelado</SelectItem>
               </SelectContent>
             </Select>
-
+            <Button onClick={() => setShowNovaInfracao(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Nova Infração
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -216,12 +219,6 @@ export default function Infracoes() {
                   <TableHead>Motorista</TableHead>
                   <TableHead>Veículo</TableHead>
                   {isAdmin && <TableHead>Locadora</TableHead>}
-                  <TableHead>
-                    <Button onClick={() => setShowNovaInfracao(true)} className="bg-blue-600 hover:bg-blue-700">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Nova Infração
-                    </Button>
-                  </TableHead>
                   <TableHead>Descrição</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead>Valor</TableHead>
@@ -261,7 +258,7 @@ export default function Infracoes() {
                           </div>
                         </TableCell>
                       )}
-                      <TableCell></TableCell>
+
                       <TableCell className="max-w-48 truncate">{infracao.descricaoInfracao}</TableCell>
                       <TableCell>{formatDate(infracao.dataInfracao)}</TableCell>
                       <TableCell className="font-medium">{formatCurrency(parseFloat(infracao.valorFinal))}</TableCell>
