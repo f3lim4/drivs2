@@ -103,6 +103,21 @@ export default function RelatoriosFinanceiros() {
     setItemsPerPageVeiculos(items);
     setCurrentPageVeiculos(1);
   };
+  
+  // Estados de paginação para a aba "Análise por Motorista"
+  const [currentPageMotoristas, setCurrentPageMotoristas] = useState(1);
+  const [itemsPerPageMotoristas, setItemsPerPageMotoristas] = useState(10);
+  
+  // Função para alterar página
+  const handlePageChangeMotoristas = (page: number) => {
+    setCurrentPageMotoristas(page);
+  };
+  
+  // Função para alterar itens por página
+  const handleItemsPerPageChangeMotoristas = (items: number) => {
+    setItemsPerPageMotoristas(items);
+    setCurrentPageMotoristas(1);
+  };
 
   // Formulário para nova despesa
   const formNovaDespesa = useForm<NovaDespesaData>({
@@ -1227,7 +1242,12 @@ export default function RelatoriosFinanceiros() {
                     }
                   });
                   
-                  return dadosOrdenados.map(({motorista, totalPagamentos, pagamentosMotorista, aluguelAtivo}) => (
+                  // Aplicar paginação
+                  const startIndex = (currentPageMotoristas - 1) * itemsPerPageMotoristas;
+                  const endIndex = startIndex + itemsPerPageMotoristas;
+                  const dadosPaginados = dadosOrdenados.slice(startIndex, endIndex);
+                  
+                  return dadosPaginados.map(({motorista, totalPagamentos, pagamentosMotorista, aluguelAtivo}) => (
                     <div key={motorista.id} className="flex justify-between items-center p-4 border rounded-lg">
                       <div>
                         <p className="font-semibold">{motorista.nome}</p>
@@ -1252,6 +1272,47 @@ export default function RelatoriosFinanceiros() {
                   ));
                 })()}
               </div>
+              
+              {/* Paginação */}
+              {(() => {
+                const dadosMotoristas = motoristas.map((motorista) => {
+                  // Calcular pagamentos do motorista no período
+                  const pagamentosMotorista = pagamentos.filter(p => 
+                    p.motoristaNome === motorista.nome && 
+                    p.status === 'pago' && 
+                    isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd })
+                  );
+                  
+                  const totalPagamentos = pagamentosMotorista.reduce((total, p) => 
+                    total + parseFloat(p.valor || '0'), 0
+                  );
+                  
+                  // Encontrar aluguel ativo do motorista
+                  const aluguelAtivo = alugueis.find(a => 
+                    a.motoristaNome === motorista.nome && a.status === 'ativo'
+                  );
+                  
+                  return {
+                    motorista,
+                    totalPagamentos,
+                    pagamentosMotorista,
+                    aluguelAtivo,
+                    temDados: totalPagamentos > 0 || aluguelAtivo
+                  };
+                }).filter(item => item.temDados);
+                
+                return dadosMotoristas.length > 0 && (
+                  <div className="border-t pt-4 mt-4">
+                    <Pagination
+                      currentPage={currentPageMotoristas}
+                      totalItems={dadosMotoristas.length}
+                      itemsPerPage={itemsPerPageMotoristas}
+                      onPageChange={handlePageChangeMotoristas}
+                      onItemsPerPageChange={handleItemsPerPageChangeMotoristas}
+                    />
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
         </TabsContent>
