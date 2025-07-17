@@ -25,7 +25,7 @@ import { useManutencoes } from '@/hooks/useManutencoes';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatDate } from '@/lib/utils';
 
 // Schema para formulário de nova despesa
 const novaDespesaSchema = z.object({
@@ -987,7 +987,7 @@ export default function RelatoriosFinanceiros() {
                         return todasDespesas.map((despesa) => (
                           <TableRow key={despesa.id}>
                             <TableCell>
-                              {format(new Date(despesa.data), 'dd/MM/yyyy')}
+                              {formatDate(despesa.data)}
                             </TableCell>
                             <TableCell>
                               <div>
