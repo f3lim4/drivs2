@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Pagination } from '@/components/ui/pagination';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { NovoContratoModal } from '@/components/contratos/NovoContratoModal';
 import { VisualizarContratoModal } from '@/components/contratos/VisualizarContratoModal';
@@ -45,6 +46,8 @@ export default function Contratos() {
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const handleContratoGerado = (novoContrato: Contrato) => {
     // O contrato já foi criado no modal, só precisamos mostrar o toast de sucesso

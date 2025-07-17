@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { usePagamentos } from '@/hooks/usePagamentos';
 import { useMotoristas } from '@/hooks/useMotoristas';
 import { useAuth } from '@/hooks/useAuth';
+import { Pagination } from '@/components/ui/pagination';
 import { NovoPagamentoModal } from '@/components/pagamentos/NovoPagamentoModal';
 import { EditarPagamentoModal } from '@/components/pagamentos/EditarPagamentoModal';
 import { DetalhesPagamentoModal } from '@/components/pagamentos/DetalhesPagamentoModal';
@@ -31,6 +32,8 @@ export default function Pagamentos() {
   const [filtroStatus, setFiltroStatus] = useState('todos');
   const [filtroTipo, setFiltroTipo] = useState('todos');
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const handleVerDetalhes = (pagamento: Pagamento) => {
     setPagamentoSelecionado(pagamento);
