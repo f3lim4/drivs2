@@ -3,11 +3,11 @@
  * Permite visualizar e gerenciar contratos de locação ativos
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, Search, Filter, Calendar, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -42,12 +42,13 @@ import { ExcluirAluguelDialog } from '@/components/alugueis/ExcluirAluguelDialog
 export default function Alugueis() {
   const { isAdmin, isLocadora, profile } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [showNovoAluguelModal, setShowNovoAluguelModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedAluguel, setSelectedAluguel] = useState<Aluguel | null>(null);
+  const [selectedAluguel, setSelectedAluguel] = useState<any>(null);
   
   // Estados para paginação
   const [currentPage, setCurrentPage] = useState(1);
@@ -86,107 +87,41 @@ export default function Alugueis() {
 
   // Logs para debug
   console.log('Alugueis - Fazendo requisição para locadora:', profile?.id);
-  console.log('Alugueis - Verificando isolamento:', {
-    locadoraId: profile?.id,
-    alugueisTotal: alugueis.length,
-    primeiroAluguel: alugueis[0]?.locadoraId || 'N/A',
-  });
   console.log('Aluguéis - Verificando isolamento:', {
     locadoraId: profile?.id,
     alugueisTotal: alugueis.length,
     primeiroAluguel: alugueis[0]?.locadoraId || 'N/A',
   });
 
-  // Função para recarregar aluguéis (removido useEffect)
-  const recarregarAlugueis = () => {
-    const loadAlugueis = async () => {
-      try {
-        setLoading(true);
-        
-        // Para locadora, usar filtro específico
-        let url = '/api/alugueis';
-        if (isLocadora && profile?.id) {
-          url += `?locadoraId=${profile.id}`;
-          console.log('Alugueis - Fazendo requisição para locadora:', profile.id);
-        }
-        
-        const response = await fetch(url, {
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
-        });
-        if (response.ok) {
-          const alugueisData = await response.json();
-          
-          // FILTRO TRIPLO DE SEGURANÇA: Garantir que locadora vê apenas seus aluguéis
-          let alugueisParaProcessar = alugueisData;
-          if (isLocadora && profile?.id) {
-            alugueisParaProcessar = alugueisData.filter((aluguel: any) => aluguel.locadoraId === profile.id);
-            
-            // PROTEÇÃO EXTRA: Se ainda houver aluguéis de outras locadoras, limpar tudo
-            const temAlugueisDeOutrasLocadoras = alugueisParaProcessar.some(a => a.locadoraId !== profile.id);
-            if (temAlugueisDeOutrasLocadoras) {
-              console.error('SECURITY ALERT: Aluguéis de outras locadoras detectados, limpando array');
-              alugueisParaProcessar = [];
-            }
-          }
-          
-          // VALIDAÇÃO ADICIONAL: Garantir que todos os aluguéis pertencem à locadora correta
-          if (isLocadora && profile?.id && alugueisParaProcessar.length > 0) {
-            const todosAlugueisCorretos = alugueisParaProcessar.every(a => a.locadoraId === profile.id);
-            if (!todosAlugueisCorretos) {
-              console.error('SECURITY ALERT: Aluguéis de outras locadoras detectados, retornando array vazio');
-              alugueisParaProcessar = [];
-            }
-          }
-          
-          const alugueisFormatados = alugueisParaProcessar.map((aluguel: any) => ({
-            id: aluguel.id,
-            motoristaId: aluguel.motoristaId,
-            motoristaNome: aluguel.motoristaNome || 'Nome não encontrado',
-            motoristaContato: aluguel.motoristaContato || 'Contato não encontrado',
-            veiculoId: aluguel.veiculoId,
-            veiculoModelo: aluguel.veiculoModelo || 'Modelo não encontrado',
-            veiculoPlaca: aluguel.veiculoPlaca || 'Placa não encontrada',
-            periodo: {
-              inicio: new Date(aluguel.dataInicio).toLocaleDateString('pt-BR'),
-              fim: new Date(aluguel.dataFim).toLocaleDateString('pt-BR'),
-              dias: aluguel.tempoContrato,
-            },
-            valores: {
-              mensal: parseFloat(aluguel.valorMensal),
-              diario: parseFloat(aluguel.valorMensal) / 30,
-              total: parseFloat(aluguel.valorTotal),
-              caucao: parseFloat(aluguel.caucao),
-              taxaAdmin: parseFloat(aluguel.taxaAdministrativa || '0'),
-            },
-            status: aluguel.status,
-          }));
-          
-          // Log apenas se houver problemas para debug
-          if (isLocadora && alugueisParaProcessar.length > 0) {
-            console.log('Alugueis - Verificando isolamento:', {
-              locadoraId: profile?.locadoraId,
-              alugueisTotal: alugueisParaProcessar.length,
-              primeiroAluguel: alugueisParaProcessar[0]?.locadoraId
-            });
-          }
-          
-          setAlugueis(alugueisFormatados);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar aluguéis:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadAlugueis();
-  }, [isLocadora, profile?.locadoraId]);
+  // Formatação dos aluguéis para exibição
+  const alugueisFormatados = useMemo(() => {
+    return alugueis.map((aluguel: any) => ({
+      id: aluguel.id,
+      motoristaId: aluguel.motoristaId,
+      motoristaNome: aluguel.motoristaNome || 'Nome não encontrado',
+      motoristaContato: aluguel.motoristaContato || 'Contato não encontrado',
+      veiculoId: aluguel.veiculoId,
+      veiculoModelo: aluguel.veiculoModelo || 'Modelo não encontrado',
+      veiculoPlaca: aluguel.veiculoPlaca || 'Placa não encontrada',
+      locadoraId: aluguel.locadoraId,
+      periodo: {
+        inicio: new Date(aluguel.dataInicio).toLocaleDateString('pt-BR'),
+        fim: new Date(aluguel.dataFim).toLocaleDateString('pt-BR'),
+        dias: aluguel.tempoContrato,
+      },
+      valores: {
+        mensal: parseFloat(aluguel.valorMensal),
+        diario: parseFloat(aluguel.valorMensal) / 30,
+        total: parseFloat(aluguel.valorTotal),
+        caucao: parseFloat(aluguel.caucao),
+        taxaAdmin: parseFloat(aluguel.taxaAdministrativa || '0'),
+      },
+      status: aluguel.status,
+    }));
+  }, [alugueis]);
 
   // Filtra aluguéis baseado na busca e filtros
-  const filteredAlugueis = alugueis.filter(aluguel => {
+  const filteredAlugueis = alugueisFormatados.filter(aluguel => {
     const matchesSearch = aluguel.motoristaNome.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          aluguel.veiculoModelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          aluguel.veiculoPlaca.toLowerCase().includes(searchTerm.toLowerCase());
@@ -213,51 +148,38 @@ export default function Alugueis() {
     setCurrentPage(1);
   };
 
-  // Função para adicionar novo aluguel
-  const handleAluguelAdicionado = (novoAluguel: Aluguel) => {
-    setAlugueis(prev => [...prev, novoAluguel]);
+  // Função para invalidar cache após mudanças
+  const handleAluguelAdicionado = () => {
+    queryClient.invalidateQueries({ queryKey: ['/api/alugueis'] });
   };
 
   // Função para editar aluguel
-  const handleEditarAluguel = (aluguel: Aluguel) => {
+  const handleEditarAluguel = (aluguel: any) => {
     setSelectedAluguel(aluguel);
     setShowEditModal(true);
   };
 
-  const handleAluguelEditado = (aluguelAtualizado: Aluguel) => {
-    setAlugueis(prev => 
-      prev.map(a => a.id === aluguelAtualizado.id ? aluguelAtualizado : a)
-    );
+  const handleAluguelEditado = () => {
+    queryClient.invalidateQueries({ queryKey: ['/api/alugueis'] });
   };
 
   // Função para excluir aluguel
-  const handleExcluirAluguel = (aluguel: Aluguel) => {
+  const handleExcluirAluguel = (aluguel: any) => {
     setSelectedAluguel(aluguel);
     setShowDeleteDialog(true);
   };
 
-  const handleConfirmarExclusao = async (aluguel: Aluguel) => {
+  const handleConfirmarExclusao = async (aluguel: any) => {
     try {
       const response = await fetch(`/api/alugueis/${aluguel.id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        // Restaurar status do veículo para "disponível"
-        const updateVeiculoResponse = await fetch(`/api/veiculos/${aluguel.veiculoId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ status: 'disponivel' }),
-        });
-
-        if (!updateVeiculoResponse.ok) {
-          console.error('Erro ao restaurar status do veículo');
-        }
-
-        // Remove da lista local
-        setAlugueis(prev => prev.filter(a => a.id !== aluguel.id));
+        // Invalidar cache para atualizar a lista
+        queryClient.invalidateQueries({ queryKey: ['/api/alugueis'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/veiculos'] });
+        
         toast({
           title: "Aluguel excluído",
           description: "O aluguel foi removido e o veículo está disponível novamente.",
@@ -285,26 +207,17 @@ export default function Alugueis() {
     const monthEnd = endOfMonth(new Date());
     
     // Calcular receita esperada (soma dos valores mensais dos aluguéis ativos)
-    const receitaEsperada = alugueis
+    const receitaEsperada = alugueisFormatados
       .filter(a => a.status === 'ativo')
       .reduce((sum, a) => sum + a.valores.mensal, 0);
     
     // Calcular receita real baseada nos pagamentos do mês
     const receitaReal = pagamentos
       .filter(p => {
-        // Verificar se o pagamento tem data válida
-        if (!p.data) {
-          console.log('Pagamento sem data:', p);
-          return false;
-        }
+        if (!p.data) return false;
         
         const dataPagamento = new Date(p.data);
-        
-        // Verificar se a data é válida
-        if (isNaN(dataPagamento.getTime())) {
-          console.log('Data inválida para pagamento:', p);
-          return false;
-        }
+        if (isNaN(dataPagamento.getTime())) return false;
         
         const dentroDoMes = isWithinInterval(dataPagamento, { start: monthStart, end: monthEnd });
         
@@ -328,13 +241,13 @@ export default function Alugueis() {
       }, 0);
     
     return {
-      total: alugueis.length,
-      ativos: alugueis.filter(a => a.status === 'ativo').length,
-      pendentes: alugueis.filter(a => a.status === 'pendente').length,
+      total: alugueisFormatados.length,
+      ativos: alugueisFormatados.filter(a => a.status === 'ativo').length,
+      pendentes: alugueisFormatados.filter(a => a.status === 'pendente').length,
       receitaEsperada,
       receitaReal,
     };
-  }, [alugueis, pagamentos]);
+  }, [alugueisFormatados, pagamentos]);
 
   // Retorna badge de status com cor apropriada
   const getStatusBadge = (status: string) => {
