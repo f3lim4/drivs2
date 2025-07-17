@@ -12,9 +12,12 @@ Preferred communication style: Simple, everyday language.
 
 ### 2025-07-17: Ajustes de Layout e Experiência do Usuário - CONCLUÍDO
 - ✅ **Card "Painel de Controle" removido** - Removido card específico da página de aluguéis
-- ✅ **Botão "Nova Despesa" reposicionado** - Movido para lado direito da página financeira
+- ✅ **Botão "Nova Despesa" reposicionado** - Movido para lado direito da página financeira, após seletor de mês
+- ✅ **Sistema de abas convertido em modal** - Aba "Locais" transformada em pop-up modal
+- ✅ **Modal de gerenciamento de locais** - Novo modal para visualizar e gerenciar locais/oficinas
+- ✅ **Botão "Gerenciar Locais" adicionado** - Novo botão na área de controles da página de manutenções
 - ✅ **Layout otimizado** - Elementos alinhados com melhor distribuição visual
-- ✅ **Experiência simplificada** - Interface mais limpa e intuitiva
+- ✅ **Experiência simplificada** - Interface mais limpa e intuitiva com menos abas
 
 ### 2025-07-17: Sistema de Loading Spinner Unificado com Animação de Carro - CONCLUÍDO
 - ✅ **Componente LoadingSpinner criado** - Substituído spinners padrão por animação de carro
