@@ -144,6 +144,23 @@ export default function Pagamentos() {
     return filtered;
   }, [pagamentos, filtroTexto, filtroStatus, filtroTipo, sortOrder]);
 
+  // Paginação
+  const totalPages = Math.ceil(pagamentosFiltrados.length / itemsPerPage);
+  const paginatedPagamentos = pagamentosFiltrados.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Funções para controlar a paginação
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   // Estatísticas (baseado nos dados filtrados)
   const totalPendente = pagamentosFiltrados
     .filter(p => p.status === 'pendente' || p.status === 'parcial')
@@ -338,7 +355,7 @@ export default function Pagamentos() {
             </div>
           ) : (
             <div className="space-y-4">
-              {pagamentosFiltrados.map((pagamento) => (
+              {paginatedPagamentos.map((pagamento) => (
                 <div key={pagamento.id} className="border rounded-lg p-4 hover:bg-gray-50">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -403,6 +420,19 @@ export default function Pagamentos() {
           )}
         </CardContent>
       </Card>
+
+      {/* Paginação */}
+      {pagamentosFiltrados.length > 0 && (
+        <div className="border-t pt-4 mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalItems={pagamentosFiltrados.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        </div>
+      )}
 
       {/* Modais */}
       <NovoPagamentoModal
