@@ -45,6 +45,7 @@ export default function Alugueis() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
+  const [sortOrder, setSortOrder] = useState<string>('mais-novos');
   const [showNovoAluguelModal, setShowNovoAluguelModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
