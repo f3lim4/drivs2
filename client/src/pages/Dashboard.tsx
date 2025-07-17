@@ -369,6 +369,77 @@ export default function Dashboard() {
     return dadosAlugueis;
   };
 
+  // Função para calcular dados de desempenho dos motoristas
+  const getDadosDesempenhoMotoristas = () => {
+    const meses = [
+      { nome: 'Jan', numero: 1 },
+      { nome: 'Fev', numero: 2 },
+      { nome: 'Mar', numero: 3 },
+      { nome: 'Abr', numero: 4 },
+      { nome: 'Mai', numero: 5 },
+      { nome: 'Jun', numero: 6 },
+      { nome: 'Jul', numero: 7 },
+      { nome: 'Ago', numero: 8 },
+      { nome: 'Set', numero: 9 },
+      { nome: 'Out', numero: 10 },
+      { nome: 'Nov', numero: 11 },
+      { nome: 'Dez', numero: 12 }
+    ];
+
+    const anoAtual = new Date().getFullYear();
+    const mesAtual = new Date().getMonth() + 1;
+    const dadosDesempenho = [];
+
+    // Pegar os últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      let mes = mesAtual - i;
+      let ano = anoAtual;
+      
+      if (mes <= 0) {
+        mes += 12;
+        ano -= 1;
+      }
+
+      const mesInfo = meses[mes - 1];
+      
+      // Calcular receita gerada pelos motoristas no mês
+      const receitaMotoristas = pagamentos
+        .filter((p: any) => {
+          const dataPagamento = new Date(p.data);
+          return dataPagamento.getMonth() + 1 === mes && 
+                 dataPagamento.getFullYear() === ano &&
+                 p.status === 'pago';
+        })
+        .reduce((total: number, p: any) => total + parseFloat(p.valor || '0'), 0);
+
+      // Contar motoristas ativos no mês (que têm aluguéis)
+      const motoristasAtivos = new Set(
+        alugueisSeguro
+          .filter((a: any) => {
+            const dataInicio = new Date(a.dataInicio);
+            const dataFim = a.dataFim ? new Date(a.dataFim) : null;
+            const ultimoDiaMes = new Date(ano, mes, 0);
+            
+            return dataInicio <= ultimoDiaMes && 
+                   (!dataFim || dataFim >= new Date(ano, mes - 1, 1));
+          })
+          .map((a: any) => a.motoristaId)
+      ).size;
+
+      // Calcular média de receita por motorista
+      const mediaPorMotorista = motoristasAtivos > 0 ? receitaMotoristas / motoristasAtivos : 0;
+
+      dadosDesempenho.push({
+        mes: mesInfo.nome,
+        receita: Math.round(receitaMotoristas),
+        motoristas: motoristasAtivos,
+        media: Math.round(mediaPorMotorista)
+      });
+    }
+
+    return dadosDesempenho;
+  };
+
   // Calcular estatísticas diretamente
   const hoje = new Date();
   const proximoMes = new Date(hoje);
@@ -392,9 +463,10 @@ export default function Dashboard() {
 
   // Estatísticas de veículos
   const totalVeiculos = veiculosSeguro.length;
-  const veiculosDisponiveis = veiculosSeguro.filter(v => v.status === 'disponivel').length;
-  const veiculosAlugados = veiculosSeguro.filter(v => v.status === 'alugado').length;
+  const veiculosDisponivel = veiculosSeguro.filter(v => v.status === 'disponivel').length;
+  const veiculosAlugado = veiculosSeguro.filter(v => v.status === 'alugado').length;
   const veiculosManutencao = veiculosSeguro.filter(v => v.status === 'manutencao').length;
+  const veiculosParado = veiculosSeguro.filter(v => v.status === 'parado').length;
 
   // Estatísticas de aluguéis
   const totalAlugueis = alugueisSeguro.length;
@@ -484,7 +556,7 @@ export default function Dashboard() {
     });
   }
 
-  if (veiculosDisponiveis === 0 && veiculos.length > 0) {
+  if (veiculosDisponivel === 0 && veiculos.length > 0) {
     alertas.push({
       id: 'sem-veiculos',
       titulo: 'Sem Veículos Disponíveis',
@@ -535,7 +607,7 @@ export default function Dashboard() {
               <div className="space-y-1">
                 <p className="text-sm font-medium text-green-700">VEÍCULOS DISPONÍVEIS</p>
                 <p className="text-2xl font-bold text-green-800">
-                  {veiculosDisponiveis}
+                  {veiculosDisponivel}
                 </p>
                 <p className="text-xs text-green-600">
                   {totalVeiculos} total na frota
@@ -590,147 +662,315 @@ export default function Dashboard() {
       </div>
       )}
 
-      {/* Gráfico Financeiro - apenas para locadoras */}
+      {/* Seção de Gráficos - Grid de 2 colunas para locadoras */}
       {isLocadora && (
-        <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-lg">
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Gráfico Financeiro Modernizado */}
+          <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-emerald-800 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Evolução Financeira
+              </CardTitle>
+              <CardDescription className="text-emerald-600">
+                Receitas vs Despesas dos últimos 6 meses
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={getDadosFinanceiros()}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
+                    <XAxis 
+                      dataKey="mes" 
+                      stroke="#059669"
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      stroke="#059669"
+                      fontSize={12}
+                      tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, '']}
+                      labelFormatter={(label) => `Mês: ${label}`}
+                      contentStyle={{
+                        backgroundColor: '#ecfdf5',
+                        border: '1px solid #a7f3d0',
+                        borderRadius: '8px',
+                        color: '#047857'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="receita" 
+                      stroke="#10b981" 
+                      strokeWidth={3}
+                      dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                      name="Receita"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="despesas" 
+                      stroke="#ef4444" 
+                      strokeWidth={3}
+                      dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
+                      name="Despesas"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="lucro" 
+                      stroke="#8b5cf6" 
+                      strokeWidth={3}
+                      dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 4 }}
+                      name="Lucro"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex items-center justify-center gap-6 mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-emerald-600 font-medium">Receita</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <span className="text-sm text-emerald-600 font-medium">Despesas</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                  <span className="text-sm text-emerald-600 font-medium">Lucro</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Gráfico de Aluguéis Modernizado */}
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
+                <Car className="w-5 h-5" />
+                Evolução de Aluguéis
+              </CardTitle>
+              <CardDescription className="text-blue-600">
+                Aluguéis iniciados, finalizados e ativos por mês
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={getDadosAlugueis()}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#dbeafe" />
+                    <XAxis 
+                      dataKey="mes" 
+                      stroke="#1e40af"
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      stroke="#1e40af"
+                      fontSize={12}
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => [value, '']}
+                      labelFormatter={(label) => `Mês: ${label}`}
+                      contentStyle={{
+                        backgroundColor: '#eff6ff',
+                        border: '1px solid #bfdbfe',
+                        borderRadius: '8px',
+                        color: '#1e40af'
+                      }}
+                    />
+                    <Bar 
+                      dataKey="iniciados" 
+                      fill="#10b981" 
+                      name="Iniciados"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar 
+                      dataKey="finalizados" 
+                      fill="#ef4444" 
+                      name="Finalizados"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar 
+                      dataKey="ativos" 
+                      fill="#3b82f6" 
+                      name="Ativos"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex items-center justify-center gap-6 mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-blue-600 font-medium">Iniciados</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <span className="text-sm text-blue-600 font-medium">Finalizados</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm text-blue-600 font-medium">Ativos</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Gráfico de Status da Frota - apenas para locadoras */}
+      {isLocadora && (
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
-              Evolução Financeira Mensal
+            <CardTitle className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+              <Activity className="w-5 h-5" />
+              Status da Frota
             </CardTitle>
-            <CardDescription className="text-slate-600">
-              Comparativo de receitas e despesas dos últimos 6 meses
+            <CardDescription className="text-purple-600">
+              Distribuição dos veículos por status atual
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={getDadosFinanceiros()}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                  <XAxis 
-                    dataKey="mes" 
-                    stroke="#64748b"
-                    fontSize={12}
-                  />
-                  <YAxis 
-                    stroke="#64748b"
-                    fontSize={12}
-                    tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
-                  />
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: 'Disponível', value: veiculosDisponivel, fill: '#10b981' },
+                      { name: 'Alugado', value: veiculosAlugado, fill: '#3b82f6' },
+                      { name: 'Manutenção', value: veiculosManutencao, fill: '#f59e0b' },
+                      { name: 'Parado', value: veiculosParado, fill: '#ef4444' }
+                    ]}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    innerRadius={40}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {[
+                      { name: 'Disponível', value: veiculosDisponivel, fill: '#10b981' },
+                      { name: 'Alugado', value: veiculosAlugado, fill: '#3b82f6' },
+                      { name: 'Manutenção', value: veiculosManutencao, fill: '#f59e0b' },
+                      { name: 'Parado', value: veiculosParado, fill: '#ef4444' }
+                    ].map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
                   <Tooltip 
-                    formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, '']}
-                    labelFormatter={(label) => `Mês: ${label}`}
+                    formatter={(value: number) => [value, 'veículos']}
                     contentStyle={{
-                      backgroundColor: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      backgroundColor: '#faf5ff',
+                      border: '1px solid #d8b4fe',
                       borderRadius: '8px',
-                      color: '#334155'
+                      color: '#7c3aed'
                     }}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="receita" 
-                    stackId="1"
-                    stroke="#10b981" 
-                    fill="#10b981" 
-                    fillOpacity={0.6}
-                    name="Receita"
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="despesas" 
-                    stackId="2"
-                    stroke="#ef4444" 
-                    fill="#ef4444" 
-                    fillOpacity={0.6}
-                    name="Despesas"
-                  />
-                </AreaChart>
+                </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="flex items-center justify-center gap-6 mt-4">
+            <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-slate-600">Receita</span>
+                <span className="text-sm text-purple-600 font-medium">Disponível ({veiculosDisponivel})</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span className="text-sm text-purple-600 font-medium">Alugado ({veiculosAlugado})</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <span className="text-sm text-purple-600 font-medium">Manutenção ({veiculosManutencao})</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span className="text-sm text-slate-600">Despesas</span>
+                <span className="text-sm text-purple-600 font-medium">Parado ({veiculosParado})</span>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Gráfico de Aluguéis - apenas para locadoras */}
+      {/* Gráfico de Desempenho dos Motoristas - apenas para locadoras */}
       {isLocadora && (
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
-              <Car className="w-5 h-5" />
-              Evolução de Aluguéis
+            <CardTitle className="text-lg font-semibold text-orange-800 flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Desempenho dos Motoristas
             </CardTitle>
-            <CardDescription className="text-blue-600">
-              Acompanhe os aluguéis iniciados, finalizados e ativos dos últimos 6 meses
+            <CardDescription className="text-orange-600">
+              Receita gerada e motoristas ativos por mês
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={getDadosAlugueis()}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#dbeafe" />
+                <AreaChart data={getDadosDesempenhoMotoristas()}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#fed7aa" />
                   <XAxis 
                     dataKey="mes" 
-                    stroke="#1e40af"
+                    stroke="#c2410c"
                     fontSize={12}
                   />
                   <YAxis 
-                    stroke="#1e40af"
+                    yAxisId="left"
+                    stroke="#c2410c"
+                    fontSize={12}
+                    tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                  />
+                  <YAxis 
+                    yAxisId="right"
+                    orientation="right"
+                    stroke="#c2410c"
                     fontSize={12}
                   />
                   <Tooltip 
-                    formatter={(value: number) => [value, '']}
+                    formatter={(value: number, name: string) => {
+                      if (name === 'receita' || name === 'media') {
+                        return [`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, ''];
+                      }
+                      return [value, ''];
+                    }}
                     labelFormatter={(label) => `Mês: ${label}`}
                     contentStyle={{
-                      backgroundColor: '#eff6ff',
-                      border: '1px solid #bfdbfe',
+                      backgroundColor: '#fff7ed',
+                      border: '1px solid #fed7aa',
                       borderRadius: '8px',
-                      color: '#1e40af'
+                      color: '#c2410c'
                     }}
                   />
-                  <Bar 
-                    dataKey="iniciados" 
-                    fill="#10b981" 
-                    name="Iniciados"
-                    radius={[4, 4, 0, 0]}
+                  <Area 
+                    yAxisId="left"
+                    type="monotone" 
+                    dataKey="receita" 
+                    stroke="#f97316" 
+                    fill="#f97316" 
+                    fillOpacity={0.6}
+                    name="Receita Total"
                   />
-                  <Bar 
-                    dataKey="finalizados" 
-                    fill="#ef4444" 
-                    name="Finalizados"
-                    radius={[4, 4, 0, 0]}
+                  <Area 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="motoristas" 
+                    stroke="#0ea5e9" 
+                    fill="#0ea5e9" 
+                    fillOpacity={0.3}
+                    name="Motoristas Ativos"
                   />
-                  <Bar 
-                    dataKey="ativos" 
-                    fill="#3b82f6" 
-                    name="Ativos"
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
             <div className="flex items-center justify-center gap-6 mt-4">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-blue-600">Iniciados</span>
+                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <span className="text-sm text-orange-600 font-medium">Receita Total</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span className="text-sm text-blue-600">Finalizados</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span className="text-sm text-blue-600">Ativos</span>
+                <div className="w-3 h-3 bg-sky-500 rounded-full"></div>
+                <span className="text-sm text-orange-600 font-medium">Motoristas Ativos</span>
               </div>
             </div>
           </CardContent>
