@@ -22,8 +22,6 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { DrivsHeader } from '@/components/layout/DrivsHeader';
-import { StatCard } from '@/components/dashboard/StatCard';
 import { startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
 import { Aluguel } from '@/types';
@@ -187,7 +185,6 @@ export default function Alugueis() {
 
   return (
     <div className="space-y-8">
-      <DrivsHeader title="Aluguéis" />
 
       {/* Cards de estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
