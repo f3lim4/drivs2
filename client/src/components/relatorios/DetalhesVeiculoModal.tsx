@@ -216,28 +216,33 @@ export function DetalhesVeiculoModal({
 
           {/* Detalhamento de Despesas */}
           <Card>
-            <CardHeader>
-              <CardTitle>Detalhamento de Despesas Mensais</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Detalhamento de Despesas Mensais</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="pt-0">
+              <div className="space-y-2">
                 {despesasDetalhadas.length > 0 ? (
                   despesasDetalhadas.map((despesa) => (
-                    <div key={despesa.categoria} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                        <span className="font-medium">
-                          {despesa.categoria}
-                        </span>
+                    <div key={despesa.categoria} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${despesa.categoria === 'IPVA' ? 'bg-orange-500' : 
+                          despesa.categoria === 'Seguro' ? 'bg-blue-500' : 
+                          despesa.categoria === 'Rastreador' ? 'bg-green-500' : 
+                          despesa.categoria === 'Financiamento' ? 'bg-purple-500' : 
+                          'bg-gray-500'}`}
+                        />
+                        <span className="text-sm font-medium">{despesa.categoria}</span>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-gray-600">{despesa.percentual.toFixed(0)}% das despesas</p>
-                        <p className="font-bold text-red-600">{formatCurrency(despesa.valor)}</p>
+                        <span className="text-sm font-bold">{formatCurrency(despesa.valor)}</span>
+                        <span className="text-xs text-gray-500 ml-1">
+                          ({despesa.percentual.toFixed(1)}%)
+                        </span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-4 text-gray-500">
+                  <div className="text-center py-2 text-gray-500 text-sm">
                     Nenhuma despesa registrada para este veículo no período selecionado.
                   </div>
                 )}
