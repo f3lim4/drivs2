@@ -540,7 +540,10 @@ export default function RelatoriosFinanceiros() {
           </SelectContent>
         </Select>
         {!isAdmin && (
-          <Button onClick={() => setModalNovaDespesa(true)} className="flex items-center gap-2">
+          <Button onClick={() => {
+            console.log('Botão Nova Despesa clicado');
+            setModalNovaDespesa(true);
+          }} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Nova Despesa
           </Button>
@@ -1218,7 +1221,10 @@ export default function RelatoriosFinanceiros() {
       </Tabs>
 
       {/* Modal de nova despesa */}
-      <Dialog open={modalNovaDespesa} onOpenChange={setModalNovaDespesa}>
+      <Dialog open={modalNovaDespesa} onOpenChange={(open) => {
+        console.log('Modal Nova Despesa mudou estado:', open);
+        setModalNovaDespesa(open);
+      }}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Nova Despesa</DialogTitle>
