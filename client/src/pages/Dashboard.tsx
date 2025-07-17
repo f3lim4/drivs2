@@ -22,6 +22,61 @@ export default function Dashboard() {
   // Buscar anúncios ativos
   const { data: anuncios = [], isLoading: loadingAnuncios } = useAnunciosAtivos();
 
+  // Função para mapear tipos de anúncios para português e cores
+  const getAnuncioConfig = (tipo: string) => {
+    switch(tipo.toLowerCase()) {
+      case 'info':
+      case 'informacao':
+        return {
+          nome: 'Informação',
+          border: 'border-l-blue-500',
+          bg: 'bg-blue-50/50',
+          iconBg: 'bg-blue-100',
+          iconColor: 'text-blue-600',
+          badgeVariant: 'default' as const
+        };
+      case 'warning':
+      case 'atencao':
+        return {
+          nome: 'Atenção',
+          border: 'border-l-yellow-500',
+          bg: 'bg-yellow-50/50',
+          iconBg: 'bg-yellow-100',
+          iconColor: 'text-yellow-600',
+          badgeVariant: 'secondary' as const
+        };
+      case 'success':
+      case 'sucesso':
+        return {
+          nome: 'Sucesso',
+          border: 'border-l-green-500',
+          bg: 'bg-green-50/50',
+          iconBg: 'bg-green-100',
+          iconColor: 'text-green-600',
+          badgeVariant: 'default' as const
+        };
+      case 'error':
+      case 'erro':
+        return {
+          nome: 'Erro',
+          border: 'border-l-red-500',
+          bg: 'bg-red-50/50',
+          iconBg: 'bg-red-100',
+          iconColor: 'text-red-600',
+          badgeVariant: 'destructive' as const
+        };
+      default:
+        return {
+          nome: 'Informação',
+          border: 'border-l-blue-500',
+          bg: 'bg-blue-50/50',
+          iconBg: 'bg-blue-100',
+          iconColor: 'text-blue-600',
+          badgeVariant: 'default' as const
+        };
+    }
+  };
+
   // Buscar dados das locadoras (apenas para admin)
   const { data: locadoras = [], isLoading: loadingLocadoras } = useQuery<any[]>({
     queryKey: ['/api/locadoras'],
@@ -360,40 +415,43 @@ export default function Dashboard() {
       {/* Seção de Anúncios */}
       {isLocadora && anuncios.length > 0 && (
         <div className="grid gap-4">
-          {anuncios.map((anuncio) => (
-            <Card key={anuncio.id} className="border-l-4 border-l-blue-500 bg-blue-50/50">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-blue-100">
-                    <Megaphone className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-medium text-foreground">{anuncio.titulo}</h3>
-                      <Badge variant="secondary" className="text-xs">
-                        {anuncio.tipo}
-                      </Badge>
+          {anuncios.map((anuncio) => {
+            const config = getAnuncioConfig(anuncio.tipo);
+            return (
+              <Card key={anuncio.id} className={`border-l-4 ${config.border} ${config.bg}`}>
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${config.iconBg}`}>
+                      <Megaphone className={`w-5 h-5 ${config.iconColor}`} />
                     </div>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {anuncio.conteudo}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      {formatDate(anuncio.dataFim) && (
-                        <span>
-                          Válido até: {formatDate(anuncio.dataFim)}
-                        </span>
-                      )}
-                      {formatDate(anuncio.dataInicio) && (
-                        <span>
-                          Publicado: {formatDate(anuncio.dataInicio)}
-                        </span>
-                      )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-medium text-foreground">{anuncio.titulo}</h3>
+                        <Badge variant={config.badgeVariant} className="text-xs">
+                          {config.nome}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {anuncio.conteudo}
+                      </p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        {formatDate(anuncio.dataFim) && (
+                          <span>
+                            Válido até: {formatDate(anuncio.dataFim)}
+                          </span>
+                        )}
+                        {formatDate(anuncio.dataInicio) && (
+                          <span>
+                            Publicado: {formatDate(anuncio.dataInicio)}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
