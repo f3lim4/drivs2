@@ -3,7 +3,7 @@
  * Permite visualizar e gerenciar contratos de locação ativos
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Plus, Search, Filter, Calendar, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -121,16 +121,41 @@ export default function Alugueis() {
     }));
   }, [alugueis]);
 
-  // Filtra aluguéis baseado na busca e filtros
-  const filteredAlugueis = alugueisFormatados.filter(aluguel => {
-    const matchesSearch = aluguel.motoristaNome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         aluguel.veiculoModelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         aluguel.veiculoPlaca.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'todos' || aluguel.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  // Filtra e ordena aluguéis baseado na busca, filtros e ordenação
+  const filteredAlugueis = useMemo(() => {
+    return alugueisFormatados
+      .filter(aluguel => {
+        const matchesSearch = aluguel.motoristaNome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             aluguel.veiculoModelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             aluguel.veiculoPlaca.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesStatus = statusFilter === 'todos' || aluguel.status === statusFilter;
+        
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        switch (sortOrder) {
+          case 'mais-novos':
+            return new Date(b.periodo.inicio).getTime() - new Date(a.periodo.inicio).getTime();
+          case 'mais-antigos':
+            return new Date(a.periodo.inicio).getTime() - new Date(b.periodo.inicio).getTime();
+          case 'motorista-az':
+            return a.motoristaNome.localeCompare(b.motoristaNome);
+          case 'motorista-za':
+            return b.motoristaNome.localeCompare(a.motoristaNome);
+          case 'veiculo-az':
+            return a.veiculoModelo.localeCompare(b.veiculoModelo);
+          case 'veiculo-za':
+            return b.veiculoModelo.localeCompare(a.veiculoModelo);
+          case 'valor-maior':
+            return b.valores.mensal - a.valores.mensal;
+          case 'valor-menor':
+            return a.valores.mensal - b.valores.mensal;
+          default:
+            return 0;
+        }
+      });
+  }, [alugueisFormatados, searchTerm, statusFilter, sortOrder]);
 
   // Paginação
   const totalPages = Math.ceil(filteredAlugueis.length / itemsPerPage);
@@ -160,6 +185,11 @@ export default function Alugueis() {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(1);
   };
+
+  // Reset page when sorting changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [sortOrder]);
 
   // Função para invalidar cache após mudanças
   const handleAluguelAdicionado = () => {
@@ -410,8 +440,25 @@ export default function Alugueis() {
 
       {/* Tabela de aluguéis */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Contratos de Locação</CardTitle>
+          
+          {/* Ordenação */}
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+              <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+              <SelectItem value="motorista-az">Motorista (A-Z)</SelectItem>
+              <SelectItem value="motorista-za">Motorista (Z-A)</SelectItem>
+              <SelectItem value="veiculo-az">Veículo (A-Z)</SelectItem>
+              <SelectItem value="veiculo-za">Veículo (Z-A)</SelectItem>
+              <SelectItem value="valor-maior">Valor (Maior)</SelectItem>
+              <SelectItem value="valor-menor">Valor (Menor)</SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent className="p-0">
           {filteredAlugueis.length > 0 ? (
