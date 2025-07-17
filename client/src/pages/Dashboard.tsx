@@ -521,104 +521,81 @@ export default function Dashboard() {
       {/* Grid de estatísticas principais - apenas para locadoras */}
       {isLocadora && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {/* Total de Motoristas - Card Personalizado */}
-        <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+        {/* Total de Motoristas - Card Futurista */}
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
           <CardContent className="p-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-blue-100">
-                  <Users className="w-4 h-4 text-blue-600" />
-                </div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Total de Motoristas
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <p className="text-xl font-bold text-foreground">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-700">TOTAL DE MOTORISTAS</p>
+                <p className="text-2xl font-bold text-blue-800">
                   {totalMotoristas}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-blue-600">
                   {motoristasAtivos > 0 ? `${motoristasAtivos} ativos` : "0 ativos"}
                 </p>
               </div>
+              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-700" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Veículos Disponíveis - Card Personalizado */}
-        <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+        {/* Veículos Disponíveis - Card Futurista */}
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
           <CardContent className="p-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-green-100">
-                  <Car className="w-4 h-4 text-green-600" />
-                </div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Veículos Disponíveis
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <p className="text-xl font-bold text-foreground">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-green-700">VEÍCULOS DISPONÍVEIS</p>
+                <p className="text-2xl font-bold text-green-800">
                   {veiculosDisponiveis}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-green-600">
                   {totalVeiculos} total na frota
                 </p>
               </div>
+              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                <Car className="w-6 h-6 text-green-700" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Aluguéis Ativos - Card Personalizado */}
-        <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+        {/* Aluguéis Ativos - Card Futurista */}
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
           <CardContent className="p-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-purple-100">
-                  <TrendingUp className="w-4 h-4 text-purple-600" />
-                </div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Aluguéis Ativos
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <p className="text-xl font-bold text-foreground">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-purple-700">ALUGUÉIS ATIVOS</p>
+                <p className="text-2xl font-bold text-purple-800">
                   {alugueisAtivos + alugueisPendentes}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-purple-600">
                   {totalAlugueis} total de contratos
                 </p>
               </div>
+              <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-purple-700" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Receita Mensal - Card Personalizado */}
-        <Card className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
+        {/* Receita Mensal - Card Futurista */}
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
           <CardContent className="p-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-green-100">
-                  <DollarSign className="w-4 h-4 text-green-600" />
-                </div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Receita Mensal
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <p className="text-xl font-bold text-foreground">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-yellow-700">RECEITA MENSAL</p>
+                <p className="text-2xl font-bold text-yellow-800">
                   {formatCurrency(receitaMensal)}
                 </p>
-                
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-medium">Semanal:</span> {formatCurrency(receitaSemanal)}
-                  </p>
-                </div>
+                <p className="text-xs text-yellow-600">
+                  <span className="font-medium">Semanal:</span> {formatCurrency(receitaSemanal)}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-yellow-700" />
               </div>
             </div>
           </CardContent>
@@ -729,43 +706,43 @@ export default function Dashboard() {
 
         {/* Estatísticas detalhadas em grid menor */}
         <div className="grid gap-4 md:grid-cols-3">
-          <Card className="border border-gray-200 bg-white">
+          <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">CNH Vencendo</p>
-                  <p className="text-2xl font-bold text-yellow-600">{cnhVencendo}</p>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-yellow-700">CNH VENCENDO</p>
+                  <p className="text-2xl font-bold text-yellow-800">{cnhVencendo}</p>
                 </div>
-                <div className="p-2 rounded-lg bg-yellow-100">
-                  <Clock className="w-6 h-6 text-yellow-600" />
+                <div className="w-10 h-10 bg-yellow-200 rounded-full flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-yellow-700" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border border-gray-200 bg-white">
+          <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">CNH Vencida</p>
-                  <p className="text-2xl font-bold text-red-600">{cnhVencida}</p>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-red-700">CNH VENCIDA</p>
+                  <p className="text-2xl font-bold text-red-800">{cnhVencida}</p>
                 </div>
-                <div className="p-2 rounded-lg bg-red-100">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-700" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border border-gray-200 bg-white">
+          <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 shadow-lg">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Veículos em Manutenção</p>
-                  <p className="text-2xl font-bold text-gray-600">{veiculosManutencao}</p>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-gray-700">VEÍCULOS EM MANUTENÇÃO</p>
+                  <p className="text-2xl font-bold text-gray-800">{veiculosManutencao}</p>
                 </div>
-                <div className="p-2 rounded-lg bg-gray-100">
-                  <Car className="w-6 h-6 text-gray-600" />
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                  <Car className="w-5 h-5 text-gray-700" />
                 </div>
               </div>
             </CardContent>
