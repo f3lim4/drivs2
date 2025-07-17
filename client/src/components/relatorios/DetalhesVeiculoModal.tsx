@@ -317,7 +317,10 @@ export function DetalhesVeiculoModal({
                                 <TableCell>
                                   <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4 text-gray-400" />
-                                    {format(new Date(receita.data), 'dd/MM/yyyy', { locale: pt })}
+                                    {receita.data && !isNaN(new Date(receita.data).getTime()) 
+                                      ? format(new Date(receita.data), 'dd/MM/yyyy', { locale: pt })
+                                      : 'Data inválida'
+                                    }
                                   </div>
                                 </TableCell>
                                 <TableCell>
@@ -367,7 +370,10 @@ export function DetalhesVeiculoModal({
                                 <TableCell>
                                   <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4 text-gray-400" />
-                                    {format(new Date(despesa.data), 'dd/MM/yyyy', { locale: pt })}
+                                    {despesa.data && !isNaN(new Date(despesa.data).getTime()) 
+                                      ? format(new Date(despesa.data), 'dd/MM/yyyy', { locale: pt })
+                                      : 'Data inválida'
+                                    }
                                   </div>
                                 </TableCell>
                                 <TableCell>
