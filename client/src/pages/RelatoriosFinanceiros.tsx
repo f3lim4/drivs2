@@ -115,8 +115,9 @@ export default function RelatoriosFinanceiros() {
       }
 
       // Invalidar cache específico com locadoraId
-      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
-      await queryClient.refetchQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
+      const locadoraId = profile?.locadoraId || profile?.id;
+      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
+      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraId] });
       setModalNovaDespesa(false);
       formNovaDespesa.reset();
       
@@ -157,8 +158,9 @@ export default function RelatoriosFinanceiros() {
       }
 
       // Invalidar cache específico com locadoraId
-      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
-      await queryClient.refetchQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
+      const locadoraId = profile?.locadoraId || profile?.id;
+      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
+      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraId] });
       setModalEditarDespesa(false);
       setDespesaEditando(null);
       formEditarDespesa.reset();
@@ -216,8 +218,9 @@ export default function RelatoriosFinanceiros() {
       }
 
       // Invalidar cache específico com locadoraId
-      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
-      await queryClient.refetchQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
+      const locadoraId = profile?.locadoraId || profile?.id;
+      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
+      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraId] });
       setConfirmDelete({ open: false, id: null });
       
       toast({
