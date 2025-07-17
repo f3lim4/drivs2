@@ -1,689 +1,349 @@
+/**
+ * Página de Planos da Locadora
+ * Permite visualizar o plano atual e solicitar mudança de plano
+ */
+
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
-import { Check, X, Star, Building2, Zap, Crown, Plus, Edit, Trash2, Eye, Settings, Gift } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Check, Crown, Star, Zap, Users, Car, FileText, TrendingUp, Shield, HeadphonesIcon } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
-interface Plano {
-  id: string;
+interface PlanoFeature {
   nome: string;
-  precoMensal: number;
-  precoAnual: number;
-  descricao: string;
-  maxVeiculos: number;
-  maxMotoristas: number;
-  features: string[];
-  ativo: boolean;
-  cor: string;
-  ordem: number;
+  basico: boolean | string;
+  premium: boolean | string;
+  enterprise: boolean | string;
 }
 
-interface LocadoraPlano {
-  id: string;
-  nome: string;
-  planoAtual: string;
-  dataInicio: string;
-  dataVencimento: string;
-  status: 'ativo' | 'vencido' | 'cancelado';
-  valorPago: number;
-}
+const planosFeatures: PlanoFeature[] = [
+  {
+    nome: "Veículos na frota",
+    basico: "Até 10",
+    premium: "Até 50",
+    enterprise: "Ilimitado"
+  },
+  {
+    nome: "Motoristas cadastrados",
+    basico: "Até 20",
+    premium: "Até 100",
+    enterprise: "Ilimitado"
+  },
+  {
+    nome: "Contratos simultâneos",
+    basico: "Até 10",
+    premium: "Até 50",
+    enterprise: "Ilimitado"
+  },
+  {
+    nome: "Relatórios financeiros",
+    basico: true,
+    premium: true,
+    enterprise: true
+  },
+  {
+    nome: "Sistema de notificações",
+    basico: true,
+    premium: true,
+    enterprise: true
+  },
+  {
+    nome: "Controle de manutenções",
+    basico: false,
+    premium: true,
+    enterprise: true
+  },
+  {
+    nome: "Gestão de multas",
+    basico: false,
+    premium: true,
+    enterprise: true
+  },
+  {
+    nome: "Templates de contrato",
+    basico: "1 template",
+    premium: "5 templates",
+    enterprise: "Ilimitado"
+  },
+  {
+    nome: "Suporte técnico",
+    basico: "Email",
+    premium: "Email + Chat",
+    enterprise: "24/7 Prioritário"
+  },
+  {
+    nome: "Backup automático",
+    basico: false,
+    premium: true,
+    enterprise: true
+  },
+  {
+    nome: "API para integração",
+    basico: false,
+    premium: false,
+    enterprise: true
+  },
+  {
+    nome: "Relatórios avançados",
+    basico: false,
+    premium: false,
+    enterprise: true
+  }
+];
+
+const planosInfo = {
+  basico: {
+    nome: "Básico",
+    preco: 99.90,
+    icone: Car,
+    cor: "bg-blue-500",
+    descricao: "Perfeito para pequenas locadoras começando no mercado"
+  },
+  premium: {
+    nome: "Premium",
+    preco: 199.90,
+    icone: Star,
+    cor: "bg-purple-500",
+    descricao: "Para locadoras em crescimento que precisam de mais recursos",
+    popular: true
+  },
+  enterprise: {
+    nome: "Enterprise",
+    preco: 399.90,
+    icone: Crown,
+    cor: "bg-yellow-500",
+    descricao: "Solução completa para grandes locadoras e redes"
+  }
+};
 
 export default function Planos() {
+  const { profile, isLocadora } = useAuth();
   const { toast } = useToast();
-  const [modalAberto, setModalAberto] = useState(false);
-  const [planoEditando, setPlanoEditando] = useState<Plano | null>(null);
-  const [modalLocadoras, setModalLocadoras] = useState(false);
-  
-  // Estados para o formulário
-  const [formData, setFormData] = useState({
-    nome: '',
-    descricao: '',
-    precoMensal: '',
-    precoAnual: '',
-    maxVeiculos: '',
-    maxMotoristas: '',
-    features: '',
-    cor: '#3b82f6',
-    ativo: true
+  const [solicitando, setSolicitando] = useState(false);
+
+  // Buscar dados da locadora
+  const { data: locadora, isLoading } = useQuery({
+    queryKey: ['/api/locadoras', profile?.locadoraId],
+    enabled: !!profile?.locadoraId && isLocadora,
   });
 
-  // Dados de exemplo dos planos
-  const [planos, setPlanos] = useState<Plano[]>([
-    {
-      id: 'free',
-      nome: 'Free',
-      precoMensal: 0,
-      precoAnual: 0,
-      descricao: 'Plano gratuito para testar o sistema',
-      maxVeiculos: 2,
-      maxMotoristas: 10,
-      features: [
-        'Até 2 veículos',
-        'Até 10 motoristas',
-        'Funcionalidades básicas',
-        'Suporte por email'
-      ],
-      ativo: true,
-      cor: '#10b981',
-      ordem: 0
-    },
-    {
-      id: 'basico',
-      nome: 'Básico',
-      precoMensal: 99,
-      precoAnual: 990,
-      descricao: 'Ideal para pequenas locadoras iniciantes',
-      maxVeiculos: 20,
-      maxMotoristas: 50,
-      features: [
-        'Gestão básica de aluguéis',
-        'Contratos simples',
-        'Relatórios básicos',
-        'Suporte por email'
-      ],
-      ativo: true,
-      cor: '#64748b',
-      ordem: 1
-    },
-    {
-      id: 'premium',
-      nome: 'Premium',
-      precoMensal: 199,
-      precoAnual: 1990,
-      descricao: 'Para locadoras em crescimento',
-      maxVeiculos: 100,
-      maxMotoristas: 200,
-      features: [
-        'Gestão completa de aluguéis',
-        'Contratos personalizados',
-        'Relatórios avançados',
-        'Dashboard completo',
-        'Notificações automáticas',
-        'Suporte prioritário'
-      ],
-      ativo: true,
-      cor: '#3b82f6',
-      ordem: 2
-    },
-    {
-      id: 'enterprise',
-      nome: 'Enterprise',
-      precoMensal: 399,
-      precoAnual: 3990,
-      descricao: 'Para grandes redes de locadoras',
-      maxVeiculos: 9999,
-      maxMotoristas: 9999,
-      features: [
-        'Veículos ilimitados',
-        'Motoristas ilimitados',
-        'Gestão multi-locadora',
-        'Contratos avançados',
-        'Relatórios personalizados',
-        'Dashboard executivo',
-        'API personalizada',
-        'Suporte 24/7',
-        'Consultoria especializada'
-      ],
-      ativo: true,
-      cor: '#8b5cf6',
-      ordem: 3
-    }
-  ]);
-
-  // Dados de exemplo das locadoras e seus planos
-  const [locadorasPlanos, setLocadorasPlanos] = useState<LocadoraPlano[]>([
-    {
-      id: '0',
-      nome: 'Nova Locadora Teste',
-      planoAtual: 'free',
-      dataInicio: '2024-07-15',
-      dataVencimento: '2024-08-15',
-      status: 'ativo',
-      valorPago: 0
-    },
-    {
-      id: '1',
-      nome: 'Crivelari Locadora',
-      planoAtual: 'premium',
-      dataInicio: '2024-01-15',
-      dataVencimento: '2024-12-15',
-      status: 'ativo',
-      valorPago: 1990
-    },
-    {
-      id: '2',
-      nome: 'AutoRent Premium',
-      planoAtual: 'enterprise',
-      dataInicio: '2024-03-01',
-      dataVencimento: '2024-03-01',
-      status: 'ativo',
-      valorPago: 3990
-    },
-    {
-      id: '3',
-      nome: 'Rápido Veículos',
-      planoAtual: 'basico',
-      dataInicio: '2024-06-10',
-      dataVencimento: '2024-06-10',
-      status: 'ativo',
-      valorPago: 990
-    }
-  ]);
-
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
-  };
-
-  const getIcon = (planoId: string) => {
-    switch (planoId) {
-      case 'free':
-        return <Gift className="w-8 h-8 text-white" />;
-      case 'basico':
-        return <Building2 className="w-8 h-8 text-white" />;
-      case 'premium':
-        return <Zap className="w-8 h-8 text-white" />;
-      case 'enterprise':
-        return <Crown className="w-8 h-8 text-white" />;
-      default:
-        return <Building2 className="w-8 h-8 text-white" />;
+  const handleSolicitarMudanca = async (novoPlano: string) => {
+    setSolicitando(true);
+    try {
+      // Simular solicitação de mudança de plano
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Solicitação enviada",
+        description: `Sua solicitação para mudar para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome} foi enviada. Nossa equipe entrará em contato em breve.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao solicitar mudança",
+        description: "Ocorreu um erro ao enviar sua solicitação. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setSolicitando(false);
     }
   };
 
-  const getGradientClass = (planoId: string) => {
-    switch (planoId) {
-      case 'free':
-        return 'bg-gradient-to-br from-green-500 to-green-600 border-green-400';
-      case 'basico':
-        return 'bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400';
-      case 'premium':
-        return 'bg-gradient-to-br from-purple-500 to-purple-600 border-purple-400';
-      case 'enterprise':
-        return 'bg-gradient-to-br from-orange-500 to-orange-600 border-orange-400';
-      default:
-        return 'bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400';
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'ativo':
-        return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
-      case 'vencido':
-        return <Badge className="bg-red-100 text-red-800">Vencido</Badge>;
-      case 'cancelado':
-        return <Badge className="bg-gray-100 text-gray-800">Cancelado</Badge>;
-      default:
-        return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
-    }
-  };
+  if (!isLocadora) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center">Acesso Negado</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-center text-muted-foreground">
+              Esta página é apenas para locadoras.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-  const getPlanoNome = (planoId: string) => {
-    const plano = planos.find(p => p.id === planoId);
-    return plano ? plano.nome : planoId;
-  };
-
-  const limparFormulario = () => {
-    setFormData({
-      nome: '',
-      descricao: '',
-      precoMensal: '',
-      precoAnual: '',
-      maxVeiculos: '',
-      maxMotoristas: '',
-      features: '',
-      cor: '#3b82f6',
-      ativo: true
-    });
-  };
-
-  const preencherFormulario = (plano: Plano) => {
-    setFormData({
-      nome: plano.nome,
-      descricao: plano.descricao,
-      precoMensal: plano.precoMensal.toString(),
-      precoAnual: plano.precoAnual.toString(),
-      maxVeiculos: plano.maxVeiculos.toString(),
-      maxMotoristas: plano.maxMotoristas.toString(),
-      features: plano.features.join('\n'),
-      cor: plano.cor,
-      ativo: plano.ativo
-    });
-  };
-
-  const handleNovoPlano = () => {
-    setPlanoEditando(null);
-    limparFormulario();
-    setModalAberto(true);
-  };
-
-  const handleEditarPlano = (plano: Plano) => {
-    setPlanoEditando(plano);
-    preencherFormulario(plano);
-    setModalAberto(true);
-  };
-
-  const handleSalvarPlano = () => {
-    toast({
-      title: "Plano salvo com sucesso",
-      description: "As alterações foram aplicadas.",
-    });
-    setModalAberto(false);
-    setPlanoEditando(null);
-    limparFormulario();
-  };
-
-  const handleExcluirPlano = (planoId: string) => {
-    setPlanos(planos.filter(p => p.id !== planoId));
-    toast({
-      title: "Plano excluído",
-      description: "O plano foi removido do sistema.",
-    });
-  };
+  const planoAtual = locadora?.plano || 'basico';
 
   return (
-    <div className="flex-1 space-y-8 p-6">
-      {/* Header Futurista */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Gerenciamento de Planos
-          </h1>
-          <p className="text-slate-600 text-lg">
-            Gerencie os planos disponíveis para as locadoras
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() => setModalLocadoras(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-400 hover:from-blue-600 hover:to-blue-700"
-          >
-            <Eye className="w-4 h-4" />
-            Ver Locadoras
-          </Button>
-          <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white hover:from-purple-600 hover:to-purple-700" onClick={handleNovoPlano}>
-                <Plus className="w-4 h-4" />
-                Novo Plano
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>
-                  {planoEditando ? 'Editar Plano' : 'Novo Plano'}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="nome">Nome do Plano</Label>
-                    <Input 
-                      id="nome" 
-                      placeholder="Ex: Premium" 
-                      value={formData.nome}
-                      onChange={(e) => setFormData({...formData, nome: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="cor">Cor</Label>
-                    <Input 
-                      id="cor" 
-                      type="color" 
-                      value={formData.cor}
-                      onChange={(e) => setFormData({...formData, cor: e.target.value})}
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="descricao">Descrição</Label>
-                  <Textarea 
-                    id="descricao" 
-                    placeholder="Descreva o plano..." 
-                    value={formData.descricao}
-                    onChange={(e) => setFormData({...formData, descricao: e.target.value})}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="precoMensal">Preço Mensal (R$)</Label>
-                    <Input 
-                      id="precoMensal" 
-                      type="number" 
-                      placeholder="199" 
-                      value={formData.precoMensal}
-                      onChange={(e) => setFormData({...formData, precoMensal: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="precoAnual">Preço Anual (R$)</Label>
-                    <Input 
-                      id="precoAnual" 
-                      type="number" 
-                      placeholder="1990" 
-                      value={formData.precoAnual}
-                      onChange={(e) => setFormData({...formData, precoAnual: e.target.value})}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="maxVeiculos">Máximo de Veículos</Label>
-                    <Input 
-                      id="maxVeiculos" 
-                      type="number" 
-                      placeholder="100" 
-                      value={formData.maxVeiculos}
-                      onChange={(e) => setFormData({...formData, maxVeiculos: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="maxMotoristas">Máximo de Motoristas</Label>
-                    <Input 
-                      id="maxMotoristas" 
-                      type="number" 
-                      placeholder="200" 
-                      value={formData.maxMotoristas}
-                      onChange={(e) => setFormData({...formData, maxMotoristas: e.target.value})}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="features">Funcionalidades (uma por linha)</Label>
-                  <Textarea 
-                    id="features" 
-                    placeholder="Gestão completa de aluguéis&#10;Relatórios avançados&#10;Suporte prioritário"
-                    rows={5}
-                    value={formData.features}
-                    onChange={(e) => setFormData({...formData, features: e.target.value})}
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => {
-                    setModalAberto(false);
-                    setPlanoEditando(null);
-                    limparFormulario();
-                  }}>
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleSalvarPlano}>
-                    Salvar Plano
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+    <div className="flex-1 space-y-6 p-6">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">Planos</h1>
+        <p className="text-muted-foreground">
+          Gerencie o plano da sua locadora e descubra recursos adicionais
+        </p>
       </div>
 
-      {/* Cards de Estatísticas */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 border-2 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/90">Total de Planos</p>
-                <p className="text-3xl font-bold text-white">{planos.length}</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Settings className="w-6 h-6 text-white" />
-              </div>
+      {/* Plano Atual */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="h-5 w-5" />
+                Plano Atual
+              </CardTitle>
+              <CardDescription>
+                Informações sobre seu plano ativo
+              </CardDescription>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-green-500 to-green-600 border-green-400 border-2 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/90">Planos Ativos</p>
-                <p className="text-3xl font-bold text-white">{planos.filter(p => p.ativo).length}</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Check className="w-6 h-6 text-white" />
-              </div>
+            <Badge variant="default" className="px-3 py-1">
+              {planosInfo[planoAtual as keyof typeof planosInfo].nome}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+            <div className={`p-3 rounded-full ${planosInfo[planoAtual as keyof typeof planosInfo].cor}`}>
+              {(() => {
+                const IconComponent = planosInfo[planoAtual as keyof typeof planosInfo].icone;
+                return <IconComponent className="h-6 w-6 text-white" />;
+              })()}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 border-purple-400 border-2 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/90">Locadoras Cadastradas</p>
-                <p className="text-3xl font-bold text-white">{locadorasPlanos.length}</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-white" />
-              </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg">
+                Plano {planosInfo[planoAtual as keyof typeof planosInfo].nome}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {planosInfo[planoAtual as keyof typeof planosInfo].descricao}
+              </p>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-orange-500 to-orange-600 border-orange-400 border-2 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/90">Receita Mensal</p>
-                <p className="text-3xl font-bold text-white">{formatCurrency(locadorasPlanos.reduce((acc, loc) => acc + loc.valorPago / 12, 0))}</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Cards dos Planos com Visual Futurista */}
-      <div className="grid gap-8 md:grid-cols-3">
-        {planos.map((plano) => {
-          const gradientClass = getGradientClass(plano.id);
-          return (
-            <Card key={plano.id} className={`${gradientClass} border-2 shadow-xl hover:shadow-2xl transition-all duration-300`}>
-              <CardHeader className="pb-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      {getIcon(plano.id)}
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl font-bold text-white mb-1">
-                        {plano.nome}
-                      </CardTitle>
-                      <p className="text-sm text-white/80">{plano.descricao}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEditarPlano(plano)}
-                      className="text-white hover:bg-white/20"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleExcluirPlano(plano.id)}
-                      className="text-white hover:bg-white/20"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                    <p className="text-sm text-white/70 mb-1">Preço Mensal</p>
-                    <p className="font-bold text-white text-lg">{formatCurrency(plano.precoMensal)}</p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                    <p className="text-sm text-white/70 mb-1">Preço Anual</p>
-                    <p className="font-bold text-white text-lg">{formatCurrency(plano.precoAnual)}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                    <p className="text-sm text-white/70 mb-1">Máx. Veículos</p>
-                    <p className="font-bold text-white text-lg">
-                      {plano.maxVeiculos === 9999 ? '∞' : plano.maxVeiculos}
-                    </p>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                    <p className="text-sm text-white/70 mb-1">Máx. Motoristas</p>
-                    <p className="font-bold text-white text-lg">
-                      {plano.maxMotoristas === 9999 ? '∞' : plano.maxMotoristas}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-                  <p className="text-sm text-white/70 mb-3">Funcionalidades</p>
-                  <div className="space-y-2">
-                    {plano.features.slice(0, 4).map((feature, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-white" />
-                        <span className="text-sm text-white/90">{feature}</span>
-                      </div>
-                    ))}
-                    {plano.features.length > 4 && (
-                      <p className="text-xs text-white/60 mt-2">
-                        +{plano.features.length - 4} funcionalidades adicionais
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center pt-2">
-                  <Badge className={plano.ativo ? 'bg-green-500/20 text-green-100 border-green-400' : 'bg-gray-500/20 text-gray-100 border-gray-400'}>
-                    {plano.ativo ? 'Ativo' : 'Inativo'}
-                  </Badge>
-                  <span className="text-sm text-white/70">Ordem: {plano.ordem}</span>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Modal das Locadoras com Visual Clean */}
-      <Dialog open={modalLocadoras} onOpenChange={setModalLocadoras}>
-        <DialogContent className="max-w-6xl bg-white border-slate-200">
-          <DialogHeader className="border-b border-slate-200 pb-4">
-            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-900 bg-clip-text text-transparent">
-              Locadoras e seus Planos
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6 mt-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {locadorasPlanos.map((locadora) => (
-                <Card key={locadora.id} className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center">
-                          <Building2 className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg font-semibold text-slate-800">
-                            {locadora.nome}
-                          </CardTitle>
-                          <p className="text-sm text-slate-600">{getPlanoNome(locadora.planoAtual)}</p>
-                        </div>
-                      </div>
-                      {getStatusBadge(locadora.status)}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-slate-50 p-3 rounded-lg">
-                        <p className="text-xs text-slate-600 mb-1">Data Início</p>
-                        <p className="font-semibold text-slate-800 text-sm">
-                          {new Date(locadora.dataInicio).toLocaleDateString('pt-BR')}
-                        </p>
-                      </div>
-                      <div className="bg-slate-50 p-3 rounded-lg">
-                        <p className="text-xs text-slate-600 mb-1">Vencimento</p>
-                        <p className="font-semibold text-slate-800 text-sm">
-                          {new Date(locadora.dataVencimento).toLocaleDateString('pt-BR')}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                      <p className="text-xs text-slate-600 mb-1">Valor Pago</p>
-                      <p className="font-bold text-slate-800 text-lg">{formatCurrency(locadora.valorPago)}</p>
-                    </div>
-
-                    <div className="flex justify-between gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          toast({
-                            title: "Alterar Plano",
-                            description: `Alterando plano da ${locadora.nome}`,
-                          });
-                        }}
-                        className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white border-blue-400 hover:from-blue-600 hover:to-blue-700"
-                      >
-                        <Edit className="w-4 h-4 mr-1" />
-                        Alterar
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          toast({
-                            title: "Renovar Assinatura",
-                            description: `Renovando assinatura da ${locadora.nome}`,
-                          });
-                        }}
-                        className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white border-green-400 hover:from-green-600 hover:to-green-700"
-                      >
-                        <Settings className="w-4 h-4 mr-1" />
-                        Renovar
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          toast({
-                            title: "Suspender Locadora",
-                            description: `Suspendendo acesso da ${locadora.nome}`,
-                          });
-                        }}
-                        className="bg-gradient-to-r from-red-500 to-red-600 text-white border-red-400 hover:from-red-600 hover:to-red-700"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="text-right">
+              <p className="text-2xl font-bold">
+                R$ {planosInfo[planoAtual as keyof typeof planosInfo].preco.toFixed(2)}
+              </p>
+              <p className="text-sm text-muted-foreground">por mês</p>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+      </Card>
+
+      {/* Comparação de Planos */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Comparação de Planos
+          </CardTitle>
+          <CardDescription>
+            Compare todos os planos disponíveis e suas funcionalidades
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-4 gap-6">
+            {/* Coluna de Features */}
+            <div className="space-y-4">
+              <div className="h-16 flex items-center">
+                <h3 className="font-semibold">Funcionalidades</h3>
+              </div>
+              <Separator />
+              {planosFeatures.map((feature, index) => (
+                <div key={index} className="py-3 border-b last:border-b-0">
+                  <p className="text-sm font-medium">{feature.nome}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Colunas dos Planos */}
+            {Object.entries(planosInfo).map(([key, plano]) => (
+              <div key={key} className="space-y-4">
+                <div className="h-16 p-4 bg-muted rounded-lg flex flex-col items-center justify-center relative">
+                  {plano.popular && (
+                    <Badge className="absolute -top-2 bg-purple-500 text-white">
+                      Mais Popular
+                    </Badge>
+                  )}
+                  <h3 className="font-semibold">{plano.nome}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    R$ {plano.preco.toFixed(2)}/mês
+                  </p>
+                </div>
+                <Separator />
+                {planosFeatures.map((feature, index) => (
+                  <div key={index} className="py-3 border-b last:border-b-0 text-center">
+                    {typeof feature[key as keyof PlanoFeature] === 'boolean' ? (
+                      feature[key as keyof PlanoFeature] ? (
+                        <Check className="h-5 w-5 text-green-500 mx-auto" />
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )
+                    ) : (
+                      <span className="text-sm">
+                        {feature[key as keyof PlanoFeature]}
+                      </span>
+                    )}
+                  </div>
+                ))}
+                <div className="pt-4">
+                  {planoAtual === key ? (
+                    <Button disabled className="w-full">
+                      Plano Atual
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => handleSolicitarMudanca(key)}
+                      disabled={solicitando}
+                      className="w-full"
+                      variant={plano.popular ? "default" : "outline"}
+                    >
+                      {solicitando ? "Solicitando..." : "Solicitar Mudança"}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Suporte */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <HeadphonesIcon className="h-5 w-5" />
+            Precisa de Ajuda?
+          </CardTitle>
+          <CardDescription>
+            Nossa equipe está pronta para ajudar com a escolha do melhor plano
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+            <div className="p-3 rounded-full bg-blue-500">
+              <HeadphonesIcon className="h-6 w-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold">Suporte Especializado</h3>
+              <p className="text-sm text-muted-foreground">
+                Entre em contato conosco para esclarecer dúvidas sobre planos
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Button variant="outline" size="sm">
+                📞 (11) 99999-9999
+              </Button>
+              <Button variant="outline" size="sm">
+                ✉️ suporte@drivs.com.br
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
