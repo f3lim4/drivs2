@@ -21,6 +21,7 @@ import { useInfracoes } from '@/hooks/useInfracoes';
 import { useDespesas } from '@/hooks/useDespesas';
 import { useVeiculos } from '@/hooks/useVeiculos';
 import { useMotoristas } from '@/hooks/useMotoristas';
+import { useManutencoes } from '@/hooks/useManutencoes';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
@@ -47,6 +48,7 @@ export default function RelatoriosFinanceiros() {
   const { despesas } = useDespesas();
   const { veiculos } = useVeiculos();
   const { motoristas } = useMotoristas();
+  const { manutencoes } = useManutencoes();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -186,8 +188,12 @@ export default function RelatoriosFinanceiros() {
       isInPeriod(new Date(despesa.data))
     );
 
-    return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo };
-  }, [alugueis, pagamentos, infracoes, despesas, monthStart, monthEnd]);
+    const manutencoesPeriodo = manutencoes.filter(manutencao => 
+      isInPeriod(new Date(manutencao.dataInicio))
+    );
+
+    return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo, manutencoes: manutencoesPeriodo };
+  }, [alugueis, pagamentos, infracoes, despesas, manutencoes, monthStart, monthEnd]);
 
   // Cálculos de despesas fixas dos veículos
   const despesasFixasVeiculos = useMemo(() => {
@@ -246,6 +252,29 @@ export default function RelatoriosFinanceiros() {
         }
       }
       
+      // Manutenções do veículo (do mês selecionado)
+      const monthStart = startOfMonth(selectedMonth);
+      const monthEnd = endOfMonth(selectedMonth);
+      
+      const manutencoesVeiculo = filteredData.manutencoes?.filter(m => 
+        m.veiculoId === veiculo.id && 
+        m.valorOrcamento && 
+        parseFloat(m.valorOrcamento) > 0 &&
+        isWithinInterval(new Date(m.dataInicio), { start: monthStart, end: monthEnd })
+      ) || [];
+      
+      manutencoesVeiculo.forEach(manutencao => {
+        const valorManutencao = parseFloat(manutencao.valorOrcamento);
+        if (!isNaN(valorManutencao)) {
+          despesasFixas.push({
+            tipo: 'Manutenção',
+            valor: valorManutencao,
+            descricao: `${manutencao.tipo} - ${manutencao.oficina} - ${veiculo.placa}`,
+            veiculo: veiculo.placa
+          });
+        }
+      });
+      
       return {
         veiculo: veiculo.placa,
         marca: veiculo.marca,
@@ -279,7 +308,7 @@ export default function RelatoriosFinanceiros() {
 
   const totalDespesas = useMemo(() => {
     const despesasManuais = filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'despesa' && despesa.fonte !== 'manutencao') // Excluir despesas de manutenção pois já estão nas despesas fixas
+      .filter(despesa => despesa.tipo === 'despesa' && despesa.fonte !== 'manutencao' && despesa.fonte !== 'financiamento') // Excluir despesas de manutenção e financiamento pois já estão nas despesas fixas
       .reduce((total, despesa) => {
         const valor = parseFloat(despesa.valor || '0');
         return total + (isNaN(valor) ? 0 : valor);
@@ -303,7 +332,7 @@ export default function RelatoriosFinanceiros() {
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
   // Debug detalhado para verificar valores
-  const despesasManuaisFiltradas = filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao');
+  const despesasManuaisFiltradas = filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.fonte !== 'financiamento');
   const despesasManuaisValor = despesasManuaisFiltradas.reduce((total, despesa) => {
     const valor = parseFloat(despesa.valor || '0');
     return total + (isNaN(valor) ? 0 : valor);
@@ -317,6 +346,13 @@ export default function RelatoriosFinanceiros() {
     totalDespesasFixas,
     despesasManuaisQuantidade: despesasManuaisFiltradas.length,
     despesasManuaisValor,
+    despesasManuaisDetalhadas: despesasManuaisFiltradas.map(d => ({
+      id: d.id,
+      fonte: d.fonte,
+      categoria: d.categoria,
+      valor: d.valor,
+      descricao: d.descricao
+    })),
     despesasFixasDetalhadas: despesasFixasVeiculos.map(dfv => ({
       veiculo: dfv.veiculo,
       totalMensal: dfv.totalMensal,
