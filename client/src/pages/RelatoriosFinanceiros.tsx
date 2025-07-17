@@ -902,7 +902,7 @@ export default function RelatoriosFinanceiros() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-green-700">RECEITA TOTAL</p>
+                <p className="text-xs font-medium text-green-700">RECEITA TOTAL</p>
                 <p className="text-2xl font-bold text-green-800">
                   {formatCurrency(receitaTotal)}
                 </p>
@@ -921,7 +921,7 @@ export default function RelatoriosFinanceiros() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-red-700">DESPESAS TOTAIS</p>
+                <p className="text-xs font-medium text-red-700">DESPESAS TOTAIS</p>
                 <p className="text-2xl font-bold text-red-800">
                   {formatCurrency(totalDespesas)}
                 </p>
@@ -940,7 +940,7 @@ export default function RelatoriosFinanceiros() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-blue-700">LUCRO LÍQUIDO</p>
+                <p className="text-xs font-medium text-blue-700">LUCRO LÍQUIDO</p>
                 <p className={`text-2xl font-bold ${lucroLiquido >= 0 ? 'text-blue-800' : 'text-red-800'}`}>
                   {formatCurrency(lucroLiquido)}
                 </p>
@@ -959,7 +959,7 @@ export default function RelatoriosFinanceiros() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-purple-700">MARGEM DE LUCRO</p>
+                <p className="text-xs font-medium text-purple-700">MARGEM DE LUCRO</p>
                 <p className={`text-2xl font-bold ${margemLucro >= 0 ? 'text-purple-800' : 'text-red-800'}`}>
                   {margemLucro.toFixed(1)}%
                 </p>
