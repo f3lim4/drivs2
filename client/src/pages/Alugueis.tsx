@@ -30,6 +30,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { StatCard } from '@/components/dashboard/StatCard';
+import { Pagination } from '@/components/ui/pagination';
 import { startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
 import { Aluguel } from '@/types';
@@ -47,6 +48,10 @@ export default function Alugueis() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedAluguel, setSelectedAluguel] = useState<Aluguel | null>(null);
+  
+  // Estados para paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Buscar locadoras para exibir nome na coluna (para admin) ou exibir nome da locadora atual (para locadora)
   const { data: locadoras = [], isLoading: locadorasLoading } = useQuery({
@@ -190,6 +195,23 @@ export default function Alugueis() {
     
     return matchesSearch && matchesStatus;
   });
+
+  // Paginação
+  const totalPages = Math.ceil(filteredAlugueis.length / itemsPerPage);
+  const paginatedAlugueis = filteredAlugueis.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Funções para controlar a paginação
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
 
   // Função para adicionar novo aluguel
   const handleAluguelAdicionado = (novoAluguel: Aluguel) => {
@@ -483,7 +505,7 @@ export default function Alugueis() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredAlugueis.map((aluguel) => (
+                {paginatedAlugueis.map((aluguel) => (
                   <TableRow key={aluguel.id}>
                     <TableCell>
                       <div>
@@ -585,7 +607,19 @@ export default function Alugueis() {
         </CardContent>
       </Card>
 
-      {/* Modals - apenas para locadoras */}
+      {/* Paginação */}
+      {filteredAlugueis.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          totalItems={filteredAlugueis.length}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
+
+      {/* Modais - apenas para locadoras */}
       {isLocadora && (
         <>
           {/* Modal Novo Aluguel */}
