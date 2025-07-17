@@ -16,6 +16,7 @@ import Infracoes from "./pages/Infracoes";
 import RelatoriosFinanceiros from "./pages/RelatoriosFinanceiros";
 import Manutencoes from "./pages/Manutencoes";
 import AnunciosAdmin from "./pages/AnunciosAdmin";
+import Planos from "./pages/Planos";
 import Perfil from "./pages/Perfil";
 import Login from "./pages/Login";
 import CadastroLocadora from "./pages/CadastroLocadora";
@@ -104,6 +105,11 @@ const App = () => (
           <Route path="/anuncios" element={
             <AuthGuard>
               <DrivsLayout><AnunciosAdmin /></DrivsLayout>
+            </AuthGuard>
+          } />
+          <Route path="/planos" element={
+            <AuthGuard>
+              <DrivsLayout><Planos /></DrivsLayout>
             </AuthGuard>
           } />
           <Route path="/perfil" element={

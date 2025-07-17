@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Página de Planos do SaaS - CONCLUÍDO
+- ✅ **Página de planos criada** - Interface completa com 3 planos (Básico, Premium, Enterprise)
+- ✅ **Toggle mensal/anual** - Seleção de período com desconto anual
+- ✅ **Cards responsivos** - Design limpo com diferentes estilos por plano
+- ✅ **Features detalhadas** - Listagem completa de funcionalidades incluídas/limitadas/não incluídas
+- ✅ **Badges especiais** - "Mais Popular" para Premium e "Recomendado" para Enterprise
+- ✅ **Seção FAQ** - Perguntas frequentes sobre planos e funcionalidades
+- ✅ **Preços brasileiros** - Formatação em reais para público nacional
+- ✅ **Menu integrado** - Item "Planos" adicionado ao menu admin com ícone de coroa
+- ✅ **Rota configurada** - Página acessível via /planos com proteção de autenticação
+
 ### 2025-07-16: Correção Coluna Locadora em Motoristas - CONCLUÍDO
 - ✅ **Nome real da locadora** - Substituído hardcode "AutoRent Premium" por nome real do banco
 - ✅ **Integração com API** - Busca dados das locadoras via React Query 
