@@ -10,10 +10,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Paginação Implementada em Análise por Veículo - CONCLUÍDO
+- ✅ **Paginação na aba "Análise por Veículo"** - Sistema completo de paginação implementado
+- ✅ **Estados de controle** - currentPageVeiculos, itemsPerPageVeiculos e funções de navegação
+- ✅ **Dados paginados** - Tabela mostra apenas itens da página atual (10 por padrão)
+- ✅ **Controles de paginação** - Navegação entre páginas e seleção de itens por página
+- ✅ **Compatibilidade com ordenação** - Paginação funciona junto com filtros de ordenação existentes
+- ✅ **Padrão consistente** - Mesmo padrão das outras páginas (Despesas Fixas, Manutenções, etc.)
+- ✅ **Layout otimizado** - Paginação aparece após a tabela com borda superior
+
 ### 2025-07-17: Paginação e Layout Melhorado em Despesas Fixas - CONCLUÍDO
 - ✅ **Paginação implementada na aba "Despesas Fixas"** - Sistema de paginação com controles de navegação
 - ✅ **Cards de totais por categoria** - IPVA, Seguros, Rastreadores e Financiamento em cards separados
-- ✅ **Layout reorganizado** - Cards de totais coloridos no topo, tabela paginada no meio, análise por categoria no final
+- ✅ **Layout reorganizado** - Cards do topo removidos, tabela paginada, cards antes da análise por categoria
 - ✅ **Controles de paginação** - 10 itens por página padrão, opções de 10-50 itens
 - ✅ **Compatibilidade com ordenação** - Paginação funciona junto com filtros de ordenação existentes
 - ✅ **Cards coloridos duplicados** - Totais por categoria antes da análise por categoria conforme solicitado
