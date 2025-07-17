@@ -10,6 +10,24 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Dashboard Admin Futurista com Dados Reais do Sistema SaaS - CONCLUÍDO
+- ✅ **Dashboard admin redesenhado** - Interface futurista e limpa com gradientes modernos
+- ✅ **Dados reais do sistema** - Métricas do PostgreSQL e informações técnicas
+- ✅ **Cards com gradientes** - Status do sistema, locadoras ativas, veículos, banco de dados
+- ✅ **Seção de dados do sistema** - Motoristas, aluguéis e receita total reais
+- ✅ **Status técnico** - Servidor, API e performance com indicadores visuais
+- ✅ **Locadoras cadastradas** - Grid com informações das empresas, CNPJ, cidade e status
+- ✅ **Header elegante** - Título com gradiente e descrição do sistema SaaS
+- ✅ **Informações técnicas** - Monitoramento em tempo real do sistema
+- ✅ **Design moderno** - Interface limpa e profissional para administradores
+
+### 2025-07-17: Correção Modal de Edição de Planos - CONCLUÍDO
+- ✅ **Estados controlados** - Formulário com estados para todos os campos
+- ✅ **Preenchimento automático** - Dados do plano carregados na edição
+- ✅ **Funções de controle** - handleEditarPlano e preencherFormulario implementadas
+- ✅ **Limpeza de formulário** - Campos zerados ao cancelar ou criar novo plano
+- ✅ **Botões atualizados** - Ações de editar e novo plano funcionando corretamente
+
 ### 2025-07-17: Página de Planos do SaaS - CONCLUÍDO
 - ✅ **Página de planos criada** - Interface completa com 3 planos (Básico, Premium, Enterprise)
 - ✅ **Toggle mensal/anual** - Seleção de período com desconto anual
