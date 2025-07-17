@@ -21,6 +21,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Página de Infrações simplificada** - Removido título "Infrações de Trânsito" e descrição
 - ✅ **Botão "Nova Infração" reposicionado** - Movido para baixo dos cards de estatísticas
 - ✅ **Título "Filtros" removido** - Interface ainda mais limpa sem títulos desnecessários
+- ✅ **Coluna "Tipo" removida** - Eliminados badges de tipos (leve, média, grave, gravíssima)
+- ✅ **Botão "Nova Infração" na tabela** - Reposicionado no cabeçalho da tabela onde era a coluna de tipos
 - ✅ **Layout otimizado** - Elementos alinhados com melhor distribuição visual
 - ✅ **Experiência simplificada** - Interface mais limpa e intuitiva sem sistema de abas
 

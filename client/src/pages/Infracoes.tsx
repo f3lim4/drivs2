@@ -20,7 +20,7 @@ export default function Infracoes() {
   const isAdmin = profile?.tipo === 'admin';
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [tipoFilter, setTipoFilter] = useState('all');
+
   const [showNovaInfracao, setShowNovaInfracao] = useState(false);
   const [editingInfracao, setEditingInfracao] = useState<Infracao | null>(null);
 
@@ -47,9 +47,8 @@ export default function Infracoes() {
       infracao.descricaoInfracao.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === 'all' || infracao.status === statusFilter;
-    const matchesTipo = tipoFilter === 'all' || infracao.tipoInfracao === tipoFilter;
 
-    return matchesSearch && matchesStatus && matchesTipo;
+    return matchesSearch && matchesStatus;
   });
 
   // Estatísticas
@@ -73,20 +72,7 @@ export default function Infracoes() {
     }
   };
 
-  const getTipoBadge = (tipo: string) => {
-    switch (tipo) {
-      case 'leve':
-        return <Badge variant="outline" className="bg-green-50 text-green-700">Leve</Badge>;
-      case 'media':
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700">Média</Badge>;
-      case 'grave':
-        return <Badge variant="outline" className="bg-orange-50 text-orange-700">Grave</Badge>;
-      case 'gravissima':
-        return <Badge variant="outline" className="bg-red-50 text-red-700">Gravíssima</Badge>;
-      default:
-        return <Badge variant="outline">{tipo}</Badge>;
-    }
-  };
+
 
   const handleDeleteInfracao = (id: string) => {
     if (confirm('Tem certeza que deseja excluir esta infração?')) {
@@ -181,13 +167,7 @@ export default function Infracoes() {
         </Card>
       </div>
 
-      {/* Botão Nova Infração */}
-      <div className="flex justify-end">
-        <Button onClick={() => setShowNovaInfracao(true)} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Infração
-        </Button>
-      </div>
+
 
       {/* Filtros */}
       <Card>
@@ -216,18 +196,7 @@ export default function Infracoes() {
                 <SelectItem value="cancelado">Cancelado</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={tipoFilter} onValueChange={setTipoFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os Tipos</SelectItem>
-                <SelectItem value="leve">Leve</SelectItem>
-                <SelectItem value="media">Média</SelectItem>
-                <SelectItem value="grave">Grave</SelectItem>
-                <SelectItem value="gravissima">Gravíssima</SelectItem>
-              </SelectContent>
-            </Select>
+
           </div>
         </CardContent>
       </Card>
@@ -247,7 +216,12 @@ export default function Infracoes() {
                   <TableHead>Motorista</TableHead>
                   <TableHead>Veículo</TableHead>
                   {isAdmin && <TableHead>Locadora</TableHead>}
-                  <TableHead>Tipo</TableHead>
+                  <TableHead>
+                    <Button onClick={() => setShowNovaInfracao(true)} className="bg-blue-600 hover:bg-blue-700">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nova Infração
+                    </Button>
+                  </TableHead>
                   <TableHead>Descrição</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead>Valor</TableHead>
@@ -263,7 +237,7 @@ export default function Infracoes() {
                         <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                         <p className="text-lg font-medium text-gray-900">Nenhuma infração encontrada</p>
                         <p className="text-gray-500 mt-2">
-                          {searchTerm || statusFilter !== 'all' || tipoFilter !== 'all' 
+                          {searchTerm || statusFilter !== 'all' 
                             ? 'Tente ajustar os filtros para encontrar infrações'
                             : 'Comece cadastrando uma nova infração'
                           }
@@ -287,7 +261,7 @@ export default function Infracoes() {
                           </div>
                         </TableCell>
                       )}
-                      <TableCell>{getTipoBadge(infracao.tipoInfracao)}</TableCell>
+                      <TableCell></TableCell>
                       <TableCell className="max-w-48 truncate">{infracao.descricaoInfracao}</TableCell>
                       <TableCell>{formatDate(infracao.dataInfracao)}</TableCell>
                       <TableCell className="font-medium">{formatCurrency(parseFloat(infracao.valorFinal))}</TableCell>
