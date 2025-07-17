@@ -191,15 +191,15 @@ export default function Pagamentos() {
         <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-red-700">Total Pendente</p>
-                <p className="text-2xl font-bold text-red-800">{formatCurrency(totalPendente)}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-red-700">Total Pendente</p>
+                <p className="text-lg font-bold text-red-800">{formatCurrency(totalPendente)}</p>
                 <p className="text-xs text-red-600">
                   {pagamentosFiltrados.filter(p => p.status === 'pendente' || p.status === 'parcial').length} pagamentos
                 </p>
               </div>
-              <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-red-700" />
+              <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-red-700" />
               </div>
             </div>
           </CardContent>
@@ -208,15 +208,15 @@ export default function Pagamentos() {
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-green-700">Total Recebido</p>
-                <p className="text-2xl font-bold text-green-800">{formatCurrency(totalRecebido)}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-green-700">Total Recebido</p>
+                <p className="text-lg font-bold text-green-800">{formatCurrency(totalRecebido)}</p>
                 <p className="text-xs text-green-600">
                   {pagamentosFiltrados.filter(p => p.status === 'pago').length} pagamentos
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-700" />
+              <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-green-700" />
               </div>
             </div>
           </CardContent>
@@ -225,15 +225,15 @@ export default function Pagamentos() {
         <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-yellow-700">Parciais</p>
-                <p className="text-2xl font-bold text-yellow-800">{formatCurrency(totalParcial)}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-yellow-700">Parciais</p>
+                <p className="text-lg font-bold text-yellow-800">{formatCurrency(totalParcial)}</p>
                 <p className="text-xs text-yellow-600">
                   {pagamentosFiltrados.filter(p => p.status === 'parcial').length} pagamentos
                 </p>
               </div>
-              <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-                <Clock className="w-6 h-6 text-yellow-700" />
+              <div className="w-10 h-10 bg-yellow-200 rounded-full flex items-center justify-center">
+                <Clock className="w-5 h-5 text-yellow-700" />
               </div>
             </div>
           </CardContent>
@@ -242,17 +242,17 @@ export default function Pagamentos() {
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-blue-700">Total Geral</p>
-                <p className="text-2xl font-bold text-blue-800">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-blue-700">Total Geral</p>
+                <p className="text-lg font-bold text-blue-800">
                   {formatCurrency(pagamentosFiltrados.reduce((sum, p) => sum + parseFloat(p.valorTotal), 0))}
                 </p>
                 <p className="text-xs text-blue-600">
                   {pagamentosFiltrados.length} pagamentos
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
-                <Calculator className="w-6 h-6 text-blue-700" />
+              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
+                <Calculator className="w-5 h-5 text-blue-700" />
               </div>
             </div>
           </CardContent>

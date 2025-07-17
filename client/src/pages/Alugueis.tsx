@@ -331,13 +331,13 @@ export default function Alugueis() {
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-blue-700">Total de Aluguéis</p>
-                <p className="text-2xl font-bold text-blue-800">{stats.total}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-blue-700">Total de Aluguéis</p>
+                <p className="text-xl font-bold text-blue-800">{stats.total}</p>
                 <p className="text-xs text-blue-600">Contratos</p>
               </div>
-              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
-                <Trending className="w-6 h-6 text-blue-700" />
+              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
+                <Trending className="w-5 h-5 text-blue-700" />
               </div>
             </div>
           </CardContent>
@@ -346,13 +346,13 @@ export default function Alugueis() {
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-green-700">Ativos</p>
-                <p className="text-2xl font-bold text-green-800">{stats.ativos}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-green-700">Ativos</p>
+                <p className="text-xl font-bold text-green-800">{stats.ativos}</p>
                 <p className="text-xs text-green-600">Em andamento</p>
               </div>
-              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-green-700" />
+              <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-green-700" />
               </div>
             </div>
           </CardContent>
@@ -361,13 +361,13 @@ export default function Alugueis() {
         <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-yellow-700">Pendentes</p>
-                <p className="text-2xl font-bold text-yellow-800">{stats.pendentes}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-yellow-700">Pendentes</p>
+                <p className="text-xl font-bold text-yellow-800">{stats.pendentes}</p>
                 <p className="text-xs text-yellow-600">Aguardando</p>
               </div>
-              <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-                <Clock className="w-6 h-6 text-yellow-700" />
+              <div className="w-10 h-10 bg-yellow-200 rounded-full flex items-center justify-center">
+                <Clock className="w-5 h-5 text-yellow-700" />
               </div>
             </div>
           </CardContent>
@@ -376,15 +376,15 @@ export default function Alugueis() {
         <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-emerald-700">Receita Mensal</p>
-                <p className="text-2xl font-bold text-emerald-800">{formatCurrency(stats.receitaEsperada)}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-emerald-700">Receita Mensal</p>
+                <p className="text-lg font-bold text-emerald-800">{formatCurrency(stats.receitaEsperada)}</p>
                 <p className="text-xs text-emerald-600">
                   Recebido: {formatCurrency(stats.receitaReal)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-emerald-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-emerald-700" />
+              <div className="w-10 h-10 bg-emerald-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-emerald-700" />
               </div>
             </div>
           </CardContent>

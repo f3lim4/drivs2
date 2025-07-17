@@ -167,13 +167,13 @@ export default function Infracoes() {
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-blue-700">Total de Infrações</p>
-                <p className="text-2xl font-bold text-blue-800">{totalInfracoes}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-blue-700">Total de Infrações</p>
+                <p className="text-xl font-bold text-blue-800">{totalInfracoes}</p>
                 <p className="text-xs text-blue-600">Todas as infrações</p>
               </div>
-              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-blue-700" />
+              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-blue-700" />
               </div>
             </div>
           </CardContent>
@@ -182,13 +182,13 @@ export default function Infracoes() {
         <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-red-700">Infrações Ativas</p>
-                <p className="text-2xl font-bold text-red-800">{infracoesAtivas}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-red-700">Infrações Ativas</p>
+                <p className="text-xl font-bold text-red-800">{infracoesAtivas}</p>
                 <p className="text-xs text-red-600">Aguardando pagamento</p>
               </div>
-              <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-red-700" />
+              <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-red-700" />
               </div>
             </div>
           </CardContent>
@@ -197,13 +197,13 @@ export default function Infracoes() {
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-green-700">Valor Total</p>
-                <p className="text-2xl font-bold text-green-800">{formatCurrency(valorTotal)}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-green-700">Valor Total</p>
+                <p className="text-lg font-bold text-green-800">{formatCurrency(valorTotal)}</p>
                 <p className="text-xs text-green-600">Valor total das infrações</p>
               </div>
-              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-green-700" />
+              <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-green-700" />
               </div>
             </div>
           </CardContent>
@@ -212,13 +212,13 @@ export default function Infracoes() {
         <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-orange-700">Valor Pendente</p>
-                <p className="text-2xl font-bold text-orange-800">{formatCurrency(valorPendente)}</p>
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-orange-700">Valor Pendente</p>
+                <p className="text-lg font-bold text-orange-800">{formatCurrency(valorPendente)}</p>
                 <p className="text-xs text-orange-600">Aguardando pagamento</p>
               </div>
-              <div className="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
-                <Clock className="w-6 h-6 text-orange-700" />
+              <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center">
+                <Clock className="w-5 h-5 text-orange-700" />
               </div>
             </div>
           </CardContent>
