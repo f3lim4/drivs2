@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Sistema de Loading Spinner Unificado com Animação de Carro - CONCLUÍDO
+- ✅ **Componente LoadingSpinner criado** - Substituído spinners padrão por animação de carro
+- ✅ **Animação de carro implementada** - Ícone de carro com bounce e sombra pulsante
+- ✅ **Tamanhos configuráveis** - Pequeno (sm), médio (md) e grande (lg)
+- ✅ **Identidade visual DRIVS** - Spinner temático para empresa de locação de veículos
+- ✅ **Aplicado em todas as páginas** - Dashboard, Motoristas, Aluguéis, Veículos, Manutenções, Perfil
+- ✅ **Modais atualizados** - NovoAluguelModal, EditarAluguelModal, NovoContratoModal
+- ✅ **Página Index corrigida** - Também usa o novo loading spinner
+- ✅ **Branding consistente** - Todos os carregamentos agora mostram tema automotivo
+- ✅ **Performance otimizada** - Animação leve e fluida sem impacto na performance
+- ✅ **Experiência do usuário melhorada** - Loading mais atrativo e relacionado ao negócio
+
 ### 2025-07-17: Design Futurista Padronizado em Todas as Páginas - CONCLUÍDO
 - ✅ **Design visual consistente** - Aplicado visual futurista com gradientes em todas as páginas principais
 - ✅ **Cards com gradientes modernos** - Substituídos cards simples por cards com gradientes coloridos

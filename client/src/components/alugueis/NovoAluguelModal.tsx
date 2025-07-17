@@ -42,6 +42,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { cn } from '@/lib/utils';
 import { Aluguel, Motorista, Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
@@ -303,7 +304,7 @@ export function NovoAluguelModal({
 
         {loadingData ? (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <LoadingSpinner />
           </div>
         ) : motoristasAtivos.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">

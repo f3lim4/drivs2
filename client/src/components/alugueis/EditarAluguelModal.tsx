@@ -42,6 +42,7 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Aluguel, Motorista, Veiculo } from '@/types';
 
 // Schema de validação
@@ -213,7 +214,7 @@ export function EditarAluguelModal({
 
         {loadingData ? (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <LoadingSpinner />
           </div>
         ) : (
           <Form {...form}>

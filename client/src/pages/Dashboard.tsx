@@ -8,6 +8,7 @@ import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, Bar
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { DashboardStats, Alert, Motorista, Veiculo } from '@/types';
 
 import { useQuery } from '@tanstack/react-query';
@@ -263,7 +264,7 @@ export default function Dashboard() {
     return (
       <div className="flex-1 space-y-6 p-6">
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <LoadingSpinner size="lg" />
         </div>
       </div>
     );
