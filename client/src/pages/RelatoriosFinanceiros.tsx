@@ -951,7 +951,8 @@ export default function RelatoriosFinanceiros() {
                         // Adicionar manutenções
                         filteredData.manutencoes.forEach(manutencao => {
                           const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
-                          if (manutencao.valorOrcamento && parseFloat(manutencao.valorOrcamento) > 0) {
+                          const valor = manutencao.valorFinal || manutencao.valorOrcamento;
+                          if (valor && parseFloat(valor) > 0) {
                             todasDespesas.push({
                               id: `manutencao-${manutencao.id}`,
                               data: manutencao.dataInicio,
@@ -959,7 +960,7 @@ export default function RelatoriosFinanceiros() {
                               tipo: 'Manutenção',
                               categoria: manutencao.tipo,
                               descricao: `${manutencao.tipo} - ${manutencao.oficina}`,
-                              valor: parseFloat(manutencao.valorOrcamento),
+                              valor: parseFloat(valor),
                               status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente'
                             });
                           }
