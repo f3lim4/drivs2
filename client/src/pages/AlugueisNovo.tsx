@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -40,6 +40,7 @@ const formatCurrency = (value: number) => {
 export default function Alugueis() {
   const { isAdmin, isLocadora, profile } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [showNovoAluguelModal, setShowNovoAluguelModal] = useState(false);
@@ -407,8 +408,18 @@ export default function Alugueis() {
       {/* Modais */}
       {showNovoAluguelModal && (
         <NovoAluguelModal
-          isOpen={showNovoAluguelModal}
-          onClose={() => setShowNovoAluguelModal(false)}
+          open={showNovoAluguelModal}
+          onOpenChange={setShowNovoAluguelModal}
+          onAluguelAdicionado={(aluguel) => {
+            // Invalidar queries para atualizar dados
+            queryClient.invalidateQueries({ queryKey: ['/api/alugueis'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/veiculos'] });
+            setShowNovoAluguelModal(false);
+            toast({
+              title: "Aluguel criado com sucesso!",
+              description: "O aluguel foi cadastrado no sistema.",
+            });
+          }}
         />
       )}
 
