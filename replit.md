@@ -10,17 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-17: Gráfico Financeiro Unificado Completo - CONCLUÍDO
-- ✅ **Gráfico único implementado** - Substituído múltiplos gráficos por visualização financeira completa
-- ✅ **Dados da página financeira** - Inclui receitas, despesas, lucro e aluguéis ativos
-- ✅ **8 métricas diferentes** - Receita total, pagamentos, aluguéis, despesas total, manuais, fixas, lucro e aluguéis
-- ✅ **Dual axis configurado** - Valores monetários no eixo esquerdo, aluguéis no eixo direito
-- ✅ **Linhas diferenciadas** - Sólidas para totais, tracejadas para detalhes
-- ✅ **Cores organizadas** - Verde para receitas, vermelho para despesas, roxo para lucro, azul para aluguéis
-- ✅ **Tooltips brasileiros** - Formatação em reais e percentuais
-- ✅ **Legenda organizada** - Agrupada por categorias (receitas, despesas, resultado, operacional)
-- ✅ **Altura aumentada** - Gráfico maior (h-96) para melhor visualização
-- ✅ **Dados dos últimos 6 meses** - Evolução temporal completa das finanças
+### 2025-07-17: Dashboard Simplificado - Gráfico Removido - CONCLUÍDO
+- ✅ **Gráfico financeiro removido** - Removido gráfico único do dashboard conforme solicitado
+- ✅ **Código limpo** - Removida função getDadosFinanceirosCompletos() não utilizada
+- ✅ **Importações otimizadas** - Removida importação do Recharts não mais necessária
+- ✅ **Dashboard focado** - Interface concentrada nos cards principais e anúncios
+- ✅ **Performance melhorada** - Reduzido processamento de dados desnecessário
+- ✅ **Interface limpa** - Dashboard mais direto e objetivo
 
 ### 2025-07-17: Correção Crítica de Isolamento de Dados - Página de Aluguéis - CONCLUÍDO
 - ✅ **Bug crítico corrigido** - Página de aluguéis estava usando profile.id em vez de profile.locadoraId
