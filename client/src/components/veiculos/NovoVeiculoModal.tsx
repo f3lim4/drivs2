@@ -113,31 +113,31 @@ export function NovoVeiculoModal({
       placa: '',
       marca: '',
       modelo: '',
-      ano: 2025,
+      ano: '' as any,
       cor: '',
       categoria: '',
       renavam: '',
       chassi: '',
       combustivel: '',
-      quilometragem: undefined,
-      valorSemanal: undefined,
-      caucao: undefined,
-      taxaAdministrativa: undefined,
+      quilometragem: '' as any,
+      valorSemanal: '' as any,
+      caucao: '' as any,
+      taxaAdministrativa: '' as any,
       limiteQuilometragem: '',
       seguradora: '',
       numeroApolice: '',
       vigenciaSeguro: '',
-      valorSeguroMensal: undefined,
-      valorVeiculo: undefined,
-      ipva: undefined,
+      valorSeguroMensal: '' as any,
+      valorVeiculo: '' as any,
+      ipva: '' as any,
       rastreador: '',
-      valorRastreadorMensal: undefined,
+      valorRastreadorMensal: '' as any,
       dataCompra: '',
       financiado: false,
-      valorFinanciamento: undefined,
-      quantidadeParcelas: undefined,
+      valorFinanciamento: '' as any,
+      quantidadeParcelas: '' as any,
       // Status será definido automaticamente como "disponível"
-      valorLimiteKm: undefined,
+      valorLimiteKm: '' as any,
     },
   });
 
@@ -318,9 +318,10 @@ export function NovoVeiculoModal({
                         <FormControl>
                           <Input 
                             type="number" 
-                            placeholder="2025" 
+                            placeholder="" 
                             {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                           />
                         </FormControl>
                         <FormMessage />
@@ -462,7 +463,7 @@ export function NovoVeiculoModal({
                       <FormControl>
                         <Input 
                           type="number" 
-                          placeholder="0" 
+                          placeholder="" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
@@ -507,8 +508,9 @@ export function NovoVeiculoModal({
                       <FormControl>
                         <Input 
                           type="number" 
-                          placeholder="Ex: 1000"
+                          placeholder=""
                           {...field}
+                          value={field.value || ''}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                         />
                       </FormControl>
@@ -529,7 +531,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0" 
+                          placeholder="" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -550,7 +552,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0" 
+                          placeholder="" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -571,7 +573,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0" 
+                          placeholder="" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -644,7 +646,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0" 
+                          placeholder="" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -700,7 +702,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0"
+                          placeholder=""
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -744,7 +746,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0"
+                          placeholder=""
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -814,7 +816,7 @@ export function NovoVeiculoModal({
                           <Input 
                             type="number" 
                             step="0.01"
-                            placeholder="0"
+                            placeholder=""
                             {...field}
                             value={field.value || ''}
                             onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -834,7 +836,7 @@ export function NovoVeiculoModal({
                         <FormControl>
                           <Input 
                             type="number"
-                            placeholder="48"
+                            placeholder=""
                             {...field}
                             value={field.value || ''}
                             onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
