@@ -279,7 +279,7 @@ export default function RelatoriosFinanceiros() {
 
   const totalDespesas = useMemo(() => {
     const despesasManuais = filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'despesa')
+      .filter(despesa => despesa.tipo === 'despesa' && despesa.fonte !== 'manutencao') // Excluir despesas de manutenção pois já estão nas despesas fixas
       .reduce((total, despesa) => {
         const valor = parseFloat(despesa.valor || '0');
         return total + (isNaN(valor) ? 0 : valor);
@@ -302,18 +302,32 @@ export default function RelatoriosFinanceiros() {
   const lucroLiquido = receitaTotal - totalDespesas;
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
-  // Debug para verificar valores
-  console.log('Dados financeiros:', {
+  // Debug detalhado para verificar valores
+  const despesasManuaisFiltradas = filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao');
+  const despesasManuaisValor = despesasManuaisFiltradas.reduce((total, despesa) => {
+    const valor = parseFloat(despesa.valor || '0');
+    return total + (isNaN(valor) ? 0 : valor);
+  }, 0);
+  
+  console.log('Dados financeiros detalhados:', {
     receitaAlugueis,
     receitaPagamentos,
     totalReceitas,
     totalDespesas,
     totalDespesasFixas,
+    despesasManuaisQuantidade: despesasManuaisFiltradas.length,
+    despesasManuaisValor,
+    despesasFixasDetalhadas: despesasFixasVeiculos.map(dfv => ({
+      veiculo: dfv.veiculo,
+      totalMensal: dfv.totalMensal,
+      despesas: dfv.despesas
+    })),
     receitaTotal,
     lucroLiquido,
     margemLucro,
     alugueisAtivos: filteredData.alugueisAtivos.length,
-    despesasFixasVeiculos: despesasFixasVeiculos.length
+    despesasFixasVeiculos: despesasFixasVeiculos.length,
+    calculoCorreto: `${despesasManuaisValor} + ${totalDespesasFixas} = ${despesasManuaisValor + totalDespesasFixas}`
   });
 
   // Análise por veículo
