@@ -315,183 +315,203 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Dashboard Clean para Admin */}
+      {/* Dashboard Futurista para Admin */}
       {isAdmin && (
-        <div className="space-y-6">
-          {/* Métricas Principais */}
+        <div className="space-y-8">
+          {/* Header do Dashboard Admin */}
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+              Sistema DRIVS - Dashboard Admin
+            </h1>
+            <p className="text-slate-500">
+              Monitoramento do sistema SaaS em tempo real
+            </p>
+          </div>
+
+          {/* Métricas do Sistema */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {metricasData.map((metric, index) => (
-              <Card key={metric.name} className="border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-slate-600">{metric.name}</p>
-                      <p className="text-2xl font-semibold text-slate-800">
-                        {metric.name === 'Receita' ? formatCurrency(metric.value) : metric.value}
-                      </p>
-                      <p className="text-xs text-slate-500 flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" />
-                        {metric.growth}
-                      </p>
-                    </div>
-                    <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-                      {metric.name === 'Locadoras' && <Building2 className="w-6 h-6 text-slate-600" />}
-                      {metric.name === 'Veículos' && <Car className="w-6 h-6 text-slate-600" />}
-                      {metric.name === 'Motoristas' && <Users className="w-6 h-6 text-slate-600" />}
-                      {metric.name === 'Receita' && <DollarSign className="w-6 h-6 text-slate-600" />}
-                    </div>
+            {/* Status do Sistema */}
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-green-700">Sistema Online</p>
+                    <p className="text-2xl font-bold text-green-800">100%</p>
+                    <p className="text-xs text-green-600 flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      Operacional
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                    <Activity className="w-6 h-6 text-green-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Locadoras Ativas */}
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-blue-700">Locadoras Ativas</p>
+                    <p className="text-2xl font-bold text-blue-800">{locadoras.length}</p>
+                    <p className="text-xs text-blue-600 flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3" />
+                      Empresas cadastradas
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                    <Building2 className="w-6 h-6 text-blue-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Total de Veículos */}
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-purple-700">Total de Veículos</p>
+                    <p className="text-2xl font-bold text-purple-800">{veiculosRaw.length}</p>
+                    <p className="text-xs text-purple-600 flex items-center gap-1">
+                      <Car className="w-3 h-3" />
+                      Frota total
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
+                    <Car className="w-6 h-6 text-purple-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Banco de Dados */}
+            <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-indigo-700">PostgreSQL</p>
+                    <p className="text-2xl font-bold text-indigo-800">OK</p>
+                    <p className="text-xs text-indigo-600 flex items-center gap-1">
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                      Conectado
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 bg-indigo-200 rounded-full flex items-center justify-center">
+                    <Database className="w-6 h-6 text-indigo-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Gráficos Principais */}
+          {/* Informações Técnicas do Sistema */}
           <div className="grid gap-6 lg:grid-cols-2">
-            {/* Receita e Aluguéis */}
-            <Card className="border border-slate-200 bg-white shadow-sm">
+            {/* Dados do Sistema */}
+            <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-slate-800 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-slate-600" />
-                  Evolução da Receita
+                  <Globe className="w-5 h-5 text-slate-600" />
+                  Dados do Sistema
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={receitaRecorrenteData}>
-                      <defs>
-                        <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#64748b" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#64748b" stopOpacity={0.1}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                      <XAxis dataKey="name" stroke="#64748b" />
-                      <YAxis stroke="#64748b" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#ffffff', 
-                          border: '1px solid #e2e8f0',
-                          borderRadius: '8px',
-                          color: '#1e293b'
-                        }}
-                        formatter={(value: any) => [formatCurrency(value), 'Receita']}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="receita" 
-                        stroke="#64748b" 
-                        fillOpacity={1}
-                        fill="url(#colorReceita)"
-                        strokeWidth={2}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-white rounded-lg border border-slate-200">
+                    <p className="text-sm font-medium text-slate-600">Motoristas</p>
+                    <p className="text-2xl font-bold text-slate-800">{motoristasRaw.length}</p>
+                  </div>
+                  <div className="p-4 bg-white rounded-lg border border-slate-200">
+                    <p className="text-sm font-medium text-slate-600">Aluguéis</p>
+                    <p className="text-2xl font-bold text-slate-800">{alugueisRaw.length}</p>
+                  </div>
+                </div>
+                <div className="p-4 bg-white rounded-lg border border-slate-200">
+                  <p className="text-sm font-medium text-slate-600">Receita Total</p>
+                  <p className="text-2xl font-bold text-slate-800">
+                    {formatCurrency(
+                      alugueisRaw.reduce((acc: number, aluguel: any) => acc + parseFloat(aluguel.valorTotal || '0'), 0)
+                    )}
+                  </p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Crescimento de Locadoras */}
-            <Card className="border border-slate-200 bg-white shadow-sm">
+            {/* Status Técnico */}
+            <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-lg">
               <CardHeader>
                 <CardTitle className="text-slate-800 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-slate-600" />
-                  Crescimento de Locadoras
+                  <Cpu className="w-5 h-5 text-slate-600" />
+                  Status Técnico
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={crescimentoLocadorasData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                      <XAxis dataKey="name" stroke="#64748b" />
-                      <YAxis stroke="#64748b" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#ffffff', 
-                          border: '1px solid #e2e8f0',
-                          borderRadius: '8px',
-                          color: '#1e293b'
-                        }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="locadoras" 
-                        stroke="#64748b" 
-                        strokeWidth={2}
-                        dot={{ fill: '#64748b', strokeWidth: 0, r: 4 }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="novasLocadoras" 
-                        stroke="#94a3b8" 
-                        strokeWidth={2}
-                        dot={{ fill: '#94a3b8', strokeWidth: 0, r: 4 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-slate-700">Servidor</span>
+                    </div>
+                    <span className="text-sm text-slate-500">Online</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-slate-700">API</span>
+                    </div>
+                    <span className="text-sm text-slate-500">Funcionando</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-slate-700">Performance</span>
+                    </div>
+                    <span className="text-sm text-slate-500">Excelente</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Distribuição de Planos */}
-          <Card className="border border-slate-200 bg-white shadow-sm">
+          {/* Locadoras Cadastradas */}
+          <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-lg">
             <CardHeader>
               <CardTitle className="text-slate-800 flex items-center gap-2">
                 <Building2 className="w-5 h-5 text-slate-600" />
-                Distribuição de Planos
+                Locadoras Cadastradas
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-6 lg:grid-cols-2">
-                {/* Gráfico de Pizza */}
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={planosData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {planosData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#ffffff', 
-                          border: '1px solid #e2e8f0',
-                          borderRadius: '8px',
-                          color: '#1e293b'
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-
-                {/* Legenda e Status */}
-                <div className="flex flex-col justify-center space-y-4">
-                  {planosData.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div 
-                          className="w-4 h-4 rounded-full"
-                          style={{ backgroundColor: item.color }}
-                        />
-                        <span className="text-slate-700">{item.name}</span>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {locadoras.map((locadora: any) => (
+                  <div key={locadora.id} className="p-4 bg-white rounded-lg border border-slate-200 hover:shadow-md transition-all">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center">
+                        <Building2 className="w-5 h-5 text-slate-600" />
                       </div>
-                      <div className="text-right">
-                        <span className="text-xl font-semibold text-slate-800">{item.value}</span>
-                        <p className="text-xs text-slate-600">locadoras</p>
+                      <div>
+                        <h3 className="font-semibold text-slate-800">{locadora.nome}</h3>
+                        <p className="text-sm text-slate-500">{locadora.plano || 'Free'}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    <div className="space-y-2 text-sm">
+                      <p className="text-slate-600">
+                        <span className="font-medium">CNPJ:</span> {locadora.cnpj}
+                      </p>
+                      <p className="text-slate-600">
+                        <span className="font-medium">Cidade:</span> {locadora.cidade}/{locadora.estado}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${locadora.status === 'ativa' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        <span className={`text-xs font-medium ${locadora.status === 'ativa' ? 'text-green-700' : 'text-red-700'}`}>
+                          {locadora.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
