@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Filter, AlertTriangle, DollarSign, Calendar } from 'lucide-react';
+import { Plus, Search, Filter, AlertTriangle, DollarSign, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -128,38 +128,65 @@ export default function Infracoes() {
         </Button>
       </div>
 
-      {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Infrações</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalInfracoes}</div>
-            <p className="text-xs text-muted-foreground">Todas as infrações</p>
+      {/* Estatísticas com visual futurista */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-700">Total de Infrações</p>
+                <p className="text-2xl font-bold text-blue-800">{totalInfracoes}</p>
+                <p className="text-xs text-blue-600">Todas as infrações</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-blue-700" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Infrações Ativas</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{infracoesAtivas}</div>
-            <p className="text-xs text-muted-foreground">Aguardando pagamento</p>
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-red-700">Infrações Ativas</p>
+                <p className="text-2xl font-bold text-red-800">{infracoesAtivas}</p>
+                <p className="text-xs text-red-600">Aguardando pagamento</p>
+              </div>
+              <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-red-700" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(valorTotal)}</div>
-            <p className="text-xs text-muted-foreground">Valor total das infrações</p>
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-green-700">Valor Total</p>
+                <p className="text-2xl font-bold text-green-800">{formatCurrency(valorTotal)}</p>
+                <p className="text-xs text-green-600">Valor total das infrações</p>
+              </div>
+              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-green-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-orange-700">Valor Pendente</p>
+                <p className="text-2xl font-bold text-orange-800">{formatCurrency(valorPendente)}</p>
+                <p className="text-xs text-orange-600">Aguardando pagamento</p>
+              </div>
+              <div className="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
+                <Clock className="w-6 h-6 text-orange-700" />
+              </div>
+            </div>
           </CardContent>
         </Card>
 

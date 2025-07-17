@@ -159,32 +159,67 @@ export default function Veiculos() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      {/* Cards de estatísticas */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <StatCard
-          title="Total de Veículos"
-          value={stats.total}
-          icon={<BarChart3 />}
-          variant="blue"
-        />
-        <StatCard
-          title="Disponíveis"
-          value={stats.disponiveis}
-          icon={<CheckCircle />}
-          variant="green"
-        />
-        <StatCard
-          title="Alugados"
-          value={stats.alugados}
-          icon={<Car />}
-          variant="blue"
-        />
-        <StatCard
-          title="Manutenção"
-          value={stats.manutencao}
-          icon={<Wrench />}
-          variant="yellow"
-        />
+      {/* Cards de estatísticas com visual futurista */}
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-700">Total de Veículos</p>
+                <p className="text-2xl font-bold text-blue-800">{stats.total}</p>
+                <p className="text-xs text-blue-600">Frota completa</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-blue-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-green-700">Disponíveis</p>
+                <p className="text-2xl font-bold text-green-800">{stats.disponiveis}</p>
+                <p className="text-xs text-green-600">Prontos para locação</p>
+              </div>
+              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-purple-700">Alugados</p>
+                <p className="text-2xl font-bold text-purple-800">{stats.alugados}</p>
+                <p className="text-xs text-purple-600">Em uso</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
+                <Car className="w-6 h-6 text-purple-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-orange-700">Manutenção</p>
+                <p className="text-2xl font-bold text-orange-800">{stats.manutencao}</p>
+                <p className="text-xs text-orange-600">Em reparo</p>
+              </div>
+              <div className="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
+                <Wrench className="w-6 h-6 text-orange-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Controles de busca e filtros */}
