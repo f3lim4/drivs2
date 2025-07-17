@@ -10,7 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-17: Dashboard Simplificado - Gráfico Removido - CONCLUÍDO
+### 2025-07-17: Sistema de Receita Semanal e Melhorias de Interface - CONCLUÍDO
+- ✅ **Card "RECEITA MENSAL" aprimorado** - Agora mostra receita recebida vs esperada na semana atual
+- ✅ **Cálculo semanal inteligente** - Receita esperada baseada nos aluguéis ativos (valor mensal ÷ 4)
+- ✅ **Receita recebida em tempo real** - Soma dos pagamentos pagos na semana atual
+- ✅ **Formato informativo** - Mostra "Semana: R$ X / R$ Y" onde X é recebido e Y é esperado
+- ✅ **Tabela de aluguéis melhorada** - Coluna "Valor Mensal" agora mostra também valor semanal
+- ✅ **Substituição /dia por /semana** - Informação mais relevante para controle financeiro semanal
 - ✅ **Gráfico financeiro removido** - Removido gráfico único do dashboard conforme solicitado
 - ✅ **Código limpo** - Removida função getDadosFinanceirosCompletos() não utilizada
 - ✅ **Importações otimizadas** - Removida importação do Recharts não mais necessária
