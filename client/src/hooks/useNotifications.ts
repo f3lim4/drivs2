@@ -181,12 +181,13 @@ export function useNotifications() {
     
     manutencoes.forEach((manutencao: any) => {
       if (manutencao.status === 'agendada') {
+        const dataAgendada = manutencao.dataAgendada || manutencao.dataInicio || new Date();
         notifications.push({
           id: `manutencao-agendada-${manutencao.id}`,
           type: 'info',
           title: 'Manutenção Agendada',
-          message: `Manutenção ${manutencao.tipoManutencao} agendada para ${format(new Date(manutencao.dataAgendada), 'dd/MM/yyyy', { locale: ptBR })}`,
-          timestamp: new Date(manutencao.dataAgendada),
+          message: `Manutenção ${manutencao.tipo} agendada para ${format(new Date(dataAgendada), 'dd/MM/yyyy', { locale: ptBR })}`,
+          timestamp: new Date(dataAgendada),
           isRead: false,
         });
       }
@@ -196,18 +197,18 @@ export function useNotifications() {
           id: `manutencao-andamento-${manutencao.id}`,
           type: 'warning',
           title: 'Manutenção em Andamento',
-          message: `Manutenção ${manutencao.tipoManutencao} em andamento na ${manutencao.oficina}`,
+          message: `Manutenção ${manutencao.tipo} em andamento na ${manutencao.oficina}`,
           timestamp: new Date(Date.now() - Math.random() * 86400000),
           isRead: false,
         });
       }
 
-      if (manutencao.statusPagamento === 'em_aberto' && manutencao.valor > 0) {
+      if (manutencao.statusPagamento === 'em_aberto' && manutencao.valorOrcamento && parseFloat(manutencao.valorOrcamento) > 0) {
         notifications.push({
           id: `manutencao-pagamento-${manutencao.id}`,
           type: 'warning',
           title: 'Pagamento Pendente',
-          message: `Pagamento de R$ ${manutencao.valor.toFixed(2)} pendente para manutenção`,
+          message: `Pagamento de R$ ${parseFloat(manutencao.valorOrcamento).toFixed(2)} pendente para manutenção`,
           timestamp: new Date(Date.now() - Math.random() * 86400000),
           isRead: false,
         });
