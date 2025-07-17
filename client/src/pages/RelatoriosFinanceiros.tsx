@@ -478,12 +478,6 @@ export default function RelatoriosFinanceiros() {
     <div className="space-y-6 p-6">
       {/* Seletor de mês e botão Nova Despesa (apenas para locadoras) */}
       <div className="flex justify-end items-center gap-4">
-        {!isAdmin && (
-          <Button onClick={() => setModalNovaDespesa(true)} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Nova Despesa
-          </Button>
-        )}
         <Select 
           value={format(selectedMonth, 'yyyy-MM')} 
           onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
@@ -502,6 +496,12 @@ export default function RelatoriosFinanceiros() {
             })}
           </SelectContent>
         </Select>
+        {!isAdmin && (
+          <Button onClick={() => setModalNovaDespesa(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Nova Despesa
+          </Button>
+        )}
       </div>
 
       {/* Seção especial para admins - Dados consolidados de todas as locadoras */}
