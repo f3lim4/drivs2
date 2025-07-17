@@ -30,6 +30,7 @@ export default function Pagamentos() {
   const [filtroTexto, setFiltroTexto] = useState('');
   const [filtroStatus, setFiltroStatus] = useState('todos');
   const [filtroTipo, setFiltroTipo] = useState('todos');
+  const [sortOrder, setSortOrder] = useState<string>('mais-novos');
 
   const handleVerDetalhes = (pagamento: Pagamento) => {
     setPagamentoSelecionado(pagamento);
@@ -90,7 +91,7 @@ export default function Pagamentos() {
     return new Date(date).toLocaleDateString('pt-BR');
   };
 
-  // Filtrar pagamentos
+  // Filtrar e ordenar pagamentos
   const pagamentosFiltrados = useMemo(() => {
     let filtered = pagamentos;
 
@@ -113,8 +114,32 @@ export default function Pagamentos() {
       filtered = filtered.filter(p => p.tipo === filtroTipo);
     }
 
+    // Ordenação
+    filtered.sort((a, b) => {
+      switch (sortOrder) {
+        case 'mais-novos':
+          return new Date(b.data || '').getTime() - new Date(a.data || '').getTime();
+        case 'mais-antigos':
+          return new Date(a.data || '').getTime() - new Date(b.data || '').getTime();
+        case 'nome-az':
+          return a.motoristaNome.localeCompare(b.motoristaNome);
+        case 'nome-za':
+          return b.motoristaNome.localeCompare(a.motoristaNome);
+        case 'valor-maior':
+          return parseFloat(b.valor) - parseFloat(a.valor);
+        case 'valor-menor':
+          return parseFloat(a.valor) - parseFloat(b.valor);
+        case 'status-pago':
+          return a.status === 'pago' ? -1 : b.status === 'pago' ? 1 : 0;
+        case 'status-pendente':
+          return a.status === 'pendente' ? -1 : b.status === 'pendente' ? 1 : 0;
+        default:
+          return 0;
+      }
+    });
+
     return filtered;
-  }, [pagamentos, filtroTexto, filtroStatus, filtroTipo]);
+  }, [pagamentos, filtroTexto, filtroStatus, filtroTipo, sortOrder]);
 
   // Estatísticas (baseado nos dados filtrados)
   const totalPendente = pagamentosFiltrados
@@ -214,20 +239,10 @@ export default function Pagamentos() {
         </Card>
       </div>
 
-      {/* Lista de Pagamentos */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Todos os Pagamentos</CardTitle>
-          <CardDescription>
-            {pagamentosFiltrados.length === 0 
-              ? 'Nenhum pagamento encontrado' 
-              : `${pagamentosFiltrados.length} pagamento${pagamentosFiltrados.length > 1 ? 's' : ''} encontrado${pagamentosFiltrados.length > 1 ? 's' : ''}`
-            }
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* Filtros */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      {/* Filtros acima da tabela */}
+      <Card className="bg-gray-50 border-gray-200">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -270,6 +285,40 @@ export default function Pagamentos() {
               Novo Pagamento
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Lista de Pagamentos */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Todos os Pagamentos</CardTitle>
+            <CardDescription>
+              {pagamentosFiltrados.length === 0 
+                ? 'Nenhum pagamento encontrado' 
+                : `${pagamentosFiltrados.length} pagamento${pagamentosFiltrados.length > 1 ? 's' : ''} encontrado${pagamentosFiltrados.length > 1 ? 's' : ''}`
+              }
+            </CardDescription>
+          </div>
+          
+          {/* Ordenação */}
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+              <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+              <SelectItem value="nome-az">Nome (A-Z)</SelectItem>
+              <SelectItem value="nome-za">Nome (Z-A)</SelectItem>
+              <SelectItem value="valor-maior">Valor (Maior)</SelectItem>
+              <SelectItem value="valor-menor">Valor (Menor)</SelectItem>
+              <SelectItem value="status-pago">Status (Pago)</SelectItem>
+              <SelectItem value="status-pendente">Status (Pendente)</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardHeader>
+        <CardContent>
           {pagamentosFiltrados.length === 0 ? (
             <div className="text-center py-8">
               <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
