@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Correções de Sistema de Contratos - CONCLUÍDO
+- ✅ **Erro de variável não definida corrigido** - Substituído `veiculo` por `dadosVeiculo` na geração de contratos
+- ✅ **Busca de dados do veículo implementada** - Sistema agora busca dados do veículo para limite de quilometragem
+- ✅ **Correção de variável motorista** - Substituído `motorista.nome` por `aluguel.motoristaNome` no template
+- ✅ **Validação de dados na API** - Endpoint PUT de contratos agora valida dados antes de atualizar
+- ✅ **Formatação de datas corrigida** - Modal de edição trata datas como strings para evitar erro de conversão
+- ✅ **Logs de debug removidos** - Interface limpa sem poluição de console
+- ✅ **Sistema de contratos funcionando** - Geração e edição de contratos operacionais
+
 ### 2025-07-17: Ajustes de Layout e Experiência do Usuário - CONCLUÍDO
 - ✅ **Card "Painel de Controle" removido** - Removido card específico da página de aluguéis
 - ✅ **Botão "Nova Despesa" reposicionado** - Movido para lado direito da página financeira, após seletor de mês
