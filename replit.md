@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Correção Crítica de Isolamento de Dados - Página de Aluguéis - CONCLUÍDO
+- ✅ **Bug crítico corrigido** - Página de aluguéis estava usando profile.id em vez de profile.locadoraId
+- ✅ **Queries de aluguéis corrigidas** - Agora usa locadoraId correto para isolamento de dados
+- ✅ **Queries de pagamentos corrigidas** - Também ajustadas para usar locadoraId adequado
+- ✅ **Cache invalidado** - React Query agora usa chaves corretas baseadas em locadoraId
+- ✅ **Logs confirmam funcionamento** - Sistema mostra 5 aluguéis para locadora 5076457100170
+- ✅ **Segurança restaurada** - Isolamento perfeito entre locadoras novamente garantido
+- ✅ **Testes validados** - Usuário confirmou que dados aparecem corretamente
+
 ### 2025-07-17: Correção Crítica de Isolamento de Dados Entre Locadoras - CONCLUÍDO
 - ✅ **Vazamento de dados corrigido** - Página de aluguéis não mostra mais dados de outras locadoras
 - ✅ **Queries frontend corrigidas** - Parâmetro locadoraId agora é passado corretamente nas requisições
