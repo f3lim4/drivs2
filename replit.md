@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Sistema de Ordenação Completo em Relatórios Financeiros - CONCLUÍDO
+- ✅ **Ordenação na aba "Análise por Motorista"** - Dropdown com 6 opções (pagamentos, valor, nome)
+- ✅ **Ordenação na aba "Despesas Fixas"** - Dropdown com 8 opções (total, IPVA, seguro, placa)
+- ✅ **Ordenação na aba "Histórico"** - Dropdown com 8 opções (data, valor, tipo, categoria)
+- ✅ **Posicionamento consistente** - Dropdowns posicionados ao lado dos títulos das abas
+- ✅ **Padrão inteligente** - "Maior Total" em despesas fixas, "Mais Recente" em histórico
+- ✅ **Lógica de ordenação avançada** - Critérios de desempate e fallback para cada tipo
+- ✅ **Integração com dados reais** - Ordenação funciona com dados do PostgreSQL
+- ✅ **Interface limpa** - Dropdowns compactos e responsivos
+- ✅ **Funcionalidade validada** - Sistema de ordenação completo nos relatórios financeiros
+
 ### 2025-07-17: Sistema de Ordenação Implementado em Todas as Páginas - CONCLUÍDO
 - ✅ **Ordenação nas infrações** - Dropdown posicionado ao lado do título "Infrações" com 8 opções
 - ✅ **Ordenação nas manutenções** - Dropdown posicionado do lado oposto ao título "Manutenções da Frota"
