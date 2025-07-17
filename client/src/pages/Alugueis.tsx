@@ -56,16 +56,23 @@ export default function Alugueis() {
 
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
+    console.log('getLocadoraName - locadoraId:', locadoraId);
+    console.log('getLocadoraName - locadorasLoading:', locadorasLoading);
+    console.log('getLocadoraName - locadoras:', locadoras);
+    
     if (!locadoraId) return 'Locadora';
     if (locadorasLoading) return 'Carregando...';
     if (!locadoras || locadoras.length === 0) return 'Sem dados';
     
     const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
+    console.log('getLocadoraName - locadora encontrada:', locadora);
     return locadora ? locadora.nome : `ID: ${locadoraId}`;
   };
 
   // Obter nome da locadora atual para usuários locadora
   const nomeLocadoraAtual = isLocadora && profile?.locadoraId ? getLocadoraName(profile.locadoraId) : null;
+  console.log('nomeLocadoraAtual:', nomeLocadoraAtual);
+  console.log('profile?.locadoraId:', profile?.locadoraId);
 
   // Carrega dados dos aluguéis
   useEffect(() => {
