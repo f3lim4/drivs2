@@ -85,8 +85,8 @@ export default function Alugueis() {
     
     // Calcular receita esperada (soma dos valores mensais dos aluguéis ativos)
     const receitaEsperada = alugueis
-      .filter(a => a.status === 'ativo')
-      .reduce((sum, a) => sum + a.valores.mensal, 0);
+      .filter(a => a && a.status === 'ativo')
+      .reduce((sum, a) => sum + (parseFloat(a.valorMensal) || 0), 0);
     
     // Calcular receita real baseada nos pagamentos do mês
     const receitaReal = pagamentos
@@ -137,7 +137,14 @@ export default function Alugueis() {
 
   // Filtrar aluguéis
   const aluguelsFiltrados = useMemo(() => {
+    if (!alugueis || !Array.isArray(alugueis)) return [];
+    
     return alugueis.filter(aluguel => {
+      // Verificar se o aluguel tem os campos necessários
+      if (!aluguel || !aluguel.motoristaNome || !aluguel.veiculoModelo || !aluguel.veiculoPlaca) {
+        return false;
+      }
+      
       const matchesSearch = 
         aluguel.motoristaNome.toLowerCase().includes(searchTerm.toLowerCase()) ||
         aluguel.veiculoModelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -319,14 +326,14 @@ export default function Alugueis() {
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <div>{aluguel.periodo.inicio} - {aluguel.periodo.fim}</div>
-                        <div className="text-gray-500">{aluguel.periodo.dias} dias</div>
+                        <div>{new Date(aluguel.dataInicio).toLocaleDateString('pt-BR')} - {new Date(aluguel.dataFim).toLocaleDateString('pt-BR')}</div>
+                        <div className="text-gray-500">{aluguel.tempoContrato} meses</div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <div className="font-medium">{formatCurrency(aluguel.valores.mensal)}</div>
-                        <div className="text-gray-500">{formatCurrency(aluguel.valores.diario)}/dia</div>
+                        <div className="font-medium">{formatCurrency(parseFloat(aluguel.valorMensal))}</div>
+                        <div className="text-gray-500">{formatCurrency(parseFloat(aluguel.valorMensal) / 30)}/dia</div>
                       </div>
                     </TableCell>
                     <TableCell>
