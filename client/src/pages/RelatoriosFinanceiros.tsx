@@ -941,43 +941,46 @@ export default function RelatoriosFinanceiros() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {despesasFixasVeiculos.map((veiculo, index) => (
-                        <TableRow key={index}>
-                          <TableCell>
-                            <div>
-                              <p className="font-medium">{veiculo.veiculo}</p>
-                              <p className="text-sm text-gray-500">{veiculo.marca} {veiculo.modelo}</p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {veiculo.despesas.find(d => d.tipo === 'IPVA') ? 
-                              formatCurrency(veiculo.despesas.find(d => d.tipo === 'IPVA')?.valor || 0) : 
-                              <span className="text-gray-400">-</span>
-                            }
-                          </TableCell>
-                          <TableCell>
-                            {veiculo.despesas.find(d => d.tipo === 'Seguro') ? 
-                              formatCurrency(veiculo.despesas.find(d => d.tipo === 'Seguro')?.valor || 0) : 
-                              <span className="text-gray-400">-</span>
-                            }
-                          </TableCell>
-                          <TableCell>
-                            {veiculo.despesas.find(d => d.tipo === 'Rastreador') ? 
-                              formatCurrency(veiculo.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0) : 
-                              <span className="text-gray-400">-</span>
-                            }
-                          </TableCell>
-                          <TableCell>
-                            {veiculo.despesas.find(d => d.tipo === 'Financiamento') ? 
-                              formatCurrency(veiculo.despesas.find(d => d.tipo === 'Financiamento')?.valor || 0) : 
-                              <span className="text-gray-400">-</span>
-                            }
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {formatCurrency(veiculo.totalMensal)}
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {despesasFixasVeiculos.map((veiculoFixo, index) => {
+                        const veiculoOriginal = veiculos.find(v => v.placa === veiculoFixo.veiculo);
+                        return (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <div>
+                                <p className="font-medium">{veiculoFixo.veiculo}</p>
+                                <p className="text-sm text-gray-500">{veiculoOriginal?.marca} {veiculoOriginal?.modelo}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {veiculoOriginal?.ipva && veiculoOriginal.ipva > 0 ? 
+                                formatCurrency(parseFloat(veiculoOriginal.ipva) / 12) : 
+                                <span className="text-gray-400">-</span>
+                              }
+                            </TableCell>
+                            <TableCell>
+                              {veiculoOriginal?.valorSeguroMensal && veiculoOriginal.valorSeguroMensal > 0 ? 
+                                formatCurrency(parseFloat(veiculoOriginal.valorSeguroMensal)) : 
+                                <span className="text-gray-400">-</span>
+                              }
+                            </TableCell>
+                            <TableCell>
+                              {veiculoOriginal?.valorRastreadorMensal && veiculoOriginal.valorRastreadorMensal > 0 ? 
+                                formatCurrency(parseFloat(veiculoOriginal.valorRastreadorMensal)) : 
+                                <span className="text-gray-400">-</span>
+                              }
+                            </TableCell>
+                            <TableCell>
+                              {veiculoOriginal?.financiado && veiculoOriginal.valorFinanciamento ? 
+                                formatCurrency(parseFloat(veiculoOriginal.valorFinanciamento)) : 
+                                <span className="text-gray-400">-</span>
+                              }
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {formatCurrency(veiculoFixo.totalMensal)}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </div>
