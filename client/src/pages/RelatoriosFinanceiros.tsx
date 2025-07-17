@@ -1444,8 +1444,8 @@ export default function RelatoriosFinanceiros() {
                 {/* Resumo das despesas fixas */}
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <h4 className="font-medium mb-2">Total das Despesas Fixas Mensais</h4>
-                  <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalDespesasFixas)}</p>
-                  <p className="text-sm text-gray-600">Projeção anual: {formatCurrency(totalDespesasFixas * 12)}</p>
+                  <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalDespesasFixasPuras)}</p>
+                  <p className="text-sm text-gray-600">Projeção anual: {formatCurrency(totalDespesasFixasPuras * 12)}</p>
                 </div>
 
                 {/* Tabela de despesas por veículo */}
@@ -1463,29 +1463,39 @@ export default function RelatoriosFinanceiros() {
                     </TableHeader>
                     <TableBody>
                       {(() => {
-                        const dadosOrdenados = [...despesasFixasVeiculos].sort((a, b) => {
-                          const veiculoA = veiculos.find(v => v.placa === a.veiculo);
-                          const veiculoB = veiculos.find(v => v.placa === b.veiculo);
+                        // Calcular despesas fixas puras para cada veículo (sem manutenções)
+                        const veiculosDespesasFixas = veiculos.map(veiculo => {
+                          const ipvaM = veiculo.ipva && veiculo.ipva > 0 ? parseFloat(veiculo.ipva) / 12 : 0;
+                          const seguroM = veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0 ? parseFloat(veiculo.valorSeguroMensal) : 0;
+                          const rastreadorM = veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0 ? parseFloat(veiculo.valorRastreadorMensal) : 0;
+                          const financiamentoM = veiculo.financiado && veiculo.valorFinanciamento ? parseFloat(veiculo.valorFinanciamento) : 0;
                           
-                          const ipvaA = veiculoA?.ipva ? parseFloat(veiculoA.ipva) / 12 : 0;
-                          const ipvaB = veiculoB?.ipva ? parseFloat(veiculoB.ipva) / 12 : 0;
-                          
-                          const seguroA = veiculoA?.valorSeguroMensal ? parseFloat(veiculoA.valorSeguroMensal) : 0;
-                          const seguroB = veiculoB?.valorSeguroMensal ? parseFloat(veiculoB.valorSeguroMensal) : 0;
-                          
+                          return {
+                            veiculo: veiculo.placa,
+                            totalMensal: ipvaM + seguroM + rastreadorM + financiamentoM,
+                            ipva: ipvaM,
+                            seguro: seguroM,
+                            rastreador: rastreadorM,
+                            financiamento: financiamentoM,
+                            veiculoOriginal: veiculo
+                          };
+                        });
+                        
+                        // Aplicar ordenação
+                        const dadosOrdenados = [...veiculosDespesasFixas].sort((a, b) => {
                           switch (sortDespesasFixas) {
                             case 'maior-total':
                               return b.totalMensal - a.totalMensal;
                             case 'menor-total':
                               return a.totalMensal - b.totalMensal;
                             case 'maior-ipva':
-                              return ipvaB - ipvaA;
+                              return b.ipva - a.ipva;
                             case 'menor-ipva':
-                              return ipvaA - ipvaB;
+                              return a.ipva - b.ipva;
                             case 'maior-seguro':
-                              return seguroB - seguroA;
+                              return b.seguro - a.seguro;
                             case 'menor-seguro':
-                              return seguroA - seguroB;
+                              return a.seguro - b.seguro;
                             case 'placa-az':
                               return a.veiculo.localeCompare(b.veiculo);
                             case 'placa-za':
@@ -1495,37 +1505,35 @@ export default function RelatoriosFinanceiros() {
                           }
                         });
                         
-                        return dadosOrdenados.map((veiculoFixo, index) => {
-                          const veiculoOriginal = veiculos.find(v => v.placa === veiculoFixo.veiculo);
-                          return (
+                        return dadosOrdenados.map((veiculoFixo, index) => (
                           <TableRow key={index}>
                             <TableCell>
                               <div>
                                 <p className="font-medium">{veiculoFixo.veiculo}</p>
-                                <p className="text-sm text-gray-500">{veiculoOriginal?.marca} {veiculoOriginal?.modelo}</p>
+                                <p className="text-sm text-gray-500">{veiculoFixo.veiculoOriginal?.marca} {veiculoFixo.veiculoOriginal?.modelo}</p>
                               </div>
                             </TableCell>
                             <TableCell>
-                              {veiculoOriginal?.ipva && veiculoOriginal.ipva > 0 ? 
-                                formatCurrency(parseFloat(veiculoOriginal.ipva) / 12) : 
+                              {veiculoFixo.ipva > 0 ? 
+                                formatCurrency(veiculoFixo.ipva) : 
                                 <span className="text-gray-400">-</span>
                               }
                             </TableCell>
                             <TableCell>
-                              {veiculoOriginal?.valorSeguroMensal && veiculoOriginal.valorSeguroMensal > 0 ? 
-                                formatCurrency(parseFloat(veiculoOriginal.valorSeguroMensal)) : 
+                              {veiculoFixo.seguro > 0 ? 
+                                formatCurrency(veiculoFixo.seguro) : 
                                 <span className="text-gray-400">-</span>
                               }
                             </TableCell>
                             <TableCell>
-                              {veiculoOriginal?.valorRastreadorMensal && veiculoOriginal.valorRastreadorMensal > 0 ? 
-                                formatCurrency(parseFloat(veiculoOriginal.valorRastreadorMensal)) : 
+                              {veiculoFixo.rastreador > 0 ? 
+                                formatCurrency(veiculoFixo.rastreador) : 
                                 <span className="text-gray-400">-</span>
                               }
                             </TableCell>
                             <TableCell>
-                              {veiculoOriginal?.financiado && veiculoOriginal.valorFinanciamento ? 
-                                formatCurrency(parseFloat(veiculoOriginal.valorFinanciamento)) : 
+                              {veiculoFixo.financiamento > 0 ? 
+                                formatCurrency(veiculoFixo.financiamento) : 
                                 <span className="text-gray-400">-</span>
                               }
                             </TableCell>
@@ -1533,9 +1541,8 @@ export default function RelatoriosFinanceiros() {
                               {formatCurrency(veiculoFixo.totalMensal)}
                             </TableCell>
                           </TableRow>
-                        );
-                      });
-                    })()}
+                        ));
+                      })()}
                     </TableBody>
                   </Table>
                 </div>
