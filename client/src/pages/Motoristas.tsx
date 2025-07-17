@@ -31,6 +31,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { StatCard } from '@/components/dashboard/StatCard';
+import { Pagination } from '@/components/ui/pagination';
 import { NovoMotoristaModal } from '@/components/motoristas/NovoMotoristaModal';
 import { EditarMotoristaModal } from '@/components/motoristas/EditarMotoristaModal';
 import { ExcluirMotoristaDialog } from '@/components/motoristas/ExcluirMotoristaDialog';
@@ -51,6 +52,8 @@ export default function Motoristas() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedMotorista, setSelectedMotorista] = useState<Motorista | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Buscar locadoras para exibir nome na coluna
   const { data: locadoras = [] } = useQuery({
@@ -113,6 +116,26 @@ export default function Motoristas() {
       const dateB = new Date(b.createdAt || '');
       return dateB.getTime() - dateA.getTime();
     });
+
+  // Paginação
+  const totalPages = Math.ceil(filteredMotoristas.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedMotoristas = filteredMotoristas.slice(startIndex, endIndex);
+  
+  // Reset para primeira página quando filtros mudam
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  };
 
   // Calcula estatísticas baseadas no status da CNH
   const stats = {
@@ -336,7 +359,7 @@ export default function Motoristas() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredMotoristas.map((motorista) => (
+              {paginatedMotoristas.map((motorista) => (
                 <TableRow key={motorista.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -434,6 +457,18 @@ export default function Motoristas() {
           )}
         </CardContent>
       </Card>
+
+      {/* Paginação */}
+      {filteredMotoristas.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          totalItems={filteredMotoristas.length}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
 
       {/* Modals - apenas para locadoras */}
       {isLocadora && (
