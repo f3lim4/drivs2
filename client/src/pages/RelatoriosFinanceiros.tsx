@@ -27,6 +27,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { Pagination } from '@/components/ui/pagination';
 
 // Schema para formulário de nova despesa
 const novaDespesaSchema = z.object({
@@ -72,6 +73,21 @@ export default function RelatoriosFinanceiros() {
   const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
   const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('mais-recentes');
   const [sortHistorico, setSortHistorico] = useState<string>('mais-recentes');
+  
+  // Estados de paginação para a aba "Despesas Fixas"
+  const [currentPageDespesasFixas, setCurrentPageDespesasFixas] = useState(1);
+  const [itemsPerPageDespesasFixas, setItemsPerPageDespesasFixas] = useState(10);
+  
+  // Função para alterar página
+  const handlePageChangeDespesasFixas = (page: number) => {
+    setCurrentPageDespesasFixas(page);
+  };
+  
+  // Função para alterar itens por página
+  const handleItemsPerPageChangeDespesasFixas = (items: number) => {
+    setItemsPerPageDespesasFixas(items);
+    setCurrentPageDespesasFixas(1);
+  };
 
   // Formulário para nova despesa
   const formNovaDespesa = useForm<NovaDespesaData>({
@@ -1531,11 +1547,43 @@ export default function RelatoriosFinanceiros() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Resumo das despesas fixas */}
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">Total das Despesas Fixas Mensais</h4>
-                  <p className="text-2xl font-bold text-blue-600">{formatCurrency(totalDespesasFixasPuras)}</p>
-                  <p className="text-sm text-gray-600">Projeção anual: {formatCurrency(totalDespesasFixasPuras * 12)}</p>
+                {/* Cards separados por tipo de despesa */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Card IPVA */}
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-blue-700 mb-2">IPVA Total</h4>
+                    <p className="text-2xl font-bold text-blue-800">
+                      {formatCurrency(veiculos.reduce((total, v) => total + (v.ipva && v.ipva > 0 ? parseFloat(v.ipva) / 12 : 0), 0))}
+                    </p>
+                    <p className="text-sm text-blue-600">Mensal</p>
+                  </div>
+                  
+                  {/* Card Seguros */}
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-green-700 mb-2">Seguros Total</h4>
+                    <p className="text-2xl font-bold text-green-800">
+                      {formatCurrency(veiculos.reduce((total, v) => total + (v.valorSeguroMensal && v.valorSeguroMensal > 0 ? parseFloat(v.valorSeguroMensal) : 0), 0))}
+                    </p>
+                    <p className="text-sm text-green-600">Mensal</p>
+                  </div>
+                  
+                  {/* Card Rastreadores */}
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-yellow-700 mb-2">Rastreadores Total</h4>
+                    <p className="text-2xl font-bold text-yellow-800">
+                      {formatCurrency(veiculos.reduce((total, v) => total + (v.valorRastreadorMensal && v.valorRastreadorMensal > 0 ? parseFloat(v.valorRastreadorMensal) : 0), 0))}
+                    </p>
+                    <p className="text-sm text-yellow-600">Mensal</p>
+                  </div>
+                  
+                  {/* Card Financiamento */}
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <h4 className="font-medium text-purple-700 mb-2">Financiamento Total</h4>
+                    <p className="text-2xl font-bold text-purple-800">
+                      {formatCurrency(veiculos.reduce((total, v) => total + (v.financiado && v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : 0), 0))}
+                    </p>
+                    <p className="text-sm text-purple-600">Mensal</p>
+                  </div>
                 </div>
 
                 {/* Tabela de despesas por veículo */}
@@ -1595,7 +1643,12 @@ export default function RelatoriosFinanceiros() {
                           }
                         });
                         
-                        return dadosOrdenados.map((veiculoFixo, index) => (
+                        // Calcular paginação
+                        const startIndex = (currentPageDespesasFixas - 1) * itemsPerPageDespesasFixas;
+                        const endIndex = startIndex + itemsPerPageDespesasFixas;
+                        const dadosPaginados = dadosOrdenados.slice(startIndex, endIndex);
+                        
+                        return dadosPaginados.map((veiculoFixo, index) => (
                           <TableRow key={index}>
                             <TableCell>
                               <div>
@@ -1637,41 +1690,37 @@ export default function RelatoriosFinanceiros() {
                   </Table>
                 </div>
 
-                {/* Detalhamento por tipo de despesa */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">IPVA Total</h4>
-                    <p className="text-2xl font-bold text-orange-600">
-                      {formatCurrency(veiculos.reduce((total, v) => 
-                        total + (v.ipva && v.ipva > 0 ? parseFloat(v.ipva) / 12 : 0), 0))}
-                    </p>
-                    <p className="text-sm text-gray-500">Mensal</p>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Seguros Total</h4>
-                    <p className="text-2xl font-bold text-blue-600">
-                      {formatCurrency(veiculos.reduce((total, v) => 
-                        total + (v.valorSeguroMensal && v.valorSeguroMensal > 0 ? parseFloat(v.valorSeguroMensal) : 0), 0))}
-                    </p>
-                    <p className="text-sm text-gray-500">Mensal</p>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Rastreadores Total</h4>
-                    <p className="text-2xl font-bold text-green-600">
-                      {formatCurrency(veiculos.reduce((total, v) => 
-                        total + (v.valorRastreadorMensal && v.valorRastreadorMensal > 0 ? parseFloat(v.valorRastreadorMensal) : 0), 0))}
-                    </p>
-                    <p className="text-sm text-gray-500">Mensal</p>
-                  </div>
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-2">Financiamento Total</h4>
-                    <p className="text-2xl font-bold text-purple-600">
-                      {formatCurrency(veiculos.reduce((total, v) => 
-                        total + (v.financiado && v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : 0), 0))}
-                    </p>
-                    <p className="text-sm text-gray-500">Mensal</p>
-                  </div>
-                </div>
+                {/* Paginação */}
+                {(() => {
+                  const veiculosDespesasFixas = veiculos.map(veiculo => {
+                    const ipvaM = veiculo.ipva && veiculo.ipva > 0 ? parseFloat(veiculo.ipva) / 12 : 0;
+                    const seguroM = veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0 ? parseFloat(veiculo.valorSeguroMensal) : 0;
+                    const rastreadorM = veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0 ? parseFloat(veiculo.valorRastreadorMensal) : 0;
+                    const financiamentoM = veiculo.financiado && veiculo.valorFinanciamento ? parseFloat(veiculo.valorFinanciamento) : 0;
+                    
+                    return {
+                      veiculo: veiculo.placa,
+                      totalMensal: ipvaM + seguroM + rastreadorM + financiamentoM,
+                      ipva: ipvaM,
+                      seguro: seguroM,
+                      rastreador: rastreadorM,
+                      financiamento: financiamentoM,
+                      veiculoOriginal: veiculo
+                    };
+                  });
+                  
+                  return veiculosDespesasFixas.length > 0 && (
+                    <div className="border-t pt-4 mt-4">
+                      <Pagination
+                        currentPage={currentPageDespesasFixas}
+                        totalItems={veiculosDespesasFixas.length}
+                        itemsPerPage={itemsPerPageDespesasFixas}
+                        onPageChange={handlePageChangeDespesasFixas}
+                        onItemsPerPageChange={handleItemsPerPageChangeDespesasFixas}
+                      />
+                    </div>
+                  );
+                })()}
 
                 {/* Análise por categoria */}
                 <div className="mt-8">
