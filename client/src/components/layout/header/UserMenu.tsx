@@ -57,9 +57,11 @@ export function UserMenu() {
               <User className="w-full h-full text-primary-foreground" />
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-sm font-medium">{profile?.name || 'Usuário'}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-base font-semibold">
                 {profile?.type === 'admin' ? 'Administrador' : (locadora?.nome || 'Locadora')}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {profile?.type === 'admin' ? 'Sistema DRIVS' : (profile?.name || 'Usuário')}
               </p>
             </div>
           </Button>
