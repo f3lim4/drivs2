@@ -43,6 +43,7 @@ export default function Alugueis() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
+  const [sortOrder, setSortOrder] = useState<string>('mais-novos');
   const [showNovoAluguelModal, setShowNovoAluguelModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -185,12 +186,36 @@ export default function Alugueis() {
         return matchesSearch && matchesStatus;
       })
       .sort((a, b) => {
-        // Ordena por data de cadastro decrescente (mais novos primeiro)
-        const dateA = new Date(a.createdAt || '');
-        const dateB = new Date(b.createdAt || '');
-        return dateB.getTime() - dateA.getTime();
+        switch (sortOrder) {
+          case 'mais-novos':
+            // Ordena por data de cadastro decrescente (mais novos primeiro)
+            return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
+          case 'mais-antigos':
+            // Ordena por data de cadastro crescente (mais antigos primeiro)
+            return new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime();
+          case 'motorista-az':
+            // Ordena por nome do motorista A-Z
+            return a.motoristaNome.localeCompare(b.motoristaNome);
+          case 'motorista-za':
+            // Ordena por nome do motorista Z-A
+            return b.motoristaNome.localeCompare(a.motoristaNome);
+          case 'veiculo-az':
+            // Ordena por modelo do veículo A-Z
+            return a.veiculoModelo.localeCompare(b.veiculoModelo);
+          case 'veiculo-za':
+            // Ordena por modelo do veículo Z-A
+            return b.veiculoModelo.localeCompare(a.veiculoModelo);
+          case 'valor-maior':
+            // Ordena por valor decrescente (maior primeiro)
+            return (parseFloat(b.valorMensal) || 0) - (parseFloat(a.valorMensal) || 0);
+          case 'valor-menor':
+            // Ordena por valor crescente (menor primeiro)
+            return (parseFloat(a.valorMensal) || 0) - (parseFloat(b.valorMensal) || 0);
+          default:
+            return 0;
+        }
       });
-  }, [alugueis, searchTerm, statusFilter]);
+  }, [alugueis, searchTerm, statusFilter, sortOrder]);
 
   // Handlers
   const handleEditAluguel = (aluguel: Aluguel) => {
@@ -321,8 +346,25 @@ export default function Alugueis() {
 
       {/* Tabela de aluguéis */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Lista de Aluguéis</CardTitle>
+          
+          {/* Ordenação */}
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+              <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+              <SelectItem value="motorista-az">Motorista (A-Z)</SelectItem>
+              <SelectItem value="motorista-za">Motorista (Z-A)</SelectItem>
+              <SelectItem value="veiculo-az">Veículo (A-Z)</SelectItem>
+              <SelectItem value="veiculo-za">Veículo (Z-A)</SelectItem>
+              <SelectItem value="valor-maior">Valor (Maior)</SelectItem>
+              <SelectItem value="valor-menor">Valor (Menor)</SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent>
           <Table>
