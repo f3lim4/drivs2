@@ -59,6 +59,12 @@ export function useNotifications() {
     enabled: !!profile?.locadoraId,
   });
 
+  // Buscar anúncios ativos
+  const { data: anunciosRaw = [] } = useQuery({
+    queryKey: ['/api/anuncios/ativos'],
+    enabled: !!profile,
+  });
+
   // Filtrar dados com isolamento de segurança
   const motoristas = profile?.locadoraId ? motoristasRaw.filter((m: any) => m.locadoraId === profile.locadoraId) : motoristasRaw;
   const alugueis = profile?.locadoraId ? alugueisRaw.filter((a: any) => a.locadoraId === profile.locadoraId) : alugueisRaw;
@@ -81,8 +87,18 @@ export function useNotifications() {
     despesas: despesas.length,
     infracoes: infracoes.length,
     pagamentos: pagamentos.length,
+    anuncios: anunciosRaw.length,
     locadoraId: profile?.locadoraId
   });
+
+  // Log específico para anúncios
+  console.log('Notificações - Anúncios carregados:', anunciosRaw.map(a => ({
+    id: a.id,
+    tipo: a.tipo,
+    titulo: a.titulo,
+    conteudo: a.conteudo,
+    created_at: a.created_at
+  })));
 
   // Log detalhado dos dados
   console.log('Notificações - Detalhes dos dados:', {
@@ -304,6 +320,32 @@ export function useNotifications() {
           timestamp: dataPagamento,
           isRead: false,
         });
+      }
+    });
+  }
+
+  // Notificações de anúncios críticos (warning e error)
+  if (anunciosRaw.length > 0) {
+    anunciosRaw.forEach((anuncio: any) => {
+      if (anuncio.tipo === 'warning' || anuncio.tipo === 'error') {
+        // Usar created_at se disponível, senão usar data atual menos 1 dia
+        const dataPublicacao = anuncio.created_at 
+          ? new Date(anuncio.created_at) 
+          : new Date(Date.now() - 24 * 60 * 60 * 1000);
+        
+        const diasAtras = differenceInDays(today, dataPublicacao);
+        
+        // Mostrar anúncios críticos dos últimos 30 dias
+        if (diasAtras <= 30) {
+          notifications.push({
+            id: `anuncio-${anuncio.tipo}-${anuncio.id}`,
+            type: anuncio.tipo === 'error' ? 'danger' : 'warning',
+            title: anuncio.tipo === 'error' ? 'Erro' : 'Atenção',
+            message: anuncio.conteudo,
+            timestamp: dataPublicacao,
+            isRead: false,
+          });
+        }
       }
     });
   }

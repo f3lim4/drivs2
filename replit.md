@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Integração Completa de Anúncios Críticos com Sistema de Notificações - CONCLUÍDO
+- ✅ **Anúncios críticos nas notificações** - Anúncios do tipo "warning" e "error" agora aparecem no sistema de notificações
+- ✅ **Busca automática de anúncios** - Hook useNotifications busca anúncios ativos automaticamente
+- ✅ **Filtro por tipo crítico** - Apenas anúncios de atenção e erro geram notificações
+- ✅ **Período de exibição** - Anúncios críticos dos últimos 30 dias aparecem nas notificações
+- ✅ **Tipos de notificação** - Warning vira "Atenção" e Error vira "Erro" nas notificações
+- ✅ **Cores diferenciadas** - Anúncios de erro aparecem como "danger" (vermelho) e warning como "warning" (amarelo)
+- ✅ **Tratamento de datas** - Sistema trata anúncios sem created_at usando data padrão
+- ✅ **Dados de teste validados** - Criados anúncios de teste para validar funcionalidade
+- ✅ **Sistema unificado** - Notificações agora incluem CNH, multas, pagamentos e anúncios críticos
+- ✅ **Visibilidade máxima** - Anúncios críticos têm dupla visibilidade: dashboard e notificações
+
 ### 2025-07-17: Sistema de Anúncios com Cores por Tipo - CONCLUÍDO
 - ✅ **Sistema de cores implementado** - Anúncios agora têm cores específicas por tipo
 - ✅ **Azul para informação** - Mantido padrão original para tipo "info"
