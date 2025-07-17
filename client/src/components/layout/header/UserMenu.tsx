@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { User, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -85,6 +85,15 @@ export function UserMenu() {
             </div>
             <span>Perfil</span>
           </DropdownMenuItem>
+          
+          {profile?.type !== 'admin' && (
+            <DropdownMenuItem onClick={() => navigate('/planos')}>
+              <div className="mr-2 h-4 w-4 flex items-center justify-center">
+                <Crown className="w-full h-full" />
+              </div>
+              <span>Planos</span>
+            </DropdownMenuItem>
+          )}
           
           <DropdownMenuSeparator />
           
