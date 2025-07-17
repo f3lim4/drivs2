@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Correção Crítica de Isolamento de Dados Entre Locadoras - CONCLUÍDO
+- ✅ **Vazamento de dados corrigido** - Página de aluguéis não mostra mais dados de outras locadoras
+- ✅ **Queries frontend corrigidas** - Parâmetro locadoraId agora é passado corretamente nas requisições
+- ✅ **Cache configurado** - StaleTime reduzido para evitar dados antigos em cache
+- ✅ **Logs de debug implementados** - Sistema monitora requisições por locadora
+- ✅ **Filtros de segurança validados** - Backend já tinha validações corretas funcionando
+- ✅ **Isolamento garantido** - Cada locadora vê apenas seus próprios aluguéis e pagamentos
+- ✅ **Sistema de pagamentos corrigido** - Queries também aplicam filtro por locadoraId
+- ✅ **Validação de integridade** - Múltiplas camadas de segurança para evitar vazamentos
+
 ### 2025-07-17: Integração Completa de Anúncios Críticos com Sistema de Notificações - CONCLUÍDO
 - ✅ **Anúncios críticos nas notificações** - Anúncios do tipo "warning" e "error" agora aparecem no sistema de notificações
 - ✅ **Busca automática de anúncios** - Hook useNotifications busca anúncios ativos automaticamente
