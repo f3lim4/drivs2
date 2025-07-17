@@ -413,12 +413,45 @@ export default function Planos() {
                     <TableCell>{getStatusBadge(locadora.status)}</TableCell>
                     <TableCell>{formatCurrency(locadora.valorPago)}</TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="sm">
+                      <div className="flex gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            toast({
+                              title: "Alterar Plano",
+                              description: `Alterando plano da ${locadora.nome}`,
+                            });
+                          }}
+                          title="Alterar plano"
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            toast({
+                              title: "Renovar Assinatura",
+                              description: `Renovando assinatura da ${locadora.nome}`,
+                            });
+                          }}
+                          title="Renovar assinatura"
+                        >
                           <Settings className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            toast({
+                              title: "Suspender Locadora",
+                              description: `Suspendendo acesso da ${locadora.nome}`,
+                            });
+                          }}
+                          title="Suspender locadora"
+                        >
+                          <X className="w-4 h-4 text-red-600" />
                         </Button>
                       </div>
                     </TableCell>
