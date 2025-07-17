@@ -19,6 +19,8 @@ export function useDespesas() {
       if (!despesasResponse.ok) throw new Error('Failed to fetch despesas');
       const despesasManuais = await despesasResponse.json();
       
+      console.log('[HOOK useDespesas] Despesas obtidas do backend:', despesasManuais.length, despesasManuais);
+      
 
       
       // Buscar manutenções para incluir como despesas
