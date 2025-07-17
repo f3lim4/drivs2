@@ -40,6 +40,19 @@ export default function Planos() {
   const [modalAberto, setModalAberto] = useState(false);
   const [planoEditando, setPlanoEditando] = useState<Plano | null>(null);
   const [modalLocadoras, setModalLocadoras] = useState(false);
+  
+  // Estados para o formulário
+  const [formData, setFormData] = useState({
+    nome: '',
+    descricao: '',
+    precoMensal: '',
+    precoAnual: '',
+    maxVeiculos: '',
+    maxMotoristas: '',
+    features: '',
+    cor: '#3b82f6',
+    ativo: true
+  });
 
   // Dados de exemplo dos planos
   const [planos, setPlanos] = useState<Plano[]>([
@@ -204,6 +217,46 @@ export default function Planos() {
     return plano ? plano.nome : planoId;
   };
 
+  const limparFormulario = () => {
+    setFormData({
+      nome: '',
+      descricao: '',
+      precoMensal: '',
+      precoAnual: '',
+      maxVeiculos: '',
+      maxMotoristas: '',
+      features: '',
+      cor: '#3b82f6',
+      ativo: true
+    });
+  };
+
+  const preencherFormulario = (plano: Plano) => {
+    setFormData({
+      nome: plano.nome,
+      descricao: plano.descricao,
+      precoMensal: plano.precoMensal.toString(),
+      precoAnual: plano.precoAnual.toString(),
+      maxVeiculos: plano.maxVeiculos.toString(),
+      maxMotoristas: plano.maxMotoristas.toString(),
+      features: plano.features.join('\n'),
+      cor: plano.cor,
+      ativo: plano.ativo
+    });
+  };
+
+  const handleNovoPlano = () => {
+    setPlanoEditando(null);
+    limparFormulario();
+    setModalAberto(true);
+  };
+
+  const handleEditarPlano = (plano: Plano) => {
+    setPlanoEditando(plano);
+    preencherFormulario(plano);
+    setModalAberto(true);
+  };
+
   const handleSalvarPlano = () => {
     toast({
       title: "Plano salvo com sucesso",
@@ -211,6 +264,7 @@ export default function Planos() {
     });
     setModalAberto(false);
     setPlanoEditando(null);
+    limparFormulario();
   };
 
   const handleExcluirPlano = (planoId: string) => {
@@ -244,7 +298,7 @@ export default function Planos() {
           </Button>
           <Dialog open={modalAberto} onOpenChange={setModalAberto}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
+              <Button className="flex items-center gap-2" onClick={handleNovoPlano}>
                 <Plus className="w-4 h-4" />
                 Novo Plano
               </Button>
@@ -259,38 +313,77 @@ export default function Planos() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="nome">Nome do Plano</Label>
-                    <Input id="nome" placeholder="Ex: Premium" />
+                    <Input 
+                      id="nome" 
+                      placeholder="Ex: Premium" 
+                      value={formData.nome}
+                      onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="cor">Cor</Label>
-                    <Input id="cor" type="color" defaultValue="#3b82f6" />
+                    <Input 
+                      id="cor" 
+                      type="color" 
+                      value={formData.cor}
+                      onChange={(e) => setFormData({...formData, cor: e.target.value})}
+                    />
                   </div>
                 </div>
                 
                 <div>
                   <Label htmlFor="descricao">Descrição</Label>
-                  <Textarea id="descricao" placeholder="Descreva o plano..." />
+                  <Textarea 
+                    id="descricao" 
+                    placeholder="Descreva o plano..." 
+                    value={formData.descricao}
+                    onChange={(e) => setFormData({...formData, descricao: e.target.value})}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="precoMensal">Preço Mensal (R$)</Label>
-                    <Input id="precoMensal" type="number" placeholder="199" />
+                    <Input 
+                      id="precoMensal" 
+                      type="number" 
+                      placeholder="199" 
+                      value={formData.precoMensal}
+                      onChange={(e) => setFormData({...formData, precoMensal: e.target.value})}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="precoAnual">Preço Anual (R$)</Label>
-                    <Input id="precoAnual" type="number" placeholder="1990" />
+                    <Input 
+                      id="precoAnual" 
+                      type="number" 
+                      placeholder="1990" 
+                      value={formData.precoAnual}
+                      onChange={(e) => setFormData({...formData, precoAnual: e.target.value})}
+                    />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="maxVeiculos">Máximo de Veículos</Label>
-                    <Input id="maxVeiculos" type="number" placeholder="100" />
+                    <Input 
+                      id="maxVeiculos" 
+                      type="number" 
+                      placeholder="100" 
+                      value={formData.maxVeiculos}
+                      onChange={(e) => setFormData({...formData, maxVeiculos: e.target.value})}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="maxMotoristas">Máximo de Motoristas</Label>
-                    <Input id="maxMotoristas" type="number" placeholder="200" />
+                    <Input 
+                      id="maxMotoristas" 
+                      type="number" 
+                      placeholder="200" 
+                      value={formData.maxMotoristas}
+                      onChange={(e) => setFormData({...formData, maxMotoristas: e.target.value})}
+                    />
                   </div>
                 </div>
 
@@ -300,11 +393,17 @@ export default function Planos() {
                     id="features" 
                     placeholder="Gestão completa de aluguéis&#10;Relatórios avançados&#10;Suporte prioritário"
                     rows={5}
+                    value={formData.features}
+                    onChange={(e) => setFormData({...formData, features: e.target.value})}
                   />
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setModalAberto(false)}>
+                  <Button variant="outline" onClick={() => {
+                    setModalAberto(false);
+                    setPlanoEditando(null);
+                    limparFormulario();
+                  }}>
                     Cancelar
                   </Button>
                   <Button onClick={handleSalvarPlano}>
@@ -341,10 +440,7 @@ export default function Planos() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => {
-                      setPlanoEditando(plano);
-                      setModalAberto(true);
-                    }}
+                    onClick={() => handleEditarPlano(plano)}
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
