@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
@@ -43,16 +44,28 @@ export default function Manutencoes() {
   const [gerenciarLocaisModalOpen, setGerenciarLocaisModalOpen] = useState(false);
   const [editarManutencaoModal, setEditarManutencaoModal] = useState<{ open: boolean; manutencao: Manutencao | null }>({ open: false, manutencao: null });
   const [visualizarManutencaoModal, setVisualizarManutencaoModal] = useState<{ open: boolean; manutencao: Manutencao | null }>({ open: false, manutencao: null });
+  const [confirmDeleteManutencao, setConfirmDeleteManutencao] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
+  const [confirmDeleteLocal, setConfirmDeleteLocal] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
 
   const handleDeleteManutencao = async (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta manutenção?')) {
-      deleteManutencao(id);
-    }
+    setConfirmDeleteManutencao({ open: true, id });
   };
 
   const handleDeleteLocal = async (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir este local?')) {
-      deleteLocal(id);
+    setConfirmDeleteLocal({ open: true, id });
+  };
+
+  const confirmDeleteManutencaoAction = async () => {
+    if (confirmDeleteManutencao.id) {
+      await deleteManutencao(confirmDeleteManutencao.id);
+      setConfirmDeleteManutencao({ open: false, id: null });
+    }
+  };
+
+  const confirmDeleteLocalAction = async () => {
+    if (confirmDeleteLocal.id) {
+      await deleteLocal(confirmDeleteLocal.id);
+      setConfirmDeleteLocal({ open: false, id: null });
     }
   };
 
@@ -483,6 +496,33 @@ export default function Manutencoes() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Modal de confirmação para exclusão de manutenção */}
+      <ConfirmDialog
+        open={confirmDeleteManutencao.open}
+        onOpenChange={(open) => setConfirmDeleteManutencao({ open, id: null })}
+        title="Excluir Manutenção"
+        description="Tem certeza que deseja excluir esta manutenção? Esta ação não pode ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={confirmDeleteManutencaoAction}
+        onCancel={() => setConfirmDeleteManutencao({ open: false, id: null })}
+        isLoading={isDeleting}
+        variant="destructive"
+      />
+
+      {/* Modal de confirmação para exclusão de local */}
+      <ConfirmDialog
+        open={confirmDeleteLocal.open}
+        onOpenChange={(open) => setConfirmDeleteLocal({ open, id: null })}
+        title="Excluir Local"
+        description="Tem certeza que deseja excluir este local? Esta ação não pode ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={confirmDeleteLocalAction}
+        onCancel={() => setConfirmDeleteLocal({ open: false, id: null })}
+        variant="destructive"
+      />
     </div>
   );
 }

@@ -10,14 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-17: Correções de Sistema de Contratos - CONCLUÍDO
+### 2025-07-17: Correções de Sistema de Contratos e Modal de Confirmação - CONCLUÍDO
 - ✅ **Erro de variável não definida corrigido** - Substituído `veiculo` por `dadosVeiculo` na geração de contratos
 - ✅ **Busca de dados do veículo implementada** - Sistema agora busca dados do veículo para limite de quilometragem
 - ✅ **Correção de variável motorista** - Substituído `motorista.nome` por `aluguel.motoristaNome` no template
 - ✅ **Validação de dados na API** - Endpoint PUT de contratos agora valida dados antes de atualizar
 - ✅ **Formatação de datas corrigida** - Modal de edição trata datas como strings para evitar erro de conversão
+- ✅ **Conversão de tipo de valor corrigida** - Campo valor agora converte string para número no carregamento
 - ✅ **Logs de debug removidos** - Interface limpa sem poluição de console
 - ✅ **Sistema de contratos funcionando** - Geração e edição de contratos operacionais
+- ✅ **Modal de confirmação personalizado** - Substituído window.confirm por modal elegante com botões estilizados
+- ✅ **Confirmação de exclusão implementada** - Página de manutenções agora usa modal de confirmação para exclusões
+- ✅ **Interface de confirmação aprimorada** - Modal com ícone de alerta, títulos descritivos e botões diferenciados
 
 ### 2025-07-17: Ajustes de Layout e Experiência do Usuário - CONCLUÍDO
 - ✅ **Card "Painel de Controle" removido** - Removido card específico da página de aluguéis
