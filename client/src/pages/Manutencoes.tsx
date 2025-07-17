@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { StatCard } from '@/components/dashboard/StatCard';
+import { Pagination } from '@/components/ui/pagination';
 import { useManutencoes } from '@/hooks/useManutencoes';
 import { useLocais } from '@/hooks/useLocais';
 import { NovaManutencaoModal } from '@/components/manutencoes/NovaManutencaoModal';
@@ -40,6 +41,8 @@ export default function Manutencoes() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [novaManutencaoModalOpen, setNovaManutencaoModalOpen] = useState(false);
   const [novoLocalModalOpen, setNovoLocalModalOpen] = useState(false);
   const [gerenciarLocaisModalOpen, setGerenciarLocaisModalOpen] = useState(false);

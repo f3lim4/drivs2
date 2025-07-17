@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Pagination } from '@/components/ui/pagination';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { NovoVeiculoModal } from '@/components/veiculos/NovoVeiculoModal';
@@ -37,6 +38,30 @@ import { VisualizarVeiculoModal } from '@/components/veiculos/VisualizarVeiculoM
 
 import { Veiculo } from '@/types';
 import { CheckCircle, AlertTriangle, Wrench, BarChart3 } from 'lucide-react';
+
+// Função auxiliar para formatar moeda
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(value);
+};
+
+// Função para obter badge de status
+const getStatusBadge = (status: string) => {
+  switch (status) {
+    case 'disponivel':
+      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Disponível</Badge>;
+    case 'alugado':
+      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Alugado</Badge>;
+    case 'manutencao':
+      return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Manutenção</Badge>;
+    case 'indisponivel':
+      return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Indisponível</Badge>;
+    default:
+      return <Badge variant="outline">Indefinido</Badge>;
+  }
+};
 
 export default function Veiculos() {
   const { toast } = useToast();
@@ -50,6 +75,8 @@ export default function Veiculos() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedVeiculo, setSelectedVeiculo] = useState<Veiculo | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
 
   // Filtra e ordena veículos baseado na busca, filtros e ordenação
@@ -93,6 +120,23 @@ export default function Veiculos() {
           return 0;
       }
     });
+
+  // Paginação
+  const totalItems = filteredVeiculos.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedVeiculos = filteredVeiculos.slice(startIndex, endIndex);
+
+  // Redefine página atual quando filtros mudam
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Volta para primeira página
+  };
 
   // Calcula estatísticas
   const stats = {
@@ -337,7 +381,7 @@ export default function Veiculos() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredVeiculos.map((veiculo) => (
+              {paginatedVeiculos.map((veiculo) => (
                 <TableRow key={veiculo.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -425,6 +469,17 @@ export default function Veiculos() {
             </div>
           )}
         </CardContent>
+        
+        {/* Paginação */}
+        {filteredVeiculos.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        )}
       </Card>
 
       {/* Modals - apenas para locadoras */}

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Pagination } from '@/components/ui/pagination';
 import { useInfracoes } from '@/hooks/useInfracoes';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocadoras } from '@/hooks/useLocadoras';
@@ -21,6 +22,8 @@ export default function Infracoes() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const [showNovaInfracao, setShowNovaInfracao] = useState(false);
   const [editingInfracao, setEditingInfracao] = useState<Infracao | null>(null);
