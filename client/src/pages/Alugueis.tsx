@@ -340,24 +340,7 @@ export default function Alugueis() {
         </Card>
       </div>
 
-      {/* Seção da locadora - apenas para usuários locadora */}
-      {isLocadora && nomeLocadoraAtual && (
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">
-                  {nomeLocadoraAtual.substring(0, 2).toUpperCase()}
-                </span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-blue-900">{nomeLocadoraAtual}</h3>
-                <p className="text-sm text-blue-600">Painel de Controle de Aluguéis</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Controles de busca e filtros */}
       <Card>
