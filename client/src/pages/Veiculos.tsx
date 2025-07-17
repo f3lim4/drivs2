@@ -44,6 +44,7 @@ export default function Veiculos() {
   const { veiculos, loading, adicionarVeiculo, atualizarVeiculo, removerVeiculo } = useVeiculos();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
+  const [sortOrder, setSortOrder] = useState<string>('mais-novos');
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -51,16 +52,47 @@ export default function Veiculos() {
   const [selectedVeiculo, setSelectedVeiculo] = useState<Veiculo | null>(null);
 
 
-  // Filtra veículos baseado na busca e filtros
-  const filteredVeiculos = veiculos.filter(veiculo => {
-    const matchesSearch = veiculo.modelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         veiculo.marca.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         veiculo.placa.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'todos' || veiculo.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  // Filtra e ordena veículos baseado na busca, filtros e ordenação
+  const filteredVeiculos = veiculos
+    .filter(veiculo => {
+      const matchesSearch = veiculo.modelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           veiculo.marca.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           veiculo.placa.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter === 'todos' || veiculo.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      switch (sortOrder) {
+        case 'mais-novos':
+          // Ordena por data de cadastro decrescente (mais novos primeiro)
+          return new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime();
+        case 'mais-antigos':
+          // Ordena por data de cadastro crescente (mais antigos primeiro)
+          return new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime();
+        case 'placa-az':
+          // Ordena por placa A-Z
+          return a.placa.localeCompare(b.placa);
+        case 'placa-za':
+          // Ordena por placa Z-A
+          return b.placa.localeCompare(a.placa);
+        case 'modelo-az':
+          // Ordena por modelo A-Z
+          return a.modelo.localeCompare(b.modelo);
+        case 'modelo-za':
+          // Ordena por modelo Z-A
+          return b.modelo.localeCompare(a.modelo);
+        case 'ano-novo':
+          // Ordena por ano decrescente (mais novos primeiro)
+          return (b.ano || 0) - (a.ano || 0);
+        case 'ano-antigo':
+          // Ordena por ano crescente (mais antigos primeiro)
+          return (a.ano || 0) - (b.ano || 0);
+        default:
+          return 0;
+      }
+    });
 
   // Calcula estatísticas
   const stats = {
@@ -251,6 +283,23 @@ export default function Veiculos() {
                   <SelectItem value="alugado">Alugado</SelectItem>
                   <SelectItem value="manutencao">Manutenção</SelectItem>
                   <SelectItem value="indisponivel">Indisponível</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Ordenação */}
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+                  <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+                  <SelectItem value="placa-az">Placa (A-Z)</SelectItem>
+                  <SelectItem value="placa-za">Placa (Z-A)</SelectItem>
+                  <SelectItem value="modelo-az">Modelo (A-Z)</SelectItem>
+                  <SelectItem value="modelo-za">Modelo (Z-A)</SelectItem>
+                  <SelectItem value="ano-novo">Ano (Mais Novo)</SelectItem>
+                  <SelectItem value="ano-antigo">Ano (Mais Antigo)</SelectItem>
                 </SelectContent>
               </Select>
 
