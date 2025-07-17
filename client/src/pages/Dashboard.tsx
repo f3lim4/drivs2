@@ -6,7 +6,7 @@
 import { useEffect, useState } from 'react';
 import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown, Crown, Phone, ExternalLink, Mail } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { DashboardStats, Alert, Motorista, Veiculo } from '@/types';
@@ -160,6 +160,29 @@ export default function Dashboard() {
     ? alugueis.every((a: any) => a.locadoraId === profile.locadoraId) ? alugueis : []
     : alugueis;
 
+  // Buscar dados financeiros para o gráfico
+  const pagamentosUrl = isLocadora && profile?.locadoraId 
+    ? `/api/pagamentos?locadoraId=${profile.locadoraId}`
+    : '/api/pagamentos';
+  
+  const despesasUrl = isLocadora && profile?.locadoraId 
+    ? `/api/despesas?locadoraId=${profile.locadoraId}`
+    : '/api/despesas';
+
+  const { data: pagamentos = [] } = useQuery({
+    queryKey: [pagamentosUrl, profile?.locadoraId],
+    enabled: !!profile && isLocadora,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  });
+
+  const { data: despesas = [] } = useQuery({
+    queryKey: [despesasUrl, profile?.locadoraId],
+    enabled: !!profile && isLocadora,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  });
+
   const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis;
 
   // Log apenas se houver problemas para debug
@@ -189,6 +212,92 @@ export default function Dashboard() {
     } catch {
       return null;
     }
+  };
+
+  // Função para calcular dados financeiros mensais
+  const getDadosFinanceiros = () => {
+    const meses = [
+      { nome: 'Jan', numero: 1 },
+      { nome: 'Fev', numero: 2 },
+      { nome: 'Mar', numero: 3 },
+      { nome: 'Abr', numero: 4 },
+      { nome: 'Mai', numero: 5 },
+      { nome: 'Jun', numero: 6 },
+      { nome: 'Jul', numero: 7 },
+      { nome: 'Ago', numero: 8 },
+      { nome: 'Set', numero: 9 },
+      { nome: 'Out', numero: 10 },
+      { nome: 'Nov', numero: 11 },
+      { nome: 'Dez', numero: 12 }
+    ];
+
+    const anoAtual = new Date().getFullYear();
+    const mesAtual = new Date().getMonth() + 1;
+    const dadosFinanceiros = [];
+
+    // Pegar os últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      let mes = mesAtual - i;
+      let ano = anoAtual;
+      
+      if (mes <= 0) {
+        mes += 12;
+        ano -= 1;
+      }
+
+      const mesInfo = meses[mes - 1];
+      
+      // Calcular receita do mês (pagamentos recebidos)
+      const receitaMes = pagamentos
+        .filter((p: any) => {
+          const dataPagamento = new Date(p.data);
+          return dataPagamento.getMonth() + 1 === mes && 
+                 dataPagamento.getFullYear() === ano &&
+                 p.status === 'pago';
+        })
+        .reduce((total: number, p: any) => total + parseFloat(p.valor || '0'), 0);
+
+      // Calcular despesas do mês (despesas pagas)
+      const despesasMes = despesas
+        .filter((d: any) => {
+          const dataDespesa = new Date(d.data);
+          return dataDespesa.getMonth() + 1 === mes && 
+                 dataDespesa.getFullYear() === ano &&
+                 d.status === 'pago';
+        })
+        .reduce((total: number, d: any) => total + parseFloat(d.valor || '0'), 0);
+
+      // Calcular despesas fixas mensais (IPVA, seguro, rastreador)
+      const despesasFixasMes = veiculosSeguro.reduce((total: number, veiculo: any) => {
+        let totalVeiculo = 0;
+        
+        // IPVA mensal (valor anual dividido por 12)
+        if (veiculo.valorIpva) {
+          totalVeiculo += parseFloat(veiculo.valorIpva) / 12;
+        }
+        
+        // Seguro mensal
+        if (veiculo.valorSeguroMensal) {
+          totalVeiculo += parseFloat(veiculo.valorSeguroMensal);
+        }
+        
+        // Rastreador mensal
+        if (veiculo.valorRastreadorMensal) {
+          totalVeiculo += parseFloat(veiculo.valorRastreadorMensal);
+        }
+        
+        return total + totalVeiculo;
+      }, 0);
+
+      dadosFinanceiros.push({
+        mes: mesInfo.nome,
+        receita: Math.round(receitaMes),
+        despesas: Math.round(despesasMes + despesasFixasMes),
+        lucro: Math.round(receitaMes - (despesasMes + despesasFixasMes))
+      });
+    }
+
+    return dadosFinanceiros;
   };
 
   // Calcular estatísticas diretamente
@@ -410,6 +519,78 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+      )}
+
+      {/* Gráfico Financeiro - apenas para locadoras */}
+      {isLocadora && (
+        <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" />
+              Evolução Financeira Mensal
+            </CardTitle>
+            <CardDescription className="text-slate-600">
+              Comparativo de receitas e despesas dos últimos 6 meses
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={getDadosFinanceiros()}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis 
+                    dataKey="mes" 
+                    stroke="#64748b"
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke="#64748b"
+                    fontSize={12}
+                    tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, '']}
+                    labelFormatter={(label) => `Mês: ${label}`}
+                    contentStyle={{
+                      backgroundColor: '#f8fafc',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '8px',
+                      color: '#334155'
+                    }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="receita" 
+                    stackId="1"
+                    stroke="#10b981" 
+                    fill="#10b981" 
+                    fillOpacity={0.6}
+                    name="Receita"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="despesas" 
+                    stackId="2"
+                    stroke="#ef4444" 
+                    fill="#ef4444" 
+                    fillOpacity={0.6}
+                    name="Despesas"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center justify-center gap-6 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-slate-600">Receita</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span className="text-sm text-slate-600">Despesas</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Seção de Anúncios */}
