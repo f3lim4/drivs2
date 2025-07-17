@@ -967,8 +967,11 @@ export default function RelatoriosFinanceiros() {
                         });
                         
                         // Adicionar despesas manuais
+                        console.log('Despesas disponíveis:', despesas.length);
+                        console.log('Despesas dados:', despesas);
                         despesas.forEach(despesa => {
                           const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
+                          console.log('Adicionando despesa:', despesa.id, despesa.data, despesa.categoria);
                           todasDespesas.push({
                             id: `despesa-${despesa.id}`,
                             data: despesa.data,
