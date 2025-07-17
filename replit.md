@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Paginação Implementada em Aluguéis - CONCLUÍDO
+- ✅ **Paginação na página de aluguéis** - Sistema completo de paginação já implementado
+- ✅ **Estados de controle** - currentPage, itemsPerPage e funções de navegação funcionando
+- ✅ **Dados paginados** - Tabela mostra apenas itens da página atual (10 por padrão)
+- ✅ **Controles de paginação** - Navegação entre páginas e seleção de itens por página
+- ✅ **Compatibilidade com filtros** - Paginação funciona junto com busca e filtros de status
+- ✅ **Padrão consistente** - Mesmo padrão das outras páginas (Relatórios, Despesas, etc.)
+- ✅ **Layout otimizado** - Paginação aparece após a tabela com borda superior
+- ✅ **Funcionalidade validada** - Sistema de paginação completo e operacional
+
 ### 2025-07-17: Paginação Implementada em Histórico - CONCLUÍDO
 - ✅ **Paginação na aba "Histórico"** - Sistema completo de paginação implementado
 - ✅ **Estados de controle** - currentPageHistorico, itemsPerPageHistorico e funções de navegação
