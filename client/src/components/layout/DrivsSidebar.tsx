@@ -17,7 +17,8 @@ import {
   CreditCard,
   AlertTriangle,
   Wrench,
-  Megaphone
+  Megaphone,
+  Crown
 } from 'lucide-react';
 import logoPath from "@assets/icone_1752434737434.png";
 import { useState } from 'react';
@@ -99,6 +100,13 @@ const navigationItems = [
     url: '/anuncios',
     icon: Megaphone,
     description: 'Gerenciar anúncios do sistema',
+    adminOnly: true  // Só admins podem ver este item
+  },
+  {
+    title: 'Planos',
+    url: '/planos',
+    icon: Crown,
+    description: 'Gerenciar planos do SaaS',
     adminOnly: true  // Só admins podem ver este item
   },
   {
