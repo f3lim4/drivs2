@@ -50,9 +50,9 @@ export default function Alugueis() {
 
   // Carregamento de dados com React Query
   const { data: alugueis = [], isLoading: loading } = useQuery({
-    queryKey: ['/api/alugueis', profile?.id],
+    queryKey: ['/api/alugueis', profile?.locadoraId],
     queryFn: async () => {
-      if (!profile?.id) return [];
+      if (!profile) return [];
       
       // Para admin, buscar todos os aluguéis
       if (isAdmin) {
@@ -61,18 +61,19 @@ export default function Alugueis() {
       }
       
       // Para locadora, buscar apenas os aluguéis da locadora
-      const response = await fetch(`/api/alugueis?locadoraId=${profile.id}`);
+      if (!profile.locadoraId) return [];
+      const response = await fetch(`/api/alugueis?locadoraId=${profile.locadoraId}`);
       return response.json();
     },
-    enabled: !!profile?.id,
+    enabled: !!profile && (isAdmin || !!profile.locadoraId),
     staleTime: 0, // Evita cache antigo
     cacheTime: 5 * 60 * 1000, // 5 minutos
   });
 
   const { data: pagamentos = [] } = useQuery({
-    queryKey: ['/api/pagamentos', profile?.id],
+    queryKey: ['/api/pagamentos', profile?.locadoraId],
     queryFn: async () => {
-      if (!profile?.id) return [];
+      if (!profile) return [];
       
       // Para admin, buscar todos os pagamentos
       if (isAdmin) {
@@ -81,10 +82,11 @@ export default function Alugueis() {
       }
       
       // Para locadora, buscar apenas os pagamentos da locadora
-      const response = await fetch(`/api/pagamentos?locadoraId=${profile.id}`);
+      if (!profile.locadoraId) return [];
+      const response = await fetch(`/api/pagamentos?locadoraId=${profile.locadoraId}`);
       return response.json();
     },
-    enabled: !!profile?.id,
+    enabled: !!profile && (isAdmin || !!profile.locadoraId),
   });
 
   const { data: locadoras = [], isLoading: locadorasLoading } = useQuery({
@@ -102,8 +104,8 @@ export default function Alugueis() {
     return locadora ? locadora.nome : `ID: ${locadoraId}`;
   };
 
-  // Para usuários locadora, buscar o nome da locadora diretamente usando o ID do perfil
-  const nomeLocadoraAtual = isLocadora && profile?.id ? getLocadoraName(profile.id) : null;
+  // Para usuários locadora, buscar o nome da locadora diretamente usando o locadoraId
+  const nomeLocadoraAtual = isLocadora && profile?.locadoraId ? getLocadoraName(profile.locadoraId) : null;
 
   // Calcula estatísticas
   const stats = useMemo(() => {
