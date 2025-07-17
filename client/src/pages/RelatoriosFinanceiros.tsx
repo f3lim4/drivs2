@@ -936,17 +936,16 @@ export default function RelatoriosFinanceiros() {
                     <h4 className="font-medium text-orange-700 mb-2">Manutenções</h4>
                     <p className="text-2xl font-bold text-orange-800">
                       {formatCurrency(filteredData.manutencoes.reduce((total, m) => 
-                        total + (m.valorOrcamento ? parseFloat(m.valorOrcamento) : 0), 0))}
+                        total + (parseFloat(m.valorFinal || m.valorOrcamento || '0') || 0), 0))}
                     </p>
                     <p className="text-sm text-orange-600">Período</p>
                   </div>
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <h4 className="font-medium text-blue-700 mb-2">Despesas Manuais</h4>
                     <p className="text-2xl font-bold text-blue-800">
-                      {formatCurrency(despesas.reduce((total, d) => 
-                        total + parseFloat(d.valor || '0'), 0))}
+                      {formatCurrency(despesasManuaisValor)}
                     </p>
-                    <p className="text-sm text-blue-600">Total</p>
+                    <p className="text-sm text-blue-600">Período</p>
                   </div>
                 </div>
 
