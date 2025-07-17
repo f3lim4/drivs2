@@ -313,6 +313,22 @@ export default function Contratos() {
       }
     });
 
+  // Paginação
+  const paginatedContratos = contratosFiltrados.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Funções para controlar a paginação
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   // Estatísticas
   const totalContratos = contratos.length;
   const contratosAtivos = contratos.filter(c => c.status === 'ativo').length;
@@ -554,7 +570,7 @@ export default function Contratos() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {contratosFiltrados.map((contrato) => (
+                    {paginatedContratos.map((contrato) => (
                       <TableRow key={contrato.id}>
                         <TableCell>
                           <p className="font-medium">{contrato.cliente}</p>
@@ -619,6 +635,19 @@ export default function Contratos() {
                 </Table>
               </CardContent>
             </Card>
+          )}
+
+          {/* Paginação */}
+          {contratosFiltrados.length > 0 && (
+            <div className="border-t pt-4 mt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalItems={contratosFiltrados.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handleItemsPerPageChange}
+              />
+            </div>
           )}
         </TabsContent>
 
