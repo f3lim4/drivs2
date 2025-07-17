@@ -8,7 +8,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import Dashboard from "./pages/Dashboard";
 import Motoristas from "./pages/Motoristas";
 import Veiculos from "./pages/Veiculos";
-import Alugueis from "./pages/AlugueisNovo";
+import Alugueis from "./pages/Alugueis";
 import Contratos from "./pages/Contratos";
 import Locadoras from "./pages/Locadoras";
 import Pagamentos from "./pages/Pagamentos";
