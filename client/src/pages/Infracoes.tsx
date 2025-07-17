@@ -20,6 +20,7 @@ export default function Infracoes() {
   const isAdmin = profile?.tipo === 'admin';
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState<string>('mais-novos');
 
   const [showNovaInfracao, setShowNovaInfracao] = useState(false);
   const [editingInfracao, setEditingInfracao] = useState<Infracao | null>(null);
@@ -38,18 +39,41 @@ export default function Infracoes() {
 
 
 
-  // Filtros
-  const filteredInfracoes = infracoes.filter(infracao => {
-    const matchesSearch = searchTerm === '' || 
-      infracao.numeroAuto.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      infracao.motoristaNome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      infracao.veiculoPlaca?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      infracao.descricaoInfracao.toLowerCase().includes(searchTerm.toLowerCase());
+  // Filtros e ordenação
+  const filteredInfracoes = infracoes
+    .filter(infracao => {
+      const matchesSearch = searchTerm === '' || 
+        infracao.numeroAuto.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        infracao.motoristaNome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        infracao.veiculoPlaca?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        infracao.descricaoInfracao.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === 'all' || infracao.status === statusFilter;
+      const matchesStatus = statusFilter === 'all' || infracao.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
-  });
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      switch (sortOrder) {
+        case 'mais-novos':
+          return new Date(b.dataInfracao || '').getTime() - new Date(a.dataInfracao || '').getTime();
+        case 'mais-antigos':
+          return new Date(a.dataInfracao || '').getTime() - new Date(b.dataInfracao || '').getTime();
+        case 'motorista-az':
+          return (a.motoristaNome || '').localeCompare(b.motoristaNome || '');
+        case 'motorista-za':
+          return (b.motoristaNome || '').localeCompare(a.motoristaNome || '');
+        case 'valor-maior':
+          return parseFloat(b.valorFinal) - parseFloat(a.valorFinal);
+        case 'valor-menor':
+          return parseFloat(a.valorFinal) - parseFloat(b.valorFinal);
+        case 'placa-az':
+          return (a.veiculoPlaca || '').localeCompare(b.veiculoPlaca || '');
+        case 'status-pendente':
+          return a.status === 'pendente' ? -1 : b.status === 'pendente' ? 1 : 0;
+        default:
+          return 0;
+      }
+    });
 
   // Estatísticas
   const totalInfracoes = infracoes.length;
@@ -221,9 +245,28 @@ export default function Infracoes() {
 
       {/* Tabela */}
       <Card>
-        <CardHeader>
-          <CardTitle>Infrações ({filteredInfracoes.length})</CardTitle>
-          <CardDescription>Lista de todas as infrações registradas</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Infrações ({filteredInfracoes.length})</CardTitle>
+            <CardDescription>Lista de todas as infrações registradas</CardDescription>
+          </div>
+          
+          {/* Ordenação */}
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+              <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+              <SelectItem value="motorista-az">Motorista (A-Z)</SelectItem>
+              <SelectItem value="motorista-za">Motorista (Z-A)</SelectItem>
+              <SelectItem value="valor-maior">Valor (Maior)</SelectItem>
+              <SelectItem value="valor-menor">Valor (Menor)</SelectItem>
+              <SelectItem value="placa-az">Placa (A-Z)</SelectItem>
+              <SelectItem value="status-pendente">Status (Pendente)</SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto max-h-96">
