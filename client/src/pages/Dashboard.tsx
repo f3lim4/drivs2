@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown } from 'lucide-react';
+import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown, Crown, Phone, ExternalLink, Mail } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -805,6 +805,78 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Card do Plano da Locadora */}
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+              <Crown className="w-5 h-5" />
+              Plano Atual
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Informações do Plano */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center">
+                    <Crown className="w-5 h-5 text-purple-700" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-purple-800">
+                      Plano {profile?.plano ? 
+                        profile.plano.charAt(0).toUpperCase() + profile.plano.slice(1) 
+                        : 'Premium'
+                      }
+                    </p>
+                    <p className="text-sm text-purple-600">
+                      {profile?.plano === 'basico' && 'Até 10 veículos'}
+                      {profile?.plano === 'premium' && 'Até 50 veículos'}
+                      {profile?.plano === 'enterprise' && 'Veículos ilimitados'}
+                      {!profile?.plano && 'Até 50 veículos'}
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Clock className="w-4 h-4" />
+                  <span>Atualizado: {new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+              </div>
+
+              {/* Suporte */}
+              <div className="space-y-3">
+                <div className="p-3 bg-white rounded-lg border border-purple-200">
+                  <h4 className="font-medium text-purple-800 mb-2 flex items-center gap-2">
+                    <Phone className="w-4 h-4" />
+                    Suporte DRIVS
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-3 h-3 text-green-600" />
+                      <span className="text-gray-700">(11) 99999-9999</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-3 h-3 text-blue-600" />
+                      <span className="text-gray-700">suporte@drivs.com.br</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ExternalLink className="w-3 h-3 text-purple-600" />
+                      <a 
+                        href="https://drivs.com.br/suporte" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-purple-600 hover:text-purple-700 hover:underline"
+                      >
+                        Central de Ajuda
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       )}
     </div>
