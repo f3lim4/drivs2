@@ -359,7 +359,7 @@ export function NovoAluguelModal({
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione um motorista" />
+                          <SelectValue placeholder="Selecionar" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -396,7 +396,7 @@ export function NovoAluguelModal({
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione um veículo" />
+                          <SelectValue placeholder="Selecionar" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

@@ -293,7 +293,7 @@ export default function Alugueis() {
           />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Filtrar por status" />
+              <SelectValue placeholder="Selecionar" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos os status</SelectItem>
