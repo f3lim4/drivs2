@@ -10,16 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-17: Dashboard Melhorado com Gráficos Avançados - CONCLUÍDO
-- ✅ **Gráficos modernizados** - Transformado gráfico de área em gráfico de linha mais elegante
-- ✅ **Grid de 2 colunas implementado** - Layout responsivo para melhor visualização
-- ✅ **Novo gráfico de status da frota** - Gráfico de pizza mostrando distribuição de veículos
-- ✅ **Gráfico de desempenho dos motoristas** - Área chart com receita e motoristas ativos
-- ✅ **Cores consistentes** - Paleta de cores harmoniosa com tema futurista
-- ✅ **Tooltips personalizados** - Tooltips com formatação brasileira e cores temáticas
-- ✅ **Variáveis corrigidas** - Resolvido problema com veiculosDisponivel vs veiculosAlugado
-- ✅ **4 gráficos distintos** - Financeiro, aluguéis, status da frota e desempenho
-- ✅ **Responsividade garantida** - Gráficos adaptáveis para diferentes tamanhos de tela
+### 2025-07-17: Gráfico Financeiro Unificado Completo - CONCLUÍDO
+- ✅ **Gráfico único implementado** - Substituído múltiplos gráficos por visualização financeira completa
+- ✅ **Dados da página financeira** - Inclui receitas, despesas, lucro e aluguéis ativos
+- ✅ **8 métricas diferentes** - Receita total, pagamentos, aluguéis, despesas total, manuais, fixas, lucro e aluguéis
+- ✅ **Dual axis configurado** - Valores monetários no eixo esquerdo, aluguéis no eixo direito
+- ✅ **Linhas diferenciadas** - Sólidas para totais, tracejadas para detalhes
+- ✅ **Cores organizadas** - Verde para receitas, vermelho para despesas, roxo para lucro, azul para aluguéis
+- ✅ **Tooltips brasileiros** - Formatação em reais e percentuais
+- ✅ **Legenda organizada** - Agrupada por categorias (receitas, despesas, resultado, operacional)
+- ✅ **Altura aumentada** - Gráfico maior (h-96) para melhor visualização
+- ✅ **Dados dos últimos 6 meses** - Evolução temporal completa das finanças
 
 ### 2025-07-17: Correção Crítica de Isolamento de Dados - Página de Aluguéis - CONCLUÍDO
 - ✅ **Bug crítico corrigido** - Página de aluguéis estava usando profile.id em vez de profile.locadoraId
