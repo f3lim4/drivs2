@@ -68,7 +68,7 @@ export function EditarContratoModal({
       form.reset({
         titulo: contrato.titulo,
         cliente: contrato.cliente,
-        valor: contrato.valor,
+        valor: typeof contrato.valor === 'string' ? parseFloat(contrato.valor) : contrato.valor,
         template: contrato.template || '',
       });
     }
