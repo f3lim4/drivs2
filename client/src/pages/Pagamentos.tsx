@@ -139,14 +139,7 @@ export default function Pagamentos() {
 
   return (
     <div className="p-6 border border-gray-200 rounded-lg bg-white space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
 
-        <Button onClick={() => setShowNovoPagamento(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Pagamento
-        </Button>
-      </div>
 
       {/* Estatísticas com visual futurista */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -234,7 +227,7 @@ export default function Pagamentos() {
         </CardHeader>
         <CardContent>
           {/* Filtros */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -271,6 +264,11 @@ export default function Pagamentos() {
                 <SelectItem value="outros">Outros</SelectItem>
               </SelectContent>
             </Select>
+
+            <Button onClick={() => setShowNovoPagamento(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Pagamento
+            </Button>
           </div>
           {pagamentosFiltrados.length === 0 ? (
             <div className="text-center py-8">
