@@ -564,7 +564,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/contratos/:id", async (req, res) => {
     try {
-      const contrato = await storage.updateContrato(req.params.id, req.body);
+      // Validate the request body
+      const result = insertContratoSchema.safeParse(req.body);
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
+      }
+      
+      const contrato = await storage.updateContrato(req.params.id, result.data);
       res.json(contrato);
     } catch (error) {
       console.error("Error updating contrato:", error);

@@ -80,18 +80,33 @@ export function EditarContratoModal({
     setLoading(true);
     
     try {
-      // Simula delay de API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Cria contrato atualizado
-      const contratoAtualizado: Contrato = {
-        ...contrato,
+      // Prepara dados para API
+      const contratoData = {
+        tipo: contrato.tipo,
         titulo: data.titulo,
         cliente: data.cliente,
-        valor: data.valor,
+        valor: data.valor.toString(),
+        dataInicio: typeof contrato.dataInicio === 'string' ? contrato.dataInicio : contrato.dataInicio.toISOString().split('T')[0],
+        dataFim: typeof contrato.dataFim === 'string' ? contrato.dataFim : contrato.dataFim?.toISOString().split('T')[0],
+        status: contrato.status,
         template: data.template,
+        locadoraId: contrato.locadoraId
       };
 
+      // Chama API para atualizar contrato
+      const response = await fetch(`/api/contratos/${contrato.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contratoData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar contrato');
+      }
+
+      const contratoAtualizado = await response.json();
       onContratoEditado(contratoAtualizado);
       onOpenChange(false);
       
