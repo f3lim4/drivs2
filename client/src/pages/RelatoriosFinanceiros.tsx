@@ -323,10 +323,39 @@ export default function RelatoriosFinanceiros() {
     });
   }, [veiculos, filteredData.manutencoes]);
 
-  // Total das despesas fixas mensais
+  // Total das despesas fixas mensais (incluindo manutenções)
   const totalDespesasFixas = useMemo(() => {
     return despesasFixasVeiculos.reduce((total, veiculo) => total + veiculo.totalMensal, 0);
   }, [despesasFixasVeiculos]);
+
+  // Total das despesas fixas puras (sem manutenções) - para o card do histórico
+  const totalDespesasFixasPuras = useMemo(() => {
+    return veiculos.reduce((total, veiculo) => {
+      let despesasFixas = 0;
+      
+      // IPVA mensal
+      if (veiculo.ipva && veiculo.ipva > 0) {
+        despesasFixas += parseFloat(veiculo.ipva) / 12;
+      }
+      
+      // Seguro mensal
+      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+        despesasFixas += parseFloat(veiculo.valorSeguroMensal);
+      }
+      
+      // Rastreador mensal
+      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+        despesasFixas += parseFloat(veiculo.valorRastreadorMensal);
+      }
+      
+      // Financiamento mensal
+      if (veiculo.financiado && veiculo.valorFinanciamento) {
+        despesasFixas += parseFloat(veiculo.valorFinanciamento);
+      }
+      
+      return total + despesasFixas;
+    }, 0);
+  }, [veiculos]);
 
   // Cálculos financeiros
   const receitaAlugueis = useMemo(() => {
@@ -928,7 +957,7 @@ export default function RelatoriosFinanceiros() {
                   <div className="bg-red-50 p-4 rounded-lg">
                     <h4 className="font-medium text-red-700 mb-2">Total Despesas Fixas</h4>
                     <p className="text-2xl font-bold text-red-800">
-                      {formatCurrency(totalDespesasFixas)}
+                      {formatCurrency(totalDespesasFixasPuras)}
                     </p>
                     <p className="text-sm text-red-600">Mensais</p>
                   </div>
