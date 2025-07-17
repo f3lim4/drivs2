@@ -245,8 +245,13 @@ export default function Alugueis() {
     const monthStart = startOfMonth(new Date());
     const monthEnd = endOfMonth(new Date());
     
-    // Calcular receita mensal baseada nos pagamentos reais
-    const receitaMensalPagamentos = pagamentos
+    // Calcular receita esperada (soma dos valores mensais dos aluguéis ativos)
+    const receitaEsperada = alugueis
+      .filter(a => a.status === 'ativo')
+      .reduce((sum, a) => sum + a.valores.mensal, 0);
+    
+    // Calcular receita real baseada nos pagamentos do mês
+    const receitaReal = pagamentos
       .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
       .reduce((total, pagamento) => {
         const valor = parseFloat(pagamento.valor || '0');
@@ -257,7 +262,8 @@ export default function Alugueis() {
       total: alugueis.length,
       ativos: alugueis.filter(a => a.status === 'ativo').length,
       pendentes: alugueis.filter(a => a.status === 'pendente').length,
-      receitaMensal: receitaMensalPagamentos,
+      receitaEsperada,
+      receitaReal,
     };
   }, [alugueis, pagamentos]);
 
@@ -347,8 +353,10 @@ export default function Alugueis() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-emerald-700">Receita Mensal</p>
-                <p className="text-2xl font-bold text-emerald-800">{formatCurrency(stats.receitaMensal)}</p>
-                <p className="text-xs text-emerald-600">Faturamento</p>
+                <p className="text-2xl font-bold text-emerald-800">{formatCurrency(stats.receitaEsperada)}</p>
+                <p className="text-xs text-emerald-600">
+                  Recebido: {formatCurrency(stats.receitaReal)}
+                </p>
               </div>
               <div className="w-12 h-12 bg-emerald-200 rounded-full flex items-center justify-center">
                 <DollarSign className="w-6 h-6 text-emerald-700" />
