@@ -106,8 +106,12 @@ export function useDespesas() {
       if (!response.ok) throw new Error('Failed to create despesa');
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
+      // Invalidar também o cache específico por veículo se a despesa foi criada para um veículo específico
+      if (data.veiculoId) {
+        queryClient.invalidateQueries({ queryKey: ['despesas', 'veiculo', data.veiculoId] });
+      }
     },
   });
 
@@ -156,15 +160,83 @@ export function useDespesas() {
 
 // Hook específico para buscar despesas por veículo
 export function useDespesasByVeiculo(veiculoId: string) {
+  const { profile } = useAuth();
+  const locadoraId = profile?.locadoraId;
+
   return useQuery({
     queryKey: ['despesas', 'veiculo', veiculoId],
     queryFn: async () => {
-      const response = await fetch(`/api/despesas?veiculoId=${veiculoId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch despesas by veiculo');
+      if (!locadoraId || !veiculoId) return [];
+      
+      // Buscar despesas manuais do veículo
+      const despesasResponse = await fetch(`/api/despesas?veiculoId=${veiculoId}`);
+      if (!despesasResponse.ok) throw new Error('Failed to fetch despesas');
+      const despesasManuais = await despesasResponse.json();
+      
+      // Buscar manutenções do veículo
+      const manutencoesResponse = await fetch(`/api/manutencoes?locadoraId=${locadoraId}`);
+      if (!manutencoesResponse.ok) throw new Error('Failed to fetch manutencoes');
+      const manutencoes = await manutencoesResponse.json();
+      
+      // Filtrar manutenções do veículo específico e converter em despesas
+      const despesasManutencao = manutencoes
+        .filter((manutencao: Manutencao) => 
+          manutencao.veiculoId === veiculoId && 
+          manutencao.valorOrcamento && 
+          parseFloat(manutencao.valorOrcamento) > 0
+        )
+        .map((manutencao: Manutencao) => ({
+          id: `manutencao_${manutencao.id}`,
+          locadoraId: manutencao.locadoraId,
+          veiculoId: manutencao.veiculoId,
+          veiculoModelo: manutencao.veiculoModelo,
+          veiculoPlaca: manutencao.veiculoPlaca,
+          categoria: 'manutencao',
+          descricao: `Manutenção - ${manutencao.tipo} - ${manutencao.oficina}`,
+          valor: manutencao.valorOrcamento,
+          data: manutencao.dataInicio,
+          tipo: 'despesa',
+          fonte: 'manutencao',
+          manutencaoId: manutencao.id,
+          createdAt: manutencao.createdAt,
+          updatedAt: manutencao.updatedAt,
+        }));
+      
+      // Buscar dados do veículo para incluir despesas de financiamento
+      const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
+      if (!veiculosResponse.ok) throw new Error('Failed to fetch veiculos');
+      const veiculos = await veiculosResponse.json();
+      
+      // Filtrar o veículo específico e converter financiamento em despesa
+      const veiculo = veiculos.find((v: any) => v.id === veiculoId);
+      const despesasFinanciamento = [];
+      
+      if (veiculo?.financiado && veiculo.valorFinanciamento && veiculo.quantidadeParcelas) {
+        const valorMensal = parseFloat(veiculo.valorFinanciamento);
+        despesasFinanciamento.push({
+          id: `financiamento_${veiculo.id}`,
+          locadoraId: veiculo.locadoraId,
+          veiculoId: veiculo.id,
+          veiculoModelo: `${veiculo.marca} ${veiculo.modelo}`,
+          veiculoPlaca: veiculo.placa,
+          categoria: 'financiamento',
+          descricao: `Financiamento - ${veiculo.marca} ${veiculo.modelo} (${veiculo.placa})`,
+          valor: valorMensal.toFixed(2),
+          data: format(new Date(), 'yyyy-MM-dd'),
+          tipo: 'despesa',
+          fonte: 'financiamento',
+          veiculoFinanciado: veiculo.id,
+          createdAt: veiculo.createdAt,
+          updatedAt: veiculo.updatedAt,
+        });
       }
-      return response.json() as Promise<Despesa[]>;
+      
+      const todasDespesas = [...despesasManuais, ...despesasManutencao, ...despesasFinanciamento];
+      
+
+      
+      return todasDespesas as Despesa[];
     },
-    enabled: !!veiculoId,
+    enabled: !!veiculoId && !!locadoraId,
   });
 }
