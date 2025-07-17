@@ -604,9 +604,14 @@ export default function Dashboard() {
                 <p className="text-2xl font-bold text-yellow-800">
                   {formatCurrency(receitaMensal)}
                 </p>
-                <p className="text-xs text-yellow-600">
-                  Semana: {formatCurrency(receitaSemanalRecebida)} / {formatCurrency(receitaSemanalEsperada)}
-                </p>
+                <div className="space-y-1">
+                  <p className="text-lg font-semibold text-yellow-800">
+                    {formatCurrency(receitaSemanalRecebida)}
+                  </p>
+                  <p className="text-xs text-yellow-600">
+                    de {formatCurrency(receitaSemanalEsperada)} esta semana
+                  </p>
+                </div>
               </div>
               <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
                 <DollarSign className="w-6 h-6 text-yellow-700" />
