@@ -151,54 +151,74 @@ export default function Pagamentos() {
         </Button>
       </div>
 
-      {/* Estatísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Pendente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{formatCurrency(totalPendente)}</div>
-            <div className="text-xs text-gray-500 mt-1">
-              {pagamentosFiltrados.filter(p => p.status === 'pendente' || p.status === 'parcial').length} pagamentos
+      {/* Estatísticas com visual futurista */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-red-700">Total Pendente</p>
+                <p className="text-2xl font-bold text-red-800">{formatCurrency(totalPendente)}</p>
+                <p className="text-xs text-red-600">
+                  {pagamentosFiltrados.filter(p => p.status === 'pendente' || p.status === 'parcial').length} pagamentos
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-red-700" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Recebido</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{formatCurrency(totalRecebido)}</div>
-            <div className="text-xs text-gray-500 mt-1">
-              {pagamentosFiltrados.filter(p => p.status === 'pago').length} pagamentos
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-green-700">Total Recebido</p>
+                <p className="text-2xl font-bold text-green-800">{formatCurrency(totalRecebido)}</p>
+                <p className="text-xs text-green-600">
+                  {pagamentosFiltrados.filter(p => p.status === 'pago').length} pagamentos
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-green-700" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Parciais</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{formatCurrency(totalParcial)}</div>
-            <div className="text-xs text-gray-500 mt-1">
-              {pagamentosFiltrados.filter(p => p.status === 'parcial').length} pagamentos
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-yellow-700">Parciais</p>
+                <p className="text-2xl font-bold text-yellow-800">{formatCurrency(totalParcial)}</p>
+                <p className="text-xs text-yellow-600">
+                  {pagamentosFiltrados.filter(p => p.status === 'parcial').length} pagamentos
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
+                <Clock className="w-6 h-6 text-yellow-700" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Geral</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {formatCurrency(pagamentosFiltrados.reduce((sum, p) => sum + parseFloat(p.valorTotal), 0))}
-            </div>
-            <div className="text-xs text-gray-500 mt-1">
-              {pagamentosFiltrados.length} pagamentos
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-700">Total Geral</p>
+                <p className="text-2xl font-bold text-blue-800">
+                  {formatCurrency(pagamentosFiltrados.reduce((sum, p) => sum + parseFloat(p.valorTotal), 0))}
+                </p>
+                <p className="text-xs text-blue-600">
+                  {pagamentosFiltrados.length} pagamentos
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                <Calculator className="w-6 h-6 text-blue-700" />
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -276,32 +276,67 @@ export default function Alugueis() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      {/* Cards de estatísticas */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <StatCard
-          title="Total de Aluguéis"
-          value={stats.total}
-          icon={<Trending />}
-          variant="blue"
-        />
-        <StatCard
-          title="Ativos"
-          value={stats.ativos}
-          icon={<TrendingUp />}
-          variant="green"
-        />
-        <StatCard
-          title="Pendentes"
-          value={stats.pendentes}
-          icon={<Clock />}
-          variant="yellow"
-        />
-        <StatCard
-          title="Receita Mensal"
-          value={formatCurrency(stats.receitaMensal)}
-          icon={<DollarSign />}
-          variant="green"
-        />
+      {/* Cards de estatísticas com visual futurista */}
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-700">Total de Aluguéis</p>
+                <p className="text-2xl font-bold text-blue-800">{stats.total}</p>
+                <p className="text-xs text-blue-600">Contratos</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                <Trending className="w-6 h-6 text-blue-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-green-700">Ativos</p>
+                <p className="text-2xl font-bold text-green-800">{stats.ativos}</p>
+                <p className="text-xs text-green-600">Em andamento</p>
+              </div>
+              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-green-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-yellow-700">Pendentes</p>
+                <p className="text-2xl font-bold text-yellow-800">{stats.pendentes}</p>
+                <p className="text-xs text-yellow-600">Aguardando</p>
+              </div>
+              <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
+                <Clock className="w-6 h-6 text-yellow-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-emerald-700">Receita Mensal</p>
+                <p className="text-2xl font-bold text-emerald-800">{formatCurrency(stats.receitaMensal)}</p>
+                <p className="text-xs text-emerald-600">Faturamento</p>
+              </div>
+              <div className="w-12 h-12 bg-emerald-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-emerald-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Seção da locadora - apenas para usuários locadora */}

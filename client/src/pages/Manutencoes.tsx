@@ -131,32 +131,67 @@ export default function Manutencoes() {
         </TabsList>
 
         <TabsContent value="manutencoes" className="space-y-6">
-          {/* Cards de estatísticas */}
-          <div className="grid gap-4 md:grid-cols-4">
-            <StatCard
-              title="Total de Manutenções"
-              value={stats.total}
-              icon={<BarChart3 />}
-              variant="blue"
-            />
-            <StatCard
-              title="Agendadas"
-              value={stats.agendadas}
-              icon={<Calendar />}
-              variant="yellow"
-            />
-            <StatCard
-              title="Em Andamento"
-              value={stats.em_andamento}
-              icon={<Wrench />}
-              variant="blue"
-            />
-            <StatCard
-              title="Concluídas"
-              value={stats.concluidas}
-              icon={<CheckCircle />}
-              variant="green"
-            />
+          {/* Cards de estatísticas com visual futurista */}
+          <div className="grid gap-6 md:grid-cols-4">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-blue-700">Total de Manutenções</p>
+                    <p className="text-2xl font-bold text-blue-800">{stats.total}</p>
+                    <p className="text-xs text-blue-600">Serviços</p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                    <BarChart3 className="w-6 h-6 text-blue-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-yellow-700">Agendadas</p>
+                    <p className="text-2xl font-bold text-yellow-800">{stats.agendadas}</p>
+                    <p className="text-xs text-yellow-600">Programadas</p>
+                  </div>
+                  <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
+                    <Calendar className="w-6 h-6 text-yellow-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-orange-700">Em Andamento</p>
+                    <p className="text-2xl font-bold text-orange-800">{stats.em_andamento}</p>
+                    <p className="text-xs text-orange-600">Executando</p>
+                  </div>
+                  <div className="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
+                    <Wrench className="w-6 h-6 text-orange-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-green-700">Concluídas</p>
+                    <p className="text-2xl font-bold text-green-800">{stats.concluidas}</p>
+                    <p className="text-xs text-green-600">Finalizadas</p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-green-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Controles de busca e filtros */}
