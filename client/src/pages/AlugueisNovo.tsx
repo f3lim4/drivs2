@@ -164,25 +164,32 @@ export default function Alugueis() {
     };
   }, [alugueis, pagamentos]);
 
-  // Filtrar aluguéis
+  // Filtrar e ordenar aluguéis
   const aluguelsFiltrados = useMemo(() => {
     if (!alugueis || !Array.isArray(alugueis)) return [];
     
-    return alugueis.filter(aluguel => {
-      // Verificar se o aluguel tem os campos necessários
-      if (!aluguel || !aluguel.motoristaNome || !aluguel.veiculoModelo || !aluguel.veiculoPlaca) {
-        return false;
-      }
-      
-      const matchesSearch = 
-        aluguel.motoristaNome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        aluguel.veiculoModelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        aluguel.veiculoPlaca.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === 'todos' || aluguel.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    });
+    return alugueis
+      .filter(aluguel => {
+        // Verificar se o aluguel tem os campos necessários
+        if (!aluguel || !aluguel.motoristaNome || !aluguel.veiculoModelo || !aluguel.veiculoPlaca) {
+          return false;
+        }
+        
+        const matchesSearch = 
+          aluguel.motoristaNome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          aluguel.veiculoModelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          aluguel.veiculoPlaca.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesStatus = statusFilter === 'todos' || aluguel.status === statusFilter;
+        
+        return matchesSearch && matchesStatus;
+      })
+      .sort((a, b) => {
+        // Ordena por data de cadastro decrescente (mais novos primeiro)
+        const dateA = new Date(a.createdAt || '');
+        const dateB = new Date(b.createdAt || '');
+        return dateB.getTime() - dateA.getTime();
+      });
   }, [alugueis, searchTerm, statusFilter]);
 
   // Handlers
