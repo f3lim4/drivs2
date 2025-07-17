@@ -96,8 +96,9 @@ export default function RelatoriosFinanceiros() {
         throw new Error('Erro ao criar despesa');
       }
 
-      // Invalidar cache e fechar modal
-      queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
+      // Invalidar cache específico com locadoraId
+      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
+      await queryClient.refetchQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
       setModalNovaDespesa(false);
       formNovaDespesa.reset();
       
@@ -140,7 +141,7 @@ export default function RelatoriosFinanceiros() {
       }
 
       // Invalidar cache do React Query para atualizar os dados
-      queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
       
       toast({
         title: "Despesa excluída",
