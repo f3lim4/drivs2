@@ -32,7 +32,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
-import { User, Building, Phone, Mail, MapPin, Calendar, CreditCard, Lock } from 'lucide-react';
+import { User, Building, Phone, Mail, MapPin, Calendar, CreditCard, Lock, Upload, Image } from 'lucide-react';
 
 // Schema de validação para perfil da locadora (sem plano)
 const perfilSchema = z.object({
@@ -46,6 +46,7 @@ const perfilSchema = z.object({
   estado: z.string().min(2, 'Estado é obrigatório'),
   cep: z.string().min(8, 'CEP deve ter 8 dígitos'),
   responsavel: z.string().min(1, 'Responsável é obrigatório'),
+  logo: z.string().optional(), // Logo é opcional
 });
 
 // Schema de validação para troca de senha
@@ -73,6 +74,7 @@ interface LocadoraData {
   estado: string;
   cep: string;
   responsavel: string;
+  logo?: string;
   status: string;
   plano: string;
   createdAt: string;
@@ -88,6 +90,8 @@ export default function Perfil() {
   const [editMode, setEditMode] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   // Função para recarregar o perfil do servidor
   const reloadProfile = async () => {
@@ -105,6 +109,69 @@ export default function Perfil() {
     return null;
   };
 
+  // Função para converter arquivo para base64
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
+  // Função para lidar com o upload do logo
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erro no upload",
+        description: "Por favor, selecione um arquivo de imagem.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validar tamanho do arquivo (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Erro no upload",
+        description: "O arquivo deve ter no máximo 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setUploadingLogo(true);
+      const base64 = await convertToBase64(file);
+      setLogoPreview(base64);
+      form.setValue('logo', base64);
+      
+      toast({
+        title: "Logo carregado",
+        description: "Logo carregado com sucesso. Salve o perfil para confirmar.",
+      });
+    } catch (error) {
+      console.error('Erro ao converter logo:', error);
+      toast({
+        title: "Erro no upload",
+        description: "Erro ao processar o arquivo de logo.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  // Função para remover o logo
+  const handleRemoveLogo = () => {
+    setLogoPreview(null);
+    form.setValue('logo', '');
+  };
+
   const form = useForm<PerfilFormData>({
     resolver: zodResolver(perfilSchema),
     defaultValues: {
@@ -118,6 +185,7 @@ export default function Perfil() {
       estado: '',
       cep: '',
       responsavel: '',
+      logo: '',
     },
   });
 
@@ -164,6 +232,7 @@ export default function Perfil() {
 
           const data = await response.json();
           setLocadora(data);
+          setLogoPreview(data.logo || null);
           
           // Atualizar form com os dados
           form.reset({
@@ -177,6 +246,7 @@ export default function Perfil() {
             estado: data.estado,
             cep: data.cep,
             responsavel: data.responsavel,
+            logo: data.logo || '',
           });
         } catch (error) {
           console.error('Erro ao carregar locadora:', error);
@@ -511,6 +581,74 @@ export default function Perfil() {
                       </FormItem>
                     )}
                   />
+                </div>
+
+                <Separator />
+
+                {/* Logo da Empresa */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center">
+                    <Image className="h-5 w-5 mr-2" />
+                    Logo da Empresa
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {/* Preview do logo atual */}
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
+                        {logoPreview ? (
+                          <img 
+                            src={logoPreview} 
+                            alt="Logo da empresa" 
+                            className="w-full h-full object-contain rounded-lg"
+                          />
+                        ) : (
+                          <Image className="w-8 h-8 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-600">
+                          {logoPreview ? 'Logo atual' : 'Nenhum logo configurado'}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Formatos aceitos: JPG, PNG, SVG (máximo 5MB)
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Controles de upload */}
+                    {editMode && (
+                      <div className="flex space-x-2">
+                        <Label htmlFor="logo-upload" className="cursor-pointer">
+                          <div className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 transition-colors">
+                            <Upload className="w-4 h-4" />
+                            <span className="text-sm font-medium">
+                              {uploadingLogo ? 'Carregando...' : 'Selecionar Logo'}
+                            </span>
+                          </div>
+                        </Label>
+                        <input
+                          id="logo-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleLogoUpload}
+                          disabled={uploadingLogo}
+                        />
+                        {logoPreview && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleRemoveLogo}
+                            disabled={uploadingLogo}
+                          >
+                            Remover
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <Separator />
