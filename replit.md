@@ -20,6 +20,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Integração com dados reais** - Ordenação funciona com dados do PostgreSQL
 - ✅ **Interface limpa** - Dropdowns compactos e responsivos
 - ✅ **Funcionalidade validada** - Sistema de ordenação completo nos relatórios financeiros
+- ✅ **Cards de resumo reposicionados** - Cards de despesas movidos para o final da aba "Histórico"
 
 ### 2025-07-17: Sistema de Ordenação Implementado em Todas as Páginas - CONCLUÍDO
 - ✅ **Ordenação nas infrações** - Dropdown posicionado ao lado do título "Infrações" com 8 opções
