@@ -19,12 +19,7 @@ export function useDespesas() {
       if (!despesasResponse.ok) throw new Error('Failed to fetch despesas');
       const despesasManuais = await despesasResponse.json();
       
-      console.log('Despesas - Debug:', {
-        locadoraId,
-        despesasRawResponse: despesasManuais,
-        despesasLength: despesasManuais.length,
-        firstDespesa: despesasManuais[0]
-      });
+
       
       // Buscar manutenções para incluir como despesas
       const manutencoesResponse = await fetch(`/api/manutencoes?locadoraId=${locadoraId}`);
