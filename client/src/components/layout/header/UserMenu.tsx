@@ -53,8 +53,16 @@ export function UserMenu() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2 px-3">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center p-1.5">
-              <User className="w-full h-full text-primary-foreground" />
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center p-1.5 overflow-hidden">
+              {locadora?.logo ? (
+                <img 
+                  src={locadora.logo} 
+                  alt="Logo da empresa" 
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <User className="w-full h-full text-primary-foreground" />
+              )}
             </div>
             <div className="hidden md:block text-left">
               <p className="text-base font-semibold">

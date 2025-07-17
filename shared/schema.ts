@@ -35,6 +35,7 @@ export const locadoras = pgTable("locadoras", {
   estado: text("estado").notNull(),
   cep: text("cep").notNull(),
   responsavel: text("responsavel").notNull(),
+  logo: text("logo"), // URL ou base64 do logo da locadora
   status: text("status").notNull().default("pendente"), // 'ativa', 'inativa', 'pendente'
   plano: text("plano").notNull().default("basico"), // 'basico', 'premium', 'enterprise'
   createdAt: timestamp("created_at").defaultNow().notNull(),
