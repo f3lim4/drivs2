@@ -286,22 +286,7 @@ export default function Veiculos() {
                 </SelectContent>
               </Select>
 
-              {/* Ordenação */}
-              <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Ordenar por" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
-                  <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
-                  <SelectItem value="placa-az">Placa (A-Z)</SelectItem>
-                  <SelectItem value="placa-za">Placa (Z-A)</SelectItem>
-                  <SelectItem value="modelo-az">Modelo (A-Z)</SelectItem>
-                  <SelectItem value="modelo-za">Modelo (Z-A)</SelectItem>
-                  <SelectItem value="ano-novo">Ano (Mais Novo)</SelectItem>
-                  <SelectItem value="ano-antigo">Ano (Mais Antigo)</SelectItem>
-                </SelectContent>
-              </Select>
+
 
               {isLocadora && (
                 <Button 
@@ -319,8 +304,25 @@ export default function Veiculos() {
 
       {/* Tabela de veículos */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Frota de Veículos</CardTitle>
+          
+          {/* Ordenação */}
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+              <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+              <SelectItem value="placa-az">Placa (A-Z)</SelectItem>
+              <SelectItem value="placa-za">Placa (Z-A)</SelectItem>
+              <SelectItem value="modelo-az">Modelo (A-Z)</SelectItem>
+              <SelectItem value="modelo-za">Modelo (Z-A)</SelectItem>
+              <SelectItem value="ano-novo">Ano (Mais Novo)</SelectItem>
+              <SelectItem value="ano-antigo">Ano (Mais Antigo)</SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
