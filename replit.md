@@ -25,6 +25,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Botão "Nova Infração" na área de filtros** - Reposicionado ao lado do filtro de status para melhor acessibilidade
 - ✅ **Layout otimizado** - Elementos alinhados com melhor distribuição visual
 - ✅ **Experiência simplificada** - Interface mais limpa e intuitiva sem sistema de abas
+- ✅ **Página de Pagamentos simplificada** - Removido título "Pagamentos" e descrição
 
 ### 2025-07-17: Sistema de Loading Spinner Unificado com Animação de Carro - CONCLUÍDO
 - ✅ **Componente LoadingSpinner criado** - Substituído spinners padrão por animação de carro
