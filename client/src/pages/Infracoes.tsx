@@ -78,6 +78,22 @@ export default function Infracoes() {
       }
     });
 
+  // Paginação
+  const paginatedInfracoes = filteredInfracoes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Funções para controlar a paginação
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   // Estatísticas
   const totalInfracoes = infracoes.length;
   const infracoesAtivas = infracoes.filter(i => i.status === 'pendente').length;
@@ -305,7 +321,7 @@ export default function Infracoes() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredInfracoes.map((infracao) => (
+                  paginatedInfracoes.map((infracao) => (
                     <TableRow key={infracao.id}>
                       <TableCell className="font-medium">{infracao.numeroAuto}</TableCell>
                       <TableCell>{infracao.motoristaNome}</TableCell>
@@ -352,6 +368,19 @@ export default function Infracoes() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Paginação */}
+      {filteredInfracoes.length > 0 && (
+        <div className="border-t pt-4 mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filteredInfracoes.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        </div>
+      )}
 
       {/* Modais */}
       {showNovaInfracao && (
