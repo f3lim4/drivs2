@@ -39,6 +39,7 @@ export default function Manutencoes() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
+  const [sortOrder, setSortOrder] = useState<string>('mais-novos');
   const [novaManutencaoModalOpen, setNovaManutencaoModalOpen] = useState(false);
   const [novoLocalModalOpen, setNovoLocalModalOpen] = useState(false);
   const [gerenciarLocaisModalOpen, setGerenciarLocaisModalOpen] = useState(false);
@@ -69,17 +70,41 @@ export default function Manutencoes() {
     }
   };
 
-  // Filtra manutenções baseado na busca e filtros
-  const filteredManutencoes = manutencoes.filter(manutencao => {
-    const matchesSearch = manutencao.veiculoModelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         manutencao.veiculoPlaca.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         manutencao.oficina.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         manutencao.descricao.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'todos' || manutencao.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  // Filtra e ordena manutenções baseado na busca e filtros
+  const filteredManutencoes = manutencoes
+    .filter(manutencao => {
+      const matchesSearch = manutencao.veiculoModelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           manutencao.veiculoPlaca.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           manutencao.oficina.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           manutencao.descricao.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter === 'todos' || manutencao.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      switch (sortOrder) {
+        case 'mais-novos':
+          return new Date(b.dataInicio || '').getTime() - new Date(a.dataInicio || '').getTime();
+        case 'mais-antigos':
+          return new Date(a.dataInicio || '').getTime() - new Date(b.dataInicio || '').getTime();
+        case 'veiculo-az':
+          return a.veiculoModelo.localeCompare(b.veiculoModelo);
+        case 'veiculo-za':
+          return b.veiculoModelo.localeCompare(a.veiculoModelo);
+        case 'valor-maior':
+          return (b.valorFinal || b.valorOrcamento || 0) - (a.valorFinal || a.valorOrcamento || 0);
+        case 'valor-menor':
+          return (a.valorFinal || a.valorOrcamento || 0) - (b.valorFinal || b.valorOrcamento || 0);
+        case 'oficina-az':
+          return a.oficina.localeCompare(b.oficina);
+        case 'prioridade-urgente':
+          const prioridadeOrder = { 'urgente': 4, 'alta': 3, 'normal': 2, 'baixa': 1 };
+          return (prioridadeOrder[b.prioridade as keyof typeof prioridadeOrder] || 0) - (prioridadeOrder[a.prioridade as keyof typeof prioridadeOrder] || 0);
+        default:
+          return 0;
+      }
+    });
 
   // Calcula estatísticas
   const stats = {
@@ -257,8 +282,25 @@ export default function Manutencoes() {
 
           {/* Tabela de manutenções */}
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Manutenções da Frota</CardTitle>
+              
+              {/* Ordenação */}
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+                  <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+                  <SelectItem value="veiculo-az">Veículo (A-Z)</SelectItem>
+                  <SelectItem value="veiculo-za">Veículo (Z-A)</SelectItem>
+                  <SelectItem value="valor-maior">Valor (Maior)</SelectItem>
+                  <SelectItem value="valor-menor">Valor (Menor)</SelectItem>
+                  <SelectItem value="oficina-az">Oficina (A-Z)</SelectItem>
+                  <SelectItem value="prioridade-urgente">Prioridade (Urgente)</SelectItem>
+                </SelectContent>
+              </Select>
             </CardHeader>
             <CardContent className="p-0">
               {filteredManutencoes.length === 0 ? (
