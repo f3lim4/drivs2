@@ -13,10 +13,14 @@ export function formatCurrency(value: number): string {
 }
 
 export function formatDate(dateString: string): string {
+  console.log('formatDate input:', dateString);
   const date = new Date(dateString);
-  return date.toLocaleDateString('pt-BR', {
+  console.log('formatDate date object:', date);
+  const formatted = date.toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
   });
+  console.log('formatDate output:', formatted);
+  return formatted;
 }
