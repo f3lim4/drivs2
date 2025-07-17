@@ -371,7 +371,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione um aluguel para gerar contrato" />
+                          <SelectValue placeholder="Selecionar" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

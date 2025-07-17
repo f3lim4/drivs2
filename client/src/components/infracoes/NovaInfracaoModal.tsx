@@ -323,7 +323,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                           <Select onValueChange={field.onChange} value={field.value} defaultValue="">
                             <FormControl>
                               <SelectTrigger className="h-9">
-                                <SelectValue placeholder="Selecione o veículo" />
+                                <SelectValue placeholder="Selecionar" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>

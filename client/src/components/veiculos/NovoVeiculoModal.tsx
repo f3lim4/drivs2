@@ -356,7 +356,7 @@ export function NovoVeiculoModal({
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Hatch" />
+                              <SelectValue placeholder="Selecionar" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -437,7 +437,7 @@ export function NovoVeiculoModal({
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Flex" />
+                            <SelectValue placeholder="Selecionar" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -483,7 +483,7 @@ export function NovoVeiculoModal({
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Quilometragem Ilimitada" />
+                            <SelectValue placeholder="Selecionar" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>

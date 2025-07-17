@@ -487,7 +487,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione o estado" />
+                          <SelectValue placeholder="Selecionar" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
