@@ -20,6 +20,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Modal de detalhes corrigido** - Dados detalhados agora mostram valores corretos
 - ✅ **Separação clara implementada** - Despesas fixas vs manutenções separadas nos cálculos
 - ✅ **Integridade dos dados** - Todas as seções agora mostram valores consistentes
+- ✅ **Despesas fixas separadas no histórico** - IPVA, Seguro, Rastreador, Financiamento mostrados individualmente
+- ✅ **Modal de análise atualizado** - Despesas detalhadas por categoria individual
 
 ### 2025-07-17: Sistema de Ordenação Completo em Relatórios Financeiros - CONCLUÍDO
 - ✅ **Ordenação na aba "Análise por Motorista"** - Dropdown com 6 opções (pagamentos, valor, nome)

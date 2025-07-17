@@ -618,15 +618,43 @@ export default function RelatoriosFinanceiros() {
       }
     }
 
-    // Detalhamento por categoria incluindo despesas fixas
+    // Detalhamento por categoria incluindo despesas fixas separadas
     const despesasDetalhadas = [];
     
-    // Despesas fixas simplificadas (valor total)
-    if (despesasFixasMensais > 0) {
+    // Despesas fixas separadas
+    if (veiculo.ipva && veiculo.ipva > 0) {
+      const valorIpva = parseFloat(veiculo.ipva) / 12;
       despesasDetalhadas.push({
-        categoria: 'Despesas Fixas',
-        valor: despesasFixasMensais,
-        percentual: despesasMensais > 0 ? (despesasFixasMensais / despesasMensais) * 100 : 0
+        categoria: 'IPVA',
+        valor: valorIpva,
+        percentual: despesasMensais > 0 ? (valorIpva / despesasMensais) * 100 : 0
+      });
+    }
+    
+    if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+      const valorSeguro = parseFloat(veiculo.valorSeguroMensal);
+      despesasDetalhadas.push({
+        categoria: 'Seguro',
+        valor: valorSeguro,
+        percentual: despesasMensais > 0 ? (valorSeguro / despesasMensais) * 100 : 0
+      });
+    }
+    
+    if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+      const valorRastreador = parseFloat(veiculo.valorRastreadorMensal);
+      despesasDetalhadas.push({
+        categoria: 'Rastreador',
+        valor: valorRastreador,
+        percentual: despesasMensais > 0 ? (valorRastreador / despesasMensais) * 100 : 0
+      });
+    }
+    
+    if (veiculo.financiado && veiculo.valorFinanciamento) {
+      const valorFinanciamento = parseFloat(veiculo.valorFinanciamento);
+      despesasDetalhadas.push({
+        categoria: 'Financiamento',
+        valor: valorFinanciamento,
+        percentual: despesasMensais > 0 ? (valorFinanciamento / despesasMensais) * 100 : 0
       });
     }
     
@@ -721,13 +749,37 @@ export default function RelatoriosFinanceiros() {
             valor: parseFloat(despesa.valor || '0'),
             data: despesa.data
           })),
-        // Despesas fixas (transformar em histórico mensal)
-        ...(despesasFixasMensais > 0 ? [{
-          id: `fixas-${veiculo.id}`,
+        // Despesas fixas separadas (transformar em histórico mensal)
+        ...(veiculo.ipva && veiculo.ipva > 0 ? [{
+          id: `ipva-${veiculo.id}`,
           tipo: 'Despesa Fixa',
-          categoria: 'Despesas Fixas',
-          descricao: 'IPVA, Seguro, Rastreador e Financiamento',
-          valor: despesasFixasMensais,
+          categoria: 'IPVA',
+          descricao: 'IPVA mensal',
+          valor: parseFloat(veiculo.ipva) / 12,
+          data: format(new Date(), 'yyyy-MM-dd')
+        }] : []),
+        ...(veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0 ? [{
+          id: `seguro-${veiculo.id}`,
+          tipo: 'Despesa Fixa',
+          categoria: 'Seguro',
+          descricao: 'Seguro mensal',
+          valor: parseFloat(veiculo.valorSeguroMensal),
+          data: format(new Date(), 'yyyy-MM-dd')
+        }] : []),
+        ...(veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0 ? [{
+          id: `rastreador-${veiculo.id}`,
+          tipo: 'Despesa Fixa',
+          categoria: 'Rastreador',
+          descricao: 'Rastreador mensal',
+          valor: parseFloat(veiculo.valorRastreadorMensal),
+          data: format(new Date(), 'yyyy-MM-dd')
+        }] : []),
+        ...(veiculo.financiado && veiculo.valorFinanciamento ? [{
+          id: `financiamento-${veiculo.id}`,
+          tipo: 'Despesa Fixa',
+          categoria: 'Financiamento',
+          descricao: 'Financiamento mensal',
+          valor: parseFloat(veiculo.valorFinanciamento),
           data: format(new Date(), 'yyyy-MM-dd')
         }] : [])
       ].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
