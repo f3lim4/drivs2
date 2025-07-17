@@ -306,7 +306,7 @@ contratadas, assinam o presente instrumento em Embu das Artes - SP, ${format(dat
 
 
             __________________                          __________________
-            ${motorista.nome}                          ${locadorInfo.responsavel}
+            ${aluguel.motoristaNome}                          ${locadorInfo.responsavel}
                 LOCATÁRIO                                    LOCADORA
 
 Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
@@ -322,7 +322,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
     } catch (error) {
       console.error('Erro ao gerar contrato:', error);
       console.error('Stack trace:', error.stack);
-      console.error('Dados do contrato:', { motorista, veiculo, data, userProfile });
+      console.error('Dados do contrato:', { aluguel, dadosVeiculo, data, userProfile });
     } finally {
       // setLoading(false); // Removido porque não usamos mais loading local
     }
