@@ -20,23 +20,23 @@ interface StatCardProps {
   className?: string;
 }
 
-// Configurações de variantes para diferentes tipos de cards
+// Configurações de variantes com cores mais clean e neutras
 const variantConfig = {
   blue: {
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600'
+    iconBg: 'bg-slate-100',
+    iconColor: 'text-slate-600'
   },
   green: {
-    iconBg: 'bg-green-100',
-    iconColor: 'text-green-600'
+    iconBg: 'bg-slate-100',
+    iconColor: 'text-slate-600'
   },
   yellow: {
-    iconBg: 'bg-yellow-100',
-    iconColor: 'text-yellow-600'
+    iconBg: 'bg-slate-100',
+    iconColor: 'text-slate-600'
   },
   red: {
-    iconBg: 'bg-red-100',
-    iconColor: 'text-red-600'
+    iconBg: 'bg-slate-100',
+    iconColor: 'text-slate-600'
   }
 };
 
@@ -57,24 +57,24 @@ export function StatCard({
 
   return (
     <Card className={cn(
-      "border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300",
+      "border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300",
       className
     )}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           {/* Conteúdo textual */}
           <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm font-medium text-slate-600">
               {title}
             </p>
             
-            <p className="text-3xl font-bold text-foreground">
+            <p className="text-2xl font-semibold text-slate-800">
               {formatValue(value)}
             </p>
             
             {/* Tendência/comparativo se disponível */}
             {trend && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1 text-sm text-slate-500">
                 <span className={cn(
                   "font-medium",
                   trend.isPositive ? "text-green-600" : "text-red-600"
@@ -101,7 +101,7 @@ export function StatCard({
   );
 }
 
-// Componente específico para card sem gradiente (branco com borda)
+// Componente específico para card clean e neutro
 export function StatCardWhite({ 
   title, 
   value, 
@@ -111,17 +111,17 @@ export function StatCardWhite({
 }: Omit<StatCardProps, 'variant'>) {
   return (
     <Card className={cn(
-      "shadow-card hover:shadow-hover transition-all duration-300",
+      "border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300",
       className
     )}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm font-medium text-slate-600">
               {title}
             </p>
             
-            <p className="text-3xl font-bold text-foreground">
+            <p className="text-2xl font-semibold text-slate-800">
               {typeof value === 'number' && title.toLowerCase().includes('receita')
                 ? new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
@@ -132,10 +132,10 @@ export function StatCardWhite({
             </p>
             
             {trend && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1 text-sm text-slate-500">
                 <span className={cn(
                   "font-medium",
-                  trend.isPositive ? "text-success" : "text-destructive"
+                  trend.isPositive ? "text-green-600" : "text-red-600"
                 )}>
                   {trend.isPositive ? '+' : ''}{trend.value}
                 </span>
@@ -144,8 +144,8 @@ export function StatCardWhite({
             )}
           </div>
 
-          <div className="p-3 rounded-xl bg-muted">
-            <div className="w-6 h-6 text-muted-foreground">
+          <div className="p-3 rounded-xl bg-slate-100">
+            <div className="w-6 h-6 text-slate-600">
               {icon}
             </div>
           </div>

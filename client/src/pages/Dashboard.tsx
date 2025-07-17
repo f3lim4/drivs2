@@ -195,9 +195,9 @@ export default function Dashboard() {
   ];
 
   const statusData = [
-    { name: 'Alugado', value: veiculosSeguro.filter(v => v.status === 'alugado').length, color: '#3b82f6' },
-    { name: 'Disponível', value: veiculosSeguro.filter(v => v.status === 'disponivel').length, color: '#10b981' },
-    { name: 'Manutenção', value: veiculosSeguro.filter(v => v.status === 'manutencao').length, color: '#f59e0b' },
+    { name: 'Alugado', value: veiculosSeguro.filter(v => v.status === 'alugado').length, color: '#64748b' },
+    { name: 'Disponível', value: veiculosSeguro.filter(v => v.status === 'disponivel').length, color: '#94a3b8' },
+    { name: 'Manutenção', value: veiculosSeguro.filter(v => v.status === 'manutencao').length, color: '#cbd5e1' },
   ];
 
   const metricasData = [
@@ -302,30 +302,30 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Dashboard Futurista para Admin */}
+      {/* Dashboard Clean para Admin */}
       {isAdmin && (
         <div className="space-y-6">
           {/* Métricas Principais */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {metricasData.map((metric, index) => (
-              <Card key={metric.name} className="border-0 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl">
+              <Card key={metric.name} className="border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium text-slate-300">{metric.name}</p>
-                      <p className="text-2xl font-bold text-white">
+                      <p className="text-sm font-medium text-slate-600">{metric.name}</p>
+                      <p className="text-2xl font-semibold text-slate-800">
                         {metric.name === 'Receita' ? formatCurrency(metric.value) : metric.value}
                       </p>
-                      <p className="text-xs text-green-400 flex items-center gap-1">
+                      <p className="text-xs text-slate-500 flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
                         {metric.growth}
                       </p>
                     </div>
-                    <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
-                      {metric.name === 'Locadoras' && <Building2 className="w-6 h-6 text-blue-400" />}
-                      {metric.name === 'Veículos' && <Car className="w-6 h-6 text-blue-400" />}
-                      {metric.name === 'Motoristas' && <Users className="w-6 h-6 text-blue-400" />}
-                      {metric.name === 'Receita' && <DollarSign className="w-6 h-6 text-blue-400" />}
+                    <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
+                      {metric.name === 'Locadoras' && <Building2 className="w-6 h-6 text-slate-600" />}
+                      {metric.name === 'Veículos' && <Car className="w-6 h-6 text-slate-600" />}
+                      {metric.name === 'Motoristas' && <Users className="w-6 h-6 text-slate-600" />}
+                      {metric.name === 'Receita' && <DollarSign className="w-6 h-6 text-slate-600" />}
                     </div>
                   </div>
                 </CardContent>
@@ -336,10 +336,10 @@ export default function Dashboard() {
           {/* Gráficos Principais */}
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Receita e Aluguéis */}
-            <Card className="border-0 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl">
+            <Card className="border border-slate-200 bg-white shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-green-400" />
+                <CardTitle className="text-slate-800 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-slate-600" />
                   Evolução da Receita
                 </CardTitle>
               </CardHeader>
@@ -349,26 +349,26 @@ export default function Dashboard() {
                     <AreaChart data={receitaData}>
                       <defs>
                         <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                          <stop offset="5%" stopColor="#64748b" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#64748b" stopOpacity={0.1}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis dataKey="name" stroke="#9ca3af" />
-                      <YAxis stroke="#9ca3af" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis dataKey="name" stroke="#64748b" />
+                      <YAxis stroke="#64748b" />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#1f2937', 
-                          border: '1px solid #374151',
+                          backgroundColor: '#ffffff', 
+                          border: '1px solid #e2e8f0',
                           borderRadius: '8px',
-                          color: '#fff'
+                          color: '#1e293b'
                         }}
                         formatter={(value: any) => [formatCurrency(value), 'Receita']}
                       />
                       <Area 
                         type="monotone" 
                         dataKey="receita" 
-                        stroke="#10b981" 
+                        stroke="#64748b" 
                         fillOpacity={1}
                         fill="url(#colorReceita)"
                         strokeWidth={2}
@@ -380,10 +380,10 @@ export default function Dashboard() {
             </Card>
 
             {/* Performance do Sistema */}
-            <Card className="border-0 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl">
+            <Card className="border border-slate-200 bg-white shadow-sm">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-blue-400" />
+                <CardTitle className="text-slate-800 flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-slate-600" />
                   Performance do Sistema
                 </CardTitle>
               </CardHeader>
@@ -391,30 +391,30 @@ export default function Dashboard() {
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={performanceData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis dataKey="name" stroke="#9ca3af" />
-                      <YAxis stroke="#9ca3af" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                      <XAxis dataKey="name" stroke="#64748b" />
+                      <YAxis stroke="#64748b" />
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#1f2937', 
-                          border: '1px solid #374151',
+                          backgroundColor: '#ffffff', 
+                          border: '1px solid #e2e8f0',
                           borderRadius: '8px',
-                          color: '#fff'
+                          color: '#1e293b'
                         }}
                       />
                       <Line 
                         type="monotone" 
                         dataKey="cpu" 
-                        stroke="#3b82f6" 
+                        stroke="#64748b" 
                         strokeWidth={2}
-                        dot={{ fill: '#3b82f6', strokeWidth: 0, r: 4 }}
+                        dot={{ fill: '#64748b', strokeWidth: 0, r: 4 }}
                       />
                       <Line 
                         type="monotone" 
                         dataKey="memoria" 
-                        stroke="#8b5cf6" 
+                        stroke="#94a3b8" 
                         strokeWidth={2}
-                        dot={{ fill: '#8b5cf6', strokeWidth: 0, r: 4 }}
+                        dot={{ fill: '#94a3b8', strokeWidth: 0, r: 4 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -424,10 +424,10 @@ export default function Dashboard() {
           </div>
 
           {/* Status dos Veículos */}
-          <Card className="border-0 bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl">
+          <Card className="border border-slate-200 bg-white shadow-sm">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Car className="w-5 h-5 text-yellow-400" />
+              <CardTitle className="text-slate-800 flex items-center gap-2">
+                <Car className="w-5 h-5 text-slate-600" />
                 Status da Frota
               </CardTitle>
             </CardHeader>
@@ -451,10 +451,10 @@ export default function Dashboard() {
                       </Pie>
                       <Tooltip 
                         contentStyle={{ 
-                          backgroundColor: '#1f2937', 
-                          border: '1px solid #374151',
+                          backgroundColor: '#ffffff', 
+                          border: '1px solid #e2e8f0',
                           borderRadius: '8px',
-                          color: '#fff'
+                          color: '#1e293b'
                         }}
                       />
                     </PieChart>
@@ -464,17 +464,17 @@ export default function Dashboard() {
                 {/* Legenda e Status */}
                 <div className="flex flex-col justify-center space-y-4">
                   {statusData.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div 
                           className="w-4 h-4 rounded-full"
                           style={{ backgroundColor: item.color }}
                         />
-                        <span className="text-slate-300">{item.name}</span>
+                        <span className="text-slate-700">{item.name}</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-xl font-bold text-white">{item.value}</span>
-                        <p className="text-xs text-slate-400">veículos</p>
+                        <span className="text-xl font-semibold text-slate-800">{item.value}</span>
+                        <p className="text-xs text-slate-600">veículos</p>
                       </div>
                     </div>
                   ))}
