@@ -4,12 +4,14 @@
  */
 
 import { useState } from 'react';
-import { Plus, Upload, FileText, Download, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Upload, FileText, Download, Eye, Edit, Trash2, Filter, Search, X, TrendingUp, DollarSign, Calendar, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useContratos } from '@/hooks/useContratos';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -39,6 +41,9 @@ export default function Contratos() {
   const [showEditarModal, setShowEditarModal] = useState(false);
   const [showUploadTemplateModal, setShowUploadTemplateModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
+  const [busca, setBusca] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState<string>('todos');
+  const [filtroTipo, setFiltroTipo] = useState<string>('todos');
 
   const handleContratoGerado = (novoContrato: Contrato) => {
     // O contrato já foi criado no modal, só precisamos mostrar o toast de sucesso
@@ -261,6 +266,33 @@ export default function Contratos() {
     }
   };
 
+  // Filtrar contratos
+  const contratosFiltrados = contratos.filter(contrato => {
+    const passaBusca = busca === '' || 
+      contrato.cliente.toLowerCase().includes(busca.toLowerCase()) ||
+      contrato.tipo.toLowerCase().includes(busca.toLowerCase());
+    
+    const passaStatus = filtroStatus === 'todos' || contrato.status === filtroStatus;
+    const passaTipo = filtroTipo === 'todos' || contrato.tipo === filtroTipo;
+    
+    return passaBusca && passaStatus && passaTipo;
+  });
+
+  // Estatísticas
+  const totalContratos = contratos.length;
+  const contratosAtivos = contratos.filter(c => c.status === 'ativo').length;
+  const contratosFinalizados = contratos.filter(c => c.status === 'finalizado').length;
+  const contratosCancelados = contratos.filter(c => c.status === 'cancelado').length;
+  const valorTotal = contratos.reduce((sum, c) => sum + (parseFloat(c.valor) || 0), 0);
+
+  // Formatar currency
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ativo':
@@ -276,16 +308,150 @@ export default function Contratos() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      {/* Botão de ação no topo */}
-      <div className="flex justify-end">
-        <Button 
-          className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
-          onClick={() => setShowNovoContratoModal(true)}
-        >
-          <Plus className="w-4 h-4" />
-          Gerar Contrato
-        </Button>
+      {/* Cards de Estatísticas */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {/* Total de Contratos */}
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-700">TOTAL DE CONTRATOS</p>
+                <p className="text-2xl font-bold text-blue-800">{totalContratos}</p>
+                <p className="text-xs text-blue-600">
+                  {contratosAtivos} ativos
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                <FileText className="w-6 h-6 text-blue-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Contratos Ativos */}
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-green-700">CONTRATOS ATIVOS</p>
+                <p className="text-2xl font-bold text-green-800">{contratosAtivos}</p>
+                <p className="text-xs text-green-600">
+                  {contratosFinalizados} finalizados
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-green-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Valor Total */}
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-purple-700">VALOR TOTAL</p>
+                <p className="text-2xl font-bold text-purple-800">{formatCurrency(valorTotal)}</p>
+                <p className="text-xs text-purple-600">
+                  Soma dos contratos
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-purple-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Contratos Cancelados */}
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-red-700">CANCELADOS</p>
+                <p className="text-2xl font-bold text-red-800">{contratosCancelados}</p>
+                <p className="text-xs text-red-600">
+                  Contratos cancelados
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
+                <X className="w-6 h-6 text-red-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Filtros */}
+      <Card className="bg-gray-50/50 border-gray-200">
+        <CardContent className="p-4">
+          <div className="grid gap-4 md:grid-cols-4 items-end">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Buscar</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Cliente ou tipo..."
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  className="pl-10"
+                />
+                {busca && (
+                  <button
+                    onClick={() => setBusca('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Status</label>
+              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os status</SelectItem>
+                  <SelectItem value="ativo">Ativo</SelectItem>
+                  <SelectItem value="finalizado">Finalizado</SelectItem>
+                  <SelectItem value="cancelado">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Tipo</label>
+              <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos os tipos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os tipos</SelectItem>
+                  <SelectItem value="mensal">Mensal</SelectItem>
+                  <SelectItem value="semanal">Semanal</SelectItem>
+                  <SelectItem value="diario">Diário</SelectItem>
+                  <SelectItem value="personalizado">Personalizado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Ação</label>
+              <Button 
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
+                onClick={() => setShowNovoContratoModal(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Gerar Contrato
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Tabs para organizar contratos e templates */}
       <Tabs defaultValue="contratos" className="w-full">
@@ -308,10 +474,20 @@ export default function Contratos() {
                 </div>
               </CardContent>
             </Card>
+          ) : contratosFiltrados.length === 0 ? (
+            <Card>
+              <CardContent className="p-8">
+                <div className="text-center text-muted-foreground">
+                  <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <p>Nenhum contrato encontrado com os filtros aplicados</p>
+                  <p className="text-sm">Tente ajustar os filtros de busca</p>
+                </div>
+              </CardContent>
+            </Card>
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>Contratos Gerados</CardTitle>
+                <CardTitle>Contratos Gerados ({contratosFiltrados.length})</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
@@ -326,7 +502,7 @@ export default function Contratos() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {contratos.map((contrato) => (
+                    {contratosFiltrados.map((contrato) => (
                       <TableRow key={contrato.id}>
                         <TableCell>
                           <p className="font-medium">{contrato.cliente}</p>
