@@ -21,6 +21,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Badges coloridos** - Sistema de badges com cores de fundo e texto correspondentes
 - ✅ **Anúncios de teste criados** - Exemplos de cada tipo para validação
 - ✅ **Interface consistente** - Cores padronizadas entre dashboard e painel admin
+- ✅ **Card de suporte adicionado** - Card após veículos em manutenção com telefone, email e link
+- ✅ **Design simplificado** - Removido informações de plano e horário, mantido apenas suporte
 
 ### 2025-07-17: Correções de Sistema de Contratos e Modal de Confirmação - CONCLUÍDO
 - ✅ **Erro de variável não definida corrigido** - Substituído `veiculo` por `dadosVeiculo` na geração de contratos
