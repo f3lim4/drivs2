@@ -1547,44 +1547,6 @@ export default function RelatoriosFinanceiros() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Cards separados por tipo de despesa */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {/* Card IPVA */}
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-blue-700 mb-2">IPVA Total</h4>
-                    <p className="text-2xl font-bold text-blue-800">
-                      {formatCurrency(veiculos.reduce((total, v) => total + (v.ipva && v.ipva > 0 ? parseFloat(v.ipva) / 12 : 0), 0))}
-                    </p>
-                    <p className="text-sm text-blue-600">Mensal</p>
-                  </div>
-                  
-                  {/* Card Seguros */}
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-green-700 mb-2">Seguros Total</h4>
-                    <p className="text-2xl font-bold text-green-800">
-                      {formatCurrency(veiculos.reduce((total, v) => total + (v.valorSeguroMensal && v.valorSeguroMensal > 0 ? parseFloat(v.valorSeguroMensal) : 0), 0))}
-                    </p>
-                    <p className="text-sm text-green-600">Mensal</p>
-                  </div>
-                  
-                  {/* Card Rastreadores */}
-                  <div className="bg-yellow-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-yellow-700 mb-2">Rastreadores Total</h4>
-                    <p className="text-2xl font-bold text-yellow-800">
-                      {formatCurrency(veiculos.reduce((total, v) => total + (v.valorRastreadorMensal && v.valorRastreadorMensal > 0 ? parseFloat(v.valorRastreadorMensal) : 0), 0))}
-                    </p>
-                    <p className="text-sm text-yellow-600">Mensal</p>
-                  </div>
-                  
-                  {/* Card Financiamento */}
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-purple-700 mb-2">Financiamento Total</h4>
-                    <p className="text-2xl font-bold text-purple-800">
-                      {formatCurrency(veiculos.reduce((total, v) => total + (v.financiado && v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : 0), 0))}
-                    </p>
-                    <p className="text-sm text-purple-600">Mensal</p>
-                  </div>
-                </div>
 
                 {/* Tabela de despesas por veículo */}
                 <div className="overflow-x-auto">
