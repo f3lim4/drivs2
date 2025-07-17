@@ -41,8 +41,6 @@ import { ExcluirAluguelDialog } from '@/components/alugueis/ExcluirAluguelDialog
 export default function Alugueis() {
   const { isAdmin, isLocadora, profile } = useAuth();
   const { toast } = useToast();
-  const [alugueis, setAlugueis] = useState<Aluguel[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [showNovoAluguelModal, setShowNovoAluguelModal] = useState(false);
@@ -56,10 +54,16 @@ export default function Alugueis() {
     enabled: isAdmin || isLocadora,
   });
 
+  // Carregamento de aluguéis usando React Query
+  const { data: alugueis = [], isLoading: loading } = useQuery({
+    queryKey: ['/api/alugueis', profile?.id],
+    enabled: !!profile?.id,
+  });
+
   // Buscar pagamentos para cálculo da receita real
   const { data: pagamentos = [] } = useQuery({
-    queryKey: ['/api/pagamentos'],
-    enabled: isLocadora,
+    queryKey: ['/api/pagamentos', profile?.id],
+    enabled: !!profile?.id,
   });
 
   // Função para encontrar o nome da locadora
@@ -75,17 +79,30 @@ export default function Alugueis() {
   // Para usuários locadora, buscar o nome da locadora diretamente usando o ID do perfil
   const nomeLocadoraAtual = isLocadora && profile?.id ? getLocadoraName(profile.id) : null;
 
-  // Carrega dados dos aluguéis
-  useEffect(() => {
+  // Logs para debug
+  console.log('Alugueis - Fazendo requisição para locadora:', profile?.id);
+  console.log('Alugueis - Verificando isolamento:', {
+    locadoraId: profile?.id,
+    alugueisTotal: alugueis.length,
+    primeiroAluguel: alugueis[0]?.locadoraId || 'N/A',
+  });
+  console.log('Aluguéis - Verificando isolamento:', {
+    locadoraId: profile?.id,
+    alugueisTotal: alugueis.length,
+    primeiroAluguel: alugueis[0]?.locadoraId || 'N/A',
+  });
+
+  // Função para recarregar aluguéis (removido useEffect)
+  const recarregarAlugueis = () => {
     const loadAlugueis = async () => {
       try {
         setLoading(true);
         
         // Para locadora, usar filtro específico
         let url = '/api/alugueis';
-        if (isLocadora && profile?.locadoraId) {
-          url += `?locadoraId=${profile.locadoraId}`;
-          console.log('Alugueis - Fazendo requisição para locadora:', profile.locadoraId);
+        if (isLocadora && profile?.id) {
+          url += `?locadoraId=${profile.id}`;
+          console.log('Alugueis - Fazendo requisição para locadora:', profile.id);
         }
         
         const response = await fetch(url, {
@@ -99,11 +116,11 @@ export default function Alugueis() {
           
           // FILTRO TRIPLO DE SEGURANÇA: Garantir que locadora vê apenas seus aluguéis
           let alugueisParaProcessar = alugueisData;
-          if (isLocadora && profile?.locadoraId) {
-            alugueisParaProcessar = alugueisData.filter((aluguel: any) => aluguel.locadoraId === profile.locadoraId);
+          if (isLocadora && profile?.id) {
+            alugueisParaProcessar = alugueisData.filter((aluguel: any) => aluguel.locadoraId === profile.id);
             
             // PROTEÇÃO EXTRA: Se ainda houver aluguéis de outras locadoras, limpar tudo
-            const temAlugueisDeOutrasLocadoras = alugueisParaProcessar.some(a => a.locadoraId !== profile.locadoraId);
+            const temAlugueisDeOutrasLocadoras = alugueisParaProcessar.some(a => a.locadoraId !== profile.id);
             if (temAlugueisDeOutrasLocadoras) {
               console.error('SECURITY ALERT: Aluguéis de outras locadoras detectados, limpando array');
               alugueisParaProcessar = [];
@@ -111,8 +128,8 @@ export default function Alugueis() {
           }
           
           // VALIDAÇÃO ADICIONAL: Garantir que todos os aluguéis pertencem à locadora correta
-          if (isLocadora && profile?.locadoraId && alugueisParaProcessar.length > 0) {
-            const todosAlugueisCorretos = alugueisParaProcessar.every(a => a.locadoraId === profile.locadoraId);
+          if (isLocadora && profile?.id && alugueisParaProcessar.length > 0) {
+            const todosAlugueisCorretos = alugueisParaProcessar.every(a => a.locadoraId === profile.id);
             if (!todosAlugueisCorretos) {
               console.error('SECURITY ALERT: Aluguéis de outras locadoras detectados, retornando array vazio');
               alugueisParaProcessar = [];
