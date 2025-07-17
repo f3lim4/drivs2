@@ -300,6 +300,75 @@ export default function Dashboard() {
     return dadosFinanceiros;
   };
 
+  // Função para calcular dados de aluguéis mensais
+  const getDadosAlugueis = () => {
+    const meses = [
+      { nome: 'Jan', numero: 1 },
+      { nome: 'Fev', numero: 2 },
+      { nome: 'Mar', numero: 3 },
+      { nome: 'Abr', numero: 4 },
+      { nome: 'Mai', numero: 5 },
+      { nome: 'Jun', numero: 6 },
+      { nome: 'Jul', numero: 7 },
+      { nome: 'Ago', numero: 8 },
+      { nome: 'Set', numero: 9 },
+      { nome: 'Out', numero: 10 },
+      { nome: 'Nov', numero: 11 },
+      { nome: 'Dez', numero: 12 }
+    ];
+
+    const anoAtual = new Date().getFullYear();
+    const mesAtual = new Date().getMonth() + 1;
+    const dadosAlugueis = [];
+
+    // Pegar os últimos 6 meses
+    for (let i = 5; i >= 0; i--) {
+      let mes = mesAtual - i;
+      let ano = anoAtual;
+      
+      if (mes <= 0) {
+        mes += 12;
+        ano -= 1;
+      }
+
+      const mesInfo = meses[mes - 1];
+      
+      // Contar aluguéis iniciados no mês
+      const alugueisIniciados = alugueisSeguro.filter((a: any) => {
+        const dataInicio = new Date(a.dataInicio);
+        return dataInicio.getMonth() + 1 === mes && 
+               dataInicio.getFullYear() === ano;
+      }).length;
+
+      // Contar aluguéis finalizados no mês
+      const alugueisFinalizados = alugueisSeguro.filter((a: any) => {
+        if (!a.dataFim) return false;
+        const dataFim = new Date(a.dataFim);
+        return dataFim.getMonth() + 1 === mes && 
+               dataFim.getFullYear() === ano;
+      }).length;
+
+      // Contar aluguéis ativos no mês (iniciados antes ou durante o mês e ainda não finalizados)
+      const alugueisAtivos = alugueisSeguro.filter((a: any) => {
+        const dataInicio = new Date(a.dataInicio);
+        const dataFim = a.dataFim ? new Date(a.dataFim) : null;
+        const ultimoDiaMes = new Date(ano, mes, 0);
+        
+        return dataInicio <= ultimoDiaMes && 
+               (!dataFim || dataFim >= new Date(ano, mes - 1, 1));
+      }).length;
+
+      dadosAlugueis.push({
+        mes: mesInfo.nome,
+        iniciados: alugueisIniciados,
+        finalizados: alugueisFinalizados,
+        ativos: alugueisAtivos
+      });
+    }
+
+    return dadosAlugueis;
+  };
+
   // Calcular estatísticas diretamente
   const hoje = new Date();
   const proximoMes = new Date(hoje);
@@ -587,6 +656,81 @@ export default function Dashboard() {
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                 <span className="text-sm text-slate-600">Despesas</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Gráfico de Aluguéis - apenas para locadoras */}
+      {isLocadora && (
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
+              <Car className="w-5 h-5" />
+              Evolução de Aluguéis
+            </CardTitle>
+            <CardDescription className="text-blue-600">
+              Acompanhe os aluguéis iniciados, finalizados e ativos dos últimos 6 meses
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={getDadosAlugueis()}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#dbeafe" />
+                  <XAxis 
+                    dataKey="mes" 
+                    stroke="#1e40af"
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke="#1e40af"
+                    fontSize={12}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [value, '']}
+                    labelFormatter={(label) => `Mês: ${label}`}
+                    contentStyle={{
+                      backgroundColor: '#eff6ff',
+                      border: '1px solid #bfdbfe',
+                      borderRadius: '8px',
+                      color: '#1e40af'
+                    }}
+                  />
+                  <Bar 
+                    dataKey="iniciados" 
+                    fill="#10b981" 
+                    name="Iniciados"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar 
+                    dataKey="finalizados" 
+                    fill="#ef4444" 
+                    name="Finalizados"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar 
+                    dataKey="ativos" 
+                    fill="#3b82f6" 
+                    name="Ativos"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center justify-center gap-6 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-blue-600">Iniciados</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span className="text-sm text-blue-600">Finalizados</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span className="text-sm text-blue-600">Ativos</span>
               </div>
             </div>
           </CardContent>
