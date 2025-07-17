@@ -238,8 +238,8 @@ export default function Veiculos() {
     <div className="flex-1 space-y-6 p-6">
       {/* Cards de estatísticas com visual futurista */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-blue-700">Total de Veículos</p>
@@ -253,8 +253,8 @@ export default function Veiculos() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-green-700">Disponíveis</p>
@@ -268,8 +268,8 @@ export default function Veiculos() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-purple-700">Alugados</p>
@@ -283,8 +283,8 @@ export default function Veiculos() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-orange-700">Manutenção</p>

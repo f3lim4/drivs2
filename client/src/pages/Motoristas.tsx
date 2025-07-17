@@ -254,8 +254,8 @@ export default function Motoristas() {
     <div className="flex-1 space-y-6 p-6">
       {/* Cards de estatísticas com visual futurista */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-blue-700">Total de Motoristas</p>
@@ -269,8 +269,8 @@ export default function Motoristas() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-green-700">Ativos</p>
@@ -284,8 +284,8 @@ export default function Motoristas() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-yellow-700">CNH Vencendo</p>
@@ -299,8 +299,8 @@ export default function Motoristas() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-red-700">CNH Vencida</p>

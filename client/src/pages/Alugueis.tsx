@@ -328,8 +328,8 @@ export default function Alugueis() {
     <div className="flex-1 space-y-6 p-6">
       {/* Cards de estatísticas com visual futurista */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-blue-700">Total de Aluguéis</p>
@@ -343,8 +343,8 @@ export default function Alugueis() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-green-700">Ativos</p>
@@ -358,8 +358,8 @@ export default function Alugueis() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-yellow-700">Pendentes</p>
@@ -373,8 +373,8 @@ export default function Alugueis() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-emerald-700">Receita Mensal</p>

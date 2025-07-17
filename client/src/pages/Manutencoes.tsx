@@ -187,8 +187,8 @@ export default function Manutencoes() {
       <div className="space-y-6">
           {/* Cards de estatísticas com visual futurista */}
           <div className="grid gap-6 md:grid-cols-4">
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
-              <CardContent className="p-6">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
+              <CardContent className="p-6 h-full">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-blue-700">Total de Manutenções</p>
@@ -202,8 +202,8 @@ export default function Manutencoes() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
-              <CardContent className="p-6">
+            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg h-32">
+              <CardContent className="p-6 h-full">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-yellow-700">Agendadas</p>
@@ -217,8 +217,8 @@ export default function Manutencoes() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
-              <CardContent className="p-6">
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg h-32">
+              <CardContent className="p-6 h-full">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-orange-700">Em Andamento</p>
