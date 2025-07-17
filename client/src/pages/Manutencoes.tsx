@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Table, 
@@ -35,7 +35,7 @@ import type { Manutencao, Local } from '@shared/schema';
 export default function Manutencoes() {
   const { manutencoes, isLoading, deleteManutencao, isDeleting } = useManutencoes();
   const { locais, isLoading: isLoadingLocais, deleteLocal } = useLocais();
-  const [activeTab, setActiveTab] = useState("manutencoes");
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [novaManutencaoModalOpen, setNovaManutencaoModalOpen] = useState(false);
@@ -127,12 +127,7 @@ export default function Manutencoes() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-1">
-          <TabsTrigger value="manutencoes">Manutenções</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="manutencoes" className="space-y-6">
+      <div className="space-y-6">
           {/* Cards de estatísticas com visual futurista */}
           <div className="grid gap-6 md:grid-cols-4">
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
@@ -364,10 +359,7 @@ export default function Manutencoes() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-
-
-      </Tabs>
+      </div>
 
       {/* Modais */}
       <NovaManutencaoModal

@@ -16,8 +16,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Sistema de abas convertido em modal** - Aba "Locais" transformada em pop-up modal
 - ✅ **Modal de gerenciamento de locais** - Novo modal para visualizar e gerenciar locais/oficinas
 - ✅ **Botão "Gerenciar Locais" adicionado** - Novo botão na área de controles da página de manutenções
+- ✅ **Título da aba "Manutenções" removido** - Interface ainda mais limpa sem título desnecessário
 - ✅ **Layout otimizado** - Elementos alinhados com melhor distribuição visual
-- ✅ **Experiência simplificada** - Interface mais limpa e intuitiva com menos abas
+- ✅ **Experiência simplificada** - Interface mais limpa e intuitiva sem sistema de abas
 
 ### 2025-07-17: Sistema de Loading Spinner Unificado com Animação de Carro - CONCLUÍDO
 - ✅ **Componente LoadingSpinner criado** - Substituído spinners padrão por animação de carro
