@@ -96,16 +96,23 @@ export default function Motoristas() {
     }
   };
 
-  // Filtra motoristas baseado na busca e filtros
-  const filteredMotoristas = motoristas.filter(motorista => {
-    const matchesSearch = motorista.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         motorista.cpf.includes(searchTerm) ||
-                         motorista.cnh.includes(searchTerm);
-    
-    const matchesStatus = statusFilter === 'todos' || motorista.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  // Filtra e ordena motoristas baseado na busca e filtros
+  const filteredMotoristas = motoristas
+    .filter(motorista => {
+      const matchesSearch = motorista.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           motorista.cpf.includes(searchTerm) ||
+                           motorista.cnh.includes(searchTerm);
+      
+      const matchesStatus = statusFilter === 'todos' || motorista.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Ordena por data de cadastro decrescente (mais novos primeiro)
+      const dateA = new Date(a.createdAt || '');
+      const dateB = new Date(b.createdAt || '');
+      return dateB.getTime() - dateA.getTime();
+    });
 
   // Calcula estatísticas baseadas no status da CNH
   const stats = {
