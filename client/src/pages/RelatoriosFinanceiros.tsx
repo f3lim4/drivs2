@@ -562,70 +562,78 @@ export default function RelatoriosFinanceiros() {
       {/* Cards de Resumo Financeiro - apenas para locadoras */}
       {!isAdmin && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-l-4 border-l-green-500">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">RECEITA TOTAL</p>
-                <p className="text-2xl font-bold text-green-600">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-green-700">RECEITA TOTAL</p>
+                <p className="text-2xl font-bold text-green-800">
                   {formatCurrency(receitaTotal)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-green-600">
                   {variacaoReceita > 0 ? '+' : ''}{variacaoReceita.toFixed(1)}% em relação ao mês anterior
                 </p>
               </div>
-              <TrendingUp className="h-6 w-6 text-green-600" />
+              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-green-700" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-red-500">
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">DESPESAS TOTAIS</p>
-                <p className="text-2xl font-bold text-red-600">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-red-700">DESPESAS TOTAIS</p>
+                <p className="text-2xl font-bold text-red-800">
                   {formatCurrency(totalDespesas)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-red-600">
                   {variacaoDespesas > 0 ? '+' : ''}{variacaoDespesas.toFixed(1)}% em relação ao mês anterior
                 </p>
               </div>
-              <TrendingDown className="h-6 w-6 text-red-600" />
+              <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
+                <TrendingDown className="w-6 h-6 text-red-700" />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-500">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">LUCRO LÍQUIDO</p>
-                <p className={`text-2xl font-bold ${lucroLiquido >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-blue-700">LUCRO LÍQUIDO</p>
+                <p className={`text-2xl font-bold ${lucroLiquido >= 0 ? 'text-blue-800' : 'text-red-800'}`}>
                   {formatCurrency(lucroLiquido)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-blue-600">
                   {variacaoLucro > 0 ? '+' : ''}{variacaoLucro.toFixed(1)}% em relação ao mês anterior
                 </p>
               </div>
-              <DollarSign className={`h-6 w-6 ${lucroLiquido >= 0 ? 'text-blue-600' : 'text-red-600'}`} />
+              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+                <DollarSign className={`w-6 h-6 ${lucroLiquido >= 0 ? 'text-blue-700' : 'text-red-700'}`} />
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-purple-500">
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">MARGEM DE LUCRO</p>
-                <p className={`text-2xl font-bold ${margemLucro >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-purple-700">MARGEM DE LUCRO</p>
+                <p className={`text-2xl font-bold ${margemLucro >= 0 ? 'text-purple-800' : 'text-red-800'}`}>
                   {margemLucro.toFixed(1)}%
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-purple-600">
                   Meta: 30%
                 </p>
               </div>
-              <TrendingUp className={`h-6 w-6 ${margemLucro >= 0 ? 'text-purple-600' : 'text-red-600'}`} />
+              <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
+                <TrendingUp className={`w-6 h-6 ${margemLucro >= 0 ? 'text-purple-700' : 'text-red-700'}`} />
+              </div>
             </div>
           </CardContent>
         </Card>
