@@ -451,11 +451,6 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => {
-                            const hoje = new Date();
-                            hoje.setHours(0, 0, 0, 0);
-                            return date < hoje;
-                          }}
                           initialFocus
                           className={cn("p-3 pointer-events-auto")}
                         />

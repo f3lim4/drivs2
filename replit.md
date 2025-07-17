@@ -23,6 +23,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Dashboard focado** - Interface concentrada nos cards principais e anúncios
 - ✅ **Performance melhorada** - Reduzido processamento de dados desnecessário
 - ✅ **Interface limpa** - Dashboard mais direto e objetivo
+- ✅ **Geração de contratos flexível** - Removida restrição de datas anteriores no modal de contratos
 
 ### 2025-07-17: Correção Crítica de Isolamento de Dados - Página de Aluguéis - CONCLUÍDO
 - ✅ **Bug crítico corrigido** - Página de aluguéis estava usando profile.id em vez de profile.locadoraId
