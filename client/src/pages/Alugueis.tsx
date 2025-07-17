@@ -48,10 +48,10 @@ export default function Alugueis() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedAluguel, setSelectedAluguel] = useState<Aluguel | null>(null);
 
-  // Buscar locadoras para exibir nome na coluna (somente para admin)
+  // Buscar locadoras para exibir nome na coluna (para admin) ou exibir nome da locadora atual (para locadora)
   const { data: locadoras = [], isLoading: locadorasLoading } = useQuery({
     queryKey: ['/api/locadoras'],
-    enabled: isAdmin,
+    enabled: isAdmin || isLocadora,
   });
 
   // Função para encontrar o nome da locadora
@@ -63,6 +63,9 @@ export default function Alugueis() {
     const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
     return locadora ? locadora.nome : `ID: ${locadoraId}`;
   };
+
+  // Obter nome da locadora atual para usuários locadora
+  const nomeLocadoraAtual = isLocadora && profile?.locadoraId ? getLocadoraName(profile.locadoraId) : null;
 
   // Carrega dados dos aluguéis
   useEffect(() => {
@@ -300,6 +303,25 @@ export default function Alugueis() {
           variant="green"
         />
       </div>
+
+      {/* Seção da locadora - apenas para usuários locadora */}
+      {isLocadora && nomeLocadoraAtual && (
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                <span className="text-white font-semibold text-sm">
+                  {nomeLocadoraAtual.substring(0, 2).toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900">{nomeLocadoraAtual}</h3>
+                <p className="text-sm text-blue-600">Painel de Controle de Aluguéis</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Controles de busca e filtros */}
       <Card>
