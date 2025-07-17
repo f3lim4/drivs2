@@ -394,7 +394,7 @@ export default function Alugueis() {
 
 
       {/* Controles de busca e filtros */}
-      <Card>
+      <Card className="bg-white border border-gray-200 shadow-sm">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Busca */}
