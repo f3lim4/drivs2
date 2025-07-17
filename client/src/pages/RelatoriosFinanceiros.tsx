@@ -88,6 +88,21 @@ export default function RelatoriosFinanceiros() {
     setItemsPerPageDespesasFixas(items);
     setCurrentPageDespesasFixas(1);
   };
+  
+  // Estados de paginação para a aba "Análise por Veículo"
+  const [currentPageVeiculos, setCurrentPageVeiculos] = useState(1);
+  const [itemsPerPageVeiculos, setItemsPerPageVeiculos] = useState(10);
+  
+  // Função para alterar página
+  const handlePageChangeVeiculos = (page: number) => {
+    setCurrentPageVeiculos(page);
+  };
+  
+  // Função para alterar itens por página
+  const handleItemsPerPageChangeVeiculos = (items: number) => {
+    setItemsPerPageVeiculos(items);
+    setCurrentPageVeiculos(1);
+  };
 
   // Formulário para nova despesa
   const formNovaDespesa = useForm<NovaDespesaData>({
@@ -1041,77 +1056,97 @@ export default function RelatoriosFinanceiros() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {analiseVeiculos.map((item) => (
-                      <TableRow key={item.veiculo}>
-                        <TableCell className="text-center">
-                          {(() => {
-                            const veiculoEncontrado = veiculos.find(v => v.placa === item.veiculo);
-                            if (!veiculoEncontrado) {
-                              return <Eye className="h-4 w-4 text-gray-400 mx-auto" />;
-                            }
-                            return (
-                              <DetalhesVeiculoModal
-                                {...gerarDadosDetalhados(veiculoEncontrado)}
-                                trigger={
-                                  <Button variant="ghost" size="sm" className="p-0 h-auto">
-                                    <Eye className="h-4 w-4 text-blue-600 hover:text-blue-800" />
-                                  </Button>
-                                }
-                              />
-                            );
-                          })()}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          <div>
-                            <p className="font-semibold">{item.veiculo}</p>
-                            <p className="text-sm text-gray-500">{item.modelo}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-green-600 font-bold">
-                          {formatCurrency(item.receitaMensal)}
-                        </TableCell>
-                        <TableCell className="text-red-600 font-bold">
-                          {formatCurrency(item.despesasMensais)}
-                        </TableCell>
-                        <TableCell className="text-green-600 font-bold">
-                          {formatCurrency(item.receitaAnual)}
-                        </TableCell>
-                        <TableCell className="text-red-600 font-bold">
-                          {formatCurrency(item.despesasAnuais)}
-                        </TableCell>
-                        <TableCell className={`font-bold ${item.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {formatCurrency(item.lucro)}
-                        </TableCell>
-                        <TableCell className={`font-bold ${item.margem >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {item.margem.toFixed(1)}%
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={item.status === 'Lucrativo' ? 'default' : 'secondary'}>
-                            {item.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {(() => {
-                            const veiculoEncontrado = veiculos.find(v => v.placa === item.veiculo);
-                            if (!veiculoEncontrado) {
+                    {(() => {
+                      // Calcular paginação
+                      const startIndex = (currentPageVeiculos - 1) * itemsPerPageVeiculos;
+                      const endIndex = startIndex + itemsPerPageVeiculos;
+                      const dadosPaginados = analiseVeiculos.slice(startIndex, endIndex);
+                      
+                      return dadosPaginados.map((item) => (
+                        <TableRow key={item.veiculo}>
+                          <TableCell className="text-center">
+                            {(() => {
+                              const veiculoEncontrado = veiculos.find(v => v.placa === item.veiculo);
+                              if (!veiculoEncontrado) {
+                                return <Eye className="h-4 w-4 text-gray-400 mx-auto" />;
+                              }
                               return (
-                                <Button variant="ghost" size="sm" disabled>
-                                  <Eye className="h-4 w-4" />
-                                </Button>
+                                <DetalhesVeiculoModal
+                                  {...gerarDadosDetalhados(veiculoEncontrado)}
+                                  trigger={
+                                    <Button variant="ghost" size="sm" className="p-0 h-auto">
+                                      <Eye className="h-4 w-4 text-blue-600 hover:text-blue-800" />
+                                    </Button>
+                                  }
+                                />
                               );
-                            }
-                            return (
-                              <DetalhesVeiculoModal
-                                {...gerarDadosDetalhados(veiculoEncontrado)}
-                              />
-                            );
-                          })()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                            })()}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            <div>
+                              <p className="font-semibold">{item.veiculo}</p>
+                              <p className="text-sm text-gray-500">{item.modelo}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-green-600 font-bold">
+                            {formatCurrency(item.receitaMensal)}
+                          </TableCell>
+                          <TableCell className="text-red-600 font-bold">
+                            {formatCurrency(item.despesasMensais)}
+                          </TableCell>
+                          <TableCell className="text-green-600 font-bold">
+                            {formatCurrency(item.receitaAnual)}
+                          </TableCell>
+                          <TableCell className="text-red-600 font-bold">
+                            {formatCurrency(item.despesasAnuais)}
+                          </TableCell>
+                          <TableCell className={`font-bold ${item.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {formatCurrency(item.lucro)}
+                          </TableCell>
+                          <TableCell className={`font-bold ${item.margem >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {item.margem.toFixed(1)}%
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={item.status === 'Lucrativo' ? 'default' : 'secondary'}>
+                              {item.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {(() => {
+                              const veiculoEncontrado = veiculos.find(v => v.placa === item.veiculo);
+                              if (!veiculoEncontrado) {
+                                return (
+                                  <Button variant="ghost" size="sm" disabled>
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                );
+                              }
+                              return (
+                                <DetalhesVeiculoModal
+                                  {...gerarDadosDetalhados(veiculoEncontrado)}
+                                />
+                              );
+                            })()}
+                          </TableCell>
+                        </TableRow>
+                      ));
+                    })()}
                   </TableBody>
                 </Table>
               </div>
+              
+              {/* Paginação */}
+              {analiseVeiculos.length > 0 && (
+                <div className="border-t pt-4 mt-4">
+                  <Pagination
+                    currentPage={currentPageVeiculos}
+                    totalItems={analiseVeiculos.length}
+                    itemsPerPage={itemsPerPageVeiculos}
+                    onPageChange={handlePageChangeVeiculos}
+                    onItemsPerPageChange={handleItemsPerPageChangeVeiculos}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
