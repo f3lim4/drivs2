@@ -195,95 +195,52 @@ export default function RelatoriosFinanceiros() {
     return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo, manutencoes: manutencoesPeriodo };
   }, [alugueis, pagamentos, infracoes, despesas, manutencoes, monthStart, monthEnd]);
 
-  // Cálculos de despesas fixas dos veículos
+  // Cálculo simplificado das despesas fixas dos veículos
   const despesasFixasVeiculos = useMemo(() => {
     return veiculos.map(veiculo => {
-      const despesasFixas = [];
+      // Calcular despesas mensais do veículo
+      let despesasMensais = 0;
       
-      // IPVA (divide anual por 12 meses)
+      // IPVA mensal (anual dividido por 12)
       if (veiculo.ipva && veiculo.ipva > 0) {
-        const valorIpva = parseFloat(veiculo.ipva) / 12;
-        if (!isNaN(valorIpva)) {
-          despesasFixas.push({
-            tipo: 'IPVA',
-            valor: valorIpva,
-            descricao: `IPVA mensal - ${veiculo.placa}`,
-            veiculo: veiculo.placa
-          });
-        }
+        despesasMensais += parseFloat(veiculo.ipva) / 12;
       }
       
       // Seguro mensal
       if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
-        const valorSeguro = parseFloat(veiculo.valorSeguroMensal);
-        if (!isNaN(valorSeguro)) {
-          despesasFixas.push({
-            tipo: 'Seguro',
-            valor: valorSeguro,
-            descricao: `Seguro ${veiculo.seguradora || 'não informado'} - ${veiculo.placa}`,
-            veiculo: veiculo.placa
-          });
-        }
+        despesasMensais += parseFloat(veiculo.valorSeguroMensal);
       }
       
       // Rastreador mensal
       if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
-        const valorRastreador = parseFloat(veiculo.valorRastreadorMensal);
-        if (!isNaN(valorRastreador)) {
-          despesasFixas.push({
-            tipo: 'Rastreador',
-            valor: valorRastreador,
-            descricao: `Rastreador ${veiculo.rastreador || 'não informado'} - ${veiculo.placa}`,
-            veiculo: veiculo.placa
-          });
-        }
+        despesasMensais += parseFloat(veiculo.valorRastreadorMensal);
       }
       
       // Financiamento mensal
-      if (veiculo.financiado && veiculo.valorFinanciamento && veiculo.quantidadeParcelas) {
-        const valorMensal = parseFloat(veiculo.valorFinanciamento);
-        if (!isNaN(valorMensal)) {
-          despesasFixas.push({
-            tipo: 'Financiamento',
-            valor: valorMensal,
-            descricao: `Financiamento - ${veiculo.placa}`,
-            veiculo: veiculo.placa
-          });
-        }
+      if (veiculo.financiado && veiculo.valorFinanciamento) {
+        despesasMensais += parseFloat(veiculo.valorFinanciamento);
       }
       
-      // Manutenções do veículo (do mês selecionado)
-      const monthStart = startOfMonth(selectedMonth);
-      const monthEnd = endOfMonth(selectedMonth);
-      
+      // Manutenções do mês selecionado
       const manutencoesVeiculo = filteredData.manutencoes?.filter(m => 
         m.veiculoId === veiculo.id && 
         m.valorOrcamento && 
-        parseFloat(m.valorOrcamento) > 0 &&
-        isWithinInterval(new Date(m.dataInicio), { start: monthStart, end: monthEnd })
+        parseFloat(m.valorOrcamento) > 0
       ) || [];
       
       manutencoesVeiculo.forEach(manutencao => {
         const valorManutencao = parseFloat(manutencao.valorOrcamento);
         if (!isNaN(valorManutencao)) {
-          despesasFixas.push({
-            tipo: 'Manutenção',
-            valor: valorManutencao,
-            descricao: `${manutencao.tipo} - ${manutencao.oficina} - ${veiculo.placa}`,
-            veiculo: veiculo.placa
-          });
+          despesasMensais += valorManutencao;
         }
       });
       
       return {
         veiculo: veiculo.placa,
-        marca: veiculo.marca,
-        modelo: veiculo.modelo,
-        despesas: despesasFixas,
-        totalMensal: despesasFixas.reduce((sum, desp) => sum + desp.valor, 0)
+        totalMensal: despesasMensais
       };
     });
-  }, [veiculos]);
+  }, [veiculos, filteredData.manutencoes]);
 
   // Total das despesas fixas mensais
   const totalDespesasFixas = useMemo(() => {
@@ -355,8 +312,7 @@ export default function RelatoriosFinanceiros() {
     })),
     despesasFixasDetalhadas: despesasFixasVeiculos.map(dfv => ({
       veiculo: dfv.veiculo,
-      totalMensal: dfv.totalMensal,
-      despesas: dfv.despesas
+      totalMensal: dfv.totalMensal
     })),
     receitaTotal,
     lucroLiquido,
@@ -474,14 +430,12 @@ export default function RelatoriosFinanceiros() {
     // Detalhamento por categoria incluindo despesas fixas
     const despesasDetalhadas = [];
     
-    // Despesas fixas
-    if (despesaFixaVeiculo && despesaFixaVeiculo.despesas) {
-      despesaFixaVeiculo.despesas.forEach(despesaFixa => {
-        despesasDetalhadas.push({
-          categoria: despesaFixa.tipo,
-          valor: despesaFixa.valor,
-          percentual: despesasMensais > 0 ? (despesaFixa.valor / despesasMensais) * 100 : 0
-        });
+    // Despesas fixas simplificadas (valor total)
+    if (despesaFixaVeiculo && despesaFixaVeiculo.totalMensal > 0) {
+      despesasDetalhadas.push({
+        categoria: 'Despesas Fixas',
+        valor: despesaFixaVeiculo.totalMensal,
+        percentual: despesasMensais > 0 ? (despesaFixaVeiculo.totalMensal / despesasMensais) * 100 : 0
       });
     }
     
