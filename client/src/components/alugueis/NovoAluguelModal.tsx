@@ -55,7 +55,6 @@ const aluguelSchema = z.object({
     required_error: 'Data de início é obrigatória',
   }),
   tempoContrato: z.number().min(1, 'Tempo de contrato deve ser maior que 0'),
-  taxaAdministrativa: z.number().optional(),
 });
 
 type AluguelFormData = z.infer<typeof aluguelSchema>;
@@ -89,7 +88,6 @@ export function NovoAluguelModal({
       veiculoId: '',
       dataInicio: getHoje(),
       tempoContrato: '' as any,
-      taxaAdministrativa: undefined,
     },
   });
 
@@ -223,7 +221,7 @@ export function NovoAluguelModal({
         caucao: (typeof veiculo.caucao === 'string' ? 
           parseFloat(veiculo.caucao.replace(',', '.')) : 
           veiculo.caucao).toString(),
-        taxaAdministrativa: data.taxaAdministrativa ? data.taxaAdministrativa.toString() : '0',
+        taxaAdministrativa: '0',
         status: 'ativo',
       };
 
@@ -276,7 +274,7 @@ export function NovoAluguelModal({
           caucao: typeof veiculo.caucao === 'string' ? 
             parseFloat(veiculo.caucao.replace(',', '.')) : 
             veiculo.caucao,
-          taxaAdmin: data.taxaAdministrativa,
+          taxaAdmin: 0,
         },
         status: 'ativo',
       };
@@ -288,7 +286,6 @@ export function NovoAluguelModal({
         veiculoId: '',
         dataInicio: getHoje(),
         tempoContrato: '' as any,
-        taxaAdministrativa: undefined,
       });
       
     } catch (error) {
@@ -430,55 +427,54 @@ export function NovoAluguelModal({
                 )}
               />
 
-              {/* DATA DE INÍCIO */}
-              <FormField
-                control={form.control}
-                name="dataInicio"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Data de Início *</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "dd/MM/yyyy", { locale: ptBR })
-                            ) : (
-                              <span>dd/mm/aaaa</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* TEMPO DE CONTRATO E TAXA ADMINISTRATIVA */}
+              {/* DATA DE INÍCIO E TEMPO DE CONTRATO */}
               <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="dataInicio"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Data de Início *</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "dd/MM/yyyy", { locale: ptBR })
+                              ) : (
+                                <span>dd/mm/aaaa</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="tempoContrato"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tempo de Contrato (meses) *</FormLabel>
+                      <FormLabel>Tempo (meses) *</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -488,26 +484,6 @@ export function NovoAluguelModal({
                             const value = e.target.value;
                             field.onChange(value === '' ? '' : parseInt(value) || 0);
                           }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="taxaAdministrativa"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Taxa Administrativa (Opcional)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          step="0.01"
-                          placeholder="0" 
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
                       </FormControl>
                       <FormMessage />
