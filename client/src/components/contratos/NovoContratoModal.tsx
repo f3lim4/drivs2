@@ -106,7 +106,7 @@ export function NovoContratoModal({
       motoristaId: '',
       veiculoId: '',
       dataInicio: getAmanha(),
-      tempoContrato: 1,
+      tempoContrato: '' as any,
       valorSemanal: 0,
       caucao: 0,
       templateId: 'default',
@@ -317,7 +317,16 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
       
       onContratoGerado(contratoCriado);
       onOpenChange(false);
-      form.reset();
+      form.reset({
+        aluguelId: '',
+        motoristaId: '',
+        veiculoId: '',
+        dataInicio: getAmanha(),
+        tempoContrato: '' as any,
+        valorSemanal: 0,
+        caucao: 0,
+        templateId: 'default',
+      });
       
     } catch (error) {
       console.error('Erro ao gerar contrato:', error);
@@ -472,9 +481,11 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
                       <Input 
                         type="number" 
                         min="1"
-                        placeholder="1" 
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value === '' ? '' : parseInt(value) || 0);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
