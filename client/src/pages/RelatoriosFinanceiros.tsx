@@ -66,6 +66,12 @@ export default function RelatoriosFinanceiros() {
   const [modalEditarDespesa, setModalEditarDespesa] = useState(false);
   const [despesaEditando, setDespesaEditando] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
+  
+  // Estados de ordenação para as abas
+  const [sortVeiculos, setSortVeiculos] = useState<string>('mais-lucrativos');
+  const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
+  const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('mais-recentes');
+  const [sortHistorico, setSortHistorico] = useState<string>('mais-recentes');
 
   // Formulário para nova despesa
   const formNovaDespesa = useForm<NovaDespesaData>({
@@ -436,7 +442,9 @@ export default function RelatoriosFinanceiros() {
 
   // Análise por veículo
   const analiseVeiculos = useMemo(() => {
-    return veiculos.map(veiculo => {
+    if (!veiculos || veiculos.length === 0) return [];
+    
+    const analise = veiculos.map(veiculo => {
       const aluguelVeiculo = alugueis.find(a => a.veiculoId === veiculo.id && a.status === 'ativo');
       const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
       
@@ -492,7 +500,31 @@ export default function RelatoriosFinanceiros() {
         status
       };
     });
-  }, [veiculos, alugueis, despesas, despesasFixasVeiculos, monthStart, monthEnd]);
+    
+    // Aplicar ordenação
+    return analise.sort((a, b) => {
+      switch (sortVeiculos) {
+        case 'mais-lucrativos':
+          return b.lucro - a.lucro;
+        case 'menos-lucrativos':
+          return a.lucro - b.lucro;
+        case 'maior-receita':
+          return b.receitaMensal - a.receitaMensal;
+        case 'menor-receita':
+          return a.receitaMensal - b.receitaMensal;
+        case 'maior-despesa':
+          return b.despesasMensais - a.despesasMensais;
+        case 'menor-despesa':
+          return a.despesasMensais - b.despesasMensais;
+        case 'placa-az':
+          return a.veiculo.localeCompare(b.veiculo);
+        case 'placa-za':
+          return b.veiculo.localeCompare(a.veiculo);
+        default:
+          return b.lucro - a.lucro;
+      }
+    });
+  }, [veiculos, alugueis, despesas, despesasFixasVeiculos, monthStart, monthEnd, sortVeiculos]);
 
   // Cálculo de mês anterior para comparação
   const mesAnterior = subMonths(selectedMonth, 1);
@@ -857,14 +889,33 @@ export default function RelatoriosFinanceiros() {
 
         <TabsContent value="veiculos" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Car className="h-5 w-5" />
-                ANÁLISE FINANCEIRA POR VEÍCULO
-              </CardTitle>
-              <CardDescription>
-                Performance financeira detalhada de cada veículo da frota
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Car className="h-5 w-5" />
+                  ANÁLISE FINANCEIRA POR VEÍCULO
+                </CardTitle>
+                <CardDescription>
+                  Performance financeira detalhada de cada veículo da frota
+                </CardDescription>
+              </div>
+              
+              {/* Ordenação */}
+              <Select value={sortVeiculos} onValueChange={setSortVeiculos}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mais-lucrativos">Mais Lucrativos</SelectItem>
+                  <SelectItem value="menos-lucrativos">Menos Lucrativos</SelectItem>
+                  <SelectItem value="maior-receita">Maior Receita</SelectItem>
+                  <SelectItem value="menor-receita">Menor Receita</SelectItem>
+                  <SelectItem value="maior-despesa">Maior Despesa</SelectItem>
+                  <SelectItem value="menor-despesa">Menor Despesa</SelectItem>
+                  <SelectItem value="placa-az">Placa (A-Z)</SelectItem>
+                  <SelectItem value="placa-za">Placa (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -961,35 +1012,81 @@ export default function RelatoriosFinanceiros() {
 
         <TabsContent value="motoristas" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Análise por Motorista</CardTitle>
-              <CardDescription>
-                Performance financeira baseada nos pagamentos de cada motorista
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Análise por Motorista</CardTitle>
+                <CardDescription>
+                  Performance financeira baseada nos pagamentos de cada motorista
+                </CardDescription>
+              </div>
+              
+              {/* Ordenação */}
+              <Select value={sortMotoristas} onValueChange={setSortMotoristas}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mais-pagamentos">Mais Pagamentos</SelectItem>
+                  <SelectItem value="menos-pagamentos">Menos Pagamentos</SelectItem>
+                  <SelectItem value="maior-valor">Maior Valor</SelectItem>
+                  <SelectItem value="menor-valor">Menor Valor</SelectItem>
+                  <SelectItem value="mais-atuais">Mais Atuais</SelectItem>
+                  <SelectItem value="menos-atuais">Menos Atuais</SelectItem>
+                  <SelectItem value="nome-az">Nome (A-Z)</SelectItem>
+                  <SelectItem value="nome-za">Nome (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {motoristas.map((motorista) => {
-                  // Calcular pagamentos do motorista no período
-                  const pagamentosMotorista = pagamentos.filter(p => 
-                    p.motoristaNome === motorista.nome && 
-                    p.status === 'pago' && 
-                    isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd })
-                  );
+                {(() => {
+                  const dadosMotoristas = motoristas.map((motorista) => {
+                    // Calcular pagamentos do motorista no período
+                    const pagamentosMotorista = pagamentos.filter(p => 
+                      p.motoristaNome === motorista.nome && 
+                      p.status === 'pago' && 
+                      isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd })
+                    );
+                    
+                    const totalPagamentos = pagamentosMotorista.reduce((total, p) => 
+                      total + parseFloat(p.valor || '0'), 0
+                    );
+                    
+                    // Encontrar aluguel ativo do motorista
+                    const aluguelAtivo = alugueis.find(a => 
+                      a.motoristaNome === motorista.nome && a.status === 'ativo'
+                    );
+                    
+                    return {
+                      motorista,
+                      totalPagamentos,
+                      pagamentosMotorista,
+                      aluguelAtivo,
+                      temDados: totalPagamentos > 0 || aluguelAtivo
+                    };
+                  }).filter(item => item.temDados);
                   
-                  const totalPagamentos = pagamentosMotorista.reduce((total, p) => 
-                    total + parseFloat(p.valor || '0'), 0
-                  );
+                  // Aplicar ordenação
+                  const dadosOrdenados = dadosMotoristas.sort((a, b) => {
+                    switch (sortMotoristas) {
+                      case 'mais-pagamentos':
+                        return b.pagamentosMotorista.length - a.pagamentosMotorista.length;
+                      case 'menos-pagamentos':
+                        return a.pagamentosMotorista.length - b.pagamentosMotorista.length;
+                      case 'maior-valor':
+                        return b.totalPagamentos - a.totalPagamentos;
+                      case 'menor-valor':
+                        return a.totalPagamentos - b.totalPagamentos;
+                      case 'nome-az':
+                        return a.motorista.nome.localeCompare(b.motorista.nome);
+                      case 'nome-za':
+                        return b.motorista.nome.localeCompare(a.motorista.nome);
+                      default:
+                        return b.totalPagamentos - a.totalPagamentos;
+                    }
+                  });
                   
-                  // Encontrar aluguel ativo do motorista
-                  const aluguelAtivo = alugueis.find(a => 
-                    a.motoristaNome === motorista.nome && a.status === 'ativo'
-                  );
-                  
-                  // Só mostrar motoristas que fizeram pagamentos ou têm aluguel ativo
-                  if (totalPagamentos === 0 && !aluguelAtivo) return null;
-                  
-                  return (
+                  return dadosOrdenados.map(({motorista, totalPagamentos, pagamentosMotorista, aluguelAtivo}) => (
                     <div key={motorista.id} className="flex justify-between items-center p-4 border rounded-lg">
                       <div>
                         <p className="font-semibold">{motorista.nome}</p>
@@ -1011,8 +1108,8 @@ export default function RelatoriosFinanceiros() {
                         </Badge>
                       </div>
                     </div>
-                  );
-                }).filter(Boolean)}
+                  ));
+                })()}
               </div>
             </CardContent>
           </Card>
@@ -1273,11 +1370,30 @@ export default function RelatoriosFinanceiros() {
 
         <TabsContent value="despesas-fixas" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Despesas Fixas dos Veículos</CardTitle>
-              <CardDescription>
-                Despesas automáticas baseadas no cadastro dos veículos (IPVA, Seguro, Rastreador)
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Despesas Fixas dos Veículos</CardTitle>
+                <CardDescription>
+                  Despesas automáticas baseadas no cadastro dos veículos (IPVA, Seguro, Rastreador)
+                </CardDescription>
+              </div>
+              
+              {/* Ordenação */}
+              <Select value={sortDespesasFixas} onValueChange={setSortDespesasFixas}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="maior-total">Maior Total</SelectItem>
+                  <SelectItem value="menor-total">Menor Total</SelectItem>
+                  <SelectItem value="maior-ipva">Maior IPVA</SelectItem>
+                  <SelectItem value="menor-ipva">Menor IPVA</SelectItem>
+                  <SelectItem value="maior-seguro">Maior Seguro</SelectItem>
+                  <SelectItem value="menor-seguro">Menor Seguro</SelectItem>
+                  <SelectItem value="placa-az">Placa (A-Z)</SelectItem>
+                  <SelectItem value="placa-za">Placa (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -1302,9 +1418,42 @@ export default function RelatoriosFinanceiros() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {despesasFixasVeiculos.map((veiculoFixo, index) => {
-                        const veiculoOriginal = veiculos.find(v => v.placa === veiculoFixo.veiculo);
-                        return (
+                      {(() => {
+                        const dadosOrdenados = [...despesasFixasVeiculos].sort((a, b) => {
+                          const veiculoA = veiculos.find(v => v.placa === a.veiculo);
+                          const veiculoB = veiculos.find(v => v.placa === b.veiculo);
+                          
+                          const ipvaA = veiculoA?.ipva ? parseFloat(veiculoA.ipva) / 12 : 0;
+                          const ipvaB = veiculoB?.ipva ? parseFloat(veiculoB.ipva) / 12 : 0;
+                          
+                          const seguroA = veiculoA?.valorSeguroMensal ? parseFloat(veiculoA.valorSeguroMensal) : 0;
+                          const seguroB = veiculoB?.valorSeguroMensal ? parseFloat(veiculoB.valorSeguroMensal) : 0;
+                          
+                          switch (sortDespesasFixas) {
+                            case 'maior-total':
+                              return b.totalMensal - a.totalMensal;
+                            case 'menor-total':
+                              return a.totalMensal - b.totalMensal;
+                            case 'maior-ipva':
+                              return ipvaB - ipvaA;
+                            case 'menor-ipva':
+                              return ipvaA - ipvaB;
+                            case 'maior-seguro':
+                              return seguroB - seguroA;
+                            case 'menor-seguro':
+                              return seguroA - seguroB;
+                            case 'placa-az':
+                              return a.veiculo.localeCompare(b.veiculo);
+                            case 'placa-za':
+                              return b.veiculo.localeCompare(a.veiculo);
+                            default:
+                              return b.totalMensal - a.totalMensal;
+                          }
+                        });
+                        
+                        return dadosOrdenados.map((veiculoFixo, index) => {
+                          const veiculoOriginal = veiculos.find(v => v.placa === veiculoFixo.veiculo);
+                          return (
                           <TableRow key={index}>
                             <TableCell>
                               <div>
@@ -1341,7 +1490,8 @@ export default function RelatoriosFinanceiros() {
                             </TableCell>
                           </TableRow>
                         );
-                      })}
+                      });
+                    })()}
                     </TableBody>
                   </Table>
                 </div>
