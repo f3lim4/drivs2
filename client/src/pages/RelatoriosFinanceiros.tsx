@@ -118,6 +118,21 @@ export default function RelatoriosFinanceiros() {
     setItemsPerPageMotoristas(items);
     setCurrentPageMotoristas(1);
   };
+  
+  // Estados de paginação para a aba "Histórico"
+  const [currentPageHistorico, setCurrentPageHistorico] = useState(1);
+  const [itemsPerPageHistorico, setItemsPerPageHistorico] = useState(10);
+  
+  // Função para alterar página
+  const handlePageChangeHistorico = (page: number) => {
+    setCurrentPageHistorico(page);
+  };
+  
+  // Função para alterar itens por página
+  const handleItemsPerPageChangeHistorico = (items: number) => {
+    setItemsPerPageHistorico(items);
+    setCurrentPageHistorico(1);
+  };
 
   // Formulário para nova despesa
   const formNovaDespesa = useForm<NovaDespesaData>({
@@ -1521,7 +1536,12 @@ export default function RelatoriosFinanceiros() {
                           return prioridadeTipo[a.tipo] - prioridadeTipo[b.tipo];
                         });
                         
-                        return todasDespesas.map((despesa) => (
+                        // Aplicar paginação
+                        const startIndex = (currentPageHistorico - 1) * itemsPerPageHistorico;
+                        const endIndex = startIndex + itemsPerPageHistorico;
+                        const despesasPaginadas = todasDespesas.slice(startIndex, endIndex);
+                        
+                        return despesasPaginadas.map((despesa) => (
                           <TableRow key={despesa.id}>
                             <TableCell>
                               {formatDate(despesa.data)}
@@ -1583,6 +1603,61 @@ export default function RelatoriosFinanceiros() {
                     </TableBody>
                   </Table>
                 </div>
+                
+                {/* Paginação */}
+                {(() => {
+                  const todasDespesas = [];
+                  
+                  // Adicionar despesas fixas mensais
+                  veiculos.forEach(veiculo => {
+                    const dataAtual = new Date().toISOString().split('T')[0];
+                    
+                    // IPVA mensal
+                    if (veiculo.ipva && veiculo.ipva > 0) {
+                      todasDespesas.push({});
+                    }
+                    
+                    // Seguro mensal
+                    if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+                      todasDespesas.push({});
+                    }
+                    
+                    // Rastreador mensal
+                    if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+                      todasDespesas.push({});
+                    }
+                    
+                    // Financiamento mensal
+                    if (veiculo.financiado && veiculo.valorFinanciamento) {
+                      todasDespesas.push({});
+                    }
+                  });
+                  
+                  // Adicionar manutenções
+                  filteredData.manutencoes.forEach(manutencao => {
+                    const valor = manutencao.valorFinal || manutencao.valorOrcamento;
+                    if (valor && parseFloat(valor) > 0) {
+                      todasDespesas.push({});
+                    }
+                  });
+                  
+                  // Adicionar despesas manuais (exceto financiamento)
+                  despesas.filter(despesa => despesa.categoria !== 'financiamento').forEach(despesa => {
+                    todasDespesas.push({});
+                  });
+                  
+                  return todasDespesas.length > 0 && (
+                    <div className="border-t pt-4 mt-4">
+                      <Pagination
+                        currentPage={currentPageHistorico}
+                        totalItems={todasDespesas.length}
+                        itemsPerPage={itemsPerPageHistorico}
+                        onPageChange={handlePageChangeHistorico}
+                        onItemsPerPageChange={handleItemsPerPageChangeHistorico}
+                      />
+                    </div>
+                  );
+                })()}
                 
                 {/* Resumo das despesas - movido para o final */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
