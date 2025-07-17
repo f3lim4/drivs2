@@ -889,7 +889,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/manutencoes", async (req, res) => {
     try {
-      const validatedData = insertManutencaoSchema.omit({ id: true }).parse(req.body);
+      // Limpar campos vazios para evitar erros de validação
+      const cleanedData = Object.fromEntries(
+        Object.entries(req.body).map(([key, value]) => {
+          // Converter strings vazias para null em campos numéricos
+          if (value === "" && ['quilometragemInicio', 'quilometragemFim', 'valorOrcamento', 'valorFinal'].includes(key)) {
+            return [key, null];
+          }
+          return [key, value];
+        })
+      );
+      
+      const validatedData = insertManutencaoSchema.omit({ id: true }).parse(cleanedData);
       const manutencao = await storage.createManutencao(validatedData);
       res.json(manutencao);
     } catch (error) {
@@ -900,7 +911,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/manutencoes/:id", async (req, res) => {
     try {
-      const validatedData = insertManutencaoSchema.partial().parse(req.body);
+      // Limpar campos vazios para evitar erros de validação
+      const cleanedData = Object.fromEntries(
+        Object.entries(req.body).map(([key, value]) => {
+          // Converter strings vazias para null em campos numéricos
+          if (value === "" && ['quilometragemInicio', 'quilometragemFim', 'valorOrcamento', 'valorFinal'].includes(key)) {
+            return [key, null];
+          }
+          return [key, value];
+        })
+      );
+      
+      const validatedData = insertManutencaoSchema.partial().parse(cleanedData);
       const manutencao = await storage.updateManutencao(req.params.id, validatedData);
       res.json(manutencao);
     } catch (error) {
