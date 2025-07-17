@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Sistema de Ordenação Implementado em Todas as Páginas - CONCLUÍDO
+- ✅ **Ordenação nas infrações** - Dropdown posicionado ao lado do título "Infrações" com 8 opções
+- ✅ **Ordenação nas manutenções** - Dropdown posicionado do lado oposto ao título "Manutenções da Frota"
+- ✅ **Sistema completo de ordenação** - Todas as páginas principais agora têm controle de ordenação
+- ✅ **Opções padronizadas** - 8 opções de ordenação por página (data, alfabética, valor, status)
+- ✅ **Posicionamento consistente** - Dropdowns posicionados ao lado dos títulos das tabelas
+- ✅ **Padrão "Mais Novos Primeiro"** - Configuração padrão em todas as páginas
+- ✅ **Integração com filtros** - Ordenação funciona junto com sistema de busca e filtros
+- ✅ **Páginas implementadas** - Veículos, Aluguéis, Contratos, Pagamentos, Infrações, Manutenções
+- ✅ **Funcionalidade validada** - Todos os sistemas de ordenação funcionando corretamente
+
 ### 2025-07-17: Sistema de Receita Semanal e Melhorias de Interface - CONCLUÍDO
 - ✅ **Card "RECEITA MENSAL" substituído** - Agora é "TOTAL RECEBIDO ESSA SEMANA" focado no valor semanal
 - ✅ **Cálculo semanal inteligente** - Receita esperada baseada nos aluguéis ativos (valor mensal ÷ 4)
