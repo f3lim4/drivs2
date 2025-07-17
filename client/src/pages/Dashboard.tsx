@@ -807,15 +807,15 @@ export default function Dashboard() {
         </div>
 
         {/* Card de Suporte */}
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+            <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
               <Phone className="w-5 h-5" />
               Suporte DRIVS
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="p-3 bg-white rounded-lg border border-purple-200">
+            <div className="p-3 bg-white rounded-lg border border-blue-200">
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-green-600" />
@@ -826,12 +826,12 @@ export default function Dashboard() {
                   <span className="text-gray-700 font-medium">suporte@drivs.com.br</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <ExternalLink className="w-4 h-4 text-purple-600" />
+                  <ExternalLink className="w-4 h-4 text-blue-600" />
                   <a 
                     href="https://drivs.com.br/suporte" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-purple-600 hover:text-purple-700 hover:underline font-medium"
+                    className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
                   >
                     Central de Ajuda
                   </a>
