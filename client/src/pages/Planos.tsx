@@ -2,59 +2,74 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, X, Star, Building2, Zap, Crown } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import { Check, X, Star, Building2, Zap, Crown, Plus, Edit, Trash2, Eye, Settings } from 'lucide-react';
 
 interface Plano {
   id: string;
   nome: string;
-  preco: number;
-  periodo: 'mensal' | 'anual';
+  precoMensal: number;
+  precoAnual: number;
   descricao: string;
+  maxVeiculos: number;
+  maxMotoristas: number;
   features: string[];
-  limitedFeatures: string[];
-  notIncluded: string[];
-  popular?: boolean;
-  recommended?: boolean;
+  ativo: boolean;
+  cor: string;
+  ordem: number;
+}
+
+interface LocadoraPlano {
+  id: string;
+  nome: string;
+  planoAtual: string;
+  dataInicio: string;
+  dataVencimento: string;
+  status: 'ativo' | 'vencido' | 'cancelado';
+  valorPago: number;
 }
 
 export default function Planos() {
-  const [periodoSelecionado, setPeriodoSelecionado] = useState<'mensal' | 'anual'>('mensal');
+  const { toast } = useToast();
+  const [modalAberto, setModalAberto] = useState(false);
+  const [planoEditando, setPlanoEditando] = useState<Plano | null>(null);
+  const [modalLocadoras, setModalLocadoras] = useState(false);
 
-  const planos: Plano[] = [
+  // Dados de exemplo dos planos
+  const [planos, setPlanos] = useState<Plano[]>([
     {
       id: 'basico',
       nome: 'Básico',
-      preco: periodoSelecionado === 'mensal' ? 99 : 990,
-      periodo: periodoSelecionado,
+      precoMensal: 99,
+      precoAnual: 990,
       descricao: 'Ideal para pequenas locadoras iniciantes',
+      maxVeiculos: 20,
+      maxMotoristas: 50,
       features: [
-        'Até 20 veículos',
-        'Até 50 motoristas',
         'Gestão básica de aluguéis',
         'Contratos simples',
         'Relatórios básicos',
         'Suporte por email'
       ],
-      limitedFeatures: [
-        'Dashboard limitado',
-        'Relatórios mensais apenas'
-      ],
-      notIncluded: [
-        'Relatórios avançados',
-        'API personalizada',
-        'Integração com terceiros',
-        'Suporte prioritário'
-      ]
+      ativo: true,
+      cor: '#64748b',
+      ordem: 1
     },
     {
       id: 'premium',
       nome: 'Premium',
-      preco: periodoSelecionado === 'mensal' ? 199 : 1990,
-      periodo: periodoSelecionado,
+      precoMensal: 199,
+      precoAnual: 1990,
       descricao: 'Para locadoras em crescimento',
+      maxVeiculos: 100,
+      maxMotoristas: 200,
       features: [
-        'Até 100 veículos',
-        'Até 200 motoristas',
         'Gestão completa de aluguéis',
         'Contratos personalizados',
         'Relatórios avançados',
@@ -62,22 +77,18 @@ export default function Planos() {
         'Notificações automáticas',
         'Suporte prioritário'
       ],
-      limitedFeatures: [
-        'Integração básica com terceiros'
-      ],
-      notIncluded: [
-        'API completamente personalizada',
-        'Suporte 24/7',
-        'Consultoria especializada'
-      ],
-      popular: true
+      ativo: true,
+      cor: '#3b82f6',
+      ordem: 2
     },
     {
       id: 'enterprise',
       nome: 'Enterprise',
-      preco: periodoSelecionado === 'mensal' ? 399 : 3990,
-      periodo: periodoSelecionado,
+      precoMensal: 399,
+      precoAnual: 3990,
       descricao: 'Para grandes redes de locadoras',
+      maxVeiculos: 9999,
+      maxMotoristas: 9999,
       features: [
         'Veículos ilimitados',
         'Motoristas ilimitados',
@@ -85,18 +96,46 @@ export default function Planos() {
         'Contratos avançados',
         'Relatórios personalizados',
         'Dashboard executivo',
-        'Notificações avançadas',
-        'API completamente personalizada',
-        'Integração completa com terceiros',
+        'API personalizada',
         'Suporte 24/7',
-        'Consultoria especializada',
-        'Treinamento da equipe'
+        'Consultoria especializada'
       ],
-      limitedFeatures: [],
-      notIncluded: [],
-      recommended: true
+      ativo: true,
+      cor: '#8b5cf6',
+      ordem: 3
     }
-  ];
+  ]);
+
+  // Dados de exemplo das locadoras e seus planos
+  const [locadorasPlanos, setLocadorasPlanos] = useState<LocadoraPlano[]>([
+    {
+      id: '1',
+      nome: 'Crivelari Locadora',
+      planoAtual: 'premium',
+      dataInicio: '2024-01-15',
+      dataVencimento: '2024-12-15',
+      status: 'ativo',
+      valorPago: 1990
+    },
+    {
+      id: '2',
+      nome: 'AutoRent Premium',
+      planoAtual: 'enterprise',
+      dataInicio: '2024-03-01',
+      dataVencimento: '2024-03-01',
+      status: 'ativo',
+      valorPago: 3990
+    },
+    {
+      id: '3',
+      nome: 'Rápido Veículos',
+      planoAtual: 'basico',
+      dataInicio: '2024-06-10',
+      dataVencimento: '2024-06-10',
+      status: 'ativo',
+      valorPago: 990
+    }
+  ]);
 
   const formatCurrency = (value: number) => {
     return value.toLocaleString('pt-BR', {
@@ -118,220 +157,278 @@ export default function Planos() {
     }
   };
 
-  const getCardStyle = (plano: Plano) => {
-    if (plano.recommended) {
-      return "border-2 border-purple-500 bg-gradient-to-br from-purple-50 to-purple-100 shadow-lg";
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'ativo':
+        return <Badge className="bg-green-100 text-green-800">Ativo</Badge>;
+      case 'vencido':
+        return <Badge className="bg-red-100 text-red-800">Vencido</Badge>;
+      case 'cancelado':
+        return <Badge className="bg-gray-100 text-gray-800">Cancelado</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
     }
-    if (plano.popular) {
-      return "border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg";
-    }
-    return "border border-slate-200 bg-white shadow-sm";
   };
 
-  const getButtonStyle = (plano: Plano) => {
-    if (plano.recommended) {
-      return "bg-purple-600 hover:bg-purple-700 text-white";
-    }
-    if (plano.popular) {
-      return "bg-blue-600 hover:bg-blue-700 text-white";
-    }
-    return "bg-slate-800 hover:bg-slate-900 text-white";
+  const getPlanoNome = (planoId: string) => {
+    const plano = planos.find(p => p.id === planoId);
+    return plano ? plano.nome : planoId;
+  };
+
+  const handleSalvarPlano = () => {
+    toast({
+      title: "Plano salvo com sucesso",
+      description: "As alterações foram aplicadas.",
+    });
+    setModalAberto(false);
+    setPlanoEditando(null);
+  };
+
+  const handleExcluirPlano = (planoId: string) => {
+    setPlanos(planos.filter(p => p.id !== planoId));
+    toast({
+      title: "Plano excluído",
+      description: "O plano foi removido do sistema.",
+    });
   };
 
   return (
     <div className="flex-1 space-y-6 p-6">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-slate-800">
-          Escolha o Plano Ideal para sua Locadora
-        </h1>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-          Planos flexíveis para todos os tamanhos de negócio. Comece gratuitamente e escale conforme sua demanda.
-        </p>
-      </div>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">
+            Gerenciamento de Planos
+          </h1>
+          <p className="text-slate-600 mt-1">
+            Gerencie os planos disponíveis para as locadoras
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setModalLocadoras(true)}
+            className="flex items-center gap-2"
+          >
+            <Eye className="w-4 h-4" />
+            Ver Locadoras
+          </Button>
+          <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                Novo Plano
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>
+                  {planoEditando ? 'Editar Plano' : 'Novo Plano'}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="nome">Nome do Plano</Label>
+                    <Input id="nome" placeholder="Ex: Premium" />
+                  </div>
+                  <div>
+                    <Label htmlFor="cor">Cor</Label>
+                    <Input id="cor" type="color" defaultValue="#3b82f6" />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="descricao">Descrição</Label>
+                  <Textarea id="descricao" placeholder="Descreva o plano..." />
+                </div>
 
-      {/* Toggle Período */}
-      <div className="flex justify-center">
-        <div className="bg-slate-100 p-1 rounded-lg">
-          <button
-            onClick={() => setPeriodoSelecionado('mensal')}
-            className={`px-4 py-2 rounded-md font-medium transition-all ${
-              periodoSelecionado === 'mensal'
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-600 hover:text-slate-800'
-            }`}
-          >
-            Mensal
-          </button>
-          <button
-            onClick={() => setPeriodoSelecionado('anual')}
-            className={`px-4 py-2 rounded-md font-medium transition-all ${
-              periodoSelecionado === 'anual'
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-600 hover:text-slate-800'
-            }`}
-          >
-            Anual
-            <Badge className="ml-2 bg-green-100 text-green-800 text-xs">
-              2 meses grátis
-            </Badge>
-          </button>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="precoMensal">Preço Mensal (R$)</Label>
+                    <Input id="precoMensal" type="number" placeholder="199" />
+                  </div>
+                  <div>
+                    <Label htmlFor="precoAnual">Preço Anual (R$)</Label>
+                    <Input id="precoAnual" type="number" placeholder="1990" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="maxVeiculos">Máximo de Veículos</Label>
+                    <Input id="maxVeiculos" type="number" placeholder="100" />
+                  </div>
+                  <div>
+                    <Label htmlFor="maxMotoristas">Máximo de Motoristas</Label>
+                    <Input id="maxMotoristas" type="number" placeholder="200" />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="features">Funcionalidades (uma por linha)</Label>
+                  <Textarea 
+                    id="features" 
+                    placeholder="Gestão completa de aluguéis&#10;Relatórios avançados&#10;Suporte prioritário"
+                    rows={5}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setModalAberto(false)}>
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleSalvarPlano}>
+                    Salvar Plano
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      {/* Grid de Planos */}
-      <div className="grid gap-8 md:grid-cols-3 max-w-7xl mx-auto">
+      {/* Cards dos Planos */}
+      <div className="grid gap-6 md:grid-cols-3">
         {planos.map((plano) => (
-          <Card key={plano.id} className={`${getCardStyle(plano)} relative overflow-hidden`}>
-            {plano.popular && (
-              <div className="absolute top-0 right-0 bg-blue-600 text-white px-3 py-1 text-sm font-medium">
-                <Star className="w-4 h-4 inline mr-1" />
-                Mais Popular
-              </div>
-            )}
-            
-            {plano.recommended && (
-              <div className="absolute top-0 right-0 bg-purple-600 text-white px-3 py-1 text-sm font-medium">
-                <Crown className="w-4 h-4 inline mr-1" />
-                Recomendado
-              </div>
-            )}
-
-            <CardHeader className="text-center space-y-4">
-              <div className="flex justify-center">
-                {getIcon(plano.id)}
-              </div>
-              
-              <div>
-                <CardTitle className="text-2xl font-bold text-slate-800">
-                  {plano.nome}
-                </CardTitle>
-                <p className="text-slate-600 mt-2">{plano.descricao}</p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-4xl font-bold text-slate-800">
-                  {formatCurrency(plano.preco)}
+          <Card key={plano.id} className="border border-slate-200 bg-white shadow-sm">
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: plano.cor + '20' }}
+                  >
+                    {getIcon(plano.id)}
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-semibold text-slate-800">
+                      {plano.nome}
+                    </CardTitle>
+                    <p className="text-sm text-slate-600">{plano.descricao}</p>
+                  </div>
                 </div>
-                <div className="text-slate-600">
-                  por {plano.periodo}
-                  {plano.periodo === 'anual' && (
-                    <div className="text-sm text-green-600 font-medium">
-                      Economize {formatCurrency(plano.preco * 0.2)} por ano
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setPlanoEditando(plano);
+                      setModalAberto(true);
+                    }}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleExcluirPlano(plano.id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-slate-600">Preço Mensal</p>
+                  <p className="font-semibold text-slate-800">{formatCurrency(plano.precoMensal)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600">Preço Anual</p>
+                  <p className="font-semibold text-slate-800">{formatCurrency(plano.precoAnual)}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-slate-600">Máx. Veículos</p>
+                  <p className="font-semibold text-slate-800">
+                    {plano.maxVeiculos === 9999 ? 'Ilimitado' : plano.maxVeiculos}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600">Máx. Motoristas</p>
+                  <p className="font-semibold text-slate-800">
+                    {plano.maxMotoristas === 9999 ? 'Ilimitado' : plano.maxMotoristas}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-slate-600 mb-2">Funcionalidades:</p>
+                <div className="space-y-1">
+                  {plano.features.slice(0, 3).map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      <span className="text-sm text-slate-700">{feature}</span>
                     </div>
+                  ))}
+                  {plano.features.length > 3 && (
+                    <p className="text-xs text-slate-500">
+                      +{plano.features.length - 3} funcionalidades
+                    </p>
                   )}
                 </div>
               </div>
 
-              <Button className={`w-full ${getButtonStyle(plano)}`}>
-                Escolher {plano.nome}
-              </Button>
-            </CardHeader>
-
-            <CardContent className="space-y-6">
-              {/* Features Incluídas */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-slate-800">Incluído:</h4>
-                <div className="space-y-2">
-                  {plano.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-slate-700">{feature}</span>
-                    </div>
-                  ))}
-                </div>
+              <div className="flex justify-between items-center pt-2">
+                <Badge className={plano.ativo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                  {plano.ativo ? 'Ativo' : 'Inativo'}
+                </Badge>
+                <span className="text-sm text-slate-600">Ordem: {plano.ordem}</span>
               </div>
-
-              {/* Features Limitadas */}
-              {plano.limitedFeatures.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-slate-800">Com limitações:</h4>
-                  <div className="space-y-2">
-                    {plano.limitedFeatures.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <Check className="w-5 h-5 text-yellow-600 flex-shrink-0" />
-                        <span className="text-slate-600">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Features Não Incluídas */}
-              {plano.notIncluded.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-slate-800">Não incluído:</h4>
-                  <div className="space-y-2">
-                    {plano.notIncluded.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <X className="w-5 h-5 text-slate-400 flex-shrink-0" />
-                        <span className="text-slate-500">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* FAQ Section */}
-      <div className="max-w-4xl mx-auto mt-16">
-        <h2 className="text-2xl font-bold text-slate-800 text-center mb-8">
-          Perguntas Frequentes
-        </h2>
-        
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="border border-slate-200 bg-white shadow-sm">
-            <CardContent className="p-6">
-              <h3 className="font-semibold text-slate-800 mb-2">
-                Posso mudar de plano a qualquer momento?
-              </h3>
-              <p className="text-slate-600">
-                Sim! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento. 
-                As mudanças são aplicadas imediatamente e você paga apenas a diferença proporcional.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-slate-200 bg-white shadow-sm">
-            <CardContent className="p-6">
-              <h3 className="font-semibold text-slate-800 mb-2">
-                Existe período de teste gratuito?
-              </h3>
-              <p className="text-slate-600">
-                Sim! Todos os planos incluem 14 dias de teste gratuito. 
-                Você pode testar todas as funcionalidades antes de decidir.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-slate-200 bg-white shadow-sm">
-            <CardContent className="p-6">
-              <h3 className="font-semibold text-slate-800 mb-2">
-                Os dados ficam seguros?
-              </h3>
-              <p className="text-slate-600">
-                Absolutamente! Utilizamos criptografia de ponta e backups diários. 
-                Seus dados estão protegidos em servidores seguros com certificação ISO.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border border-slate-200 bg-white shadow-sm">
-            <CardContent className="p-6">
-              <h3 className="font-semibold text-slate-800 mb-2">
-                Preciso de treinamento?
-              </h3>
-              <p className="text-slate-600">
-                O sistema é intuitivo, mas oferecemos treinamento completo da equipe 
-                no plano Enterprise e documentação detalhada em todos os planos.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {/* Modal das Locadoras */}
+      <Dialog open={modalLocadoras} onOpenChange={setModalLocadoras}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Locadoras e seus Planos</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Locadora</TableHead>
+                  <TableHead>Plano Atual</TableHead>
+                  <TableHead>Data Início</TableHead>
+                  <TableHead>Data Vencimento</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Valor Pago</TableHead>
+                  <TableHead>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {locadorasPlanos.map((locadora) => (
+                  <TableRow key={locadora.id}>
+                    <TableCell className="font-medium">{locadora.nome}</TableCell>
+                    <TableCell>{getPlanoNome(locadora.planoAtual)}</TableCell>
+                    <TableCell>{new Date(locadora.dataInicio).toLocaleDateString('pt-BR')}</TableCell>
+                    <TableCell>{new Date(locadora.dataVencimento).toLocaleDateString('pt-BR')}</TableCell>
+                    <TableCell>{getStatusBadge(locadora.status)}</TableCell>
+                    <TableCell>{formatCurrency(locadora.valorPago)}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="sm">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Settings className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
