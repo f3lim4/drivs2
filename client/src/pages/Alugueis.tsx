@@ -411,10 +411,9 @@ export default function Alugueis() {
                   <TableHead>PERÍODO</TableHead>
                   <TableHead>VALOR</TableHead>
                   <TableHead>CAUÇÃO</TableHead>
-                  <TableHead>TAXA ADMIN</TableHead>
                   <TableHead>LIMITE KM</TableHead>
-                <TableHead>STATUS</TableHead>
-                <TableHead>AÇÕES</TableHead>
+                  <TableHead>STATUS</TableHead>
+                  <TableHead>AÇÕES</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -467,7 +466,7 @@ export default function Alugueis() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <p>limitado</p>
+                      <p>{aluguel.limiteKm || 'Ilimitado'}</p>
                     </TableCell>
                     <TableCell>
                       {getStatusBadge(aluguel.status)}
@@ -521,12 +520,11 @@ export default function Alugueis() {
       </Card>
 
       {/* Paginação */}
-      {filteredAlugueis.length > 0 && (
+      {alugueisFormatados.length > 0 && (
         <Pagination
           currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
           totalItems={filteredAlugueis.length}
+          itemsPerPage={itemsPerPage}
           onPageChange={handlePageChange}
           onItemsPerPageChange={handleItemsPerPageChange}
         />
