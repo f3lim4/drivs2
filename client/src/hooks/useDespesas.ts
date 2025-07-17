@@ -30,7 +30,11 @@ export function useDespesas() {
       
       // Converter manutenções em despesas
       const despesasManutencao = manutencoes
-        .filter((manutencao: Manutencao) => manutencao.valorOrcamento && parseFloat(manutencao.valorOrcamento) > 0)
+        .filter((manutencao: Manutencao) => {
+          // Prioriza valorFinal se disponível, senão usa valorOrcamento
+          const valor = manutencao.valorFinal || manutencao.valorOrcamento;
+          return valor && parseFloat(valor) > 0;
+        })
         .map((manutencao: Manutencao) => ({
           id: `manutencao_${manutencao.id}`,
           locadoraId: manutencao.locadoraId,
@@ -39,7 +43,7 @@ export function useDespesas() {
           veiculoPlaca: manutencao.veiculoPlaca,
           categoria: 'manutencao',
           descricao: `Manutenção - ${manutencao.tipo} - ${manutencao.oficina}`,
-          valor: manutencao.valorOrcamento,
+          valor: manutencao.valorFinal || manutencao.valorOrcamento, // Usa valorFinal se disponível
           data: manutencao.dataInicio,
           tipo: 'despesa',
           fonte: 'manutencao',
