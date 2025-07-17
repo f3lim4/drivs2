@@ -964,30 +964,55 @@ export default function RelatoriosFinanceiros() {
             <CardHeader>
               <CardTitle>Análise por Motorista</CardTitle>
               <CardDescription>
-                Performance financeira de cada motorista
+                Performance financeira baseada nos pagamentos de cada motorista
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {filteredData.alugueisAtivos.map((aluguel) => (
-                  <div key={aluguel.id} className="flex justify-between items-center p-4 border rounded-lg">
-                    <div>
-                      <p className="font-semibold">{aluguel.motoristaNome}</p>
-                      <p className="text-sm text-gray-500">{aluguel.veiculoModelo} - {aluguel.veiculoPlaca}</p>
-                      <p className="text-xs text-gray-400">
-                        Início: {format(new Date(aluguel.dataInicio), 'dd/MM/yyyy', { locale: pt })}
-                      </p>
+                {motoristas.map((motorista) => {
+                  // Calcular pagamentos do motorista no período
+                  const pagamentosMotorista = pagamentos.filter(p => 
+                    p.motoristaNome === motorista.nome && 
+                    p.status === 'pago' && 
+                    isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd })
+                  );
+                  
+                  const totalPagamentos = pagamentosMotorista.reduce((total, p) => 
+                    total + parseFloat(p.valor || '0'), 0
+                  );
+                  
+                  // Encontrar aluguel ativo do motorista
+                  const aluguelAtivo = alugueis.find(a => 
+                    a.motoristaNome === motorista.nome && a.status === 'ativo'
+                  );
+                  
+                  // Só mostrar motoristas que fizeram pagamentos ou têm aluguel ativo
+                  if (totalPagamentos === 0 && !aluguelAtivo) return null;
+                  
+                  return (
+                    <div key={motorista.id} className="flex justify-between items-center p-4 border rounded-lg">
+                      <div>
+                        <p className="font-semibold">{motorista.nome}</p>
+                        {aluguelAtivo && (
+                          <p className="text-sm text-gray-500">
+                            {aluguelAtivo.veiculoModelo} - {aluguelAtivo.veiculoPlaca}
+                          </p>
+                        )}
+                        <p className="text-xs text-gray-400">
+                          {pagamentosMotorista.length} pagamento{pagamentosMotorista.length !== 1 ? 's' : ''} este mês
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-green-600">
+                          {formatCurrency(totalPagamentos)}
+                        </p>
+                        <Badge variant={aluguelAtivo ? "default" : "secondary"}>
+                          {aluguelAtivo ? "Ativo" : "Inativo"}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-green-600">
-                        {formatCurrency(parseFloat(aluguel.valorMensal || aluguel.valorDiario))}
-                      </p>
-                      <Badge variant="default">
-                        {aluguel.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
+                  );
+                }).filter(Boolean)}
               </div>
             </CardContent>
           </Card>
