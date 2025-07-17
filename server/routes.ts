@@ -892,8 +892,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Limpar campos vazios para evitar erros de validação
       const cleanedData = Object.fromEntries(
         Object.entries(req.body).map(([key, value]) => {
-          // Converter strings vazias para null em campos numéricos
-          if (value === "" && ['quilometragemInicio', 'quilometragemFim', 'valorOrcamento', 'valorFinal'].includes(key)) {
+          // Converter strings vazias para null em campos numéricos e de data
+          if (value === "" && ['quilometragemInicio', 'quilometragemFim', 'valorOrcamento', 'valorFinal', 'dataConclusao', 'proximaManutencao'].includes(key)) {
             return [key, null];
           }
           return [key, value];
@@ -914,8 +914,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Limpar campos vazios para evitar erros de validação
       const cleanedData = Object.fromEntries(
         Object.entries(req.body).map(([key, value]) => {
-          // Converter strings vazias para null em campos numéricos
-          if (value === "" && ['quilometragemInicio', 'quilometragemFim', 'valorOrcamento', 'valorFinal'].includes(key)) {
+          // Converter strings vazias para null em campos numéricos e de data
+          if (value === "" && ['quilometragemInicio', 'quilometragemFim', 'valorOrcamento', 'valorFinal', 'dataConclusao', 'proximaManutencao'].includes(key)) {
             return [key, null];
           }
           return [key, value];
