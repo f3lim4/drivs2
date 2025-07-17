@@ -595,23 +595,18 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Receita Mensal - Card Futurista */}
+        {/* Receita Semanal - Card Futurista */}
         <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
-                <p className="text-sm font-medium text-yellow-700">RECEITA MENSAL</p>
+                <p className="text-sm font-medium text-yellow-700">TOTAL RECEBIDO ESSA SEMANA</p>
                 <p className="text-2xl font-bold text-yellow-800">
-                  {formatCurrency(receitaMensal)}
+                  {formatCurrency(receitaSemanalRecebida)}
                 </p>
-                <div className="space-y-1">
-                  <p className="text-lg font-semibold text-yellow-800">
-                    {formatCurrency(receitaSemanalRecebida)}
-                  </p>
-                  <p className="text-xs text-yellow-600">
-                    de {formatCurrency(receitaSemanalEsperada)} esta semana
-                  </p>
-                </div>
+                <p className="text-xs text-yellow-600">
+                  de {formatCurrency(receitaSemanalEsperada)} esperado
+                </p>
               </div>
               <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
                 <DollarSign className="w-6 h-6 text-yellow-700" />
