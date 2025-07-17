@@ -60,11 +60,8 @@ export default function Alugueis() {
       }
       
       // Para locadora, buscar apenas os aluguéis da locadora
-      console.log(`[DEBUG] Buscando aluguéis para locadora:`, profile.id);
       const response = await fetch(`/api/alugueis?locadoraId=${profile.id}`);
-      const data = await response.json();
-      console.log(`[DEBUG] Aluguéis retornados:`, data);
-      return data;
+      return response.json();
     },
     enabled: !!profile?.id,
     staleTime: 0, // Evita cache antigo
