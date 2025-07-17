@@ -173,6 +173,15 @@ export function NovoContratoModal({
           dadosLocadora = await response.json();
         }
       }
+
+      // Buscar dados do veículo
+      let dadosVeiculo = null;
+      if (aluguel.veiculoId) {
+        const response = await fetch(`/api/veiculos/${aluguel.veiculoId}`);
+        if (response.ok) {
+          dadosVeiculo = await response.json();
+        }
+      }
       
       // Usar dados reais da locadora ou dados padrão
       const locadorInfo = dadosLocadora ? {
@@ -276,7 +285,7 @@ instrumento e o devido pagamento de multa pela parte inadimplente, no valor corr
 locação.
 
 7. CLÁUSULA SÉTIMA - Limite de Quilometragem Mensal
-Fica estipulado o limite mensal de quilometragem de ${veiculo.valorLimiteKm ? `${veiculo.valorLimiteKm * 4} km` : 'ILIMITADO'} para o veículo alugado. Caso o condutor exceda esse
+Fica estipulado o limite mensal de quilometragem de ${dadosVeiculo?.valorLimiteKm ? `${dadosVeiculo.valorLimiteKm * 4} km` : 'ILIMITADO'} para o veículo alugado. Caso o condutor exceda esse
 limite, será cobrado o valor de R$ 0,50 (cinquenta centavos) por quilômetro excedido.
 
 8. CLÁUSULA OITAVA - Responsabilidade por Batidas e Reparos
