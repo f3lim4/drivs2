@@ -1030,10 +1030,10 @@ export default function RelatoriosFinanceiros() {
                       
                       // Adicionar despesas fixas
                       const despesasFixasTotal = {
-                        'ipva': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'IPVA')?.valor || 0), 0),
-                        'seguro': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Seguro')?.valor || 0), 0),
-                        'rastreador': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Rastreador')?.valor || 0), 0),
-                        'financiamento': despesasFixasVeiculos.reduce((total, v) => total + (v.despesas.find(d => d.tipo === 'Financiamento')?.valor || 0), 0)
+                        'ipva': veiculos.reduce((total, v) => total + (v.ipva && v.ipva > 0 ? parseFloat(v.ipva) / 12 : 0), 0),
+                        'seguro': veiculos.reduce((total, v) => total + (v.valorSeguroMensal && v.valorSeguroMensal > 0 ? parseFloat(v.valorSeguroMensal) : 0), 0),
+                        'rastreador': veiculos.reduce((total, v) => total + (v.valorRastreadorMensal && v.valorRastreadorMensal > 0 ? parseFloat(v.valorRastreadorMensal) : 0), 0),
+                        'financiamento': veiculos.reduce((total, v) => total + (v.financiado && v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : 0), 0)
                       };
                       
                       // Adicionar despesas manuais (excluindo categorias que já estão nas despesas fixas)
