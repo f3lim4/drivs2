@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Reorganização da Página de Contratos - Abas Removidas - CONCLUÍDO
+- ✅ **Abas removidas** - Eliminado sistema de abas "Contratos Gerados" e "Meus Templates"
+- ✅ **Botão "Templates" adicionado** - Posicionado na linha do título "Contratos Gerados"
+- ✅ **Modal de templates criado** - Pop-up dedicado para gerenciar templates personalizados
+- ✅ **Interface mais direta** - Página com foco principal na tabela de contratos
+- ✅ **Funcionalidade preservada** - Acesso a templates via botão e modal
+- ✅ **Layout otimizado** - Botão "Templates" ao lado do dropdown de ordenação
+- ✅ **Experiência simplificada** - Menos navegação entre abas, mais foco no conteúdo
+
 ### 2025-07-17: Limpeza da Interface da Página de Contratos - CONCLUÍDO
 - ✅ **Títulos de filtros removidos** - Eliminados rótulos "Buscar", "Status", "Tipo" e "Ação"
 - ✅ **Interface mais limpa** - Filtros mantidos funcionais sem títulos desnecessários

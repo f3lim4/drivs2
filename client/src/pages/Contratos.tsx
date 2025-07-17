@@ -21,13 +21,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Pagination } from '@/components/ui/pagination';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { NovoContratoModal } from '@/components/contratos/NovoContratoModal';
 import { VisualizarContratoModal } from '@/components/contratos/VisualizarContratoModal';
 import { EditarContratoModal } from '@/components/contratos/EditarContratoModal';
 import { UploadTemplateModal } from '@/components/contratos/UploadTemplateModal';
+import { TemplatesModal } from '@/components/contratos/TemplatesModal';
 import { useTemplateContratos } from '@/hooks/useTemplateContratos';
 import { Contrato } from '@/types';
 import jsPDF from 'jspdf';
@@ -41,6 +41,7 @@ export default function Contratos() {
   const [showVisualizarModal, setShowVisualizarModal] = useState(false);
   const [showEditarModal, setShowEditarModal] = useState(false);
   const [showUploadTemplateModal, setShowUploadTemplateModal] = useState(false);
+  const [showTemplatesModal, setShowTemplatesModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
@@ -500,18 +501,8 @@ export default function Contratos() {
         </CardContent>
       </Card>
 
-      {/* Tabs para organizar contratos e templates */}
-      <Tabs defaultValue="contratos" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="contratos">Contratos Gerados</TabsTrigger>
-          <TabsTrigger value="templates">Meus Templates</TabsTrigger>
-        </TabsList>
-        
-        {/* Aba de Contratos */}
-        <TabsContent value="contratos" className="space-y-4">
-
-          {/* Tabela de contratos */}
-          {contratos.length === 0 ? (
+      {/* Tabela de contratos */}
+      {contratos.length === 0 ? (
             <Card>
               <CardContent className="p-8">
                 <div className="text-center text-muted-foreground">
@@ -536,11 +527,22 @@ export default function Contratos() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Contratos Gerados ({contratosFiltrados.length})</CardTitle>
                 
-                {/* Ordenação */}
-                <Select value={sortOrder} onValueChange={setSortOrder}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Ordenar por" />
-                  </SelectTrigger>
+                <div className="flex items-center gap-2">
+                  {/* Botão Templates */}
+                  <Button 
+                    variant="outline"
+                    onClick={() => setShowTemplatesModal(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Templates
+                  </Button>
+                  
+                  {/* Ordenação */}
+                  <Select value={sortOrder} onValueChange={setSortOrder}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Ordenar por" />
+                    </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
                     <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
@@ -552,6 +554,7 @@ export default function Contratos() {
                     <SelectItem value="data-fim">Data de Fim</SelectItem>
                   </SelectContent>
                 </Select>
+                </div>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
@@ -633,107 +636,18 @@ export default function Contratos() {
             </Card>
           )}
 
-          {/* Paginação */}
-          {contratosFiltrados.length > 0 && (
-            <div className="border-t pt-4 mt-4">
-              <Pagination
-                currentPage={currentPage}
-                totalItems={contratosFiltrados.length}
-                itemsPerPage={itemsPerPage}
-                onPageChange={handlePageChange}
-                onItemsPerPageChange={handleItemsPerPageChange}
-              />
-            </div>
-          )}
-        </TabsContent>
-
-        {/* Aba de Templates */}
-        <TabsContent value="templates" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl">Meus Templates</CardTitle>
-                  <p className="text-muted-foreground mt-1">
-                    Gerencie seus templates personalizados de contratos
-                  </p>
-                </div>
-                <Button 
-                  variant="outline" 
-                  className="flex items-center gap-2"
-                  onClick={() => setShowUploadTemplateModal(true)}
-                >
-                  <Upload className="w-4 h-4" />
-                  Novo Template
-                </Button>
-              </div>
-            </CardHeader>
-          </Card>
-
-          {/* Lista de templates */}
-          {templates.length === 0 ? (
-            <Card>
-              <CardContent className="p-8">
-                <div className="text-center text-muted-foreground">
-                  <Upload className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p>Nenhum template personalizado ainda</p>
-                  <p className="text-sm">Clique em "Novo Template" para criar seu primeiro template</p>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Templates Disponíveis</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>NOME</TableHead>
-                      <TableHead>CRIADO EM</TableHead>
-                      <TableHead>STATUS</TableHead>
-                      <TableHead>AÇÕES</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {templates.map((template) => (
-                      <TableRow key={template.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <FileText className="w-4 h-4 text-blue-500" />
-                            <p className="font-medium">{template.nome}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <p>{new Date(template.createdAt).toLocaleDateString('pt-BR')}</p>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={template.ativo ? "default" : "secondary"}>
-                            {template.ativo ? "Ativo" : "Inativo"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleExcluirTemplate(template.id)}
-                              title="Excluir"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-      </Tabs>
+      {/* Paginação */}
+      {contratosFiltrados.length > 0 && (
+        <div className="border-t pt-4 mt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalItems={contratosFiltrados.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        </div>
+      )}
 
       {/* Modais */}
       <NovoContratoModal 
@@ -745,6 +659,11 @@ export default function Contratos() {
       <UploadTemplateModal
         open={showUploadTemplateModal}
         onOpenChange={setShowUploadTemplateModal}
+      />
+
+      <TemplatesModal
+        isOpen={showTemplatesModal}
+        onClose={() => setShowTemplatesModal(false)}
       />
 
       {selectedContrato && (
