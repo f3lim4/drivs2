@@ -333,11 +333,11 @@ export default function Alugueis() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-blue-700">Total de Aluguéis</p>
-                <p className="text-xl font-bold text-blue-800">{stats.total}</p>
+                <p className="text-lg font-bold text-blue-800">{stats.total}</p>
                 <p className="text-xs text-blue-600">Contratos</p>
               </div>
-              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
-                <Trending className="w-5 h-5 text-blue-700" />
+              <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
+                <Trending className="w-4 h-4 text-blue-700" />
               </div>
             </div>
           </CardContent>
@@ -348,11 +348,11 @@ export default function Alugueis() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-green-700">Ativos</p>
-                <p className="text-xl font-bold text-green-800">{stats.ativos}</p>
+                <p className="text-lg font-bold text-green-800">{stats.ativos}</p>
                 <p className="text-xs text-green-600">Em andamento</p>
               </div>
-              <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-green-700" />
+              <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-green-700" />
               </div>
             </div>
           </CardContent>
@@ -363,11 +363,11 @@ export default function Alugueis() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-yellow-700">Pendentes</p>
-                <p className="text-xl font-bold text-yellow-800">{stats.pendentes}</p>
+                <p className="text-lg font-bold text-yellow-800">{stats.pendentes}</p>
                 <p className="text-xs text-yellow-600">Aguardando</p>
               </div>
-              <div className="w-10 h-10 bg-yellow-200 rounded-full flex items-center justify-center">
-                <Clock className="w-5 h-5 text-yellow-700" />
+              <div className="w-8 h-8 bg-yellow-200 rounded-full flex items-center justify-center">
+                <Clock className="w-4 h-4 text-yellow-700" />
               </div>
             </div>
           </CardContent>
@@ -383,8 +383,8 @@ export default function Alugueis() {
                   Recebido: {formatCurrency(stats.receitaReal)}
                 </p>
               </div>
-              <div className="w-10 h-10 bg-emerald-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-emerald-700" />
+              <div className="w-8 h-8 bg-emerald-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-emerald-700" />
               </div>
             </div>
           </CardContent>
@@ -424,6 +424,22 @@ export default function Alugueis() {
                 </SelectContent>
               </Select>
 
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mais-novos">Mais novos primeiro</SelectItem>
+                  <SelectItem value="mais-antigos">Mais antigos primeiro</SelectItem>
+                  <SelectItem value="motorista-az">Motorista (A-Z)</SelectItem>
+                  <SelectItem value="motorista-za">Motorista (Z-A)</SelectItem>
+                  <SelectItem value="veiculo-az">Veículo (A-Z)</SelectItem>
+                  <SelectItem value="veiculo-za">Veículo (Z-A)</SelectItem>
+                  <SelectItem value="valor-maior">Maior valor</SelectItem>
+                  <SelectItem value="valor-menor">Menor valor</SelectItem>
+                </SelectContent>
+              </Select>
+
               {isLocadora && (
                 <Button 
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -440,25 +456,8 @@ export default function Alugueis() {
 
       {/* Tabela de aluguéis */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader>
           <CardTitle>Contratos de Locação</CardTitle>
-          
-          {/* Ordenação */}
-          <Select value={sortOrder} onValueChange={setSortOrder}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Ordenar por" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
-              <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
-              <SelectItem value="motorista-az">Motorista (A-Z)</SelectItem>
-              <SelectItem value="motorista-za">Motorista (Z-A)</SelectItem>
-              <SelectItem value="veiculo-az">Veículo (A-Z)</SelectItem>
-              <SelectItem value="veiculo-za">Veículo (Z-A)</SelectItem>
-              <SelectItem value="valor-maior">Valor (Maior)</SelectItem>
-              <SelectItem value="valor-menor">Valor (Menor)</SelectItem>
-            </SelectContent>
-          </Select>
         </CardHeader>
         <CardContent className="p-0">
           {filteredAlugueis.length > 0 ? (
@@ -577,20 +576,19 @@ export default function Alugueis() {
             </div>
           )}
         </CardContent>
+        {/* Paginação */}
+        {filteredAlugueis.length > 0 && (
+          <div className="border-t pt-4 px-6 pb-4">
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredAlugueis.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+            />
+          </div>
+        )}
       </Card>
-
-      {/* Paginação */}
-      {filteredAlugueis.length > 0 && (
-        <div className="border-t pt-4 mt-4">
-          <Pagination
-            currentPage={currentPage}
-            totalItems={filteredAlugueis.length}
-            itemsPerPage={itemsPerPage}
-            onPageChange={handlePageChange}
-            onItemsPerPageChange={handleItemsPerPageChange}
-          />
-        </div>
-      )}
 
       {/* Modais - apenas para locadoras */}
       {isLocadora && (
