@@ -259,44 +259,11 @@ export function DetalhesVeiculoModal({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="evolucao" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="evolucao">Evolução</TabsTrigger>
+              <Tabs defaultValue="receitas" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="receitas">Receitas</TabsTrigger>
                   <TabsTrigger value="despesas">Despesas</TabsTrigger>
                 </TabsList>
-
-                <TabsContent value="evolucao" className="space-y-4">
-                  <div className="space-y-4">
-                    {evolucaoMensal.length > 0 ? (
-                      evolucaoMensal.map((mes) => (
-                        <div key={mes.mes} className="p-4 border rounded-lg">
-                          <h4 className="font-semibold mb-2">{mes.mes}</h4>
-                          <div className="grid grid-cols-3 gap-4">
-                            <div>
-                              <p className="text-sm text-gray-600">Receita</p>
-                              <p className="font-bold text-green-600">{formatCurrency(mes.receita)}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Despesas</p>
-                              <p className="font-bold text-red-600">{formatCurrency(mes.despesas)}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Lucro</p>
-                              <p className={`font-bold ${mes.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {formatCurrency(mes.lucro)}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-center py-4 text-gray-500">
-                        Nenhum histórico financeiro disponível para este veículo.
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
 
                 <TabsContent value="receitas" className="space-y-4">
                   <div className="space-y-4">
