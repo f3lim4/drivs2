@@ -409,8 +409,32 @@ export default function Dashboard() {
     .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
     .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorMensal || '0'), 0);
 
-  // Calcular receita semanal (mensal dividido por 4 semanas)
-  const receitaSemanal = receitaMensal / 4;
+  // Calcular receita semanal esperada (baseada nos aluguéis ativos)
+  const receitaSemanalEsperada = alugueisSeguro
+    .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
+    .reduce((total: number, aluguel: any) => {
+      const valorMensal = parseFloat(aluguel.valorMensal || '0');
+      const valorSemanal = valorMensal / 4; // Divide por 4 semanas
+      return total + valorSemanal;
+    }, 0);
+
+  // Calcular receita semanal já recebida (pagamentos desta semana)
+  const inicioSemana = new Date(hoje);
+  inicioSemana.setDate(hoje.getDate() - hoje.getDay()); // Domingo da semana atual
+  inicioSemana.setHours(0, 0, 0, 0);
+  
+  const fimSemana = new Date(inicioSemana);
+  fimSemana.setDate(inicioSemana.getDate() + 6); // Sábado da semana atual
+  fimSemana.setHours(23, 59, 59, 999);
+
+  const receitaSemanalRecebida = pagamentos
+    .filter((p: any) => {
+      const dataPagamento = new Date(p.data);
+      return dataPagamento >= inicioSemana && 
+             dataPagamento <= fimSemana &&
+             p.status === 'pago';
+    })
+    .reduce((sum: number, p: any) => sum + parseFloat(p.valor || '0'), 0);
 
   // Métricas importantes para admin de SaaS de locadoras
   const locadorasAtivas = locadoras.filter(l => l.status === 'ativa').length;
@@ -581,7 +605,7 @@ export default function Dashboard() {
                   {formatCurrency(receitaMensal)}
                 </p>
                 <p className="text-xs text-yellow-600">
-                  {formatCurrency(receitaSemanal)} por semana
+                  Semana: {formatCurrency(receitaSemanalRecebida)} / {formatCurrency(receitaSemanalEsperada)}
                 </p>
               </div>
               <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
