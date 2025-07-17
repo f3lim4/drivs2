@@ -44,6 +44,8 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Aluguel, Motorista, Veiculo } from '@/types';
+import { useAlugueis } from '@/hooks/useAlugueis';
+import { useToast } from '@/hooks/use-toast';
 
 // Schema de validação
 const aluguelSchema = z.object({
@@ -76,6 +78,8 @@ export function EditarAluguelModal({
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const { updateAluguel, isUpdating } = useAlugueis();
+  const { toast } = useToast();
 
   const form = useForm<AluguelFormData>({
     resolver: zodResolver(aluguelSchema),
@@ -147,9 +151,6 @@ export function EditarAluguelModal({
     setLoading(true);
     
     try {
-      // Simula delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
       // Busca dados do motorista e veículo selecionados
       const motorista = motoristas.find(m => m.id === data.motoristaId);
       const veiculo = veiculos.find(v => v.id === data.veiculoId);
@@ -167,34 +168,79 @@ export function EditarAluguelModal({
       const valorMensal = veiculo.valorSemanal ? parseFloat(veiculo.valorSemanal) * 4 : 0; // 4 semanas por mês
       const valorTotal = valorMensal * data.tempoContrato;
 
-      // Cria aluguel atualizado
-      const aluguelAtualizado: Aluguel = {
-        ...aluguel,
+      // Prepara dados para atualização no banco
+      const updateData = {
         motoristaId: data.motoristaId,
         motoristaNome: motorista.nome,
         motoristaContato: motorista.telefone,
         veiculoId: data.veiculoId,
         veiculoModelo: `${veiculo.marca} ${veiculo.modelo}`,
         veiculoPlaca: veiculo.placa,
-        periodo: {
-          inicio: format(dataInicio, 'dd/MM/yyyy'),
-          fim: format(dataFim, 'dd/MM/yyyy'),
-          dias: data.tempoContrato,
-        },
-        valores: {
-          diario: valorMensal,
-          total: valorTotal,
-          caucao: veiculo.caucao ? parseFloat(veiculo.caucao) : 0,
-          taxaAdmin: data.taxaAdministrativa,
-        },
+        dataInicio: dataInicio.toISOString(),
+        dataFim: dataFim.toISOString(),
+        tempoContrato: data.tempoContrato,
+        valorMensal: valorMensal.toString(),
+        valorTotal: valorTotal.toString(),
+        caucao: veiculo.caucao || '0',
+        taxaAdministrativa: data.taxaAdministrativa?.toString() || '0',
         status: data.status,
       };
 
-      onAluguelEditado(aluguelAtualizado);
-      onOpenChange(false);
+      // Atualiza no banco via mutação
+      updateAluguel(
+        { id: aluguel.id, updates: updateData },
+        {
+          onSuccess: () => {
+            // Cria aluguel atualizado para o frontend
+            const aluguelAtualizado: Aluguel = {
+              ...aluguel,
+              motoristaId: data.motoristaId,
+              motoristaNome: motorista.nome,
+              motoristaContato: motorista.telefone,
+              veiculoId: data.veiculoId,
+              veiculoModelo: `${veiculo.marca} ${veiculo.modelo}`,
+              veiculoPlaca: veiculo.placa,
+              periodo: {
+                inicio: format(dataInicio, 'dd/MM/yyyy'),
+                fim: format(dataFim, 'dd/MM/yyyy'),
+                dias: data.tempoContrato,
+              },
+              valores: {
+                mensal: valorMensal,
+                diario: valorMensal / 30,
+                total: valorTotal,
+                caucao: veiculo.caucao ? parseFloat(veiculo.caucao) : 0,
+                taxaAdmin: data.taxaAdministrativa || 0,
+              },
+              status: data.status,
+            };
+
+            onAluguelEditado(aluguelAtualizado);
+            onOpenChange(false);
+            
+            toast({
+              title: "Aluguel atualizado",
+              description: "As alterações foram salvas com sucesso.",
+            });
+          },
+          onError: (error) => {
+            console.error('Erro ao editar aluguel:', error);
+            toast({
+              title: "Erro ao salvar",
+              description: "Não foi possível salvar as alterações. Tente novamente.",
+              variant: "destructive",
+            });
+          }
+        }
+      );
       
     } catch (error) {
       console.error('Erro ao editar aluguel:', error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Ocorreu um erro inesperado. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -398,12 +444,12 @@ export function EditarAluguelModal({
                   type="button"
                   variant="outline"
                   onClick={() => onOpenChange(false)}
-                  disabled={loading}
+                  disabled={loading || isUpdating}
                 >
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Salvando...' : 'Salvar Alterações'}
+                <Button type="submit" disabled={loading || isUpdating}>
+                  {loading || isUpdating ? 'Salvando...' : 'Salvar Alterações'}
                 </Button>
               </DialogFooter>
             </form>
