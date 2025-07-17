@@ -361,7 +361,7 @@ export default function Alugueis() {
                     <TableCell>
                       <div className="text-sm">
                         <div className="font-medium">{formatCurrency(parseFloat(aluguel.valorMensal))}</div>
-                        <div className="text-gray-500">{formatCurrency(parseFloat(aluguel.valorMensal) / 30)}/dia</div>
+                        <div className="text-gray-500">{formatCurrency(parseFloat(aluguel.valorMensal) / 4)}/semana</div>
                       </div>
                     </TableCell>
                     <TableCell>
