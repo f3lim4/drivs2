@@ -10,6 +10,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Ajustes de Layout e Experiência do Usuário - CONCLUÍDO
+- ✅ **Card "Painel de Controle" removido** - Removido card específico da página de aluguéis
+- ✅ **Botão "Nova Despesa" reposicionado** - Movido para lado direito da página financeira
+- ✅ **Layout otimizado** - Elementos alinhados com melhor distribuição visual
+- ✅ **Experiência simplificada** - Interface mais limpa e intuitiva
+
 ### 2025-07-17: Sistema de Loading Spinner Unificado com Animação de Carro - CONCLUÍDO
 - ✅ **Componente LoadingSpinner criado** - Substituído spinners padrão por animação de carro
 - ✅ **Animação de carro implementada** - Ícone de carro com bounce e sombra pulsante

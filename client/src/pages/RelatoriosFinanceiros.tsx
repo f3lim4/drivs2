@@ -477,33 +477,31 @@ export default function RelatoriosFinanceiros() {
   return (
     <div className="space-y-6 p-6">
       {/* Seletor de mês e botão Nova Despesa (apenas para locadoras) */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-end items-center gap-4">
         {!isAdmin && (
           <Button onClick={() => setModalNovaDespesa(true)} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Nova Despesa
           </Button>
         )}
-        <div className={isAdmin ? "w-full flex justify-end" : ""}>
-          <Select 
-            value={format(selectedMonth, 'yyyy-MM')} 
-            onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Array.from({ length: 12 }, (_, i) => {
-                const date = subMonths(new Date(), i);
-                return (
-                  <SelectItem key={i} value={format(date, 'yyyy-MM')}>
-                    {format(date, 'MMMM yyyy', { locale: pt })}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select 
+          value={format(selectedMonth, 'yyyy-MM')} 
+          onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
+        >
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {Array.from({ length: 12 }, (_, i) => {
+              const date = subMonths(new Date(), i);
+              return (
+                <SelectItem key={i} value={format(date, 'yyyy-MM')}>
+                  {format(date, 'MMMM yyyy', { locale: pt })}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Seção especial para admins - Dados consolidados de todas as locadoras */}
