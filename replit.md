@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Correção Crítica de Cálculo de Despesas Fixas - CONCLUÍDO
+- ✅ **Bug crítico identificado** - Despesas fixas incluindo incorretamente manutenções nos cálculos
+- ✅ **Dados reais verificados** - Veículo EUQ8D22: IPVA R$720, Seguro R$89, Rastreador R$10
+- ✅ **Cálculo corrigido** - Total correto R$159 (60+89+10) ao invés de R$1.359
+- ✅ **Manutenção removida** - R$1.200 de manutenção não deve estar nas despesas fixas
+- ✅ **Aba "Despesas Fixas" corrigida** - Agora usa totalDespesasFixasPuras
+- ✅ **Análise por veículo corrigida** - Recalculado despesas fixas sem manutenções
+- ✅ **Modal de detalhes corrigido** - Dados detalhados agora mostram valores corretos
+- ✅ **Separação clara implementada** - Despesas fixas vs manutenções separadas nos cálculos
+- ✅ **Integridade dos dados** - Todas as seções agora mostram valores consistentes
+
 ### 2025-07-17: Sistema de Ordenação Completo em Relatórios Financeiros - CONCLUÍDO
 - ✅ **Ordenação na aba "Análise por Motorista"** - Dropdown com 6 opções (pagamentos, valor, nome)
 - ✅ **Ordenação na aba "Despesas Fixas"** - Dropdown com 8 opções (total, IPVA, seguro, placa)
