@@ -88,7 +88,7 @@ export function NovoAluguelModal({
       motoristaId: '',
       veiculoId: '',
       dataInicio: getHoje(),
-      tempoContrato: 1,
+      tempoContrato: '' as any,
       taxaAdministrativa: undefined,
     },
   });
@@ -283,7 +283,13 @@ export function NovoAluguelModal({
 
       onAluguelAdicionado(novoAluguel);
       onOpenChange(false);
-      form.reset();
+      form.reset({
+        motoristaId: '',
+        veiculoId: '',
+        dataInicio: getHoje(),
+        tempoContrato: '' as any,
+        taxaAdministrativa: undefined,
+      });
       
     } catch (error) {
       console.error('Erro ao criar aluguel:', error);
@@ -477,9 +483,11 @@ export function NovoAluguelModal({
                         <Input 
                           type="number" 
                           min="1"
-                          placeholder="1" 
                           {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.onChange(value === '' ? '' : parseInt(value) || 0);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
