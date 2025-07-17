@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Check, X, Star, Building2, Zap, Crown, Plus, Edit, Trash2, Eye, Settings } from 'lucide-react';
+import { Check, X, Star, Building2, Zap, Crown, Plus, Edit, Trash2, Eye, Settings, Gift } from 'lucide-react';
 
 interface Plano {
   id: string;
@@ -43,6 +43,24 @@ export default function Planos() {
 
   // Dados de exemplo dos planos
   const [planos, setPlanos] = useState<Plano[]>([
+    {
+      id: 'free',
+      nome: 'Free',
+      precoMensal: 0,
+      precoAnual: 0,
+      descricao: 'Plano gratuito para testar o sistema',
+      maxVeiculos: 2,
+      maxMotoristas: 10,
+      features: [
+        'Até 2 veículos',
+        'Até 10 motoristas',
+        'Funcionalidades básicas',
+        'Suporte por email'
+      ],
+      ativo: true,
+      cor: '#10b981',
+      ordem: 0
+    },
     {
       id: 'basico',
       nome: 'Básico',
@@ -109,6 +127,15 @@ export default function Planos() {
   // Dados de exemplo das locadoras e seus planos
   const [locadorasPlanos, setLocadorasPlanos] = useState<LocadoraPlano[]>([
     {
+      id: '0',
+      nome: 'Nova Locadora Teste',
+      planoAtual: 'free',
+      dataInicio: '2024-07-15',
+      dataVencimento: '2024-08-15',
+      status: 'ativo',
+      valorPago: 0
+    },
+    {
       id: '1',
       nome: 'Crivelari Locadora',
       planoAtual: 'premium',
@@ -146,6 +173,8 @@ export default function Planos() {
 
   const getIcon = (planoId: string) => {
     switch (planoId) {
+      case 'free':
+        return <Gift className="w-8 h-8 text-green-600" />;
       case 'basico':
         return <Building2 className="w-8 h-8 text-slate-600" />;
       case 'premium':
