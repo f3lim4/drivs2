@@ -18,6 +18,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Botão "Gerenciar Locais" adicionado** - Novo botão na área de controles da página de manutenções
 - ✅ **Título da aba "Manutenções" removido** - Interface ainda mais limpa sem título desnecessário
 - ✅ **Modal de locais em formato de lista** - Locais agora são exibidos em tabela organizada
+- ✅ **Página de Infrações simplificada** - Removido título "Infrações de Trânsito" e descrição
+- ✅ **Botão "Nova Infração" reposicionado** - Movido para baixo dos cards de estatísticas
 - ✅ **Layout otimizado** - Elementos alinhados com melhor distribuição visual
 - ✅ **Experiência simplificada** - Interface mais limpa e intuitiva sem sistema de abas
 

@@ -116,17 +116,7 @@ export default function Infracoes() {
 
   return (
     <div className="space-y-6 p-6 border-l-4 border-blue-500 bg-white min-h-screen">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Infrações de Trânsito</h1>
-          <p className="text-gray-600 mt-1">Gerencie e controle as infrações de trânsito</p>
-        </div>
-        <Button onClick={() => setShowNovaInfracao(true)} className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="h-4 w-4 mr-2" />
-          Nova Infração
-        </Button>
-      </div>
+
 
       {/* Estatísticas com visual futurista */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -189,6 +179,14 @@ export default function Infracoes() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Botão Nova Infração */}
+      <div className="flex justify-end">
+        <Button onClick={() => setShowNovaInfracao(true)} className="bg-blue-600 hover:bg-blue-700">
+          <Plus className="h-4 w-4 mr-2" />
+          Nova Infração
+        </Button>
       </div>
 
       {/* Filtros */}
