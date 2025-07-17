@@ -333,11 +333,11 @@ export default function Alugueis() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-blue-700">Total de Aluguéis</p>
-                <p className="text-lg font-bold text-blue-800">{stats.total}</p>
+                <p className="text-xl font-bold text-blue-800">{stats.total}</p>
                 <p className="text-xs text-blue-600">Contratos</p>
               </div>
-              <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
-                <Trending className="w-4 h-4 text-blue-700" />
+              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
+                <FileCheck className="w-5 h-5 text-blue-700" />
               </div>
             </div>
           </CardContent>
@@ -348,11 +348,11 @@ export default function Alugueis() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-green-700">Ativos</p>
-                <p className="text-lg font-bold text-green-800">{stats.ativos}</p>
+                <p className="text-xl font-bold text-green-800">{stats.ativos}</p>
                 <p className="text-xs text-green-600">Em andamento</p>
               </div>
-              <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-green-700" />
+              <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-green-700" />
               </div>
             </div>
           </CardContent>
@@ -363,11 +363,11 @@ export default function Alugueis() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-yellow-700">Pendentes</p>
-                <p className="text-lg font-bold text-yellow-800">{stats.pendentes}</p>
+                <p className="text-xl font-bold text-yellow-800">{stats.pendentes}</p>
                 <p className="text-xs text-yellow-600">Aguardando</p>
               </div>
-              <div className="w-8 h-8 bg-yellow-200 rounded-full flex items-center justify-center">
-                <Clock className="w-4 h-4 text-yellow-700" />
+              <div className="w-10 h-10 bg-yellow-200 rounded-full flex items-center justify-center">
+                <Clock className="w-5 h-5 text-yellow-700" />
               </div>
             </div>
           </CardContent>
@@ -378,13 +378,13 @@ export default function Alugueis() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-emerald-700">Receita Mensal</p>
-                <p className="text-lg font-bold text-emerald-800">{formatCurrency(stats.receitaEsperada)}</p>
+                <p className="text-xl font-bold text-emerald-800">{formatCurrency(stats.receitaEsperada)}</p>
                 <p className="text-xs text-emerald-600">
                   Recebido: {formatCurrency(stats.receitaReal)}
                 </p>
               </div>
-              <div className="w-8 h-8 bg-emerald-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-4 h-4 text-emerald-700" />
+              <div className="w-10 h-10 bg-emerald-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-emerald-700" />
               </div>
             </div>
           </CardContent>
@@ -576,17 +576,16 @@ export default function Alugueis() {
             </div>
           )}
         </CardContent>
+        
         {/* Paginação */}
         {filteredAlugueis.length > 0 && (
-          <div className="border-t pt-4 px-6 pb-4">
-            <Pagination
-              currentPage={currentPage}
-              totalItems={filteredAlugueis.length}
-              itemsPerPage={itemsPerPage}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
-            />
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filteredAlugueis.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
         )}
       </Card>
 
