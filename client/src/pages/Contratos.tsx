@@ -439,7 +439,6 @@ export default function Contratos() {
         <CardContent className="p-4">
           <div className="grid gap-4 md:grid-cols-4 items-end">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Buscar</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
@@ -460,7 +459,6 @@ export default function Contratos() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Status</label>
               <Select value={filtroStatus} onValueChange={setFiltroStatus}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos os status" />
@@ -475,7 +473,6 @@ export default function Contratos() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Tipo</label>
               <Select value={filtroTipo} onValueChange={setFiltroTipo}>
                 <SelectTrigger>
                   <SelectValue placeholder="Todos os tipos" />
@@ -491,7 +488,6 @@ export default function Contratos() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Ação</label>
               <Button 
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
                 onClick={() => setShowNovoContratoModal(true)}

@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Limpeza da Interface da Página de Contratos - CONCLUÍDO
+- ✅ **Títulos de filtros removidos** - Eliminados rótulos "Buscar", "Status", "Tipo" e "Ação"
+- ✅ **Interface mais limpa** - Filtros mantidos funcionais sem títulos desnecessários
+- ✅ **Experiência otimizada** - Página com visual mais direto e menos poluído
+- ✅ **Componentes preservados** - Todos os filtros e funcionalidades mantidos intactos
+- ✅ **Padrão de interface** - Seguindo tendência de interface minimalista do sistema
+
 ### 2025-07-17: Sistema de Ordenação Implementado na Página de Motoristas - CONCLUÍDO
 - ✅ **Dropdown de ordenação posicionado** - Localizado do lado oposto ao título "Lista de Motoristas"
 - ✅ **8 opções de ordenação** - Nome (A-Z/Z-A), CPF (crescente/decrescente), CNH (crescente/decrescente), Vencimento CNH (primeiro/último)
