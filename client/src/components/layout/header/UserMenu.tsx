@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -20,6 +21,12 @@ export function UserMenu() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { logout, profile } = useAuth();
+
+  // Buscar dados da locadora apenas para usuários não admin
+  const { data: locadora } = useQuery({
+    queryKey: [`/api/locadoras/${profile?.locadoraId}`],
+    enabled: !!profile?.locadoraId && profile?.type !== 'admin',
+  });
 
   const handleLogout = async () => {
     try {
@@ -52,7 +59,7 @@ export function UserMenu() {
             <div className="hidden md:block text-left">
               <p className="text-sm font-medium">{profile?.name || 'Usuário'}</p>
               <p className="text-xs text-muted-foreground">
-                {profile?.type === 'admin' ? 'Administrador' : 'Locadora'}
+                {profile?.type === 'admin' ? 'Administrador' : (locadora?.nome || 'Locadora')}
               </p>
             </div>
           </Button>
