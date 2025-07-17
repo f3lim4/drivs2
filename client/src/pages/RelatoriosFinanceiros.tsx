@@ -98,6 +98,8 @@ export default function RelatoriosFinanceiros() {
   // Função para criar nova despesa
   const criarNovaDespesa = async (data: NovaDespesaData) => {
     try {
+      const locadoraId = profile?.locadoraId || profile?.id;
+      console.log('Criando despesa com locadoraId:', locadoraId);
       const response = await fetch('/api/despesas', {
         method: 'POST',
         headers: {
@@ -105,7 +107,7 @@ export default function RelatoriosFinanceiros() {
         },
         body: JSON.stringify({
           ...data,
-          locadoraId: profile?.id,
+          locadoraId,
           tipo: 'despesa'
         }),
       });
@@ -148,7 +150,7 @@ export default function RelatoriosFinanceiros() {
         },
         body: JSON.stringify({
           ...data,
-          locadoraId: profile?.id,
+          locadoraId: profile?.locadoraId || profile?.id,
           tipo: 'despesa'
         }),
       });
