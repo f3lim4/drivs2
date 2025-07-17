@@ -1001,7 +1001,11 @@ export class DatabaseStorage implements IStorage {
 
   async getDespesasByLocadora(locadoraId: string): Promise<Despesa[]> {
     try {
+      console.log(`[DESPESAS] Buscando despesas para locadoraId: ${locadoraId}`);
+      
       const result = await db.select().from(despesas).where(eq(despesas.locadoraId, locadoraId));
+      
+      console.log(`[DESPESAS] Encontradas ${result.length} despesas:`, result.map(d => ({ id: d.id, tipo: d.tipo, valor: d.valor })));
       
       // Enriquecer com dados do veículo
       const enrichedResults = await Promise.all(
@@ -1023,6 +1027,7 @@ export class DatabaseStorage implements IStorage {
         })
       );
       
+      console.log(`[DESPESAS] Retornando ${enrichedResults.length} despesas enriquecidas`);
       return enrichedResults;
     } catch (error) {
       console.error('Error getting despesas by locadora:', error);
