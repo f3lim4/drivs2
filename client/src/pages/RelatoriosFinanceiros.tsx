@@ -611,6 +611,41 @@ export default function RelatoriosFinanceiros() {
       };
     }).reverse().filter(item => item !== null && (item.receita > 0 || item.despesas > 0)); // Mostrar apenas meses com dados reais
 
+    // Preparar histórico financeiro detalhado
+    const historico = {
+      receitas: alugueis
+        .filter(a => a.veiculoId === veiculo.id && a.status === 'ativo')
+        .map(aluguel => ({
+          id: aluguel.id,
+          tipo: 'Aluguel',
+          descricao: `Aluguel para ${aluguel.motoristaNome}`,
+          valor: parseFloat(aluguel.valorMensal || aluguel.valorDiario || '0'),
+          data: aluguel.dataInicio
+        })),
+      despesas: [
+        // Despesas manuais
+        ...despesasVeiculo
+          .filter(d => d.tipo === 'despesa')
+          .map(despesa => ({
+            id: despesa.id,
+            tipo: 'Despesa Manual',
+            categoria: despesa.categoria,
+            descricao: despesa.descricao || `Despesa de ${despesa.categoria}`,
+            valor: parseFloat(despesa.valor || '0'),
+            data: despesa.data
+          })),
+        // Despesas fixas (transformar em histórico mensal)
+        ...(despesasFixasMensais > 0 ? [{
+          id: `fixas-${veiculo.id}`,
+          tipo: 'Despesa Fixa',
+          categoria: 'Despesas Fixas',
+          descricao: 'IPVA, Seguro, Rastreador e Financiamento',
+          valor: despesasFixasMensais,
+          data: format(new Date(), 'yyyy-MM-dd')
+        }] : [])
+      ].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+    };
+
     return {
       veiculo,
       analiseFinanceira: {
@@ -622,7 +657,8 @@ export default function RelatoriosFinanceiros() {
       },
       motorista,
       despesasDetalhadas,
-      evolucaoMensal
+      evolucaoMensal,
+      historico
     };
   };
 

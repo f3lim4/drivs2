@@ -3,7 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, Car, User, FileText, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Eye, Car, User, FileText, TrendingUp, TrendingDown, AlertTriangle, Calendar, DollarSign } from 'lucide-react';
 import { format, subMonths } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { formatCurrency } from '@/lib/utils';
@@ -39,6 +41,23 @@ interface DetalhesVeiculoModalProps {
     despesas: number;
     lucro: number;
   }>;
+  historico?: {
+    receitas: Array<{
+      id: string;
+      tipo: string;
+      descricao: string;
+      valor: number;
+      data: string;
+    }>;
+    despesas: Array<{
+      id: string;
+      tipo: string;
+      categoria: string;
+      descricao: string;
+      valor: number;
+      data: string;
+    }>;
+  };
 }
 
 export function DetalhesVeiculoModal({
@@ -46,7 +65,8 @@ export function DetalhesVeiculoModal({
   analiseFinanceira,
   motorista,
   despesasDetalhadas,
-  evolucaoMensal
+  evolucaoMensal,
+  historico
 }: DetalhesVeiculoModalProps) {
   const [open, setOpen] = useState(false);
 
@@ -225,41 +245,154 @@ export function DetalhesVeiculoModal({
             </CardContent>
           </Card>
 
-          {/* Evolução Financeira */}
+          {/* Histórico Financeiro Detalhado */}
           <Card>
             <CardHeader>
-              <CardTitle>Evolução Financeira - Últimos 6 Meses</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Histórico Financeiro Completo
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {evolucaoMensal.length > 0 ? (
-                  evolucaoMensal.map((mes) => (
-                    <div key={mes.mes} className="p-4 border rounded-lg">
-                      <h4 className="font-semibold mb-2">{mes.mes}</h4>
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <p className="text-sm text-gray-600">Receita</p>
-                          <p className="font-bold text-green-600">{formatCurrency(mes.receita)}</p>
+              <Tabs defaultValue="evolucao" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="evolucao">Evolução</TabsTrigger>
+                  <TabsTrigger value="receitas">Receitas</TabsTrigger>
+                  <TabsTrigger value="despesas">Despesas</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="evolucao" className="space-y-4">
+                  <div className="space-y-4">
+                    {evolucaoMensal.length > 0 ? (
+                      evolucaoMensal.map((mes) => (
+                        <div key={mes.mes} className="p-4 border rounded-lg">
+                          <h4 className="font-semibold mb-2">{mes.mes}</h4>
+                          <div className="grid grid-cols-3 gap-4">
+                            <div>
+                              <p className="text-sm text-gray-600">Receita</p>
+                              <p className="font-bold text-green-600">{formatCurrency(mes.receita)}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Despesas</p>
+                              <p className="font-bold text-red-600">{formatCurrency(mes.despesas)}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Lucro</p>
+                              <p className={`font-bold ${mes.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {formatCurrency(mes.lucro)}
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm text-gray-600">Despesas</p>
-                          <p className="font-bold text-red-600">{formatCurrency(mes.despesas)}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-600">Lucro</p>
-                          <p className={`font-bold ${mes.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {formatCurrency(mes.lucro)}
-                          </p>
-                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-4 text-gray-500">
+                        Nenhum histórico financeiro disponível para este veículo.
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-4 text-gray-500">
-                    Nenhum histórico financeiro disponível para este veículo.
+                    )}
                   </div>
-                )}
-              </div>
+                </TabsContent>
+
+                <TabsContent value="receitas" className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-green-600">
+                      <TrendingUp className="h-4 w-4" />
+                      <span className="font-medium">Histórico de Receitas</span>
+                    </div>
+                    
+                    {historico?.receitas && historico.receitas.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Data</TableHead>
+                              <TableHead>Tipo</TableHead>
+                              <TableHead>Descrição</TableHead>
+                              <TableHead className="text-right">Valor</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {historico.receitas.map((receita) => (
+                              <TableRow key={receita.id}>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                    {format(new Date(receita.data), 'dd/MM/yyyy', { locale: pt })}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="text-green-600 border-green-600">
+                                    {receita.tipo}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>{receita.descricao}</TableCell>
+                                <TableCell className="text-right font-bold text-green-600">
+                                  {formatCurrency(receita.valor)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <DollarSign className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                        <p>Nenhuma receita registrada para este veículo.</p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="despesas" className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-red-600">
+                      <TrendingDown className="h-4 w-4" />
+                      <span className="font-medium">Histórico de Despesas</span>
+                    </div>
+                    
+                    {historico?.despesas && historico.despesas.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Data</TableHead>
+                              <TableHead>Categoria</TableHead>
+                              <TableHead>Descrição</TableHead>
+                              <TableHead className="text-right">Valor</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {historico.despesas.map((despesa) => (
+                              <TableRow key={despesa.id}>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                    {format(new Date(despesa.data), 'dd/MM/yyyy', { locale: pt })}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="text-red-600 border-red-600">
+                                    {despesa.categoria}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>{despesa.descricao}</TableCell>
+                                <TableCell className="text-right font-bold text-red-600">
+                                  {formatCurrency(despesa.valor)}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                        <p>Nenhuma despesa registrada para este veículo.</p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
 
