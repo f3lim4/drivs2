@@ -187,15 +187,30 @@ export default function Planos() {
   const getIcon = (planoId: string) => {
     switch (planoId) {
       case 'free':
-        return <Gift className="w-8 h-8 text-green-600" />;
+        return <Gift className="w-8 h-8 text-white" />;
       case 'basico':
-        return <Building2 className="w-8 h-8 text-slate-600" />;
+        return <Building2 className="w-8 h-8 text-white" />;
       case 'premium':
-        return <Zap className="w-8 h-8 text-blue-600" />;
+        return <Zap className="w-8 h-8 text-white" />;
       case 'enterprise':
-        return <Crown className="w-8 h-8 text-purple-600" />;
+        return <Crown className="w-8 h-8 text-white" />;
       default:
-        return <Building2 className="w-8 h-8 text-slate-600" />;
+        return <Building2 className="w-8 h-8 text-white" />;
+    }
+  };
+
+  const getGradientClass = (planoId: string) => {
+    switch (planoId) {
+      case 'free':
+        return 'bg-gradient-to-br from-green-500 to-emerald-600 border-green-400';
+      case 'basico':
+        return 'bg-gradient-to-br from-slate-500 to-slate-600 border-slate-400';
+      case 'premium':
+        return 'bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400';
+      case 'enterprise':
+        return 'bg-gradient-to-br from-purple-500 to-violet-600 border-purple-400';
+      default:
+        return 'bg-gradient-to-br from-slate-500 to-slate-600 border-slate-400';
     }
   };
 
@@ -276,14 +291,14 @@ export default function Planos() {
   };
 
   return (
-    <div className="flex-1 space-y-6 p-6">
-      {/* Header */}
+    <div className="flex-1 space-y-8 p-6">
+      {/* Header Futurista */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
             Gerenciamento de Planos
           </h1>
-          <p className="text-slate-600 mt-1">
+          <p className="text-slate-600 text-lg">
             Gerencie os planos disponíveis para as locadoras
           </p>
         </div>
@@ -291,14 +306,14 @@ export default function Planos() {
           <Button
             variant="outline"
             onClick={() => setModalLocadoras(true)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 bg-gradient-to-r from-slate-600 to-slate-700 text-white border-slate-500 hover:from-slate-700 hover:to-slate-800"
           >
             <Eye className="w-4 h-4" />
             Ver Locadoras
           </Button>
           <Dialog open={modalAberto} onOpenChange={setModalAberto}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2" onClick={handleNovoPlano}>
+              <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" onClick={handleNovoPlano}>
                 <Plus className="w-4 h-4" />
                 Novo Plano
               </Button>
@@ -416,174 +431,256 @@ export default function Planos() {
         </div>
       </div>
 
-      {/* Cards dos Planos */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {planos.map((plano) => (
-          <Card key={plano.id} className="border border-slate-200 bg-white shadow-sm">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-10 h-10 rounded-lg flex items-center justify-center"
-                    style={{ backgroundColor: plano.cor + '20' }}
-                  >
-                    {getIcon(plano.id)}
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg font-semibold text-slate-800">
-                      {plano.nome}
-                    </CardTitle>
-                    <p className="text-sm text-slate-600">{plano.descricao}</p>
-                  </div>
-                </div>
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleEditarPlano(plano)}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleExcluirPlano(plano.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-slate-600">Preço Mensal</p>
-                  <p className="font-semibold text-slate-800">{formatCurrency(plano.precoMensal)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Preço Anual</p>
-                  <p className="font-semibold text-slate-800">{formatCurrency(plano.precoAnual)}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-slate-600">Máx. Veículos</p>
-                  <p className="font-semibold text-slate-800">
-                    {plano.maxVeiculos === 9999 ? 'Ilimitado' : plano.maxVeiculos}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Máx. Motoristas</p>
-                  <p className="font-semibold text-slate-800">
-                    {plano.maxMotoristas === 9999 ? 'Ilimitado' : plano.maxMotoristas}
-                  </p>
-                </div>
-              </div>
-
+      {/* Cards de Estatísticas */}
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card className="bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400 border-2 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-600 mb-2">Funcionalidades:</p>
-                <div className="space-y-1">
-                  {plano.features.slice(0, 3).map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600" />
-                      <span className="text-sm text-slate-700">{feature}</span>
-                    </div>
-                  ))}
-                  {plano.features.length > 3 && (
-                    <p className="text-xs text-slate-500">
-                      +{plano.features.length - 3} funcionalidades
-                    </p>
-                  )}
-                </div>
+                <p className="text-sm font-medium text-white/80">Total de Planos</p>
+                <p className="text-3xl font-bold text-white">{planos.length}</p>
               </div>
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <Settings className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              <div className="flex justify-between items-center pt-2">
-                <Badge className={plano.ativo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-                  {plano.ativo ? 'Ativo' : 'Inativo'}
-                </Badge>
-                <span className="text-sm text-slate-600">Ordem: {plano.ordem}</span>
+        <Card className="bg-gradient-to-br from-green-500 to-emerald-600 border-green-400 border-2 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-white/80">Planos Ativos</p>
+                <p className="text-3xl font-bold text-white">{planos.filter(p => p.ativo).length}</p>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <Check className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-500 to-violet-600 border-purple-400 border-2 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-white/80">Locadoras Cadastradas</p>
+                <p className="text-3xl font-bold text-white">{locadorasPlanos.length}</p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <Building2 className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-orange-500 to-red-600 border-orange-400 border-2 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-white/80">Receita Mensal</p>
+                <p className="text-3xl font-bold text-white">{formatCurrency(locadorasPlanos.reduce((acc, loc) => acc + loc.valorPago / 12, 0))}</p>
+              </div>
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                <Star className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Modal das Locadoras */}
-      <Dialog open={modalLocadoras} onOpenChange={setModalLocadoras}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Locadoras e seus Planos</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Locadora</TableHead>
-                  <TableHead>Plano Atual</TableHead>
-                  <TableHead>Data Início</TableHead>
-                  <TableHead>Data Vencimento</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Valor Pago</TableHead>
-                  <TableHead>Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {locadorasPlanos.map((locadora) => (
-                  <TableRow key={locadora.id}>
-                    <TableCell className="font-medium">{locadora.nome}</TableCell>
-                    <TableCell>{getPlanoNome(locadora.planoAtual)}</TableCell>
-                    <TableCell>{new Date(locadora.dataInicio).toLocaleDateString('pt-BR')}</TableCell>
-                    <TableCell>{new Date(locadora.dataVencimento).toLocaleDateString('pt-BR')}</TableCell>
-                    <TableCell>{getStatusBadge(locadora.status)}</TableCell>
-                    <TableCell>{formatCurrency(locadora.valorPago)}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => {
-                            toast({
-                              title: "Alterar Plano",
-                              description: `Alterando plano da ${locadora.nome}`,
-                            });
-                          }}
-                          title="Alterar plano"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => {
-                            toast({
-                              title: "Renovar Assinatura",
-                              description: `Renovando assinatura da ${locadora.nome}`,
-                            });
-                          }}
-                          title="Renovar assinatura"
-                        >
-                          <Settings className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => {
-                            toast({
-                              title: "Suspender Locadora",
-                              description: `Suspendendo acesso da ${locadora.nome}`,
-                            });
-                          }}
-                          title="Suspender locadora"
-                        >
-                          <X className="w-4 h-4 text-red-600" />
-                        </Button>
+      {/* Cards dos Planos com Visual Futurista */}
+      <div className="grid gap-8 md:grid-cols-3">
+        {planos.map((plano) => {
+          const gradientClass = getGradientClass(plano.id);
+          return (
+            <Card key={plano.id} className={`${gradientClass} border-2 shadow-xl hover:shadow-2xl transition-all duration-300`}>
+              <CardHeader className="pb-4">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      {getIcon(plano.id)}
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl font-bold text-white mb-1">
+                        {plano.nome}
+                      </CardTitle>
+                      <p className="text-sm text-white/80">{plano.descricao}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditarPlano(plano)}
+                      className="text-white hover:bg-white/20"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleExcluirPlano(plano.id)}
+                      className="text-white hover:bg-white/20"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
+                    <p className="text-sm text-white/70 mb-1">Preço Mensal</p>
+                    <p className="font-bold text-white text-lg">{formatCurrency(plano.precoMensal)}</p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
+                    <p className="text-sm text-white/70 mb-1">Preço Anual</p>
+                    <p className="font-bold text-white text-lg">{formatCurrency(plano.precoAnual)}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
+                    <p className="text-sm text-white/70 mb-1">Máx. Veículos</p>
+                    <p className="font-bold text-white text-lg">
+                      {plano.maxVeiculos === 9999 ? '∞' : plano.maxVeiculos}
+                    </p>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
+                    <p className="text-sm text-white/70 mb-1">Máx. Motoristas</p>
+                    <p className="font-bold text-white text-lg">
+                      {plano.maxMotoristas === 9999 ? '∞' : plano.maxMotoristas}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
+                  <p className="text-sm text-white/70 mb-3">Funcionalidades</p>
+                  <div className="space-y-2">
+                    {plano.features.slice(0, 4).map((feature, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-white" />
+                        <span className="text-sm text-white/90">{feature}</span>
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    ))}
+                    {plano.features.length > 4 && (
+                      <p className="text-xs text-white/60 mt-2">
+                        +{plano.features.length - 4} funcionalidades adicionais
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-2">
+                  <Badge className={plano.ativo ? 'bg-green-500/20 text-green-100 border-green-400' : 'bg-gray-500/20 text-gray-100 border-gray-400'}>
+                    {plano.ativo ? 'Ativo' : 'Inativo'}
+                  </Badge>
+                  <span className="text-sm text-white/70">Ordem: {plano.ordem}</span>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Modal das Locadoras com Visual Futurista */}
+      <Dialog open={modalLocadoras} onOpenChange={setModalLocadoras}>
+        <DialogContent className="max-w-6xl bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200">
+          <DialogHeader className="border-b border-slate-200 pb-4">
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Locadoras e seus Planos
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 mt-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {locadorasPlanos.map((locadora) => (
+                <Card key={locadora.id} className="bg-gradient-to-br from-white to-slate-50 border-slate-200 shadow-lg hover:shadow-xl transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                          <Building2 className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-lg font-semibold text-slate-800">
+                            {locadora.nome}
+                          </CardTitle>
+                          <p className="text-sm text-slate-600">{getPlanoNome(locadora.planoAtual)}</p>
+                        </div>
+                      </div>
+                      {getStatusBadge(locadora.status)}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-slate-50 p-3 rounded-lg">
+                        <p className="text-xs text-slate-600 mb-1">Data Início</p>
+                        <p className="font-semibold text-slate-800 text-sm">
+                          {new Date(locadora.dataInicio).toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                      <div className="bg-slate-50 p-3 rounded-lg">
+                        <p className="text-xs text-slate-600 mb-1">Vencimento</p>
+                        <p className="font-semibold text-slate-800 text-sm">
+                          {new Date(locadora.dataVencimento).toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200">
+                      <p className="text-xs text-green-700 mb-1">Valor Pago</p>
+                      <p className="font-bold text-green-800 text-lg">{formatCurrency(locadora.valorPago)}</p>
+                    </div>
+
+                    <div className="flex justify-between gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          toast({
+                            title: "Alterar Plano",
+                            description: `Alterando plano da ${locadora.nome}`,
+                          });
+                        }}
+                        className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 hover:from-blue-600 hover:to-indigo-700"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Alterar
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          toast({
+                            title: "Renovar Assinatura",
+                            description: `Renovando assinatura da ${locadora.nome}`,
+                          });
+                        }}
+                        className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-green-400 hover:from-green-600 hover:to-emerald-700"
+                      >
+                        <Settings className="w-4 h-4 mr-1" />
+                        Renovar
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          toast({
+                            title: "Suspender Locadora",
+                            description: `Suspendendo acesso da ${locadora.nome}`,
+                          });
+                        }}
+                        className="bg-gradient-to-r from-red-500 to-red-600 text-white border-red-400 hover:from-red-600 hover:to-red-700"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
