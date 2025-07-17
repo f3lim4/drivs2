@@ -353,8 +353,7 @@ export default function Motoristas() {
                 <TableHead>CPF</TableHead>
                 <TableHead>CNH</TableHead>
                 <TableHead>CONTATO</TableHead>
-                <TableHead>VENCIMENTO CNH</TableHead>
-                <TableHead>STATUS</TableHead>
+                <TableHead>VENCIMENTO CNH / STATUS</TableHead>
                 <TableHead>AÇÕES</TableHead>
               </TableRow>
             </TableHeader>
@@ -404,10 +403,10 @@ export default function Motoristas() {
                     <p>{motorista.telefone || motorista.contato}</p>
                   </TableCell>
                   <TableCell>
-                    <p>{motorista.vencimentoCnh}</p>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(motorista)}
+                    <div className="space-y-1">
+                      <p className="text-sm">{motorista.vencimentoCnh}</p>
+                      {getStatusBadge(motorista)}
+                    </div>
                   </TableCell>
                   {isLocadora && (
                     <TableCell>
