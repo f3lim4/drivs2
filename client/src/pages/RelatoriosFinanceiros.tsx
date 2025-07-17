@@ -341,7 +341,7 @@ export default function RelatoriosFinanceiros() {
 
   const totalDespesas = useMemo(() => {
     const despesasManuais = filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'despesa' && despesa.fonte !== 'manutencao' && despesa.fonte !== 'financiamento') // Excluir despesas de manutenção e financiamento pois já estão nas despesas fixas
+      .filter(despesa => despesa.tipo === 'despesa' && despesa.fonte !== 'manutencao' && despesa.categoria !== 'financiamento') // Excluir despesas de manutenção e financiamento pois já estão nas despesas fixas
       .reduce((total, despesa) => {
         const valor = parseFloat(despesa.valor || '0');
         return total + (isNaN(valor) ? 0 : valor);
@@ -365,7 +365,7 @@ export default function RelatoriosFinanceiros() {
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
   // Debug detalhado para verificar valores
-  const despesasManuaisFiltradas = filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.fonte !== 'financiamento');
+  const despesasManuaisFiltradas = filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.categoria !== 'financiamento');
   const despesasManuaisValor = despesasManuaisFiltradas.reduce((total, despesa) => {
     const valor = parseFloat(despesa.valor || '0');
     return total + (isNaN(valor) ? 0 : valor);
@@ -1043,8 +1043,8 @@ export default function RelatoriosFinanceiros() {
                           }
                         });
                         
-                        // Adicionar despesas manuais
-                        despesas.forEach(despesa => {
+                        // Adicionar despesas manuais (exceto financiamento)
+                        despesas.filter(despesa => despesa.categoria !== 'financiamento').forEach(despesa => {
                           const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
                           todasDespesas.push({
                             id: `despesa-${despesa.id}`,
