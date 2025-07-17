@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Sistema de Ordenação Implementado na Página de Motoristas - CONCLUÍDO
+- ✅ **Dropdown de ordenação posicionado** - Localizado do lado oposto ao título "Lista de Motoristas"
+- ✅ **8 opções de ordenação** - Nome (A-Z/Z-A), CPF (crescente/decrescente), CNH (crescente/decrescente), Vencimento CNH (primeiro/último)
+- ✅ **Função de ordenação inteligente** - sortMotoristas() com switch case para cada tipo de ordenação
+- ✅ **Padrão "Nome (A-Z)"** - Configuração inicial para ordenação alfabética
+- ✅ **Integração com filtros** - Ordenação funciona junto com busca e filtros de status
+- ✅ **Reset automático de paginação** - Página volta para 1 quando ordenação muda
+- ✅ **Ordenação por data de vencimento** - Opções específicas para CNH vencendo primeiro/último
+- ✅ **Interface consistente** - Dropdown compacto e responsivo seguindo padrão do sistema
+
 ### 2025-07-17: Paginação Implementada em Aluguéis - CONCLUÍDO
 - ✅ **Paginação na página de aluguéis** - Sistema completo de paginação já implementado
 - ✅ **Estados de controle** - currentPage, itemsPerPage e funções de navegação funcionando

@@ -54,6 +54,7 @@ export default function Motoristas() {
   const [selectedMotorista, setSelectedMotorista] = useState<Motorista | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [sortBy, setSortBy] = useState<string>('nome-asc');
 
   // Buscar locadoras para exibir nome na coluna
   const { data: locadoras = [] } = useQuery({
@@ -99,23 +100,42 @@ export default function Motoristas() {
     }
   };
 
-  // Filtra e ordena motoristas baseado na busca e filtros
-  const filteredMotoristas = motoristas
-    .filter(motorista => {
-      const matchesSearch = motorista.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           motorista.cpf.includes(searchTerm) ||
-                           motorista.cnh.includes(searchTerm);
-      
-      const matchesStatus = statusFilter === 'todos' || motorista.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      // Ordena por data de cadastro decrescente (mais novos primeiro)
-      const dateA = new Date(a.createdAt || '');
-      const dateB = new Date(b.createdAt || '');
-      return dateB.getTime() - dateA.getTime();
+  // Função para ordenar motoristas
+  const sortMotoristas = (motoristas: Motorista[]) => {
+    return [...motoristas].sort((a, b) => {
+      switch (sortBy) {
+        case 'nome-asc':
+          return a.nome.localeCompare(b.nome);
+        case 'nome-desc':
+          return b.nome.localeCompare(a.nome);
+        case 'cpf-asc':
+          return a.cpf.localeCompare(b.cpf);
+        case 'cpf-desc':
+          return b.cpf.localeCompare(a.cpf);
+        case 'cnh-asc':
+          return a.cnh.localeCompare(b.cnh);
+        case 'cnh-desc':
+          return b.cnh.localeCompare(a.cnh);
+        case 'vencimento-asc':
+          return new Date(a.vencimentoCnh).getTime() - new Date(b.vencimentoCnh).getTime();
+        case 'vencimento-desc':
+          return new Date(b.vencimentoCnh).getTime() - new Date(a.vencimentoCnh).getTime();
+        default:
+          return 0;
+      }
     });
+  };
+
+  // Filtra e ordena motoristas baseado na busca e filtros
+  const filteredMotoristas = sortMotoristas(motoristas.filter(motorista => {
+    const matchesSearch = motorista.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         motorista.cpf.includes(searchTerm) ||
+                         motorista.cnh.includes(searchTerm);
+    
+    const matchesStatus = statusFilter === 'todos' || motorista.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  }));
 
   // Paginação
   const totalPages = Math.ceil(filteredMotoristas.length / itemsPerPage);
@@ -126,7 +146,7 @@ export default function Motoristas() {
   // Reset para primeira página quando filtros mudam
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter]);
+  }, [searchTerm, statusFilter, sortBy]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -342,7 +362,24 @@ export default function Motoristas() {
       {/* Tabela de motoristas */}
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Motoristas</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Lista de Motoristas</CardTitle>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="nome-asc">Nome (A-Z)</SelectItem>
+                <SelectItem value="nome-desc">Nome (Z-A)</SelectItem>
+                <SelectItem value="cpf-asc">CPF (Crescente)</SelectItem>
+                <SelectItem value="cpf-desc">CPF (Decrescente)</SelectItem>
+                <SelectItem value="cnh-asc">CNH (Crescente)</SelectItem>
+                <SelectItem value="cnh-desc">CNH (Decrescente)</SelectItem>
+                <SelectItem value="vencimento-asc">CNH Vence Primeiro</SelectItem>
+                <SelectItem value="vencimento-desc">CNH Vence Último</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
