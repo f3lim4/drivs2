@@ -72,6 +72,21 @@ export default function Infracoes() {
     }
   };
 
+  const getTipoBadge = (tipo: string) => {
+    switch (tipo) {
+      case 'leve':
+        return <Badge variant="outline" className="bg-green-50 text-green-700">Leve</Badge>;
+      case 'media':
+        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700">Média</Badge>;
+      case 'grave':
+        return <Badge variant="outline" className="bg-orange-50 text-orange-700">Grave</Badge>;
+      case 'gravissima':
+        return <Badge variant="outline" className="bg-red-50 text-red-700">Gravíssima</Badge>;
+      default:
+        return <Badge variant="outline">{tipo}</Badge>;
+    }
+  };
+
 
 
   const handleDeleteInfracao = (id: string) => {
@@ -219,6 +234,7 @@ export default function Infracoes() {
                   <TableHead>Motorista</TableHead>
                   <TableHead>Veículo</TableHead>
                   {isAdmin && <TableHead>Locadora</TableHead>}
+                  <TableHead>Tipo</TableHead>
                   <TableHead>Descrição</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead>Valor</TableHead>
@@ -258,7 +274,7 @@ export default function Infracoes() {
                           </div>
                         </TableCell>
                       )}
-
+                      <TableCell>{getTipoBadge(infracao.tipoInfracao)}</TableCell>
                       <TableCell className="max-w-48 truncate">{infracao.descricaoInfracao}</TableCell>
                       <TableCell>{formatDate(infracao.dataInfracao)}</TableCell>
                       <TableCell className="font-medium">{formatCurrency(parseFloat(infracao.valorFinal))}</TableCell>
