@@ -117,7 +117,6 @@ export default function RelatoriosFinanceiros() {
       }
 
       // Invalidar cache específico com locadoraId
-      const locadoraId = profile?.locadoraId || profile?.id;
       await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
       await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraId] });
       setModalNovaDespesa(false);
@@ -160,9 +159,9 @@ export default function RelatoriosFinanceiros() {
       }
 
       // Invalidar cache específico com locadoraId
-      const locadoraId = profile?.locadoraId || profile?.id;
-      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
-      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraId] });
+      const locadoraIdForEdit = profile?.locadoraId || profile?.id;
+      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraIdForEdit] });
+      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraIdForEdit] });
       setModalEditarDespesa(false);
       setDespesaEditando(null);
       formEditarDespesa.reset();
@@ -185,6 +184,7 @@ export default function RelatoriosFinanceiros() {
   // Função para abrir modal de edição
   const abrirModalEdicao = (despesa: any) => {
     // Buscar dados da despesa real do banco
+    if (!despesas || !Array.isArray(despesas)) return;
     const despesaReal = despesas.find(d => d.id === despesa.id.replace('despesa-', ''));
     if (!despesaReal) return;
     
@@ -220,9 +220,9 @@ export default function RelatoriosFinanceiros() {
       }
 
       // Invalidar cache específico com locadoraId
-      const locadoraId = profile?.locadoraId || profile?.id;
-      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
-      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraId] });
+      const locadoraIdForDelete = profile?.locadoraId || profile?.id;
+      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraIdForDelete] });
+      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraIdForDelete] });
       setConfirmDelete({ open: false, id: null });
       
       toast({
