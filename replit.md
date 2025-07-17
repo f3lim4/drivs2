@@ -28,6 +28,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Página de Pagamentos simplificada** - Removido título "Pagamentos" e descrição
 - ✅ **Botão "Novo Pagamento" na área de filtros** - Reposicionado ao lado dos filtros para melhor acessibilidade
 - ✅ **Cards principais acima dos anúncios** - Estatísticas do dashboard reposicionadas antes dos anúncios
+- ✅ **Página de contratos com cards e filtros** - Adicionados cards de estatísticas e sistema de filtros completo
 
 ### 2025-07-17: Sistema de Loading Spinner Unificado com Animação de Carro - CONCLUÍDO
 - ✅ **Componente LoadingSpinner criado** - Substituído spinners padrão por animação de carro
