@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Sistema de Anúncios com Cores por Tipo - CONCLUÍDO
+- ✅ **Sistema de cores implementado** - Anúncios agora têm cores específicas por tipo
+- ✅ **Azul para informação** - Mantido padrão original para tipo "info"
+- ✅ **Amarelo para atenção** - Tipo "warning" com destaque amarelo
+- ✅ **Verde para sucesso** - Tipo "success" com cor verde
+- ✅ **Vermelho para erro** - Tipo "error" com cor vermelha de alerta
+- ✅ **Traduções em português** - Todos os tipos traduzidos no dashboard das locadoras
+- ✅ **Página admin atualizada** - Painel de administração com cores e traduções
+- ✅ **Badges coloridos** - Sistema de badges com cores de fundo e texto correspondentes
+- ✅ **Anúncios de teste criados** - Exemplos de cada tipo para validação
+- ✅ **Interface consistente** - Cores padronizadas entre dashboard e painel admin
+
 ### 2025-07-17: Correções de Sistema de Contratos e Modal de Confirmação - CONCLUÍDO
 - ✅ **Erro de variável não definida corrigido** - Substituído `veiculo` por `dadosVeiculo` na geração de contratos
 - ✅ **Busca de dados do veículo implementada** - Sistema agora busca dados do veículo para limite de quilometragem
