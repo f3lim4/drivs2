@@ -190,13 +190,13 @@ export default function Manutencoes() {
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
               <CardContent className="p-6 h-full">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-blue-700">Total de Manutenções</p>
-                    <p className="text-2xl font-bold text-blue-800">{stats.total}</p>
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-blue-700">Total de Manutenções</p>
+                    <p className="text-xl font-bold text-blue-800">{stats.total}</p>
                     <p className="text-xs text-blue-600">Serviços</p>
                   </div>
-                  <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
-                    <BarChart3 className="w-6 h-6 text-blue-700" />
+                  <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-blue-700" />
                   </div>
                 </div>
               </CardContent>
@@ -205,13 +205,13 @@ export default function Manutencoes() {
             <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg h-32">
               <CardContent className="p-6 h-full">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-yellow-700">Agendadas</p>
-                    <p className="text-2xl font-bold text-yellow-800">{stats.agendadas}</p>
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-yellow-700">Agendadas</p>
+                    <p className="text-xl font-bold text-yellow-800">{stats.agendadas}</p>
                     <p className="text-xs text-yellow-600">Programadas</p>
                   </div>
-                  <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-yellow-700" />
+                  <div className="w-10 h-10 bg-yellow-200 rounded-full flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-yellow-700" />
                   </div>
                 </div>
               </CardContent>
@@ -220,28 +220,28 @@ export default function Manutencoes() {
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg h-32">
               <CardContent className="p-6 h-full">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-orange-700">Em Andamento</p>
-                    <p className="text-2xl font-bold text-orange-800">{stats.em_andamento}</p>
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-orange-700">Em Andamento</p>
+                    <p className="text-xl font-bold text-orange-800">{stats.em_andamento}</p>
                     <p className="text-xs text-orange-600">Executando</p>
                   </div>
-                  <div className="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
-                    <Wrench className="w-6 h-6 text-orange-700" />
+                  <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center">
+                    <Wrench className="w-5 h-5 text-orange-700" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
-              <CardContent className="p-6">
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
+              <CardContent className="p-6 h-full">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-green-700">Concluídas</p>
-                    <p className="text-2xl font-bold text-green-800">{stats.concluidas}</p>
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-green-700">Concluídas</p>
+                    <p className="text-xl font-bold text-green-800">{stats.concluidas}</p>
                     <p className="text-xs text-green-600">Finalizadas</p>
                   </div>
-                  <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-green-700" />
+                  <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-green-700" />
                   </div>
                 </div>
               </CardContent>

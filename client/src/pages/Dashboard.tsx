@@ -536,80 +536,80 @@ export default function Dashboard() {
       {isLocadora && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Total de Motoristas - Card Futurista */}
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-blue-700">TOTAL DE MOTORISTAS</p>
-                <p className="text-2xl font-bold text-blue-800">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-blue-700">TOTAL DE MOTORISTAS</p>
+                <p className="text-lg font-bold text-blue-800">
                   {totalMotoristas}
                 </p>
                 <p className="text-xs text-blue-600">
                   {motoristasAtivos > 0 ? `${motoristasAtivos} ativos` : "0 ativos"}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-700" />
+              <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
+                <Users className="w-4 h-4 text-blue-700" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Veículos Disponíveis - Card Futurista */}
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-green-700">VEÍCULOS DISPONÍVEIS</p>
-                <p className="text-2xl font-bold text-green-800">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-green-700">VEÍCULOS DISPONÍVEIS</p>
+                <p className="text-lg font-bold text-green-800">
                   {veiculosDisponivel}
                 </p>
                 <p className="text-xs text-green-600">
                   {totalVeiculos} total na frota
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
-                <Car className="w-6 h-6 text-green-700" />
+              <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center">
+                <Car className="w-4 h-4 text-green-700" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Aluguéis Ativos - Card Futurista */}
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-purple-700">ALUGUÉIS ATIVOS</p>
-                <p className="text-2xl font-bold text-purple-800">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-purple-700">ALUGUÉIS ATIVOS</p>
+                <p className="text-lg font-bold text-purple-800">
                   {alugueisAtivos + alugueisPendentes}
                 </p>
                 <p className="text-xs text-purple-600">
                   {totalAlugueis} total de contratos
                 </p>
               </div>
-              <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-700" />
+              <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-purple-700" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Receita Semanal - Card Futurista */}
-        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-yellow-700">TOTAL RECEBIDO ESSA SEMANA</p>
-                <p className="text-2xl font-bold text-yellow-800">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-yellow-700">TOTAL RECEBIDO ESSA SEMANA</p>
+                <p className="text-lg font-bold text-yellow-800">
                   {formatCurrency(receitaSemanalRecebida)}
                 </p>
                 <p className="text-xs text-yellow-600">
                   de {formatCurrency(receitaSemanalEsperada)} esperado
                 </p>
               </div>
-              <div className="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-yellow-700" />
+              <div className="w-8 h-8 bg-yellow-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-yellow-700" />
               </div>
             </div>
           </CardContent>
