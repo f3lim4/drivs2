@@ -982,7 +982,8 @@ export default function RelatoriosFinanceiros() {
                               categoria: 'IPVA',
                               descricao: `IPVA mensal - ${veiculo.placa}`,
                               valor: parseFloat(veiculo.ipva) / 12,
-                              status: 'Automático'
+                              status: 'Automático',
+                              createdAt: veiculo.createdAt || dataAtual
                             });
                           }
                           
@@ -996,7 +997,8 @@ export default function RelatoriosFinanceiros() {
                               categoria: 'Seguro',
                               descricao: `Seguro ${veiculo.seguradora || 'não informado'} - ${veiculo.placa}`,
                               valor: parseFloat(veiculo.valorSeguroMensal),
-                              status: 'Automático'
+                              status: 'Automático',
+                              createdAt: veiculo.createdAt || dataAtual
                             });
                           }
                           
@@ -1010,7 +1012,8 @@ export default function RelatoriosFinanceiros() {
                               categoria: 'Rastreador',
                               descricao: `Rastreador ${veiculo.rastreador || 'não informado'} - ${veiculo.placa}`,
                               valor: parseFloat(veiculo.valorRastreadorMensal),
-                              status: 'Automático'
+                              status: 'Automático',
+                              createdAt: veiculo.createdAt || dataAtual
                             });
                           }
                           
@@ -1024,7 +1027,8 @@ export default function RelatoriosFinanceiros() {
                               categoria: 'Financiamento',
                               descricao: `Financiamento mensal - ${veiculo.placa}`,
                               valor: parseFloat(veiculo.valorFinanciamento),
-                              status: 'Automático'
+                              status: 'Automático',
+                              createdAt: veiculo.createdAt || dataAtual
                             });
                           }
                         });
@@ -1042,7 +1046,8 @@ export default function RelatoriosFinanceiros() {
                               categoria: manutencao.tipo,
                               descricao: `${manutencao.tipo} - ${manutencao.oficina}`,
                               valor: parseFloat(valor),
-                              status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente'
+                              status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente',
+                              createdAt: manutencao.createdAt || manutencao.dataInicio
                             });
                           }
                         });
@@ -1058,12 +1063,39 @@ export default function RelatoriosFinanceiros() {
                             categoria: despesa.categoria,
                             descricao: despesa.descricao,
                             valor: parseFloat(despesa.valor || '0'),
-                            status: despesa.status === 'pago' ? 'Pago' : 'Pendente'
+                            status: despesa.status === 'pago' ? 'Pago' : 'Pendente',
+                            createdAt: despesa.createdAt || despesa.data // Para ordenação adicional
                           });
                         });
                         
-                        // Ordenar por data (mais recente primeiro)
-                        todasDespesas.sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+                        // Ordenar por data (mais recente primeiro), depois por criação, depois por tipo
+                        todasDespesas.sort((a, b) => {
+                          const dateA = new Date(a.data).getTime();
+                          const dateB = new Date(b.data).getTime();
+                          
+                          // Primeiro ordena por data (mais recente primeiro)
+                          if (dateB !== dateA) {
+                            return dateB - dateA;
+                          }
+                          
+                          // Em caso de empate na data, ordena por data de criação (mais recente primeiro)
+                          if (a.createdAt && b.createdAt) {
+                            const createdA = new Date(a.createdAt).getTime();
+                            const createdB = new Date(b.createdAt).getTime();
+                            if (createdB !== createdA) {
+                              return createdB - createdA;
+                            }
+                          }
+                          
+                          // Em caso de empate, prioriza despesas manuais
+                          const prioridadeTipo = {
+                            'Despesa Manual': 1,
+                            'Manutenção': 2,
+                            'Despesa Fixa': 3
+                          };
+                          
+                          return prioridadeTipo[a.tipo] - prioridadeTipo[b.tipo];
+                        });
                         
                         return todasDespesas.map((despesa) => (
                           <TableRow key={despesa.id}>
