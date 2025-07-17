@@ -1722,6 +1722,47 @@ export default function RelatoriosFinanceiros() {
                   );
                 })()}
 
+                {/* Cards de totais por categoria */}
+                <div className="mt-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    {/* Card IPVA Total */}
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <h4 className="font-medium text-blue-700 mb-2">IPVA Total</h4>
+                      <p className="text-2xl font-bold text-blue-800">
+                        {formatCurrency(veiculos.reduce((total, v) => total + (v.ipva && v.ipva > 0 ? parseFloat(v.ipva) / 12 : 0), 0))}
+                      </p>
+                      <p className="text-sm text-blue-600">Mensal</p>
+                    </div>
+                    
+                    {/* Card Seguros Total */}
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <h4 className="font-medium text-green-700 mb-2">Seguros Total</h4>
+                      <p className="text-2xl font-bold text-green-800">
+                        {formatCurrency(veiculos.reduce((total, v) => total + (v.valorSeguroMensal && v.valorSeguroMensal > 0 ? parseFloat(v.valorSeguroMensal) : 0), 0))}
+                      </p>
+                      <p className="text-sm text-green-600">Mensal</p>
+                    </div>
+                    
+                    {/* Card Rastreadores Total */}
+                    <div className="bg-yellow-50 p-4 rounded-lg">
+                      <h4 className="font-medium text-yellow-700 mb-2">Rastreadores Total</h4>
+                      <p className="text-2xl font-bold text-yellow-800">
+                        {formatCurrency(veiculos.reduce((total, v) => total + (v.valorRastreadorMensal && v.valorRastreadorMensal > 0 ? parseFloat(v.valorRastreadorMensal) : 0), 0))}
+                      </p>
+                      <p className="text-sm text-yellow-600">Mensal</p>
+                    </div>
+                    
+                    {/* Card Financiamento Total */}
+                    <div className="bg-purple-50 p-4 rounded-lg">
+                      <h4 className="font-medium text-purple-700 mb-2">Financiamento Total</h4>
+                      <p className="text-2xl font-bold text-purple-800">
+                        {formatCurrency(veiculos.reduce((total, v) => total + (v.financiado && v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : 0), 0))}
+                      </p>
+                      <p className="text-sm text-purple-600">Mensal</p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Análise por categoria */}
                 <div className="mt-8">
                   <h3 className="text-lg font-semibold mb-4">Análise por Categoria</h3>
