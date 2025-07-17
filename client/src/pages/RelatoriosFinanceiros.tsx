@@ -367,11 +367,13 @@ export default function RelatoriosFinanceiros() {
   }, [filteredData.alugueisAtivos]);
 
   const receitaPagamentos = useMemo(() => {
-    return filteredData.pagamentosRealizados.reduce((total, pagamento) => {
-      const valor = parseFloat(pagamento.valorPago || '0');
-      return total + (isNaN(valor) ? 0 : valor);
-    }, 0);
-  }, [filteredData.pagamentosRealizados]);
+    return pagamentos
+      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
+      .reduce((total, pagamento) => {
+        const valor = parseFloat(pagamento.valor || '0');
+        return total + (isNaN(valor) ? 0 : valor);
+      }, 0);
+  }, [pagamentos, monthStart, monthEnd]);
 
   const totalDespesas = useMemo(() => {
     const despesasManuais = filteredData.despesasPeriodo
@@ -394,7 +396,7 @@ export default function RelatoriosFinanceiros() {
       }, 0);
   }, [filteredData.despesasPeriodo]);
 
-  const receitaTotal = receitaAlugueis + receitaPagamentos + totalReceitas;
+  const receitaTotal = receitaPagamentos + totalReceitas;
   const lucroLiquido = receitaTotal - totalDespesas;
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
@@ -442,8 +444,17 @@ export default function RelatoriosFinanceiros() {
       const despesasFixasVeiculo = despesasFixasVeiculos.find(dfv => dfv.veiculo === veiculo.placa);
       const despesasFixasMensais = despesasFixasVeiculo ? despesasFixasVeiculo.totalMensal : 0;
       
-      const receitaMensal = aluguelVeiculo ? (parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario || '0') || 0) : 0;
-      const receitaAnual = receitaMensal * 12;
+      // Calcular receita baseada nos pagamentos do motorista do veículo
+      const pagamentosVeiculo = pagamentos.filter(p => {
+        return aluguelVeiculo && p.motoristaNome === aluguelVeiculo.motoristaNome;
+      });
+      
+      const receitaMensal = pagamentosVeiculo
+        .filter(p => isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
+        .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0);
+      
+      const receitaAnual = pagamentosVeiculo
+        .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0);
       
       const despesasManuaisMensais = despesasVeiculo
         .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
@@ -594,8 +605,10 @@ export default function RelatoriosFinanceiros() {
         new Date(a.dataFim) >= mesStart
       );
       
-      // Só mostrar receita se há aluguel ativo no período
-      const receitaMes = aluguelPeriodo ? parseFloat(aluguelPeriodo.valorMensal || 0) : 0;
+      // Calcular receita baseada nos pagamentos do período
+      const receitaMes = aluguelPeriodo ? pagamentosVeiculo
+        .filter(p => isWithinInterval(new Date(p.data), { start: mesStart, end: mesEnd }))
+        .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0) : 0;
       const despesasManuaisMes = despesasVeiculo
         .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: mesStart, end: mesEnd }))
         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
@@ -613,14 +626,18 @@ export default function RelatoriosFinanceiros() {
 
     // Preparar histórico financeiro detalhado
     const historico = {
-      receitas: alugueis
-        .filter(a => a.veiculoId === veiculo.id && a.status === 'ativo')
-        .map(aluguel => ({
-          id: aluguel.id,
-          tipo: 'Aluguel',
-          descricao: `Aluguel para ${aluguel.motoristaNome}`,
-          valor: parseFloat(aluguel.valorMensal || aluguel.valorDiario || '0'),
-          data: aluguel.dataInicio
+      receitas: pagamentos
+        .filter(p => {
+          // Encontrar o aluguel relacionado ao pagamento
+          const aluguelRelacionado = alugueis.find(a => a.motoristaNome === p.motoristaNome);
+          return aluguelRelacionado && aluguelRelacionado.veiculoId === veiculo.id;
+        })
+        .map(pagamento => ({
+          id: pagamento.id,
+          tipo: 'Pagamento',
+          descricao: `Pagamento de ${pagamento.motoristaNome}`,
+          valor: parseFloat(pagamento.valor || '0'),
+          data: pagamento.data
         })),
       despesas: [
         // Despesas manuais

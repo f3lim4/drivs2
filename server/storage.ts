@@ -615,6 +615,8 @@ export class DatabaseStorage implements IStorage {
           const motorista = await db.select().from(motoristas).where(eq(motoristas.id, pagamento.motoristaId)).limit(1);
           return {
             ...pagamento,
+            data: pagamento.dataPagamento, // Mapear campo data corretamente
+            valor: pagamento.valorPago, // Mapear campo valor corretamente
             motoristaNome: motorista[0]?.nome || '',
             motoristaContato: motorista[0]?.telefone || ''
           };
