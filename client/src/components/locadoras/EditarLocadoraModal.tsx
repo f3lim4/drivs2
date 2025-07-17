@@ -170,11 +170,18 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="basico">Básico</SelectItem>
-                  <SelectItem value="premium">Premium</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
+                  <SelectItem value="basico">Básico - R$ 99/mês</SelectItem>
+                  <SelectItem value="premium">Premium - R$ 199/mês</SelectItem>
+                  <SelectItem value="enterprise">Enterprise - R$ 399/mês</SelectItem>
                 </SelectContent>
               </Select>
+              {formData.plano && (
+                <div className="text-sm text-slate-600 mt-1">
+                  {formData.plano === 'basico' && 'Até 20 veículos, 50 motoristas - R$ 99/mês'}
+                  {formData.plano === 'premium' && 'Até 100 veículos, 200 motoristas - R$ 199/mês'}
+                  {formData.plano === 'enterprise' && 'Veículos ilimitados, motoristas ilimitados - R$ 399/mês'}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
