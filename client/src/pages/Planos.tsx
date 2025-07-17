@@ -202,15 +202,15 @@ export default function Planos() {
   const getGradientClass = (planoId: string) => {
     switch (planoId) {
       case 'free':
-        return 'bg-gradient-to-br from-green-500 to-emerald-600 border-green-400';
+        return 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600';
       case 'basico':
-        return 'bg-gradient-to-br from-slate-500 to-slate-600 border-slate-400';
+        return 'bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700';
       case 'premium':
-        return 'bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400';
+        return 'bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700';
       case 'enterprise':
-        return 'bg-gradient-to-br from-purple-500 to-violet-600 border-purple-400';
+        return 'bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700';
       default:
-        return 'bg-gradient-to-br from-slate-500 to-slate-600 border-slate-400';
+        return 'bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700';
     }
   };
 
@@ -306,14 +306,14 @@ export default function Planos() {
           <Button
             variant="outline"
             onClick={() => setModalLocadoras(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-slate-600 to-slate-700 text-white border-slate-500 hover:from-slate-700 hover:to-slate-800"
+            className="flex items-center gap-2 bg-slate-800 text-white border-slate-700 hover:bg-slate-700"
           >
             <Eye className="w-4 h-4" />
             Ver Locadoras
           </Button>
           <Dialog open={modalAberto} onOpenChange={setModalAberto}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" onClick={handleNovoPlano}>
+              <Button className="flex items-center gap-2 bg-slate-800 text-white hover:bg-slate-700" onClick={handleNovoPlano}>
                 <Plus className="w-4 h-4" />
                 Novo Plano
               </Button>
@@ -433,57 +433,57 @@ export default function Planos() {
 
       {/* Cards de Estatísticas */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400 border-2 shadow-xl">
+        <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 border shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-white/80">Total de Planos</p>
+                <p className="text-sm font-medium text-slate-300">Total de Planos</p>
                 <p className="text-3xl font-bold text-white">{planos.length}</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Settings className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center">
+                <Settings className="w-6 h-6 text-slate-300" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-500 to-emerald-600 border-green-400 border-2 shadow-xl">
+        <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 border shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-white/80">Planos Ativos</p>
+                <p className="text-sm font-medium text-slate-300">Planos Ativos</p>
                 <p className="text-3xl font-bold text-white">{planos.filter(p => p.ativo).length}</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Check className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center">
+                <Check className="w-6 h-6 text-slate-300" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-500 to-violet-600 border-purple-400 border-2 shadow-xl">
+        <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 border shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-white/80">Locadoras Cadastradas</p>
+                <p className="text-sm font-medium text-slate-300">Locadoras Cadastradas</p>
                 <p className="text-3xl font-bold text-white">{locadorasPlanos.length}</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center">
+                <Building2 className="w-6 h-6 text-slate-300" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-500 to-red-600 border-orange-400 border-2 shadow-xl">
+        <Card className="bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700 border shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-white/80">Receita Mensal</p>
+                <p className="text-sm font-medium text-slate-300">Receita Mensal</p>
                 <p className="text-3xl font-bold text-white">{formatCurrency(locadorasPlanos.reduce((acc, loc) => acc + loc.valorPago / 12, 0))}</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-                <Star className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center">
+                <Star className="w-6 h-6 text-slate-300" />
               </div>
             </div>
           </CardContent>
@@ -585,22 +585,22 @@ export default function Planos() {
         })}
       </div>
 
-      {/* Modal das Locadoras com Visual Futurista */}
+      {/* Modal das Locadoras com Visual Clean */}
       <Dialog open={modalLocadoras} onOpenChange={setModalLocadoras}>
-        <DialogContent className="max-w-6xl bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200">
+        <DialogContent className="max-w-6xl bg-white border-slate-200">
           <DialogHeader className="border-b border-slate-200 pb-4">
-            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-900 bg-clip-text text-transparent">
               Locadoras e seus Planos
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-6 mt-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {locadorasPlanos.map((locadora) => (
-                <Card key={locadora.id} className="bg-gradient-to-br from-white to-slate-50 border-slate-200 shadow-lg hover:shadow-xl transition-shadow">
+                <Card key={locadora.id} className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center">
                           <Building2 className="w-5 h-5 text-white" />
                         </div>
                         <div>
@@ -629,9 +629,9 @@ export default function Planos() {
                       </div>
                     </div>
                     
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200">
-                      <p className="text-xs text-green-700 mb-1">Valor Pago</p>
-                      <p className="font-bold text-green-800 text-lg">{formatCurrency(locadora.valorPago)}</p>
+                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                      <p className="text-xs text-slate-600 mb-1">Valor Pago</p>
+                      <p className="font-bold text-slate-800 text-lg">{formatCurrency(locadora.valorPago)}</p>
                     </div>
 
                     <div className="flex justify-between gap-2">
@@ -644,7 +644,7 @@ export default function Planos() {
                             description: `Alterando plano da ${locadora.nome}`,
                           });
                         }}
-                        className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400 hover:from-blue-600 hover:to-indigo-700"
+                        className="flex-1 bg-slate-800 text-white border-slate-700 hover:bg-slate-700"
                       >
                         <Edit className="w-4 h-4 mr-1" />
                         Alterar
@@ -658,7 +658,7 @@ export default function Planos() {
                             description: `Renovando assinatura da ${locadora.nome}`,
                           });
                         }}
-                        className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-green-400 hover:from-green-600 hover:to-emerald-700"
+                        className="flex-1 bg-slate-800 text-white border-slate-700 hover:bg-slate-700"
                       >
                         <Settings className="w-4 h-4 mr-1" />
                         Renovar
@@ -672,7 +672,7 @@ export default function Planos() {
                             description: `Suspendendo acesso da ${locadora.nome}`,
                           });
                         }}
-                        className="bg-gradient-to-r from-red-500 to-red-600 text-white border-red-400 hover:from-red-600 hover:to-red-700"
+                        className="bg-slate-800 text-white border-slate-700 hover:bg-slate-700"
                       >
                         <X className="w-4 h-4" />
                       </Button>
