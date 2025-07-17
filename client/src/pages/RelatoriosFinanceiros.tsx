@@ -223,14 +223,13 @@ export default function RelatoriosFinanceiros() {
       }
       
       // Manutenções do mês selecionado
-      const manutencoesVeiculo = filteredData.manutencoes?.filter(m => 
-        m.veiculoId === veiculo.id && 
-        m.valorOrcamento && 
-        parseFloat(m.valorOrcamento) > 0
-      ) || [];
+      const manutencoesVeiculo = filteredData.manutencoes?.filter(m => {
+        const valor = m.valorFinal || m.valorOrcamento;
+        return m.veiculoId === veiculo.id && valor && parseFloat(valor) > 0;
+      }) || [];
       
       manutencoesVeiculo.forEach(manutencao => {
-        const valorManutencao = parseFloat(manutencao.valorOrcamento);
+        const valorManutencao = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento);
         if (!isNaN(valorManutencao)) {
           despesasMensais += valorManutencao;
         }
