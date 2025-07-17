@@ -50,11 +50,42 @@ export default function Alugueis() {
   // Carregamento de dados com React Query
   const { data: alugueis = [], isLoading: loading } = useQuery({
     queryKey: ['/api/alugueis', profile?.id],
+    queryFn: async () => {
+      if (!profile?.id) return [];
+      
+      // Para admin, buscar todos os aluguéis
+      if (isAdmin) {
+        const response = await fetch('/api/alugueis');
+        return response.json();
+      }
+      
+      // Para locadora, buscar apenas os aluguéis da locadora
+      console.log(`[DEBUG] Buscando aluguéis para locadora:`, profile.id);
+      const response = await fetch(`/api/alugueis?locadoraId=${profile.id}`);
+      const data = await response.json();
+      console.log(`[DEBUG] Aluguéis retornados:`, data);
+      return data;
+    },
     enabled: !!profile?.id,
+    staleTime: 0, // Evita cache antigo
+    cacheTime: 5 * 60 * 1000, // 5 minutos
   });
 
   const { data: pagamentos = [] } = useQuery({
     queryKey: ['/api/pagamentos', profile?.id],
+    queryFn: async () => {
+      if (!profile?.id) return [];
+      
+      // Para admin, buscar todos os pagamentos
+      if (isAdmin) {
+        const response = await fetch('/api/pagamentos');
+        return response.json();
+      }
+      
+      // Para locadora, buscar apenas os pagamentos da locadora
+      const response = await fetch(`/api/pagamentos?locadoraId=${profile.id}`);
+      return response.json();
+    },
     enabled: !!profile?.id,
   });
 
