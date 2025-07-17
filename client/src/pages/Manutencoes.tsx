@@ -109,6 +109,22 @@ export default function Manutencoes() {
       }
     });
 
+  // Paginação
+  const paginatedManutencoes = filteredManutencoes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Funções para controlar a paginação
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   // Calcula estatísticas
   const stats = {
     total: manutencoes.length,
@@ -327,7 +343,7 @@ export default function Manutencoes() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredManutencoes.map((manutencao) => (
+                    {paginatedManutencoes.map((manutencao) => (
                       <TableRow key={manutencao.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
@@ -417,6 +433,19 @@ export default function Manutencoes() {
               )}
             </CardContent>
           </Card>
+
+          {/* Paginação */}
+          {filteredManutencoes.length > 0 && (
+            <div className="border-t pt-4 mt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalItems={filteredManutencoes.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handleItemsPerPageChange}
+              />
+            </div>
+          )}
       </div>
 
       {/* Modais */}
