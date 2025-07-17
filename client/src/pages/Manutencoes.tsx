@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Table, 
   TableBody, 
@@ -39,6 +40,7 @@ export default function Manutencoes() {
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [novaManutencaoModalOpen, setNovaManutencaoModalOpen] = useState(false);
   const [novoLocalModalOpen, setNovoLocalModalOpen] = useState(false);
+  const [gerenciarLocaisModalOpen, setGerenciarLocaisModalOpen] = useState(false);
   const [editarManutencaoModal, setEditarManutencaoModal] = useState<{ open: boolean; manutencao: Manutencao | null }>({ open: false, manutencao: null });
   const [visualizarManutencaoModal, setVisualizarManutencaoModal] = useState<{ open: boolean; manutencao: Manutencao | null }>({ open: false, manutencao: null });
 
@@ -126,9 +128,8 @@ export default function Manutencoes() {
   return (
     <div className="flex-1 space-y-6 p-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-1">
           <TabsTrigger value="manutencoes">Manutenções</TabsTrigger>
-          <TabsTrigger value="locais">Locais</TabsTrigger>
         </TabsList>
 
         <TabsContent value="manutencoes" className="space-y-6">
@@ -226,6 +227,14 @@ export default function Manutencoes() {
                     </SelectContent>
                   </Select>
 
+                  <Button 
+                    variant="outline"
+                    onClick={() => setGerenciarLocaisModalOpen(true)}
+                  >
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Gerenciar Locais
+                  </Button>
+                  
                   <Button 
                     className="bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={() => setNovaManutencaoModalOpen(true)}
@@ -357,76 +366,7 @@ export default function Manutencoes() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="locais" className="space-y-6">
-          <div className="flex justify-end">
-            <Button onClick={() => setNovoLocalModalOpen(true)} className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Novo Local
-            </Button>
-          </div>
 
-          {locais.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <MapPin className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Nenhum local encontrado</h3>
-                <p className="text-gray-500">Clique no botão acima para cadastrar um novo local</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {locais.map((local) => (
-                <Card key={local.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{local.nome}</CardTitle>
-                        <p className="text-sm text-gray-500 capitalize">{local.tipo}</p>
-                      </div>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteLocal(local.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {local.telefone && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm">{local.telefone}</span>
-                        </div>
-                      )}
-                      
-                      {local.email && (
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm">{local.email}</span>
-                        </div>
-                      )}
-                      
-                      {local.endereco && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm">{local.endereco}</span>
-                        </div>
-                      )}
-                      
-                      {local.observacoes && (
-                        <p className="text-sm text-gray-600 mt-2">{local.observacoes}</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
       </Tabs>
 
       {/* Modais */}
@@ -451,6 +391,90 @@ export default function Manutencoes() {
         open={novoLocalModalOpen}
         onClose={() => setNovoLocalModalOpen(false)}
       />
+
+      {/* Modal para gerenciar locais */}
+      <Dialog open={gerenciarLocaisModalOpen} onOpenChange={setGerenciarLocaisModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Gerenciar Locais</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="flex justify-end">
+              <Button onClick={() => setNovoLocalModalOpen(true)} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Novo Local
+              </Button>
+            </div>
+
+            {isLoadingLocais ? (
+              <div className="flex justify-center py-8">
+                <LoadingSpinner />
+              </div>
+            ) : locais.length === 0 ? (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <MapPin className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Nenhum local encontrado</h3>
+                  <p className="text-gray-500">Clique no botão acima para cadastrar um novo local</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {locais.map((local) => (
+                  <Card key={local.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">{local.nome}</CardTitle>
+                          <p className="text-sm text-gray-500 capitalize">{local.tipo}</p>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteLocal(local.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {local.telefone && (
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-gray-500" />
+                            <span className="text-sm">{local.telefone}</span>
+                          </div>
+                        )}
+                        
+                        {local.email && (
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-gray-500" />
+                            <span className="text-sm">{local.email}</span>
+                          </div>
+                        )}
+                        
+                        {local.endereco && (
+                          <div className="flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-gray-500" />
+                            <span className="text-sm">{local.endereco}</span>
+                          </div>
+                        )}
+                        
+                        {local.observacoes && (
+                          <p className="text-sm text-gray-600 mt-2">{local.observacoes}</p>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
