@@ -141,20 +141,42 @@ export default function AnunciosAdmin() {
   };
 
   const getTipoBadge = (tipo: string) => {
-    const badges = {
-      info: { color: 'blue', label: 'Informação' },
-      warning: { color: 'yellow', label: 'Atenção' },
-      success: { color: 'green', label: 'Sucesso' },
-      error: { color: 'red', label: 'Erro' },
-    };
-    
-    const badge = badges[tipo as keyof typeof badges] || badges.info;
-    
-    return (
-      <Badge variant={badge.color === 'blue' ? 'default' : 'secondary'}>
-        {badge.label}
-      </Badge>
-    );
+    switch(tipo.toLowerCase()) {
+      case 'info':
+      case 'informacao':
+        return (
+          <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+            Informação
+          </Badge>
+        );
+      case 'warning':
+      case 'atencao':
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
+            Atenção
+          </Badge>
+        );
+      case 'success':
+      case 'sucesso':
+        return (
+          <Badge className="bg-green-100 text-green-800 border-green-200">
+            Sucesso
+          </Badge>
+        );
+      case 'error':
+      case 'erro':
+        return (
+          <Badge className="bg-red-100 text-red-800 border-red-200">
+            Erro
+          </Badge>
+        );
+      default:
+        return (
+          <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+            Informação
+          </Badge>
+        );
+    }
   };
 
   const getPrioridadeBadge = (prioridade: number) => {
