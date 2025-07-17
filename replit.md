@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-17: Sistema de Ordenação Implementado na Página de Aluguéis - CONCLUÍDO
+- ✅ **Dropdown de ordenação posicionado** - Localizado no header da tabela "Contratos de Locação"
+- ✅ **8 opções de ordenação** - Mais novos primeiro, Mais antigos, Motorista (A-Z/Z-A), Veículo (A-Z/Z-A), Valor (Maior/Menor)
+- ✅ **Função de ordenação inteligente** - sortOrder integrado com useMemo para performance otimizada
+- ✅ **Padrão "Mais Novos Primeiro"** - Configuração inicial para ordenação por data de início
+- ✅ **Integração com filtros** - Ordenação funciona junto com busca e filtros de status
+- ✅ **Reset automático de paginação** - Página volta para 1 quando ordenação muda
+- ✅ **Estilo consistente** - Card de filtros com fundo branco e borda destacada
+- ✅ **Interface padronizada** - Mesmo padrão visual da página de veículos implementado
+
 ### 2025-07-17: Reorganização da Página de Contratos - Abas Removidas - CONCLUÍDO
 - ✅ **Abas removidas** - Eliminado sistema de abas "Contratos Gerados" e "Meus Templates"
 - ✅ **Botão "Templates" adicionado** - Posicionado na linha do título "Contratos Gerados"
