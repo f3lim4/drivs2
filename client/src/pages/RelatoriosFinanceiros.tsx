@@ -196,43 +196,54 @@ export default function RelatoriosFinanceiros() {
       
       // IPVA (divide anual por 12 meses)
       if (veiculo.ipva && veiculo.ipva > 0) {
-        despesasFixas.push({
-          tipo: 'IPVA',
-          valor: parseFloat(veiculo.ipva) / 12,
-          descricao: `IPVA mensal - ${veiculo.placa}`,
-          veiculo: veiculo.placa
-        });
+        const valorIpva = parseFloat(veiculo.ipva) / 12;
+        if (!isNaN(valorIpva)) {
+          despesasFixas.push({
+            tipo: 'IPVA',
+            valor: valorIpva,
+            descricao: `IPVA mensal - ${veiculo.placa}`,
+            veiculo: veiculo.placa
+          });
+        }
       }
       
       // Seguro mensal
       if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
-        despesasFixas.push({
-          tipo: 'Seguro',
-          valor: parseFloat(veiculo.valorSeguroMensal),
-          descricao: `Seguro ${veiculo.seguradora || 'não informado'} - ${veiculo.placa}`,
-          veiculo: veiculo.placa
-        });
+        const valorSeguro = parseFloat(veiculo.valorSeguroMensal);
+        if (!isNaN(valorSeguro)) {
+          despesasFixas.push({
+            tipo: 'Seguro',
+            valor: valorSeguro,
+            descricao: `Seguro ${veiculo.seguradora || 'não informado'} - ${veiculo.placa}`,
+            veiculo: veiculo.placa
+          });
+        }
       }
       
       // Rastreador mensal
       if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
-        despesasFixas.push({
-          tipo: 'Rastreador',
-          valor: parseFloat(veiculo.valorRastreadorMensal),
-          descricao: `Rastreador ${veiculo.rastreador || 'não informado'} - ${veiculo.placa}`,
-          veiculo: veiculo.placa
-        });
+        const valorRastreador = parseFloat(veiculo.valorRastreadorMensal);
+        if (!isNaN(valorRastreador)) {
+          despesasFixas.push({
+            tipo: 'Rastreador',
+            valor: valorRastreador,
+            descricao: `Rastreador ${veiculo.rastreador || 'não informado'} - ${veiculo.placa}`,
+            veiculo: veiculo.placa
+          });
+        }
       }
       
       // Financiamento mensal
       if (veiculo.financiado && veiculo.valorFinanciamento && veiculo.quantidadeParcelas) {
         const valorMensal = parseFloat(veiculo.valorFinanciamento);
-        despesasFixas.push({
-          tipo: 'Financiamento',
-          valor: valorMensal,
-          descricao: `Financiamento - ${veiculo.placa}`,
-          veiculo: veiculo.placa
-        });
+        if (!isNaN(valorMensal)) {
+          despesasFixas.push({
+            tipo: 'Financiamento',
+            valor: valorMensal,
+            descricao: `Financiamento - ${veiculo.placa}`,
+            veiculo: veiculo.placa
+          });
+        }
       }
       
       return {
@@ -253,22 +264,26 @@ export default function RelatoriosFinanceiros() {
   // Cálculos financeiros
   const receitaAlugueis = useMemo(() => {
     return filteredData.alugueisAtivos.reduce((total, aluguel) => {
-      const valorMensal = parseFloat(aluguel.valorMensal || aluguel.valorDiario);
-      return total + valorMensal;
+      // Garantir que o valor seja um número válido
+      const valorMensal = parseFloat(aluguel.valorMensal || aluguel.valorDiario || '0');
+      return total + (isNaN(valorMensal) ? 0 : valorMensal);
     }, 0);
   }, [filteredData.alugueisAtivos]);
 
   const receitaPagamentos = useMemo(() => {
     return filteredData.pagamentosRealizados.reduce((total, pagamento) => {
       const valor = parseFloat(pagamento.valorPago || '0');
-      return total + valor;
+      return total + (isNaN(valor) ? 0 : valor);
     }, 0);
   }, [filteredData.pagamentosRealizados]);
 
   const totalDespesas = useMemo(() => {
     const despesasManuais = filteredData.despesasPeriodo
       .filter(despesa => despesa.tipo === 'despesa')
-      .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+      .reduce((total, despesa) => {
+        const valor = parseFloat(despesa.valor || '0');
+        return total + (isNaN(valor) ? 0 : valor);
+      }, 0);
     
     // Somar despesas fixas dos veículos
     return despesasManuais + totalDespesasFixas;
@@ -277,12 +292,29 @@ export default function RelatoriosFinanceiros() {
   const totalReceitas = useMemo(() => {
     return filteredData.despesasPeriodo
       .filter(despesa => despesa.tipo === 'receita')
-      .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+      .reduce((total, despesa) => {
+        const valor = parseFloat(despesa.valor || '0');
+        return total + (isNaN(valor) ? 0 : valor);
+      }, 0);
   }, [filteredData.despesasPeriodo]);
 
   const receitaTotal = receitaAlugueis + receitaPagamentos + totalReceitas;
   const lucroLiquido = receitaTotal - totalDespesas;
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
+
+  // Debug para verificar valores
+  console.log('Dados financeiros:', {
+    receitaAlugueis,
+    receitaPagamentos,
+    totalReceitas,
+    totalDespesas,
+    totalDespesasFixas,
+    receitaTotal,
+    lucroLiquido,
+    margemLucro,
+    alugueisAtivos: filteredData.alugueisAtivos.length,
+    despesasFixasVeiculos: despesasFixasVeiculos.length
+  });
 
   // Análise por veículo
   const analiseVeiculos = useMemo(() => {
@@ -294,16 +326,22 @@ export default function RelatoriosFinanceiros() {
       const despesasFixasVeiculo = despesasFixasVeiculos.find(dfv => dfv.veiculo === veiculo.placa);
       const despesasFixasMensais = despesasFixasVeiculo ? despesasFixasVeiculo.totalMensal : 0;
       
-      const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
+      const receitaMensal = aluguelVeiculo ? (parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario || '0') || 0) : 0;
       const receitaAnual = receitaMensal * 12;
       
       const despesasManuaisMensais = despesasVeiculo
         .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
-        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+        .reduce((total, despesa) => {
+          const valor = parseFloat(despesa.valor || '0');
+          return total + (isNaN(valor) ? 0 : valor);
+        }, 0);
       
       const despesasManuaisAnuais = despesasVeiculo
         .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento')
-        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
+        .reduce((total, despesa) => {
+          const valor = parseFloat(despesa.valor || '0');
+          return total + (isNaN(valor) ? 0 : valor);
+        }, 0);
       
       // Somar despesas manuais + fixas
       const despesasMensais = despesasManuaisMensais + despesasFixasMensais;
