@@ -253,7 +253,20 @@ export default function Alugueis() {
     // Calcular receita real baseada nos pagamentos do mês
     const receitaReal = pagamentos
       .filter(p => {
+        // Verificar se o pagamento tem data válida
+        if (!p.data) {
+          console.log('Pagamento sem data:', p);
+          return false;
+        }
+        
         const dataPagamento = new Date(p.data);
+        
+        // Verificar se a data é válida
+        if (isNaN(dataPagamento.getTime())) {
+          console.log('Data inválida para pagamento:', p);
+          return false;
+        }
+        
         const dentroDoMes = isWithinInterval(dataPagamento, { start: monthStart, end: monthEnd });
         
         console.log('Pagamento filtro:', {

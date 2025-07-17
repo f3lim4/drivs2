@@ -596,6 +596,8 @@ export class DatabaseStorage implements IStorage {
       const result = await db.select().from(pagamentos);
       return result.map(pagamento => ({
         ...pagamento,
+        data: pagamento.dataPagamento, // Mapear campo data corretamente
+        valor: pagamento.valorPago, // Mapear campo valor corretamente
         motoristaNome: '',
         motoristaContato: ''
       }));
