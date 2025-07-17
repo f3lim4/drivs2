@@ -11,7 +11,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Trash2, Plus } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Trash2, Plus, Edit } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { useAuth } from '@/hooks/useAuth';
@@ -62,9 +63,26 @@ export default function RelatoriosFinanceiros() {
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
   const [despesaParaExcluir, setDespesaParaExcluir] = useState<string | null>(null);
   const [modalNovaDespesa, setModalNovaDespesa] = useState(false);
+  const [modalEditarDespesa, setModalEditarDespesa] = useState(false);
+  const [despesaEditando, setDespesaEditando] = useState<any>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
 
   // Formulário para nova despesa
   const formNovaDespesa = useForm<NovaDespesaData>({
+    resolver: zodResolver(novaDespesaSchema),
+    defaultValues: {
+      veiculoId: '',
+      categoria: '',
+      descricao: '',
+      valor: '',
+      data: format(new Date(), 'yyyy-MM-dd'),
+      status: 'pendente',
+      formaPagamento: 'dinheiro'
+    }
+  });
+
+  // Formulário para editar despesa
+  const formEditarDespesa = useForm<NovaDespesaData>({
     resolver: zodResolver(novaDespesaSchema),
     defaultValues: {
       veiculoId: '',
@@ -117,31 +135,90 @@ export default function RelatoriosFinanceiros() {
     }
   };
 
-  // Função para mostrar confirmação de exclusão
-  const handleClickExcluir = (despesaId: string) => {
-    setDespesaParaExcluir(despesaId);
+  // Função para editar despesa
+  const editarDespesa = async (data: NovaDespesaData) => {
+    if (!despesaEditando?.id) return;
+
+    try {
+      const response = await fetch(`/api/despesas/${despesaEditando.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...data,
+          locadoraId: profile?.id,
+          tipo: 'despesa'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao editar despesa');
+      }
+
+      // Invalidar cache específico com locadoraId
+      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
+      await queryClient.refetchQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
+      setModalEditarDespesa(false);
+      setDespesaEditando(null);
+      formEditarDespesa.reset();
+      
+      toast({
+        title: "Despesa editada",
+        description: "A despesa foi editada com sucesso.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error('Erro ao editar despesa:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível editar a despesa. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para abrir modal de edição
+  const abrirModalEdicao = (despesa: any) => {
+    // Buscar dados da despesa real do banco
+    const despesaReal = despesas.find(d => d.id === despesa.id.replace('despesa-', ''));
+    if (!despesaReal) return;
+    
+    setDespesaEditando(despesaReal);
+    formEditarDespesa.reset({
+      veiculoId: despesaReal.veiculoId || '',
+      categoria: despesaReal.categoria || '',
+      descricao: despesaReal.descricao || '',
+      valor: despesaReal.valor?.toString() || '',
+      data: despesaReal.data || '',
+      status: despesaReal.status || 'pendente',
+      formaPagamento: despesaReal.formaPagamento || 'dinheiro'
+    });
+    setModalEditarDespesa(true);
+  };
+
+  // Função para abrir modal de exclusão
+  const abrirModalExclusao = (id: string) => {
+    setConfirmDelete({ open: true, id });
   };
 
   // Função para confirmar exclusão
   const confirmarExclusao = async () => {
-    if (!despesaParaExcluir) return;
+    if (!confirmDelete.id) return;
     
     try {
-      setDespesaExcluindo(despesaParaExcluir);
-      
-      const response = await fetch(`/api/despesas/${despesaParaExcluir}`, {
+      const response = await fetch(`/api/despesas/${confirmDelete.id}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
 
       if (!response.ok) {
         throw new Error('Erro ao excluir despesa');
       }
 
-      // Invalidar cache do React Query para atualizar os dados
-      queryClient.invalidateQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
+      // Invalidar cache específico com locadoraId
+      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
+      await queryClient.refetchQueries({ queryKey: ['/api/despesas', profile?.locadoraId] });
+      setConfirmDelete({ open: false, id: null });
       
       toast({
         title: "Despesa excluída",
@@ -152,14 +229,13 @@ export default function RelatoriosFinanceiros() {
       console.error('Erro ao excluir despesa:', error);
       toast({
         title: "Erro",
-        description: "Erro ao excluir despesa. Tente novamente.",
+        description: "Não foi possível excluir a despesa. Tente novamente.",
         variant: "destructive",
       });
-    } finally {
-      setDespesaExcluindo(null);
-      setDespesaParaExcluir(null);
     }
   };
+
+
 
   // Função para cancelar exclusão
   const cancelarExclusao = () => {
@@ -881,6 +957,7 @@ export default function RelatoriosFinanceiros() {
                         <TableHead>Descrição</TableHead>
                         <TableHead>Valor</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1015,6 +1092,30 @@ export default function RelatoriosFinanceiros() {
                               <Badge variant={despesa.status === 'Pago' ? 'default' : 'secondary'}>
                                 {despesa.status}
                               </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {despesa.id.startsWith('despesa-') && (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => abrirModalEdicao(despesa)}
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => abrirModalExclusao(despesa.id.replace('despesa-', ''))}
+                                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
                             </TableCell>
                           </TableRow>
                         ));
@@ -1386,33 +1487,179 @@ export default function RelatoriosFinanceiros() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal de confirmação de exclusão */}
-      <Dialog open={!!despesaParaExcluir} onOpenChange={() => setDespesaParaExcluir(null)}>
-        <DialogContent className="sm:max-w-[425px]">
+      {/* Modal de edição de despesa */}
+      <Dialog open={modalEditarDespesa} onOpenChange={setModalEditarDespesa}>
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Confirmar exclusão</DialogTitle>
+            <DialogTitle>Editar Despesa</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.
+              Edite os dados da despesa selecionada.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={cancelarExclusao}
-              disabled={!!despesaExcluindo}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={confirmarExclusao}
-              disabled={!!despesaExcluindo}
-            >
-              {despesaExcluindo ? 'Excluindo...' : 'Excluir'}
-            </Button>
-          </DialogFooter>
+          <Form {...formEditarDespesa}>
+            <form onSubmit={formEditarDespesa.handleSubmit(editarDespesa)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={formEditarDespesa.control}
+                  name="veiculoId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Veículo</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um veículo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {veiculos.map((veiculo) => (
+                            <SelectItem key={veiculo.id} value={veiculo.id}>
+                              {veiculo.placa} - {veiculo.marca} {veiculo.modelo}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formEditarDespesa.control}
+                  name="categoria"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoria</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione uma categoria" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="combustivel">Combustível</SelectItem>
+                          <SelectItem value="manutencao">Manutenção</SelectItem>
+                          <SelectItem value="lavagem">Lavagem</SelectItem>
+                          <SelectItem value="licenciamento">Licenciamento</SelectItem>
+                          <SelectItem value="outros">Outros</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={formEditarDespesa.control}
+                name="descricao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={formEditarDespesa.control}
+                  name="valor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="number" step="0.01" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formEditarDespesa.control}
+                  name="data"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="date" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={formEditarDespesa.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="pendente">Pendente</SelectItem>
+                          <SelectItem value="pago">Pago</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formEditarDespesa.control}
+                  name="formaPagamento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Forma de Pagamento</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione uma forma" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                          <SelectItem value="cartao_credito">Cartão de Crédito</SelectItem>
+                          <SelectItem value="cartao_debito">Cartão de Débito</SelectItem>
+                          <SelectItem value="pix">PIX</SelectItem>
+                          <SelectItem value="transferencia">Transferência</SelectItem>
+                          <SelectItem value="boleto">Boleto</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setModalEditarDespesa(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={formEditarDespesa.formState.isSubmitting}>
+                  {formEditarDespesa.formState.isSubmitting ? 'Salvando...' : 'Salvar'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Modal de confirmação de exclusão */}
+      <ConfirmDialog
+        open={confirmDelete.open}
+        onOpenChange={(open) => setConfirmDelete({ open, id: null })}
+        title="Confirmar exclusão"
+        description="Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita."
+        onConfirm={confirmarExclusao}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+      />
     </div>
   );
 }
