@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { NovoVeiculoModal } from '@/components/veiculos/NovoVeiculoModal';
@@ -152,7 +153,7 @@ export default function Veiculos() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
