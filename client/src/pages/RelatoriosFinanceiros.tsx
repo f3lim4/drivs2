@@ -859,7 +859,7 @@ export default function RelatoriosFinanceiros() {
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <h4 className="font-medium text-blue-700 mb-2">Despesas Manuais</h4>
                     <p className="text-2xl font-bold text-blue-800">
-                      {formatCurrency(despesas.filter(d => d.tipo === 'despesa').reduce((total, d) => 
+                      {formatCurrency(despesas.reduce((total, d) => 
                         total + parseFloat(d.valor || '0'), 0))}
                     </p>
                     <p className="text-sm text-blue-600">Total</p>
@@ -963,7 +963,7 @@ export default function RelatoriosFinanceiros() {
                         });
                         
                         // Adicionar despesas manuais
-                        despesas.filter(d => d.tipo === 'despesa').forEach(despesa => {
+                        despesas.forEach(despesa => {
                           const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
                           todasDespesas.push({
                             id: `despesa-${despesa.id}`,
