@@ -1587,7 +1587,6 @@ export default function RelatoriosFinanceiros() {
                         <TableHead>Descrição</TableHead>
                         <TableHead>Valor</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>Forma de Pagamento</TableHead>
                         <TableHead>Ações</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -1736,7 +1735,7 @@ export default function RelatoriosFinanceiros() {
                         if (paginatedDespesas.length === 0) {
                           return (
                             <TableRow>
-                              <TableCell colSpan={9} className="text-center text-gray-500 py-8">
+                              <TableCell colSpan={8} className="text-center text-gray-500 py-8">
                                 Nenhuma despesa encontrada no período selecionado
                               </TableCell>
                             </TableRow>
@@ -1775,11 +1774,6 @@ export default function RelatoriosFinanceiros() {
                             <TableCell>
                               <Badge variant={despesa.status === 'Pago' ? 'default' : 'secondary'}>
                                 {despesa.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="text-xs">
-                                {despesa.formaPagamento}
                               </Badge>
                             </TableCell>
                             <TableCell>
@@ -1853,6 +1847,111 @@ export default function RelatoriosFinanceiros() {
                   );
                 })()}
                 
+                {/* Resumo por Formas de Pagamento */}
+                <div className="mt-8">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg font-semibold">Resumo por Formas de Pagamento</CardTitle>
+                      <CardDescription>Distribuição das despesas por forma de pagamento</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {(() => {
+                        const formasPagamento = {};
+                        let totalGeral = 0;
+                        
+                        // Calcular totais por forma de pagamento
+                        // Despesas fixas
+                        veiculos.forEach(veiculo => {
+                          // IPVA e Seguro - Boleto
+                          if (veiculo.ipva && veiculo.ipva > 0) {
+                            const valor = parseFloat(veiculo.ipva) / 12;
+                            formasPagamento['Boleto'] = (formasPagamento['Boleto'] || 0) + valor;
+                            totalGeral += valor;
+                          }
+                          if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+                            const valor = parseFloat(veiculo.valorSeguroMensal);
+                            formasPagamento['Boleto'] = (formasPagamento['Boleto'] || 0) + valor;
+                            totalGeral += valor;
+                          }
+                          
+                          // Rastreador e Financiamento - Débito Automático
+                          if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+                            const valor = parseFloat(veiculo.valorRastreadorMensal);
+                            formasPagamento['Débito Automático'] = (formasPagamento['Débito Automático'] || 0) + valor;
+                            totalGeral += valor;
+                          }
+                          if (veiculo.financiado && veiculo.valorFinanciamento) {
+                            const valor = parseFloat(veiculo.valorFinanciamento);
+                            formasPagamento['Débito Automático'] = (formasPagamento['Débito Automático'] || 0) + valor;
+                            totalGeral += valor;
+                          }
+                        });
+                        
+                        // Manutenções
+                        filteredData.manutencoes.forEach(manutencao => {
+                          const valor = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
+                          if (valor > 0) {
+                            const forma = manutencao.formaPagamento || 'Não informado';
+                            formasPagamento[forma] = (formasPagamento[forma] || 0) + valor;
+                            totalGeral += valor;
+                          }
+                        });
+                        
+                        // Despesas manuais
+                        despesas.filter(despesa => despesa.categoria !== 'financiamento').forEach(despesa => {
+                          const valor = parseFloat(despesa.valor || '0');
+                          if (valor > 0) {
+                            const forma = despesa.formaPagamento || 'Não informado';
+                            formasPagamento[forma] = (formasPagamento[forma] || 0) + valor;
+                            totalGeral += valor;
+                          }
+                        });
+                        
+                        // Ordenar por valor (maior para menor)
+                        const formasOrdenadas = Object.entries(formasPagamento).sort(([,a], [,b]) => b - a);
+                        
+                        const cores = {
+                          'PIX': 'bg-emerald-100 text-emerald-800 border-emerald-300',
+                          'Dinheiro': 'bg-green-100 text-green-800 border-green-300',
+                          'Cartão de Crédito': 'bg-blue-100 text-blue-800 border-blue-300',
+                          'Cartão de Débito': 'bg-cyan-100 text-cyan-800 border-cyan-300',
+                          'Boleto': 'bg-orange-100 text-orange-800 border-orange-300',
+                          'Débito Automático': 'bg-purple-100 text-purple-800 border-purple-300',
+                          'Transferência': 'bg-indigo-100 text-indigo-800 border-indigo-300',
+                          'Não informado': 'bg-gray-100 text-gray-800 border-gray-300'
+                        };
+                        
+                        return (
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {formasOrdenadas.map(([forma, valor]) => {
+                              const percentual = totalGeral > 0 ? (valor / totalGeral) * 100 : 0;
+                              const corClasse = cores[forma] || 'bg-gray-100 text-gray-800 border-gray-300';
+                              
+                              return (
+                                <div key={forma} className={`p-4 rounded-lg border ${corClasse}`}>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <h4 className="font-medium text-sm">{forma}</h4>
+                                    <span className="text-xs font-semibold">{percentual.toFixed(1)}%</span>
+                                  </div>
+                                  <p className="text-lg font-bold">
+                                    {formatCurrency(valor)}
+                                  </p>
+                                  <div className="mt-2 bg-white bg-opacity-50 rounded-full h-2">
+                                    <div 
+                                      className="bg-current h-2 rounded-full transition-all duration-300"
+                                      style={{ width: `${percentual}%`, opacity: 0.7 }}
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      })()}
+                    </CardContent>
+                  </Card>
+                </div>
+
                 {/* Resumo das despesas */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
                   <div className="bg-red-50 p-4 rounded-lg">
