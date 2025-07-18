@@ -1250,6 +1250,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Upload de imagens de motoristas
+  app.post("/api/motoristas/:id/upload-imagem", async (req, res) => {
+    try {
+      const { imageData, imageIndex } = req.body;
+      const motoristaId = req.params.id;
+      
+      console.log(`[UPLOAD] Iniciando upload de imagem para motorista ${motoristaId}`);
+      console.log(`[UPLOAD] Índice da imagem: ${imageIndex}`);
+      
+      if (!imageData || imageIndex === undefined) {
+        return res.status(400).json({ message: "Dados da imagem e índice são obrigatórios" });
+      }
+      
+      if (imageIndex < 1 || imageIndex > 5) {
+        return res.status(400).json({ message: "Índice da imagem deve ser entre 1 e 5" });
+      }
+      
+      // Criar diretório uploads se não existir
+      const uploadsDir = path.join(process.cwd(), 'uploads', 'motoristas');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+        console.log(`[UPLOAD] Diretório uploads criado: ${uploadsDir}`);
+      }
+      
+      // Gerar nome único para a imagem
+      const timestamp = Date.now();
+      const imageExtension = imageData.includes('data:image/jpeg') ? 'jpg' : 'png';
+      const uniqueFileName = `motorista_${motoristaId}_${imageIndex}_${timestamp}.${imageExtension}`;
+      const filePath = path.join(uploadsDir, uniqueFileName);
+      
+      console.log(`[UPLOAD] Caminho da imagem: ${filePath}`);
+      
+      // Converter base64 para arquivo
+      const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
+      fs.writeFileSync(filePath, base64Data, 'base64');
+      
+      console.log(`[UPLOAD] Imagem salva com sucesso`);
+      
+      // Atualizar motorista no banco
+      const imageFieldName = `imagem${imageIndex}` as keyof typeof updates;
+      const updates = {
+        [imageFieldName]: uniqueFileName,
+      };
+      
+      await storage.updateMotorista(motoristaId, updates);
+      
+      console.log(`[UPLOAD] Banco de dados atualizado`);
+      
+      res.json({ 
+        message: "Imagem enviada com sucesso", 
+        fileName: uniqueFileName,
+        imageIndex,
+        uploadedAt: new Date().toISOString() 
+      });
+    } catch (error) {
+      console.error("Error uploading motorista image:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Endpoint para visualizar imagem do motorista
+  app.get("/api/motoristas/:id/imagem/:index", async (req, res) => {
+    try {
+      const motoristaId = req.params.id;
+      const imageIndex = parseInt(req.params.index);
+      
+      if (imageIndex < 1 || imageIndex > 5) {
+        return res.status(400).json({ message: "Índice da imagem deve ser entre 1 e 5" });
+      }
+      
+      // Buscar dados do motorista
+      const motorista = await storage.getMotorista(motoristaId);
+      if (!motorista) {
+        return res.status(404).json({ message: "Motorista não encontrado" });
+      }
+      
+      const imageFieldName = `imagem${imageIndex}` as keyof typeof motorista;
+      const imageName = motorista[imageFieldName] as string;
+      
+      if (!imageName) {
+        return res.status(404).json({ message: "Imagem não encontrada" });
+      }
+      
+      const filePath = path.join(process.cwd(), 'uploads', 'motoristas', imageName);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "Arquivo de imagem não encontrado no servidor" });
+      }
+      
+      // Determinar tipo de conteúdo baseado na extensão
+      const extension = path.extname(imageName).toLowerCase();
+      let contentType = 'image/jpeg';
+      if (extension === '.png') {
+        contentType = 'image/png';
+      }
+      
+      // Definir headers para visualização
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', 'inline');
+      
+      // Enviar arquivo
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      
+    } catch (error) {
+      console.error("Error viewing motorista image:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Endpoint para deletar imagem do motorista
+  app.delete("/api/motoristas/:id/imagem/:index", async (req, res) => {
+    try {
+      const motoristaId = req.params.id;
+      const imageIndex = parseInt(req.params.index);
+      
+      if (imageIndex < 1 || imageIndex > 5) {
+        return res.status(400).json({ message: "Índice da imagem deve ser entre 1 e 5" });
+      }
+      
+      // Buscar dados do motorista
+      const motorista = await storage.getMotorista(motoristaId);
+      if (!motorista) {
+        return res.status(404).json({ message: "Motorista não encontrado" });
+      }
+      
+      const imageFieldName = `imagem${imageIndex}` as keyof typeof motorista;
+      const imageName = motorista[imageFieldName] as string;
+      
+      if (imageName) {
+        // Deletar arquivo do sistema de arquivos
+        const filePath = path.join(process.cwd(), 'uploads', 'motoristas', imageName);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`[DELETE] Arquivo removido: ${filePath}`);
+        }
+        
+        // Remover referência do banco
+        const updates = {
+          [imageFieldName]: null,
+        };
+        
+        await storage.updateMotorista(motoristaId, updates);
+        console.log(`[DELETE] Banco de dados atualizado`);
+      }
+      
+      res.json({ message: "Imagem removida com sucesso" });
+    } catch (error) {
+      console.error("Error deleting motorista image:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
