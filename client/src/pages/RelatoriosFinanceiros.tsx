@@ -1101,13 +1101,97 @@ export default function RelatoriosFinanceiros() {
         </TabsList>
 
         <TabsContent value="despesas" className="space-y-4">
-          {/* Cards de resumo dentro da aba removidos conforme solicitado */}
-          <div className="text-center py-8">
-            <p className="text-gray-600">Interface simplificada - cards de resumo removidos</p>
-            <p className="text-sm text-gray-500 mt-2">Acesse a aba "Histórico" para visualizar as despesas detalhadas</p>
+          {/* Cards pequenos de resumo removidos conforme solicitado */}
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Receitas por Tipo */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Receitas por Tipo
+                </CardTitle>
+                <CardDescription>
+                  Detalhamento das receitas do mês
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-green-800">Pagamentos Recebidos</p>
+                      <p className="text-sm text-green-600">Pagamentos de aluguéis</p>
+                    </div>
+                    <p className="text-lg font-bold text-green-600">
+                      {formatCurrency(receitaPagamentos)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-blue-800">Receitas Extras</p>
+                      <p className="text-sm text-blue-600">Outras receitas</p>
+                    </div>
+                    <p className="text-lg font-bold text-blue-600">
+                      {formatCurrency(totalReceitas)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
+                    <div>
+                      <p className="font-bold text-gray-800">TOTAL RECEITAS</p>
+                      <p className="text-sm text-gray-600">Soma de todas as receitas</p>
+                    </div>
+                    <p className="text-xl font-bold text-green-600">
+                      {formatCurrency(receitaTotal)}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Despesas por Tipo */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingDown className="h-5 w-5" />
+                  Despesas por Tipo
+                </CardTitle>
+                <CardDescription>
+                  Detalhamento das despesas do mês
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-red-800">Despesas Fixas</p>
+                      <p className="text-sm text-red-600">IPVA, Seguro, Rastreador</p>
+                    </div>
+                    <p className="text-lg font-bold text-red-600">
+                      {formatCurrency(totalDespesasFixas)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-orange-800">Despesas Manuais</p>
+                      <p className="text-sm text-orange-600">Lavagem, Empréstimos, etc.</p>
+                    </div>
+                    <p className="text-lg font-bold text-orange-600">
+                      {formatCurrency(totalDespesas - totalDespesasFixas)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
+                    <div>
+                      <p className="font-bold text-gray-800">TOTAL DESPESAS</p>
+                      <p className="text-sm text-gray-600">Soma de todas as despesas</p>
+                    </div>
+                    <p className="text-xl font-bold text-red-600">
+                      {formatCurrency(totalDespesas)}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-
-
         </TabsContent>
 
         <TabsContent value="veiculos" className="space-y-4">
