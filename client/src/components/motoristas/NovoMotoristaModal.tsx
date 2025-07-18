@@ -327,8 +327,8 @@ export function NovoMotoristaModal({
                 )}
               />
 
-              {/* CPF e RG */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* CPF, RG e Data de Nascimento */}
+              <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -366,22 +366,21 @@ export function NovoMotoristaModal({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              {/* Data de Nascimento */}
-              <FormField
-                control={form.control}
-                name="dataNascimento"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data de Nascimento *</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="dataNascimento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data de Nascimento *</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             {/* CONTATO */}
