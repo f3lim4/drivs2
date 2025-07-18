@@ -11,7 +11,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Trash2, Plus, Edit } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Trash2, Plus, Edit, ChevronDown } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { pt } from 'date-fns/locale';
@@ -53,14 +54,20 @@ export default function RelatoriosFinanceiros() {
   const { motoristas } = useMotoristas();
   const { manutencoes } = useManutencoes();
   
+  // Criar variável despesasComManutencoes usando dados do hook useDespesas
+  const despesasComManutencoes = useMemo(() => {
+    return despesas || [];
+  }, [despesas]);
+
   // Debug - verificar se dados estão sendo carregados
   useEffect(() => {
     console.log('RelatoriosFinanceiros - Dados carregados:', {
       despesas: despesas?.length || 0,
+      despesasComManutencoes: despesasComManutencoes?.length || 0,
       manutencoes: manutencoes?.length || 0,
       veiculos: veiculos?.length || 0
     });
-  }, [despesas, manutencoes, veiculos]);
+  }, [despesas, despesasComManutencoes, manutencoes, veiculos]);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -73,17 +80,19 @@ export default function RelatoriosFinanceiros() {
 
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
   const [despesaParaExcluir, setDespesaParaExcluir] = useState<string | null>(null);
-  const [modalNovaDespesa, setModalNovaDespesa] = useState(false);
+  const [modalAberto, setModalAberto] = useState(false);
   const [modalEditarDespesa, setModalEditarDespesa] = useState(false);
   const [despesaEditando, setDespesaEditando] = useState<any>(null);
+  const [editando, setEditando] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
   
   // Estados de ordenação para as abas
   const [sortVeiculos, setSortVeiculos] = useState<string>('mais-lucrativos');
   const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
-  const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('mais-recentes');
-  const [sortHistorico, setSortHistorico] = useState<string>('mais-recentes');
+  const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('maior-total');
+  const [sortHistorico, setSortHistorico] = useState<string>('mais-recente');
   
   // Estados de paginação para a aba "Despesas Fixas"
   const [currentPageDespesasFixas, setCurrentPageDespesasFixas] = useState(1);
@@ -145,195 +154,149 @@ export default function RelatoriosFinanceiros() {
     setCurrentPageHistorico(1);
   };
 
-  // Formulário para nova despesa
-  const formNovaDespesa = useForm<NovaDespesaData>({
-    resolver: zodResolver(novaDespesaSchema),
+  // Schema atualizado para multi-seleção de veículos
+  const formSchema = z.object({
+    veiculoIds: z.array(z.string()).min(1, "Selecione pelo menos um veículo"),
+    categoria: z.string().min(1, "Selecione uma categoria"),
+    descricao: z.string().min(1, "Descrição é obrigatória"),
+    valor: z.string().min(1, "Valor é obrigatório"),
+    valorPorVeiculo: z.number().optional(),
+    formaPagamento: z.string().min(1, "Selecione uma forma de pagamento"),
+  });
+
+  // Formulário principal
+  const form = useForm({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      veiculoId: '',
+      veiculoIds: [],
       categoria: '',
       descricao: '',
       valor: '',
-      data: format(new Date(), 'yyyy-MM-dd'),
-      status: 'pendente',
-      formaPagamento: 'dinheiro'
+      valorPorVeiculo: 0,
+      formaPagamento: '',
     }
   });
 
-  // Formulário para editar despesa
-  const formEditarDespesa = useForm<NovaDespesaData>({
-    resolver: zodResolver(novaDespesaSchema),
-    defaultValues: {
-      veiculoId: '',
-      categoria: '',
-      descricao: '',
-      valor: '',
-      data: format(new Date(), 'yyyy-MM-dd'),
-      status: 'pendente',
-      formaPagamento: 'dinheiro'
-    }
-  });
-
-  // Limpar veículos selecionados quando modal fecha
-  useEffect(() => {
-    if (!modalNovaDespesa) {
-      setSelectedVehicles([]);
-    }
-  }, [modalNovaDespesa]);
-
-  // Função para criar nova despesa
-  const criarNovaDespesa = async (data: NovaDespesaData) => {
+  // Função para enviar formulário
+  const onSubmit = async (data: any) => {
+    setIsLoading(true);
     try {
       const locadoraId = profile?.locadoraId || profile?.id;
-      console.log('Criando despesa com locadoraId:', locadoraId);
       
-      // Validar se há veículos selecionados
-      if (selectedVehicles.length === 0) {
+      if (data.veiculoIds.length === 0) {
         toast({
-          title: 'Erro de validação',
-          description: 'Você deve selecionar pelo menos um veículo.',
+          title: 'Erro',
+          description: 'Selecione pelo menos um veículo.',
           variant: 'destructive',
         });
         return;
       }
 
-      // Se há múltiplos veículos selecionados, criar múltiplas despesas
-      if (selectedVehicles.length > 1) {
-        const valorTotal = parseFloat(data.valor.toString().replace(',', '.'));
-        const valorPorVeiculo = (valorTotal / selectedVehicles.length).toFixed(2);
-        
-        // Criar uma despesa para cada veículo selecionado
-        const promises = selectedVehicles.map(veiculoId => 
-          fetch('/api/despesas', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              ...data,
-              veiculoId,
-              valor: valorPorVeiculo,
-              descricao: `${data.descricao} (${selectedVehicles.length} veículos - R$ ${valorPorVeiculo} cada)`,
-              locadoraId,
-              tipo: 'despesa'
-            }),
-          })
-        );
-        
-        const responses = await Promise.all(promises);
-        const allOk = responses.every(response => response.ok);
-        
-        if (!allOk) {
-          throw new Error('Erro ao criar uma ou mais despesas');
-        }
-        
-        toast({
-          title: 'Despesas criadas com sucesso',
-          description: `${selectedVehicles.length} despesas de ${data.categoria} criadas - R$ ${valorPorVeiculo} cada`,
-        });
-      } else {
-        // Comportamento para um único veículo
-        const response = await fetch('/api/despesas', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      if (editando && despesaEditando) {
+        // Modo edição - editar despesa existente
+        const response = await fetch(`/api/despesas/${despesaEditando.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...data,
-            veiculoId: selectedVehicles[0],
+            veiculoId: data.veiculoIds[0], // Para edição, usar apenas o primeiro veículo
+            categoria: data.categoria,
+            descricao: data.descricao,
+            valor: parseFloat(data.valor.replace(',', '.')),
+            formaPagamento: data.formaPagamento,
             locadoraId,
-            tipo: 'despesa'
+            tipo: 'despesa',
+            fonte: 'manual'
           }),
         });
 
-        if (!response.ok) {
-          throw new Error('Erro ao criar despesa');
+        if (!response.ok) throw new Error('Erro ao editar despesa');
+
+        toast({
+          title: 'Sucesso',
+          description: 'Despesa editada com sucesso.',
+        });
+      } else {
+        // Modo criação - criar novas despesas
+        const valorTotal = parseFloat(data.valor.replace(',', '.'));
+        const valorPorVeiculo = valorTotal / data.veiculoIds.length;
+
+        for (const veiculoId of data.veiculoIds) {
+          const despesaData = {
+            locadoraId,
+            veiculoId,
+            categoria: data.categoria,
+            descricao: data.descricao,
+            valor: valorPorVeiculo.toFixed(2),
+            data: format(new Date(), 'yyyy-MM-dd'),
+            formaPagamento: data.formaPagamento,
+            tipo: 'despesa',
+            fonte: 'manual'
+          };
+
+          const response = await fetch('/api/despesas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(despesaData),
+          });
+
+          if (!response.ok) throw new Error('Erro ao criar despesa');
         }
 
         toast({
-          title: "Despesa criada",
-          description: "A despesa foi criada com sucesso.",
-          variant: "default",
+          title: 'Sucesso',
+          description: `${data.veiculoIds.length} despesa(s) criada(s) com sucesso.`,
         });
       }
 
-      // Invalidar cache específico com locadoraId
-      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
-      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraId] });
-      setModalNovaDespesa(false);
-      formNovaDespesa.reset();
-      setSelectedVehicles([]);
+      setModalAberto(false);
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
     } catch (error) {
-      console.error('Erro ao criar despesa:', error);
       toast({
-        title: "Erro",
-        description: "Erro ao criar despesa. Tente novamente.",
-        variant: "destructive",
+        title: 'Erro',
+        description: editando ? 'Erro ao editar despesa.' : 'Erro ao criar despesa.',
+        variant: 'destructive',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Função para editar despesa
-  const editarDespesa = async (data: NovaDespesaData) => {
-    if (!despesaEditando?.id) return;
-
-    try {
-      const response = await fetch(`/api/despesas/${despesaEditando.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...data,
-          locadoraId: profile?.locadoraId || profile?.id,
-          tipo: 'despesa'
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao editar despesa');
-      }
-
-      // Invalidar cache específico com locadoraId
-      const locadoraIdForEdit = profile?.locadoraId || profile?.id;
-      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraIdForEdit] });
-      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraIdForEdit] });
-      setModalEditarDespesa(false);
+  // Limpar formulário quando modal fecha
+  useEffect(() => {
+    if (!modalAberto) {
+      form.reset();
+      setEditando(false);
       setDespesaEditando(null);
-      formEditarDespesa.reset();
-      
-      toast({
-        title: "Despesa editada",
-        description: "A despesa foi editada com sucesso.",
-        variant: "default",
-      });
-    } catch (error) {
-      console.error('Erro ao editar despesa:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível editar a despesa. Tente novamente.",
-        variant: "destructive",
-      });
     }
-  };
+  }, [modalAberto, form]);
+
+
+
+  // Função para editar despesa - usando onSubmit quando em modo edição
 
   // Função para abrir modal de edição
   const abrirModalEdicao = (despesa: any) => {
-    // Buscar dados da despesa real do banco
-    if (!despesas || !Array.isArray(despesas)) return;
-    const despesaReal = despesas.find(d => d.id === despesa.id.replace('despesa-', ''));
-    if (!despesaReal) return;
+    // Apenas permite editar despesas manuais
+    if (despesa.fonte !== 'manual') {
+      toast({
+        title: 'Não é possível editar',
+        description: 'Apenas despesas manuais podem ser editadas.',
+        variant: 'destructive',
+      });
+      return;
+    }
     
-    setDespesaEditando(despesaReal);
-    formEditarDespesa.reset({
-      veiculoId: despesaReal.veiculoId || '',
-      categoria: despesaReal.categoria || '',
-      descricao: despesaReal.descricao || '',
-      valor: despesaReal.valor?.toString() || '',
-      data: despesaReal.data || '',
-      status: despesaReal.status || 'pendente',
-      formaPagamento: despesaReal.formaPagamento || 'dinheiro'
+    setDespesaEditando(despesa);
+    setEditando(true);
+    form.reset({
+      veiculoIds: [despesa.veiculoId],
+      categoria: despesa.categoria || '',
+      descricao: despesa.descricao || '',
+      valor: despesa.valor?.toString() || '',
+      formaPagamento: despesa.formaPagamento || '',
     });
-    setModalEditarDespesa(true);
+    setModalAberto(true);
   };
 
   // Função para abrir modal de exclusão
