@@ -21,6 +21,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Interface funcional** - Card categoria e tabela histórico exibem dados reais
 - ✅ **Ordenação do histórico corrigida** - Manutenções usam data de conclusão para aparecer nas primeiras páginas
 - ✅ **Priorização de alterações recentes** - Sistema mostra manutenções concluídas nas primeiras posições do histórico
+- ✅ **Ordenação secundária implementada** - Quando múltiplas despesas têm a mesma data, manutenções aparecem primeiro
+- ✅ **Problema de exibição resolvido** - Manutenções agora aparecem corretamente na primeira página do histórico
 
 ### 2025-07-18: Container de Resumo por Formas de Pagamento - CONCLUÍDO
 - ✅ **Container de resumo implementado** - Card dedicado mostrando distribuição por formas de pagamento
