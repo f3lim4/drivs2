@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Categorias de Veículos Expandidas - CONCLUÍDO
+- ✅ **Novas categorias adicionadas** - Moto, Utilitário e Caminhão incluídas no sistema
+- ✅ **Modal de cadastro atualizado** - NovoVeiculoModal com 9 opções de categoria
+- ✅ **Modal de edição atualizado** - EditarVeiculoModal com categorias expandidas
+- ✅ **Lista completa de categorias** - Hatch, Sedan, SUV, Pickup, Van, Conversível, Moto, Utilitário, Caminhão
+- ✅ **Cobertura ampliada** - Sistema agora suporta todos os tipos de veículos comuns
+- ✅ **Consistência mantida** - Mesmo padrão de interface para todas as categorias
+
 ### 2025-07-18: Campo Cor com Dropdown de Seleção - CONCLUÍDO
 - ✅ **Campo cor atualizado** - Substituído input de texto por dropdown de seleção
 - ✅ **10 opções de cores** - Branco, Preto, Prata, Cinza, Azul, Vermelho, Verde, Bege, Amarelo, Marrom
