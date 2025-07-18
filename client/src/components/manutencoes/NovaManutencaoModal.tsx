@@ -114,14 +114,14 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nova Manutenção</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="space-y-1">
               <Label htmlFor="veiculoId">Veículo</Label>
               <Select 
                 value={form.watch('veiculoId')} 
@@ -140,7 +140,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="tipo">Tipo</Label>
               <Select 
                 value={form.watch('tipo')} 
@@ -157,22 +157,40 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="prioridade">Prioridade</Label>
+              <Select 
+                value={form.watch('prioridade')} 
+                onValueChange={(value) => form.setValue('prioridade', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="baixa">Baixa</SelectItem>
+                  <SelectItem value="normal">Normal</SelectItem>
+                  <SelectItem value="alta">Alta</SelectItem>
+                  <SelectItem value="urgente">Urgente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="descricao">Descrição</Label>
             <Textarea
               id="descricao"
               {...form.register('descricao')}
               placeholder="Descreva o serviço a ser realizado"
-              rows={3}
+              rows={2}
             />
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className="space-y-2">
+            <div className="space-y-1">
               <Label>Local/Oficina</Label>
-              <div className="space-y-2">
+              <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-2">
                   <input
                     type="radio"
@@ -197,8 +215,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </div>
 
             {useLocalCadastrado ? (
-              <div className="space-y-2">
-                <Label htmlFor="local-select">Selecionar Local</Label>
+              <div className="space-y-1">
                 <Select 
                   value={localSelecionado} 
                   onValueChange={handleLocalSelection}
@@ -218,8 +235,8 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                 </Select>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1">
                   <Label htmlFor="oficina">Oficina</Label>
                   <Input
                     id="oficina"
@@ -228,7 +245,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Label htmlFor="contato">Contato</Label>
                   <Input
                     id="contato"
@@ -240,8 +257,8 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="space-y-1">
               <Label htmlFor="dataInicio">Data de Início</Label>
               <Input
                 id="dataInicio"
@@ -250,7 +267,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="dataPrevisao">Data Prevista</Label>
               <Input
                 id="dataPrevisao"
@@ -258,10 +275,8 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                 {...form.register('dataPrevisao')}
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="valorOrcamento">Valor do Orçamento</Label>
               <Input
                 id="valorOrcamento"
@@ -271,28 +286,10 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                 placeholder="0,00"
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="prioridade">Prioridade</Label>
-              <Select 
-                value={form.watch('prioridade')} 
-                onValueChange={(value) => form.setValue('prioridade', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="baixa">Baixa</SelectItem>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="alta">Alta</SelectItem>
-                  <SelectItem value="urgente">Urgente</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="space-y-1">
               <Label htmlFor="quilometragemInicio">Quilometragem Atual</Label>
               <Input
                 id="quilometragemInicio"
@@ -302,7 +299,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="status">Status</Label>
               <Select 
                 value={form.watch('status')} 
@@ -319,10 +316,8 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label htmlFor="statusPagamento">Status do Pagamento</Label>
               <Select 
                 value={form.watch('statusPagamento')} 
@@ -337,8 +332,10 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            <div className="space-y-2">
+          {form.watch('statusPagamento') === 'pago' && (
+            <div className="space-y-1">
               <Label htmlFor="formaPagamento">Forma de Pagamento</Label>
               <Select 
                 value={form.watch('formaPagamento') || ''} 
@@ -357,7 +354,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                 </SelectContent>
               </Select>
             </div>
-          </div>
+          )}
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={handleClose}>
