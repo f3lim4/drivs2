@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -67,6 +67,7 @@ export default function RelatoriosFinanceiros() {
   const [modalEditarDespesa, setModalEditarDespesa] = useState(false);
   const [despesaEditando, setDespesaEditando] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
+  const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
   
   // Estados de ordenação para as abas
   const [sortVeiculos, setSortVeiculos] = useState<string>('mais-lucrativos');
@@ -162,25 +163,86 @@ export default function RelatoriosFinanceiros() {
     }
   });
 
+  // Limpar veículos selecionados quando categoria não for empréstimo
+  useEffect(() => {
+    if (formNovaDespesa.watch('categoria') !== 'emprestimo') {
+      setSelectedVehicles([]);
+    }
+  }, [formNovaDespesa.watch('categoria')]);
+
   // Função para criar nova despesa
   const criarNovaDespesa = async (data: NovaDespesaData) => {
     try {
       const locadoraId = profile?.locadoraId || profile?.id;
       console.log('Criando despesa com locadoraId:', locadoraId);
-      const response = await fetch('/api/despesas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...data,
-          locadoraId,
-          tipo: 'despesa'
-        }),
-      });
+      
+      // Validar se categoria empréstimo tem veículos selecionados
+      if (data.categoria === 'emprestimo' && selectedVehicles.length === 0) {
+        toast({
+          title: 'Erro de validação',
+          description: 'Para empréstimos, você deve selecionar pelo menos um veículo.',
+          variant: 'destructive',
+        });
+        return;
+      }
 
-      if (!response.ok) {
-        throw new Error('Erro ao criar despesa');
+      // Se for categoria "emprestimo" e há veículos selecionados, criar múltiplas despesas
+      if (data.categoria === 'emprestimo' && selectedVehicles.length > 0) {
+        const valorTotal = parseFloat(data.valor.toString().replace(',', '.'));
+        const valorPorVeiculo = (valorTotal / selectedVehicles.length).toFixed(2);
+        
+        // Criar uma despesa para cada veículo selecionado
+        const promises = selectedVehicles.map(veiculoId => 
+          fetch('/api/despesas', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              ...data,
+              veiculoId,
+              valor: valorPorVeiculo,
+              descricao: `${data.descricao} (${selectedVehicles.length} veículos - R$ ${valorPorVeiculo} cada)`,
+              locadoraId,
+              tipo: 'despesa'
+            }),
+          })
+        );
+        
+        const responses = await Promise.all(promises);
+        const allOk = responses.every(response => response.ok);
+        
+        if (!allOk) {
+          throw new Error('Erro ao criar uma ou mais despesas');
+        }
+        
+        toast({
+          title: 'Despesas criadas com sucesso',
+          description: `${selectedVehicles.length} despesas de empréstimo criadas - R$ ${valorPorVeiculo} cada`,
+        });
+      } else {
+        // Comportamento padrão para outras categorias
+        const response = await fetch('/api/despesas', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...data,
+            locadoraId,
+            tipo: 'despesa'
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao criar despesa');
+        }
+
+        toast({
+          title: "Despesa criada",
+          description: "A despesa foi criada com sucesso.",
+          variant: "default",
+        });
       }
 
       // Invalidar cache específico com locadoraId
@@ -188,12 +250,7 @@ export default function RelatoriosFinanceiros() {
       await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraId] });
       setModalNovaDespesa(false);
       formNovaDespesa.reset();
-      
-      toast({
-        title: "Despesa criada",
-        description: "A despesa foi criada com sucesso.",
-        variant: "default",
-      });
+      setSelectedVehicles([]);
     } catch (error) {
       console.error('Erro ao criar despesa:', error);
       toast({
@@ -2034,6 +2091,7 @@ export default function RelatoriosFinanceiros() {
                           <SelectItem value="multa">Multa</SelectItem>
                           <SelectItem value="licenciamento">Licenciamento</SelectItem>
                           <SelectItem value="lavagem">Lavagem</SelectItem>
+                          <SelectItem value="emprestimo">Empréstimo</SelectItem>
                           <SelectItem value="outros">Outros</SelectItem>
                         </SelectContent>
                       </Select>
@@ -2042,6 +2100,71 @@ export default function RelatoriosFinanceiros() {
                   )}
                 />
               </div>
+              
+              {/* Multi-vehicle selection for emprestimo category */}
+              {formNovaDespesa.watch('categoria') === 'emprestimo' && (
+                <div className="space-y-4">
+                  <div className="border rounded-lg p-4 bg-blue-50">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-medium text-blue-700">Selecionar Veículos para Empréstimo</h4>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const allSelected = selectedVehicles.length === veiculos.length;
+                          setSelectedVehicles(allSelected ? [] : veiculos.map(v => v.id));
+                        }}
+                      >
+                        {selectedVehicles.length === veiculos.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
+                      </Button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {veiculos.map((veiculo) => (
+                        <div key={veiculo.id} className="flex items-center space-x-3 p-2 border rounded bg-white">
+                          <input
+                            type="checkbox"
+                            id={`vehicle-${veiculo.id}`}
+                            checked={selectedVehicles.includes(veiculo.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedVehicles(prev => [...prev, veiculo.id]);
+                              } else {
+                                setSelectedVehicles(prev => prev.filter(id => id !== veiculo.id));
+                              }
+                            }}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <label htmlFor={`vehicle-${veiculo.id}`} className="flex-1 cursor-pointer">
+                            <div className="font-medium">{veiculo.placa}</div>
+                            <div className="text-sm text-gray-600">{veiculo.marca} {veiculo.modelo}</div>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {selectedVehicles.length > 0 && formNovaDespesa.watch('valor') && (
+                      <div className="mt-4 p-3 bg-green-50 rounded border border-green-200">
+                        <div className="text-sm text-green-700">
+                          <span className="font-medium">Valor total:</span> R$ {formNovaDespesa.watch('valor') || '0,00'}
+                        </div>
+                        <div className="text-sm text-green-700">
+                          <span className="font-medium">Valor por veículo:</span> R$ {
+                            selectedVehicles.length > 0 && formNovaDespesa.watch('valor') 
+                              ? (parseFloat(formNovaDespesa.watch('valor').toString().replace(',', '.')) / selectedVehicles.length).toFixed(2) 
+                              : '0,00'
+                          }
+                        </div>
+                        <div className="text-sm text-green-700">
+                          <span className="font-medium">Veículos selecionados:</span> {selectedVehicles.length}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <FormField
                 control={formNovaDespesa.control}
                 name="descricao"
