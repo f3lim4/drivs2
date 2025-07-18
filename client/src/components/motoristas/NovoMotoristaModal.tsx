@@ -190,6 +190,48 @@ export function NovoMotoristaModal({
     setImagePreviews(prev => ({ ...prev, [tipo]: null }));
   };
 
+  // Função para buscar endereço por CEP
+  const buscarEnderecoPorCep = async (cep: string) => {
+    // Limpar CEP (remover caracteres não numéricos)
+    const cepLimpo = cep.replace(/\D/g, '');
+    
+    // Validar CEP
+    if (cepLimpo.length !== 8) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
+      
+      if (data.erro) {
+        toast({
+          title: "CEP não encontrado",
+          description: "Verifique o CEP digitado",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Preencher campos automaticamente
+      form.setValue('rua', data.logradouro || '');
+      form.setValue('bairro', data.bairro || '');
+      form.setValue('cidade', data.localidade || '');
+      form.setValue('estado', data.uf || '');
+      
+      toast({
+        title: "Endereço encontrado!",
+        description: `${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao buscar CEP",
+        description: "Tente novamente mais tarde",
+        variant: "destructive",
+      });
+    }
+  };
+
   const onSubmit = async (data: MotoristaFormData) => {
     setLoading(true);
     
@@ -632,6 +674,11 @@ export function NovoMotoristaModal({
                               value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
                             }
                             field.onChange(value);
+                            
+                            // Buscar endereço automaticamente quando CEP tiver 8 dígitos
+                            if (value.replace(/\D/g, '').length === 8) {
+                              buscarEnderecoPorCep(value);
+                            }
                           }}
                         />
                       </FormControl>

@@ -192,6 +192,48 @@ export function EditarMotoristaModal({
     setImagePreviews(prev => ({ ...prev, [tipo]: null }));
   };
 
+  // Função para buscar endereço por CEP
+  const buscarEnderecoPorCep = async (cep: string) => {
+    // Limpar CEP (remover caracteres não numéricos)
+    const cepLimpo = cep.replace(/\D/g, '');
+    
+    // Validar CEP
+    if (cepLimpo.length !== 8) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
+      
+      if (data.erro) {
+        toast({
+          title: "CEP não encontrado",
+          description: "Verifique o CEP digitado",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Preencher campos automaticamente
+      form.setValue('rua', data.logradouro || '');
+      form.setValue('bairro', data.bairro || '');
+      form.setValue('cidade', data.localidade || '');
+      form.setValue('estado', data.uf || '');
+      
+      toast({
+        title: "Endereço encontrado!",
+        description: `${data.logradouro}, ${data.bairro} - ${data.localidade}/${data.uf}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro ao buscar CEP",
+        description: "Tente novamente mais tarde",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Preenche o formulário quando o motorista é selecionado
   useEffect(() => {
     if (motorista && open) {
@@ -624,8 +666,16 @@ export function EditarMotoristaModal({
                           placeholder="00000-000" 
                           {...field}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/\D/g, '');
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length <= 8) {
+                              value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+                            }
                             field.onChange(value);
+                            
+                            // Buscar endereço automaticamente quando CEP tiver 8 dígitos
+                            if (value.replace(/\D/g, '').length === 8) {
+                              buscarEnderecoPorCep(value);
+                            }
                           }}
                         />
                       </FormControl>

@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Busca Automática de Endereço por CEP - CONCLUÍDO
+- ✅ **Integração com API ViaCEP** - Sistema automaticamente busca endereço quando CEP completo é digitado
+- ✅ **Preenchimento automático** - Campos rua, bairro, cidade e estado são preenchidos automaticamente
+- ✅ **Validação inteligente** - Verifica se CEP tem 8 dígitos antes de fazer a busca
+- ✅ **Formatação de CEP** - Aplica máscara 00000-000 automaticamente durante digitação
+- ✅ **Feedback visual** - Toast de sucesso mostra endereço encontrado ou erro caso CEP seja inválido
+- ✅ **Implementado em ambos modais** - Novo motorista e edição de motorista têm a funcionalidade
+- ✅ **Tratamento de erros** - Mensagens claras para CEP não encontrado ou problemas na API
+- ✅ **Experiência otimizada** - Busca automática sem necessidade de clique adicional
+- ✅ **Dados em tempo real** - Utiliza API oficial dos Correios para dados sempre atualizados
+
 ### 2025-07-18: Campos de Upload Ultra-Compactos - CONCLUÍDO
 - ✅ **Layout em 4 colunas** - Grid expandido de 3 para 4 colunas para melhor aproveitamento de espaço
 - ✅ **Padding mínimo** - Reduzido de p-2 para p-1 em todos os containers de upload
