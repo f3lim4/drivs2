@@ -42,37 +42,35 @@ export function useDespesas() {
       
       // Converter manutenções em despesas
       const despesasManutencao = manutencoes
-        .filter((manutencao: Manutencao) => {
+        .map((manutencao: Manutencao) => {
           // Prioriza valorFinal se disponível, senão usa valorOrcamento
-          const valor = manutencao.valorFinal || manutencao.valorOrcamento;
-          const temValor = valor && parseFloat(valor) > 0;
+          const valor = manutencao.valorFinal || manutencao.valorOrcamento || '0.00';
           
-          console.log('Filtrando manutenção:', {
+          console.log('Convertendo manutenção:', {
             id: manutencao.id,
             valorOrcamento: manutencao.valorOrcamento,
             valorFinal: manutencao.valorFinal,
-            valor: valor,
-            temValor: temValor
+            valorUsado: valor,
+            status: manutencao.status
           });
           
-          return temValor;
-        })
-        .map((manutencao: Manutencao) => ({
-          id: `manutencao_${manutencao.id}`,
-          locadoraId: manutencao.locadoraId,
-          veiculoId: manutencao.veiculoId,
-          veiculoModelo: manutencao.veiculoModelo,
-          veiculoPlaca: manutencao.veiculoPlaca,
-          categoria: 'manutencao',
-          descricao: `Manutenção - ${manutencao.tipo} - ${manutencao.oficina}`,
-          valor: manutencao.valorFinal || manutencao.valorOrcamento, // Usa valorFinal se disponível
-          data: manutencao.dataInicio,
-          tipo: 'despesa',
-          fonte: 'manutencao',
-          manutencaoId: manutencao.id,
-          createdAt: manutencao.createdAt,
-          updatedAt: manutencao.updatedAt,
-        }));
+          return {
+            id: `manutencao_${manutencao.id}`,
+            locadoraId: manutencao.locadoraId,
+            veiculoId: manutencao.veiculoId,
+            veiculoModelo: manutencao.veiculoModelo,
+            veiculoPlaca: manutencao.veiculoPlaca,
+            categoria: 'manutencao',
+            descricao: `Manutenção - ${manutencao.tipo} - ${manutencao.oficina}`,
+            valor: valor, // Usa valor calculado ou 0.00
+            data: manutencao.dataInicio,
+            tipo: 'despesa',
+            fonte: 'manutencao',
+            manutencaoId: manutencao.id,
+            createdAt: manutencao.createdAt,
+            updatedAt: manutencao.updatedAt,
+          };
+        });
       
       // Buscar veículos para incluir despesas de financiamento
       const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
