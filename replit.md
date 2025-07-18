@@ -10,16 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-18: Sistema de Seleção Multi-Veículo Universal para Todas as Categorias - CONCLUÍDO
-- ✅ **Seleção multi-veículo universal** - Disponível para TODAS as categorias de despesas (não apenas empréstimo)
-- ✅ **UX melhorado** - Seleção de veículos aparece primeiro, seguida pelo tipo de despesa
-- ✅ **Interface compacta** - Design reduzido com padding menor, texto pequeno e grid 2-3 colunas
-- ✅ **Validação universal** - Obrigatório selecionar pelo menos um veículo para qualquer categoria
-- ✅ **Divisão automática inteligente** - Valor dividido automaticamente independente da categoria
-- ✅ **Criação múltipla** - Sistema cria despesas separadas para cada veículo com valor dividido
-- ✅ **Feedback específico** - Toast mostra categoria e número de despesas criadas
-- ✅ **Limpeza automática** - Seleção limpa quando modal é fechado
-- ✅ **Fluxo otimizado** - Primeiro seleciona veículos, depois categoria e demais dados
+### 2025-07-18: Interface de Seleção Multi-Veículo Otimizada - CONCLUÍDO
+- ✅ **Interface dropdown compacta** - Seleção de veículos em formato dropdown similar ao campo categoria
+- ✅ **Layout lado a lado** - Veículos e categoria no mesmo nível usando grid 2 colunas
+- ✅ **Informações completas** - Cada veículo mostra placa e modelo para identificação
+- ✅ **Design otimizado** - Altura reduzida (h-9), elementos compactos e espaçamento menor
+- ✅ **Seleção múltipla inteligente** - Checkbox para cada veículo com feedback visual
+- ✅ **Placeholders inteligentes** - Mostra "PLACA - MODELO" para um veículo ou "X veículos" para múltiplos
+- ✅ **Cálculo automático** - Valor dividido automaticamente entre veículos selecionados
+- ✅ **Botão Todos/Limpar** - Seleção rápida de todos os veículos ou limpeza da seleção
+- ✅ **Validação obrigatória** - Deve selecionar pelo menos um veículo para criar despesa
+- ✅ **Verificação IPVA** - Confirmado que cálculo está correto: FVN9I69 = R$ 1.630 (R$ 1.400 IPVA + R$ 220 seguro + R$ 10 rastreador)
 
 ### 2025-07-17: Verificação de Integridade e Limpeza do Sistema - CONCLUÍDO
 - ✅ **Páginas duplicadas eliminadas** - Removida AlugueisNovo.tsx que causava conflitos de roteamento
