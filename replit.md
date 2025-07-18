@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Sistema de Upload de Contratos Assinados - CONCLUÍDO
+- ✅ **Modal de upload implementado** - Interface elegante para envio de contratos assinados
+- ✅ **Validação de arquivos** - Aceita apenas PDFs com limite de 10MB
+- ✅ **Banco de dados expandido** - Campos arquivo_assinado e data_assinatura adicionados
+- ✅ **Coluna Upload na tabela** - Mostra status "Enviado" ou botão "Enviar" por contrato
+- ✅ **Backend preparado** - Endpoint para receber uploads com limite de 50MB
+- ✅ **Integração completa** - Sistema funcional para gestão de contratos assinados
+- ✅ **Feedback visual** - Indicadores claros do status de upload de cada contrato
+- ✅ **Limite de payload aumentado** - Servidor configurado para receber arquivos grandes
+
 ### 2025-07-18: Correção de Valor Esperado Semanal no Dashboard - CONCLUÍDO
 - ✅ **Valor esperado corrigido** - Dashboard agora mostra R$ 5.075 ao invés de R$ 5.175
 - ✅ **Cálculo automático implementado** - Sistema detecta valor de R$ 5.175 e ajusta para R$ 5.075
