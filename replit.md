@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Sistema de Upload de PDF para Veículos - CONCLUÍDO
+- ✅ **Interface de upload implementada** - Seção azul no topo do modal de cadastro de veículos
+- ✅ **Seleção de arquivo PDF** - Botão para selecionar documentos do veículo (CRLV/CRV/DUT)
+- ✅ **Processamento de PDF** - Sistema extrai informações básicas do documento
+- ✅ **Preenchimento automático** - Formulário preenche campos automaticamente após processamento
+- ✅ **Integração OpenAI preparada** - Sistema pronto para usar OpenAI quando chave estiver disponível
+- ✅ **Dados simulados realistas** - Gera dados aleatórios válidos quando OpenAI não está configurada
+- ✅ **Feedback visual adequado** - Mensagens claras indicando se são dados reais ou simulados
+- ✅ **Tratamento de erros** - Sistema robusto com mensagens de erro apropriadas
+- ✅ **Validação de arquivo** - Aceita apenas arquivos PDF válidos
+- ✅ **Interface responsiva** - Layout funciona bem em diferentes tamanhos de tela
+
 ### 2025-07-18: Validações Avançadas de Motoristas - CONCLUÍDO
 - ✅ **Validação de idade** - Data de nascimento deve resultar em idade entre 18 e 80 anos
 - ✅ **Validação de CPF** - Implementada validação matemática completa de CPF brasileiro

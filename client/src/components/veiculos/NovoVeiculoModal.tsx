@@ -173,7 +173,7 @@ export function NovoVeiculoModal({
     
     try {
       const formData = new FormData();
-      formData.append('documento', pdfFile);
+      formData.append('pdf', pdfFile);
 
       const response = await fetch('/api/veiculos/extrair-dados', {
         method: 'POST',
@@ -216,9 +216,13 @@ export function NovoVeiculoModal({
           }
         });
 
+        const isSimulated = result.message && result.message.includes('simulados');
+        
         toast({
-          title: "Dados extraídos com sucesso!",
-          description: "Os campos foram preenchidos automaticamente com as informações do documento",
+          title: isSimulated ? "Dados simulados gerados!" : "Dados extraídos com sucesso!",
+          description: isSimulated ? 
+            "Os campos foram preenchidos com dados simulados (OpenAI não configurada)" :
+            "Os campos foram preenchidos automaticamente com as informações do documento",
         });
       } else {
         throw new Error('Não foi possível extrair os dados do documento');
