@@ -1548,16 +1548,301 @@ export default function RelatoriosFinanceiros() {
 
         <TabsContent value="despesas" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Resumo de Despesas</CardTitle>
-              <CardDescription>
-                Totais das despesas por categoria
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
+                <CardDescription>
+                  Todas as despesas fixas e manutenções registradas no sistema - dados reais
+                </CardDescription>
+              </div>
+              
+              {/* Ordenação */}
+              <Select value={sortHistorico} onValueChange={setSortHistorico}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Ordenar por" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mais-recente">Mais Recente</SelectItem>
+                  <SelectItem value="mais-antiga">Mais Antiga</SelectItem>
+                  <SelectItem value="maior-valor">Maior Valor</SelectItem>
+                  <SelectItem value="menor-valor">Menor Valor</SelectItem>
+                  <SelectItem value="tipo-az">Tipo (A-Z)</SelectItem>
+                  <SelectItem value="tipo-za">Tipo (Z-A)</SelectItem>
+                  <SelectItem value="categoria-az">Categoria (A-Z)</SelectItem>
+                  <SelectItem value="categoria-za">Categoria (Z-A)</SelectItem>
+                </SelectContent>
+              </Select>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Tabela detalhada removida - usando apenas cards de resumo */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Tabela de todas as despesas */}
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Veículo</TableHead>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Categoria</TableHead>
+                        <TableHead>Descrição</TableHead>
+                        <TableHead>Valor</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {(() => {
+                        const todasDespesas = [];
+                        
+                        // Adicionar despesas fixas mensais
+                        veiculos.forEach(veiculo => {
+                          const dataAtual = new Date().toISOString().split('T')[0];
+                          
+                          // IPVA mensal
+                          if (veiculo.ipva && veiculo.ipva > 0) {
+                            todasDespesas.push({
+                              id: `ipva-${veiculo.id}`,
+                              data: dataAtual,
+                              veiculo: veiculo,
+                              tipo: 'Despesa Fixa',
+                              categoria: 'IPVA',
+                              descricao: `IPVA mensal - ${veiculo.placa}`,
+                              valor: parseFloat(veiculo.ipva) / 12,
+                              status: 'Automático',
+                              createdAt: veiculo.createdAt || dataAtual
+                            });
+                          }
+                          
+                          // Seguro mensal
+                          if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+                            todasDespesas.push({
+                              id: `seguro-${veiculo.id}`,
+                              data: dataAtual,
+                              veiculo: veiculo,
+                              tipo: 'Despesa Fixa',
+                              categoria: 'Seguro',
+                              descricao: `Seguro ${veiculo.seguradora || 'não informado'} - ${veiculo.placa}`,
+                              valor: parseFloat(veiculo.valorSeguroMensal),
+                              status: 'Automático',
+                              createdAt: veiculo.createdAt || dataAtual
+                            });
+                          }
+                          
+                          // Rastreador mensal
+                          if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+                            todasDespesas.push({
+                              id: `rastreador-${veiculo.id}`,
+                              data: dataAtual,
+                              veiculo: veiculo,
+                              tipo: 'Despesa Fixa',
+                              categoria: 'Rastreador',
+                              descricao: `Rastreador ${veiculo.rastreador || 'não informado'} - ${veiculo.placa}`,
+                              valor: parseFloat(veiculo.valorRastreadorMensal),
+                              status: 'Automático',
+                              createdAt: veiculo.createdAt || dataAtual
+                            });
+                          }
+                          
+                          // Financiamento mensal
+                          if (veiculo.financiado && veiculo.valorFinanciamento) {
+                            todasDespesas.push({
+                              id: `financiamento-${veiculo.id}`,
+                              data: dataAtual,
+                              veiculo: veiculo,
+                              tipo: 'Despesa Fixa',
+                              categoria: 'Financiamento',
+                              descricao: `Financiamento mensal - ${veiculo.placa}`,
+                              valor: parseFloat(veiculo.valorFinanciamento),
+                              status: 'Automático',
+                              createdAt: veiculo.createdAt || dataAtual
+                            });
+                          }
+                        });
+                        
+                        // Adicionar manutenções
+                        filteredData.manutencoes.forEach(manutencao => {
+                          const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
+                          const valor = manutencao.valorFinal || manutencao.valorOrcamento;
+                          if (valor && parseFloat(valor) > 0) {
+                            todasDespesas.push({
+                              id: `manutencao-${manutencao.id}`,
+                              data: manutencao.dataInicio,
+                              veiculo: veiculo,
+                              tipo: 'Manutenção',
+                              categoria: manutencao.tipo,
+                              descricao: `${manutencao.tipo} - ${manutencao.oficina}`,
+                              valor: parseFloat(valor),
+                              status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente',
+                              createdAt: manutencao.createdAt || manutencao.dataInicio
+                            });
+                          }
+                        });
+                        
+                        // Adicionar despesas manuais (exceto financiamento)
+                        despesas.filter(despesa => despesa.categoria !== 'financiamento').forEach(despesa => {
+                          const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
+                          todasDespesas.push({
+                            id: `despesa-${despesa.id}`,
+                            data: despesa.data,
+                            veiculo: veiculo,
+                            tipo: 'Despesa Manual',
+                            categoria: despesa.categoria,
+                            descricao: despesa.descricao,
+                            valor: parseFloat(despesa.valor || '0'),
+                            status: despesa.status === 'pago' ? 'Pago' : 'Pendente',
+                            createdAt: despesa.createdAt || despesa.data
+                          });
+                        });
+                        
+                        // Aplicar ordenação
+                        todasDespesas.sort((a, b) => {
+                          const dateA = new Date(a.data).getTime();
+                          const dateB = new Date(b.data).getTime();
+                          
+                          switch (sortHistorico) {
+                            case 'mais-recente':
+                              return dateB - dateA;
+                            case 'mais-antiga':
+                              return dateA - dateB;
+                            case 'maior-valor':
+                              return b.valor - a.valor;
+                            case 'menor-valor':
+                              return a.valor - b.valor;
+                            case 'tipo-az':
+                              return a.tipo.localeCompare(b.tipo);
+                            case 'tipo-za':
+                              return b.tipo.localeCompare(a.tipo);
+                            case 'categoria-az':
+                              return a.categoria.localeCompare(b.categoria);
+                            case 'categoria-za':
+                              return b.categoria.localeCompare(a.categoria);
+                            default:
+                              return dateB - dateA;
+                          }
+                        });
+                        
+                        // Aplicar paginação
+                        const startIndex = (currentPageHistorico - 1) * itemsPerPageHistorico;
+                        const endIndex = startIndex + itemsPerPageHistorico;
+                        const paginatedDespesas = todasDespesas.slice(startIndex, endIndex);
+                        
+                        if (paginatedDespesas.length === 0) {
+                          return (
+                            <TableRow>
+                              <TableCell colSpan={8} className="text-center text-gray-500 py-8">
+                                Nenhuma despesa encontrada no período selecionado
+                              </TableCell>
+                            </TableRow>
+                          );
+                        }
+                        
+                        return paginatedDespesas.map((despesa) => (
+                          <TableRow key={despesa.id}>
+                            <TableCell>{formatDate(despesa.data)}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Car className="h-4 w-4 text-blue-600" />
+                                <div>
+                                  <p className="font-medium">{despesa.veiculo?.placa || 'Não informado'}</p>
+                                  <p className="text-sm text-gray-600">{despesa.veiculo?.marca} {despesa.veiculo?.modelo}</p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={despesa.tipo === 'Despesa Fixa' ? 'default' : 
+                                            despesa.tipo === 'Manutenção' ? 'secondary' : 'destructive'}>
+                                {despesa.tipo}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">
+                                {despesa.categoria}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <p className="max-w-xs truncate">{despesa.descricao}</p>
+                            </TableCell>
+                            <TableCell className="font-medium text-red-600">
+                              {formatCurrency(despesa.valor)}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={despesa.status === 'Pago' ? 'default' : 'secondary'}>
+                                {despesa.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {despesa.id.startsWith('despesa-') && (
+                                  <>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => abrirModalEdicao(despesa)}
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => abrirModalExclusao(despesa.id.replace('despesa-', ''))}
+                                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ));
+                      })()}
+                    </TableBody>
+                  </Table>
+                </div>
+                
+                {/* Paginação */}
+                {(() => {
+                  const totalItems = (() => {
+                    let total = 0;
+                    
+                    // Contar despesas fixas
+                    veiculos.forEach(veiculo => {
+                      if (veiculo.ipva && veiculo.ipva > 0) total++;
+                      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) total++;
+                      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) total++;
+                      if (veiculo.financiado && veiculo.valorFinanciamento) total++;
+                    });
+                    
+                    // Contar manutenções
+                    filteredData.manutencoes.forEach(manutencao => {
+                      const valor = manutencao.valorFinal || manutencao.valorOrcamento;
+                      if (valor && parseFloat(valor) > 0) total++;
+                    });
+                    
+                    // Contar despesas manuais
+                    despesas.filter(despesa => despesa.categoria !== 'financiamento').forEach(() => {
+                      total++;
+                    });
+                    
+                    return total;
+                  })();
+                  
+                  return totalItems > 0 && (
+                    <div className="border-t pt-4 mt-4">
+                      <Pagination
+                        currentPage={currentPageHistorico}
+                        totalItems={totalItems}
+                        itemsPerPage={itemsPerPageHistorico}
+                        onPageChange={handlePageChangeHistorico}
+                        onItemsPerPageChange={handleItemsPerPageChangeHistorico}
+                      />
+                    </div>
+                  );
+                })()}
+                
+                {/* Resumo das despesas */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
                   <div className="bg-red-50 p-4 rounded-lg">
                     <h4 className="font-medium text-red-700 mb-2">Total Despesas Fixas</h4>
                     <p className="text-2xl font-bold text-red-800">

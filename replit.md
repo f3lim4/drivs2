@@ -10,16 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-18: Visualização Financeira Simplificada - CONCLUÍDO
-- ✅ **Gráficos complexos removidos** - Eliminados gráficos de barras, pizza e linha da aba "Despesas"
-- ✅ **Cards coloridos implementados** - Receitas e despesas organizadas em cards visuais claros
-- ✅ **Receitas por tipo** - Pagamentos Recebidos e Receitas Extras separados visualmente
-- ✅ **Despesas por tipo** - Despesas Fixas e Despesas Manuais diferenciadas por cor
-- ✅ **Totais destacados** - Cards com bordas para totais gerais de receitas e despesas
-- ✅ **Tabela detalhada removida** - Removida lista completa de despesas manuais conforme solicitado
-- ✅ **Visualização limpa** - Interface focada em cards simples e informativos
-- ✅ **Cores intuitivas** - Verde para receitas, vermelho para despesas fixas, laranja para despesas manuais
-- ✅ **Informações essenciais** - Apenas dados principais visíveis de forma clara e direta
+### 2025-07-18: Restauração da Tabela Histórico - CONCLUÍDO
+- ✅ **Tabela "Histórico de Despesas dos Veículos" restaurada** - Usuário solicitou o retorno dos dados detalhados
+- ✅ **Funcionalidade completa** - Ordenação, paginação e todos os dados reais funcionando
+- ✅ **Despesas fixas automáticas** - IPVA, seguro, rastreador, financiamento exibidos na tabela
+- ✅ **Manutenções integradas** - Registros de manutenções incluídos no histórico
+- ✅ **Despesas manuais** - Todas as despesas cadastradas manualmente listadas
+- ✅ **Sistema de ordenação** - 8 opções (mais recente, mais antiga, maior valor, etc.)
+- ✅ **Paginação funcional** - Navegação completa entre páginas
+- ✅ **Cards de resumo** - Totais por categoria mantidos no final da tabela
+- ✅ **Interface detalhada** - Dados completos com veículo, tipo, categoria, descrição, valor e status
+- ✅ **Ações por linha** - Editar e excluir despesas manuais quando aplicável
 
 ### 2025-07-18: Fotos de Perfil dos Motoristas - CONCLUÍDO
 - ✅ **Avatar dinâmico implementado** - Exibe foto de perfil quando disponível (imagem1)
