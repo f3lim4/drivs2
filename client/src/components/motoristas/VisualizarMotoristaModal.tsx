@@ -2,6 +2,7 @@
  * Modal para visualizar detalhes do motorista
  */
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,8 +15,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { User, Phone, Mail, Calendar, CreditCard, FileText } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { User, Phone, Mail, Calendar, CreditCard, FileText, Image, Upload, X } from 'lucide-react';
 import { Motorista } from '@/types';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface VisualizarMotoristaModalProps {
   open: boolean;
@@ -24,7 +28,153 @@ interface VisualizarMotoristaModalProps {
 }
 
 export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: VisualizarMotoristaModalProps) {
+  const [imagens, setImagens] = useState<string[]>([]);
+  const [loadingImagens, setLoadingImagens] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
+  const { profile } = useAuth();
+
   if (!motorista) return null;
+
+  const isLocadora = profile?.tipo === 'locadora';
+
+  // Carregar imagens do motorista
+  useEffect(() => {
+    if (!motorista || !open) return;
+
+    const carregarImagens = async () => {
+      setLoadingImagens(true);
+      try {
+        const response = await fetch(`/api/motoristas/${motorista.id}/imagens`);
+        if (response.ok) {
+          const data = await response.json();
+          setImagens(data.imagens || []);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar imagens:', error);
+      } finally {
+        setLoadingImagens(false);
+      }
+    };
+
+    carregarImagens();
+  }, [motorista, open]);
+
+  // Função para upload de imagens
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || !motorista) return;
+
+    const newImages = Array.from(files);
+    const totalImages = imagens.length + newImages.length;
+
+    if (totalImages > 5) {
+      toast({
+        title: "Limite de imagens",
+        description: "Você pode adicionar no máximo 5 imagens por motorista",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validar tipo e tamanho das imagens
+    const validImages = newImages.filter(file => {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Formato inválido",
+          description: `${file.name} não é uma imagem válida`,
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        toast({
+          title: "Arquivo muito grande",
+          description: `${file.name} é maior que 5MB`,
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      return true;
+    });
+
+    if (validImages.length === 0) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('motoristaId', motorista.id);
+
+      validImages.forEach((file) => {
+        formData.append('imagens', file);
+      });
+
+      const response = await fetch('/api/motoristas/upload-imagens', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao fazer upload das imagens');
+      }
+
+      toast({
+        title: "Imagens enviadas com sucesso!",
+        description: `${validImages.length} imagem(s) adicionada(s)`,
+      });
+
+      // Recarregar imagens
+      const imagensResponse = await fetch(`/api/motoristas/${motorista.id}/imagens`);
+      if (imagensResponse.ok) {
+        const data = await imagensResponse.json();
+        setImagens(data.imagens || []);
+      }
+    } catch (error) {
+      console.error('Erro no upload:', error);
+      toast({
+        title: "Erro no upload",
+        description: "Não foi possível enviar as imagens. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Função para excluir imagem
+  const handleDeleteImage = async (index: number) => {
+    if (!motorista) return;
+
+    try {
+      const response = await fetch(`/api/motoristas/${motorista.id}/imagens/${index + 1}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao excluir imagem');
+      }
+
+      toast({
+        title: "Imagem excluída",
+        description: "A imagem foi removida com sucesso",
+      });
+
+      // Recarregar imagens
+      const imagensResponse = await fetch(`/api/motoristas/${motorista.id}/imagens`);
+      if (imagensResponse.ok) {
+        const data = await imagensResponse.json();
+        setImagens(data.imagens || []);
+      }
+    } catch (error) {
+      console.error('Erro ao excluir imagem:', error);
+      toast({
+        title: "Erro ao excluir",
+        description: "Não foi possível excluir a imagem. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -147,6 +297,105 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                   {motorista.vencimentoCnh}
                 </p>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Imagens */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Image className="w-4 h-4" />
+                Imagens do Motorista
+                {isLocadora && imagens.length < 5 && (
+                  <span className="text-sm text-muted-foreground">({imagens.length}/5)</span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Upload de imagens (apenas para locadoras) */}
+              {isLocadora && imagens.length < 5 && (
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleImageUpload(e.target.files)}
+                    className="flex-1"
+                    disabled={uploading}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.multiple = true;
+                      input.onchange = (e) => handleImageUpload((e.target as HTMLInputElement).files);
+                      input.click();
+                    }}
+                    disabled={uploading}
+                  >
+                    <Upload className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+              
+              {/* Exibição das imagens */}
+              {loadingImagens ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : imagens.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {imagens.map((imagemUrl, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={imagemUrl}
+                        alt={`Imagem ${index + 1} do motorista`}
+                        className="w-full h-32 object-cover rounded-lg border hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => window.open(imagemUrl, '_blank')}
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded-lg flex items-center justify-center">
+                        <span className="text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                          Clique para ampliar
+                        </span>
+                      </div>
+                      {/* Botão de excluir (apenas para locadoras) */}
+                      {isLocadora && (
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteImage(index);
+                          }}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Image className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>Nenhuma imagem cadastrada</p>
+                  {isLocadora && (
+                    <p className="text-xs mt-2">Use o campo acima para adicionar imagens</p>
+                  )}
+                </div>
+              )}
+              
+              {/* Indicador de upload */}
+              {uploading && (
+                <div className="flex items-center justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mr-2"></div>
+                  <span className="text-sm text-muted-foreground">Enviando imagens...</span>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

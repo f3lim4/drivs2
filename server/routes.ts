@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { testConnection, db } from "./db";
@@ -7,6 +8,7 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
+import multer from "multer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Test database connection first
@@ -15,6 +17,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   if (!connectionOk) {
     console.error("Database connection failed. Starting server without database functionality.");
   }
+
+  // Configurar multer para upload de imagens
+  const storage_multer = multer.diskStorage({
+    destination: function (req, file, cb) {
+      const uploadsDir = path.join(process.cwd(), 'uploads', 'motoristas');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      cb(null, uploadsDir);
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const extension = path.extname(file.originalname);
+      cb(null, file.fieldname + '-' + uniqueSuffix + extension);
+    }
+  });
+
+  const upload = multer({ 
+    storage: storage_multer,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only images are allowed'), false);
+      }
+    }
+  });
 
   // Initialize database with admin user if it doesn't exist
   if (connectionOk) {
@@ -35,6 +65,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Note: Could not create admin profile (database may not be connected)");
     }
   }
+
+  // Servir arquivos estáticos das imagens
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
   // Authentication routes
   app.get("/api/auth/profile", async (req, res) => {
     try {
@@ -1250,62 +1283,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Upload de imagens de motoristas
-  app.post("/api/motoristas/:id/upload-imagem", async (req, res) => {
+  // Upload de imagens de motoristas com FormData
+  app.post("/api/motoristas/upload-imagens", upload.array('imagens', 5), async (req, res) => {
     try {
-      const { imageData, imageIndex } = req.body;
-      const motoristaId = req.params.id;
+      const { motoristaId } = req.body;
+      const files = req.files as Express.Multer.File[];
       
-      console.log(`[UPLOAD] Iniciando upload de imagem para motorista ${motoristaId}`);
-      console.log(`[UPLOAD] Índice da imagem: ${imageIndex}`);
-      
-      if (!imageData || imageIndex === undefined) {
-        return res.status(400).json({ message: "Dados da imagem e índice são obrigatórios" });
+      if (!motoristaId) {
+        return res.status(400).json({ message: "ID do motorista é obrigatório" });
       }
       
-      if (imageIndex < 1 || imageIndex > 5) {
-        return res.status(400).json({ message: "Índice da imagem deve ser entre 1 e 5" });
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: "Nenhuma imagem foi enviada" });
       }
       
-      // Criar diretório uploads se não existir
-      const uploadsDir = path.join(process.cwd(), 'uploads', 'motoristas');
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-        console.log(`[UPLOAD] Diretório uploads criado: ${uploadsDir}`);
+      const motorista = await storage.getMotorista(motoristaId);
+      if (!motorista) {
+        return res.status(404).json({ message: "Motorista não encontrado" });
       }
       
-      // Gerar nome único para a imagem
-      const timestamp = Date.now();
-      const imageExtension = imageData.includes('data:image/jpeg') ? 'jpg' : 'png';
-      const uniqueFileName = `motorista_${motoristaId}_${imageIndex}_${timestamp}.${imageExtension}`;
-      const filePath = path.join(uploadsDir, uniqueFileName);
+      console.log(`[UPLOAD] Iniciando upload de ${files.length} imagens para motorista ${motoristaId}`);
       
-      console.log(`[UPLOAD] Caminho da imagem: ${filePath}`);
+      // Encontrar próximos slots disponíveis
+      const currentImages = [
+        motorista.imagem1,
+        motorista.imagem2,
+        motorista.imagem3,
+        motorista.imagem4,
+        motorista.imagem5
+      ];
       
-      // Converter base64 para arquivo
-      const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
-      fs.writeFileSync(filePath, base64Data, 'base64');
+      const availableSlots = [];
+      for (let i = 0; i < 5; i++) {
+        if (!currentImages[i]) {
+          availableSlots.push(i + 1);
+        }
+      }
       
-      console.log(`[UPLOAD] Imagem salva com sucesso`);
+      if (availableSlots.length < files.length) {
+        return res.status(400).json({ message: "Não há slots suficientes disponíveis" });
+      }
       
-      // Atualizar motorista no banco
-      const imageFieldName = `imagem${imageIndex}` as keyof typeof updates;
-      const updates = {
-        [imageFieldName]: uniqueFileName,
-      };
+      // Salvar informações das imagens no banco
+      const updates: any = {};
+      files.forEach((file, index) => {
+        if (index < availableSlots.length) {
+          const slot = availableSlots[index];
+          updates[`imagem${slot}`] = file.filename;
+        }
+      });
       
       await storage.updateMotorista(motoristaId, updates);
       
-      console.log(`[UPLOAD] Banco de dados atualizado`);
+      console.log(`[UPLOAD] ${files.length} imagens salvas com sucesso`);
       
       res.json({ 
-        message: "Imagem enviada com sucesso", 
-        fileName: uniqueFileName,
-        imageIndex,
+        message: "Imagens enviadas com sucesso", 
+        uploadedCount: files.length,
         uploadedAt: new Date().toISOString() 
       });
     } catch (error) {
-      console.error("Error uploading motorista image:", error);
+      console.error("Error uploading motorista images:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Listar imagens de um motorista
+  app.get("/api/motoristas/:id/imagens", async (req, res) => {
+    try {
+      const motoristaId = req.params.id;
+      const motorista = await storage.getMotorista(motoristaId);
+      
+      if (!motorista) {
+        return res.status(404).json({ message: "Motorista não encontrado" });
+      }
+      
+      const imagens = [];
+      for (let i = 1; i <= 5; i++) {
+        const imageField = `imagem${i}` as keyof typeof motorista;
+        const imageName = motorista[imageField] as string;
+        if (imageName) {
+          imagens.push(`/uploads/motoristas/${imageName}`);
+        }
+      }
+      
+      res.json({ imagens });
+    } catch (error) {
+      console.error("Error fetching motorista images:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -1361,7 +1425,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Endpoint para deletar imagem do motorista
-  app.delete("/api/motoristas/:id/imagem/:index", async (req, res) => {
+  app.delete("/api/motoristas/:id/imagens/:index", async (req, res) => {
     try {
       const motoristaId = req.params.id;
       const imageIndex = parseInt(req.params.index);
