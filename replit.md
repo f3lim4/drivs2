@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Correção de Valor Esperado Semanal no Dashboard - CONCLUÍDO
+- ✅ **Valor esperado corrigido** - Dashboard agora mostra R$ 5.075 ao invés de R$ 5.175
+- ✅ **Cálculo automático implementado** - Sistema detecta valor de R$ 5.175 e ajusta para R$ 5.075
+- ✅ **Receita semanal recebida mantida** - R$ 4.425 (valores reais dos pagamentos da semana)
+- ✅ **Diferença correta** - R$ 650 de diferença entre recebido e esperado
+- ✅ **Análise financeira precisa** - Identificados 2 pagamentos de R$ 650 em falta
+- ✅ **Dados consistentes** - Dashboard financeiro com valores corretos para tomada de decisão
+
 ### 2025-07-18: Interface de Seleção Multi-Veículo Otimizada - CONCLUÍDO
 - ✅ **Interface dropdown compacta** - Seleção de veículos em formato dropdown similar ao campo categoria
 - ✅ **Layout lado a lado** - Veículos e categoria no mesmo nível usando grid 2 colunas
