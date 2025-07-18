@@ -52,6 +52,15 @@ export default function RelatoriosFinanceiros() {
   const { veiculos } = useVeiculos();
   const { motoristas } = useMotoristas();
   const { manutencoes } = useManutencoes();
+  
+  // Debug - verificar se dados estão sendo carregados
+  useEffect(() => {
+    console.log('RelatoriosFinanceiros - Dados carregados:', {
+      despesas: despesas?.length || 0,
+      manutencoes: manutencoes?.length || 0,
+      veiculos: veiculos?.length || 0
+    });
+  }, [despesas, manutencoes, veiculos]);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
