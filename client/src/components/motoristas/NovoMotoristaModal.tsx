@@ -36,6 +36,7 @@ import { Motorista } from '@/types';
 import { generateId } from '@/utils/formatters';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useMotoristas } from '@/hooks/useMotoristas';
 import { Image, Upload, X } from 'lucide-react';
 
 // Funções de validação
@@ -144,13 +145,11 @@ type MotoristaFormData = z.infer<typeof motoristaSchema>;
 interface NovoMotoristaModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onMotoristaAdicionado: (motorista: Motorista) => void;
 }
 
 export function NovoMotoristaModal({ 
   open, 
-  onOpenChange, 
-  onMotoristaAdicionado 
+  onOpenChange 
 }: NovoMotoristaModalProps) {
   const [loading, setLoading] = useState(false);
   const [imagens, setImagens] = useState<{
@@ -185,6 +184,7 @@ export function NovoMotoristaModal({
   });
   const { profile } = useAuth();
   const { toast } = useToast();
+  const { createMotorista } = useMotoristas();
 
   const form = useForm<MotoristaFormData>({
     resolver: zodResolver(motoristaSchema),
@@ -332,21 +332,8 @@ export function NovoMotoristaModal({
         status: data.status,
       };
 
-      // Enviar dados do motorista
-      const response = await fetch('/api/motoristas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(motoristaData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao cadastrar motorista');
-      }
-
-      const novoMotorista = await response.json();
+      // Usar hook do React Query para criar motorista
+      const novoMotorista = await createMotorista.mutateAsync(motoristaData);
       
       // Upload das imagens se houver
       const imagensParaUpload = Object.values(imagens).filter(img => img !== null);
@@ -391,7 +378,6 @@ export function NovoMotoristaModal({
         });
       }
       
-      onMotoristaAdicionado(novoMotorista);
       onOpenChange(false);
       form.reset();
       setImagens({

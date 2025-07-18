@@ -172,13 +172,7 @@ export default function Motoristas() {
     setModalOpen(true);
   };
 
-  const handleMotoristaAdicionado = (novoMotorista: Motorista) => {
-    toast({
-      title: "Motorista Cadastrado",
-      description: `${novoMotorista.nome} foi cadastrado com sucesso!`,
-    });
-    // A atualização da lista é feita automaticamente pelo hook
-  };
+
 
   const handleEditarMotorista = (motorista: Motorista) => {
     setSelectedMotorista(motorista);
@@ -538,7 +532,6 @@ export default function Motoristas() {
           <NovoMotoristaModal
             open={modalOpen}
             onOpenChange={setModalOpen}
-            onMotoristaAdicionado={handleMotoristaAdicionado}
           />
 
           {/* Modal de Editar Motorista */}
