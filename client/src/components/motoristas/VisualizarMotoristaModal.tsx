@@ -241,12 +241,15 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                     {motorista.email || 'Não informado'}
                   </p>
                 </div>
-                {motorista.localizacao && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Localização</p>
-                    <p className="text-sm">{motorista.localizacao}</p>
-                  </div>
-                )}
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Endereço</p>
+                  <p className="text-sm">
+                    {motorista.rua}, {motorista.numero} - {motorista.bairro}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {motorista.cidade} - {motorista.estado} | CEP: {motorista.cep}
+                  </p>
+                </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Número da CNH</p>
                   <p className="text-sm font-mono">{motorista.cnh}</p>
