@@ -1,25 +1,36 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { testConnection } from "./db";
 import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema } from "@shared/schema";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Test database connection first
+  console.log("Testing database connection...");
+  const connectionOk = await testConnection();
+  if (!connectionOk) {
+    console.error("Database connection failed. Starting server without database functionality.");
+  }
+
   // Initialize database with admin user if it doesn't exist
-  try {
-    const adminProfile = await storage.getProfileByEmail("drivs@drivs.com.br");
-    if (!adminProfile) {
-      await storage.createProfile({
-        userId: "admin-user-id",
-        email: "drivs@drivs.com.br",
-        name: "Admin DRIVS", 
-        type: "admin",
-        locadoraId: null
-      });
-      console.log("Admin profile created");
+  if (connectionOk) {
+    try {
+      const adminProfile = await storage.getProfileByEmail("drivs@drivs.com.br");
+      if (!adminProfile) {
+        await storage.createProfile({
+          userId: "550e8400-e29b-41d4-a716-446655440000", // Valid UUID format
+          email: "drivs@drivs.com.br",
+          name: "Admin DRIVS", 
+          type: "admin",
+          locadoraId: null
+        });
+        console.log("Admin profile created");
+      }
+    } catch (error) {
+      console.error("Database initialization error:", error);
+      console.log("Note: Could not create admin profile (database may not be connected)");
     }
-  } catch (error) {
-    console.log("Note: Could not create admin profile (database may not be connected)");
   }
   // Authentication routes
   app.get("/api/auth/profile", async (req, res) => {
