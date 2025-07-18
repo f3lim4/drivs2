@@ -2109,9 +2109,9 @@ export default function RelatoriosFinanceiros() {
                               </svg>
                             )}
                           </div>
-                          <div className="flex flex-col">
+                          <div className="flex items-center justify-between flex-1">
                             <span className="text-sm font-medium">{veiculo.placa}</span>
-                            <span className="text-xs text-gray-500">{veiculo.marca} {veiculo.modelo}</span>
+                            <span className="text-xs text-gray-500">{veiculo.modelo}</span>
                           </div>
                         </div>
                       ))}
