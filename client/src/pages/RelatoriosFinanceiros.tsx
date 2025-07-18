@@ -2103,26 +2103,27 @@ export default function RelatoriosFinanceiros() {
               
               {/* Multi-vehicle selection for emprestimo category */}
               {formNovaDespesa.watch('categoria') === 'emprestimo' && (
-                <div className="space-y-4">
-                  <div className="border rounded-lg p-4 bg-blue-50">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-medium text-blue-700">Selecionar Veículos para Empréstimo</h4>
+                <div className="space-y-3">
+                  <div className="border rounded-lg p-3 bg-blue-50">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-medium text-blue-700">Selecionar Veículos</h4>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
+                        className="h-7 text-xs"
                         onClick={() => {
                           const allSelected = selectedVehicles.length === veiculos.length;
                           setSelectedVehicles(allSelected ? [] : veiculos.map(v => v.id));
                         }}
                       >
-                        {selectedVehicles.length === veiculos.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
+                        {selectedVehicles.length === veiculos.length ? 'Desmarcar' : 'Todos'}
                       </Button>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                       {veiculos.map((veiculo) => (
-                        <div key={veiculo.id} className="flex items-center space-x-3 p-2 border rounded bg-white">
+                        <div key={veiculo.id} className="flex items-center space-x-2 p-2 border rounded bg-white text-sm">
                           <input
                             type="checkbox"
                             id={`vehicle-${veiculo.id}`}
@@ -2137,27 +2138,28 @@ export default function RelatoriosFinanceiros() {
                             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                           />
                           <label htmlFor={`vehicle-${veiculo.id}`} className="flex-1 cursor-pointer">
-                            <div className="font-medium">{veiculo.placa}</div>
-                            <div className="text-sm text-gray-600">{veiculo.marca} {veiculo.modelo}</div>
+                            <div className="font-medium text-sm">{veiculo.placa}</div>
                           </label>
                         </div>
                       ))}
                     </div>
                     
                     {selectedVehicles.length > 0 && formNovaDespesa.watch('valor') && (
-                      <div className="mt-4 p-3 bg-green-50 rounded border border-green-200">
-                        <div className="text-sm text-green-700">
-                          <span className="font-medium">Valor total:</span> R$ {formNovaDespesa.watch('valor') || '0,00'}
-                        </div>
-                        <div className="text-sm text-green-700">
-                          <span className="font-medium">Valor por veículo:</span> R$ {
-                            selectedVehicles.length > 0 && formNovaDespesa.watch('valor') 
-                              ? (parseFloat(formNovaDespesa.watch('valor').toString().replace(',', '.')) / selectedVehicles.length).toFixed(2) 
-                              : '0,00'
-                          }
-                        </div>
-                        <div className="text-sm text-green-700">
-                          <span className="font-medium">Veículos selecionados:</span> {selectedVehicles.length}
+                      <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
+                        <div className="grid grid-cols-3 gap-2 text-xs text-green-700">
+                          <div>
+                            <span className="font-medium">Total:</span> R$ {formNovaDespesa.watch('valor') || '0,00'}
+                          </div>
+                          <div>
+                            <span className="font-medium">Por veículo:</span> R$ {
+                              selectedVehicles.length > 0 && formNovaDespesa.watch('valor') 
+                                ? (parseFloat(formNovaDespesa.watch('valor').toString().replace(',', '.')) / selectedVehicles.length).toFixed(2) 
+                                : '0,00'
+                            }
+                          </div>
+                          <div>
+                            <span className="font-medium">Selecionados:</span> {selectedVehicles.length}
+                          </div>
                         </div>
                       </div>
                     )}
