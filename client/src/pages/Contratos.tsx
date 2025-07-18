@@ -45,7 +45,7 @@ export default function Contratos() {
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
-  const [filtroTipo, setFiltroTipo] = useState<string>('todos');
+
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -279,9 +279,8 @@ export default function Contratos() {
         contrato.tipo.toLowerCase().includes(busca.toLowerCase());
       
       const passaStatus = filtroStatus === 'todos' || contrato.status === filtroStatus;
-      const passaTipo = filtroTipo === 'todos' || contrato.tipo === filtroTipo;
       
-      return passaBusca && passaStatus && passaTipo;
+      return passaBusca && passaStatus;
     })
     .sort((a, b) => {
       switch (sortOrder) {
@@ -438,7 +437,7 @@ export default function Contratos() {
       {/* Filtros */}
       <Card className="bg-gray-50/50 border-gray-200">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-4 items-end">
+          <div className="grid gap-4 md:grid-cols-3 items-end">
             <div className="space-y-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -469,21 +468,6 @@ export default function Contratos() {
                   <SelectItem value="ativo">Ativo</SelectItem>
                   <SelectItem value="finalizado">Finalizado</SelectItem>
                   <SelectItem value="cancelado">Cancelado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Todos os tipos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os tipos</SelectItem>
-                  <SelectItem value="mensal">Mensal</SelectItem>
-                  <SelectItem value="semanal">Semanal</SelectItem>
-                  <SelectItem value="diario">Diário</SelectItem>
-                  <SelectItem value="personalizado">Personalizado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
