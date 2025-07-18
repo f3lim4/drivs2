@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Ícones dos Veículos com Cores Dinâmicas - CONCLUÍDO
+- ✅ **Função de mapeamento de cores** - getVehicleIconColor() criada para mapear cores dos veículos
+- ✅ **10 cores específicas mapeadas** - Branco, Preto, Prata, Cinza, Azul, Vermelho, Verde, Bege, Amarelo, Marrom
+- ✅ **Ícones coloridos na lista** - Ícones dos veículos agora refletem a cor real do veículo
+- ✅ **Cores realistas aplicadas** - Branco (cinza claro), Preto (cinza escuro), Prata (cinza médio), etc.
+- ✅ **Fallback implementado** - Cor padrão quando cor não reconhecida
+- ✅ **Visual melhorado** - Identificação visual instantânea da cor do veículo na lista
+
 ### 2025-07-18: Categorias de Veículos Expandidas - CONCLUÍDO
 - ✅ **Novas categorias adicionadas** - Moto, Utilitário e Caminhão incluídas no sistema
 - ✅ **Modal de cadastro atualizado** - NovoVeiculoModal com 9 opções de categoria

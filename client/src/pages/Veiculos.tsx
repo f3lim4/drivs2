@@ -63,6 +63,24 @@ const getStatusBadge = (status: string) => {
   }
 };
 
+// Função para obter cor do ícone do veículo baseado na cor do veículo
+const getVehicleIconColor = (cor: string) => {
+  const colorMap: { [key: string]: string } = {
+    'branco': 'bg-gray-100 text-gray-600',
+    'preto': 'bg-gray-800 text-gray-100',
+    'prata': 'bg-gray-300 text-gray-700',
+    'cinza': 'bg-gray-500 text-gray-100',
+    'azul': 'bg-blue-500 text-blue-100',
+    'vermelho': 'bg-red-500 text-red-100',
+    'verde': 'bg-green-500 text-green-100',
+    'bege': 'bg-yellow-200 text-yellow-800',
+    'amarelo': 'bg-yellow-400 text-yellow-900',
+    'marrom': 'bg-amber-700 text-amber-100'
+  };
+  
+  return colorMap[cor?.toLowerCase()] || 'bg-primary text-primary-foreground';
+};
+
 export default function Veiculos() {
   const { toast } = useToast();
   const { isAdmin, isLocadora } = useAuth();
@@ -385,8 +403,8 @@ export default function Veiculos() {
                 <TableRow key={veiculo.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                        <Car className="w-5 h-5 text-primary-foreground" />
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getVehicleIconColor(veiculo.cor)}`}>
+                        <Car className="w-5 h-5" />
                       </div>
                       <div>
                         <p className="font-medium">{veiculo.marca} {veiculo.modelo}</p>
