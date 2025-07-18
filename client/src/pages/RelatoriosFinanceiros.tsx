@@ -1115,10 +1115,10 @@ export default function RelatoriosFinanceiros() {
       <Tabs defaultValue="despesas" className="space-y-4">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="despesas">Despesas</TabsTrigger>
-          <TabsTrigger value="historico">Histórico</TabsTrigger>
+          <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
-          <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
+          <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
 
         <TabsContent value="despesas" className="space-y-4">

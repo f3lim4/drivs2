@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Reorganização das Abas de Relatórios Financeiros - CONCLUÍDO
+- ✅ **"Despesas Fixas" movida para segunda posição** - Agora aparece logo após a aba "Despesas"
+- ✅ **"Histórico" movida para última posição** - Posicionada como quinta e última aba
+- ✅ **Nova ordem implementada** - Despesas → Despesas Fixas → Análise por Veículo → Análise por Motorista → Histórico
+- ✅ **Navegação otimizada** - Fluxo mais lógico para consulta de relatórios
+- ✅ **Priorização de despesas fixas** - Maior destaque para informações de despesas automáticas
+
 ### 2025-07-18: Gráfico de Análise por Categoria em Despesas Fixas - CONCLUÍDO
 - ✅ **Gráfico de análise por categoria adicionado** - Seção "Análise por Categoria" implementada na aba "Despesas Fixas"
 - ✅ **Design de lista compacto** - Layout em formato lista com bordas divisórias entre itens
