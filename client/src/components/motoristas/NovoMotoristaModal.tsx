@@ -87,12 +87,14 @@ export function NovoMotoristaModal({
     fotoComCnh: File | null;
     comprovanteEndereco: File | null;
     fotoExtra: File | null;
+    fotoExtra2: File | null;
   }>({
     fotoPerfil: null,
     cnhImagem: null,
     fotoComCnh: null,
     comprovanteEndereco: null,
     fotoExtra: null,
+    fotoExtra2: null,
   });
   const [imagePreviews, setImagePreviews] = useState<{
     fotoPerfil: string | null;
@@ -100,12 +102,14 @@ export function NovoMotoristaModal({
     fotoComCnh: string | null;
     comprovanteEndereco: string | null;
     fotoExtra: string | null;
+    fotoExtra2: string | null;
   }>({
     fotoPerfil: null,
     cnhImagem: null,
     fotoComCnh: null,
     comprovanteEndereco: null,
     fotoExtra: null,
+    fotoExtra2: null,
   });
   const { profile } = useAuth();
   const { toast } = useToast();
@@ -241,6 +245,7 @@ export function NovoMotoristaModal({
           if (imagens.fotoComCnh) formData.append('fotoComCnh', imagens.fotoComCnh);
           if (imagens.comprovanteEndereco) formData.append('comprovanteEndereco', imagens.comprovanteEndereco);
           if (imagens.fotoExtra) formData.append('fotoExtra', imagens.fotoExtra);
+          if (imagens.fotoExtra2) formData.append('fotoExtra2', imagens.fotoExtra2);
           
           const uploadResponse = await fetch('/api/motoristas/upload-imagens', {
             method: 'POST',
@@ -279,6 +284,7 @@ export function NovoMotoristaModal({
         fotoComCnh: null,
         comprovanteEndereco: null,
         fotoExtra: null,
+        fotoExtra2: null,
       });
       setImagePreviews({
         fotoPerfil: null,
@@ -286,6 +292,7 @@ export function NovoMotoristaModal({
         fotoComCnh: null,
         comprovanteEndereco: null,
         fotoExtra: null,
+        fotoExtra2: null,
       });
       
     } catch (error) {
@@ -789,8 +796,8 @@ export function NovoMotoristaModal({
                   )}
                 </div>
 
-                {/* Foto Extra */}
-                <div className="space-y-2 md:col-span-2">
+                {/* Foto Extra 1 */}
+                <div className="space-y-2">
                   <label className="block text-sm font-medium text-foreground">
                     Foto Extra (Opcional)
                   </label>
@@ -817,6 +824,40 @@ export function NovoMotoristaModal({
                       <img
                         src={imagePreviews.fotoExtra}
                         alt="Foto Extra"
+                        className="w-20 h-20 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Foto Extra 2 */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-foreground">
+                    Foto Extra 2 (Opcional)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e.target.files, 'fotoExtra2')}
+                      className="flex-1"
+                    />
+                    {imagens.fotoExtra2 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleRemoveImage('fotoExtra2')}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                  {imagePreviews.fotoExtra2 && (
+                    <div className="mt-2">
+                      <img
+                        src={imagePreviews.fotoExtra2}
+                        alt="Foto Extra 2"
                         className="w-20 h-20 object-cover rounded-lg border"
                       />
                     </div>
