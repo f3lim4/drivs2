@@ -1,8 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { testConnection } from "./db";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema } from "@shared/schema";
+import { testConnection, db } from "./db";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, contratos } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -641,10 +642,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Em produção, você salvaria o arquivo em um storage (AWS S3, etc.)
       const updates = {
         arquivoAssinado: fileName,
-        dataAssinatura: new Date().toISOString(),
+        dataAssinatura: new Date(),
       };
       
-      await storage.updateContrato(contratoId, updates);
+      // Atualizar contrato diretamente no banco
+      await db.update(contratos)
+        .set(updates)
+        .where(eq(contratos.id, contratoId));
       
       res.json({ 
         message: "Arquivo enviado com sucesso", 
