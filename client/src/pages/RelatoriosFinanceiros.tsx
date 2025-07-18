@@ -2078,7 +2078,7 @@ export default function RelatoriosFinanceiros() {
                         selectedVehicles.length === 0 
                           ? "Selecione os veículos" 
                           : selectedVehicles.length === 1 
-                            ? `${veiculos.find(v => v.id === selectedVehicles[0])?.placa}`
+                            ? `${veiculos.find(v => v.id === selectedVehicles[0])?.placa} - ${veiculos.find(v => v.id === selectedVehicles[0])?.modelo}`
                             : `${selectedVehicles.length} veículos`
                       } />
                     </SelectTrigger>
@@ -2109,8 +2109,10 @@ export default function RelatoriosFinanceiros() {
                               </svg>
                             )}
                           </div>
-                          <span className="text-sm font-medium">{veiculo.placa}</span>
-                          <span className="text-xs text-gray-500">{veiculo.marca}</span>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">{veiculo.placa}</span>
+                            <span className="text-xs text-gray-500">{veiculo.marca} {veiculo.modelo}</span>
+                          </div>
                         </div>
                       ))}
                     </SelectContent>
