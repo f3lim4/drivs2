@@ -16,6 +16,8 @@ import { ptBR } from 'date-fns/locale';
 
 export function NotificationsDropdown() {
   const { notifications, unreadCount, hasNotifications } = useNotifications();
+  
+
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
