@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Campo Cor com Dropdown de Seleção - CONCLUÍDO
+- ✅ **Campo cor atualizado** - Substituído input de texto por dropdown de seleção
+- ✅ **10 opções de cores** - Branco, Preto, Prata, Cinza, Azul, Vermelho, Verde, Bege, Amarelo, Marrom
+- ✅ **Modal de cadastro atualizado** - NovoVeiculoModal com select dropdown para cor
+- ✅ **Modal de edição atualizado** - EditarVeiculoModal com select dropdown para cor
+- ✅ **Validação mantida** - Campo cor continua obrigatório no formulário
+- ✅ **Valores padronizados** - Cores em lowercase para consistência no banco de dados
+- ✅ **Interface consistente** - Mesmo padrão visual dos outros campos select
+- ✅ **Placeholder atualizado** - "Selecionar" ao invés de texto de exemplo
+- ✅ **Experiência melhorada** - Usuário não precisa mais digitar, apenas selecionar
+
 ### 2025-07-18: Sistema de Upload de PDF para Veículos - REMOVIDO
 - ✅ **Sistema completo removido** - Funcionalidade de upload de PDF retirada do cadastro de veículos
 - ✅ **Interface limpa** - Modal de cadastro voltou ao formato original apenas com entrada manual

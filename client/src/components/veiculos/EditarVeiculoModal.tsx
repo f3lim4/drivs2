@@ -335,9 +335,25 @@ export function EditarVeiculoModal({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Cor *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Branco, Preto, etc." {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecionar" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="branco">Branco</SelectItem>
+                            <SelectItem value="preto">Preto</SelectItem>
+                            <SelectItem value="prata">Prata</SelectItem>
+                            <SelectItem value="cinza">Cinza</SelectItem>
+                            <SelectItem value="azul">Azul</SelectItem>
+                            <SelectItem value="vermelho">Vermelho</SelectItem>
+                            <SelectItem value="verde">Verde</SelectItem>
+                            <SelectItem value="bege">Bege</SelectItem>
+                            <SelectItem value="amarelo">Amarelo</SelectItem>
+                            <SelectItem value="marrom">Marrom</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
