@@ -2050,85 +2050,81 @@ export default function RelatoriosFinanceiros() {
           </DialogHeader>
           <Form {...formNovaDespesa}>
             <form onSubmit={formNovaDespesa.handleSubmit(criarNovaDespesa)} className="space-y-4">
-              {/* Vehicle selection dropdown */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Veículos</label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 text-xs text-blue-600"
-                    onClick={() => {
-                      const allSelected = selectedVehicles.length === veiculos.length;
-                      setSelectedVehicles(allSelected ? [] : veiculos.map(v => v.id));
-                    }}
+              {/* Vehicle selection and category side by side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">Veículos</label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 text-xs text-blue-600"
+                      onClick={() => {
+                        const allSelected = selectedVehicles.length === veiculos.length;
+                        setSelectedVehicles(allSelected ? [] : veiculos.map(v => v.id));
+                      }}
+                    >
+                      {selectedVehicles.length === veiculos.length ? 'Limpar' : 'Todos'}
+                    </Button>
+                  </div>
+                  
+                  <Select 
+                    value={selectedVehicles.length > 0 ? 'selected' : ''}
+                    onValueChange={() => {}}
                   >
-                    {selectedVehicles.length === veiculos.length ? 'Limpar' : 'Todos'}
-                  </Button>
-                </div>
-                
-                <Select 
-                  value={selectedVehicles.length > 0 ? 'selected' : ''}
-                  onValueChange={() => {}}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={
-                      selectedVehicles.length === 0 
-                        ? "Selecione os veículos" 
-                        : selectedVehicles.length === 1 
-                          ? `${veiculos.find(v => v.id === selectedVehicles[0])?.placa} selecionado`
-                          : `${selectedVehicles.length} veículos selecionados`
-                    } />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {veiculos.map((veiculo) => (
-                      <div
-                        key={veiculo.id}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if (selectedVehicles.includes(veiculo.id)) {
-                            setSelectedVehicles(prev => prev.filter(id => id !== veiculo.id));
-                          } else {
-                            setSelectedVehicles(prev => [...prev, veiculo.id]);
-                          }
-                        }}
-                        className={`flex items-center justify-between p-2 cursor-pointer hover:bg-gray-50 ${
-                          selectedVehicles.includes(veiculo.id) ? 'bg-blue-50' : ''
-                        }`}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                    <SelectTrigger className="w-full h-9">
+                      <SelectValue placeholder={
+                        selectedVehicles.length === 0 
+                          ? "Selecione os veículos" 
+                          : selectedVehicles.length === 1 
+                            ? `${veiculos.find(v => v.id === selectedVehicles[0])?.placa}`
+                            : `${selectedVehicles.length} veículos`
+                      } />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {veiculos.map((veiculo) => (
+                        <div
+                          key={veiculo.id}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (selectedVehicles.includes(veiculo.id)) {
+                              setSelectedVehicles(prev => prev.filter(id => id !== veiculo.id));
+                            } else {
+                              setSelectedVehicles(prev => [...prev, veiculo.id]);
+                            }
+                          }}
+                          className={`flex items-center space-x-2 p-2 cursor-pointer hover:bg-gray-50 ${
+                            selectedVehicles.includes(veiculo.id) ? 'bg-blue-50' : ''
+                          }`}
+                        >
+                          <div className={`w-3 h-3 rounded border flex items-center justify-center ${
                             selectedVehicles.includes(veiculo.id) 
                               ? 'bg-blue-500 border-blue-500' 
                               : 'border-gray-300'
                           }`}>
                             {selectedVehicles.includes(veiculo.id) && (
-                              <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
                             )}
                           </div>
                           <span className="text-sm font-medium">{veiculo.placa}</span>
+                          <span className="text-xs text-gray-500">{veiculo.marca}</span>
                         </div>
-                        <span className="text-xs text-gray-500">{veiculo.marca} {veiculo.modelo}</span>
-                      </div>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                {selectedVehicles.length > 1 && formNovaDespesa.watch('valor') && (
-                  <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
-                    <span className="font-medium">{selectedVehicles.length} veículos selecionados</span>
-                    {' • '}
-                    <span>R$ {
-                      (parseFloat(formNovaDespesa.watch('valor').toString().replace(',', '.')) / selectedVehicles.length).toFixed(2)
-                    } por veículo</span>
-                  </div>
-                )}
-              </div>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  {selectedVehicles.length > 1 && formNovaDespesa.watch('valor') && (
+                    <div className="text-xs text-gray-600 bg-gray-50 p-1 rounded">
+                      <span>{selectedVehicles.length} veículos • R$ {
+                        (parseFloat(formNovaDespesa.watch('valor').toString().replace(',', '.')) / selectedVehicles.length).toFixed(2)
+                      } cada</span>
+                    </div>
+                  )}
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={formNovaDespesa.control}
                   name="categoria"
@@ -2137,7 +2133,7 @@ export default function RelatoriosFinanceiros() {
                       <FormLabel>Categoria</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="h-9">
                             <SelectValue placeholder="Selecione uma categoria" />
                           </SelectTrigger>
                         </FormControl>
