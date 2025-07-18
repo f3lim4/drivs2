@@ -2044,63 +2044,40 @@ export default function RelatoriosFinanceiros() {
                   const categoriasOrdenadas = Object.entries(categorias).sort(([,a], [,b]) => b - a);
                   
                   return totalDespesasFixas > 0 && (
-                    <div className="space-y-4">
-                      {categoriasOrdenadas.map(([categoria, valor]) => {
-                        const percentual = (valor / totalDespesasFixas) * 100;
-                        
-                        // Cores específicas por categoria
-                        const corBg = categoria === 'IPVA' ? 'bg-yellow-50' :
-                                     categoria === 'Seguro' ? 'bg-green-50' :
-                                     categoria === 'Rastreador' ? 'bg-indigo-50' :
-                                     categoria === 'Financiamento' ? 'bg-pink-50' :
-                                     'bg-gray-50';
-                        
-                        const corTexto = categoria === 'IPVA' ? 'text-yellow-700' :
-                                        categoria === 'Seguro' ? 'text-green-700' :
-                                        categoria === 'Rastreador' ? 'text-indigo-700' :
-                                        categoria === 'Financiamento' ? 'text-pink-700' :
-                                        'text-gray-700';
-                        
-                        const corValor = categoria === 'IPVA' ? 'text-yellow-600' :
-                                        categoria === 'Seguro' ? 'text-green-600' :
-                                        categoria === 'Rastreador' ? 'text-indigo-600' :
-                                        categoria === 'Financiamento' ? 'text-pink-600' :
-                                        'text-gray-600';
-                        
-                        const corBarra = categoria === 'IPVA' ? 'bg-yellow-500' :
-                                        categoria === 'Seguro' ? 'bg-green-500' :
-                                        categoria === 'Rastreador' ? 'bg-indigo-500' :
-                                        categoria === 'Financiamento' ? 'bg-pink-500' :
-                                        'bg-gray-500';
-                        
-                        return (
-                          <div key={categoria} className={`flex justify-between items-center p-4 ${corBg} rounded-lg border`}>
-                            <div className="flex-1">
-                              <div className="flex justify-between items-center mb-2">
-                                <p className={`font-medium ${corTexto}`}>{categoria}</p>
-                                <div className="text-right">
-                                  <p className={`font-bold ${corValor}`}>{formatCurrency(valor)}</p>
-                                  <p className="text-sm text-gray-600">{percentual.toFixed(1)}%</p>
+                    <div className="bg-red-50 p-6 rounded-lg border border-red-200">
+                      <div className="space-y-3">
+                        {categoriasOrdenadas.map(([categoria, valor]) => {
+                          const percentual = (valor / totalDespesasFixas) * 100;
+                          
+                          return (
+                            <div key={categoria} className="flex justify-between items-center p-3 bg-white rounded-md border border-red-100">
+                              <div className="flex-1">
+                                <div className="flex justify-between items-center mb-2">
+                                  <p className="font-medium text-red-700">{categoria}</p>
+                                  <div className="text-right">
+                                    <p className="font-bold text-red-600">{formatCurrency(valor)}</p>
+                                    <p className="text-sm text-red-500">{percentual.toFixed(1)}%</p>
+                                  </div>
+                                </div>
+                                <div className="w-full bg-red-100 rounded-full h-2">
+                                  <div 
+                                    className="bg-red-500 h-2 rounded-full transition-all duration-300"
+                                    style={{ width: `${percentual}%` }}
+                                  />
                                 </div>
                               </div>
-                              <div className="w-full bg-white bg-opacity-50 rounded-full h-2">
-                                <div 
-                                  className={`${corBarra} h-2 rounded-full transition-all duration-300`}
-                                  style={{ width: `${percentual}%` }}
-                                />
-                              </div>
                             </div>
+                          );
+                        })}
+                        <div className="flex justify-between items-center p-4 bg-red-100 rounded-lg border-2 border-red-300 mt-4">
+                          <div>
+                            <p className="font-bold text-red-800">TOTAL DESPESAS FIXAS</p>
+                            <p className="text-sm text-red-600">Soma de todas as categorias fixas</p>
                           </div>
-                        );
-                      })}
-                      <div className="flex justify-between items-center p-4 bg-gray-100 rounded-lg border-2 border-gray-300 mt-4">
-                        <div>
-                          <p className="font-bold text-gray-800">TOTAL DESPESAS FIXAS</p>
-                          <p className="text-sm text-gray-600">Soma de todas as categorias fixas</p>
+                          <p className="text-xl font-bold text-red-700">
+                            {formatCurrency(totalDespesasFixas)}
+                          </p>
                         </div>
-                        <p className="text-xl font-bold text-red-600">
-                          {formatCurrency(totalDespesasFixas)}
-                        </p>
                       </div>
                     </div>
                   );
