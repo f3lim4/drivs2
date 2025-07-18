@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Fotos de Perfil dos Motoristas - CONCLUÍDO
+- ✅ **Avatar dinâmico implementado** - Exibe foto de perfil quando disponível (imagem1)
+- ✅ **Fallback para iniciais** - Mostra primeira letra do nome quando não há foto
+- ✅ **Tratamento de erro** - Se imagem não carregar, volta automaticamente para iniciais
+- ✅ **Integração com uploads** - Utiliza sistema de upload existente (/uploads/)
+- ✅ **Visual aprimorado** - Avatar circular com foto real do motorista
+- ✅ **Experiência personalizada** - Identificação visual instantânea dos motoristas
+
 ### 2025-07-18: Ícones dos Veículos com Cores Dinâmicas - CONCLUÍDO
 - ✅ **Função de mapeamento de cores** - getVehicleIconColor() criada para mapear cores dos veículos
 - ✅ **10 cores específicas mapeadas** - Branco, Preto, Prata, Cinza, Azul, Vermelho, Verde, Bege, Amarelo, Marrom
