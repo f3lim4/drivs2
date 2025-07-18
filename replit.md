@@ -10,13 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-18: Coluna Forma de Pagamento no Histórico de Despesas - CONCLUÍDO
-- ✅ **Coluna "Forma de Pagamento" adicionada** - Nova coluna na tabela do histórico de despesas
-- ✅ **Formas de pagamento por tipo** - Despesas fixas: Boleto (IPVA/Seguro), Débito Automático (Rastreador/Financiamento)
-- ✅ **Integração com manutenções** - Exibe forma de pagamento das manutenções quando informada
-- ✅ **Despesas manuais** - Mostra forma de pagamento cadastrada ou "Não informado"
-- ✅ **Badge visual** - Forma de pagamento exibida em badge outline para melhor visualização
-- ✅ **Tabela otimizada** - Colspan ajustado para acomodar nova coluna
+### 2025-07-18: Container de Resumo por Formas de Pagamento - CONCLUÍDO
+- ✅ **Container de resumo implementado** - Card dedicado mostrando distribuição por formas de pagamento
+- ✅ **Valores e percentuais** - Cada forma de pagamento mostra valor total e percentual do total
+- ✅ **Integração completa** - Inclui despesas fixas, manutenções e despesas manuais
+- ✅ **Formas automáticas** - Despesas fixas: Boleto (IPVA/Seguro), Débito Automático (Rastreador/Financiamento)
+- ✅ **Cores diferenciadas** - Cada forma tem cor específica (PIX verde, Cartão azul, Dinheiro verde, etc.)
+- ✅ **Barras de progresso** - Indicadores visuais do percentual de cada forma
+- ✅ **Ordenação por valor** - Formas ordenadas da maior para menor valor
+- ✅ **Layout responsivo** - Grid adaptável para diferentes tamanhos de tela
 
 ### 2025-07-18: Otimização Final da Interface de Relatórios Financeiros - CONCLUÍDO
 - ✅ **Cards pequenos removidos** - Eliminados 4 cards pequenos que ficavam no topo da aba "Despesas" (Receitas Totais, Despesas Totais, Lucro Líquido, Aluguéis Ativos)
