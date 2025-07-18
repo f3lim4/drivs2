@@ -13,12 +13,17 @@ export function useAtividades() {
         throw new Error('Locadora ID is required');
       }
       
+      console.log('useAtividades - Fazendo requisição para:', `/api/atividades?locadoraId=${profile.locadoraId}`);
+      
       const response = await fetch(`/api/atividades?locadoraId=${profile.locadoraId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch atividades');
       }
       
-      return response.json() as Promise<Atividade[]>;
+      const data = await response.json() as Atividade[];
+      console.log('useAtividades - Dados recebidos:', data);
+      
+      return data;
     },
     enabled: !!profile?.locadoraId,
     staleTime: 30 * 1000, // 30 segundos

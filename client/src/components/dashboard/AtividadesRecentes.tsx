@@ -96,6 +96,14 @@ const formatActionText = (acao: string, entidade: string, detalhes?: string) => 
 
 export function AtividadesRecentes() {
   const { data: atividades, isLoading, error } = useAtividades();
+  
+  // Debug log para verificar dados
+  console.log('AtividadesRecentes - Debug:', {
+    isLoading,
+    error,
+    atividades,
+    length: atividades?.length
+  });
 
   if (isLoading) {
     return (
