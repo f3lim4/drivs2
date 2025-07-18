@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Validações Avançadas de Motoristas - CONCLUÍDO
+- ✅ **Validação de idade** - Data de nascimento deve resultar em idade entre 18 e 80 anos
+- ✅ **Validação de CPF** - Implementada validação matemática completa de CPF brasileiro
+- ✅ **Validação de CNH** - Implementada validação matemática completa de CNH brasileira
+- ✅ **Placeholder categoria** - Campo categoria agora mostra "Selecionar" em vez de placeholder específico
+- ✅ **Validação de CNH vencimento** - CNH não pode estar vencida na data atual
+- ✅ **Funções de validação** - Implementadas funções específicas para cada tipo de validação
+- ✅ **Aplicado em ambos modais** - Validações funcionam em cadastro e edição de motoristas
+- ✅ **Schema atualizado** - Validações Zod com funções refinadas para cada campo
+- ✅ **Mensagens de erro** - Mensagens claras para cada tipo de validação falha
+- ✅ **Cálculo de idade** - Função precisa considerando anos, meses e dias
+
 ### 2025-07-18: Campo Complemento e Reorganização do Endereço - CONCLUÍDO
 - ✅ **Campo complemento adicionado** - Novo campo opcional para apartamento, casa, bloco, etc.
 - ✅ **CEP reposicionado** - Campo CEP agora aparece primeiro no formulário de endereço
