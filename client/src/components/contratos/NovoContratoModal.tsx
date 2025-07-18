@@ -48,6 +48,8 @@ import { generateId } from '@/utils/formatters';
 import { useAuth } from '@/hooks/useAuth';
 import { useContratos } from '../../hooks/useContratos';
 import { useTemplateContratos } from '../../hooks/useTemplateContratos';
+import { registrarAtividade } from '@/utils/activityLogger';
+import { useToast } from '@/hooks/use-toast';
 
 // Schema de validação
 const contratoSchema = z.object({
@@ -80,6 +82,7 @@ export function NovoContratoModal({
   const [loadingData, setLoadingData] = useState(true);
   const { profile } = useAuth();
   const userProfile = profile;
+  const { toast } = useToast();
   
   // Hook para gerenciar contratos
   const { createContrato } = useContratos();
@@ -315,6 +318,16 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
       // Usa o hook para criar o contrato
       const contratoCriado = await createContrato.mutateAsync(novoContrato);
       
+      // Log da atividade
+      await registrarAtividade(
+        profile?.locadoraId || '',
+        profile?.email || 'usuario@drivs.me',
+        'cadastrar',
+        'contrato',
+        contratoCriado.id,
+        `Novo contrato gerado: ${aluguel.motoristaNome} - ${aluguel.veiculoModelo} (${aluguel.veiculoPlaca})`
+      );
+
       onContratoGerado(contratoCriado);
       onOpenChange(false);
       form.reset({

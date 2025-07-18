@@ -36,6 +36,7 @@ import { NovoMotoristaModal } from '@/components/motoristas/NovoMotoristaModal';
 import { EditarMotoristaModal } from '@/components/motoristas/EditarMotoristaModal';
 import { ExcluirMotoristaDialog } from '@/components/motoristas/ExcluirMotoristaDialog';
 import { VisualizarMotoristaModal } from '@/components/motoristas/VisualizarMotoristaModal';
+import { registrarAtividade } from '@/utils/activityLogger';
 
 
 import { Motorista } from '@/types';
@@ -195,6 +196,16 @@ export default function Motoristas() {
   const handleConfirmarExclusao = async (motorista: Motorista) => {
     try {
       await deleteMotorista.mutateAsync(motorista.id);
+
+      // Log da atividade
+      await registrarAtividade(
+        profile.locadoraId,
+        profile.email || 'usuario@drivs.me',
+        'excluir',
+        'motorista',
+        motorista.id,
+        `Motorista excluído: ${motorista.nome} (CPF: ${motorista.cpf})`
+      );
       
       toast({
         title: "Motorista Excluído",

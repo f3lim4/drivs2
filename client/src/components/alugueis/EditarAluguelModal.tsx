@@ -45,6 +45,8 @@ import { cn } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Aluguel, Motorista, Veiculo } from '@/types';
 import { useAlugueis } from '@/hooks/useAlugueis';
+import { useAuth } from '@/hooks/useAuth';
+import { registrarAtividade } from '@/utils/activityLogger';
 import { useToast } from '@/hooks/use-toast';
 
 // Schema de validação
@@ -79,6 +81,7 @@ export function EditarAluguelModal({
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const { updateAluguel, isUpdating } = useAlugueis();
+  const { profile } = useAuth();
   const { toast } = useToast();
 
   const form = useForm<AluguelFormData>({
@@ -190,7 +193,17 @@ export function EditarAluguelModal({
       updateAluguel(
         { id: aluguel.id, updates: updateData },
         {
-          onSuccess: () => {
+          onSuccess: async () => {
+            // Log da atividade
+            await registrarAtividade(
+              profile?.locadoraId || '',
+              profile?.email || 'usuario@drivs.me',
+              'editar',
+              'aluguel',
+              aluguel.id,
+              `Aluguel editado: ${motorista.nome} - ${veiculo.marca} ${veiculo.modelo} (${veiculo.placa})`
+            );
+
             // Cria aluguel atualizado para o frontend
             const aluguelAtualizado: Aluguel = {
               ...aluguel,

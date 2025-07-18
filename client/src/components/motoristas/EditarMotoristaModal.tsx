@@ -36,6 +36,7 @@ import {
 import { Motorista } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { registrarAtividade } from '@/utils/activityLogger';
 import { Image, Upload, X, FileText, Eye } from 'lucide-react';
 
 // Funções de validação
@@ -376,6 +377,16 @@ export function EditarMotoristaModal({
       }
 
       const motoristaAtualizado = await response.json();
+
+      // Log da atividade
+      await registrarAtividade(
+        profile.locadoraId,
+        profile.email || 'usuario@drivs.me',
+        'atualizar',
+        'motorista',
+        motorista.id,
+        `Motorista atualizado: ${motoristaAtualizado.nome} (CPF: ${motoristaAtualizado.cpf})`
+      );
       
       // Upload das imagens se existirem
       const imagensParaUpload = Object.entries(imagens).filter(([_, file]) => file !== null);

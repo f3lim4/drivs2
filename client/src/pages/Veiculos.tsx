@@ -35,6 +35,7 @@ import { NovoVeiculoModal } from '@/components/veiculos/NovoVeiculoModal';
 import { EditarVeiculoModal } from '@/components/veiculos/EditarVeiculoModal';
 import { ExcluirVeiculoDialog } from '@/components/veiculos/ExcluirVeiculoDialog';
 import { VisualizarVeiculoModal } from '@/components/veiculos/VisualizarVeiculoModal';
+import { registrarAtividade } from '@/utils/activityLogger';
 
 import { Veiculo } from '@/types';
 import { CheckCircle, AlertTriangle, Wrench, BarChart3 } from 'lucide-react';
@@ -200,6 +201,16 @@ export default function Veiculos() {
       if (!response.ok) {
         throw new Error('Erro ao excluir veículo');
       }
+      
+      // Log da atividade
+      await registrarAtividade(
+        profile.locadoraId,
+        profile.email || 'usuario@drivs.me',
+        'excluir',
+        'veiculo',
+        veiculo.id,
+        `Veículo excluído: ${veiculo.marca} ${veiculo.modelo} (${veiculo.placa})`
+      );
       
       // Remove do estado local após sucesso na API
       removerVeiculo(veiculo.id);

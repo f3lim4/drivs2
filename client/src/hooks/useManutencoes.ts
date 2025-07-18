@@ -43,6 +43,22 @@ export function useManutencoes() {
       
       const result = await response.json();
       console.log('Resposta da API:', result);
+      
+      // Log da atividade
+      try {
+        const { registrarAtividade } = await import('@/utils/activityLogger');
+        await registrarAtividade(
+          data.locadoraId,
+          profile?.email || 'usuario@drivs.me',
+          'criar',
+          'manutencao',
+          result.id,
+          `Manutenção criada: ${data.tipo} - ${data.descricao}`
+        );
+      } catch (error) {
+        console.error('Erro ao registrar atividade:', error);
+      }
+      
       return result;
     },
     onSuccess: () => {
@@ -61,7 +77,24 @@ export function useManutencoes() {
       });
       
       if (!response.ok) throw new Error('Failed to update manutencao');
-      return response.json();
+      const result = await response.json();
+      
+      // Log da atividade
+      try {
+        const { registrarAtividade } = await import('@/utils/activityLogger');
+        await registrarAtividade(
+          data.locadoraId || profile?.locadoraId || '',
+          profile?.email || 'usuario@drivs.me',
+          'editar',
+          'manutencao',
+          id,
+          `Manutenção editada: ${data.tipo || 'manutenção'} - ${data.descricao || 'sem descrição'}`
+        );
+      } catch (error) {
+        console.error('Erro ao registrar atividade:', error);
+      }
+      
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['manutencoes'] });
