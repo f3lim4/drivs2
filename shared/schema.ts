@@ -117,6 +117,12 @@ export const motoristas = pgTable("motoristas", {
   // Status
   status: text("status").notNull().default("ativo"), // 'ativo', 'inativo', 'vencido'
   avatar: text("avatar"),
+  // Imagens do motorista (até 5 imagens)
+  imagem1: text("imagem1"),
+  imagem2: text("imagem2"),
+  imagem3: text("imagem3"),
+  imagem4: text("imagem4"),
+  imagem5: text("imagem5"),
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
