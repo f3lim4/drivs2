@@ -83,7 +83,7 @@ const veiculoSchema = z.object({
   // Status será controlado automaticamente
   
   // Campo condicional para limite específico
-  valorLimiteKm: z.number().optional(),
+  valorLimiteKm: z.number().nullable().optional(),
 });
 
 type VeiculoFormData = z.infer<typeof veiculoSchema>;
@@ -174,16 +174,7 @@ export function EditarVeiculoModal({
   }, [veiculo, open, form]);
 
   const onSubmit = async (data: VeiculoFormData) => {
-    console.log('=== INÍCIO DA FUNÇÃO onSubmit ===');
-    console.log('Veículo recebido:', veiculo);
-    
-    if (!veiculo) {
-      console.error('Erro: Veículo não encontrado');
-      return;
-    }
-
-    console.log('Iniciando edição do veículo:', veiculo.id);
-    console.log('Dados do formulário:', data);
+    if (!veiculo) return;
     
     setLoading(true);
     
@@ -220,8 +211,6 @@ export function EditarVeiculoModal({
         // Status não será enviado na edição
       };
 
-      console.log('Dados preparados para API:', veiculoData);
-
       // Fazer chamada à API
       const response = await fetch(`/api/veiculos/${veiculo.id}`, {
         method: 'PUT',
@@ -231,21 +220,16 @@ export function EditarVeiculoModal({
         body: JSON.stringify(veiculoData),
       });
 
-      console.log('Resposta da API:', response.status, response.statusText);
-
       if (!response.ok) {
         const error = await response.json();
-        console.error('Erro da API:', error);
         throw new Error(error.message || 'Erro ao atualizar veículo');
       }
 
       const veiculoAtualizado = await response.json();
-      console.log('Veículo atualizado:', veiculoAtualizado);
       onVeiculoEditado(veiculoAtualizado);
       onOpenChange(false);
       
     } catch (error) {
-      console.error('Erro ao editar veículo:', error);
       alert('Erro ao atualizar veículo: ' + (error.message || 'Erro desconhecido'));
     } finally {
       setLoading(false);
@@ -265,10 +249,7 @@ export function EditarVeiculoModal({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
-            console.log('Formulário possui erros:', errors);
-            console.log('Tentativa de submit com erros rejeitada');
-          })} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
@@ -864,14 +845,6 @@ export function EditarVeiculoModal({
               <Button 
                 type="submit" 
                 disabled={loading}
-                onClick={() => {
-                  console.log('Botão salvar clicado');
-                  console.log('Veículo sendo editado:', veiculo);
-                  console.log('Erros do formulário:', form.formState.errors);
-                  console.log('Dados do formulário antes do submit:', form.getValues());
-                  console.log('Formulário válido:', form.formState.isValid);
-                  console.log('Formulário foi submetido:', form.formState.isSubmitted);
-                }}
               >
                 {loading ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
