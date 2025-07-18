@@ -11,7 +11,7 @@ import * as z from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Upload, FileText, Loader2 } from 'lucide-react';
+// Imports de ícones removidos (não mais necessários)
 import {
   Dialog,
   DialogContent,
@@ -105,8 +105,6 @@ export function NovoVeiculoModal({
   onVeiculoAdicionado 
 }: NovoVeiculoModalProps) {
   const [loading, setLoading] = useState(false);
-  const [extractingData, setExtractingData] = useState(false);
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { profile } = useAuth();
   const { toast } = useToast();
 
@@ -143,101 +141,6 @@ export function NovoVeiculoModal({
       valorLimiteKm: '' as any,
     },
   });
-
-  // Função para lidar com o upload de PDF
-  const handlePdfUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type === 'application/pdf') {
-      setPdfFile(file);
-    } else {
-      toast({
-        title: "Erro no arquivo",
-        description: "Por favor, selecione um arquivo PDF válido",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Função para extrair dados do PDF
-  const extractDataFromPdf = async () => {
-    if (!pdfFile) {
-      toast({
-        title: "Nenhum arquivo selecionado",
-        description: "Por favor, selecione um arquivo PDF primeiro",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setExtractingData(true);
-    
-    try {
-      const formData = new FormData();
-      formData.append('pdf', pdfFile);
-
-      const response = await fetch('/api/veiculos/extrair-dados', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao extrair dados');
-      }
-
-      const result = await response.json();
-      
-      if (result.success && result.dados) {
-        // Preencher os campos do formulário com os dados extraídos
-        const dados = result.dados;
-        
-        // Mapear os dados para os campos do formulário
-        const formUpdates: Partial<VeiculoFormData> = {};
-        
-        if (dados.placa) formUpdates.placa = dados.placa;
-        if (dados.marca) formUpdates.marca = dados.marca;
-        if (dados.modelo) formUpdates.modelo = dados.modelo;
-        if (dados.ano) formUpdates.ano = dados.ano;
-        if (dados.cor) formUpdates.cor = dados.cor;
-        if (dados.renavam) formUpdates.renavam = dados.renavam;
-        if (dados.chassi) formUpdates.chassi = dados.chassi;
-        if (dados.categoria) formUpdates.categoria = dados.categoria;
-        if (dados.combustivel) formUpdates.combustivel = dados.combustivel;
-        if (dados.valorVeiculo) formUpdates.valorVeiculo = dados.valorVeiculo;
-        if (dados.valorIpva) formUpdates.ipva = dados.valorIpva;
-        if (dados.valorSeguro) formUpdates.valorSeguroMensal = dados.valorSeguro;
-        if (dados.valorRastreador) formUpdates.valorRastreadorMensal = dados.valorRastreador;
-        if (dados.dataCompra) formUpdates.dataCompra = dados.dataCompra;
-
-        // Atualizar os campos do formulário
-        Object.entries(formUpdates).forEach(([key, value]) => {
-          if (value !== null && value !== undefined) {
-            form.setValue(key as keyof VeiculoFormData, value);
-          }
-        });
-
-        const isSimulated = result.message && result.message.includes('simulados');
-        
-        toast({
-          title: isSimulated ? "Dados simulados gerados!" : "Dados extraídos com sucesso!",
-          description: isSimulated ? 
-            "Os campos foram preenchidos com dados simulados (OpenAI não configurada)" :
-            "Os campos foram preenchidos automaticamente com as informações do documento",
-        });
-      } else {
-        throw new Error('Não foi possível extrair os dados do documento');
-      }
-    } catch (error) {
-      console.error('Erro ao extrair dados do PDF:', error);
-      toast({
-        title: "Erro ao extrair dados",
-        description: error instanceof Error ? error.message : "Erro desconhecido",
-        variant: "destructive",
-      });
-    } finally {
-      setExtractingData(false);
-    }
-  };
 
   const onSubmit = async (data: VeiculoFormData) => {
     setLoading(true);
@@ -347,52 +250,6 @@ export function NovoVeiculoModal({
             Preencha as informações do novo veículo para adicioná-lo à frota.
           </DialogDescription>
         </DialogHeader>
-
-        {/* SEÇÃO DE UPLOAD DE PDF */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <h3 className="text-sm font-medium text-blue-900 mb-2">Preencher Automaticamente</h3>
-          <p className="text-xs text-blue-700 mb-3">
-            Faça upload do documento do veículo (CRLV/CRV/DUT) para preencher automaticamente os campos
-          </p>
-          
-          <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handlePdfUpload}
-                className="hidden"
-                id="pdf-upload"
-              />
-              <label
-                htmlFor="pdf-upload"
-                className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
-              >
-                <Upload className="h-4 w-4" />
-                {pdfFile ? pdfFile.name : 'Selecionar PDF'}
-              </label>
-            </div>
-            
-            <Button
-              type="button"
-              onClick={extractDataFromPdf}
-              disabled={!pdfFile || extractingData}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-            >
-              {extractingData ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Extraindo...
-                </>
-              ) : (
-                <>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Extrair Dados
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
