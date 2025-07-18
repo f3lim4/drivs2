@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Sistema de Seleção Multi-Veículo para Empréstimos - CONCLUÍDO
+- ✅ **Categoria "Empréstimo" adicionada** - Nova opção no modal de despesas da página de relatórios financeiros
+- ✅ **Interface de seleção múltipla** - Checkboxes para selecionar um ou mais veículos quando categoria é "empréstimo"
+- ✅ **Botão "Selecionar Todos"** - Permite marcar/desmarcar todos os veículos de uma vez
+- ✅ **Divisão automática de valor** - Valor total é dividido automaticamente pelo número de veículos selecionados
+- ✅ **Cálculo em tempo real** - Mostra valor total, valor por veículo e número de veículos selecionados
+- ✅ **Validação de formulário** - Obrigatório selecionar pelo menos um veículo para categoria empréstimo
+- ✅ **Criação múltipla de despesas** - Sistema cria uma despesa para cada veículo selecionado com valor dividido
+- ✅ **Limpeza automática** - Seleção de veículos é limpa quando categoria muda ou modal é fechado
+- ✅ **Feedback detalhado** - Toast mostra quantas despesas foram criadas e valor individual
+- ✅ **Descrição enriquecida** - Cada despesa inclui informação sobre divisão (ex: "3 veículos - R$ 100,00 cada")
+
 ### 2025-07-17: Verificação de Integridade e Limpeza do Sistema - CONCLUÍDO
 - ✅ **Páginas duplicadas eliminadas** - Removida AlugueisNovo.tsx que causava conflitos de roteamento
 - ✅ **App.tsx corrigido** - Referências de importação atualizadas para usar páginas corretas
