@@ -34,9 +34,9 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
   const { toast } = useToast();
   const { profile } = useAuth();
 
-  if (!motorista) return null;
-
   const isLocadora = profile?.tipo === 'locadora';
+
+  if (!motorista) return null;
 
   // Carregar imagens do motorista
   useEffect(() => {
