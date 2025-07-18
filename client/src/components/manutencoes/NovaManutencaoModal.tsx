@@ -361,12 +361,23 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="proximaManutencao">Próxima Manutenção (km)</Label>
+                    <Label htmlFor="proximaManutencaoKm">Próxima Manutenção (km) - Opcional</Label>
+                    <Input
+                      id="proximaManutencaoKm"
+                      type="number"
+                      {...form.register('proximaManutencaoKm', { valueAsNumber: true })}
+                      placeholder="Ex: 80000"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="proximaManutencao">Próxima Manutenção (Data) - Opcional</Label>
                     <Input
                       id="proximaManutencao"
-                      type="number"
-                      {...form.register('proximaManutencao', { valueAsNumber: true })}
-                      placeholder="0"
+                      type="date"
+                      {...form.register('proximaManutencao')}
                     />
                   </div>
                 </div>

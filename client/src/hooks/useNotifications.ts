@@ -192,7 +192,18 @@ export function useNotifications() {
       tipoManutencao: m.tipoManutencao,
       dataAgendada: m.dataAgendada,
       dataInicio: m.dataInicio,
-      dataFinalizacao: m.dataFinalizacao
+      dataFinalizacao: m.dataFinalizacao,
+      proximaManutencao: m.proximaManutencao,
+      proximaManutencaoKm: m.proximaManutencaoKm,
+      veiculoId: m.veiculoId
+    })));
+
+    console.log('Notificações - Veículos disponíveis:', veiculos.map(v => ({
+      id: v.id,
+      placa: v.placa,
+      marca: v.marca,
+      modelo: v.modelo,
+      quilometragem: v.quilometragem
     })));
     
     manutencoes.forEach((manutencao: any) => {
@@ -244,6 +255,119 @@ export function useNotifications() {
             timestamp: dataFinalizacao,
             isRead: false,
           });
+        }
+      }
+
+      // Verificar próximas manutenções programadas (apenas para manutenções concluídas)
+      if (manutencao.status === 'concluida') {
+        const veiculo = veiculos.find((v: any) => v.id === manutencao.veiculoId);
+        
+        if (veiculo) {
+          // Verificar manutenção por data
+          if (manutencao.proximaManutencao) {
+            const dataProximaManutencao = new Date(manutencao.proximaManutencao);
+            const diasParaManutencao = differenceInDays(dataProximaManutencao, today);
+
+            console.log(`Notificações - Alerta por data: Veículo ${veiculo.placa}, próxima em ${diasParaManutencao} dias`);
+
+            if (diasParaManutencao <= 15 && diasParaManutencao > 7) {
+              notifications.push({
+                id: `manutencao-data-aviso-${manutencao.id}`,
+                type: 'warning',
+                title: 'Manutenção Programada se Aproxima',
+                message: `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa}) - Manutenção programada para ${format(dataProximaManutencao, 'dd/MM/yyyy', { locale: ptBR })} (em ${diasParaManutencao} dias)`,
+                timestamp: new Date(),
+                isRead: false,
+              });
+            } else if (diasParaManutencao <= 7 && diasParaManutencao > 0) {
+              notifications.push({
+                id: `manutencao-data-urgente-${manutencao.id}`,
+                type: 'danger',
+                title: 'Manutenção Urgente',
+                message: `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa}) - Manutenção urgente em ${diasParaManutencao} dias (${format(dataProximaManutencao, 'dd/MM/yyyy', { locale: ptBR })})`,
+                timestamp: new Date(),
+                isRead: false,
+              });
+            } else if (diasParaManutencao <= 0) {
+              notifications.push({
+                id: `manutencao-data-vencida-${manutencao.id}`,
+                type: 'danger',
+                title: 'Manutenção Vencida',
+                message: `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa}) - Manutenção estava programada para ${format(dataProximaManutencao, 'dd/MM/yyyy', { locale: ptBR })} (${Math.abs(diasParaManutencao)} dias em atraso)`,
+                timestamp: new Date(),
+                isRead: false,
+              });
+            }
+          }
+
+          // Verificar manutenção por quilometragem
+          if (manutencao.proximaManutencaoKm && veiculo.quilometragem) {
+            const kmRestantes = manutencao.proximaManutencaoKm - veiculo.quilometragem;
+
+            console.log(`Notificações - Alerta por KM: Veículo ${veiculo.placa}, restam ${kmRestantes}km (atual: ${veiculo.quilometragem}, próxima: ${manutencao.proximaManutencaoKm})`);
+
+            if (kmRestantes <= 5000 && kmRestantes > 1000) {
+              notifications.push({
+                id: `manutencao-km-aviso-${manutencao.id}`,
+                type: 'warning',
+                title: 'Manutenção por Quilometragem se Aproxima',
+                message: `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa}) - Restam ${kmRestantes.toLocaleString()}km para próxima manutenção (${manutencao.proximaManutencaoKm.toLocaleString()}km)`,
+                timestamp: new Date(),
+                isRead: false,
+              });
+            } else if (kmRestantes <= 1000 && kmRestantes > 0) {
+              notifications.push({
+                id: `manutencao-km-urgente-${manutencao.id}`,
+                type: 'danger',
+                title: 'Manutenção por Quilometragem Urgente',
+                message: `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa}) - URGENTE: Apenas ${kmRestantes.toLocaleString()}km restantes para manutenção (${manutencao.proximaManutencaoKm.toLocaleString()}km)`,
+                timestamp: new Date(),
+                isRead: false,
+              });
+            } else if (kmRestantes <= 0) {
+              notifications.push({
+                id: `manutencao-km-critica-${manutencao.id}`,
+                type: 'danger',
+                title: 'Manutenção por Quilometragem Crítica',
+                message: `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa}) - CRÍTICO: Quilometragem de manutenção ultrapassada (atual: ${veiculo.quilometragem.toLocaleString()}km, deveria ser: ${manutencao.proximaManutencaoKm.toLocaleString()}km)`,
+                timestamp: new Date(),
+                isRead: false,
+              });
+            }
+          }
+        }
+      }
+
+      // Verificar manutenção por quilometragem (se houver dados do veículo) - código antigo a ser removido
+      if (false && manutencao.proximaManutencaoKm) {
+        const veiculo = veiculos.find((v: any) => v.id === manutencao.veiculoId);
+        if (veiculo && veiculo.quilometragem) {
+          const kmAtual = parseInt(veiculo.quilometragem) || 0;
+          const kmManutencao = parseInt(manutencao.proximaManutencaoKm) || 0;
+          const kmRestantes = kmManutencao - kmAtual;
+          
+          // Alertar quando restam 5000km ou menos
+          if (kmRestantes <= 5000 && kmRestantes > 0) {
+            const placaVeiculo = `${veiculo.placa} (${veiculo.marca} ${veiculo.modelo})`;
+            notifications.push({
+              id: `manutencao-km-${manutencao.id}`,
+              type: kmRestantes <= 1000 ? 'danger' : 'warning',
+              title: kmRestantes <= 1000 ? 'Manutenção Urgente (KM)' : 'Manutenção Próxima (KM)',
+              message: `Veículo ${placaVeiculo} precisa de manutenção em ${kmRestantes.toLocaleString()} km`,
+              timestamp: new Date(Date.now() - Math.random() * 3600000),
+              isRead: false,
+            });
+          } else if (kmRestantes <= 0) {
+            const placaVeiculo = `${veiculo.placa} (${veiculo.marca} ${veiculo.modelo})`;
+            notifications.push({
+              id: `manutencao-atrasada-${manutencao.id}`,
+              type: 'danger',
+              title: 'Manutenção Atrasada',
+              message: `Veículo ${placaVeiculo} ultrapassou ${Math.abs(kmRestantes).toLocaleString()} km da manutenção programada`,
+              timestamp: new Date(Date.now() - Math.random() * 3600000),
+              isRead: false,
+            });
+          }
         }
       }
     });

@@ -359,7 +359,8 @@ export const manutencoes = pgTable("manutencoes", {
   
   // Observações
   pecasSubstituidas: text("pecas_substituidas"), // Lista de peças
-  proximaManutencao: date("proxima_manutencao"),
+  proximaManutencao: date("proxima_manutencao"), // Data da próxima manutenção
+  proximaManutencaoKm: integer("proxima_manutencao_km"), // Quilometragem da próxima manutenção
   
   // Controle interno
   createdAt: timestamp("created_at").defaultNow().notNull(),
