@@ -36,8 +36,6 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
 
   const isLocadora = profile?.tipo === 'locadora';
 
-  if (!motorista) return null;
-
   // Carregar imagens do motorista
   useEffect(() => {
     if (!motorista || !open) return;
@@ -59,6 +57,8 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
 
     carregarImagens();
   }, [motorista, open]);
+
+  if (!motorista) return null;
 
   // Função para upload de imagens
   const handleImageUpload = async (files: FileList | null) => {
