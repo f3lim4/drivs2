@@ -35,6 +35,8 @@ import {
 import { Motorista } from '@/types';
 import { generateId } from '@/utils/formatters';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { Image, Upload, X } from 'lucide-react';
 
 // Schema de validação baseado no schema do banco
 const motoristaSchema = z.object({
@@ -79,7 +81,10 @@ export function NovoMotoristaModal({
   onMotoristaAdicionado 
 }: NovoMotoristaModalProps) {
   const [loading, setLoading] = useState(false);
+  const [imagens, setImagens] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const { profile } = useAuth();
+  const { toast } = useToast();
 
   const form = useForm<MotoristaFormData>({
     resolver: zodResolver(motoristaSchema),
@@ -103,13 +108,71 @@ export function NovoMotoristaModal({
     },
   });
 
+  // Função para adicionar imagens
+  const handleImageUpload = (files: FileList | null) => {
+    if (!files) return;
+    
+    const newImages = Array.from(files);
+    const totalImages = imagens.length + newImages.length;
+    
+    if (totalImages > 5) {
+      toast({
+        title: "Limite de imagens",
+        description: "Você pode adicionar no máximo 5 imagens por motorista",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validar tipo e tamanho das imagens
+    const validImages = newImages.filter(file => {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Formato inválido",
+          description: `${file.name} não é uma imagem válida`,
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        toast({
+          title: "Arquivo muito grande",
+          description: `${file.name} é maior que 5MB`,
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      return true;
+    });
+    
+    if (validImages.length === 0) return;
+    
+    setImagens(prev => [...prev, ...validImages]);
+    
+    // Criar previews
+    validImages.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setImagePreviews(prev => [...prev, e.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Função para remover imagem
+  const handleRemoveImage = (index: number) => {
+    setImagens(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
   const onSubmit = async (data: MotoristaFormData) => {
     setLoading(true);
     
     try {
-      // Debug: Log dos dados do formulário
-      console.log('[DEBUG] NovoMotoristaModal - Dados do formulário:', data);
-      
       // Preparar dados para envio à API
       const motoristaData = {
         id: data.cpf.replace(/\D/g, ''), // Usar CPF limpo como ID
@@ -132,10 +195,7 @@ export function NovoMotoristaModal({
         status: data.status,
       };
 
-      // Debug: Log dos dados preparados
-      console.log('[DEBUG] NovoMotoristaModal - Dados preparados para API:', motoristaData);
-
-      // Enviar para API
+      // Enviar dados do motorista
       const response = await fetch('/api/motoristas', {
         method: 'POST',
         headers: {
@@ -151,12 +211,49 @@ export function NovoMotoristaModal({
 
       const novoMotorista = await response.json();
       
-      // Debug: Log da resposta da API
-      console.log('[DEBUG] NovoMotoristaModal - Resposta da API:', novoMotorista);
+      // Upload das imagens se houver
+      if (imagens.length > 0) {
+        try {
+          const formData = new FormData();
+          formData.append('motoristaId', novoMotorista.id);
+          
+          imagens.forEach((file, index) => {
+            formData.append(`imagem${index + 1}`, file);
+          });
+          
+          const uploadResponse = await fetch('/api/motoristas/upload-imagens', {
+            method: 'POST',
+            body: formData,
+          });
+          
+          if (!uploadResponse.ok) {
+            throw new Error('Erro ao fazer upload das imagens');
+          }
+          
+          toast({
+            title: "Motorista cadastrado com sucesso!",
+            description: `${imagens.length} imagem(s) enviada(s)`,
+          });
+        } catch (uploadError) {
+          console.error('Erro no upload das imagens:', uploadError);
+          toast({
+            title: "Motorista cadastrado",
+            description: "Mas houve erro no upload das imagens. Você pode tentar novamente.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Motorista cadastrado com sucesso!",
+          description: "Motorista adicionado ao sistema",
+        });
+      }
       
       onMotoristaAdicionado(novoMotorista);
       onOpenChange(false);
       form.reset();
+      setImagens([]);
+      setImagePreviews([]);
       
     } catch (error) {
       console.error('Erro ao cadastrar motorista:', error);
@@ -482,6 +579,74 @@ export function NovoMotoristaModal({
                     </FormItem>
                   )}
                 />
+              </div>
+            </div>
+
+            {/* IMAGENS */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                Imagens (Opcional)
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Adicionar Imagens ({imagens.length}/5)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => handleImageUpload(e.target.files)}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*';
+                          input.multiple = true;
+                          input.onchange = (e) => handleImageUpload((e.target as HTMLInputElement).files);
+                          input.click();
+                        }}
+                      >
+                        <Upload className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Máximo 5 imagens, até 5MB cada. Formatos: JPG, PNG
+                    </p>
+                  </div>
+                </div>
+
+                {/* Preview das imagens */}
+                {imagePreviews.length > 0 && (
+                  <div className="grid grid-cols-3 gap-4">
+                    {imagePreviews.map((preview, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6"
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
