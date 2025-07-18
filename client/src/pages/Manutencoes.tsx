@@ -35,7 +35,7 @@ import { formatDate } from '@/lib/utils';
 import type { Manutencao, Local } from '@shared/schema';
 
 export default function Manutencoes() {
-  const { manutencoes, isLoading, deleteManutencao, isDeleting } = useManutencoes();
+  const { manutencoes, isLoading, deleteManutencao, isDeleting, updateManutencao } = useManutencoes();
   const { locais, isLoading: isLoadingLocais, deleteLocal } = useLocais();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,6 +71,17 @@ export default function Manutencoes() {
       await deleteLocal(confirmDeleteLocal.id);
       setConfirmDeleteLocal({ open: false, id: null });
     }
+  };
+
+  const handleMarcarConcluida = async (manutencao: Manutencao) => {
+    const dadosAtualizados = {
+      id: manutencao.id,
+      status: 'concluida' as const,
+      dataConclusao: new Date().toISOString().split('T')[0]
+    };
+    
+    updateManutencao(dadosAtualizados);
+    setVisualizarManutencaoModal({ open: false, manutencao: null });
   };
 
   // Filtra e ordena manutenções baseado na busca e filtros
@@ -464,6 +475,7 @@ export default function Manutencoes() {
         open={visualizarManutencaoModal.open}
         onClose={() => setVisualizarManutencaoModal({ open: false, manutencao: null })}
         manutencao={visualizarManutencaoModal.manutencao}
+        onMarcarConcluida={handleMarcarConcluida}
       />
 
       <NovoLocalModal
