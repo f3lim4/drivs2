@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Gráfico de Análise por Categoria em Despesas Fixas - CONCLUÍDO
+- ✅ **Gráfico de análise por categoria adicionado** - Seção "Análise por Categoria" implementada na aba "Despesas Fixas"
+- ✅ **Distribuição visual completa** - Cada categoria (IPVA, Seguro, Rastreador, Financiamento) com valor e percentual
+- ✅ **Cores específicas por categoria** - Amarelo para IPVA, verde para seguro, índigo para rastreador, rosa para financiamento
+- ✅ **Barras de progresso dinâmicas** - Indicadores visuais proporcionais ao valor de cada categoria
+- ✅ **Ordenação automática** - Categorias ordenadas do maior para menor valor
+- ✅ **Total consolidado** - Card final mostrando soma total das despesas fixas
+- ✅ **Cálculo em tempo real** - Valores calculados automaticamente baseados no cadastro dos veículos
+
 ### 2025-07-18: Remoção do "Resumo por Formas de Pagamento" - CONCLUÍDO
 - ✅ **Seção "Resumo por Formas de Pagamento" removida** - Eliminada da aba "Despesas" conforme solicitação
 - ✅ **Interface simplificada** - Aba "Despesas" agora mostra apenas: Receitas por Tipo → Despesas por Categoria → Resumo das Despesas
