@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Campos de Upload Ultra-Compactos - CONCLUÍDO
+- ✅ **Layout em 4 colunas** - Grid expandido de 3 para 4 colunas para melhor aproveitamento de espaço
+- ✅ **Padding mínimo** - Reduzido de p-2 para p-1 em todos os containers de upload
+- ✅ **Espaçamento reduzido** - space-y-2 alterado para space-y-1 em todos os campos
+- ✅ **Ícones miniaturizados** - Reduzidos de h-6 w-6 para h-4 w-4 em todos os ícones de upload
+- ✅ **Previews compactas** - Imagens preview reduzidas de 16x16 para 12x12 pixels
+- ✅ **Labels minimalistas** - Fonte reduzida para text-xs e peso font-medium
+- ✅ **Textos otimizados** - "Clique para selecionar" simplificado para "Selecionar"
+- ✅ **Títulos compactos** - "Comprovante de Endereço" abreviado para "Comprovante"
+- ✅ **PDFs compactos** - Indicadores PDF reduzidos de 16x16 para 12x12 pixels
+- ✅ **Interface ultra-limpa** - Máxima compactação mantendo funcionalidade completa
+
 ### 2025-07-18: Interface de Edição de Motoristas Otimizada - CONCLUÍDO
 - ✅ **Modal de edição atualizado** - Agora usa o mesmo formato do modal de cadastro
 - ✅ **Sistema de upload completo** - Todos os 6 tipos de documentos disponíveis no modal de edição
