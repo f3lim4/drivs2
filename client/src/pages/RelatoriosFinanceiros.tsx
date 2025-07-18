@@ -1684,26 +1684,12 @@ export default function RelatoriosFinanceiros() {
                         });
                         
                         // Adicionar manutenções
-                        console.log('HISTÓRICO - Debug manutenções:', {
-                          totalManutencoes: filteredData.manutencoes.length,
-                          manutencoes: filteredData.manutencoes
-                        });
-                        
                         filteredData.manutencoes.forEach(manutencao => {
                           const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
                           const valor = manutencao.valorFinal || manutencao.valorOrcamento;
                           
-                          console.log('HISTÓRICO - Processando manutenção:', {
-                            id: manutencao.id,
-                            veiculoId: manutencao.veiculoId,
-                            veiculoEncontrado: !!veiculo,
-                            valorFinal: manutencao.valorFinal,
-                            valorOrcamento: manutencao.valorOrcamento,
-                            valorUsado: valor
-                          });
-                          
                           if (valor && parseFloat(valor) > 0) {
-                            const item = {
+                            todasDespesas.push({
                               id: `manutencao-${manutencao.id}`,
                               data: manutencao.dataInicio,
                               veiculo: veiculo,
@@ -1714,10 +1700,7 @@ export default function RelatoriosFinanceiros() {
                               status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente',
                               formaPagamento: manutencao.formaPagamento || 'Não informado',
                               createdAt: manutencao.createdAt || manutencao.dataInicio
-                            };
-                            
-                            console.log('HISTÓRICO - Adicionando item:', item);
-                            todasDespesas.push(item);
+                            });
                           }
                         });
                         
@@ -1738,13 +1721,7 @@ export default function RelatoriosFinanceiros() {
                           });
                         });
                         
-                        console.log('HISTÓRICO - Total final antes ordenação:', {
-                          total: todasDespesas.length,
-                          manutencoes: todasDespesas.filter(d => d.tipo === 'Manutenção').length,
-                          despesasFixas: todasDespesas.filter(d => d.tipo === 'Despesa Fixa').length,
-                          despesasManuais: todasDespesas.filter(d => d.tipo === 'Despesa Manual').length,
-                          tipos: [...new Set(todasDespesas.map(d => d.tipo))]
-                        });
+
                         
                         // Aplicar ordenação
                         todasDespesas.sort((a, b) => {
@@ -1773,10 +1750,13 @@ export default function RelatoriosFinanceiros() {
                           }
                         });
                         
+
                         // Aplicar paginação
                         const startIndex = (currentPageHistorico - 1) * itemsPerPageHistorico;
                         const endIndex = startIndex + itemsPerPageHistorico;
                         const paginatedDespesas = todasDespesas.slice(startIndex, endIndex);
+                        
+
                         
                         if (paginatedDespesas.length === 0) {
                           return (
