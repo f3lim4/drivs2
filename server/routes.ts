@@ -638,10 +638,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Nome do arquivo e dados são obrigatórios" });
       }
       
-      // Por simplicidade, vamos apenas salvar o nome do arquivo no banco
-      // Em produção, você salvaria o arquivo em um storage (AWS S3, etc.)
+      // Salvar arquivo no servidor
+      const fs = require('fs');
+      const path = require('path');
+      
+      // Criar diretório uploads se não existir
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      // Gerar nome único para o arquivo
+      const timestamp = Date.now();
+      const uniqueFileName = `${timestamp}_${fileName}`;
+      const filePath = path.join(uploadsDir, uniqueFileName);
+      
+      // Converter base64 para arquivo
+      const base64Data = fileData.replace(/^data:application\/pdf;base64,/, '');
+      fs.writeFileSync(filePath, base64Data, 'base64');
+      
       const updates = {
-        arquivoAssinado: fileName,
+        arquivoAssinado: uniqueFileName,
         dataAssinatura: new Date(),
       };
       
@@ -652,11 +669,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ 
         message: "Arquivo enviado com sucesso", 
-        fileName,
+        fileName: uniqueFileName,
+        originalName: fileName,
         uploadedAt: new Date().toISOString() 
       });
     } catch (error) {
       console.error("Error uploading contract file:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Endpoint para baixar/visualizar arquivo
+  app.get("/api/contratos/:id/download", async (req, res) => {
+    try {
+      const contratoId = req.params.id;
+      
+      // Buscar dados do contrato
+      const contrato = await storage.getContrato(contratoId);
+      if (!contrato || !contrato.arquivoAssinado) {
+        return res.status(404).json({ message: "Arquivo não encontrado" });
+      }
+      
+      const fs = require('fs');
+      const path = require('path');
+      
+      const filePath = path.join(process.cwd(), 'uploads', contrato.arquivoAssinado);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "Arquivo não encontrado no servidor" });
+      }
+      
+      // Definir headers para download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${contrato.arquivoAssinado}"`);
+      
+      // Enviar arquivo
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      
+    } catch (error) {
+      console.error("Error downloading contract file:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Endpoint para visualizar arquivo no navegador
+  app.get("/api/contratos/:id/view", async (req, res) => {
+    try {
+      const contratoId = req.params.id;
+      
+      // Buscar dados do contrato
+      const contrato = await storage.getContrato(contratoId);
+      if (!contrato || !contrato.arquivoAssinado) {
+        return res.status(404).json({ message: "Arquivo não encontrado" });
+      }
+      
+      const fs = require('fs');
+      const path = require('path');
+      
+      const filePath = path.join(process.cwd(), 'uploads', contrato.arquivoAssinado);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "Arquivo não encontrado no servidor" });
+      }
+      
+      // Definir headers para visualização
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline');
+      
+      // Enviar arquivo
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      
+    } catch (error) {
+      console.error("Error viewing contract file:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
