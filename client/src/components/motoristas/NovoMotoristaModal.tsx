@@ -434,7 +434,7 @@ export function NovoMotoristaModal({
             {/* CARTEIRA DE MOTORISTA */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="cnh"
@@ -481,21 +481,21 @@ export function NovoMotoristaModal({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <FormField
-                control={form.control}
-                name="vencimentoCnh"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Vencimento da CNH *</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="vencimentoCnh"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Vencimento da CNH *</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             {/* ENDEREÇO */}

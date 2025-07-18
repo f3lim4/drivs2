@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Sistema de Upload de Documentos Específicos - CONCLUÍDO
+- ✅ **Sistema de upload específico implementado** - Substituído upload genérico por campos específicos de documentos
+- ✅ **5 tipos de documentos organizados** - Foto de Perfil, CNH, Foto com CNH, Comprovante de Endereço e Foto Extra
+- ✅ **Validação por tipo de documento** - CNH e Comprovante aceitam PDF além de imagens
+- ✅ **Backend atualizado** - Endpoint modificado para trabalhar com campos específicos (upload.fields)
+- ✅ **Interface limpa implementada** - Títulos das seções removidos do modal de cadastro
+- ✅ **Layout otimizado** - CPF, RG e Data de Nascimento em uma linha (3 colunas)
+- ✅ **Campos CNH organizados** - Número da CNH, Categoria e Vencimento em uma linha (3 colunas)
+- ✅ **Mapeamento de campos** - Sistema mapeia fotoPerfil->imagem1, cnhImagem->imagem2, etc.
+- ✅ **Preview inteligente** - Mostra preview de imagens e indicador "PDF" para arquivos PDF
+- ✅ **Funções específicas** - handleImageUpload e handleRemoveImage adaptadas para campos específicos
+
 ### 2025-07-18: Sistema de Imagens Integrado ao Modal de Motoristas - CONCLUÍDO
 - ✅ **Modal de visualização unificado** - Motoristas agora têm um único botão "ver" que mostra todos os dados incluindo imagens
 - ✅ **Sistema de upload integrado** - Locadoras podem fazer upload de até 5 imagens por motorista no modal de visualização
