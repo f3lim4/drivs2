@@ -1247,59 +1247,7 @@ export default function RelatoriosFinanceiros() {
             </Card>
           </div>
 
-          {/* Detalhes das Despesas Manuais */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Despesas Manuais Detalhadas
-              </CardTitle>
-              <CardDescription>
-                Lista completa das despesas manuais do mês
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Categoria</TableHead>
-                      <TableHead>Descrição</TableHead>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Valor</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredData.despesasPeriodo
-                      .filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.categoria !== 'financiamento')
-                      .map((despesa) => (
-                        <TableRow key={despesa.id}>
-                          <TableCell>
-                            <Badge variant="secondary">
-                              {despesa.categoria}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>{despesa.descricao}</TableCell>
-                          <TableCell>{formatDate(despesa.data)}</TableCell>
-                          <TableCell className="text-red-600 font-semibold">
-                            {formatCurrency(parseFloat(despesa.valor || '0'))}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    {filteredData.despesasPeriodo
-                      .filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.categoria !== 'financiamento')
-                      .length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center text-gray-500 py-8">
-                          Nenhuma despesa manual encontrada no período
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+
         </TabsContent>
 
         <TabsContent value="veiculos" className="space-y-4">
