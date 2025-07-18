@@ -437,8 +437,8 @@ export default function Contratos() {
       {/* Filtros */}
       <Card className="bg-gray-50/50 border-gray-200">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-3 items-end">
-            <div className="space-y-2">
+          <div className="grid gap-4 md:grid-cols-4 items-end">
+            <div className="space-y-2 md:col-span-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
@@ -474,10 +474,10 @@ export default function Contratos() {
 
             <div className="space-y-2">
               <Button 
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-3 px-6 text-base font-semibold"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-2 px-4 text-sm"
                 onClick={() => setShowNovoContratoModal(true)}
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4" />
                 Gerar Contrato
               </Button>
             </div>
