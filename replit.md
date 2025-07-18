@@ -18,6 +18,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Interface limpa implementada** - Títulos das seções removidos do modal de cadastro
 - ✅ **Layout otimizado** - CPF, RG e Data de Nascimento em uma linha (3 colunas)
 - ✅ **Campos CNH organizados** - Número da CNH, Categoria e Vencimento em uma linha (3 colunas)
+- ✅ **Dropdown de estados implementado** - Campo estado como select com siglas em ordem alfabética
 - ✅ **Mapeamento de campos** - Sistema mapeia fotoPerfil->imagem1, cnhImagem->imagem2, etc.
 - ✅ **Preview inteligente** - Mostra preview de imagens e indicador "PDF" para arquivos PDF
 - ✅ **Funções específicas** - handleImageUpload e handleRemoveImage adaptadas para campos específicos
