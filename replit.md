@@ -11,10 +11,10 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes
 
 ### 2025-07-18: Remoção dos Cards de Resumo Financeiro - CONCLUÍDO
-- ✅ **Cards de resumo corretos removidos** - Eliminados cards "Receitas por Tipo" e "Despesas por Tipo" que ficavam DENTRO da aba "Despesas"
-- ✅ **Cards principais mantidos** - Preservados cards do topo da página (Receita Total, Despesas Totais, Lucro Líquido, Margem de Lucro)
-- ✅ **Interface simplificada** - Aba "Despesas" agora direcionada para a aba "Histórico" com dados completos
-- ✅ **Preferência do usuário atendida** - Removidos cards detalhados internos, mantidos resumos principais
+- ✅ **Cards pequenos removidos** - Eliminados 4 cards pequenos que ficavam no topo da aba "Despesas" (Receitas Totais, Despesas Totais, Lucro Líquido, Aluguéis Ativos)
+- ✅ **Cards principais mantidos** - Preservados cards do topo da página principal (Receita Total, Despesas Totais, Lucro Líquido, Margem de Lucro)
+- ✅ **Cards detalhados restaurados** - Mantidos cards grandes "Receitas por Tipo" e "Despesas por Tipo" na aba "Despesas"
+- ✅ **Interface otimizada** - Aba "Despesas" com informações detalhadas sem cards pequenos desnecessários
 
 ### 2025-07-18: Restauração da Tabela Histórico - CONCLUÍDO
 - ✅ **Tabela "Histórico de Despesas dos Veículos" restaurada** - Usuário solicitou o retorno dos dados detalhados
