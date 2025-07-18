@@ -28,7 +28,7 @@ import { useToast } from '@/hooks/use-toast';
 import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Pagination } from '@/components/ui/pagination';
-import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Pie, Cell, LineChart as RechartsLineChart, Line } from 'recharts';
+// Recharts removed - using simple tables and cards instead
 
 // Schema para formulário de nova despesa
 const novaDespesaSchema = z.object({
@@ -526,74 +526,7 @@ export default function RelatoriosFinanceiros() {
   const lucroLiquido = receitaTotal - totalDespesas;
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
-  // Dados para gráficos da aba Despesas
-  const dadosGraficoMensal = useMemo(() => {
-    return [
-      {
-        nome: 'Receitas',
-        valor: receitaTotal,
-        cor: '#10B981'
-      },
-      {
-        nome: 'Despesas Fixas',
-        valor: totalDespesasFixas,
-        cor: '#EF4444'
-      },
-      {
-        nome: 'Despesas Manuais',
-        valor: totalDespesas - totalDespesasFixas,
-        cor: '#F59E0B'
-      },
-      {
-        nome: 'Lucro Líquido',
-        valor: lucroLiquido,
-        cor: lucroLiquido >= 0 ? '#10B981' : '#EF4444'
-      }
-    ];
-  }, [receitaTotal, totalDespesasFixas, totalDespesas, lucroLiquido]);
-
-  const dadosGraficoPizza = useMemo(() => {
-    const despesasManuais = totalDespesas - totalDespesasFixas;
-    return [
-      {
-        nome: 'Despesas Fixas',
-        valor: totalDespesasFixas,
-        cor: '#EF4444'
-      },
-      {
-        nome: 'Despesas Manuais',
-        valor: despesasManuais,
-        cor: '#F59E0B'
-      }
-    ].filter(item => item.valor > 0);
-  }, [totalDespesas, totalDespesasFixas]);
-
-  const dadosGraficoEvolucao = useMemo(() => {
-    const meses = [];
-    for (let i = 5; i >= 0; i--) {
-      const data = subMonths(new Date(), i);
-      const mesStart = startOfMonth(data);
-      const mesEnd = endOfMonth(data);
-      
-      const receitaMes = pagamentos
-        .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: mesStart, end: mesEnd }))
-        .reduce((total, p) => total + parseFloat(p.valor || '0'), 0);
-      
-      const despesasMes = despesas
-        .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: mesStart, end: mesEnd }))
-        .reduce((total, d) => total + parseFloat(d.valor || '0'), 0);
-      
-      meses.push({
-        mes: format(data, 'MMM', { locale: pt }),
-        receitas: receitaMes,
-        despesas: despesasMes + totalDespesasFixas,
-        lucro: receitaMes - (despesasMes + totalDespesasFixas)
-      });
-    }
-    return meses;
-  }, [pagamentos, despesas, totalDespesasFixas]);
-
-  const CORES = ['#10B981', '#EF4444', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899'];
+  // Gráficos removidos - usando visualização simples com cards e tabelas
 
   // Debug detalhado para verificar valores
   const despesasManuaisFiltradas = filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.categoria !== 'financiamento');
@@ -1168,93 +1101,7 @@ export default function RelatoriosFinanceiros() {
         </TabsList>
 
         <TabsContent value="despesas" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Gráfico de Barras - Receitas vs Despesas */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Receitas vs Despesas - {format(selectedMonth, 'MMMM yyyy', { locale: pt })}
-                </CardTitle>
-                <CardDescription>
-                  Comparação entre receitas e despesas do mês
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RechartsBarChart data={dadosGraficoMensal}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="nome" />
-                    <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
-                    <Tooltip formatter={(value) => [formatCurrency(value), 'Valor']} />
-                    <Bar dataKey="valor" fill="#3B82F6" />
-                  </RechartsBarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* Gráfico de Pizza - Distribuição das Despesas */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5" />
-                  Distribuição das Despesas
-                </CardTitle>
-                <CardDescription>
-                  Proporção entre despesas fixas e manuais
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RechartsPieChart>
-                    <Pie
-                      data={dadosGraficoPizza}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ nome, value }) => `${nome}: ${formatCurrency(value)}`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="valor"
-                    >
-                      {dadosGraficoPizza.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.cor} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => [formatCurrency(value), 'Valor']} />
-                  </RechartsPieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Gráfico de Evolução Mensal */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Evolução Financeira - Últimos 6 Meses
-              </CardTitle>
-              <CardDescription>
-                Tendência de receitas, despesas e lucro ao longo do tempo
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <RechartsLineChart data={dadosGraficoEvolucao}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="mes" />
-                  <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(value) => [formatCurrency(value), 'Valor']} />
-                  <Line type="monotone" dataKey="receitas" stroke="#10B981" strokeWidth={2} name="Receitas" />
-                  <Line type="monotone" dataKey="despesas" stroke="#EF4444" strokeWidth={2} name="Despesas" />
-                  <Line type="monotone" dataKey="lucro" stroke="#3B82F6" strokeWidth={2} name="Lucro" />
-                </RechartsLineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Resumo Numérico */}
+          {/* Resumo Financeiro */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4">
@@ -1309,6 +1156,150 @@ export default function RelatoriosFinanceiros() {
               </CardContent>
             </Card>
           </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Receitas por Tipo */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Receitas por Tipo
+                </CardTitle>
+                <CardDescription>
+                  Detalhamento das receitas do mês
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-green-800">Pagamentos Recebidos</p>
+                      <p className="text-sm text-green-600">Pagamentos de aluguéis</p>
+                    </div>
+                    <p className="text-lg font-bold text-green-600">
+                      {formatCurrency(receitaPagamentos)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-blue-800">Receitas Extras</p>
+                      <p className="text-sm text-blue-600">Outras receitas</p>
+                    </div>
+                    <p className="text-lg font-bold text-blue-600">
+                      {formatCurrency(totalReceitas)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
+                    <div>
+                      <p className="font-bold text-gray-800">TOTAL RECEITAS</p>
+                      <p className="text-sm text-gray-600">Soma de todas as receitas</p>
+                    </div>
+                    <p className="text-xl font-bold text-green-600">
+                      {formatCurrency(receitaTotal)}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Despesas por Tipo */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingDown className="h-5 w-5" />
+                  Despesas por Tipo
+                </CardTitle>
+                <CardDescription>
+                  Detalhamento das despesas do mês
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-red-800">Despesas Fixas</p>
+                      <p className="text-sm text-red-600">IPVA, Seguro, Rastreador</p>
+                    </div>
+                    <p className="text-lg font-bold text-red-600">
+                      {formatCurrency(totalDespesasFixas)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-orange-800">Despesas Manuais</p>
+                      <p className="text-sm text-orange-600">Lavagem, Empréstimos, etc.</p>
+                    </div>
+                    <p className="text-lg font-bold text-orange-600">
+                      {formatCurrency(totalDespesas - totalDespesasFixas)}
+                    </p>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
+                    <div>
+                      <p className="font-bold text-gray-800">TOTAL DESPESAS</p>
+                      <p className="text-sm text-gray-600">Soma de todas as despesas</p>
+                    </div>
+                    <p className="text-xl font-bold text-red-600">
+                      {formatCurrency(totalDespesas)}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Detalhes das Despesas Manuais */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Despesas Manuais Detalhadas
+              </CardTitle>
+              <CardDescription>
+                Lista completa das despesas manuais do mês
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Categoria</TableHead>
+                      <TableHead>Descrição</TableHead>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Valor</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredData.despesasPeriodo
+                      .filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.categoria !== 'financiamento')
+                      .map((despesa) => (
+                        <TableRow key={despesa.id}>
+                          <TableCell>
+                            <Badge variant="secondary">
+                              {despesa.categoria}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{despesa.descricao}</TableCell>
+                          <TableCell>{formatDate(despesa.data)}</TableCell>
+                          <TableCell className="text-red-600 font-semibold">
+                            {formatCurrency(parseFloat(despesa.valor || '0'))}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    {filteredData.despesasPeriodo
+                      .filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.categoria !== 'financiamento')
+                      .length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center text-gray-500 py-8">
+                          Nenhuma despesa manual encontrada no período
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="veiculos" className="space-y-4">
