@@ -1113,7 +1113,7 @@ export default function RelatoriosFinanceiros() {
 
       {/* Tabs de Análise */}
       <Tabs defaultValue="despesas" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full" style={{ gridTemplateColumns: '1fr 1.2fr 1.5fr 1.5fr 1fr' }}>
           <TabsTrigger value="despesas">Despesas</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
