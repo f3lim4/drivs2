@@ -107,6 +107,9 @@ export function NovoMotoristaModal({
     setLoading(true);
     
     try {
+      // Debug: Log dos dados do formulário
+      console.log('[DEBUG] NovoMotoristaModal - Dados do formulário:', data);
+      
       // Preparar dados para envio à API
       const motoristaData = {
         id: data.cpf.replace(/\D/g, ''), // Usar CPF limpo como ID
@@ -129,6 +132,9 @@ export function NovoMotoristaModal({
         status: data.status,
       };
 
+      // Debug: Log dos dados preparados
+      console.log('[DEBUG] NovoMotoristaModal - Dados preparados para API:', motoristaData);
+
       // Enviar para API
       const response = await fetch('/api/motoristas', {
         method: 'POST',
@@ -144,6 +150,10 @@ export function NovoMotoristaModal({
       }
 
       const novoMotorista = await response.json();
+      
+      // Debug: Log da resposta da API
+      console.log('[DEBUG] NovoMotoristaModal - Resposta da API:', novoMotorista);
+      
       onMotoristaAdicionado(novoMotorista);
       onOpenChange(false);
       form.reset();
