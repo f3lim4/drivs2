@@ -331,10 +331,6 @@ export function EditarMotoristaModal({
             
             {/* INFORMAÇÕES PESSOAIS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Informações Pessoais
-              </h3>
-              
               <FormField
                 control={form.control}
                 name="nome"
@@ -403,10 +399,6 @@ export function EditarMotoristaModal({
 
             {/* CONTATO */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Contato
-              </h3>
-              
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -447,10 +439,6 @@ export function EditarMotoristaModal({
 
             {/* CNH */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Carteira de Motorista
-              </h3>
-              
               <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
@@ -517,10 +505,6 @@ export function EditarMotoristaModal({
 
             {/* ENDEREÇO */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Endereço
-              </h3>
-              
               <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-2">
                   <FormField
@@ -654,15 +638,11 @@ export function EditarMotoristaModal({
 
             {/* DOCUMENTOS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Documentos
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Foto de Perfil */}
                 <div className="space-y-2">
                   <Label htmlFor="foto-perfil">Foto de Perfil</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-2">
                     <input
                       id="foto-perfil"
                       type="file"
@@ -673,7 +653,7 @@ export function EditarMotoristaModal({
                     {imagens.fotoPerfil ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">{imagens.fotoPerfil.name}</span>
+                          <span className="text-xs text-gray-600">{imagens.fotoPerfil.name}</span>
                           <Button
                             type="button"
                             variant="outline"
@@ -687,17 +667,17 @@ export function EditarMotoristaModal({
                           <img 
                             src={imagePreviews.fotoPerfil} 
                             alt="Preview" 
-                            className="w-20 h-20 object-cover rounded"
+                            className="w-16 h-16 object-cover rounded"
                           />
                         )}
                       </div>
                     ) : (
                       <label
                         htmlFor="foto-perfil"
-                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                        className="cursor-pointer flex flex-col items-center justify-center py-1"
                       >
-                        <Upload className="h-8 w-8 text-gray-400" />
-                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                        <Upload className="h-6 w-6 text-gray-400" />
+                        <span className="text-xs text-gray-600">Clique para selecionar</span>
                       </label>
                     )}
                   </div>
@@ -706,7 +686,7 @@ export function EditarMotoristaModal({
                 {/* CNH */}
                 <div className="space-y-2">
                   <Label htmlFor="cnh-imagem">CNH</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-2">
                     <input
                       id="cnh-imagem"
                       type="file"
@@ -717,7 +697,7 @@ export function EditarMotoristaModal({
                     {imagens.cnhImagem ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">{imagens.cnhImagem.name}</span>
+                          <span className="text-xs text-gray-600">{imagens.cnhImagem.name}</span>
                           <Button
                             type="button"
                             variant="outline"
@@ -731,11 +711,11 @@ export function EditarMotoristaModal({
                           <img 
                             src={imagePreviews.cnhImagem} 
                             alt="Preview" 
-                            className="w-20 h-20 object-cover rounded"
+                            className="w-16 h-16 object-cover rounded"
                           />
                         ) : (
-                          <div className="flex items-center justify-center w-20 h-20 bg-gray-100 rounded">
-                            <FileText className="h-8 w-8 text-gray-400" />
+                          <div className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded">
+                            <FileText className="h-6 w-6 text-gray-400" />
                             <span className="text-xs text-gray-600 ml-1">PDF</span>
                           </div>
                         )}
@@ -743,10 +723,10 @@ export function EditarMotoristaModal({
                     ) : (
                       <label
                         htmlFor="cnh-imagem"
-                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                        className="cursor-pointer flex flex-col items-center justify-center py-1"
                       >
-                        <Upload className="h-8 w-8 text-gray-400" />
-                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                        <Upload className="h-6 w-6 text-gray-400" />
+                        <span className="text-xs text-gray-600">Clique para selecionar</span>
                       </label>
                     )}
                   </div>
@@ -755,7 +735,7 @@ export function EditarMotoristaModal({
                 {/* Foto com CNH */}
                 <div className="space-y-2">
                   <Label htmlFor="foto-com-cnh">Foto com CNH</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-2">
                     <input
                       id="foto-com-cnh"
                       type="file"
@@ -766,7 +746,7 @@ export function EditarMotoristaModal({
                     {imagens.fotoComCnh ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">{imagens.fotoComCnh.name}</span>
+                          <span className="text-xs text-gray-600">{imagens.fotoComCnh.name}</span>
                           <Button
                             type="button"
                             variant="outline"
@@ -780,17 +760,17 @@ export function EditarMotoristaModal({
                           <img 
                             src={imagePreviews.fotoComCnh} 
                             alt="Preview" 
-                            className="w-20 h-20 object-cover rounded"
+                            className="w-16 h-16 object-cover rounded"
                           />
                         )}
                       </div>
                     ) : (
                       <label
                         htmlFor="foto-com-cnh"
-                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                        className="cursor-pointer flex flex-col items-center justify-center py-1"
                       >
-                        <Upload className="h-8 w-8 text-gray-400" />
-                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                        <Upload className="h-6 w-6 text-gray-400" />
+                        <span className="text-xs text-gray-600">Clique para selecionar</span>
                       </label>
                     )}
                   </div>
@@ -799,7 +779,7 @@ export function EditarMotoristaModal({
                 {/* Comprovante de Endereço */}
                 <div className="space-y-2">
                   <Label htmlFor="comprovante-endereco">Comprovante de Endereço</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-2">
                     <input
                       id="comprovante-endereco"
                       type="file"
@@ -810,7 +790,7 @@ export function EditarMotoristaModal({
                     {imagens.comprovanteEndereco ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">{imagens.comprovanteEndereco.name}</span>
+                          <span className="text-xs text-gray-600">{imagens.comprovanteEndereco.name}</span>
                           <Button
                             type="button"
                             variant="outline"
@@ -824,11 +804,11 @@ export function EditarMotoristaModal({
                           <img 
                             src={imagePreviews.comprovanteEndereco} 
                             alt="Preview" 
-                            className="w-20 h-20 object-cover rounded"
+                            className="w-16 h-16 object-cover rounded"
                           />
                         ) : (
-                          <div className="flex items-center justify-center w-20 h-20 bg-gray-100 rounded">
-                            <FileText className="h-8 w-8 text-gray-400" />
+                          <div className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded">
+                            <FileText className="h-6 w-6 text-gray-400" />
                             <span className="text-xs text-gray-600 ml-1">PDF</span>
                           </div>
                         )}
@@ -836,10 +816,10 @@ export function EditarMotoristaModal({
                     ) : (
                       <label
                         htmlFor="comprovante-endereco"
-                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                        className="cursor-pointer flex flex-col items-center justify-center py-1"
                       >
-                        <Upload className="h-8 w-8 text-gray-400" />
-                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                        <Upload className="h-6 w-6 text-gray-400" />
+                        <span className="text-xs text-gray-600">Clique para selecionar</span>
                       </label>
                     )}
                   </div>
@@ -848,7 +828,7 @@ export function EditarMotoristaModal({
                 {/* Foto Extra */}
                 <div className="space-y-2">
                   <Label htmlFor="foto-extra">Foto Extra</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-2">
                     <input
                       id="foto-extra"
                       type="file"
@@ -859,7 +839,7 @@ export function EditarMotoristaModal({
                     {imagens.fotoExtra ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">{imagens.fotoExtra.name}</span>
+                          <span className="text-xs text-gray-600">{imagens.fotoExtra.name}</span>
                           <Button
                             type="button"
                             variant="outline"
@@ -873,17 +853,17 @@ export function EditarMotoristaModal({
                           <img 
                             src={imagePreviews.fotoExtra} 
                             alt="Preview" 
-                            className="w-20 h-20 object-cover rounded"
+                            className="w-16 h-16 object-cover rounded"
                           />
                         )}
                       </div>
                     ) : (
                       <label
                         htmlFor="foto-extra"
-                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                        className="cursor-pointer flex flex-col items-center justify-center py-1"
                       >
-                        <Upload className="h-8 w-8 text-gray-400" />
-                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                        <Upload className="h-6 w-6 text-gray-400" />
+                        <span className="text-xs text-gray-600">Clique para selecionar</span>
                       </label>
                     )}
                   </div>
@@ -937,10 +917,6 @@ export function EditarMotoristaModal({
 
             {/* STATUS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Status
-              </h3>
-              
               <FormField
                 control={form.control}
                 name="status"
