@@ -10,11 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-18: Remoção dos Cards de Resumo Financeiro - CONCLUÍDO
+### 2025-07-18: Otimização Final da Interface de Relatórios Financeiros - CONCLUÍDO
 - ✅ **Cards pequenos removidos** - Eliminados 4 cards pequenos que ficavam no topo da aba "Despesas" (Receitas Totais, Despesas Totais, Lucro Líquido, Aluguéis Ativos)
 - ✅ **Cards principais mantidos** - Preservados cards do topo da página principal (Receita Total, Despesas Totais, Lucro Líquido, Margem de Lucro)
 - ✅ **Cards detalhados restaurados** - Mantidos cards grandes "Receitas por Tipo" e "Despesas por Tipo" na aba "Despesas"
 - ✅ **Interface otimizada** - Aba "Despesas" com informações detalhadas sem cards pequenos desnecessários
+- ✅ **Despesas por categoria individuais** - Card "Despesas por Categoria" agora mostra valor específico de cada categoria (Empréstimo: R$ 7.621,95, IPVA: R$ 2.713,33, etc.)
+- ✅ **Cores diferenciadas por categoria** - Sistema de cores específicas para cada tipo de despesa (roxo para empréstimo, amarelo para IPVA, verde para seguro, etc.)
+- ✅ **Ordenação por valor** - Categorias ordenadas automaticamente do maior para o menor valor
+- ✅ **Título da aba "Histórico" removido** - Interface limpa na aba histórico sem título "Histórico de Despesas dos Veículos"
 
 ### 2025-07-18: Restauração da Tabela Histórico - CONCLUÍDO
 - ✅ **Tabela "Histórico de Despesas dos Veículos" restaurada** - Usuário solicitou o retorno dos dados detalhados

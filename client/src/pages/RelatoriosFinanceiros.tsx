@@ -1551,7 +1551,6 @@ export default function RelatoriosFinanceiros() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
                 <CardDescription>
                   Todas as despesas fixas e manutenções registradas no sistema - dados reais
                 </CardDescription>
