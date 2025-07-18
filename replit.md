@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Remoção do "Resumo por Formas de Pagamento" - CONCLUÍDO
+- ✅ **Seção "Resumo por Formas de Pagamento" removida** - Eliminada da aba "Despesas" conforme solicitação
+- ✅ **Interface simplificada** - Aba "Despesas" agora mostra apenas: Receitas por Tipo → Despesas por Categoria → Resumo das Despesas
+- ✅ **Limpeza de código** - Removida toda lógica de cálculo de distribuição por formas de pagamento
+- ✅ **Sequência otimizada** - Fluxo mais direto sem cards intermediários desnecessários
+- ✅ **Funcionalidade preservada** - Mantidos todos os cálculos e relatórios essenciais
+
 ### 2025-07-18: Consolidação de Resumos Financeiros na Aba "Despesas" - CONCLUÍDO
 - ✅ **Resumo por Formas de Pagamento movido** - Transferido da aba "Histórico" para aba "Despesas"
 - ✅ **Resumo das Despesas movido** - Cards "Total Despesas Fixas", "Manutenções" e "Despesas Manuais" transferidos para aba "Despesas"
