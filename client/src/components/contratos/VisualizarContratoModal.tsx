@@ -29,6 +29,13 @@ export function VisualizarContratoModal({
   onEditar
 }: VisualizarContratoModalProps) {
   const { profile } = useAuth();
+  
+  const handleBaixarArquivoAssinado = () => {
+    if (contrato?.arquivoAssinado) {
+      window.location.href = `/api/contratos/${contrato.id}/download`;
+    }
+  };
+  
   const handleImprimir = async () => {
     if (!contrato) return;
     
@@ -308,6 +315,17 @@ export function VisualizarContratoModal({
                 <Download className="w-4 h-4" />
                 Baixar PDF
               </Button>
+              {contrato.arquivoAssinado && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleBaixarArquivoAssinado()}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Baixar Assinado
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"

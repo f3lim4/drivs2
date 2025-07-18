@@ -5,6 +5,8 @@ import { testConnection, db } from "./db";
 import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, contratos } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
+import fs from "fs";
+import path from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Test database connection first
@@ -639,8 +641,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Salvar arquivo no servidor
-      const fs = require('fs');
-      const path = require('path');
       
       // Criar diretório uploads se não existir
       const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -690,9 +690,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Arquivo não encontrado" });
       }
       
-      const fs = require('fs');
-      const path = require('path');
-      
       const filePath = path.join(process.cwd(), 'uploads', contrato.arquivoAssinado);
       
       if (!fs.existsSync(filePath)) {
@@ -723,9 +720,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!contrato || !contrato.arquivoAssinado) {
         return res.status(404).json({ message: "Arquivo não encontrado" });
       }
-      
-      const fs = require('fs');
-      const path = require('path');
       
       const filePath = path.join(process.cwd(), 'uploads', contrato.arquivoAssinado);
       
