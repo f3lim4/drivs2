@@ -2044,24 +2044,24 @@ export default function RelatoriosFinanceiros() {
                   const categoriasOrdenadas = Object.entries(categorias).sort(([,a], [,b]) => b - a);
                   
                   return totalDespesasFixas > 0 && (
-                    <div className="bg-red-50 p-6 rounded-lg border border-red-200">
-                      <div className="space-y-3">
+                    <div className="bg-white p-4 rounded-lg border border-gray-200">
+                      <div className="space-y-1">
                         {categoriasOrdenadas.map(([categoria, valor]) => {
                           const percentual = (valor / totalDespesasFixas) * 100;
                           
                           return (
-                            <div key={categoria} className="flex justify-between items-center p-3 bg-white rounded-md border border-red-100">
+                            <div key={categoria} className="flex justify-between items-center p-2 border-b border-gray-100 last:border-b-0">
                               <div className="flex-1">
-                                <div className="flex justify-between items-center mb-2">
+                                <div className="flex justify-between items-center mb-1">
                                   <p className="font-medium text-red-700">{categoria}</p>
                                   <div className="text-right">
                                     <p className="font-bold text-red-600">{formatCurrency(valor)}</p>
-                                    <p className="text-sm text-red-500">{percentual.toFixed(1)}%</p>
+                                    <p className="text-xs text-red-500">{percentual.toFixed(1)}%</p>
                                   </div>
                                 </div>
-                                <div className="w-full bg-red-100 rounded-full h-2">
+                                <div className="w-full bg-red-100 rounded-full h-1.5">
                                   <div 
-                                    className="bg-red-500 h-2 rounded-full transition-all duration-300"
+                                    className="bg-red-500 h-1.5 rounded-full transition-all duration-300"
                                     style={{ width: `${percentual}%` }}
                                   />
                                 </div>
@@ -2069,12 +2069,12 @@ export default function RelatoriosFinanceiros() {
                             </div>
                           );
                         })}
-                        <div className="flex justify-between items-center p-4 bg-red-100 rounded-lg border-2 border-red-300 mt-4">
+                        <div className="flex justify-between items-center p-3 bg-red-50 rounded-md border border-red-200 mt-2">
                           <div>
                             <p className="font-bold text-red-800">TOTAL DESPESAS FIXAS</p>
-                            <p className="text-sm text-red-600">Soma de todas as categorias fixas</p>
+                            <p className="text-xs text-red-600">Soma de todas as categorias fixas</p>
                           </div>
-                          <p className="text-xl font-bold text-red-700">
+                          <p className="text-lg font-bold text-red-700">
                             {formatCurrency(totalDespesasFixas)}
                           </p>
                         </div>
