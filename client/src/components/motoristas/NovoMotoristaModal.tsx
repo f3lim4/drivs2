@@ -81,8 +81,32 @@ export function NovoMotoristaModal({
   onMotoristaAdicionado 
 }: NovoMotoristaModalProps) {
   const [loading, setLoading] = useState(false);
-  const [imagens, setImagens] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imagens, setImagens] = useState<{
+    fotoPerfil: File | null;
+    cnhImagem: File | null;
+    fotoComCnh: File | null;
+    comprovanteEndereco: File | null;
+    fotoExtra: File | null;
+  }>({
+    fotoPerfil: null,
+    cnhImagem: null,
+    fotoComCnh: null,
+    comprovanteEndereco: null,
+    fotoExtra: null,
+  });
+  const [imagePreviews, setImagePreviews] = useState<{
+    fotoPerfil: string | null;
+    cnhImagem: string | null;
+    fotoComCnh: string | null;
+    comprovanteEndereco: string | null;
+    fotoExtra: string | null;
+  }>({
+    fotoPerfil: null,
+    cnhImagem: null,
+    fotoComCnh: null,
+    comprovanteEndereco: null,
+    fotoExtra: null,
+  });
   const { profile } = useAuth();
   const { toast } = useToast();
 
@@ -108,65 +132,58 @@ export function NovoMotoristaModal({
     },
   });
 
-  // Função para adicionar imagens
-  const handleImageUpload = (files: FileList | null) => {
-    if (!files) return;
+  // Funções para gerenciar imagens específicas
+  const handleImageUpload = (files: FileList | null, tipo: keyof typeof imagens) => {
+    if (!files || files.length === 0) return;
     
-    const newImages = Array.from(files);
-    const totalImages = imagens.length + newImages.length;
+    const file = files[0];
     
-    if (totalImages > 5) {
+    // Validar arquivo
+    const isValidImage = file.type.startsWith('image/');
+    const isValidPdf = file.type === 'application/pdf';
+    const isValidFile = tipo === 'cnhImagem' || tipo === 'comprovanteEndereco' ? 
+      (isValidImage || isValidPdf) : isValidImage;
+    
+    if (!isValidFile) {
       toast({
-        title: "Limite de imagens",
-        description: "Você pode adicionar no máximo 5 imagens por motorista",
+        title: "Arquivo inválido",
+        description: tipo === 'cnhImagem' || tipo === 'comprovanteEndereco' ? 
+          "Apenas imagens (JPG, PNG) ou PDF são aceitos" : 
+          "Apenas imagens (JPG, PNG) são aceitas",
         variant: "destructive",
       });
       return;
     }
     
-    // Validar tipo e tamanho das imagens
-    const validImages = newImages.filter(file => {
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Formato inválido",
-          description: `${file.name} não é uma imagem válida`,
-          variant: "destructive",
-        });
-        return false;
-      }
-      
-      if (file.size > 5 * 1024 * 1024) { // 5MB
-        toast({
-          title: "Arquivo muito grande",
-          description: `${file.name} é maior que 5MB`,
-          variant: "destructive",
-        });
-        return false;
-      }
-      
-      return true;
-    });
+    if (file.size > 5 * 1024 * 1024) { // 5MB max
+      toast({
+        title: "Arquivo muito grande",
+        description: "O arquivo deve ter no máximo 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
     
-    if (validImages.length === 0) return;
+    // Atualizar arquivo
+    setImagens(prev => ({ ...prev, [tipo]: file }));
     
-    setImagens(prev => [...prev, ...validImages]);
-    
-    // Criar previews
-    validImages.forEach(file => {
+    // Criar preview (apenas para imagens)
+    if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        if (e.target?.result) {
-          setImagePreviews(prev => [...prev, e.target!.result as string]);
-        }
+        const result = e.target?.result as string;
+        setImagePreviews(prev => ({ ...prev, [tipo]: result }));
       };
       reader.readAsDataURL(file);
-    });
+    } else {
+      // Para PDFs, apenas limpar preview
+      setImagePreviews(prev => ({ ...prev, [tipo]: null }));
+    }
   };
 
-  // Função para remover imagem
-  const handleRemoveImage = (index: number) => {
-    setImagens(prev => prev.filter((_, i) => i !== index));
-    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  const handleRemoveImage = (tipo: keyof typeof imagens) => {
+    setImagens(prev => ({ ...prev, [tipo]: null }));
+    setImagePreviews(prev => ({ ...prev, [tipo]: null }));
   };
 
   const onSubmit = async (data: MotoristaFormData) => {
@@ -212,14 +229,18 @@ export function NovoMotoristaModal({
       const novoMotorista = await response.json();
       
       // Upload das imagens se houver
-      if (imagens.length > 0) {
+      const imagensParaUpload = Object.values(imagens).filter(img => img !== null);
+      if (imagensParaUpload.length > 0) {
         try {
           const formData = new FormData();
           formData.append('motoristaId', novoMotorista.id);
           
-          imagens.forEach((file, index) => {
-            formData.append(`imagem${index + 1}`, file);
-          });
+          // Adicionar imagens específicas
+          if (imagens.fotoPerfil) formData.append('fotoPerfil', imagens.fotoPerfil);
+          if (imagens.cnhImagem) formData.append('cnhImagem', imagens.cnhImagem);
+          if (imagens.fotoComCnh) formData.append('fotoComCnh', imagens.fotoComCnh);
+          if (imagens.comprovanteEndereco) formData.append('comprovanteEndereco', imagens.comprovanteEndereco);
+          if (imagens.fotoExtra) formData.append('fotoExtra', imagens.fotoExtra);
           
           const uploadResponse = await fetch('/api/motoristas/upload-imagens', {
             method: 'POST',
@@ -232,13 +253,13 @@ export function NovoMotoristaModal({
           
           toast({
             title: "Motorista cadastrado com sucesso!",
-            description: `${imagens.length} imagem(s) enviada(s)`,
+            description: `${imagensParaUpload.length} documento(s) enviado(s)`,
           });
         } catch (uploadError) {
           console.error('Erro no upload das imagens:', uploadError);
           toast({
             title: "Motorista cadastrado",
-            description: "Mas houve erro no upload das imagens. Você pode tentar novamente.",
+            description: "Mas houve erro no upload dos documentos. Você pode tentar novamente.",
             variant: "destructive",
           });
         }
@@ -252,8 +273,20 @@ export function NovoMotoristaModal({
       onMotoristaAdicionado(novoMotorista);
       onOpenChange(false);
       form.reset();
-      setImagens([]);
-      setImagePreviews([]);
+      setImagens({
+        fotoPerfil: null,
+        cnhImagem: null,
+        fotoComCnh: null,
+        comprovanteEndereco: null,
+        fotoExtra: null,
+      });
+      setImagePreviews({
+        fotoPerfil: null,
+        cnhImagem: null,
+        fotoComCnh: null,
+        comprovanteEndereco: null,
+        fotoExtra: null,
+      });
       
     } catch (error) {
       console.error('Erro ao cadastrar motorista:', error);
@@ -582,72 +615,201 @@ export function NovoMotoristaModal({
               </div>
             </div>
 
-            {/* IMAGENS */}
+            {/* DOCUMENTOS */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Imagens (Opcional)
+                Documentos (Opcional)
               </h3>
               
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Adicionar Imagens ({imagens.length}/5)
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={(e) => handleImageUpload(e.target.files)}
-                        className="flex-1"
-                      />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Foto de Perfil */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-foreground">
+                    Foto de Perfil
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e.target.files, 'fotoPerfil')}
+                      className="flex-1"
+                    />
+                    {imagens.fotoPerfil && (
                       <Button
                         type="button"
                         variant="outline"
                         size="icon"
-                        onClick={() => {
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'image/*';
-                          input.multiple = true;
-                          input.onchange = (e) => handleImageUpload((e.target as HTMLInputElement).files);
-                          input.click();
-                        }}
+                        onClick={() => handleRemoveImage('fotoPerfil')}
                       >
-                        <Upload className="w-4 h-4" />
+                        <X className="w-4 h-4" />
                       </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Máximo 5 imagens, até 5MB cada. Formatos: JPG, PNG
-                    </p>
+                    )}
                   </div>
+                  {imagePreviews.fotoPerfil && (
+                    <div className="mt-2">
+                      <img
+                        src={imagePreviews.fotoPerfil}
+                        alt="Foto de Perfil"
+                        className="w-20 h-20 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                {/* Preview das imagens */}
-                {imagePreviews.length > 0 && (
-                  <div className="grid grid-cols-3 gap-4">
-                    {imagePreviews.map((preview, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={preview}
-                          alt={`Preview ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute -top-2 -right-2 h-6 w-6"
-                          onClick={() => handleRemoveImage(index)}
-                        >
-                          <X className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    ))}
+                {/* CNH Imagem */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-foreground">
+                    CNH (Imagem ou PDF)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => handleImageUpload(e.target.files, 'cnhImagem')}
+                      className="flex-1"
+                    />
+                    {imagens.cnhImagem && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleRemoveImage('cnhImagem')}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
-                )}
+                  {imagePreviews.cnhImagem && (
+                    <div className="mt-2">
+                      <img
+                        src={imagePreviews.cnhImagem}
+                        alt="CNH"
+                        className="w-20 h-20 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
+                  {imagens.cnhImagem && imagens.cnhImagem.type === 'application/pdf' && (
+                    <div className="mt-2">
+                      <div className="w-20 h-20 bg-red-100 rounded-lg border flex items-center justify-center">
+                        <span className="text-xs text-red-600">PDF</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Foto com CNH */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-foreground">
+                    Foto Segurando CNH
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e.target.files, 'fotoComCnh')}
+                      className="flex-1"
+                    />
+                    {imagens.fotoComCnh && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleRemoveImage('fotoComCnh')}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                  {imagePreviews.fotoComCnh && (
+                    <div className="mt-2">
+                      <img
+                        src={imagePreviews.fotoComCnh}
+                        alt="Foto com CNH"
+                        className="w-20 h-20 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Comprovante de Endereço */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-foreground">
+                    Comprovante de Endereço
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => handleImageUpload(e.target.files, 'comprovanteEndereco')}
+                      className="flex-1"
+                    />
+                    {imagens.comprovanteEndereco && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleRemoveImage('comprovanteEndereco')}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                  {imagePreviews.comprovanteEndereco && (
+                    <div className="mt-2">
+                      <img
+                        src={imagePreviews.comprovanteEndereco}
+                        alt="Comprovante de Endereço"
+                        className="w-20 h-20 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
+                  {imagens.comprovanteEndereco && imagens.comprovanteEndereco.type === 'application/pdf' && (
+                    <div className="mt-2">
+                      <div className="w-20 h-20 bg-red-100 rounded-lg border flex items-center justify-center">
+                        <span className="text-xs text-red-600">PDF</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Foto Extra */}
+                <div className="space-y-2 md:col-span-2">
+                  <label className="block text-sm font-medium text-foreground">
+                    Foto Extra (Opcional)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e.target.files, 'fotoExtra')}
+                      className="flex-1"
+                    />
+                    {imagens.fotoExtra && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleRemoveImage('fotoExtra')}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                  {imagePreviews.fotoExtra && (
+                    <div className="mt-2">
+                      <img
+                        src={imagePreviews.fotoExtra}
+                        alt="Foto Extra"
+                        className="w-20 h-20 object-cover rounded-lg border"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
+              
+              <p className="text-xs text-muted-foreground">
+                Máximo 5MB por arquivo. Formatos aceitos: JPG, PNG (todos os campos) e PDF (CNH e Comprovante)
+              </p>
             </div>
 
             {/* STATUS */}
