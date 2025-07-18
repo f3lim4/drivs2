@@ -1790,7 +1790,18 @@ export default function RelatoriosFinanceiros() {
                           );
                         }
                         
-                        return paginatedDespesas.map((despesa) => (
+                        return paginatedDespesas.map((despesa) => {
+                          // Debug temporário para manutenções
+                          if (despesa.tipo === 'Manutenção') {
+                            console.log('DEBUG Data Manutenção:', {
+                              id: despesa.id,
+                              dataOriginal: despesa.data,
+                              dataFormatada: formatDate(despesa.data),
+                              tipo: despesa.tipo
+                            });
+                          }
+                          
+                          return (
                           <TableRow key={despesa.id}>
                             <TableCell>{formatDate(despesa.data)}</TableCell>
                             <TableCell>
@@ -1849,7 +1860,8 @@ export default function RelatoriosFinanceiros() {
                               </div>
                             </TableCell>
                           </TableRow>
-                        ));
+                          );
+                        });
                       })()}
                     </TableBody>
                   </Table>
