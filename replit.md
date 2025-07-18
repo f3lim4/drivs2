@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Consolidação de Resumos Financeiros na Aba "Despesas" - CONCLUÍDO
+- ✅ **Resumo por Formas de Pagamento movido** - Transferido da aba "Histórico" para aba "Despesas"
+- ✅ **Resumo das Despesas movido** - Cards "Total Despesas Fixas", "Manutenções" e "Despesas Manuais" transferidos para aba "Despesas"
+- ✅ **Organização melhorada** - Aba "Despesas" agora centraliza todos os resumos financeiros
+- ✅ **Sequência otimizada** - Cards "Receitas por Tipo" → "Despesas por Categoria" → "Resumo por Formas de Pagamento" → "Resumo das Despesas"
+- ✅ **Aba "Histórico" simplificada** - Mantida apenas tabela detalhada de despesas com paginação e ordenação
+- ✅ **Interface consistente** - Todos os resumos financeiros em um local centralizado
+- ✅ **Funcionalidade preservada** - Mantidos todos os cálculos, cores e funcionalidades dos componentes movidos
+
 ### 2025-07-18: Integração Completa de Manutenções nos Relatórios Financeiros - CONCLUÍDO
 - ✅ **Card "Despesas por Categoria" corrigido** - Manutenções agora aparecem na categoria "Manutenção"
 - ✅ **Histórico de despesas integrado** - Manutenções incluídas na tabela "Histórico de Despesas dos Veículos"

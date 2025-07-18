@@ -1337,6 +1337,32 @@ export default function RelatoriosFinanceiros() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Resumo das despesas */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+            <div className="bg-red-50 p-4 rounded-lg">
+              <h4 className="font-medium text-red-700 mb-2">Total Despesas Fixas</h4>
+              <p className="text-2xl font-bold text-red-800">
+                {formatCurrency(totalDespesasFixasPuras)}
+              </p>
+              <p className="text-sm text-red-600">Mensais</p>
+            </div>
+            <div className="bg-orange-50 p-4 rounded-lg">
+              <h4 className="font-medium text-orange-700 mb-2">Manutenções</h4>
+              <p className="text-2xl font-bold text-orange-800">
+                {formatCurrency(filteredData.manutencoes.reduce((total, m) => 
+                  total + (parseFloat(m.valorFinal || m.valorOrcamento || '0') || 0), 0))}
+              </p>
+              <p className="text-sm text-orange-600">Período</p>
+            </div>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-700 mb-2">Despesas Manuais</h4>
+              <p className="text-2xl font-bold text-blue-800">
+                {formatCurrency(despesasManuaisValor)}
+              </p>
+              <p className="text-sm text-blue-600">Período</p>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="historico" className="space-y-4">
@@ -1641,31 +1667,6 @@ export default function RelatoriosFinanceiros() {
                 })()}
 
 
-                {/* Resumo das despesas */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-                  <div className="bg-red-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-red-700 mb-2">Total Despesas Fixas</h4>
-                    <p className="text-2xl font-bold text-red-800">
-                      {formatCurrency(totalDespesasFixasPuras)}
-                    </p>
-                    <p className="text-sm text-red-600">Mensais</p>
-                  </div>
-                  <div className="bg-orange-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-orange-700 mb-2">Manutenções</h4>
-                    <p className="text-2xl font-bold text-orange-800">
-                      {formatCurrency(filteredData.manutencoes.reduce((total, m) => 
-                        total + (parseFloat(m.valorFinal || m.valorOrcamento || '0') || 0), 0))}
-                    </p>
-                    <p className="text-sm text-orange-600">Período</p>
-                  </div>
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h4 className="font-medium text-blue-700 mb-2">Despesas Manuais</h4>
-                    <p className="text-2xl font-bold text-blue-800">
-                      {formatCurrency(despesasManuaisValor)}
-                    </p>
-                    <p className="text-sm text-blue-600">Período</p>
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>
