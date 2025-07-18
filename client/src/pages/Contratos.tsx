@@ -442,10 +442,10 @@ export default function Contratos() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
-                  placeholder="Cliente ou tipo..."
+                  placeholder="Buscar contrato..."
                   value={busca}
                   onChange={(e) => setBusca(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-sm"
                 />
                 {busca && (
                   <button
@@ -474,10 +474,10 @@ export default function Contratos() {
 
             <div className="space-y-2">
               <Button 
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-3 px-6 text-base font-semibold"
                 onClick={() => setShowNovoContratoModal(true)}
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-5 h-5" />
                 Gerar Contrato
               </Button>
             </div>
