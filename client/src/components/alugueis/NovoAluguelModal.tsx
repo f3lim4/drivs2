@@ -74,6 +74,7 @@ export function NovoAluguelModal({
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [alugueisAtivos, setAlugueisAtivos] = useState<Aluguel[]>([]);
   const { isLocadora, profile } = useAuth();
 
   // Função para obter a data de hoje
@@ -101,10 +102,27 @@ export function NovoAluguelModal({
           // CRITICAL SECURITY: Sempre usar filtro se for locadora
           let motoristaUrl = '/api/motoristas';
           let veiculoUrl = '/api/veiculos';
+          let aluguelUrl = '/api/alugueis';
           
           if (isLocadora && profile?.locadoraId) {
             motoristaUrl += `?locadoraId=${profile.locadoraId}`;
             veiculoUrl += `?locadoraId=${profile.locadoraId}`;
+            aluguelUrl += `?locadoraId=${profile.locadoraId}`;
+          }
+          
+          // Carrega aluguéis ativos primeiro
+          const aluguelResponse = await fetch(aluguelUrl, {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
+          
+          let alugueisAtivosData: Aluguel[] = [];
+          if (aluguelResponse.ok) {
+            const todosAlugueis = await aluguelResponse.json();
+            alugueisAtivosData = todosAlugueis.filter((aluguel: Aluguel) => aluguel.status === 'ativo');
+            setAlugueisAtivos(alugueisAtivosData);
           }
           
           // Carrega motoristas
@@ -124,10 +142,18 @@ export function NovoAluguelModal({
                 console.error('SECURITY ALERT: Motoristas de outras locadoras detectados');
                 setMotoristas([]);
               } else {
-                setMotoristas(motoristasData);
+                // Filtrar apenas motoristas que não têm aluguéis ativos
+                const motoristasDisponiveis = motoristasData.filter((motorista: Motorista) => 
+                  !alugueisAtivosData.some(aluguel => aluguel.motoristaId === motorista.id)
+                );
+                setMotoristas(motoristasDisponiveis);
               }
             } else {
-              setMotoristas(motoristasData);
+              // Filtrar apenas motoristas que não têm aluguéis ativos
+              const motoristasDisponiveis = motoristasData.filter((motorista: Motorista) => 
+                !alugueisAtivosData.some(aluguel => aluguel.motoristaId === motorista.id)
+              );
+              setMotoristas(motoristasDisponiveis);
             }
           }
           
@@ -315,9 +341,9 @@ export function NovoAluguelModal({
               <svg className="h-12 w-12 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              <p className="text-lg font-medium">Nenhum motorista cadastrado</p>
+              <p className="text-lg font-medium">Nenhum motorista disponível</p>
               <p className="text-sm mt-1">
-                Você precisa cadastrar pelo menos um motorista ativo antes de criar um aluguel.
+                Todos os motoristas já possuem aluguéis ativos. Cadastre novos motoristas ou finalize aluguéis existentes.
               </p>
             </div>
             <Button 
