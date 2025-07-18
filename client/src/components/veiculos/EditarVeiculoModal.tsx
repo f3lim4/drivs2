@@ -380,6 +380,9 @@ export function EditarVeiculoModal({
                             <SelectItem value="pickup">Pickup</SelectItem>
                             <SelectItem value="van">Van</SelectItem>
                             <SelectItem value="conversivel">Conversível</SelectItem>
+                            <SelectItem value="moto">Moto</SelectItem>
+                            <SelectItem value="utilitario">Utilitário</SelectItem>
+                            <SelectItem value="caminhao">Caminhão</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
