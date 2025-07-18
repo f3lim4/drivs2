@@ -202,7 +202,7 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Status */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -211,22 +211,14 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
             </div>
           </div>
 
-          <Separator />
-
-          {/* Informações Pessoais */}
+          {/* Dados Compactos */}
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Informações Pessoais
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Nome Completo</p>
-                <p className="text-sm">{motorista.nome}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Nome Completo</p>
+                  <p className="text-sm">{motorista.nome}</p>
+                </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">CPF</p>
                   <p className="text-sm font-mono">{motorista.cpf}</p>
@@ -235,52 +227,26 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                   <p className="text-sm font-medium text-muted-foreground">Data de Nascimento</p>
                   <p className="text-sm">{motorista.dataNascimento || 'Não informado'}</p>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Contato */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                Contato
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Telefone</p>
-                <p className="text-sm flex items-center gap-1">
-                  <Phone className="w-3 h-3" />
-                  {motorista.telefone || motorista.contato}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Email</p>
-                <p className="text-sm flex items-center gap-1">
-                  <Mail className="w-3 h-3" />
-                  {motorista.email || 'Não informado'}
-                </p>
-              </div>
-              {motorista.localizacao && (
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Localização</p>
-                  <p className="text-sm">{motorista.localizacao}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Telefone</p>
+                  <p className="text-sm flex items-center gap-1">
+                    <Phone className="w-3 h-3" />
+                    {motorista.telefone || motorista.contato}
+                  </p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* CNH */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <CreditCard className="w-4 h-4" />
-                Carteira Nacional de Habilitação
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Email</p>
+                  <p className="text-sm flex items-center gap-1">
+                    <Mail className="w-3 h-3" />
+                    {motorista.email || 'Não informado'}
+                  </p>
+                </div>
+                {motorista.localizacao && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Localização</p>
+                    <p className="text-sm">{motorista.localizacao}</p>
+                  </div>
+                )}
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Número da CNH</p>
                   <p className="text-sm font-mono">{motorista.cnh}</p>
@@ -289,13 +255,13 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                   <p className="text-sm font-medium text-muted-foreground">Categoria</p>
                   <p className="text-sm">{motorista.categoria}</p>
                 </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Data de Vencimento</p>
-                <p className="text-sm flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  {motorista.vencimentoCnh}
-                </p>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Vencimento CNH</p>
+                  <p className="text-sm flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {motorista.vencimentoCnh}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
