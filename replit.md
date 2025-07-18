@@ -19,6 +19,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Logs de debug implementados** - Sistema monitora detecção e conversão de manutenções
 - ✅ **Validação completa** - Manutenções de R$ 1.000,00 aparecem corretamente no sistema
 - ✅ **Interface funcional** - Card categoria e tabela histórico exibem dados reais
+- ✅ **Ordenação do histórico corrigida** - Manutenções usam data de conclusão para aparecer nas primeiras páginas
+- ✅ **Priorização de alterações recentes** - Sistema mostra manutenções concluídas nas primeiras posições do histórico
 
 ### 2025-07-18: Container de Resumo por Formas de Pagamento - CONCLUÍDO
 - ✅ **Container de resumo implementado** - Card dedicado mostrando distribuição por formas de pagamento
