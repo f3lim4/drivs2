@@ -568,9 +568,42 @@ export function NovoMotoristaModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Estado *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="SP" {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecionar" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="SP">SP - São Paulo</SelectItem>
+                          <SelectItem value="AC">AC - Acre</SelectItem>
+                          <SelectItem value="AL">AL - Alagoas</SelectItem>
+                          <SelectItem value="AP">AP - Amapá</SelectItem>
+                          <SelectItem value="AM">AM - Amazonas</SelectItem>
+                          <SelectItem value="BA">BA - Bahia</SelectItem>
+                          <SelectItem value="CE">CE - Ceará</SelectItem>
+                          <SelectItem value="DF">DF - Distrito Federal</SelectItem>
+                          <SelectItem value="ES">ES - Espírito Santo</SelectItem>
+                          <SelectItem value="GO">GO - Goiás</SelectItem>
+                          <SelectItem value="MA">MA - Maranhão</SelectItem>
+                          <SelectItem value="MT">MT - Mato Grosso</SelectItem>
+                          <SelectItem value="MS">MS - Mato Grosso do Sul</SelectItem>
+                          <SelectItem value="MG">MG - Minas Gerais</SelectItem>
+                          <SelectItem value="PA">PA - Pará</SelectItem>
+                          <SelectItem value="PB">PB - Paraíba</SelectItem>
+                          <SelectItem value="PR">PR - Paraná</SelectItem>
+                          <SelectItem value="PE">PE - Pernambuco</SelectItem>
+                          <SelectItem value="PI">PI - Piauí</SelectItem>
+                          <SelectItem value="RJ">RJ - Rio de Janeiro</SelectItem>
+                          <SelectItem value="RN">RN - Rio Grande do Norte</SelectItem>
+                          <SelectItem value="RS">RS - Rio Grande do Sul</SelectItem>
+                          <SelectItem value="RO">RO - Rondônia</SelectItem>
+                          <SelectItem value="RR">RR - Roraima</SelectItem>
+                          <SelectItem value="SC">SC - Santa Catarina</SelectItem>
+                          <SelectItem value="SE">SE - Sergipe</SelectItem>
+                          <SelectItem value="TO">TO - Tocantins</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
