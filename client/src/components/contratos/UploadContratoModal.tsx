@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Upload, FileText, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ export function UploadContratoModal({
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -93,6 +95,9 @@ export function UploadContratoModal({
         }
 
         const result = await response.json();
+        
+        // Invalidar cache para recarregar os dados
+        queryClient.invalidateQueries({ queryKey: ['/api/contratos'] });
         
         onUploadSuccess(contrato.id, fileName);
         onOpenChange(false);
