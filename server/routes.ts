@@ -636,6 +636,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { fileName, fileData } = req.body;
       const contratoId = req.params.id;
       
+      console.log(`[UPLOAD] Iniciando upload para contrato ${contratoId}`);
+      console.log(`[UPLOAD] Nome do arquivo: ${fileName}`);
+      console.log(`[UPLOAD] Dados recebidos: ${fileData ? 'Sim' : 'Não'}`);
+      
       if (!fileName || !fileData) {
         return res.status(400).json({ message: "Nome do arquivo e dados são obrigatórios" });
       }
@@ -646,6 +650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const uploadsDir = path.join(process.cwd(), 'uploads');
       if (!fs.existsSync(uploadsDir)) {
         fs.mkdirSync(uploadsDir, { recursive: true });
+        console.log(`[UPLOAD] Diretório uploads criado: ${uploadsDir}`);
       }
       
       // Gerar nome único para o arquivo
@@ -653,9 +658,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const uniqueFileName = `${timestamp}_${fileName}`;
       const filePath = path.join(uploadsDir, uniqueFileName);
       
+      console.log(`[UPLOAD] Caminho do arquivo: ${filePath}`);
+      
       // Converter base64 para arquivo
       const base64Data = fileData.replace(/^data:application\/pdf;base64,/, '');
       fs.writeFileSync(filePath, base64Data, 'base64');
+      
+      console.log(`[UPLOAD] Arquivo salvo com sucesso`);
       
       const updates = {
         arquivoAssinado: uniqueFileName,
@@ -666,6 +675,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await db.update(contratos)
         .set(updates)
         .where(eq(contratos.id, contratoId));
+      
+      console.log(`[UPLOAD] Banco de dados atualizado`);
       
       res.json({ 
         message: "Arquivo enviado com sucesso", 
@@ -684,13 +695,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const contratoId = req.params.id;
       
+      console.log(`[DOWNLOAD] Solicitando download do contrato ${contratoId}`);
+      
       // Buscar dados do contrato
       const contrato = await storage.getContrato(contratoId);
       if (!contrato || !contrato.arquivoAssinado) {
+        console.log(`[DOWNLOAD] Contrato não encontrado ou sem arquivo: ${contrato ? 'Sem arquivo' : 'Contrato não existe'}`);
         return res.status(404).json({ message: "Arquivo não encontrado" });
       }
       
+      console.log(`[DOWNLOAD] Arquivo no banco: ${contrato.arquivoAssinado}`);
+      
       const filePath = path.join(process.cwd(), 'uploads', contrato.arquivoAssinado);
+      
+      console.log(`[DOWNLOAD] Caminho do arquivo: ${filePath}`);
+      console.log(`[DOWNLOAD] Arquivo existe: ${fs.existsSync(filePath)}`);
       
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ message: "Arquivo não encontrado no servidor" });
@@ -703,6 +722,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Enviar arquivo
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(res);
+      
+      console.log(`[DOWNLOAD] Arquivo enviado com sucesso`);
       
     } catch (error) {
       console.error("Error downloading contract file:", error);
