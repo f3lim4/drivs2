@@ -10,17 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-18: Sistema de Seleção Multi-Veículo para Empréstimos - CONCLUÍDO
-- ✅ **Categoria "Empréstimo" adicionada** - Nova opção no modal de despesas da página de relatórios financeiros
-- ✅ **Interface de seleção múltipla** - Checkboxes para selecionar um ou mais veículos quando categoria é "empréstimo"
-- ✅ **Botão "Selecionar Todos"** - Permite marcar/desmarcar todos os veículos de uma vez
-- ✅ **Divisão automática de valor** - Valor total é dividido automaticamente pelo número de veículos selecionados
-- ✅ **Cálculo em tempo real** - Mostra valor total, valor por veículo e número de veículos selecionados
-- ✅ **Validação de formulário** - Obrigatório selecionar pelo menos um veículo para categoria empréstimo
-- ✅ **Criação múltipla de despesas** - Sistema cria uma despesa para cada veículo selecionado com valor dividido
-- ✅ **Limpeza automática** - Seleção de veículos é limpa quando categoria muda ou modal é fechado
-- ✅ **Feedback detalhado** - Toast mostra quantas despesas foram criadas e valor individual
-- ✅ **Descrição enriquecida** - Cada despesa inclui informação sobre divisão (ex: "3 veículos - R$ 100,00 cada")
+### 2025-07-18: Sistema de Seleção Multi-Veículo Universal para Todas as Categorias - CONCLUÍDO
+- ✅ **Seleção multi-veículo universal** - Disponível para TODAS as categorias de despesas (não apenas empréstimo)
+- ✅ **UX melhorado** - Seleção de veículos aparece primeiro, seguida pelo tipo de despesa
+- ✅ **Interface compacta** - Design reduzido com padding menor, texto pequeno e grid 2-3 colunas
+- ✅ **Validação universal** - Obrigatório selecionar pelo menos um veículo para qualquer categoria
+- ✅ **Divisão automática inteligente** - Valor dividido automaticamente independente da categoria
+- ✅ **Criação múltipla** - Sistema cria despesas separadas para cada veículo com valor dividido
+- ✅ **Feedback específico** - Toast mostra categoria e número de despesas criadas
+- ✅ **Limpeza automática** - Seleção limpa quando modal é fechado
+- ✅ **Fluxo otimizado** - Primeiro seleciona veículos, depois categoria e demais dados
 
 ### 2025-07-17: Verificação de Integridade e Limpeza do Sistema - CONCLUÍDO
 - ✅ **Páginas duplicadas eliminadas** - Removida AlugueisNovo.tsx que causava conflitos de roteamento
