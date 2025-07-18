@@ -3,7 +3,7 @@
  * Formulário preenchido com dados do motorista selecionado
  */
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -33,6 +34,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Motorista } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { Image, Upload, X, FileText, Eye } from 'lucide-react';
 
 // Schema de validação (mesmo do NovoMotoristaModal)
 const motoristaSchema = z.object({
@@ -78,6 +82,40 @@ export function EditarMotoristaModal({
   motorista,
   onMotoristaEditado 
 }: EditarMotoristaModalProps) {
+  const [loading, setLoading] = useState(false);
+  const [imagens, setImagens] = useState<{
+    fotoPerfil: File | null;
+    cnhImagem: File | null;
+    fotoComCnh: File | null;
+    comprovanteEndereco: File | null;
+    fotoExtra: File | null;
+    fotoExtra2: File | null;
+  }>({
+    fotoPerfil: null,
+    cnhImagem: null,
+    fotoComCnh: null,
+    comprovanteEndereco: null,
+    fotoExtra: null,
+    fotoExtra2: null,
+  });
+  const [imagePreviews, setImagePreviews] = useState<{
+    fotoPerfil: string | null;
+    cnhImagem: string | null;
+    fotoComCnh: string | null;
+    comprovanteEndereco: string | null;
+    fotoExtra: string | null;
+    fotoExtra2: string | null;
+  }>({
+    fotoPerfil: null,
+    cnhImagem: null,
+    fotoComCnh: null,
+    comprovanteEndereco: null,
+    fotoExtra: null,
+    fotoExtra2: null,
+  });
+  const { profile } = useAuth();
+  const { toast } = useToast();
+
   const form = useForm<MotoristaFormData>({
     resolver: zodResolver(motoristaSchema),
     defaultValues: {
@@ -100,6 +138,60 @@ export function EditarMotoristaModal({
     },
   });
 
+  // Funções para gerenciar imagens específicas
+  const handleImageUpload = (files: FileList | null, tipo: keyof typeof imagens) => {
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    
+    // Validar arquivo
+    const isValidImage = file.type.startsWith('image/');
+    const isValidPdf = file.type === 'application/pdf';
+    const isValidFile = tipo === 'cnhImagem' || tipo === 'comprovanteEndereco' ? 
+      (isValidImage || isValidPdf) : isValidImage;
+    
+    if (!isValidFile) {
+      toast({
+        title: "Arquivo inválido",
+        description: tipo === 'cnhImagem' || tipo === 'comprovanteEndereco' ? 
+          "Apenas imagens (JPG, PNG) ou PDF são aceitos" : 
+          "Apenas imagens (JPG, PNG) são aceitas",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB max
+      toast({
+        title: "Arquivo muito grande",
+        description: "O arquivo deve ter no máximo 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Atualizar arquivo
+    setImagens(prev => ({ ...prev, [tipo]: file }));
+    
+    // Criar preview (apenas para imagens)
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreviews(prev => ({ ...prev, [tipo]: result }));
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // Para PDFs, apenas limpar preview
+      setImagePreviews(prev => ({ ...prev, [tipo]: null }));
+    }
+  };
+
+  const handleRemoveImage = (tipo: keyof typeof imagens) => {
+    setImagens(prev => ({ ...prev, [tipo]: null }));
+    setImagePreviews(prev => ({ ...prev, [tipo]: null }));
+  };
+
   // Preenche o formulário quando o motorista é selecionado
   useEffect(() => {
     if (motorista && open) {
@@ -121,50 +213,104 @@ export function EditarMotoristaModal({
         cep: motorista.cep,
         status: motorista.status,
       });
+      
+      // Limpar imagens quando mudar motorista
+      setImagens({
+        fotoPerfil: null,
+        cnhImagem: null,
+        fotoComCnh: null,
+        comprovanteEndereco: null,
+        fotoExtra: null,
+        fotoExtra2: null,
+      });
+      setImagePreviews({
+        fotoPerfil: null,
+        cnhImagem: null,
+        fotoComCnh: null,
+        comprovanteEndereco: null,
+        fotoExtra: null,
+        fotoExtra2: null,
+      });
     }
   }, [motorista, open, form]);
 
   const onSubmit = async (data: MotoristaFormData) => {
-    if (!motorista) return;
+    if (!motorista || !profile) return;
 
     try {
-      // Simula delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      setLoading(true);
       
-      // Cria motorista atualizado
-      const motoristaAtualizado: Motorista = {
-        ...motorista,
-        // Informações Pessoais
-        nome: data.nome,
-        cpf: data.cpf,
-        rg: data.rg,
-        dataNascimento: data.dataNascimento,
-        // Contato
-        telefone: data.telefone,
+      // Preparar dados para API
+      const motoristaData = {
+        ...data,
+        locadoraId: profile.id,
         email: data.email || undefined,
-        // Carteira de Motorista
-        cnh: data.cnh,
-        categoria: data.categoria,
-        vencimentoCnh: data.vencimentoCnh,
-        // Endereço
-        rua: data.rua,
-        numero: data.numero,
-        bairro: data.bairro,
-        cidade: data.cidade,
-        estado: data.estado,
-        cep: data.cep,
-        // Status
-        status: data.status,
-        // Campos de compatibilidade
-        contato: data.telefone,
-        localizacao: `${data.cidade}/${data.estado}`,
       };
+      
+      // Atualizar dados do motorista
+      const response = await fetch(`/api/motoristas/${motorista.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(motoristaData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar motorista');
+      }
+
+      const motoristaAtualizado = await response.json();
+      
+      // Upload das imagens se existirem
+      const imagensParaUpload = Object.entries(imagens).filter(([_, file]) => file !== null);
+      
+      if (imagensParaUpload.length > 0) {
+        const formData = new FormData();
+        
+        imagensParaUpload.forEach(([tipo, file]) => {
+          if (file) {
+            formData.append(tipo, file);
+          }
+        });
+        
+        const uploadResponse = await fetch(`/api/motoristas/${motorista.id}/upload-imagens`, {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!uploadResponse.ok) {
+          console.error('Erro ao fazer upload das imagens');
+          toast({
+            title: "Dados atualizados",
+            description: "Motorista atualizado, mas houve erro no upload das imagens",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Sucesso!",
+            description: "Motorista e documentos atualizados com sucesso",
+          });
+        }
+      } else {
+        toast({
+          title: "Sucesso!",
+          description: "Motorista atualizado com sucesso",
+        });
+      }
 
       onMotoristaEditado(motoristaAtualizado);
       onOpenChange(false);
       
     } catch (error) {
       console.error('Erro ao editar motorista:', error);
+      toast({
+        title: "Erro!",
+        description: "Erro ao atualizar motorista. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -442,9 +588,42 @@ export function EditarMotoristaModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Estado *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="SP" {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o estado" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="AC">AC</SelectItem>
+                          <SelectItem value="AL">AL</SelectItem>
+                          <SelectItem value="AP">AP</SelectItem>
+                          <SelectItem value="AM">AM</SelectItem>
+                          <SelectItem value="BA">BA</SelectItem>
+                          <SelectItem value="CE">CE</SelectItem>
+                          <SelectItem value="DF">DF</SelectItem>
+                          <SelectItem value="ES">ES</SelectItem>
+                          <SelectItem value="GO">GO</SelectItem>
+                          <SelectItem value="MA">MA</SelectItem>
+                          <SelectItem value="MT">MT</SelectItem>
+                          <SelectItem value="MS">MS</SelectItem>
+                          <SelectItem value="MG">MG</SelectItem>
+                          <SelectItem value="PA">PA</SelectItem>
+                          <SelectItem value="PB">PB</SelectItem>
+                          <SelectItem value="PR">PR</SelectItem>
+                          <SelectItem value="PE">PE</SelectItem>
+                          <SelectItem value="PI">PI</SelectItem>
+                          <SelectItem value="RJ">RJ</SelectItem>
+                          <SelectItem value="RN">RN</SelectItem>
+                          <SelectItem value="RS">RS</SelectItem>
+                          <SelectItem value="RO">RO</SelectItem>
+                          <SelectItem value="RR">RR</SelectItem>
+                          <SelectItem value="SC">SC</SelectItem>
+                          <SelectItem value="SP">SP</SelectItem>
+                          <SelectItem value="SE">SE</SelectItem>
+                          <SelectItem value="TO">TO</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -470,6 +649,289 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
+              </div>
+            </div>
+
+            {/* DOCUMENTOS */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-foreground border-b pb-2">
+                Documentos
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Foto de Perfil */}
+                <div className="space-y-2">
+                  <Label htmlFor="foto-perfil">Foto de Perfil</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <input
+                      id="foto-perfil"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e.target.files, 'fotoPerfil')}
+                      className="hidden"
+                    />
+                    {imagens.fotoPerfil ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">{imagens.fotoPerfil.name}</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveImage('fotoPerfil')}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {imagePreviews.fotoPerfil && (
+                          <img 
+                            src={imagePreviews.fotoPerfil} 
+                            alt="Preview" 
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="foto-perfil"
+                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                      >
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                {/* CNH */}
+                <div className="space-y-2">
+                  <Label htmlFor="cnh-imagem">CNH</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <input
+                      id="cnh-imagem"
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => handleImageUpload(e.target.files, 'cnhImagem')}
+                      className="hidden"
+                    />
+                    {imagens.cnhImagem ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">{imagens.cnhImagem.name}</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveImage('cnhImagem')}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {imagePreviews.cnhImagem ? (
+                          <img 
+                            src={imagePreviews.cnhImagem} 
+                            alt="Preview" 
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center w-20 h-20 bg-gray-100 rounded">
+                            <FileText className="h-8 w-8 text-gray-400" />
+                            <span className="text-xs text-gray-600 ml-1">PDF</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="cnh-imagem"
+                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                      >
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                {/* Foto com CNH */}
+                <div className="space-y-2">
+                  <Label htmlFor="foto-com-cnh">Foto com CNH</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <input
+                      id="foto-com-cnh"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e.target.files, 'fotoComCnh')}
+                      className="hidden"
+                    />
+                    {imagens.fotoComCnh ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">{imagens.fotoComCnh.name}</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveImage('fotoComCnh')}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {imagePreviews.fotoComCnh && (
+                          <img 
+                            src={imagePreviews.fotoComCnh} 
+                            alt="Preview" 
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="foto-com-cnh"
+                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                      >
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                {/* Comprovante de Endereço */}
+                <div className="space-y-2">
+                  <Label htmlFor="comprovante-endereco">Comprovante de Endereço</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <input
+                      id="comprovante-endereco"
+                      type="file"
+                      accept="image/*,application/pdf"
+                      onChange={(e) => handleImageUpload(e.target.files, 'comprovanteEndereco')}
+                      className="hidden"
+                    />
+                    {imagens.comprovanteEndereco ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">{imagens.comprovanteEndereco.name}</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveImage('comprovanteEndereco')}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {imagePreviews.comprovanteEndereco ? (
+                          <img 
+                            src={imagePreviews.comprovanteEndereco} 
+                            alt="Preview" 
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center w-20 h-20 bg-gray-100 rounded">
+                            <FileText className="h-8 w-8 text-gray-400" />
+                            <span className="text-xs text-gray-600 ml-1">PDF</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="comprovante-endereco"
+                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                      >
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                {/* Foto Extra */}
+                <div className="space-y-2">
+                  <Label htmlFor="foto-extra">Foto Extra</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <input
+                      id="foto-extra"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e.target.files, 'fotoExtra')}
+                      className="hidden"
+                    />
+                    {imagens.fotoExtra ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">{imagens.fotoExtra.name}</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveImage('fotoExtra')}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {imagePreviews.fotoExtra && (
+                          <img 
+                            src={imagePreviews.fotoExtra} 
+                            alt="Preview" 
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="foto-extra"
+                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                      >
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                {/* Foto Extra 2 */}
+                <div className="space-y-2">
+                  <Label htmlFor="foto-extra-2">Foto Extra 2</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <input
+                      id="foto-extra-2"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e.target.files, 'fotoExtra2')}
+                      className="hidden"
+                    />
+                    {imagens.fotoExtra2 ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">{imagens.fotoExtra2.name}</span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleRemoveImage('fotoExtra2')}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {imagePreviews.fotoExtra2 && (
+                          <img 
+                            src={imagePreviews.fotoExtra2} 
+                            alt="Preview" 
+                            className="w-20 h-20 object-cover rounded"
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="foto-extra-2"
+                        className="cursor-pointer flex flex-col items-center justify-center py-2"
+                      >
+                        <Upload className="h-8 w-8 text-gray-400" />
+                        <span className="text-sm text-gray-600">Clique para selecionar</span>
+                      </label>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -508,11 +970,12 @@ export function EditarMotoristaModal({
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                disabled={loading}
               >
                 Cancelar
               </Button>
-              <Button type="submit">
-                Salvar Alterações
+              <Button type="submit" disabled={loading}>
+                {loading ? "Salvando..." : "Salvar Alterações"}
               </Button>
             </DialogFooter>
           </form>
