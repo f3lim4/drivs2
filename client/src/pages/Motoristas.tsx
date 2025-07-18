@@ -408,8 +408,23 @@ export default function Motoristas() {
                 <TableRow key={motorista.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                        <span className="text-primary-foreground font-medium text-sm">
+                      <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center overflow-hidden">
+                        {motorista.imagem1 ? (
+                          <img 
+                            src={`/uploads/${motorista.imagem1}`} 
+                            alt={motorista.nome}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Se a imagem não carregar, mostra as iniciais
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling!.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <span 
+                          className="text-primary-foreground font-medium text-sm w-full h-full flex items-center justify-center"
+                          style={{ display: motorista.imagem1 ? 'none' : 'flex' }}
+                        >
                           {motorista.nome.charAt(0).toUpperCase()}
                         </span>
                       </div>
