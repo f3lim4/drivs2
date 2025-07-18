@@ -3,16 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDate } from '@/lib/utils';
-import { Wrench, Calendar, Clock, DollarSign, MapPin, Phone } from 'lucide-react';
+import { Wrench, Calendar, Clock, DollarSign, MapPin, Phone, CheckCircle } from 'lucide-react';
 import type { Manutencao } from '@shared/schema';
 
 interface VisualizarManutencaoModalProps {
   open: boolean;
   onClose: () => void;
   manutencao: Manutencao | null;
+  onMarcarConcluida?: (manutencao: Manutencao) => void;
 }
 
-export function VisualizarManutencaoModal({ open, onClose, manutencao }: VisualizarManutencaoModalProps) {
+export function VisualizarManutencaoModal({ open, onClose, manutencao, onMarcarConcluida }: VisualizarManutencaoModalProps) {
   if (!manutencao) return null;
 
   const getStatusColor = (status: string) => {
@@ -304,9 +305,20 @@ export function VisualizarManutencaoModal({ open, onClose, manutencao }: Visuali
             </CardContent>
           </Card>
 
-          {/* Botão de fechar */}
-          <div className="flex justify-end">
-            <Button onClick={onClose}>Fechar</Button>
+          {/* Botões de ação */}
+          <div className="flex justify-between">
+            <div>
+              {manutencao.status !== 'concluida' && manutencao.status !== 'cancelada' && onMarcarConcluida && (
+                <Button 
+                  onClick={() => onMarcarConcluida(manutencao)}
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Manutenção Realizada
+                </Button>
+              )}
+            </div>
+            <Button onClick={onClose} variant="outline">Fechar</Button>
           </div>
         </div>
       </DialogContent>
