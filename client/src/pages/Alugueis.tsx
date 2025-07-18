@@ -223,6 +223,16 @@ export default function Alugueis() {
       });
 
       if (response.ok) {
+        // Log da atividade
+        await registrarAtividade(
+          profile?.locadoraId || '',
+          profile?.email || 'usuario@drivs.me',
+          'excluir',
+          'aluguel',
+          aluguel.id,
+          `Aluguel excluído: ${aluguel.motoristaNome} - ${aluguel.veiculoModelo} (${aluguel.veiculoPlaca})`
+        );
+
         // Invalidar cache para atualizar a lista
         queryClient.invalidateQueries({ queryKey: ['/api/alugueis'] });
         queryClient.invalidateQueries({ queryKey: ['/api/veiculos'] });

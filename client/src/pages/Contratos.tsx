@@ -8,6 +8,7 @@ import { Plus, Upload, FileText, Download, Eye, Edit, Trash2, Filter, Search, X,
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useContratos } from '@/hooks/useContratos';
+import { registrarAtividade } from '@/utils/activityLogger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -113,6 +114,17 @@ export default function Contratos() {
   const handleConfirmarExclusao = async (contrato: Contrato) => {
     try {
       await deleteContrato.mutateAsync(contrato.id);
+      
+      // Log da atividade
+      await registrarAtividade(
+        profile?.locadoraId || '',
+        profile?.email || 'usuario@drivs.me',
+        'excluir',
+        'contrato',
+        contrato.id,
+        `Contrato excluído: ${contrato.cliente} - ${contrato.tipo}`
+      );
+      
       toast({
         title: "Contrato Excluído",
         description: `Contrato de ${contrato.cliente} foi excluído.`,

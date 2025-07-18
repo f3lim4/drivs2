@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/select';
 import { Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
+import { registrarAtividade } from '@/utils/activityLogger';
 
 // Schema de validação
 const veiculoSchema = z.object({
@@ -218,6 +219,16 @@ export function NovoVeiculoModal({
       }
 
       const novoVeiculo = await response.json();
+
+      // Log da atividade
+      await registrarAtividade(
+        profile.locadoraId,
+        profile.email || 'usuario@drivs.me',
+        'cadastrar',
+        'veiculo',
+        novoVeiculo.id,
+        `Novo veículo cadastrado: ${novoVeiculo.marca} ${novoVeiculo.modelo} (${novoVeiculo.placa})`
+      );
 
       onVeiculoAdicionado(novoVeiculo);
       

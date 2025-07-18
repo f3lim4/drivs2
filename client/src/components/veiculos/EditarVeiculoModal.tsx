@@ -33,6 +33,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Veiculo } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { registrarAtividade } from '@/utils/activityLogger';
 
 // Schema de validação (mesmo do NovoVeiculoModal)
 const veiculoSchema = z.object({
@@ -102,6 +105,8 @@ export function EditarVeiculoModal({
   onVeiculoEditado 
 }: EditarVeiculoModalProps) {
   const [loading, setLoading] = useState(false);
+  const { profile } = useAuth();
+  const { toast } = useToast();
 
   const form = useForm<VeiculoFormData>({
     resolver: zodResolver(veiculoSchema),
@@ -226,7 +231,24 @@ export function EditarVeiculoModal({
       }
 
       const veiculoAtualizado = await response.json();
+
+      // Log da atividade
+      await registrarAtividade(
+        profile.locadoraId,
+        profile.email || 'usuario@drivs.me',
+        'atualizar',
+        'veiculo',
+        veiculo.id,
+        `Veículo atualizado: ${veiculoAtualizado.marca} ${veiculoAtualizado.modelo} (${veiculoAtualizado.placa})`
+      );
+
       onVeiculoEditado(veiculoAtualizado);
+      
+      toast({
+        title: "Veículo atualizado com sucesso!",
+        description: `${veiculoAtualizado.marca} ${veiculoAtualizado.modelo} foi atualizado.`,
+      });
+      
       onOpenChange(false);
       
     } catch (error) {

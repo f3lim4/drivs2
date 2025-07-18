@@ -7,6 +7,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
+import { registrarAtividade } from '@/utils/activityLogger';
+import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -51,6 +54,8 @@ export function EditarContratoModal({
   onContratoEditado 
 }: EditarContratoModalProps) {
   const [loading, setLoading] = useState(false);
+  const { profile } = useAuth();
+  const { toast } = useToast();
 
   const form = useForm<ContratoFormData>({
     resolver: zodResolver(contratoSchema),
@@ -107,11 +112,32 @@ export function EditarContratoModal({
       }
 
       const contratoAtualizado = await response.json();
+      
+      // Log da atividade
+      await registrarAtividade(
+        profile?.locadoraId || '',
+        profile?.email || 'usuario@drivs.me',
+        'editar',
+        'contrato',
+        contrato.id,
+        `Contrato editado: ${data.cliente} - ${contrato.tipo}`
+      );
+      
       onContratoEditado(contratoAtualizado);
       onOpenChange(false);
       
+      toast({
+        title: "Contrato Editado",
+        description: `Contrato de ${data.cliente} foi atualizado com sucesso.`,
+      });
+      
     } catch (error) {
       console.error('Erro ao editar contrato:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível editar o contrato. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }

@@ -38,7 +38,24 @@ export function usePagamentos() {
       });
       
       if (!response.ok) throw new Error('Failed to create pagamento');
-      return response.json();
+      const novoPagamento = await response.json();
+      
+      // Log da atividade
+      try {
+        const { registrarAtividade } = await import('@/utils/activityLogger');
+        await registrarAtividade(
+          pagamento.locadoraId,
+          profile?.email || 'usuario@drivs.me',
+          'criar',
+          'pagamento',
+          novoPagamento.id,
+          `Pagamento criado: ${pagamento.tipo} - ${pagamento.motoristaId} (R$ ${pagamento.valorTotal})`
+        );
+      } catch (error) {
+        console.error('Erro ao registrar atividade:', error);
+      }
+      
+      return novoPagamento;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
@@ -54,7 +71,24 @@ export function usePagamentos() {
       });
       
       if (!response.ok) throw new Error('Failed to update pagamento');
-      return response.json();
+      const pagamentoAtualizado = await response.json();
+      
+      // Log da atividade
+      try {
+        const { registrarAtividade } = await import('@/utils/activityLogger');
+        await registrarAtividade(
+          locadoraId,
+          profile?.email || 'usuario@drivs.me',
+          'editar',
+          'pagamento',
+          id,
+          `Pagamento editado: ${updates.tipo || 'pagamento'} - ${updates.motoristaId || 'motorista'}`
+        );
+      } catch (error) {
+        console.error('Erro ao registrar atividade:', error);
+      }
+      
+      return pagamentoAtualizado;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
@@ -63,11 +97,30 @@ export function usePagamentos() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
+      // Buscar dados do pagamento antes de excluir para o log
+      const pagamentoPrevio = data?.find(p => p.id === id);
+      
       const response = await fetch(`/api/pagamentos/${id}`, {
         method: 'DELETE',
       });
       
       if (!response.ok) throw new Error('Failed to delete pagamento');
+      
+      // Log da atividade
+      try {
+        const { registrarAtividade } = await import('@/utils/activityLogger');
+        await registrarAtividade(
+          locadoraId,
+          profile?.email || 'usuario@drivs.me',
+          'excluir',
+          'pagamento',
+          id,
+          `Pagamento excluído: ${pagamentoPrevio?.tipo || 'pagamento'} - ${pagamentoPrevio?.motoristaId || 'motorista'} (R$ ${pagamentoPrevio?.valorTotal || '0'})`
+        );
+      } catch (error) {
+        console.error('Erro ao registrar atividade:', error);
+      }
+      
       return response.json();
     },
     onSuccess: () => {

@@ -46,6 +46,8 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { cn } from '@/lib/utils';
 import { Aluguel, Motorista, Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
+import { registrarAtividade } from '@/utils/activityLogger';
+import { useToast } from '@/hooks/use-toast';
 
 // Schema de validação
 const aluguelSchema = z.object({
@@ -76,6 +78,7 @@ export function NovoAluguelModal({
   const [loadingData, setLoadingData] = useState(true);
   const [alugueisAtivos, setAlugueisAtivos] = useState<Aluguel[]>([]);
   const { isLocadora, profile } = useAuth();
+  const { toast } = useToast();
 
   // Função para obter a data de hoje
   const getHoje = () => {
@@ -304,6 +307,16 @@ export function NovoAluguelModal({
         },
         status: 'ativo',
       };
+
+      // Log da atividade
+      await registrarAtividade(
+        profile?.locadoraId || '',
+        profile?.email || 'usuario@drivs.me',
+        'cadastrar',
+        'aluguel',
+        aluguelCriado.id,
+        `Novo aluguel criado: ${motorista.nome} - ${veiculo.marca} ${veiculo.modelo} (${veiculo.placa})`
+      );
 
       onAluguelAdicionado(novoAluguel);
       onOpenChange(false);

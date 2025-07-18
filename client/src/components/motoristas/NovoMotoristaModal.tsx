@@ -37,6 +37,7 @@ import { generateId } from '@/utils/formatters';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useMotoristas } from '@/hooks/useMotoristas';
+import { registrarAtividade } from '@/utils/activityLogger';
 import { Image, Upload, X } from 'lucide-react';
 
 // Funções de validação
@@ -334,6 +335,16 @@ export function NovoMotoristaModal({
 
       // Usar hook do React Query para criar motorista
       const novoMotorista = await createMotorista.mutateAsync(motoristaData);
+
+      // Log da atividade
+      await registrarAtividade(
+        profile?.locadoraId || '123456789',
+        profile?.email || 'usuario@drivs.me',
+        'cadastrar',
+        'motorista',
+        novoMotorista.id,
+        `Novo motorista cadastrado: ${novoMotorista.nome} (CPF: ${novoMotorista.cpf})`
+      );
       
       // Upload das imagens se houver
       const imagensParaUpload = Object.values(imagens).filter(img => img !== null);
