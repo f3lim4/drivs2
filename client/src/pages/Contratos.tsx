@@ -29,6 +29,7 @@ import { EditarContratoModal } from '@/components/contratos/EditarContratoModal'
 import { UploadTemplateModal } from '@/components/contratos/UploadTemplateModal';
 import { TemplatesModal } from '@/components/contratos/TemplatesModal';
 import { UploadContratoModal } from '@/components/contratos/UploadContratoModal';
+import { ExcluirContratoDialog } from '@/components/contratos/ExcluirContratoDialog';
 import { useTemplateContratos } from '@/hooks/useTemplateContratos';
 import { Contrato } from '@/types';
 import jsPDF from 'jspdf';
@@ -44,7 +45,9 @@ export default function Contratos() {
   const [showUploadTemplateModal, setShowUploadTemplateModal] = useState(false);
   const [showTemplatesModal, setShowTemplatesModal] = useState(false);
   const [showUploadContratoModal, setShowUploadContratoModal] = useState(false);
+  const [showExcluirDialog, setShowExcluirDialog] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
+  const [contratoParaExcluir, setContratoParaExcluir] = useState<Contrato | null>(null);
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
 
@@ -102,7 +105,12 @@ export default function Contratos() {
     }
   };
 
-  const handleExcluirContrato = async (contrato: Contrato) => {
+  const handleExcluirContrato = (contrato: Contrato) => {
+    setContratoParaExcluir(contrato);
+    setShowExcluirDialog(true);
+  };
+
+  const handleConfirmarExclusao = async (contrato: Contrato) => {
     try {
       await deleteContrato.mutateAsync(contrato.id);
       toast({
@@ -715,6 +723,13 @@ export default function Contratos() {
           />
         </>
       )}
+
+      <ExcluirContratoDialog
+        open={showExcluirDialog}
+        onOpenChange={setShowExcluirDialog}
+        contrato={contratoParaExcluir}
+        onConfirmarExclusao={handleConfirmarExclusao}
+      />
     </div>
   );
 }
