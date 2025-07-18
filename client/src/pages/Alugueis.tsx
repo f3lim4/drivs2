@@ -414,22 +414,6 @@ export default function Alugueis() {
                 </SelectContent>
               </Select>
 
-              <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mais-novos">Mais novos primeiro</SelectItem>
-                  <SelectItem value="mais-antigos">Mais antigos primeiro</SelectItem>
-                  <SelectItem value="motorista-az">Motorista (A-Z)</SelectItem>
-                  <SelectItem value="motorista-za">Motorista (Z-A)</SelectItem>
-                  <SelectItem value="veiculo-az">Veículo (A-Z)</SelectItem>
-                  <SelectItem value="veiculo-za">Veículo (Z-A)</SelectItem>
-                  <SelectItem value="valor-maior">Maior valor</SelectItem>
-                  <SelectItem value="valor-menor">Menor valor</SelectItem>
-                </SelectContent>
-              </Select>
-
               {isLocadora && (
                 <Button 
                   className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -446,8 +430,25 @@ export default function Alugueis() {
 
       {/* Tabela de aluguéis */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle>Contratos de Locação</CardTitle>
+          
+          {/* Ordenação posicionada no lado oposto */}
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+              <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+              <SelectItem value="motorista-az">Motorista (A-Z)</SelectItem>
+              <SelectItem value="motorista-za">Motorista (Z-A)</SelectItem>
+              <SelectItem value="veiculo-az">Veículo (A-Z)</SelectItem>
+              <SelectItem value="veiculo-za">Veículo (Z-A)</SelectItem>
+              <SelectItem value="valor-maior">Maior valor</SelectItem>
+              <SelectItem value="valor-menor">Menor valor</SelectItem>
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent className="p-0">
           {filteredAlugueis.length > 0 ? (
