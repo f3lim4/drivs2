@@ -18,7 +18,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Despesas por categoria individuais** - Card "Despesas por Categoria" agora mostra valor específico de cada categoria (Empréstimo: R$ 7.621,95, IPVA: R$ 2.713,33, etc.)
 - ✅ **Cores diferenciadas por categoria** - Sistema de cores específicas para cada tipo de despesa (roxo para empréstimo, amarelo para IPVA, verde para seguro, etc.)
 - ✅ **Ordenação por valor** - Categorias ordenadas automaticamente do maior para o menor valor
-- ✅ **Título da aba "Histórico" removido** - Interface limpa na aba histórico sem título "Histórico de Despesas dos Veículos"
+- ✅ **Aba "Histórico" removida** - Eliminada aba vazia que não tinha conteúdo, mantendo apenas 4 abas funcionais
+- ✅ **Título "Histórico de Despesas dos Veículos" restaurado** - Título restaurado na aba "Despesas" conforme solicitado
 
 ### 2025-07-18: Restauração da Tabela Histórico - CONCLUÍDO
 - ✅ **Tabela "Histórico de Despesas dos Veículos" restaurada** - Usuário solicitou o retorno dos dados detalhados
