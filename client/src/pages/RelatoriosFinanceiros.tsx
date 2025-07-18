@@ -1684,32 +1684,9 @@ export default function RelatoriosFinanceiros() {
                         });
                         
                         // Adicionar manutenções
-                        console.log('HISTÓRICO - Adicionando manutenções:', {
-                          totalManutencoes: filteredData.manutencoes.length,
-                          manutencoes: filteredData.manutencoes.map(m => ({
-                            id: m.id,
-                            veiculoId: m.veiculoId,
-                            valorFinal: m.valorFinal,
-                            valorOrcamento: m.valorOrcamento,
-                            dataInicio: m.dataInicio,
-                            dataConclusao: m.dataConclusao,
-                            tipo: m.tipo,
-                            oficina: m.oficina
-                          }))
-                        });
-                        
                         filteredData.manutencoes.forEach(manutencao => {
                           const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
                           const valor = manutencao.valorFinal || manutencao.valorOrcamento;
-                          
-                          console.log('HISTÓRICO - Processando manutenção:', {
-                            id: manutencao.id,
-                            valor,
-                            valorFinal: manutencao.valorFinal,
-                            valorOrcamento: manutencao.valorOrcamento,
-                            veiculo: veiculo?.placa,
-                            adicionando: !!(valor && parseFloat(valor) > 0)
-                          });
                           
                           if (valor && parseFloat(valor) > 0) {
                             // Usar data de conclusão se disponível (para manutenções concluídas), senão data de início
@@ -1726,13 +1703,6 @@ export default function RelatoriosFinanceiros() {
                               status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente',
                               formaPagamento: manutencao.formaPagamento || 'Não informado',
                               createdAt: manutencao.createdAt || dataManutencao
-                            });
-                            
-                            console.log('HISTÓRICO - Manutenção adicionada:', {
-                              id: `manutencao-${manutencao.id}`,
-                              data: dataManutencao,
-                              tipo: 'Manutenção',
-                              valor: parseFloat(valor)
                             });
                           }
                         });
@@ -1754,19 +1724,7 @@ export default function RelatoriosFinanceiros() {
                           });
                         });
                         
-                        console.log('HISTÓRICO - Total despesas após processamento:', {
-                          totalDespesas: todasDespesas.length,
-                          tiposDespesas: todasDespesas.reduce((acc, d) => {
-                            acc[d.tipo] = (acc[d.tipo] || 0) + 1;
-                            return acc;
-                          }, {} as Record<string, number>),
-                          primeiras5: todasDespesas.slice(0, 5).map(d => ({
-                            tipo: d.tipo,
-                            categoria: d.categoria,
-                            valor: d.valor,
-                            data: d.data
-                          }))
-                        });
+
 
                         
                         // Aplicar ordenação
@@ -1776,8 +1734,20 @@ export default function RelatoriosFinanceiros() {
                           
                           switch (sortHistorico) {
                             case 'mais-recente':
+                              // Se datas são iguais, priorizar manutenções
+                              if (dateB === dateA) {
+                                if (a.tipo === 'Manutenção' && b.tipo !== 'Manutenção') return -1;
+                                if (b.tipo === 'Manutenção' && a.tipo !== 'Manutenção') return 1;
+                                return 0;
+                              }
                               return dateB - dateA;
                             case 'mais-antiga':
+                              // Se datas são iguais, priorizar manutenções
+                              if (dateA === dateB) {
+                                if (a.tipo === 'Manutenção' && b.tipo !== 'Manutenção') return -1;
+                                if (b.tipo === 'Manutenção' && a.tipo !== 'Manutenção') return 1;
+                                return 0;
+                              }
                               return dateA - dateB;
                             case 'maior-valor':
                               return b.valor - a.valor;
@@ -1792,6 +1762,12 @@ export default function RelatoriosFinanceiros() {
                             case 'categoria-za':
                               return b.categoria.localeCompare(a.categoria);
                             default:
+                              // Se datas são iguais, priorizar manutenções
+                              if (dateB === dateA) {
+                                if (a.tipo === 'Manutenção' && b.tipo !== 'Manutenção') return -1;
+                                if (b.tipo === 'Manutenção' && a.tipo !== 'Manutenção') return 1;
+                                return 0;
+                              }
                               return dateB - dateA;
                           }
                         });
