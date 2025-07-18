@@ -158,6 +158,8 @@ export const contratos = pgTable("contratos", {
   dataFim: date("data_fim"),
   status: text("status").notNull().default("ativo"), // 'ativo', 'finalizado', 'cancelado'
   template: text("template"), // conteúdo do contrato
+  arquivoAssinado: text("arquivo_assinado"), // nome do arquivo assinado
+  dataAssinatura: timestamp("data_assinatura"), // quando foi assinado
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

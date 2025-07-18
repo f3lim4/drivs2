@@ -627,6 +627,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Upload de contrato assinado
+  app.post("/api/contratos/:id/upload", async (req, res) => {
+    try {
+      const { fileName, fileData } = req.body;
+      const contratoId = req.params.id;
+      
+      if (!fileName || !fileData) {
+        return res.status(400).json({ message: "Nome do arquivo e dados são obrigatórios" });
+      }
+      
+      // Por simplicidade, vamos apenas salvar o nome do arquivo no banco
+      // Em produção, você salvaria o arquivo em um storage (AWS S3, etc.)
+      const updates = {
+        arquivoAssinado: fileName,
+        dataAssinatura: new Date().toISOString(),
+      };
+      
+      await storage.updateContrato(contratoId, updates);
+      
+      res.json({ 
+        message: "Arquivo enviado com sucesso", 
+        fileName,
+        uploadedAt: new Date().toISOString() 
+      });
+    } catch (error) {
+      console.error("Error uploading contract file:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Template Contratos routes
   app.get("/api/template-contratos", async (req, res) => {
     try {
