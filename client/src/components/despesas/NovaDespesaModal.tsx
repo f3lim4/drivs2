@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Plus } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { CalendarIcon, Plus, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ const despesaFormSchema = insertDespesaSchema.omit({ id: true });
 
 export function NovaDespesaModal() {
   const [open, setOpen] = useState(false);
+  const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
   const { profile } = useAuth();
   const { createDespesa, isCreating } = useDespesas();
   const { veiculos } = useVeiculos();
@@ -47,6 +49,7 @@ export function NovaDespesaModal() {
   // Observar mudanças nos campos categoria e veiculoId
   const categoria = form.watch('categoria');
   const veiculoId = form.watch('veiculoId');
+  const valorTotal = form.watch('valor');
 
   // Preenchimento automático quando categoria é seguro e veículo selecionado
   useEffect(() => {
@@ -59,15 +62,80 @@ export function NovaDespesaModal() {
     }
   }, [categoria, veiculoId, veiculos, form]);
 
+  // Limpar veículos selecionados quando categoria não for empréstimo
+  useEffect(() => {
+    if (categoria !== 'emprestimo') {
+      setSelectedVehicles([]);
+    }
+  }, [categoria]);
+
+  // Funções para gerenciar seleção de veículos
+  const handleVehicleSelection = (veiculoId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedVehicles(prev => [...prev, veiculoId]);
+    } else {
+      setSelectedVehicles(prev => prev.filter(id => id !== veiculoId));
+    }
+  };
+
+  const handleSelectAllVehicles = (checked: boolean) => {
+    if (checked) {
+      setSelectedVehicles(veiculos.map(v => v.id));
+    } else {
+      setSelectedVehicles([]);
+    }
+  };
+
+  // Calcular valor por veículo para empréstimos
+  const valorPorVeiculo = categoria === 'emprestimo' && selectedVehicles.length > 0 && valorTotal
+    ? (parseFloat(valorTotal.toString().replace(',', '.')) / selectedVehicles.length).toFixed(2)
+    : '0.00';
+
   const onSubmit = async (data: z.infer<typeof despesaFormSchema>) => {
     try {
-      await createDespesa(data);
-      toast({
-        title: 'Despesa criada com sucesso',
-        description: 'A despesa foi cadastrada no sistema.',
-      });
+      // Validar se categoria empréstimo tem veículos selecionados
+      if (data.categoria === 'emprestimo' && selectedVehicles.length === 0) {
+        toast({
+          title: 'Erro de validação',
+          description: 'Para empréstimos, você deve selecionar pelo menos um veículo.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Se for categoria "emprestimo" e há veículos selecionados, criar múltiplas despesas
+      if (data.categoria === 'emprestimo' && selectedVehicles.length > 0) {
+        const valorTotal = parseFloat(data.valor.toString().replace(',', '.'));
+        const valorPorVeiculo = (valorTotal / selectedVehicles.length).toFixed(2);
+        
+        // Criar uma despesa para cada veículo selecionado
+        const promises = selectedVehicles.map(veiculoId => 
+          createDespesa({
+            ...data,
+            veiculoId,
+            valor: valorPorVeiculo,
+            descricao: `${data.descricao} (${selectedVehicles.length} veículos - R$ ${valorPorVeiculo} cada)`,
+          })
+        );
+        
+        await Promise.all(promises);
+        
+        toast({
+          title: 'Despesas criadas com sucesso',
+          description: `${selectedVehicles.length} despesas de empréstimo criadas - R$ ${valorPorVeiculo} cada`,
+        });
+      } else {
+        // Comportamento padrão para outras categorias
+        await createDespesa(data);
+        toast({
+          title: 'Despesa criada com sucesso',
+          description: 'A despesa foi cadastrada no sistema.',
+        });
+      }
+      
       setOpen(false);
       form.reset();
+      setSelectedVehicles([]);
     } catch (error) {
       console.error('Error creating despesa:', error);
       toast({
@@ -89,6 +157,7 @@ export function NovaDespesaModal() {
     'pneus',
     'revisao',
     'reparo',
+    'emprestimo',
     'outros'
   ];
 
@@ -103,6 +172,7 @@ export function NovaDespesaModal() {
     pneus: 'Pneus',
     revisao: 'Revisão',
     reparo: 'Reparo',
+    emprestimo: 'Empréstimo',
     outros: 'Outros'
   };
 
@@ -147,31 +217,70 @@ export function NovaDespesaModal() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="veiculoId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Veículo (Opcional)</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ''}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecionar" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="sem-veiculo">Nenhum veículo</SelectItem>
-                        {veiculos.map((veiculo) => (
-                          <SelectItem key={veiculo.id} value={veiculo.id}>
-                            {veiculo.modelo} - {veiculo.placa}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {categoria === 'emprestimo' ? (
+                <FormItem>
+                  <FormLabel>Veículos para Empréstimo</FormLabel>
+                  <div className="border rounded-lg p-4 space-y-3 max-h-48 overflow-y-auto">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="select-all"
+                        checked={selectedVehicles.length === veiculos.length}
+                        onCheckedChange={handleSelectAllVehicles}
+                      />
+                      <label htmlFor="select-all" className="text-sm font-medium">
+                        Selecionar todos os veículos ({veiculos.length})
+                      </label>
+                    </div>
+                    {veiculos.map((veiculo) => (
+                      <div key={veiculo.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={veiculo.id}
+                          checked={selectedVehicles.includes(veiculo.id)}
+                          onCheckedChange={(checked) => handleVehicleSelection(veiculo.id, checked as boolean)}
+                        />
+                        <label htmlFor={veiculo.id} className="text-sm">
+                          {veiculo.modelo} - {veiculo.placa}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  {selectedVehicles.length > 0 && (
+                    <div className="flex items-center space-x-2 text-sm text-blue-600">
+                      <Info className="h-4 w-4" />
+                      <span>
+                        {selectedVehicles.length} veículos selecionados
+                        {valorTotal && ` - R$ ${valorPorVeiculo} por veículo`}
+                      </span>
+                    </div>
+                  )}
+                </FormItem>
+              ) : (
+                <FormField
+                  control={form.control}
+                  name="veiculoId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Veículo (Opcional)</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || ''}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecionar" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="sem-veiculo">Nenhum veículo</SelectItem>
+                          {veiculos.map((veiculo) => (
+                            <SelectItem key={veiculo.id} value={veiculo.id}>
+                              {veiculo.modelo} - {veiculo.placa}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             <FormField
