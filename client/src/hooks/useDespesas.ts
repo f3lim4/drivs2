@@ -28,12 +28,34 @@ export function useDespesas() {
       if (!manutencoesResponse.ok) throw new Error('Failed to fetch manutencoes');
       const manutencoes = await manutencoesResponse.json();
       
+      // Debug das manutenções
+      console.log('Debug Manutenções:', {
+        total: manutencoes.length,
+        manutencoes: manutencoes.map((m: Manutencao) => ({
+          id: m.id,
+          valorOrcamento: m.valorOrcamento,
+          valorFinal: m.valorFinal,
+          status: m.status,
+          statusPagamento: m.statusPagamento
+        }))
+      });
+      
       // Converter manutenções em despesas
       const despesasManutencao = manutencoes
         .filter((manutencao: Manutencao) => {
           // Prioriza valorFinal se disponível, senão usa valorOrcamento
           const valor = manutencao.valorFinal || manutencao.valorOrcamento;
-          return valor && parseFloat(valor) > 0;
+          const temValor = valor && parseFloat(valor) > 0;
+          
+          console.log('Filtrando manutenção:', {
+            id: manutencao.id,
+            valorOrcamento: manutencao.valorOrcamento,
+            valorFinal: manutencao.valorFinal,
+            valor: valor,
+            temValor: temValor
+          });
+          
+          return temValor;
         })
         .map((manutencao: Manutencao) => ({
           id: `manutencao_${manutencao.id}`,
