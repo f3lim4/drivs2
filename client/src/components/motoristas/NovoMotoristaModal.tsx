@@ -38,27 +38,130 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Image, Upload, X } from 'lucide-react';
 
+// Funções de validação
+function validarCPF(cpf: string): boolean {
+  // Remove caracteres não numéricos
+  cpf = cpf.replace(/[^\d]/g, '');
+  
+  // Verifica se tem 11 dígitos
+  if (cpf.length !== 11) return false;
+  
+  // Verifica se todos os dígitos são iguais
+  if (/^(\d)\1{10}$/.test(cpf)) return false;
+  
+  // Validação do primeiro dígito verificador
+  let soma = 0;
+  for (let i = 0; i < 9; i++) {
+    soma += parseInt(cpf.charAt(i)) * (10 - i);
+  }
+  let resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.charAt(9))) return false;
+  
+  // Validação do segundo dígito verificador
+  soma = 0;
+  for (let i = 0; i < 10; i++) {
+    soma += parseInt(cpf.charAt(i)) * (11 - i);
+  }
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.charAt(10))) return false;
+  
+  return true;
+}
+
+function validarCNH(cnh: string): boolean {
+  // Remove caracteres não numéricos
+  cnh = cnh.replace(/[^\d]/g, '');
+  
+  // Verifica se tem 11 dígitos
+  if (cnh.length !== 11) return false;
+  
+  // Verifica se todos os dígitos são iguais
+  if (/^(\d)\1{10}$/.test(cnh)) return false;
+  
+  // Validação específica da CNH
+  const sequencia = cnh.substring(0, 9);
+  let soma = 0;
+  let peso = 9;
+  
+  for (let i = 0; i < 9; i++) {
+    soma += parseInt(sequencia.charAt(i)) * peso;
+    peso--;
+  }
+  
+  let primeiroDigito = soma % 11;
+  if (primeiroDigito >= 2) {
+    primeiroDigito = 11 - primeiroDigito;
+  } else {
+    primeiroDigito = 0;
+  }
+  
+  soma = 0;
+  peso = 1;
+  
+  for (let i = 0; i < 9; i++) {
+    soma += parseInt(sequencia.charAt(i)) * peso;
+    peso++;
+  }
+  
+  let segundoDigito = soma % 11;
+  if (segundoDigito >= 2) {
+    segundoDigito = 11 - segundoDigito;
+  } else {
+    segundoDigito = 0;
+  }
+  
+  return (primeiroDigito === parseInt(cnh.charAt(9)) && segundoDigito === parseInt(cnh.charAt(10)));
+}
+
+function validarIdade(dataNascimento: string): boolean {
+  const hoje = new Date();
+  const nascimento = new Date(dataNascimento);
+  
+  let idade = hoje.getFullYear() - nascimento.getFullYear();
+  const mes = hoje.getMonth() - nascimento.getMonth();
+  
+  if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+    idade--;
+  }
+  
+  return idade >= 18 && idade <= 80;
+}
+
+function validarCNHVencimento(dataVencimento: string): boolean {
+  const hoje = new Date();
+  const vencimento = new Date(dataVencimento);
+  
+  return vencimento > hoje;
+}
+
 // Schema de validação baseado no schema do banco
 const motoristaSchema = z.object({
   // Informações Pessoais
   nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-  cpf: z.string().min(11, 'CPF deve ter 11 dígitos').max(14, 'CPF inválido'),
+  cpf: z.string().min(11, 'CPF deve ter 11 dígitos').max(14, 'CPF inválido')
+    .refine(validarCPF, 'CPF inválido'),
   rg: z.string().min(7, 'RG deve ter pelo menos 7 dígitos'),
-  dataNascimento: z.string().min(1, 'Data de nascimento é obrigatória'),
+  dataNascimento: z.string().min(1, 'Data de nascimento é obrigatória')
+    .refine(validarIdade, 'Idade deve estar entre 18 e 80 anos'),
   
   // Contato
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
   email: z.string().email('Email inválido').optional().or(z.literal('')),
   
   // Carteira de Motorista
-  cnh: z.string().min(11, 'CNH deve ter 11 dígitos'),
+  cnh: z.string().min(11, 'CNH deve ter 11 dígitos')
+    .refine(validarCNH, 'CNH inválida'),
   categoria: z.string().min(1, 'Selecione uma categoria'),
-  vencimentoCnh: z.string().min(1, 'Data de vencimento é obrigatória'),
+  vencimentoCnh: z.string().min(1, 'Data de vencimento é obrigatória')
+    .refine(validarCNHVencimento, 'CNH não pode estar vencida'),
   
   // Endereço
   rua: z.string().min(1, 'Rua é obrigatória'),
   numero: z.string().min(1, 'Número é obrigatório'),
   bairro: z.string().min(1, 'Bairro é obrigatório'),
+  complemento: z.string().optional(),
   cidade: z.string().min(1, 'Cidade é obrigatória'),
   estado: z.string().min(1, 'Estado é obrigatório'),
   cep: z.string().min(8, 'CEP deve ter 8 dígitos'),
@@ -516,7 +619,7 @@ export function NovoMotoristaModal({
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="B" />
+                            <SelectValue placeholder="Selecionar" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
