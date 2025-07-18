@@ -1587,6 +1587,7 @@ export default function RelatoriosFinanceiros() {
                         <TableHead>Descrição</TableHead>
                         <TableHead>Valor</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead>Forma de Pagamento</TableHead>
                         <TableHead>Ações</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -1609,6 +1610,7 @@ export default function RelatoriosFinanceiros() {
                               descricao: `IPVA mensal - ${veiculo.placa}`,
                               valor: parseFloat(veiculo.ipva) / 12,
                               status: 'Automático',
+                              formaPagamento: 'Boleto',
                               createdAt: veiculo.createdAt || dataAtual
                             });
                           }
@@ -1624,6 +1626,7 @@ export default function RelatoriosFinanceiros() {
                               descricao: `Seguro ${veiculo.seguradora || 'não informado'} - ${veiculo.placa}`,
                               valor: parseFloat(veiculo.valorSeguroMensal),
                               status: 'Automático',
+                              formaPagamento: 'Boleto',
                               createdAt: veiculo.createdAt || dataAtual
                             });
                           }
@@ -1639,6 +1642,7 @@ export default function RelatoriosFinanceiros() {
                               descricao: `Rastreador ${veiculo.rastreador || 'não informado'} - ${veiculo.placa}`,
                               valor: parseFloat(veiculo.valorRastreadorMensal),
                               status: 'Automático',
+                              formaPagamento: 'Débito Automático',
                               createdAt: veiculo.createdAt || dataAtual
                             });
                           }
@@ -1654,6 +1658,7 @@ export default function RelatoriosFinanceiros() {
                               descricao: `Financiamento mensal - ${veiculo.placa}`,
                               valor: parseFloat(veiculo.valorFinanciamento),
                               status: 'Automático',
+                              formaPagamento: 'Débito Automático',
                               createdAt: veiculo.createdAt || dataAtual
                             });
                           }
@@ -1673,6 +1678,7 @@ export default function RelatoriosFinanceiros() {
                               descricao: `${manutencao.tipo} - ${manutencao.oficina}`,
                               valor: parseFloat(valor),
                               status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente',
+                              formaPagamento: manutencao.formaPagamento || 'Não informado',
                               createdAt: manutencao.createdAt || manutencao.dataInicio
                             });
                           }
@@ -1690,6 +1696,7 @@ export default function RelatoriosFinanceiros() {
                             descricao: despesa.descricao,
                             valor: parseFloat(despesa.valor || '0'),
                             status: despesa.status === 'pago' ? 'Pago' : 'Pendente',
+                            formaPagamento: despesa.formaPagamento || 'Não informado',
                             createdAt: despesa.createdAt || despesa.data
                           });
                         });
@@ -1729,7 +1736,7 @@ export default function RelatoriosFinanceiros() {
                         if (paginatedDespesas.length === 0) {
                           return (
                             <TableRow>
-                              <TableCell colSpan={8} className="text-center text-gray-500 py-8">
+                              <TableCell colSpan={9} className="text-center text-gray-500 py-8">
                                 Nenhuma despesa encontrada no período selecionado
                               </TableCell>
                             </TableRow>
@@ -1768,6 +1775,11 @@ export default function RelatoriosFinanceiros() {
                             <TableCell>
                               <Badge variant={despesa.status === 'Pago' ? 'default' : 'secondary'}>
                                 {despesa.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="text-xs">
+                                {despesa.formaPagamento}
                               </Badge>
                             </TableCell>
                             <TableCell>
