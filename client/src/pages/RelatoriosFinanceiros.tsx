@@ -1130,12 +1130,11 @@ export default function RelatoriosFinanceiros() {
 
       {/* Tabs de Análise */}
       <Tabs defaultValue="despesas" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="despesas">Despesas</TabsTrigger>
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
-          <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
 
         <TabsContent value="despesas" className="space-y-4">
@@ -1551,6 +1550,7 @@ export default function RelatoriosFinanceiros() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
+                <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
                 <CardDescription>
                   Todas as despesas fixas e manutenções registradas no sistema - dados reais
                 </CardDescription>
