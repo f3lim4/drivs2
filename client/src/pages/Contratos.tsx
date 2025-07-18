@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Plus, Upload, FileText, Download, Eye, Edit, Trash2, Filter, Search, X, TrendingUp, DollarSign, Calendar, Users } from 'lucide-react';
+import { Plus, Upload, FileText, Download, Eye, Edit, Trash2, Filter, Search, X, TrendingUp, DollarSign, Calendar, Users, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useContratos } from '@/hooks/useContratos';
@@ -28,6 +28,7 @@ import { VisualizarContratoModal } from '@/components/contratos/VisualizarContra
 import { EditarContratoModal } from '@/components/contratos/EditarContratoModal';
 import { UploadTemplateModal } from '@/components/contratos/UploadTemplateModal';
 import { TemplatesModal } from '@/components/contratos/TemplatesModal';
+import { UploadContratoModal } from '@/components/contratos/UploadContratoModal';
 import { useTemplateContratos } from '@/hooks/useTemplateContratos';
 import { Contrato } from '@/types';
 import jsPDF from 'jspdf';
@@ -42,6 +43,7 @@ export default function Contratos() {
   const [showEditarModal, setShowEditarModal] = useState(false);
   const [showUploadTemplateModal, setShowUploadTemplateModal] = useState(false);
   const [showTemplatesModal, setShowTemplatesModal] = useState(false);
+  const [showUploadContratoModal, setShowUploadContratoModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
@@ -115,6 +117,22 @@ export default function Contratos() {
         variant: "destructive",
       });
     }
+  };
+
+  const handleUploadContrato = (contrato: Contrato) => {
+    setSelectedContrato(contrato);
+    setShowUploadContratoModal(true);
+  };
+
+  const handleUploadSuccess = (contratoId: string, arquivoAssinado: string) => {
+    // Recarregar os contratos para refletir as mudanças
+    toast({
+      title: "Upload Concluído",
+      description: "Contrato assinado foi enviado com sucesso!",
+    });
+    
+    // Atualizar o contrato na lista local
+    // A query será revalidada automaticamente
   };
 
   const handleBaixarPDF = async (contrato: Contrato) => {
@@ -549,6 +567,7 @@ export default function Contratos() {
                       <TableHead>VALOR</TableHead>
                       <TableHead>DATA INÍCIO</TableHead>
                       <TableHead>STATUS</TableHead>
+                      <TableHead>UPLOAD</TableHead>
                       <TableHead>AÇÕES</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -571,6 +590,27 @@ export default function Contratos() {
                         </TableCell>
                         <TableCell>
                           {getStatusBadge(contrato.status)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {contrato.arquivoAssinado ? (
+                              <div className="flex items-center gap-1">
+                                <CheckCircle className="w-4 h-4 text-green-600" />
+                                <span className="text-xs text-green-600">Enviado</span>
+                              </div>
+                            ) : (
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => handleUploadContrato(contrato)}
+                                title="Enviar Contrato Assinado"
+                                className="text-xs"
+                              >
+                                <Upload className="w-4 h-4 mr-1" />
+                                Enviar
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
@@ -663,6 +703,13 @@ export default function Contratos() {
             onOpenChange={setShowEditarModal}
             contrato={selectedContrato}
             onContratoEditado={handleContratoEditado}
+          />
+          
+          <UploadContratoModal 
+            open={showUploadContratoModal}
+            onOpenChange={setShowUploadContratoModal}
+            contrato={selectedContrato}
+            onUploadSuccess={handleUploadSuccess}
           />
         </>
       )}
