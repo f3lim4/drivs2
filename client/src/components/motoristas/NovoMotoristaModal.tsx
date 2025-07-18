@@ -311,9 +311,6 @@ export function NovoMotoristaModal({
             
             {/* INFORMAÇÕES PESSOAIS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Informações Pessoais
-              </h3>
               
               {/* Nome */}
               <FormField
@@ -389,9 +386,6 @@ export function NovoMotoristaModal({
 
             {/* CONTATO */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Contato
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -440,9 +434,6 @@ export function NovoMotoristaModal({
 
             {/* CARTEIRA DE MOTORISTA */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Carteira de Motorista
-              </h3>
               
               <div className="grid grid-cols-2 gap-4">
                 <FormField
@@ -510,9 +501,6 @@ export function NovoMotoristaModal({
 
             {/* ENDEREÇO */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Endereço
-              </h3>
               
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
@@ -617,9 +605,6 @@ export function NovoMotoristaModal({
 
             {/* DOCUMENTOS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Documentos (Opcional)
-              </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Foto de Perfil */}
@@ -814,9 +799,6 @@ export function NovoMotoristaModal({
 
             {/* STATUS */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-foreground border-b pb-2">
-                Status
-              </h3>
               
               <FormField
                 control={form.control}
