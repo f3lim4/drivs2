@@ -38,6 +38,7 @@ import { FileCheck, Clock, DollarSign, AlertCircle, Edit, Trash2, Eye, TrendingU
 import { NovoAluguelModal } from '@/components/alugueis/NovoAluguelModal';
 import { EditarAluguelModal } from '@/components/alugueis/EditarAluguelModal';
 import { ExcluirAluguelDialog } from '@/components/alugueis/ExcluirAluguelDialog';
+import { formatCurrency } from '@/lib/utils';
 
 export default function Alugueis() {
   const { isAdmin, isLocadora, profile } = useAuth();
@@ -73,6 +74,12 @@ export default function Alugueis() {
     enabled: !!profile?.id,
   });
 
+  // Buscar veículos para ter acesso ao valor semanal
+  const { data: veiculos = [] } = useQuery({
+    queryKey: ['/api/veiculos', profile?.id],
+    enabled: !!profile?.id,
+  });
+
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
     if (!locadoraId) return 'Locadora';
@@ -96,30 +103,37 @@ export default function Alugueis() {
 
   // Formatação dos aluguéis para exibição
   const alugueisFormatados = useMemo(() => {
-    return alugueis.map((aluguel: any) => ({
-      id: aluguel.id,
-      motoristaId: aluguel.motoristaId,
-      motoristaNome: aluguel.motoristaNome || 'Nome não encontrado',
-      motoristaContato: aluguel.motoristaContato || 'Contato não encontrado',
-      veiculoId: aluguel.veiculoId,
-      veiculoModelo: aluguel.veiculoModelo || 'Modelo não encontrado',
-      veiculoPlaca: aluguel.veiculoPlaca || 'Placa não encontrada',
-      locadoraId: aluguel.locadoraId,
-      periodo: {
-        inicio: new Date(aluguel.dataInicio).toLocaleDateString('pt-BR'),
-        fim: new Date(aluguel.dataFim).toLocaleDateString('pt-BR'),
-        dias: aluguel.tempoContrato,
-      },
-      valores: {
-        mensal: parseFloat(aluguel.valorMensal),
-        diario: parseFloat(aluguel.valorMensal) / 30,
-        total: parseFloat(aluguel.valorTotal),
-        caucao: parseFloat(aluguel.caucao),
-        taxaAdmin: parseFloat(aluguel.taxaAdministrativa || '0'),
-      },
-      status: aluguel.status,
-    }));
-  }, [alugueis]);
+    return alugueis.map((aluguel: any) => {
+      // Buscar dados do veículo para ter acesso ao valor semanal
+      const veiculo = veiculos.find((v: any) => v.id === aluguel.veiculoId);
+      const valorSemanal = veiculo?.valorSemanal ? parseFloat(veiculo.valorSemanal) : 0;
+      
+      return {
+        id: aluguel.id,
+        motoristaId: aluguel.motoristaId,
+        motoristaNome: aluguel.motoristaNome || 'Nome não encontrado',
+        motoristaContato: aluguel.motoristaContato || 'Contato não encontrado',
+        veiculoId: aluguel.veiculoId,
+        veiculoModelo: aluguel.veiculoModelo || 'Modelo não encontrado',
+        veiculoPlaca: aluguel.veiculoPlaca || 'Placa não encontrada',
+        locadoraId: aluguel.locadoraId,
+        periodo: {
+          inicio: new Date(aluguel.dataInicio).toLocaleDateString('pt-BR'),
+          fim: new Date(aluguel.dataFim).toLocaleDateString('pt-BR'),
+          dias: aluguel.tempoContrato,
+        },
+        valores: {
+          mensal: parseFloat(aluguel.valorMensal),
+          semanal: valorSemanal,
+          diario: parseFloat(aluguel.valorMensal) / 30,
+          total: parseFloat(aluguel.valorTotal),
+          caucao: parseFloat(aluguel.caucao),
+          taxaAdmin: parseFloat(aluguel.taxaAdministrativa || '0'),
+        },
+        status: aluguel.status,
+      };
+    });
+  }, [alugueis, veiculos]);
 
   // Filtra e ordena aluguéis baseado na busca, filtros e ordenação
   const filteredAlugueis = useMemo(() => {
@@ -505,7 +519,7 @@ export default function Alugueis() {
                       <div>
                         <p className="font-medium">{formatCurrency(aluguel.valores.mensal)}</p>
                         <p className="text-sm text-muted-foreground">
-                          {formatCurrency(aluguel.valores.diario)}/dia
+                          {formatCurrency(aluguel.valores.semanal)}/semana
                         </p>
                       </div>
                     </TableCell>
