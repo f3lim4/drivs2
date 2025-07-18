@@ -174,7 +174,13 @@ export function EditarVeiculoModal({
   }, [veiculo, open, form]);
 
   const onSubmit = async (data: VeiculoFormData) => {
-    if (!veiculo) return;
+    console.log('=== INÍCIO DA FUNÇÃO onSubmit ===');
+    console.log('Veículo recebido:', veiculo);
+    
+    if (!veiculo) {
+      console.error('Erro: Veículo não encontrado');
+      return;
+    }
 
     console.log('Iniciando edição do veículo:', veiculo.id);
     console.log('Dados do formulário:', data);
@@ -259,7 +265,10 @@ export function EditarVeiculoModal({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
+            console.log('Formulário possui erros:', errors);
+            console.log('Tentativa de submit com erros rejeitada');
+          })} className="space-y-6">
             
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
@@ -857,8 +866,11 @@ export function EditarVeiculoModal({
                 disabled={loading}
                 onClick={() => {
                   console.log('Botão salvar clicado');
+                  console.log('Veículo sendo editado:', veiculo);
                   console.log('Erros do formulário:', form.formState.errors);
                   console.log('Dados do formulário antes do submit:', form.getValues());
+                  console.log('Formulário válido:', form.formState.isValid);
+                  console.log('Formulário foi submetido:', form.formState.isSubmitted);
                 }}
               >
                 {loading ? 'Salvando...' : 'Salvar Alterações'}
