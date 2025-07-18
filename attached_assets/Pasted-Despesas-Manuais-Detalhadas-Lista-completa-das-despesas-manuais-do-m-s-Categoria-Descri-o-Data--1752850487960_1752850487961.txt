@@ -1,0 +1,154 @@
+Despesas Manuais Detalhadas
+Lista completa das despesas manuais do mês
+
+Categoria	Descrição	Data	Valor
+lavagem	Lava rapido	17/07/2025	R$ 40,00
+emprestimo	Jobinho (3 veículos - R$ 1333.33 cada)	15/07/2025	R$ 1.333,33
+emprestimo	Jobinho (3 veículos - R$ 1333.33 cada)	15/07/2025	R$ 1.333,33
+emprestimo	Fabio (9 veículos - R$ 402.44 cada)	20/07/2025	R$ 402,44
+emprestimo	Fabio (9 veículos - R$ 402.44 cada)	20/07/2025	R$ 402,44
+emprestimo	Fabio (9 veículos - R$ 402.44 cada)	20/07/2025	R$ 402,44
+emprestimo	Fabio (9 veículos - R$ 402.44 cada)	20/07/2025	R$ 402,44
+emprestimo	Jobinho (3 veículos - R$ 1333.33 cada)	15/07/2025	R$ 1.333,33
+emprestimo	Fabio (9 veículos - R$ 402.44 cada)	20/07/2025	R$ 402,44
+emprestimo	Fabio (9 veículos - R$ 402.44 cada)	20/07/2025	R$ 402,44
+emprestimo	Fabio (9 veículos - R$ 402.44 cada)	20/07/2025	R$ 402,44
+emprestimo	Fabio (9 veículos - R$ 402.44 cada)	20/07/2025	R$ 402,44
+emprestimo	Fabio (9 veículos - R$ 402.44 cada)	20/07/2025	R$ 402,44
+Histórico de Despesas dos Veículos
+Todas as despesas fixas e manutenções registradas no sistema - dados reais
+
+
+Data	Veículo	Tipo	Categoria	Descrição	Valor	Status	Ações
+20/07/2025	
+FGY6J35
+
+Hundai Hb20
+
+Despesa Manual	emprestimo	
+Fabio (9 veículos - R$ 402.44 cada)
+
+R$ 402,44	Pendente	
+
+
+20/07/2025	
+OQH8C31
+
+Fiat Palio
+
+Despesa Manual	emprestimo	
+Fabio (9 veículos - R$ 402.44 cada)
+
+R$ 402,44	Pendente	
+
+
+20/07/2025	
+FVN9I69
+
+Hyundai Hb20s
+
+Despesa Manual	emprestimo	
+Fabio (9 veículos - R$ 402.44 cada)
+
+R$ 402,44	Pendente	
+
+
+20/07/2025	
+DJM9817
+
+Chevrolet Onix
+
+Despesa Manual	emprestimo	
+Fabio (9 veículos - R$ 402.44 cada)
+
+R$ 402,44	Pendente	
+
+
+20/07/2025	
+FYN1890
+
+Fiat Palio
+
+Despesa Manual	emprestimo	
+Fabio (9 veículos - R$ 402.44 cada)
+
+R$ 402,44	Pendente	
+
+
+20/07/2025	
+FNC0C06
+
+Renault Sandero
+
+Despesa Manual	emprestimo	
+Fabio (9 veículos - R$ 402.44 cada)
+
+R$ 402,44	Pendente	
+
+
+20/07/2025	
+FMQ0A25
+
+Fiat Mobi
+
+Despesa Manual	emprestimo	
+Fabio (9 veículos - R$ 402.44 cada)
+
+R$ 402,44	Pendente	
+
+
+20/07/2025	
+JGK2A31
+
+Fiat Palio
+
+Despesa Manual	emprestimo	
+Fabio (9 veículos - R$ 402.44 cada)
+
+R$ 402,44	Pendente	
+
+
+20/07/2025	
+EUQ8D22
+
+Jac J3
+
+Despesa Manual	emprestimo	
+Fabio (9 veículos - R$ 402.44 cada)
+
+R$ 402,44	Pendente	
+
+
+18/07/2025	
+GDD7A13
+
+Fiat Palio
+
+Despesa Fixa	IPVA	
+IPVA mensal - GDD7A13
+
+R$ 113,33	Automático	
+Mostrando 1 a 10 de 41 resultados
+
+Itens por página
+
+
+10
+Página 1 de 5
+
+
+
+Total Despesas Fixas
+R$ 4.352,67
+
+Mensais
+
+Manutenções
+R$ 0,00
+
+Período
+
+Despesas Manuais
+R$ 7.661,95
+
+Período
