@@ -124,19 +124,7 @@ export default function Contratos() {
     setShowUploadContratoModal(true);
   };
 
-  const handleVisualizarArquivo = (contrato: Contrato) => {
-    if (contrato.arquivoAssinado) {
-      // Abrir arquivo em nova aba para visualização
-      window.open(`/api/contratos/${contrato.id}/view`, '_blank');
-    }
-  };
 
-  const handleBaixarArquivo = (contrato: Contrato) => {
-    if (contrato.arquivoAssinado) {
-      // Baixar arquivo
-      window.location.href = `/api/contratos/${contrato.id}/download`;
-    }
-  };
 
   const handleUploadSuccess = (contratoId: string, arquivoAssinado: string) => {
     // Recarregar os contratos para refletir as mudanças
@@ -608,29 +596,9 @@ export default function Contratos() {
                         <TableCell>
                           <div className="flex items-center gap-1">
                             {contrato.arquivoAssinado ? (
-                              <div className="flex items-center gap-2">
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => handleVisualizarArquivo(contrato)}
-                                  title="Visualizar Arquivo Assinado"
-                                  className="text-xs p-1"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => handleBaixarArquivo(contrato)}
-                                  title="Baixar Arquivo Assinado"
-                                  className="text-xs p-1"
-                                >
-                                  <Download className="w-4 h-4" />
-                                </Button>
-                                <div className="flex items-center gap-1">
-                                  <CheckCircle className="w-4 h-4 text-green-600" />
-                                  <span className="text-xs text-green-600">Enviado</span>
-                                </div>
+                              <div className="flex items-center gap-1">
+                                <CheckCircle className="w-4 h-4 text-green-600" />
+                                <span className="text-xs text-green-600">Enviado</span>
                               </div>
                             ) : (
                               <Button 
