@@ -1283,18 +1283,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Upload de imagens de motoristas com FormData
-  app.post("/api/motoristas/upload-imagens", upload.array('imagens', 5), async (req, res) => {
+  // Upload de documentos de motoristas com campos específicos
+  app.post("/api/motoristas/upload-imagens", upload.fields([
+    { name: 'fotoPerfil', maxCount: 1 },
+    { name: 'cnhImagem', maxCount: 1 },
+    { name: 'fotoComCnh', maxCount: 1 },
+    { name: 'comprovanteEndereco', maxCount: 1 },
+    { name: 'fotoExtra', maxCount: 1 }
+  ]), async (req, res) => {
     try {
       const { motoristaId } = req.body;
-      const files = req.files as Express.Multer.File[];
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
       
       if (!motoristaId) {
         return res.status(400).json({ message: "ID do motorista é obrigatório" });
       }
       
-      if (!files || files.length === 0) {
-        return res.status(400).json({ message: "Nenhuma imagem foi enviada" });
+      if (!files || Object.keys(files).length === 0) {
+        return res.status(400).json({ message: "Nenhum documento foi enviado" });
       }
       
       const motorista = await storage.getMotorista(motoristaId);
@@ -1302,53 +1308,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Motorista não encontrado" });
       }
       
-      console.log(`[UPLOAD] Iniciando upload de ${files.length} imagens para motorista ${motoristaId}`);
+      console.log(`[UPLOAD] Iniciando upload de documentos para motorista ${motoristaId}`);
       
-      // Encontrar próximos slots disponíveis
-      const currentImages = [
-        motorista.imagem1,
-        motorista.imagem2,
-        motorista.imagem3,
-        motorista.imagem4,
-        motorista.imagem5
-      ];
+      // Mapear campos específicos
+      const fieldMapping = {
+        fotoPerfil: 'imagem1',
+        cnhImagem: 'imagem2', 
+        fotoComCnh: 'imagem3',
+        comprovanteEndereco: 'imagem4',
+        fotoExtra: 'imagem5'
+      };
       
-      const availableSlots = [];
-      for (let i = 0; i < 5; i++) {
-        if (!currentImages[i]) {
-          availableSlots.push(i + 1);
-        }
-      }
-      
-      if (availableSlots.length < files.length) {
-        return res.status(400).json({ message: "Não há slots suficientes disponíveis" });
-      }
-      
-      // Salvar informações das imagens no banco
       const updates: any = {};
-      files.forEach((file, index) => {
-        if (index < availableSlots.length) {
-          const slot = availableSlots[index];
-          updates[`imagem${slot}`] = file.filename;
+      let uploadedCount = 0;
+      
+      // Processar cada tipo de documento
+      Object.keys(files).forEach(fieldName => {
+        const fieldFiles = files[fieldName];
+        if (fieldFiles && fieldFiles.length > 0) {
+          const file = fieldFiles[0];
+          const dbFieldName = fieldMapping[fieldName as keyof typeof fieldMapping];
+          if (dbFieldName) {
+            updates[dbFieldName] = file.filename;
+            uploadedCount++;
+            console.log(`[UPLOAD] ${fieldName} -> ${dbFieldName}: ${file.filename}`);
+          }
         }
       });
       
-      await storage.updateMotorista(motoristaId, updates);
-      
-      console.log(`[UPLOAD] ${files.length} imagens salvas com sucesso`);
+      if (uploadedCount > 0) {
+        await storage.updateMotorista(motoristaId, updates);
+        console.log(`[UPLOAD] ${uploadedCount} documentos salvos com sucesso`);
+      }
       
       res.json({ 
-        message: "Imagens enviadas com sucesso", 
-        uploadedCount: files.length,
+        message: "Documentos enviados com sucesso", 
+        uploadedCount,
         uploadedAt: new Date().toISOString() 
       });
     } catch (error) {
-      console.error("Error uploading motorista images:", error);
+      console.error("Error uploading motorista documents:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  // Listar imagens de um motorista
+  // Listar documentos de um motorista
   app.get("/api/motoristas/:id/imagens", async (req, res) => {
     try {
       const motoristaId = req.params.id;
@@ -1358,18 +1362,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Motorista não encontrado" });
       }
       
-      const imagens = [];
-      for (let i = 1; i <= 5; i++) {
-        const imageField = `imagem${i}` as keyof typeof motorista;
-        const imageName = motorista[imageField] as string;
-        if (imageName) {
-          imagens.push(`/uploads/motoristas/${imageName}`);
-        }
-      }
+      // Mapear campos específicos
+      const documentos = {
+        fotoPerfil: motorista.imagem1 ? `/uploads/motoristas/${motorista.imagem1}` : null,
+        cnhImagem: motorista.imagem2 ? `/uploads/motoristas/${motorista.imagem2}` : null,
+        fotoComCnh: motorista.imagem3 ? `/uploads/motoristas/${motorista.imagem3}` : null,
+        comprovanteEndereco: motorista.imagem4 ? `/uploads/motoristas/${motorista.imagem4}` : null,
+        fotoExtra: motorista.imagem5 ? `/uploads/motoristas/${motorista.imagem5}` : null,
+      };
       
-      res.json({ imagens });
+      res.json({ documentos });
     } catch (error) {
-      console.error("Error fetching motorista images:", error);
+      console.error("Error fetching motorista documents:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
