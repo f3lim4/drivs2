@@ -341,11 +341,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { locadoraId } = req.query;
       
+      // Debug: Log parâmetros recebidos
+      console.log('[DEBUG] GET /api/motoristas - Parâmetros:', { locadoraId });
+      
       let motoristas;
       if (locadoraId) {
         motoristas = await storage.getMotoristasByLocadora(locadoraId as string);
       } else {
         motoristas = await storage.getAllMotoristas();
+      }
+      
+      // Debug: Log resultado do storage
+      console.log('[DEBUG] GET /api/motoristas - Resultado do storage:', motoristas.length, 'motoristas');
+      
+      // Debug: Verificar se há "alias" nos dados
+      const aliasData = motoristas.filter(m => 
+        Object.values(m).some(value => 
+          typeof value === 'string' && value.toLowerCase().includes('alias')
+        )
+      );
+      
+      if (aliasData.length > 0) {
+        console.warn('[DEBUG] GET /api/motoristas - ENCONTRADO "alias" nos dados:', aliasData);
       }
       
       res.json(motoristas);
@@ -370,12 +387,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/motoristas", async (req, res) => {
     try {
+      // Debug: Log dados recebidos
+      console.log('[DEBUG] POST /api/motoristas - Dados recebidos:', req.body);
+      
       const result = insertMotoristaSchema.safeParse(req.body);
       if (!result.success) {
+        console.log('[DEBUG] POST /api/motoristas - Erro de validação:', result.error.errors);
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
+      // Debug: Log dados validados
+      console.log('[DEBUG] POST /api/motoristas - Dados validados:', result.data);
+      
       const motorista = await storage.createMotorista(result.data);
+      
+      // Debug: Log resultado do storage
+      console.log('[DEBUG] POST /api/motoristas - Motorista criado:', motorista);
+      
       res.json(motorista);
     } catch (error) {
       console.error("Error creating motorista:", error);
