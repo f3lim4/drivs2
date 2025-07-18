@@ -2050,7 +2050,7 @@ export default function RelatoriosFinanceiros() {
           </DialogHeader>
           <Form {...formNovaDespesa}>
             <form onSubmit={formNovaDespesa.handleSubmit(criarNovaDespesa)} className="space-y-4">
-              {/* Simple vehicle selection */}
+              {/* Vehicle selection as list */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium">Veículos</label>
@@ -2068,11 +2068,10 @@ export default function RelatoriosFinanceiros() {
                   </Button>
                 </div>
                 
-                <div className="flex flex-wrap gap-2">
+                <div className="border rounded-lg max-h-32 overflow-y-auto">
                   {veiculos.map((veiculo) => (
-                    <button
+                    <div
                       key={veiculo.id}
-                      type="button"
                       onClick={() => {
                         if (selectedVehicles.includes(veiculo.id)) {
                           setSelectedVehicles(prev => prev.filter(id => id !== veiculo.id));
@@ -2080,14 +2079,26 @@ export default function RelatoriosFinanceiros() {
                           setSelectedVehicles(prev => [...prev, veiculo.id]);
                         }
                       }}
-                      className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
-                        selectedVehicles.includes(veiculo.id)
-                          ? 'bg-blue-500 text-white border-blue-500'
-                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300'
+                      className={`flex items-center justify-between p-2 cursor-pointer hover:bg-gray-50 border-b last:border-b-0 ${
+                        selectedVehicles.includes(veiculo.id) ? 'bg-blue-50 border-blue-200' : ''
                       }`}
                     >
-                      {veiculo.placa}
-                    </button>
+                      <div className="flex items-center space-x-2">
+                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                          selectedVehicles.includes(veiculo.id) 
+                            ? 'bg-blue-500 border-blue-500' 
+                            : 'border-gray-300'
+                        }`}>
+                          {selectedVehicles.includes(veiculo.id) && (
+                            <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="text-sm font-medium">{veiculo.placa}</span>
+                      </div>
+                      <span className="text-xs text-gray-500">{veiculo.marca} {veiculo.modelo}</span>
+                    </div>
                   ))}
                 </div>
                 
