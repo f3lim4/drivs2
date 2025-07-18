@@ -491,3 +491,22 @@ export const insertAnuncioSchema = createInsertSchema(anuncios).omit({
 
 export type InsertAnuncio = z.infer<typeof insertAnuncioSchema>;
 export type Anuncio = typeof anuncios.$inferSelect;
+
+// Atividades do sistema (log de ações)
+export const atividades = pgTable("atividades", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  locadoraId: text("locadora_id").notNull(), // Referência ao CNPJ da locadora
+  usuario: text("usuario").notNull(), // Nome do usuário que fez a ação
+  acao: text("acao").notNull(), // Descrição da ação (ex: "Criou veículo", "Atualizou motorista")
+  entidade: text("entidade").notNull(), // Tipo de entidade (motorista, veiculo, aluguel, etc.)
+  entidadeId: text("entidade_id"), // ID da entidade afetada
+  detalhes: text("detalhes"), // Detalhes adicionais em JSON
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
+export const insertAtividadeSchema = createInsertSchema(atividades).omit({
+  timestamp: true,
+});
+
+export type InsertAtividade = z.infer<typeof insertAtividadeSchema>;
+export type Atividade = typeof atividades.$inferSelect;

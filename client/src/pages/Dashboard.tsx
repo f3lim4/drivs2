@@ -14,6 +14,7 @@ import { DashboardStats, Alert, Motorista, Veiculo } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useAnunciosAtivos } from '@/hooks/useAnuncios';
+import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
 
 
 export default function Dashboard() {
@@ -877,54 +878,7 @@ export default function Dashboard() {
       {isLocadora && (
       <div className="grid gap-6 md:grid-cols-2">
         {/* Card de Atividade Recentes */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              Atividade Recentes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {totalAlugueis > 0 ? (
-              <div className="space-y-4">
-                {alugueisSeguro.slice(0, 3).map((aluguel: any) => (
-                  <div key={aluguel.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                        <Car className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">{aluguel.motoristaNome}</p>
-                        <p className="text-xs text-muted-foreground">{aluguel.veiculoModelo}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium text-sm">{formatCurrency(parseFloat(aluguel.valorTotal))}</p>
-                      <Badge variant={aluguel.status === 'ativo' ? 'default' : 'secondary'} className="text-xs">
-                        {aluguel.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-                {totalAlugueis > 3 && (
-                  <p className="text-xs text-center text-muted-foreground mt-2">
-                    +{totalAlugueis - 3} mais aluguéis
-                  </p>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <p className="text-muted-foreground text-sm">Nenhum aluguel encontrado</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Os aluguéis recentes aparecerão aqui
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <AtividadesRecentes />
 
         {/* Card de Alertas */}
         <Card>

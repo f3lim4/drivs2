@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -13,7 +13,8 @@ import {
   type Despesa, type InsertDespesa,
   type Manutencao, type InsertManutencao,
   type Local, type InsertLocal,
-  type Anuncio, type InsertAnuncio
+  type Anuncio, type InsertAnuncio,
+  type Atividade, type InsertAtividade
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -134,6 +135,10 @@ export interface IStorage {
   createAnuncio(anuncio: InsertAnuncio): Promise<Anuncio>;
   updateAnuncio(id: string, updates: Partial<InsertAnuncio>): Promise<Anuncio>;
   deleteAnuncio(id: string): Promise<void>;
+  
+  // Atividade operations
+  getAtividadesByLocadora(locadoraId: string): Promise<Atividade[]>;
+  createAtividade(atividade: InsertAtividade): Promise<Atividade>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1458,6 +1463,36 @@ export class DatabaseStorage implements IStorage {
   async deleteAnuncio(id: string): Promise<void> {
     await db.delete(anuncios).where(eq(anuncios.id, id));
   }
+
+  // Atividade operations
+  async getAtividadesByLocadora(locadoraId: string): Promise<Atividade[]> {
+    try {
+      const result = await db.select()
+        .from(atividades)
+        .where(eq(atividades.locadoraId, locadoraId))
+        .orderBy(sql`${atividades.timestamp} DESC`)
+        .limit(50); // Limitar aos 50 mais recentes
+      return result;
+    } catch (error) {
+      console.error('Error getting atividades by locadora:', error);
+      return [];
+    }
+  }
+
+  async createAtividade(atividade: InsertAtividade): Promise<Atividade> {
+    try {
+      const atividadeData = {
+        ...atividade,
+        id: crypto.randomUUID(),
+      };
+      
+      const [created] = await db.insert(atividades).values(atividadeData).returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating atividade:', error);
+      throw error;
+    }
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -1846,6 +1881,144 @@ export class MemStorage implements IStorage {
 
   async deleteInfracao(id: string): Promise<void> {
     throw new Error('Infrações não implementadas no MemStorage');
+  }
+
+  // Atividade operations (memoria - não implementados)
+  async getAtividadesByLocadora(locadoraId: string): Promise<Atividade[]> {
+    return [];
+  }
+
+  async createAtividade(atividade: InsertAtividade): Promise<Atividade> {
+    throw new Error('Atividades não implementadas no MemStorage');
+  }
+
+  // Métodos não implementados no MemStorage
+  async getAllTemplateContratos(): Promise<TemplateContrato[]> {
+    return [];
+  }
+  
+  async getTemplateContratosByLocadora(locadoraId: string): Promise<TemplateContrato[]> {
+    return [];
+  }
+  
+  async getTemplateContrato(id: string): Promise<TemplateContrato | undefined> {
+    return undefined;
+  }
+  
+  async createTemplateContrato(template: InsertTemplateContrato): Promise<TemplateContrato> {
+    throw new Error('Templates não implementados no MemStorage');
+  }
+  
+  async updateTemplateContrato(id: string, updates: Partial<InsertTemplateContrato>): Promise<TemplateContrato> {
+    throw new Error('Templates não implementados no MemStorage');
+  }
+  
+  async deleteTemplateContrato(id: string): Promise<void> {
+    throw new Error('Templates não implementados no MemStorage');
+  }
+
+  async getAllDespesas(): Promise<Despesa[]> {
+    return [];
+  }
+
+  async getDespesasByLocadora(locadoraId: string): Promise<Despesa[]> {
+    return [];
+  }
+
+  async getDespesasByVeiculo(veiculoId: string): Promise<Despesa[]> {
+    return [];
+  }
+
+  async getDespesa(id: string): Promise<Despesa | undefined> {
+    return undefined;
+  }
+
+  async createDespesa(despesa: InsertDespesa): Promise<Despesa> {
+    throw new Error('Despesas não implementadas no MemStorage');
+  }
+
+  async updateDespesa(id: string, updates: Partial<InsertDespesa>): Promise<Despesa> {
+    throw new Error('Despesas não implementadas no MemStorage');
+  }
+
+  async deleteDespesa(id: string): Promise<void> {
+    throw new Error('Despesas não implementadas no MemStorage');
+  }
+
+  async getAllManutencoes(): Promise<Manutencao[]> {
+    return [];
+  }
+
+  async getManutencoesByLocadora(locadoraId: string): Promise<Manutencao[]> {
+    return [];
+  }
+
+  async getManutencoesByVeiculo(veiculoId: string): Promise<Manutencao[]> {
+    return [];
+  }
+
+  async getManutencao(id: string): Promise<Manutencao | undefined> {
+    return undefined;
+  }
+
+  async createManutencao(manutencao: InsertManutencao): Promise<Manutencao> {
+    throw new Error('Manutenções não implementadas no MemStorage');
+  }
+
+  async updateManutencao(id: string, updates: Partial<InsertManutencao>): Promise<Manutencao> {
+    throw new Error('Manutenções não implementadas no MemStorage');
+  }
+
+  async deleteManutencao(id: string): Promise<void> {
+    throw new Error('Manutenções não implementadas no MemStorage');
+  }
+
+  async getAllLocais(): Promise<Local[]> {
+    return [];
+  }
+
+  async getLocaisByLocadora(locadoraId: string): Promise<Local[]> {
+    return [];
+  }
+
+  async getLocal(id: string): Promise<Local | undefined> {
+    return undefined;
+  }
+
+  async createLocal(local: InsertLocal): Promise<Local> {
+    throw new Error('Locais não implementados no MemStorage');
+  }
+
+  async updateLocal(id: string, updates: Partial<InsertLocal>): Promise<Local> {
+    throw new Error('Locais não implementados no MemStorage');
+  }
+
+  async deleteLocal(id: string): Promise<void> {
+    throw new Error('Locais não implementados no MemStorage');
+  }
+
+  async getAllAnuncios(): Promise<Anuncio[]> {
+    return [];
+  }
+
+  async getAnunciosAtivos(): Promise<Anuncio[]> {
+    return [];
+  }
+
+  async getAnuncio(id: string): Promise<Anuncio | undefined> {
+    return undefined;
+  }
+
+  async createAnuncio(anuncio: InsertAnuncio): Promise<Anuncio> {
+    throw new Error('Anúncios não implementados no MemStorage');
+  }
+
+  async updateAnuncio(id: string, updates: Partial<InsertAnuncio>): Promise<Anuncio> {
+    throw new Error('Anúncios não implementados no MemStorage');
+  }
+
+  async deleteAnuncio(id: string): Promise<void> {
+    throw new Error('Anúncios não implementados no MemStorage');
   }
 }
 

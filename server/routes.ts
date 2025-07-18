@@ -3,7 +3,7 @@ import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { testConnection, db } from "./db";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, contratos } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, contratos } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import fs from "fs";
@@ -1585,6 +1585,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Imagem removida com sucesso" });
     } catch (error) {
       console.error("Error deleting motorista image:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Rotas de atividades
+  app.get("/api/atividades", async (req, res) => {
+    try {
+      const { locadoraId } = req.query;
+      
+      if (!locadoraId || typeof locadoraId !== 'string') {
+        return res.status(400).json({ message: "locadoraId é obrigatório" });
+      }
+      
+      const atividades = await storage.getAtividadesByLocadora(locadoraId);
+      res.json(atividades);
+    } catch (error) {
+      console.error("Error fetching atividades:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/atividades", async (req, res) => {
+    try {
+      const data = insertAtividadeSchema.parse(req.body);
+      const atividade = await storage.createAtividade(data);
+      res.status(201).json(atividade);
+    } catch (error) {
+      console.error("Error creating atividade:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
