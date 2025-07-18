@@ -250,6 +250,7 @@ export function EditarMotoristaModal({
         rua: motorista.rua,
         numero: motorista.numero,
         bairro: motorista.bairro,
+        complemento: motorista.complemento || '',
         cidade: motorista.cidade,
         estado: motorista.estado,
         cep: motorista.cep,
@@ -547,7 +548,36 @@ export function EditarMotoristaModal({
 
             {/* ENDEREÇO */}
             <div className="space-y-4">
-              <div className="grid grid-cols-4 gap-4">
+              <FormField
+                control={form.control}
+                name="cep"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CEP *</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="00000-000" 
+                        {...field}
+                        onChange={(e) => {
+                          let value = e.target.value.replace(/\D/g, '');
+                          if (value.length <= 8) {
+                            value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+                          }
+                          field.onChange(value);
+                          
+                          // Buscar endereço automaticamente quando CEP tiver 8 dígitos
+                          if (value.replace(/\D/g, '').length === 8) {
+                            buscarEnderecoPorCep(value);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-2">
                   <FormField
                     control={form.control}
@@ -577,7 +607,9 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
+              </div>
 
+              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="bairro"
@@ -591,9 +623,23 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="complemento"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Complemento</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Apto, casa, bloco..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="cidade"
@@ -650,35 +696,6 @@ export function EditarMotoristaModal({
                           <SelectItem value="TO">TO</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="cep"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>CEP *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="00000-000" 
-                          {...field}
-                          onChange={(e) => {
-                            let value = e.target.value.replace(/\D/g, '');
-                            if (value.length <= 8) {
-                              value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
-                            }
-                            field.onChange(value);
-                            
-                            // Buscar endereço automaticamente quando CEP tiver 8 dígitos
-                            if (value.replace(/\D/g, '').length === 8) {
-                              buscarEnderecoPorCep(value);
-                            }
-                          }}
-                        />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
