@@ -526,31 +526,12 @@ export default function RelatoriosFinanceiros() {
       });
     
     // Adicionar manutenções do período selecionado
-    console.log('Verificando manutenções para categoria:', {
-      totalManutencoes: filteredData.manutencoes.length,
-      periodoSelecionado: {
-        inicio: monthStart.toISOString(),
-        fim: monthEnd.toISOString()
-      },
-      manutencoes: filteredData.manutencoes.map(m => ({
-        id: m.id,
-        dataInicio: m.dataInicio,
-        valorFinal: m.valorFinal,
-        valorOrcamento: m.valorOrcamento
-      }))
-    });
-    
     filteredData.manutencoes.forEach(manutencao => {
       const valor = manutencao.valorFinal || manutencao.valorOrcamento;
       if (valor && parseFloat(valor) > 0) {
         const valorManutencao = parseFloat(valor);
         if (!isNaN(valorManutencao)) {
           categorias['manutencao'] = (categorias['manutencao'] || 0) + valorManutencao;
-          console.log('Manutenção adicionada ao card categoria:', {
-            id: manutencao.id,
-            valor: valorManutencao,
-            totalManutencao: categorias['manutencao']
-          });
         }
       }
     });
