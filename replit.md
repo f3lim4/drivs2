@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Integração Completa de Manutenções nos Relatórios Financeiros - CONCLUÍDO
+- ✅ **Card "Despesas por Categoria" corrigido** - Manutenções agora aparecem na categoria "Manutenção"
+- ✅ **Histórico de despesas integrado** - Manutenções incluídas na tabela "Histórico de Despesas dos Veículos"
+- ✅ **Filtro de categoria removido** - Eliminado filtro que excluía manutenções (`despesa.fonte !== 'manutencao'`)
+- ✅ **Cálculo de totais corrigido** - Despesas totais incluem manutenções (R$ 13.014,62)
+- ✅ **Hook useDespesas otimizado** - Conversão automática de manutenções para despesas
+- ✅ **Logs de debug implementados** - Sistema monitora detecção e conversão de manutenções
+- ✅ **Validação completa** - Manutenções de R$ 1.000,00 aparecem corretamente no sistema
+- ✅ **Interface funcional** - Card categoria e tabela histórico exibem dados reais
+
 ### 2025-07-18: Container de Resumo por Formas de Pagamento - CONCLUÍDO
 - ✅ **Container de resumo implementado** - Card dedicado mostrando distribuição por formas de pagamento
 - ✅ **Valores e percentuais** - Cada forma de pagamento mostra valor total e percentual do total
