@@ -1289,7 +1289,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     { name: 'cnhImagem', maxCount: 1 },
     { name: 'fotoComCnh', maxCount: 1 },
     { name: 'comprovanteEndereco', maxCount: 1 },
-    { name: 'fotoExtra', maxCount: 1 }
+    { name: 'fotoExtra', maxCount: 1 },
+    { name: 'fotoExtra2', maxCount: 1 }
   ]), async (req, res) => {
     try {
       const { motoristaId } = req.body;
@@ -1316,7 +1317,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cnhImagem: 'imagem2', 
         fotoComCnh: 'imagem3',
         comprovanteEndereco: 'imagem4',
-        fotoExtra: 'imagem5'
+        fotoExtra: 'imagem5',
+        fotoExtra2: 'imagem6'
       };
       
       const updates: any = {};
@@ -1369,6 +1371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fotoComCnh: motorista.imagem3 ? `/uploads/motoristas/${motorista.imagem3}` : null,
         comprovanteEndereco: motorista.imagem4 ? `/uploads/motoristas/${motorista.imagem4}` : null,
         fotoExtra: motorista.imagem5 ? `/uploads/motoristas/${motorista.imagem5}` : null,
+        fotoExtra2: motorista.imagem6 ? `/uploads/motoristas/${motorista.imagem6}` : null,
       };
       
       res.json({ documentos });
