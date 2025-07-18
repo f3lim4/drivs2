@@ -2100,174 +2100,6 @@ export default function RelatoriosFinanceiros() {
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="historico" className="space-y-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
-                <CardDescription>
-                  Todas as despesas fixas e manutenções registradas no sistema - dados reais
-                </CardDescription>
-              </div>
-              
-              <Select value={sortHistorico} onValueChange={setSortHistorico}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Ordenar por" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mais-recente">Mais Recente</SelectItem>
-                  <SelectItem value="mais-antiga">Mais Antiga</SelectItem>
-                  <SelectItem value="maior-valor">Maior Valor</SelectItem>
-                  <SelectItem value="menor-valor">Menor Valor</SelectItem>
-                  <SelectItem value="tipo-az">Tipo (A-Z)</SelectItem>
-                  <SelectItem value="tipo-za">Tipo (Z-A)</SelectItem>
-                  <SelectItem value="categoria-az">Categoria (A-Z)</SelectItem>
-                  <SelectItem value="categoria-za">Categoria (Z-A)</SelectItem>
-                </SelectContent>
-              </Select>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Veículo</TableHead>
-                        <TableHead>Tipo</TableHead>
-                        <TableHead>Categoria</TableHead>
-                        <TableHead>Descrição</TableHead>
-                        <TableHead>Valor</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Ações</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {(() => {
-                        const todasDespesas = despesasComManutencoes;
-                        
-                        const despesasOrdenadas = [...todasDespesas].sort((a, b) => {
-                          switch (sortHistorico) {
-                            case 'mais-recente':
-                              const dateA = new Date(a.createdAt || a.data);
-                              const dateB = new Date(b.createdAt || b.data);
-                              if (dateB.getTime() === dateA.getTime()) {
-                                if (a.fonte === 'manutencao' && b.fonte !== 'manutencao') return -1;
-                                if (b.fonte === 'manutencao' && a.fonte !== 'manutencao') return 1;
-                              }
-                              return dateB.getTime() - dateA.getTime();
-                            case 'mais-antiga':
-                              return new Date(a.createdAt || a.data).getTime() - new Date(b.createdAt || b.data).getTime();
-                            case 'maior-valor':
-                              return b.valor - a.valor;
-                            case 'menor-valor':
-                              return a.valor - b.valor;
-                            case 'tipo-az':
-                              return a.tipo.localeCompare(b.tipo);
-                            case 'tipo-za':
-                              return b.tipo.localeCompare(a.tipo);
-                            case 'categoria-az':
-                              return a.categoria.localeCompare(b.categoria);
-                            case 'categoria-za':
-                              return b.categoria.localeCompare(a.categoria);
-                            default:
-                              return new Date(b.createdAt || b.data).getTime() - new Date(a.createdAt || a.data).getTime();
-                          }
-                        });
-
-                        const startIndex = (currentPageHistorico - 1) * itemsPerPageHistorico;
-                        const endIndex = startIndex + itemsPerPageHistorico;
-                        const despesasPaginadas = despesasOrdenadas.slice(startIndex, endIndex);
-
-                        return despesasPaginadas.map(despesa => (
-                          <TableRow key={despesa.id}>
-                            <TableCell>
-                              {format(new Date(despesa.createdAt || despesa.data), "dd/MM/yyyy")}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Car className="h-4 w-4 text-blue-600" />
-                                <div>
-                                  <p className="font-medium">{despesa.veiculo?.placa}</p>
-                                  <p className="text-sm text-gray-600">{despesa.veiculo?.marca} {despesa.veiculo?.modelo}</p>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={despesa.tipo === 'Despesa Fixa' ? 'default' : 'secondary'}>
-                                {despesa.tipo}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className={
-                                despesa.categoria === 'Manutenção' ? 'border-green-500 text-green-700' :
-                                despesa.categoria === 'IPVA' ? 'border-amber-500 text-amber-700' :
-                                despesa.categoria === 'Seguro' ? 'border-blue-500 text-blue-700' :
-                                despesa.categoria === 'Rastreador' ? 'border-indigo-500 text-indigo-700' :
-                                'border-gray-500 text-gray-700'
-                              }>
-                                {despesa.categoria}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="max-w-xs truncate">
-                              {despesa.descricao}
-                            </TableCell>
-                            <TableCell className="font-medium text-red-600">
-                              {formatCurrency(despesa.valor)}
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={
-                                despesa.status === 'Automático' ? 'default' :
-                                despesa.status === 'Concluída' ? 'secondary' :
-                                despesa.status === 'Em Aberto' ? 'destructive' :
-                                'outline'
-                              }>
-                                {despesa.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              {despesa.fonte === 'manual' && (
-                                <div className="flex gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => abrirModalEdicao(despesa)}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setConfirmDelete({ open: true, id: despesa.id })}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        ));
-                      })()}
-                    </TableBody>
-                  </Table>
-                </div>
-                
-                {despesasComManutencoes.length > 0 && (
-                  <div className="border-t pt-4 mt-4">
-                    <Pagination
-                      currentPage={currentPageHistorico}
-                      totalItems={despesasComManutencoes.length}
-                      itemsPerPage={itemsPerPageHistorico}
-                      onPageChange={handlePageChangeHistorico}
-                      onItemsPerPageChange={handleItemsPerPageChangeHistorico}
-                    />
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
 
       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
@@ -2364,6 +2196,7 @@ export default function RelatoriosFinanceiros() {
                           <SelectItem value="manutencao">Manutenção</SelectItem>
                           <SelectItem value="licenciamento">Licenciamento</SelectItem>
                           <SelectItem value="lavagem">Lavagem</SelectItem>
+                          <SelectItem value="emprestimo">Empréstimo</SelectItem>
                           <SelectItem value="outros">Outros</SelectItem>
                         </SelectContent>
                       </Select>
@@ -2377,24 +2210,14 @@ export default function RelatoriosFinanceiros() {
                   name="valor"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor</FormLabel>
+                      <FormLabel>Valor Total</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
                           step="0.01" 
-                          placeholder="0,00"
-                          {...field} 
-                          onChange={(e) => {
-                            const valor = parseFloat(e.target.value) || 0;
-                            const veiculosSelecionados = form.watch('veiculoIds') || [];
-                            field.onChange(e.target.value);
-                            if (veiculosSelecionados.length > 1) {
-                              const valorPorVeiculo = valor / veiculosSelecionados.length;
-                              form.setValue('valorPorVeiculo', valorPorVeiculo);
-                            } else {
-                              form.setValue('valorPorVeiculo', valor);
-                            }
-                          }}
+                          placeholder="0,00" 
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -2403,12 +2226,6 @@ export default function RelatoriosFinanceiros() {
                 />
               </div>
 
-              {(form.watch('veiculoIds')?.length || 0) > 1 && (
-                <div className="text-sm text-gray-600 bg-blue-50 p-2 rounded">
-                  Valor por veículo: {formatCurrency(form.watch('valorPorVeiculo') || 0)}
-                </div>
-              )}
-
               <FormField
                 control={form.control}
                 name="descricao"
@@ -2416,7 +2233,26 @@ export default function RelatoriosFinanceiros() {
                   <FormItem>
                     <FormLabel>Descrição</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="Descrição da despesa" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="data"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="date" 
+                        {...field}
+                        value={field.value ? format(new Date(field.value), 'yyyy-MM-dd') : ''}
+                        onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -2448,28 +2284,38 @@ export default function RelatoriosFinanceiros() {
                 )}
               />
 
-              <DialogFooter>
+              <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setModalAberto(false)}>
                   Cancelar
                 </Button>
                 <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Salvando...' : editando ? 'Atualizar' : 'Salvar'}
+                  {isLoading ? "Salvando..." : editando ? "Atualizar" : "Salvar"}
                 </Button>
-              </DialogFooter>
+              </div>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
 
-      <ConfirmDialog
-        open={confirmDelete.open}
-        onOpenChange={(open) => setConfirmDelete({ open, id: null })}
-        title="Confirmar exclusão"
-        description="Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita."
-        onConfirm={confirmarExclusao}
-        confirmText="Excluir"
-        cancelText="Cancelar"
-      />
+      {/* Modal de confirmação de exclusão */}
+      <Dialog open={confirmDelete.open} onOpenChange={(open) => setConfirmDelete({ ...confirmDelete, open })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setConfirmDelete({ open: false, id: '' })}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={confirmarExclusao}>
+              Excluir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
-}
+};
