@@ -501,17 +501,55 @@ export default function RelatoriosFinanceiros() {
       }, 0);
   }, [pagamentos, monthStart, monthEnd]);
 
-  const totalDespesas = useMemo(() => {
-    const despesasManuais = filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'despesa' && despesa.fonte !== 'manutencao' && despesa.categoria !== 'financiamento') // Excluir despesas de manutenção e financiamento pois já estão nas despesas fixas
-      .reduce((total, despesa) => {
-        const valor = parseFloat(despesa.valor || '0');
-        return total + (isNaN(valor) ? 0 : valor);
-      }, 0);
+  // Despesas por categoria
+  const despesasPorCategoria = useMemo(() => {
+    const categorias = {};
     
-    // Somar despesas fixas dos veículos
-    return despesasManuais + totalDespesasFixas;
-  }, [filteredData.despesasPeriodo, totalDespesasFixas]);
+    // Calcular despesas manuais por categoria
+    filteredData.despesasPeriodo
+      .filter(despesa => despesa.tipo === 'despesa' && despesa.fonte !== 'manutencao' && despesa.categoria !== 'financiamento')
+      .forEach(despesa => {
+        const categoria = despesa.categoria || 'outros';
+        const valor = parseFloat(despesa.valor || '0');
+        if (!isNaN(valor)) {
+          categorias[categoria] = (categorias[categoria] || 0) + valor;
+        }
+      });
+    
+    // Adicionar despesas fixas por categoria
+    categorias['ipva'] = veiculos.reduce((total, veiculo) => {
+      const ipva = veiculo.ipva ? parseFloat(veiculo.ipva) / 12 : 0;
+      return total + (isNaN(ipva) ? 0 : ipva);
+    }, 0);
+    
+    categorias['seguro'] = veiculos.reduce((total, veiculo) => {
+      const seguro = veiculo.valorSeguroMensal ? parseFloat(veiculo.valorSeguroMensal) : 0;
+      return total + (isNaN(seguro) ? 0 : seguro);
+    }, 0);
+    
+    categorias['rastreador'] = veiculos.reduce((total, veiculo) => {
+      const rastreador = veiculo.valorRastreadorMensal ? parseFloat(veiculo.valorRastreadorMensal) : 0;
+      return total + (isNaN(rastreador) ? 0 : rastreador);
+    }, 0);
+    
+    categorias['financiamento'] = veiculos.reduce((total, veiculo) => {
+      const financiamento = veiculo.financiado && veiculo.valorFinanciamento ? parseFloat(veiculo.valorFinanciamento) : 0;
+      return total + (isNaN(financiamento) ? 0 : financiamento);
+    }, 0);
+    
+    // Remover categorias com valor zero
+    Object.keys(categorias).forEach(key => {
+      if (categorias[key] === 0) {
+        delete categorias[key];
+      }
+    });
+    
+    return categorias;
+  }, [filteredData.despesasPeriodo, veiculos]);
+
+  const totalDespesas = useMemo(() => {
+    return Object.values(despesasPorCategoria).reduce((total, valor) => total + valor, 0);
+  }, [despesasPorCategoria]);
 
   const totalReceitas = useMemo(() => {
     return filteredData.despesasPeriodo
@@ -1153,36 +1191,55 @@ export default function RelatoriosFinanceiros() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingDown className="h-5 w-5" />
-                  Despesas por Tipo
+                  Despesas por Categoria
                 </CardTitle>
                 <CardDescription>
-                  Detalhamento das despesas do mês
+                  Valor de cada categoria de despesa
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-red-800">Despesas Fixas</p>
-                      <p className="text-sm text-red-600">IPVA, Seguro, Rastreador</p>
-                    </div>
-                    <p className="text-lg font-bold text-red-600">
-                      {formatCurrency(totalDespesasFixas)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-orange-800">Despesas Manuais</p>
-                      <p className="text-sm text-orange-600">Lavagem, Empréstimos, etc.</p>
-                    </div>
-                    <p className="text-lg font-bold text-orange-600">
-                      {formatCurrency(totalDespesas - totalDespesasFixas)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
+                <div className="space-y-2">
+                  {Object.entries(despesasPorCategoria)
+                    .sort(([,a], [,b]) => b - a) // Ordenar por valor decrescente
+                    .map(([categoria, valor]) => {
+                      const nomeCategoria = categoria.charAt(0).toUpperCase() + categoria.slice(1);
+                      const corBg = categoria === 'emprestimo' ? 'bg-purple-50' :
+                                   categoria === 'lavagem' ? 'bg-blue-50' :
+                                   categoria === 'ipva' ? 'bg-yellow-50' :
+                                   categoria === 'seguro' ? 'bg-green-50' :
+                                   categoria === 'rastreador' ? 'bg-indigo-50' :
+                                   categoria === 'financiamento' ? 'bg-pink-50' :
+                                   'bg-gray-50';
+                      const corTexto = categoria === 'emprestimo' ? 'text-purple-800' :
+                                      categoria === 'lavagem' ? 'text-blue-800' :
+                                      categoria === 'ipva' ? 'text-yellow-800' :
+                                      categoria === 'seguro' ? 'text-green-800' :
+                                      categoria === 'rastreador' ? 'text-indigo-800' :
+                                      categoria === 'financiamento' ? 'text-pink-800' :
+                                      'text-gray-800';
+                      const corValor = categoria === 'emprestimo' ? 'text-purple-600' :
+                                      categoria === 'lavagem' ? 'text-blue-600' :
+                                      categoria === 'ipva' ? 'text-yellow-600' :
+                                      categoria === 'seguro' ? 'text-green-600' :
+                                      categoria === 'rastreador' ? 'text-indigo-600' :
+                                      categoria === 'financiamento' ? 'text-pink-600' :
+                                      'text-gray-600';
+                      
+                      return (
+                        <div key={categoria} className={`flex justify-between items-center p-2 ${corBg} rounded-lg`}>
+                          <div>
+                            <p className={`font-medium ${corTexto}`}>{nomeCategoria}</p>
+                          </div>
+                          <p className={`font-bold ${corValor}`}>
+                            {formatCurrency(valor)}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200 mt-3">
                     <div>
                       <p className="font-bold text-gray-800">TOTAL DESPESAS</p>
-                      <p className="text-sm text-gray-600">Soma de todas as despesas</p>
+                      <p className="text-sm text-gray-600">Soma de todas as categorias</p>
                     </div>
                     <p className="text-xl font-bold text-red-600">
                       {formatCurrency(totalDespesas)}
