@@ -46,7 +46,7 @@ export function ExcluirContratoDialog({
             <br /><br />
             <strong>Detalhes do contrato:</strong>
             <br />• Veículo: {contrato.veiculo}
-            <br />• Valor: R$ {contrato.valor?.toFixed(2)}
+            <br />• Valor: R$ {typeof contrato.valor === 'number' ? contrato.valor.toFixed(2) : parseFloat(contrato.valor || '0').toFixed(2)}
             <br />• Data de início: {contrato.dataInicio}
             <br />• Data de fim: {contrato.dataFim}
             <br /><br />

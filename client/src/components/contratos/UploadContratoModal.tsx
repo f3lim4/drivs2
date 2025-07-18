@@ -158,7 +158,7 @@ export function UploadContratoModal({
               </div>
               <div>
                 <span className="text-slate-600">Valor:</span>
-                <p className="font-medium">R$ {parseFloat(contrato.valor).toFixed(2)}</p>
+                <p className="font-medium">R$ {parseFloat(contrato.valor || '0').toFixed(2)}</p>
               </div>
               <div>
                 <span className="text-slate-600">Status:</span>
