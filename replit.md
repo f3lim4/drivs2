@@ -20,7 +20,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Cálculo automático** - Valor dividido automaticamente entre veículos selecionados
 - ✅ **Botão Todos/Limpar** - Seleção rápida de todos os veículos ou limpeza da seleção
 - ✅ **Validação obrigatória** - Deve selecionar pelo menos um veículo para criar despesa
-- ✅ **Verificação IPVA** - Confirmado que cálculo está correto: FVN9I69 = R$ 1.630 (R$ 1.400 IPVA + R$ 220 seguro + R$ 10 rastreador)
+- ✅ **Correção IPVA** - Valor corrigido: FVN9I69 = R$ 370 (R$ 140 IPVA + R$ 220 seguro + R$ 10 rastreador)
 
 ### 2025-07-17: Verificação de Integridade e Limpeza do Sistema - CONCLUÍDO
 - ✅ **Páginas duplicadas eliminadas** - Removida AlugueisNovo.tsx que causava conflitos de roteamento
