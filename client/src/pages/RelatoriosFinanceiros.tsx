@@ -956,7 +956,86 @@ export default function RelatoriosFinanceiros() {
         )}
       </div>
 
-      {/* Cards de resumo financeiro removidos conforme solicitado */}
+      {/* Cards de Resumo Financeiro - apenas para locadoras */}
+      {!isAdmin && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-green-700">RECEITA TOTAL</p>
+                <p className="text-lg font-bold text-green-800">
+                  {formatCurrency(receitaTotal)}
+                </p>
+                <p className="text-xs text-green-600">
+                  {variacaoReceita > 0 ? '+' : ''}{variacaoReceita.toFixed(1)}% em relação ao mês anterior
+                </p>
+              </div>
+              <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-green-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-red-700">DESPESAS TOTAIS</p>
+                <p className="text-lg font-bold text-red-800">
+                  {formatCurrency(totalDespesas)}
+                </p>
+                <p className="text-xs text-red-600">
+                  {variacaoDespesas > 0 ? '+' : ''}{variacaoDespesas.toFixed(1)}% em relação ao mês anterior
+                </p>
+              </div>
+              <div className="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center">
+                <TrendingDown className="w-4 h-4 text-red-700" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-blue-700">LUCRO LÍQUIDO</p>
+                <p className={`text-lg font-bold ${lucroLiquido >= 0 ? 'text-blue-800' : 'text-red-800'}`}>
+                  {formatCurrency(lucroLiquido)}
+                </p>
+                <p className="text-xs text-blue-600">
+                  {variacaoLucro > 0 ? '+' : ''}{variacaoLucro.toFixed(1)}% em relação ao mês anterior
+                </p>
+              </div>
+              <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
+                <DollarSign className={`w-4 h-4 ${lucroLiquido >= 0 ? 'text-blue-700' : 'text-red-700'}`} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-purple-700">MARGEM DE LUCRO</p>
+                <p className={`text-lg font-bold ${margemLucro >= 0 ? 'text-purple-800' : 'text-red-800'}`}>
+                  {margemLucro.toFixed(1)}%
+                </p>
+                <p className="text-xs text-purple-600">
+                  Meta: 30%
+                </p>
+              </div>
+              <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
+                <TrendingUp className={`w-4 h-4 ${margemLucro >= 0 ? 'text-purple-700' : 'text-red-700'}`} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        </div>
+      )}
 
       {/* Seção especial para admins - Dados consolidados de todas as locadoras */}
       {isAdmin && locadoras.length > 0 && (
@@ -1022,150 +1101,10 @@ export default function RelatoriosFinanceiros() {
         </TabsList>
 
         <TabsContent value="despesas" className="space-y-4">
-          {/* Resumo Financeiro */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Receitas Totais</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {formatCurrency(receitaTotal)}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {format(selectedMonth, 'MMMM yyyy', { locale: pt })}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Despesas Totais</p>
-                  <p className="text-2xl font-bold text-red-600">
-                    {formatCurrency(totalDespesas)}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Fixas: {formatCurrency(totalDespesasFixas)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Lucro Líquido</p>
-                  <p className={`text-2xl font-bold ${lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(lucroLiquido)}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Margem: {margemLucro.toFixed(1)}%
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">Aluguéis Ativos</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {filteredData.alugueisAtivos.length}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Receita: {formatCurrency(receitaAlugueis)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Receitas por Tipo */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Receitas por Tipo
-                </CardTitle>
-                <CardDescription>
-                  Detalhamento das receitas do mês
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-green-800">Pagamentos Recebidos</p>
-                      <p className="text-sm text-green-600">Pagamentos de aluguéis</p>
-                    </div>
-                    <p className="text-lg font-bold text-green-600">
-                      {formatCurrency(receitaPagamentos)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-blue-800">Receitas Extras</p>
-                      <p className="text-sm text-blue-600">Outras receitas</p>
-                    </div>
-                    <p className="text-lg font-bold text-blue-600">
-                      {formatCurrency(totalReceitas)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
-                    <div>
-                      <p className="font-bold text-gray-800">TOTAL RECEITAS</p>
-                      <p className="text-sm text-gray-600">Soma de todas as receitas</p>
-                    </div>
-                    <p className="text-xl font-bold text-green-600">
-                      {formatCurrency(receitaTotal)}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Despesas por Tipo */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingDown className="h-5 w-5" />
-                  Despesas por Tipo
-                </CardTitle>
-                <CardDescription>
-                  Detalhamento das despesas do mês
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-red-800">Despesas Fixas</p>
-                      <p className="text-sm text-red-600">IPVA, Seguro, Rastreador</p>
-                    </div>
-                    <p className="text-lg font-bold text-red-600">
-                      {formatCurrency(totalDespesasFixas)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-orange-800">Despesas Manuais</p>
-                      <p className="text-sm text-orange-600">Lavagem, Empréstimos, etc.</p>
-                    </div>
-                    <p className="text-lg font-bold text-orange-600">
-                      {formatCurrency(totalDespesas - totalDespesasFixas)}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
-                    <div>
-                      <p className="font-bold text-gray-800">TOTAL DESPESAS</p>
-                      <p className="text-sm text-gray-600">Soma de todas as despesas</p>
-                    </div>
-                    <p className="text-xl font-bold text-red-600">
-                      {formatCurrency(totalDespesas)}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Cards de resumo dentro da aba removidos conforme solicitado */}
+          <div className="text-center py-8">
+            <p className="text-gray-600">Interface simplificada - cards de resumo removidos</p>
+            <p className="text-sm text-gray-500 mt-2">Acesse a aba "Histórico" para visualizar as despesas detalhadas</p>
           </div>
 
 
