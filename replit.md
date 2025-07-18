@@ -10,6 +10,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Modal de Edição de Motoristas Unificado - CONCLUÍDO
+- ✅ **Modal de edição atualizado** - Agora usa o mesmo formato do modal de cadastro
+- ✅ **Sistema de upload completo** - Todos os 6 tipos de documentos disponíveis no modal de edição
+- ✅ **Funções específicas implementadas** - handleImageUpload e handleRemoveImage para cada tipo de documento
+- ✅ **Validação por tipo** - CNH e Comprovante aceitam PDF além de imagens
+- ✅ **Integração com backend** - Chamadas para API de atualização de motoristas e upload de imagens
+- ✅ **Preview inteligente** - Mostra preview de imagens e indicador "PDF" para arquivos PDF
+- ✅ **Estados de loading** - Botões desabilitados e feedback visual durante processos
+- ✅ **Dropdown de estados** - Campo estado como select com todas as UFs brasileiras
+- ✅ **Consistência visual** - Mesmo layout e organização do modal de cadastro
+- ✅ **Tratamento de erros** - Toast notifications para sucesso e erro nas operações
+- ✅ **Limpeza de dados** - Imagens são zeradas ao trocar de motorista
+
 ### 2025-07-18: Sistema de Upload de Documentos Específicos - CONCLUÍDO
 - ✅ **Sistema de upload específico implementado** - Substituído upload genérico por campos específicos de documentos
 - ✅ **5 tipos de documentos organizados** - Foto de Perfil, CNH, Foto com CNH, Comprovante de Endereço e Foto Extra
