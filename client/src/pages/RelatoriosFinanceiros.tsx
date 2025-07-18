@@ -1689,9 +1689,12 @@ export default function RelatoriosFinanceiros() {
                           const valor = manutencao.valorFinal || manutencao.valorOrcamento;
                           
                           if (valor && parseFloat(valor) > 0) {
+                            // Usar data de conclusão se disponível (para manutenções concluídas), senão data de início
+                            const dataManutencao = manutencao.dataConclusao || manutencao.dataInicio;
+                            
                             todasDespesas.push({
                               id: `manutencao-${manutencao.id}`,
-                              data: manutencao.dataInicio,
+                              data: dataManutencao,
                               veiculo: veiculo,
                               tipo: 'Manutenção',
                               categoria: manutencao.tipo,
@@ -1699,7 +1702,7 @@ export default function RelatoriosFinanceiros() {
                               valor: parseFloat(valor),
                               status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente',
                               formaPagamento: manutencao.formaPagamento || 'Não informado',
-                              createdAt: manutencao.createdAt || manutencao.dataInicio
+                              createdAt: manutencao.createdAt || dataManutencao
                             });
                           }
                         });
