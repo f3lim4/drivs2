@@ -268,7 +268,7 @@ export function useNotifications() {
             const dataProximaManutencao = new Date(manutencao.proximaManutencao);
             const diasParaManutencao = differenceInDays(dataProximaManutencao, today);
 
-            console.log(`Notificações - Alerta por data: Veículo ${veiculo.placa}, próxima em ${diasParaManutencao} dias`);
+
 
             if (diasParaManutencao <= 15 && diasParaManutencao > 7) {
               notifications.push({
@@ -304,7 +304,7 @@ export function useNotifications() {
           if (manutencao.proximaManutencaoKm && veiculo.quilometragem) {
             const kmRestantes = manutencao.proximaManutencaoKm - veiculo.quilometragem;
 
-            console.log(`Notificações - Alerta por KM: Veículo ${veiculo.placa}, restam ${kmRestantes}km (atual: ${veiculo.quilometragem}, próxima: ${manutencao.proximaManutencaoKm})`);
+
 
             if (kmRestantes <= 5000 && kmRestantes > 1000) {
               notifications.push({
@@ -474,10 +474,27 @@ export function useNotifications() {
     });
   }
 
-  // Ordenar notificações por timestamp (mais recentes primeiro)
-  const sortedNotifications = notifications.sort((a, b) => 
-    b.timestamp.getTime() - a.timestamp.getTime()
-  );
+  // Priorizar notificações por tipo de criticidade
+  const priorityOrder = {
+    'danger': 1,    // Manutenções urgentes, CNH vencida, multas vencidas
+    'warning': 2,   // Manutenções próximas, despesas altas, pagamentos pendentes
+    'info': 3,      // Informações gerais
+    'success': 4    // Confirmações
+  };
+  
+  // Ordenar notificações por prioridade e depois por timestamp
+  const sortedNotifications = notifications.sort((a, b) => {
+    const priorityA = priorityOrder[a.type] || 999;
+    const priorityB = priorityOrder[b.type] || 999;
+    
+    // Primeiro ordenar por prioridade
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB;
+    }
+    
+    // Se a prioridade for igual, ordenar por timestamp (mais recente primeiro)
+    return b.timestamp.getTime() - a.timestamp.getTime();
+  });
 
   const unreadCount = sortedNotifications.filter(n => !n.isRead).length;
 

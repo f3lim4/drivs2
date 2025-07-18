@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-18: Sistema de Alertas de Manutenção Avançado - CONCLUÍDO
+### 2025-07-18: Sistema de Alertas de Manutenção Avançado - CONCLUÍDO ✅
 - ✅ **Modal "Nova Manutenção" restaurado ao formato original** - Revertido layout compacto para formato espaçado preferido pelo usuário
 - ✅ **Campos condicionais implementados** - Seção "Conclusão da Manutenção" aparece apenas quando status = "concluída"
 - ✅ **Próxima Manutenção expandida** - Agora aceita tanto quilometragem (km) quanto data como campos opcionais
@@ -21,6 +21,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Schema atualizado** - Campo proxima_manutencao_km adicionado ao banco de dados
 - ✅ **Campos de conclusão** - Data de Conclusão, Valor Final, Quilometragem Final, Peças Substituídas incluídos
 - ✅ **Interface condicional** - Campos aparecem automaticamente com borda e título quando status muda para "concluída"
+- ✅ **Priorização inteligente** - Alertas de manutenção (danger) aparecem no topo das notificações
+- ✅ **Sistema completamente funcional** - Alertas de manutenção detectados e exibidos corretamente no dropdown de notificações
 
 ### 2025-07-18: Reorganização das Abas de Relatórios Financeiros - CONCLUÍDO
 - ✅ **"Despesas Fixas" movida para segunda posição** - Agora aparece logo após a aba "Despesas"
