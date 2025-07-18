@@ -2050,68 +2050,56 @@ export default function RelatoriosFinanceiros() {
           </DialogHeader>
           <Form {...formNovaDespesa}>
             <form onSubmit={formNovaDespesa.handleSubmit(criarNovaDespesa)} className="space-y-4">
-              {/* Multi-vehicle selection interface */}
-              <div className="space-y-3">
-                <div className="border rounded-lg p-3 bg-blue-50">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium text-blue-700">Selecionar Veículos</h4>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="h-7 text-xs"
-                      onClick={() => {
-                        const allSelected = selectedVehicles.length === veiculos.length;
-                        setSelectedVehicles(allSelected ? [] : veiculos.map(v => v.id));
-                      }}
-                    >
-                      {selectedVehicles.length === veiculos.length ? 'Desmarcar' : 'Todos'}
-                    </Button>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {veiculos.map((veiculo) => (
-                      <div key={veiculo.id} className="flex items-center space-x-2 p-2 border rounded bg-white text-sm">
-                        <input
-                          type="checkbox"
-                          id={`vehicle-${veiculo.id}`}
-                          checked={selectedVehicles.includes(veiculo.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedVehicles(prev => [...prev, veiculo.id]);
-                            } else {
-                              setSelectedVehicles(prev => prev.filter(id => id !== veiculo.id));
-                            }
-                          }}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <label htmlFor={`vehicle-${veiculo.id}`} className="flex-1 cursor-pointer">
-                          <div className="font-medium text-sm">{veiculo.placa}</div>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {selectedVehicles.length > 0 && formNovaDespesa.watch('valor') && (
-                    <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
-                      <div className="grid grid-cols-3 gap-2 text-xs text-green-700">
-                        <div>
-                          <span className="font-medium">Total:</span> R$ {formNovaDespesa.watch('valor') || '0,00'}
-                        </div>
-                        <div>
-                          <span className="font-medium">Por veículo:</span> R$ {
-                            selectedVehicles.length > 0 && formNovaDespesa.watch('valor') 
-                              ? (parseFloat(formNovaDespesa.watch('valor').toString().replace(',', '.')) / selectedVehicles.length).toFixed(2) 
-                              : '0,00'
-                          }
-                        </div>
-                        <div>
-                          <span className="font-medium">Selecionados:</span> {selectedVehicles.length}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+              {/* Simple vehicle selection */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Veículos</label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-xs text-blue-600"
+                    onClick={() => {
+                      const allSelected = selectedVehicles.length === veiculos.length;
+                      setSelectedVehicles(allSelected ? [] : veiculos.map(v => v.id));
+                    }}
+                  >
+                    {selectedVehicles.length === veiculos.length ? 'Limpar' : 'Todos'}
+                  </Button>
                 </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  {veiculos.map((veiculo) => (
+                    <button
+                      key={veiculo.id}
+                      type="button"
+                      onClick={() => {
+                        if (selectedVehicles.includes(veiculo.id)) {
+                          setSelectedVehicles(prev => prev.filter(id => id !== veiculo.id));
+                        } else {
+                          setSelectedVehicles(prev => [...prev, veiculo.id]);
+                        }
+                      }}
+                      className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${
+                        selectedVehicles.includes(veiculo.id)
+                          ? 'bg-blue-500 text-white border-blue-500'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300'
+                      }`}
+                    >
+                      {veiculo.placa}
+                    </button>
+                  ))}
+                </div>
+                
+                {selectedVehicles.length > 1 && formNovaDespesa.watch('valor') && (
+                  <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                    <span className="font-medium">{selectedVehicles.length} veículos selecionados</span>
+                    {' • '}
+                    <span>R$ {
+                      (parseFloat(formNovaDespesa.watch('valor').toString().replace(',', '.')) / selectedVehicles.length).toFixed(2)
+                    } por veículo</span>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
