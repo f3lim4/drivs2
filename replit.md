@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Sistema de Imagens Integrado ao Modal de Motoristas - CONCLUÍDO
+- ✅ **Modal de visualização unificado** - Motoristas agora têm um único botão "ver" que mostra todos os dados incluindo imagens
+- ✅ **Sistema de upload integrado** - Locadoras podem fazer upload de até 5 imagens por motorista no modal de visualização
+- ✅ **Endpoints de imagens criados** - API para listar, upload e exclusão de imagens dos motoristas
+- ✅ **Configuração multer implementada** - Sistema de upload com validação de tipo e tamanho (max 5MB)
+- ✅ **Interface para locadoras** - Funcionalidades de gerenciamento de imagens disponíveis apenas para locadoras
+- ✅ **Visualização de imagens** - Grid responsivo com opção de ampliar imagens em nova aba
+- ✅ **Middleware de arquivos estáticos** - Configurado para servir imagens através de /uploads/
+- ✅ **Correção de hooks React** - Resolvido problema de ordem de hooks no modal de visualização
+- ✅ **Sistema de validação** - Validação de formato (JPG/PNG) e tamanho antes do upload
+- ✅ **Feedback visual** - Indicadores de carregamento e mensagens de sucesso/erro
+
 ### 2025-07-18: Sistema de Upload de Contratos Assinados - CONCLUÍDO
 - ✅ **Modal de upload implementado** - Interface elegante para envio de contratos assinados
 - ✅ **Validação de arquivos** - Aceita apenas PDFs com limite de 10MB
