@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, Eye, Image } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useMotoristas } from '@/hooks/useMotoristas';
@@ -36,7 +36,7 @@ import { NovoMotoristaModal } from '@/components/motoristas/NovoMotoristaModal';
 import { EditarMotoristaModal } from '@/components/motoristas/EditarMotoristaModal';
 import { ExcluirMotoristaDialog } from '@/components/motoristas/ExcluirMotoristaDialog';
 import { VisualizarMotoristaModal } from '@/components/motoristas/VisualizarMotoristaModal';
-import { UploadImagensModal } from '@/components/motoristas/UploadImagensModal';
+
 
 import { Motorista } from '@/types';
 import { Users, UserCheck, UserX, Clock, Activity } from 'lucide-react';
@@ -52,7 +52,7 @@ export default function Motoristas() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [uploadImagensModalOpen, setUploadImagensModalOpen] = useState(false);
+
   const [selectedMotorista, setSelectedMotorista] = useState<Motorista | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -466,18 +466,18 @@ export default function Motoristas() {
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          onClick={() => handleEditarMotorista(motorista)}
-                          title="Editar"
+                          onClick={() => handleVisualizarMotorista(motorista)}
+                          title="Ver Dados e Imagens"
                         >
-                          <Edit className="w-4 h-4" />
+                          <Eye className="w-4 h-4" />
                         </Button>
                         <Button 
                           variant="ghost" 
                           size="icon"
-                          onClick={() => handleUploadImagens(motorista)}
-                          title="Gerenciar Imagens"
+                          onClick={() => handleEditarMotorista(motorista)}
+                          title="Editar"
                         >
-                          <Image className="w-4 h-4" />
+                          <Edit className="w-4 h-4" />
                         </Button>
                         <Button 
                           variant="ghost" 
@@ -557,13 +557,7 @@ export default function Motoristas() {
             onConfirmarExclusao={handleConfirmarExclusao}
           />
 
-          {/* Modal de Upload de Imagens */}
-          <UploadImagensModal
-            open={uploadImagensModalOpen}
-            onOpenChange={setUploadImagensModalOpen}
-            motorista={selectedMotorista}
-            onUploadSuccess={handleUploadImagensSuccess}
-          />
+
         </>
       )}
 
