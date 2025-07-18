@@ -111,6 +111,7 @@ export const motoristas = pgTable("motoristas", {
   rua: text("rua").notNull(),
   numero: text("numero").notNull(),
   bairro: text("bairro").notNull(),
+  complemento: text("complemento"),
   cidade: text("cidade").notNull(),
   estado: text("estado").notNull(),
   cep: text("cep").notNull(),

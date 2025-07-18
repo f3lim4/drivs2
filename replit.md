@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-18: Campo Complemento e Reorganização do Endereço - CONCLUÍDO
+- ✅ **Campo complemento adicionado** - Novo campo opcional para apartamento, casa, bloco, etc.
+- ✅ **CEP reposicionado** - Campo CEP agora aparece primeiro no formulário de endereço
+- ✅ **Layout reorganizado** - Endereço estruturado: CEP → Rua/Número → Bairro/Complemento → Cidade/Estado
+- ✅ **Schema atualizado** - Campo complemento adicionado ao banco de dados e validações
+- ✅ **Ambos modais atualizados** - Cadastro e edição de motoristas com nova estrutura
+- ✅ **Funcionalidade CEP mantida** - Busca automática de endereço continua funcionando
+- ✅ **Campo opcional** - Complemento não é obrigatório, melhora experiência do usuário
+
 ### 2025-07-18: Busca Automática de Endereço por CEP - CONCLUÍDO
 - ✅ **Integração com API ViaCEP** - Sistema automaticamente busca endereço quando CEP completo é digitado
 - ✅ **Preenchimento automático** - Campos rua, bairro, cidade e estado são preenchidos automaticamente
