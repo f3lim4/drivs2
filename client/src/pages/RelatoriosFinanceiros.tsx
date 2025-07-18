@@ -31,7 +31,7 @@ import { Pagination } from '@/components/ui/pagination';
 
 // Schema para formulário de nova despesa
 const novaDespesaSchema = z.object({
-  veiculoId: z.string().min(1, "Selecione um veículo"),
+  veiculoId: z.string().optional(), // Não obrigatório quando usa multi-seleção
   categoria: z.string().min(1, "Selecione uma categoria"),
   descricao: z.string().min(1, "Descrição é obrigatória"),
   valor: z.string().min(1, "Valor é obrigatório"),
@@ -163,12 +163,12 @@ export default function RelatoriosFinanceiros() {
     }
   });
 
-  // Limpar veículos selecionados quando categoria não for empréstimo
+  // Limpar veículos selecionados quando modal fecha
   useEffect(() => {
-    if (formNovaDespesa.watch('categoria') !== 'emprestimo') {
+    if (!modalNovaDespesa) {
       setSelectedVehicles([]);
     }
-  }, [formNovaDespesa.watch('categoria')]);
+  }, [modalNovaDespesa]);
 
   // Função para criar nova despesa
   const criarNovaDespesa = async (data: NovaDespesaData) => {
@@ -176,18 +176,18 @@ export default function RelatoriosFinanceiros() {
       const locadoraId = profile?.locadoraId || profile?.id;
       console.log('Criando despesa com locadoraId:', locadoraId);
       
-      // Validar se categoria empréstimo tem veículos selecionados
-      if (data.categoria === 'emprestimo' && selectedVehicles.length === 0) {
+      // Validar se há veículos selecionados
+      if (selectedVehicles.length === 0) {
         toast({
           title: 'Erro de validação',
-          description: 'Para empréstimos, você deve selecionar pelo menos um veículo.',
+          description: 'Você deve selecionar pelo menos um veículo.',
           variant: 'destructive',
         });
         return;
       }
 
-      // Se for categoria "emprestimo" e há veículos selecionados, criar múltiplas despesas
-      if (data.categoria === 'emprestimo' && selectedVehicles.length > 0) {
+      // Se há múltiplos veículos selecionados, criar múltiplas despesas
+      if (selectedVehicles.length > 1) {
         const valorTotal = parseFloat(data.valor.toString().replace(',', '.'));
         const valorPorVeiculo = (valorTotal / selectedVehicles.length).toFixed(2);
         
@@ -218,10 +218,10 @@ export default function RelatoriosFinanceiros() {
         
         toast({
           title: 'Despesas criadas com sucesso',
-          description: `${selectedVehicles.length} despesas de empréstimo criadas - R$ ${valorPorVeiculo} cada`,
+          description: `${selectedVehicles.length} despesas de ${data.categoria} criadas - R$ ${valorPorVeiculo} cada`,
         });
       } else {
-        // Comportamento padrão para outras categorias
+        // Comportamento para um único veículo
         const response = await fetch('/api/despesas', {
           method: 'POST',
           headers: {
@@ -229,6 +229,7 @@ export default function RelatoriosFinanceiros() {
           },
           body: JSON.stringify({
             ...data,
+            veiculoId: selectedVehicles[0],
             locadoraId,
             tipo: 'despesa'
           }),
@@ -2049,31 +2050,71 @@ export default function RelatoriosFinanceiros() {
           </DialogHeader>
           <Form {...formNovaDespesa}>
             <form onSubmit={formNovaDespesa.handleSubmit(criarNovaDespesa)} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={formNovaDespesa.control}
-                  name="veiculoId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Veículo</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione um veículo" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {veiculos.map((veiculo) => (
-                            <SelectItem key={veiculo.id} value={veiculo.id}>
-                              {veiculo.placa} - {veiculo.marca} {veiculo.modelo}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+              {/* Multi-vehicle selection interface */}
+              <div className="space-y-3">
+                <div className="border rounded-lg p-3 bg-blue-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-blue-700">Selecionar Veículos</h4>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        const allSelected = selectedVehicles.length === veiculos.length;
+                        setSelectedVehicles(allSelected ? [] : veiculos.map(v => v.id));
+                      }}
+                    >
+                      {selectedVehicles.length === veiculos.length ? 'Desmarcar' : 'Todos'}
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {veiculos.map((veiculo) => (
+                      <div key={veiculo.id} className="flex items-center space-x-2 p-2 border rounded bg-white text-sm">
+                        <input
+                          type="checkbox"
+                          id={`vehicle-${veiculo.id}`}
+                          checked={selectedVehicles.includes(veiculo.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedVehicles(prev => [...prev, veiculo.id]);
+                            } else {
+                              setSelectedVehicles(prev => prev.filter(id => id !== veiculo.id));
+                            }
+                          }}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label htmlFor={`vehicle-${veiculo.id}`} className="flex-1 cursor-pointer">
+                          <div className="font-medium text-sm">{veiculo.placa}</div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {selectedVehicles.length > 0 && formNovaDespesa.watch('valor') && (
+                    <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
+                      <div className="grid grid-cols-3 gap-2 text-xs text-green-700">
+                        <div>
+                          <span className="font-medium">Total:</span> R$ {formNovaDespesa.watch('valor') || '0,00'}
+                        </div>
+                        <div>
+                          <span className="font-medium">Por veículo:</span> R$ {
+                            selectedVehicles.length > 0 && formNovaDespesa.watch('valor') 
+                              ? (parseFloat(formNovaDespesa.watch('valor').toString().replace(',', '.')) / selectedVehicles.length).toFixed(2) 
+                              : '0,00'
+                          }
+                        </div>
+                        <div>
+                          <span className="font-medium">Selecionados:</span> {selectedVehicles.length}
+                        </div>
+                      </div>
+                    </div>
                   )}
-                />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={formNovaDespesa.control}
                   name="categoria"
@@ -2100,72 +2141,6 @@ export default function RelatoriosFinanceiros() {
                   )}
                 />
               </div>
-              
-              {/* Multi-vehicle selection for emprestimo category */}
-              {formNovaDespesa.watch('categoria') === 'emprestimo' && (
-                <div className="space-y-3">
-                  <div className="border rounded-lg p-3 bg-blue-50">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-medium text-blue-700">Selecionar Veículos</h4>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-7 text-xs"
-                        onClick={() => {
-                          const allSelected = selectedVehicles.length === veiculos.length;
-                          setSelectedVehicles(allSelected ? [] : veiculos.map(v => v.id));
-                        }}
-                      >
-                        {selectedVehicles.length === veiculos.length ? 'Desmarcar' : 'Todos'}
-                      </Button>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {veiculos.map((veiculo) => (
-                        <div key={veiculo.id} className="flex items-center space-x-2 p-2 border rounded bg-white text-sm">
-                          <input
-                            type="checkbox"
-                            id={`vehicle-${veiculo.id}`}
-                            checked={selectedVehicles.includes(veiculo.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedVehicles(prev => [...prev, veiculo.id]);
-                              } else {
-                                setSelectedVehicles(prev => prev.filter(id => id !== veiculo.id));
-                              }
-                            }}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <label htmlFor={`vehicle-${veiculo.id}`} className="flex-1 cursor-pointer">
-                            <div className="font-medium text-sm">{veiculo.placa}</div>
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {selectedVehicles.length > 0 && formNovaDespesa.watch('valor') && (
-                      <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
-                        <div className="grid grid-cols-3 gap-2 text-xs text-green-700">
-                          <div>
-                            <span className="font-medium">Total:</span> R$ {formNovaDespesa.watch('valor') || '0,00'}
-                          </div>
-                          <div>
-                            <span className="font-medium">Por veículo:</span> R$ {
-                              selectedVehicles.length > 0 && formNovaDespesa.watch('valor') 
-                                ? (parseFloat(formNovaDespesa.watch('valor').toString().replace(',', '.')) / selectedVehicles.length).toFixed(2) 
-                                : '0,00'
-                            }
-                          </div>
-                          <div>
-                            <span className="font-medium">Selecionados:</span> {selectedVehicles.length}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
 
               <FormField
                 control={formNovaDespesa.control}
