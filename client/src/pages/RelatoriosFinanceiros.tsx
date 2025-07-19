@@ -969,7 +969,7 @@ export default function RelatoriosFinanceiros() {
         {!isAdmin && (
           <Button onClick={() => {
             console.log('Botão Nova Despesa clicado');
-            setModalNovaDespesa(true);
+            setModalAberto(true);
           }} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Nova Despesa
