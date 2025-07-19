@@ -23,6 +23,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Validação backend** - API retorna erro 409 quando detecta tentativa de criar despesa duplicada
 - ✅ **Logs de debug removidos** - Interface limpa após identificar e corrigir a causa raiz
 - ✅ **Schema otimizado** - Função z.union() com transform() garante compatibilidade total
+- ✅ **Sistema totalmente funcional** - Teste curl confirmou: números são aceitos e convertidos automaticamente
+- ✅ **Duplicatas bloqueadas com sucesso** - Sistema detecta e impede criação de despesas idênticas
+- ✅ **Validação tripla implementada** - Backend verifica veículo, categoria, valor, data e descrição
 
 ### 2025-07-19: Remoção do Card Receita Extra dos Relatórios Financeiros - CONCLUÍDO ✅
 - ✅ **Card "Receita Extra" removido** - Eliminada seção específica para juros e multas nos relatórios financeiros
