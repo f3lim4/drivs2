@@ -325,7 +325,12 @@ export const insertDespesaSchema = createInsertSchema(despesas).omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  valor: z.string(),
+  valor: z.union([z.string(), z.number()]).transform((val) => {
+    if (typeof val === 'string') {
+      return parseFloat(val.replace(',', '.'));
+    }
+    return val;
+  }),
   data: z.string(),
 });
 

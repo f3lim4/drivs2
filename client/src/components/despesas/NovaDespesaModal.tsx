@@ -51,7 +51,7 @@ export function NovaDespesaModal() {
       veiculoId: '',
       categoria: '',
       descricao: '',
-      valor: '0',
+      valor: 0,
       data: format(new Date(), 'dd/MM/yyyy'),
       tipo: 'despesa',
       status: 'pendente',
@@ -69,7 +69,7 @@ export function NovaDespesaModal() {
     if (categoria === 'seguro' && veiculoId && veiculoId !== 'sem-veiculo') {
       const veiculo = veiculos.find(v => v.id === veiculoId);
       if (veiculo && veiculo.valorSeguroMensal) {
-        form.setValue('valor', veiculo.valorSeguroMensal.toString());
+        form.setValue('valor', parseFloat(veiculo.valorSeguroMensal.toString()));
         form.setValue('descricao', `Seguro ${veiculo.seguradora || 'mensal'} - ${veiculo.placa}`);
       }
     }
@@ -126,7 +126,7 @@ export function NovaDespesaModal() {
           createDespesa({
             ...data,
             veiculoId,
-            valor: valorPorVeiculo,
+            valor: parseFloat(valorPorVeiculo),
             descricao: `${data.descricao} (${selectedVehicles.length} veículos - R$ ${valorPorVeiculo} cada)`,
           })
         );
@@ -332,7 +332,13 @@ export function NovaDespesaModal() {
                       )}
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="0,00" />
+                      <Input 
+                        {...field} 
+                        type="number"
+                        step="0.01"
+                        placeholder="0,00"
+                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
