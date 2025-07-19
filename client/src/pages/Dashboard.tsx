@@ -411,34 +411,13 @@ export default function Dashboard() {
     .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorMensal || '0'), 0);
 
   // Calcular receita semanal esperada (baseada nos aluguéis ativos)
-  // Valor corrigido: R$ 5.075 ao invés de R$ 5.175
-  const alugueisAtivosParaCalculo = alugueisSeguro
-    .filter((a: any) => a.status === 'ativo' || a.status === 'pendente');
-  
-  console.log('Dashboard - Aluguéis para cálculo semanal:', {
-    total: alugueisAtivosParaCalculo.length,
-    valores: alugueisAtivosParaCalculo.map(a => ({
-      id: a.id,
-      status: a.status,
-      valorMensal: a.valorMensal,
-      motoristaNome: a.motoristaNome
-    }))
-  });
-
-  const receitaSemanalEsperada = alugueisAtivosParaCalculo
+  const receitaSemanalEsperada = alugueisSeguro
+    .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
     .reduce((total: number, aluguel: any) => {
       const valorMensal = parseFloat(aluguel.valorMensal || '0');
       const valorSemanal = valorMensal / 4; // Divide por 4 semanas
-      console.log('Dashboard - Calculando:', { valorMensal, valorSemanal, total: total + valorSemanal });
       return total + valorSemanal;
     }, 0);
-
-  console.log('Dashboard - Receita semanal esperada calculada:', receitaSemanalEsperada);
-
-  // Correção do valor esperado: se for exatamente R$ 5.175, ajustar para R$ 5.075
-  const receitaSemanalEsperadaCorrigida = Math.abs(receitaSemanalEsperada - 5175) < 0.01 
-    ? 5075 
-    : receitaSemanalEsperada;
 
   // Calcular receita semanal já recebida (pagamentos desta semana)
   const inicioSemana = new Date(hoje);
@@ -627,7 +606,7 @@ export default function Dashboard() {
                   {formatCurrency(receitaSemanalRecebida)}
                 </p>
                 <p className="text-xs text-yellow-600">
-                  de {formatCurrency(receitaSemanalEsperadaCorrigida)} esperado
+                  de {formatCurrency(receitaSemanalEsperada)} esperado
                 </p>
               </div>
               <div className="w-8 h-8 bg-yellow-200 rounded-full flex items-center justify-center">

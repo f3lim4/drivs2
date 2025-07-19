@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-19: Correção do Valor Esperado Semanal e Sistema de Nova Despesa - CONCLUÍDO ✅
+- ✅ **Bug do botão Nova Despesa corrigido** - Função setModalNovaDespesa mudada para setModalAberto
+- ✅ **Valor semanal esperado corrigido** - Removido ajuste fixo para R$ 5.075, agora calcula automaticamente
+- ✅ **Cálculo dinâmico implementado** - R$ 5.625 baseado nos 10 aluguéis ativos (R$ 22.500 mensal ÷ 4)
+- ✅ **Sistema funcional** - Botão "Nova Despesa" nos relatórios financeiros agora abre modal corretamente
+- ✅ **Logs de debug removidos** - Dashboard limpo após identificar causa do valor incorreto
+
 ### 2025-07-19: Descrições SEO Ultra Persuasivas para Google - CONCLUÍDO ✅
 - ✅ **Meta descrição otimizada** - "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais"
 - ✅ **Título impactante** - "🚗 DRIVS - Sistema que DOBRA Receita de Locadoras em 90 Dias! Teste Grátis"
