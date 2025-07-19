@@ -473,6 +473,28 @@ export default function RelatoriosFinanceiros() {
       }, 0);
   }, [pagamentos, monthStart, monthEnd]);
 
+  // Receita extra de juros e multas
+  const receitaExtra = useMemo(() => {
+    const pagamentosFiltrados = pagamentos
+      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }));
+    
+    const totalJuros = pagamentosFiltrados.reduce((total, pagamento) => {
+      const juros = parseFloat(pagamento.valorJuros || '0');
+      return total + (isNaN(juros) ? 0 : juros);
+    }, 0);
+
+    const totalMultas = pagamentosFiltrados.reduce((total, pagamento) => {
+      const multa = parseFloat(pagamento.valorMulta || '0');
+      return total + (isNaN(multa) ? 0 : multa);
+    }, 0);
+
+    return {
+      totalJuros,
+      totalMultas,
+      total: totalJuros + totalMultas
+    };
+  }, [pagamentos, monthStart, monthEnd]);
+
   // Despesas por categoria
   const despesasPorCategoria = useMemo(() => {
     const categorias = {};
@@ -543,7 +565,7 @@ export default function RelatoriosFinanceiros() {
       }, 0);
   }, [filteredData.despesasPeriodo]);
 
-  const receitaTotal = receitaPagamentos + totalReceitas;
+  const receitaTotal = receitaPagamentos + totalReceitas + receitaExtra.total;
   const lucroLiquido = receitaTotal - totalDespesas;
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
@@ -979,7 +1001,7 @@ export default function RelatoriosFinanceiros() {
 
       {/* Cards de Resumo Financeiro - apenas para locadoras */}
       {!isAdmin && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
@@ -1051,6 +1073,26 @@ export default function RelatoriosFinanceiros() {
               </div>
               <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
                 <TrendingUp className={`w-4 h-4 ${margemLucro >= 0 ? 'text-purple-700' : 'text-red-700'}`} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Card de Receita Extra (Juros e Multas) */}
+        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-lg h-32">
+          <CardContent className="p-6 h-full">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-emerald-700">RECEITA EXTRA</p>
+                <p className="text-lg font-bold text-emerald-800">
+                  {formatCurrency(receitaExtra.total)}
+                </p>
+                <p className="text-xs text-emerald-600">
+                  Juros: {formatCurrency(receitaExtra.totalJuros)} | Multas: {formatCurrency(receitaExtra.totalMultas)}
+                </p>
+              </div>
+              <div className="w-8 h-8 bg-emerald-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-emerald-700" />
               </div>
             </div>
           </CardContent>

@@ -238,6 +238,8 @@ export const pagamentos = pgTable("pagamentos", {
   valorTotal: decimal("valor_total", { precision: 10, scale: 2 }).notNull(),
   valorPago: decimal("valor_pago", { precision: 10, scale: 2 }).notNull(),
   valorRestante: decimal("valor_restante", { precision: 10, scale: 2 }).notNull(),
+  valorJuros: decimal("valor_juros", { precision: 10, scale: 2 }).default("0.00"), // Juros cobrados
+  valorMulta: decimal("valor_multa", { precision: 10, scale: 2 }).default("0.00"), // Multa cobrada
   dataPagamento: date("data_pagamento").notNull(),
   status: text("status").notNull().default("pendente"), // 'pendente', 'parcial', 'pago', 'atrasado'
   observacoes: text("observacoes"),
