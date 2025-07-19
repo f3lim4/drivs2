@@ -21,7 +21,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { insertDespesaSchema } from '@shared/schema';
 
-const despesaFormSchema = insertDespesaSchema.omit({ id: true });
+const despesaFormSchema = insertDespesaSchema.omit({ id: true }).extend({
+  valor: z.union([z.string(), z.number()]).transform((val) => val.toString())
+});
 
 export function NovaDespesaModal() {
   const [open, setOpen] = useState(false);
@@ -125,8 +127,12 @@ export function NovaDespesaModal() {
           description: `${selectedVehicles.length} despesas de empréstimo criadas - R$ ${valorPorVeiculo} cada`,
         });
       } else {
-        // Comportamento padrão para outras categorias
-        await createDespesa(data);
+        // Comportamento padrão para outras categorias - garantir que valor seja string
+        const despesaData = {
+          ...data,
+          valor: data.valor.toString()
+        };
+        await createDespesa(despesaData);
         toast({
           title: 'Despesa criada com sucesso',
           description: 'A despesa foi cadastrada no sistema.',
