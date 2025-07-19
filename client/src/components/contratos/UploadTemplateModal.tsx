@@ -87,31 +87,40 @@ export function UploadTemplateModal({
       return;
     }
     
+    console.log('🔥 Iniciando onSubmit');
+    
     try {
-      console.log('Enviando template:', {
+      console.log('🔥 Entrando no try block');
+      console.log('🔥 Enviando template:', {
         ...data,
         locadoraId: profile.locadoraId,
         ativo: true,
       });
       
+      console.log('🔥 Chamando mutateAsync...');
       const result = await createTemplate.mutateAsync({
         ...data,
         locadoraId: profile.locadoraId,
         ativo: true,
       });
 
-      console.log('Template criado com sucesso:', result);
+      console.log('🔥 Template criado com sucesso:', result);
+      console.log('🔥 Mostrando toast de sucesso');
 
       toast({
         title: "Template Salvo",
         description: "Seu template foi salvo com sucesso!",
       });
 
+      console.log('🔥 Executando callbacks finais');
       onTemplateUploaded();
       onOpenChange(false);
       form.reset();
       
+      console.log('🔥 onSubmit concluído com sucesso');
+      
     } catch (error) {
+      console.log('🔥 Entrando no catch block');
       console.error('Erro ao salvar template:', error);
       console.error('Tipo do erro:', typeof error);
       console.error('Detalhes do erro:', JSON.stringify(error, null, 2));
