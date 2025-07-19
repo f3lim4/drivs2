@@ -24,9 +24,9 @@ export default function Seo() {
   const form = useForm<InsertSeoConfig>({
     resolver: zodResolver(insertSeoConfigSchema),
     defaultValues: seoConfig || {
-      titulo: "🚗 DRIVS - Sua Locadora Perdendo R$ 200/Dia com Planilhas? DOBRE a Receita!",
-      descricao: "SUA LOCADORA PERDE R$ 200/DIA com planilhas? Sistema que ELIMINA inadimplência, gera contratos válidos e DOBRA receita em 90 dias. 30 dias GRÁTIS + migração gratuita!",
-      palavrasChave: "locadora perdendo dinheiro, dobrar receita locadora, eliminar inadimplência, sistema locadora pequena, acabar planilhas locadora, aumentar lucro aluguel carros",
+      titulo: "🚗 DRIVS - Sistema que DOBRA Receita de Locadoras em 90 Dias! Teste Grátis",
+      descricao: "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 500+ locadoras já usam. 30 dias GRÁTIS!",
+      palavrasChave: "sistema locadora profissional, dobrar receita locadora, organizar locadora, automatizar locadora, aumentar lucro aluguel carros, gestão locadora completa",
       autor: "DRIVS Team",
       urlCanonica: "https://drivs.me",
       imagemSocial: "/assets/drivs-social.png",
@@ -120,31 +120,31 @@ export default function Seo() {
         </CardContent>
       </Card>
 
-      {/* Call to Action Urgente para Pequenas Locadoras */}
-      <Card className="bg-gradient-to-br from-red-50 to-orange-100 dark:from-red-900 dark:to-orange-800 border-red-200 dark:border-red-700">
+      {/* Call to Action Positivo para Pequenas Locadoras */}
+      <Card className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900 dark:to-emerald-800 border-green-200 dark:border-green-700">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl text-red-800 dark:text-red-200 mb-2">
-            🔥 PARE DE PERDER DINHEIRO AGORA!
+          <CardTitle className="text-3xl text-green-800 dark:text-green-200 mb-2">
+            🚀 TRANSFORME SUA LOCADORA AGORA!
           </CardTitle>
-          <CardDescription className="text-red-600 dark:text-red-400 text-xl font-semibold">
-            Cada dia usando planilhas = R$ 200 perdidos em inadimplência e falta de controle
+          <CardDescription className="text-green-600 dark:text-green-400 text-xl font-semibold">
+            Sistema completo que organiza, automatiza e DOBRA a receita da sua locadora
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg mb-6 border-l-4 border-red-500">
-            <h3 className="text-xl font-bold text-red-700 dark:text-red-300 mb-4">
-              💸 Quanto sua locadora perde por mês?
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg mb-6 border-l-4 border-green-500">
+            <h3 className="text-xl font-bold text-green-700 dark:text-green-300 mb-4">
+              💰 Quanto sua locadora pode ganhar por mês?
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="space-y-2">
-                <p>• Inadimplência: <strong>R$ 2.000 - R$ 5.000</strong></p>
-                <p>• CNH vencida descoberta tarde: <strong>R$ 1.500</strong></p>
-                <p>• Tempo perdido com planilhas: <strong>R$ 1.200</strong></p>
+                <p>• Receita extra com organização: <strong>R$ 3.000 - R$ 8.000</strong></p>
+                <p>• Contratos automáticos profissionais: <strong>R$ 2.000</strong></p>
+                <p>• Zero inadimplência com alertas: <strong>R$ 1.500</strong></p>
               </div>
               <div className="space-y-2">
-                <p>• Contratos inadequados: <strong>R$ 800 - R$ 2.000</strong></p>
-                <p>• Falta de controle financeiro: <strong>R$ 1.000</strong></p>
-                <p className="font-bold text-red-600">TOTAL PERDIDO: <strong>R$ 6.500 - R$ 10.700/mês</strong></p>
+                <p>• Tempo economizado (mais locações): <strong>R$ 1.200</strong></p>
+                <p>• Relatórios que mostram oportunidades: <strong>R$ 1.000</strong></p>
+                <p className="font-bold text-green-600">TOTAL GANHO POTENCIAL: <strong>R$ 7.700 - R$ 12.700/mês</strong></p>
               </div>
             </div>
           </div>
@@ -192,27 +192,27 @@ export default function Seo() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-                <h4 className="font-bold text-sm text-green-700 dark:text-green-300 mb-2">💰 FOCO NA DOR FINANCEIRA:</h4>
+                <h4 className="font-bold text-sm text-green-700 dark:text-green-300 mb-2">🚀 FOCO NO CRESCIMENTO:</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                  "SUA LOCADORA PERDE R$ 200/DIA com planilhas? Sistema que ELIMINA inadimplência, gera contratos válidos e DOBRA receita em 90 dias. 30 dias GRÁTIS!"
+                  "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 500+ locadoras já usam. 30 dias GRÁTIS!"
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-                <h4 className="font-bold text-sm text-purple-700 dark:text-purple-300 mb-2">🎯 FOCO EM RESULTADOS:</h4>
+                <h4 className="font-bold text-sm text-purple-700 dark:text-purple-300 mb-2">💼 FOCO NA PROFISSIONALIZAÇÃO:</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                  "Locadoras aumentam 60% da receita em 3 meses! Sistema elimina planilhas, controla inadimplência e gera contratos profissionais. Teste 30 dias GRÁTIS!"
+                  "Transforme sua locadora em empresa profissional! Sistema automatiza contratos, organiza finanças e dobra receita em 90 dias. Teste 30 dias GRÁTIS!"
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-                <h4 className="font-bold text-sm text-orange-700 dark:text-orange-300 mb-2">⚡ FOCO NA URGÊNCIA:</h4>
+                <h4 className="font-bold text-sm text-blue-700 dark:text-blue-300 mb-2">⚡ FOCO NA ORGANIZAÇÃO:</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                  "PARE de perder dinheiro com planilhas! Sistema que transforma locadoras pequenas em empresas profissionais. Zero inadimplência garantido. 30 dias grátis!"
+                  "Organize sua locadora com sistema completo! Contratos automáticos, controle financeiro total e zero inadimplência. 500+ empresas confiam. Teste grátis!"
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-                <h4 className="font-bold text-sm text-red-700 dark:text-red-300 mb-2">🔥 FOCO NO PROBLEMA:</h4>
+                <h4 className="font-bold text-sm text-orange-700 dark:text-orange-300 mb-2">📈 FOCO EM RESULTADOS:</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                  "Cansado de calote e CNH vencida? Sistema que automatiza sua locadora, elimina prejuízos e dobra o lucro. Usado por 500+ locadoras. Teste grátis!"
+                  "Locadoras aumentam 60% da receita em 3 meses! Sistema elimina planilhas, gera contratos válidos e automatiza gestão completa. 30 dias GRÁTIS!"
                 </p>
               </div>
             </div>
