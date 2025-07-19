@@ -477,7 +477,7 @@ export default function Contratos() {
       {/* Filtros */}
       <Card className="bg-gray-50/50 border-gray-200">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-4 items-end">
+          <div className="grid gap-4 md:grid-cols-5 items-end">
             <div className="space-y-2 md:col-span-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -512,7 +512,7 @@ export default function Contratos() {
               </Select>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 md:col-span-2">
               <Button 
                 variant="outline"
                 onClick={() => setShowTemplatesModal(true)}
