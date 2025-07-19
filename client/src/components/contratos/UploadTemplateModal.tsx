@@ -88,11 +88,19 @@ export function UploadTemplateModal({
     }
     
     try {
-      await createTemplate.mutateAsync({
+      console.log('Enviando template:', {
         ...data,
         locadoraId: profile.locadoraId,
         ativo: true,
       });
+      
+      const result = await createTemplate.mutateAsync({
+        ...data,
+        locadoraId: profile.locadoraId,
+        ativo: true,
+      });
+
+      console.log('Template criado com sucesso:', result);
 
       toast({
         title: "Template Salvo",
@@ -105,6 +113,8 @@ export function UploadTemplateModal({
       
     } catch (error) {
       console.error('Erro ao salvar template:', error);
+      console.error('Tipo do erro:', typeof error);
+      console.error('Detalhes do erro:', JSON.stringify(error, null, 2));
       toast({
         title: "Erro",
         description: "Falha ao salvar template. Tente novamente.",
