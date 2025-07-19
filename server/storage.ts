@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -14,7 +14,8 @@ import {
   type Manutencao, type InsertManutencao,
   type Local, type InsertLocal,
   type Anuncio, type InsertAnuncio,
-  type Atividade, type InsertAtividade
+  type Atividade, type InsertAtividade,
+  type SeoConfig, type InsertSeoConfig
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -140,6 +141,11 @@ export interface IStorage {
   getAtividadesByLocadora(locadoraId: string): Promise<Atividade[]>;
   getAtividadesByLocadoraEUsuario(locadoraId: string, usuario?: string): Promise<Atividade[]>;
   createAtividade(atividade: InsertAtividade): Promise<Atividade>;
+  
+  // SEO operations (apenas admin)
+  getSeoConfig(): Promise<SeoConfig | undefined>;
+  updateSeoConfig(updates: Partial<InsertSeoConfig>): Promise<SeoConfig>;
+  createDefaultSeoConfig(): Promise<SeoConfig>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1523,6 +1529,53 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  // SEO operations (apenas admin)
+  async getSeoConfig(): Promise<SeoConfig | undefined> {
+    try {
+      const result = await db.select().from(seoConfig).limit(1);
+      return result[0];
+    } catch (error) {
+      console.error('Error getting SEO config:', error);
+      return undefined;
+    }
+  }
+
+  async updateSeoConfig(updates: Partial<InsertSeoConfig>): Promise<SeoConfig> {
+    try {
+      // Buscar configuração existente
+      const existing = await this.getSeoConfig();
+      
+      if (existing) {
+        // Atualizar configuração existente
+        const [updated] = await db.update(seoConfig)
+          .set({
+            ...updates,
+            updatedAt: new Date(),
+          })
+          .where(eq(seoConfig.id, existing.id))
+          .returning();
+        
+        return updated;
+      } else {
+        // Criar nova configuração se não existir
+        return await this.createDefaultSeoConfig();
+      }
+    } catch (error) {
+      console.error('Error updating SEO config:', error);
+      throw error;
+    }
+  }
+
+  async createDefaultSeoConfig(): Promise<SeoConfig> {
+    try {
+      const [created] = await db.insert(seoConfig).values({}).returning();
+      return created;
+    } catch (error) {
+      console.error('Error creating default SEO config:', error);
+      throw error;
+    }
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -2049,6 +2102,31 @@ export class MemStorage implements IStorage {
 
   async deleteAnuncio(id: string): Promise<void> {
     throw new Error('Anúncios não implementados no MemStorage');
+  }
+
+  async getAtividadesByLocadora(locadoraId: string): Promise<Atividade[]> {
+    return [];
+  }
+
+  async getAtividadesByLocadoraEUsuario(locadoraId: string, usuario?: string): Promise<Atividade[]> {
+    return [];
+  }
+
+  async createAtividade(atividade: InsertAtividade): Promise<Atividade> {
+    throw new Error('Atividades não implementadas no MemStorage');
+  }
+
+  // SEO operations (apenas admin)
+  async getSeoConfig(): Promise<SeoConfig | undefined> {
+    return undefined;
+  }
+
+  async updateSeoConfig(updates: Partial<InsertSeoConfig>): Promise<SeoConfig> {
+    throw new Error('SEO não implementado no MemStorage');
+  }
+
+  async createDefaultSeoConfig(): Promise<SeoConfig> {
+    throw new Error('SEO não implementado no MemStorage');
   }
 }
 

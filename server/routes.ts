@@ -3,7 +3,7 @@ import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { testConnection, db } from "./db";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, insertTemplateContratoSchema, contratos } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, insertTemplateContratoSchema, insertSeoConfigSchema, contratos } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import fs from "fs";
@@ -1631,6 +1631,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(atividade);
     } catch (error) {
       console.error("Error creating atividade:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // SEO Configuration Routes (apenas admin)
+  app.get("/api/seo", async (req, res) => {
+    try {
+      const config = await storage.getSeoConfig();
+      if (!config) {
+        // Criar configuração padrão se não existir
+        const defaultConfig = await storage.createDefaultSeoConfig();
+        return res.json(defaultConfig);
+      }
+      res.json(config);
+    } catch (error) {
+      console.error("Error fetching SEO config:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/seo", async (req, res) => {
+    try {
+      const data = insertSeoConfigSchema.parse(req.body);
+      const updated = await storage.updateSeoConfig(data);
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating SEO config:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

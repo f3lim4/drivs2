@@ -18,7 +18,8 @@ import {
   AlertTriangle,
   Wrench,
   Megaphone,
-  Crown
+  Crown,
+  Search
 } from 'lucide-react';
 import logoPath from "@assets/icone_1752434737434.png";
 import { useState } from 'react';
@@ -107,6 +108,13 @@ const navigationItems = [
     url: '/planos',
     icon: Crown,
     description: 'Gerenciar planos do SaaS',
+    adminOnly: true  // Só admins podem ver este item
+  },
+  {
+    title: 'SEO',
+    url: '/seo',
+    icon: Search,
+    description: 'Configurações de SEO e Analytics',
     adminOnly: true  // Só admins podem ver este item
   },
   {
