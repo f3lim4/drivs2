@@ -58,13 +58,34 @@ export function useTemplateContratos() {
   // Criar template
   const createTemplate = useMutation({
     mutationFn: async (template: Omit<TemplateContrato, 'id' | 'createdAt' | 'updatedAt'>) => {
-      return apiRequest('/api/template-contratos', {
+      console.log('Enviando para API:', template);
+      const response = await fetch('/api/template-contratos', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(template),
       });
+      
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Erro da API:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('Template criado via fetch:', result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Mutation onSuccess:', data);
       queryClient.invalidateQueries({ queryKey: ['template-contratos', locadoraId] });
+    },
+    onError: (error) => {
+      console.error('Mutation onError:', error);
     },
   });
 
