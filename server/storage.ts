@@ -17,7 +17,7 @@ import {
   type Atividade, type InsertAtividade
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, desc } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 // Storage interface for database operations
@@ -1470,7 +1470,7 @@ export class DatabaseStorage implements IStorage {
       const result = await db.select()
         .from(atividades)
         .where(eq(atividades.locadoraId, locadoraId))
-        .orderBy(sql`${atividades.timestamp} DESC`)
+        .orderBy(desc(atividades.timestamp))
         .limit(50); // Limitar aos 50 mais recentes
       return result;
     } catch (error) {
