@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-19: Correção Crítica do Bug de Validação de Despesa - CONCLUÍDO ✅
+- ✅ **Erro "Expected string, received number" corrigido** - Schema Zod agora aceita números e strings no campo valor
+- ✅ **Transformação automática implementada** - Números são convertidos automaticamente para strings
+- ✅ **Sistema de despesas funcional** - Criação de despesas pelo modal agora funciona perfeitamente
+- ✅ **Validação flexível** - Backend aceita tanto 50 (número) quanto "50" (string) no campo valor
+- ✅ **Logs de debug removidos** - Interface limpa após identificar e corrigir a causa raiz
+- ✅ **Schema otimizado** - Função z.union() com transform() garante compatibilidade total
+
 ### 2025-07-19: Remoção do Card Receita Extra dos Relatórios Financeiros - CONCLUÍDO ✅
 - ✅ **Card "Receita Extra" removido** - Eliminada seção específica para juros e multas nos relatórios financeiros
 - ✅ **Cálculo de receita total ajustado** - Removida receita extra do total de receitas nos relatórios  
