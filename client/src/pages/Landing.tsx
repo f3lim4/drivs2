@@ -55,7 +55,7 @@ export default function Landing() {
     {
       icon: Clock,
       titulo: "Economiza 4 Horas/Dia",
-      descricao: "Automação completa elimina 90% da papelada e trabalho manual repetitivo.",
+      descricao: "Seu tempo vale muito - automação elimina 90% da papelada e trabalho repetitivo.",
       cor: "bg-purple-100 text-purple-600"
     },
     {
@@ -141,7 +141,7 @@ export default function Landing() {
           </h1>
           
           <p className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
-            Pare de perder R$ 200/dia com planilhas bagunçadas. 
+            Pare de perder tempo com planilhas bagunçadas - afinal, tempo É dinheiro e seu tempo vale muito. 
             Sistema COMPLETO que organiza, automatiza e MULTIPLICA seus lucros.
           </p>
 
@@ -185,10 +185,10 @@ export default function Landing() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {[
-              "📋 Planilhas bagunçadas = Prejuízo diário",
+              "📋 Planilhas bagunçadas = Tempo desperdiçado",
               "💸 Inadimplência descontrolada", 
               "📄 Contratos inválidos = Risco jurídico",
-              "⏰ Horas perdidas com papelada"
+              "⏰ Seu tempo vale muito - não perca com papelada"
             ].map((problema, index) => (
               <Card key={index} className="border-red-400/30 bg-red-900/30 backdrop-blur-md hover:bg-red-800/40 transition-all duration-300 transform hover:scale-105">
                 <CardContent className="p-6 text-center">
@@ -201,9 +201,9 @@ export default function Landing() {
           <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white p-8 rounded-2xl max-w-2xl mx-auto shadow-2xl border border-red-400/50 backdrop-blur-md">
             <h3 className="text-3xl font-bold mb-2 flex items-center justify-center gap-2">
               <span className="w-3 h-3 bg-yellow-400 rounded-full animate-ping"></span>
-              CADA DIA PERDIDO = R$ 200 A MENOS
+              TEMPO PERDIDO = DINHEIRO PERDIDO
             </h3>
-            <p className="text-xl">Locadoras desorganizadas perdem em média R$ 6.000/mês por falta de controle.</p>
+            <p className="text-xl">Seu tempo vale muito - pare de desperdiçá-lo com planilhas desorganizadas.</p>
           </div>
         </div>
       </section>
@@ -372,7 +372,7 @@ export default function Landing() {
             Pare de Perder Dinheiro HOJE!
           </h2>
           <p className="text-xl md:text-2xl mb-8 opacity-90">
-            Cada dia que passa é dinheiro que você deixa de ganhar.
+            Cada dia que passa é tempo valioso desperdiçado - e tempo é dinheiro.
           </p>
           
           <div className="bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-md p-10 rounded-2xl max-w-2xl mx-auto mb-8 border border-white/30 shadow-2xl">
