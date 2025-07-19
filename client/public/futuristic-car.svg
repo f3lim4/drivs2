@@ -1,0 +1,58 @@
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="carGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f5ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0080ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6c5ce7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f5ff;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#6c5ce7;stop-opacity:0.8" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Car Body -->
+  <path d="M80 120 Q80 100 100 100 L300 100 Q320 100 320 120 L320 140 Q320 150 310 150 L90 150 Q80 150 80 140 Z" 
+        fill="url(#carGradient)" filter="url(#glow)"/>
+  
+  <!-- Car Windows -->
+  <path d="M100 100 Q100 85 120 85 L280 85 Q300 85 300 100 L280 100 L120 100 Z" 
+        fill="rgba(255,255,255,0.3)" stroke="url(#glowGradient)" stroke-width="2"/>
+  
+  <!-- Wheels -->
+  <circle cx="120" cy="150" r="20" fill="url(#carGradient)" filter="url(#glow)"/>
+  <circle cx="120" cy="150" r="15" fill="rgba(255,255,255,0.8)"/>
+  <circle cx="280" cy="150" r="20" fill="url(#carGradient)" filter="url(#glow)"/>
+  <circle cx="280" cy="150" r="15" fill="rgba(255,255,255,0.8)"/>
+  
+  <!-- Headlights -->
+  <ellipse cx="320" cy="125" rx="8" ry="12" fill="#00f5ff" filter="url(#glow)"/>
+  <ellipse cx="320" cy="135" rx="8" ry="12" fill="#ffffff" opacity="0.6"/>
+  
+  <!-- Energy Lines -->
+  <path d="M50 60 Q100 50 150 60 Q200 70 250 60 Q300 50 350 60" 
+        fill="none" stroke="url(#glowGradient)" stroke-width="3" opacity="0.7">
+    <animate attributeName="opacity" values="0.3;0.9;0.3" dur="2s" repeatCount="indefinite"/>
+  </path>
+  
+  <path d="M30 80 Q80 70 130 80 Q180 90 230 80 Q280 70 330 80" 
+        fill="none" stroke="url(#glowGradient)" stroke-width="2" opacity="0.5">
+    <animate attributeName="opacity" values="0.2;0.7;0.2" dur="3s" repeatCount="indefinite"/>
+  </path>
+  
+  <!-- Digital Grid -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#00f5ff" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#grid)" opacity="0.2"/>
+</svg>

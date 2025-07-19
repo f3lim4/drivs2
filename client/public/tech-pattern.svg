@@ -1,0 +1,65 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="techGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f5ff;stop-opacity:0.6" />
+      <stop offset="50%" style="stop-color:#3b82f6;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#6c5ce7;stop-opacity:0.6" />
+    </linearGradient>
+    <filter id="techGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Tech Circles -->
+  <circle cx="100" cy="100" r="40" fill="none" stroke="url(#techGradient)" stroke-width="2" filter="url(#techGlow)">
+    <animate attributeName="r" values="35;45;35" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="300" cy="100" r="35" fill="none" stroke="url(#techGradient)" stroke-width="2" filter="url(#techGlow)">
+    <animate attributeName="r" values="30;40;30" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="200" cy="300" r="50" fill="none" stroke="url(#techGradient)" stroke-width="2" filter="url(#techGlow)">
+    <animate attributeName="r" values="45;55;45" dur="4s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Connection Lines -->
+  <path d="M100 100 L300 100" stroke="url(#techGradient)" stroke-width="1" opacity="0.5">
+    <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
+  </path>
+  <path d="M100 100 L200 300" stroke="url(#techGradient)" stroke-width="1" opacity="0.5">
+    <animate attributeName="opacity" values="0.2;0.6;0.2" dur="3s" repeatCount="indefinite"/>
+  </path>
+  <path d="M300 100 L200 300" stroke="url(#techGradient)" stroke-width="1" opacity="0.5">
+    <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2.5s" repeatCount="indefinite"/>
+  </path>
+  
+  <!-- Data Points -->
+  <circle cx="100" cy="100" r="4" fill="#00f5ff">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="300" cy="100" r="4" fill="#3b82f6">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="200" cy="300" r="4" fill="#6c5ce7">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="0.8s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Tech Grid -->
+  <defs>
+    <pattern id="techGrid" width="50" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#00f5ff" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#techGrid)"/>
+  
+  <!-- Floating Tech Elements -->
+  <rect x="50" y="200" width="20" height="20" fill="rgba(0,245,255,0.3)" transform="rotate(45 60 210)">
+    <animate attributeName="y" values="200;190;200" dur="2s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="350" y="250" width="15" height="15" fill="rgba(59,130,246,0.3)" transform="rotate(45 357 257)">
+    <animate attributeName="y" values="250;240;250" dur="3s" repeatCount="indefinite"/>
+  </rect>
+</svg>
