@@ -20,8 +20,21 @@ import { useVeiculos } from '@/hooks/useVeiculos';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { insertDespesaSchema } from '@shared/schema';
+import { parse } from 'date-fns';
 
 const despesaFormSchema = insertDespesaSchema.omit({ id: true });
+
+// Função para converter data brasileira (dd/MM/yyyy) para Date
+const parseDate = (dateStr: string): Date | undefined => {
+  try {
+    if (dateStr.includes('/')) {
+      return parse(dateStr, 'dd/MM/yyyy', new Date());
+    }
+    return new Date(dateStr);
+  } catch {
+    return undefined;
+  }
+};
 
 export function NovaDespesaModal() {
   const [open, setOpen] = useState(false);
@@ -39,7 +52,7 @@ export function NovaDespesaModal() {
       categoria: '',
       descricao: '',
       valor: '',
-      data: format(new Date(), 'yyyy-MM-dd'),
+      data: format(new Date(), 'dd/MM/yyyy'),
       tipo: 'despesa',
       status: 'pendente',
       observacoes: '',
@@ -358,10 +371,11 @@ export function NovaDespesaModal() {
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
-                          selected={field.value ? new Date(field.value) : undefined}
-                          onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                          selected={field.value ? parseDate(field.value) : undefined}
+                          onSelect={(date) => field.onChange(date ? format(date, 'dd/MM/yyyy') : '')}
                           disabled={(date) => date < new Date('1900-01-01')}
                           initialFocus
+
                         />
                       </PopoverContent>
                     </Popover>
