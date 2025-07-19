@@ -5,6 +5,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 
+const apiRequest = async (url: string, options?: RequestInit) => {
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+    ...options,
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response.json();
+};
+
 export interface TemplateContrato {
   id: string;
   locadoraId: string;
@@ -42,19 +58,10 @@ export function useTemplateContratos() {
   // Criar template
   const createTemplate = useMutation({
     mutationFn: async (template: Omit<TemplateContrato, 'id' | 'createdAt' | 'updatedAt'>) => {
-      const response = await fetch('/api/template-contratos', {
+      return apiRequest('/api/template-contratos', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(template),
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to create template');
-      }
-      
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['template-contratos', locadoraId] });
