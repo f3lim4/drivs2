@@ -41,7 +41,7 @@ export function NovaDespesaModal() {
       categoria: '',
       descricao: '',
       valor: '',
-      data: new Date(),
+      data: format(new Date(), 'yyyy-MM-dd'),
       tipo: 'despesa',
       status: 'pendente',
       observacoes: '',
@@ -58,7 +58,7 @@ export function NovaDespesaModal() {
     if (categoria === 'seguro' && veiculoId && veiculoId !== 'sem-veiculo') {
       const veiculo = veiculos.find(v => v.id === veiculoId);
       if (veiculo && veiculo.valorSeguroMensal) {
-        form.setValue('valor', veiculo.valorSeguroMensal);
+        form.setValue('valor', veiculo.valorSeguroMensal.toString());
         form.setValue('descricao', `Seguro ${veiculo.seguradora || 'mensal'} - ${veiculo.placa}`);
       }
     }
@@ -349,7 +349,7 @@ export function NovaDespesaModal() {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, 'dd/MM/yyyy', { locale: pt })
+                              format(new Date(field.value), 'dd/MM/yyyy', { locale: pt })
                             ) : (
                               <span>Selecione a data</span>
                             )}
@@ -360,8 +360,8 @@ export function NovaDespesaModal() {
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
                           disabled={(date) => date < new Date('1900-01-01')}
                           initialFocus
                         />
