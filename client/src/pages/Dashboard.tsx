@@ -412,13 +412,28 @@ export default function Dashboard() {
 
   // Calcular receita semanal esperada (baseada nos aluguéis ativos)
   // Valor corrigido: R$ 5.075 ao invés de R$ 5.175
-  const receitaSemanalEsperada = alugueisSeguro
-    .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
+  const alugueisAtivosParaCalculo = alugueisSeguro
+    .filter((a: any) => a.status === 'ativo' || a.status === 'pendente');
+  
+  console.log('Dashboard - Aluguéis para cálculo semanal:', {
+    total: alugueisAtivosParaCalculo.length,
+    valores: alugueisAtivosParaCalculo.map(a => ({
+      id: a.id,
+      status: a.status,
+      valorMensal: a.valorMensal,
+      motoristaNome: a.motoristaNome
+    }))
+  });
+
+  const receitaSemanalEsperada = alugueisAtivosParaCalculo
     .reduce((total: number, aluguel: any) => {
       const valorMensal = parseFloat(aluguel.valorMensal || '0');
       const valorSemanal = valorMensal / 4; // Divide por 4 semanas
+      console.log('Dashboard - Calculando:', { valorMensal, valorSemanal, total: total + valorSemanal });
       return total + valorSemanal;
     }, 0);
+
+  console.log('Dashboard - Receita semanal esperada calculada:', receitaSemanalEsperada);
 
   // Correção do valor esperado: se for exatamente R$ 5.175, ajustar para R$ 5.075
   const receitaSemanalEsperadaCorrigida = Math.abs(receitaSemanalEsperada - 5175) < 0.01 
