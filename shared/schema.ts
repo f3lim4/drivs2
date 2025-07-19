@@ -325,7 +325,7 @@ export const insertDespesaSchema = createInsertSchema(despesas).omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  valor: z.union([z.string(), z.number()]).transform((val) => val.toString()),
+  valor: z.string(),
   data: z.string(),
 });
 
