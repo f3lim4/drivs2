@@ -1078,25 +1078,7 @@ export default function RelatoriosFinanceiros() {
           </CardContent>
         </Card>
 
-        {/* Card de Receita Extra (Juros e Multas) */}
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <p className="text-xs font-medium text-emerald-700">RECEITA EXTRA</p>
-                <p className="text-lg font-bold text-emerald-800">
-                  {formatCurrency(receitaExtra.total)}
-                </p>
-                <p className="text-xs text-emerald-600">
-                  Juros: {formatCurrency(receitaExtra.totalJuros)} | Multas: {formatCurrency(receitaExtra.totalMultas)}
-                </p>
-              </div>
-              <div className="w-8 h-8 bg-emerald-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-4 h-4 text-emerald-700" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
         </div>
       )}
 
