@@ -167,8 +167,11 @@ export function TemplatesModal({ isOpen, onClose }: TemplatesModalProps) {
 
       {/* Modal de upload de template */}
       <UploadTemplateModal
-        isOpen={showUploadTemplateModal}
-        onClose={() => setShowUploadTemplateModal(false)}
+        open={showUploadTemplateModal}
+        onOpenChange={setShowUploadTemplateModal}
+        onTemplateUploaded={() => {
+          refetch(); // Recarregar templates após upload
+        }}
       />
     </>
   );
