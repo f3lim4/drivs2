@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-19: Sistema de Atividades Filtrado por Usuário - CONCLUÍDO ✅
+### 2025-07-19: Sistema de Atividades Filtrado por Usuário e Botão Templates Restaurado - CONCLUÍDO ✅
 - ✅ **Sistema de atividades implementado** - Rastreamento automático de todas as ações importantes do sistema
 - ✅ **Banco de dados funcional** - Tabela atividades com campos locadoraId, usuario, acao, entidade, detalhes e timestamp
 - ✅ **API REST completa** - Endpoints para buscar e criar atividades com filtro por usuário específico
@@ -21,6 +21,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Isolamento completo** - Sistema funciona tanto para admin quanto para locadoras individuais
 - ✅ **Integração automática** - Atividades capturadas automaticamente quando ações são executadas
 - ✅ **Funcionalidade validada** - Sistema filtra corretamente: 5 atividades para admin@drivs.com.br, 0 para drivs.me@gmail.com
+- ✅ **Botão Templates restaurado** - Botão "Templates" agora sempre visível ao lado do botão "Gerar Contrato"
+- ✅ **Interface otimizada** - Removido botão duplicado, Templates acessível mesmo sem contratos gerados
 
 ### 2025-07-18: Sistema de Alertas de Manutenção Avançado - CONCLUÍDO ✅
 - ✅ **Modal "Nova Manutenção" restaurado ao formato original** - Revertido layout compacto para formato espaçado preferido pelo usuário
