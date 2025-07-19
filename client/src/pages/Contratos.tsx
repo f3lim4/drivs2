@@ -399,32 +399,6 @@ export default function Contratos() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      {/* Header da Página */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Contratos</h1>
-          <p className="text-gray-600">Gerencie contratos e templates de locação</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="outline"
-            onClick={() => setShowTemplatesModal(true)}
-            className="flex items-center gap-2"
-          >
-            <FileText className="w-4 h-4" />
-            Templates
-          </Button>
-          
-          <Button 
-            onClick={() => setShowNovoContratoModal(true)}
-            className="flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Gerar Contrato
-          </Button>
-        </div>
-      </div>
-
       {/* Cards de Estatísticas */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Total de Contratos */}
@@ -536,6 +510,25 @@ export default function Contratos() {
                   <SelectItem value="cancelado">Cancelado</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2 flex gap-2">
+              <Button 
+                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-2 px-4 text-sm"
+                onClick={() => setShowNovoContratoModal(true)}
+              >
+                <Plus className="w-4 h-4" />
+                Gerar Contrato
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={() => setShowTemplatesModal(true)}
+                className="flex items-center gap-2 py-2 px-4 text-sm"
+              >
+                <FileText className="w-4 h-4" />
+                Templates
+              </Button>
             </div>
           </div>
         </CardContent>
