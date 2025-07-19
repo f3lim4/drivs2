@@ -1592,13 +1592,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rotas de atividades
   app.get("/api/atividades", async (req, res) => {
     try {
-      const { locadoraId } = req.query;
+      const { locadoraId, usuario } = req.query;
+      
+      console.log('[DEBUG] GET /api/atividades - Parâmetros:', { locadoraId, usuario });
       
       if (!locadoraId || typeof locadoraId !== 'string') {
         return res.status(400).json({ message: "locadoraId é obrigatório" });
       }
       
-      const atividades = await storage.getAtividadesByLocadora(locadoraId);
+      const atividades = await storage.getAtividadesByLocadoraEUsuario(locadoraId, usuario as string);
+      console.log('[DEBUG] GET /api/atividades - Resultado:', atividades.length, 'atividades');
       res.json(atividades);
     } catch (error) {
       console.error("Error fetching atividades:", error);

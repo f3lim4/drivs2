@@ -138,6 +138,7 @@ export interface IStorage {
   
   // Atividade operations
   getAtividadesByLocadora(locadoraId: string): Promise<Atividade[]>;
+  getAtividadesByLocadoraEUsuario(locadoraId: string, usuario?: string): Promise<Atividade[]>;
   createAtividade(atividade: InsertAtividade): Promise<Atividade>;
 }
 
@@ -1475,6 +1476,40 @@ export class DatabaseStorage implements IStorage {
       return result;
     } catch (error) {
       console.error('Error getting atividades by locadora:', error);
+      return [];
+    }
+  }
+
+  async getAtividadesByLocadoraEUsuario(locadoraId: string, usuario?: string): Promise<Atividade[]> {
+    try {
+      console.log('[DEBUG] Storage - Buscando atividades:', { locadoraId, usuario });
+      
+      // Criar a condição base
+      let whereCondition;
+      
+      if (usuario && usuario.trim() !== '') {
+        // Se usuário foi especificado, filtrar por locadora E usuário
+        console.log('[DEBUG] Storage - Filtrando por usuário:', usuario);
+        whereCondition = and(
+          eq(atividades.locadoraId, locadoraId),
+          eq(atividades.usuario, usuario)
+        );
+      } else {
+        // Se não, filtrar apenas por locadora
+        console.log('[DEBUG] Storage - Filtrando apenas por locadora');
+        whereCondition = eq(atividades.locadoraId, locadoraId);
+      }
+
+      const result = await db.select()
+        .from(atividades)
+        .where(whereCondition)
+        .orderBy(desc(atividades.timestamp))
+        .limit(50); // Limitar aos 50 mais recentes
+      
+      console.log('[DEBUG] Storage - Resultado:', result.length, 'atividades encontradas');
+      return result;
+    } catch (error) {
+      console.error('Error getting atividades by locadora e usuario:', error);
       return [];
     }
   }
