@@ -470,6 +470,35 @@ export type Manutencao = typeof manutencoes.$inferSelect & {
 export type InsertLocal = z.infer<typeof insertLocalSchema>;
 export type Local = typeof locais.$inferSelect;
 
+// Configurações SEO do sistema (apenas admin)
+export const seoConfig = pgTable("seo_config", {
+  id: serial("id").primaryKey(),
+  titulo: text("titulo").notNull().default("DRIVS - Sistema de Locação de Veículos"),
+  descricao: text("descricao").notNull().default("Sistema completo para gerenciamento de locadoras de veículos com controle financeiro, contratos e relatórios avançados."),
+  palavrasChave: text("palavras_chave").notNull().default("locação de veículos, aluguel de carros, gestão de frota, sistema de locadora, controle financeiro"),
+  autor: text("autor").default("DRIVS Team"),
+  urlCanonica: text("url_canonica").default("https://drivs.me"),
+  imagemSocial: text("imagem_social").default("/assets/drivs-social.png"),
+  
+  // Configurações do Google Analytics
+  gaTrackingId: text("ga_tracking_id"),
+  gaEnabled: boolean("ga_enabled").default(false),
+  
+  // Meta tags adicionais
+  themeColor: text("theme_color").default("#2563eb"),
+  manifestUrl: text("manifest_url").default("/manifest.json"),
+  
+  // Controle
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertSeoConfigSchema = createInsertSchema(seoConfig).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Anúncios do sistema (visíveis para todas as locadoras)
 export const anuncios = pgTable("anuncios", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -510,3 +539,6 @@ export const insertAtividadeSchema = createInsertSchema(atividades).omit({
 
 export type InsertAtividade = z.infer<typeof insertAtividadeSchema>;
 export type Atividade = typeof atividades.$inferSelect;
+
+export type InsertSeoConfig = z.infer<typeof insertSeoConfigSchema>;
+export type SeoConfig = typeof seoConfig.$inferSelect;
