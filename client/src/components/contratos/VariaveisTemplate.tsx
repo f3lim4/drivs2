@@ -46,36 +46,42 @@ export function VariaveisTemplate() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid md:grid-cols-3 gap-4 text-sm">
+        <div className="space-y-6">
+          {/* Dados da Locadora */}
           <div>
-            <h4 className="font-semibold text-blue-800 mb-2">Dados da Locadora</h4>
-            <div className="space-y-1 text-blue-700">
+            <h4 className="font-semibold text-blue-800 mb-3 border-b border-blue-200 pb-1">Dados da Locadora</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-700">
               {variaveisLocadora.map((variavel, index) => (
-                <p key={index}>
-                  <code>{variavel.nome}</code> - {variavel.descricao}
-                </p>
+                <div key={index} className="flex flex-col bg-blue-100/30 p-2 rounded">
+                  <code className="font-mono text-blue-800 font-semibold">{variavel.nome}</code>
+                  <span className="text-xs text-blue-600">{variavel.descricao}</span>
+                </div>
               ))}
             </div>
           </div>
           
+          {/* Dados do Motorista */}
           <div>
-            <h4 className="font-semibold text-blue-800 mb-2">Dados do Motorista</h4>
-            <div className="space-y-1 text-blue-700">
+            <h4 className="font-semibold text-blue-800 mb-3 border-b border-blue-200 pb-1">Dados do Motorista</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-700">
               {variaveisMotorista.map((variavel, index) => (
-                <p key={index}>
-                  <code>{variavel.nome}</code> - {variavel.descricao}
-                </p>
+                <div key={index} className="flex flex-col bg-blue-100/30 p-2 rounded">
+                  <code className="font-mono text-blue-800 font-semibold">{variavel.nome}</code>
+                  <span className="text-xs text-blue-600">{variavel.descricao}</span>
+                </div>
               ))}
             </div>
           </div>
           
+          {/* Dados do Contrato */}
           <div>
-            <h4 className="font-semibold text-blue-800 mb-2">Dados do Contrato</h4>
-            <div className="space-y-1 text-blue-700">
+            <h4 className="font-semibold text-blue-800 mb-3 border-b border-blue-200 pb-1">Dados do Contrato</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-700">
               {variaveisContrato.map((variavel, index) => (
-                <p key={index}>
-                  <code>{variavel.nome}</code> - {variavel.descricao}
-                </p>
+                <div key={index} className="flex flex-col bg-blue-100/30 p-2 rounded">
+                  <code className="font-mono text-blue-800 font-semibold">{variavel.nome}</code>
+                  <span className="text-xs text-blue-600">{variavel.descricao}</span>
+                </div>
               ))}
             </div>
           </div>
