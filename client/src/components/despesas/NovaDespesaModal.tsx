@@ -51,7 +51,7 @@ export function NovaDespesaModal() {
       veiculoId: '',
       categoria: '',
       descricao: '',
-      valor: '',
+      valor: '0',
       data: format(new Date(), 'dd/MM/yyyy'),
       tipo: 'despesa',
       status: 'pendente',
@@ -138,12 +138,8 @@ export function NovaDespesaModal() {
           description: `${selectedVehicles.length} despesas de empréstimo criadas - R$ ${valorPorVeiculo} cada`,
         });
       } else {
-        // Comportamento padrão para outras categorias - garantir que valor seja string
-        const despesaData = {
-          ...data,
-          valor: data.valor.toString()
-        };
-        await createDespesa(despesaData);
+        // Comportamento padrão para outras categorias
+        await createDespesa(data);
         toast({
           title: 'Despesa criada com sucesso',
           description: 'A despesa foi cadastrada no sistema.',
