@@ -7,13 +7,18 @@ export function useAtividades() {
   const queryClient = useQueryClient();
   
   return useQuery({
-    queryKey: ['atividades', profile?.locadoraId],
+    queryKey: ['atividades', profile?.locadoraId, profile?.email],
     queryFn: async () => {
       if (!profile?.locadoraId) {
         throw new Error('Locadora ID is required');
       }
       
-      const response = await fetch(`/api/atividades?locadoraId=${profile.locadoraId}`);
+      const params = new URLSearchParams({
+        locadoraId: profile.locadoraId,
+        usuario: profile.email || ''
+      });
+      
+      const response = await fetch(`/api/atividades?${params}`);
       if (!response.ok) {
         throw new Error('Failed to fetch atividades');
       }
@@ -46,7 +51,7 @@ export function useCreateAtividade() {
       return response.json() as Promise<Atividade>;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['atividades', profile?.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['atividades', profile?.locadoraId, profile?.email] });
     },
   });
 }
