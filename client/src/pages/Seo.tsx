@@ -24,9 +24,9 @@ export default function Seo() {
   const form = useForm<InsertSeoConfig>({
     resolver: zodResolver(insertSeoConfigSchema),
     defaultValues: seoConfig || {
-      titulo: "DRIVS - Sistema de Locação de Veículos",
-      descricao: "Sistema completo para gerenciamento de locadoras de veículos com controle financeiro, contratos e relatórios avançados.",
-      palavrasChave: "locação de veículos, aluguel de carros, gestão de frota, sistema de locadora, controle financeiro",
+      titulo: "🚗 DRIVS - Sua Locadora Perdendo R$ 200/Dia com Planilhas? DOBRE a Receita!",
+      descricao: "SUA LOCADORA PERDE R$ 200/DIA com planilhas? Sistema que ELIMINA inadimplência, gera contratos válidos e DOBRA receita em 90 dias. 30 dias GRÁTIS + migração gratuita!",
+      palavrasChave: "locadora perdendo dinheiro, dobrar receita locadora, eliminar inadimplência, sistema locadora pequena, acabar planilhas locadora, aumentar lucro aluguel carros",
       autor: "DRIVS Team",
       urlCanonica: "https://drivs.me",
       imagemSocial: "/assets/drivs-social.png",
@@ -178,6 +178,47 @@ export default function Seo() {
       </Card>
 
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {/* Sugestões de Descrições Ultra Persuasivas */}
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-100 dark:from-blue-900 dark:to-indigo-800 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2 text-blue-800 dark:text-blue-200">
+              <Search className="h-5 w-5" />
+              <span>📈 Sugestões de Descrições para Google</span>
+            </CardTitle>
+            <CardDescription className="text-blue-600 dark:text-blue-400">
+              Descrições ultra persuasivas testadas para atrair locadoras pequenas e médias
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+                <h4 className="font-bold text-sm text-green-700 dark:text-green-300 mb-2">💰 FOCO NA DOR FINANCEIRA:</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 italic">
+                  "SUA LOCADORA PERDE R$ 200/DIA com planilhas? Sistema que ELIMINA inadimplência, gera contratos válidos e DOBRA receita em 90 dias. 30 dias GRÁTIS!"
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+                <h4 className="font-bold text-sm text-purple-700 dark:text-purple-300 mb-2">🎯 FOCO EM RESULTADOS:</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 italic">
+                  "Locadoras aumentam 60% da receita em 3 meses! Sistema elimina planilhas, controla inadimplência e gera contratos profissionais. Teste 30 dias GRÁTIS!"
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+                <h4 className="font-bold text-sm text-orange-700 dark:text-orange-300 mb-2">⚡ FOCO NA URGÊNCIA:</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 italic">
+                  "PARE de perder dinheiro com planilhas! Sistema que transforma locadoras pequenas em empresas profissionais. Zero inadimplência garantido. 30 dias grátis!"
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+                <h4 className="font-bold text-sm text-red-700 dark:text-red-300 mb-2">🔥 FOCO NO PROBLEMA:</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 italic">
+                  "Cansado de calote e CNH vencida? Sistema que automatiza sua locadora, elimina prejuízos e dobra o lucro. Usado por 500+ locadoras. Teste grátis!"
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Configurações Básicas de SEO */}
         <Card>
           <CardHeader>
