@@ -11,21 +11,15 @@ Preferred communication style: Simple, everyday language.
 ## Recent Changes
 
 ### 2025-07-19: Correção Crítica do Bug de Validação de Despesa e Sistema Anti-Duplicata - CONCLUÍDO ✅
-- ✅ **Erro "Expected string, received number" corrigido** - Schema Zod agora aceita números e strings no campo valor
-- ✅ **Transformação automática implementada** - Números são convertidos automaticamente para strings
-- ✅ **Sistema de despesas funcional** - Criação de despesas pelo modal agora funciona perfeitamente
-- ✅ **Validação flexível** - Backend aceita tanto 50 (número) quanto "50" (string) no campo valor
-- ✅ **Bug de seleção de data corrigido** - Removida restrição que impedia selecionar data atual (19/07/2025)
-- ✅ **Calendar otimizado** - Agora permite seleção de todas as datas válidas incluindo hoje
-- ✅ **Sistema anti-duplicata implementado** - Verificação automática de despesas duplicadas no backend
-- ✅ **Detecção inteligente** - Compara veículo, categoria, valor, data e descrição para identificar duplicatas
-- ✅ **Mensagens específicas** - Frontend alerta sobre despesas duplicadas com mensagem clara
-- ✅ **Validação backend** - API retorna erro 409 quando detecta tentativa de criar despesa duplicada
-- ✅ **Logs de debug removidos** - Interface limpa após identificar e corrigir a causa raiz
-- ✅ **Schema otimizado** - Função z.union() com transform() garante compatibilidade total
-- ✅ **Sistema totalmente funcional** - Teste curl confirmou: números são aceitos e convertidos automaticamente
-- ✅ **Duplicatas bloqueadas com sucesso** - Sistema detecta e impede criação de despesas idênticas
-- ✅ **Validação tripla implementada** - Backend verifica veículo, categoria, valor, data e descrição
+- ✅ **Duplicação de schema corrigida** - Removida duplicação entre shared/schema.ts e modal que causava conflito de validação
+- ✅ **Schema unificado implementado** - Modal agora usa apenas insertDespesaSchema do shared sem sobrescrever
+- ✅ **Erro "Expected string, received number" eliminado** - Causa raiz identificada como conflito entre schemas
+- ✅ **Data padrão corrigida** - Campo data inicia com formato yyyy-MM-dd da data atual (19/07/2025)
+- ✅ **Calendar otimizado** - Conversão correta entre Date objects e string format nos campos
+- ✅ **Preenchimento automático protegido** - Valor do seguro convertido para string antes de preencher
+- ✅ **Sistema anti-duplicata funcional** - Backend detecta e impede despesas duplicadas corretamente
+- ✅ **Validação consistente** - Apenas um schema de validação ativo para evitar conflitos
+- ✅ **Modal totalmente funcional** - Sistema de criação de despesas sem erros de validação
 
 ### 2025-07-19: Remoção do Card Receita Extra dos Relatórios Financeiros - CONCLUÍDO ✅
 - ✅ **Card "Receita Extra" removido** - Eliminada seção específica para juros e multas nos relatórios financeiros
