@@ -113,9 +113,30 @@ export function UploadTemplateModal({
       });
 
       console.log('🔥 Executando callbacks finais');
-      onTemplateUploaded();
-      onOpenChange(false);
-      form.reset();
+      
+      try {
+        console.log('🔥 Executando onTemplateUploaded...');
+        onTemplateUploaded();
+        console.log('✅ onTemplateUploaded executado');
+      } catch (e) {
+        console.error('❌ Erro em onTemplateUploaded:', e);
+      }
+      
+      try {
+        console.log('🔥 Executando onOpenChange(false)...');
+        onOpenChange(false);
+        console.log('✅ onOpenChange executado');
+      } catch (e) {
+        console.error('❌ Erro em onOpenChange:', e);
+      }
+      
+      try {
+        console.log('🔥 Executando form.reset()...');
+        form.reset();
+        console.log('✅ form.reset executado');
+      } catch (e) {
+        console.error('❌ Erro em form.reset:', e);
+      }
       
       console.log('🔥 onSubmit concluído com sucesso');
       
