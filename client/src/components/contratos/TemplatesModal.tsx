@@ -86,11 +86,11 @@ export function TemplatesModal({ isOpen, onClose }: TemplatesModalProps) {
                               variant="destructive"
                               size="sm"
                               onClick={() => handleExcluirTemplate(template.id)}
-                              disabled={isExcluindoTemplate}
+                              disabled={deleteTemplate.isPending}
                               className="flex items-center gap-1"
                             >
                               <Trash2 className="w-4 h-4" />
-                              Excluir
+                              {deleteTemplate.isPending ? "Excluindo..." : "Excluir"}
                             </Button>
                           </TableCell>
                         </TableRow>
