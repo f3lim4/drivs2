@@ -1,14 +1,19 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Allow: /login
+Allow: /cadastro
+
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+Disallow: /perfil
+Disallow: /veiculos
+Disallow: /motoristas
+Disallow: /alugueis
+Disallow: /contratos
+Disallow: /pagamentos
+Disallow: /infracoes
+Disallow: /manutencoes
+Disallow: /relatorios-financeiros
+
+Sitemap: https://drivs-rental-control-hub-71-drivs1.replit.app/sitemap.xml
