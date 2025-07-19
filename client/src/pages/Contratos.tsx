@@ -512,13 +512,22 @@ export default function Contratos() {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 flex gap-2">
               <Button 
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-2 px-4 text-sm"
+                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-2 px-4 text-sm"
                 onClick={() => setShowNovoContratoModal(true)}
               >
                 <Plus className="w-4 h-4" />
                 Gerar Contrato
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={() => setShowTemplatesModal(true)}
+                className="flex items-center gap-2 py-2 px-4 text-sm"
+              >
+                <FileText className="w-4 h-4" />
+                Templates
               </Button>
             </div>
           </div>
@@ -552,16 +561,6 @@ export default function Contratos() {
                 <CardTitle>Contratos Gerados ({contratosFiltrados.length})</CardTitle>
                 
                 <div className="flex items-center gap-2">
-                  {/* Botão Templates */}
-                  <Button 
-                    variant="outline"
-                    onClick={() => setShowTemplatesModal(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <FileText className="w-4 h-4" />
-                    Templates
-                  </Button>
-                  
                   {/* Ordenação */}
                   <Select value={sortOrder} onValueChange={setSortOrder}>
                     <SelectTrigger className="w-48">
