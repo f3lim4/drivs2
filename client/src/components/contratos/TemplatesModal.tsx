@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { UploadTemplateModal } from './UploadTemplateModal';
+import { VariaveisTemplate } from './VariaveisTemplate';
 
 interface TemplatesModalProps {
   isOpen: boolean;
@@ -47,68 +48,7 @@ export function TemplatesModal({ isOpen, onClose }: TemplatesModalProps) {
           
           <div className="space-y-4">
             {/* Variáveis Disponíveis */}
-            <Card className="bg-blue-50 border-blue-200">
-              <CardHeader>
-                <CardTitle className="text-blue-800 flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Variáveis Disponíveis para Templates
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <h4 className="font-semibold text-blue-800 mb-2">Dados da Locadora</h4>
-                    <div className="space-y-1 text-blue-700">
-                      <p><code>{{nomeLocadora}}</code> - Nome da empresa</p>
-                      <p><code>{{cnpjLocadora}}</code> - CNPJ da locadora</p>
-                      <p><code>{{telefoneLocadora}}</code> - Telefone</p>
-                      <p><code>{{emailLocadora}}</code> - E-mail</p>
-                      <p><code>{{enderecoLocadora}}</code> - Endereço completo</p>
-                      <p><code>{{responsavelLocadora}}</code> - Responsável</p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-semibold text-blue-800 mb-2">Dados do Motorista</h4>
-                    <div className="space-y-1 text-blue-700">
-                      <p><code>{{nomeMotorista}}</code> - Nome completo</p>
-                      <p><code>{{cpfMotorista}}</code> - CPF</p>
-                      <p><code>{{rgMotorista}}</code> - RG</p>
-                      <p><code>{{telefoneMotorista}}</code> - Telefone</p>
-                      <p><code>{{emailMotorista}}</code> - E-mail</p>
-                      <p><code>{{enderecoMotorista}}</code> - Endereço</p>
-                      <p><code>{{cnhMotorista}}</code> - Número da CNH</p>
-                      <p><code>{{vencimentoCnh}}</code> - Data vencimento</p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-semibold text-blue-800 mb-2">Dados do Contrato</h4>
-                    <div className="space-y-1 text-blue-700">
-                      <p><code>{{placaVeiculo}}</code> - Placa do veículo</p>
-                      <p><code>{{marcaVeiculo}}</code> - Marca</p>
-                      <p><code>{{modeloVeiculo}}</code> - Modelo</p>
-                      <p><code>{{anoVeiculo}}</code> - Ano</p>
-                      <p><code>{{corVeiculo}}</code> - Cor</p>
-                      <p><code>{{valorSemanal}}</code> - Valor semanal</p>
-                      <p><code>{{valorMensal}}</code> - Valor mensal</p>
-                      <p><code>{{caucao}}</code> - Valor da caução</p>
-                      <p><code>{{dataInicio}}</code> - Data de início</p>
-                      <p><code>{{dataFim}}</code> - Data de fim</p>
-                      <p><code>{{limiteKm}}</code> - Limite quilometragem</p>
-                      <p><code>{{dataAtual}}</code> - Data atual</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-4 p-3 bg-blue-100 rounded-lg">
-                  <p className="text-blue-800 text-sm">
-                    <strong>Como usar:</strong> Copie as variáveis acima e cole no seu template. 
-                    Elas serão automaticamente substituídas pelos dados reais do contrato.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <VariaveisTemplate />
 
             {/* Botão para upload de novo template */}
             <div className="flex justify-end">
