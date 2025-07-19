@@ -1189,15 +1189,20 @@ export default function RelatoriosFinanceiros() {
                       {formatCurrency(receitaPagamentos)}
                     </p>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-blue-800">Receitas Extras</p>
-                      <p className="text-sm text-blue-600">Outras receitas</p>
+                  {receitaExtra.total > 0 && (
+                    <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-yellow-800">Receita Extra</p>
+                        <p className="text-sm text-yellow-600">
+                          Juros: {formatCurrency(receitaExtra.totalJuros)} • 
+                          Multas: {formatCurrency(receitaExtra.totalMultas)}
+                        </p>
+                      </div>
+                      <p className="text-lg font-bold text-yellow-600">
+                        {formatCurrency(receitaExtra.total)}
+                      </p>
                     </div>
-                    <p className="text-lg font-bold text-blue-600">
-                      {formatCurrency(totalReceitas)}
-                    </p>
-                  </div>
+                  )}
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
                     <div>
                       <p className="font-bold text-gray-800">TOTAL RECEITAS</p>

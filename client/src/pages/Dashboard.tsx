@@ -435,7 +435,12 @@ export default function Dashboard() {
              dataPagamento <= fimSemana &&
              p.status === 'pago';
     })
-    .reduce((sum: number, p: any) => sum + parseFloat(p.valor || '0'), 0);
+    .reduce((sum: number, p: any) => {
+      const valorBase = parseFloat(p.valor || '0');
+      const valorJuros = parseFloat(p.valorJuros || '0');
+      const valorMulta = parseFloat(p.valorMulta || '0');
+      return sum + valorBase + valorJuros + valorMulta;
+    }, 0);
 
   // Métricas importantes para admin de SaaS de locadoras
   const locadorasAtivas = locadoras.filter(l => l.status === 'ativa').length;
