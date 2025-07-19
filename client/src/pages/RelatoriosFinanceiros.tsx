@@ -565,7 +565,7 @@ export default function RelatoriosFinanceiros() {
       }, 0);
   }, [filteredData.despesasPeriodo]);
 
-  const receitaTotal = receitaPagamentos + totalReceitas;
+  const receitaTotal = receitaPagamentos + totalReceitas + receitaExtra.total;
   const lucroLiquido = receitaTotal - totalDespesas;
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
@@ -1171,6 +1171,21 @@ export default function RelatoriosFinanceiros() {
                       {formatCurrency(receitaPagamentos)}
                     </p>
                   </div>
+
+                  {receitaExtra.total > 0 && (
+                    <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-yellow-800">Receita Extra</p>
+                        <p className="text-sm text-yellow-600">
+                          Juros: {formatCurrency(receitaExtra.totalJuros)} • 
+                          Multas: {formatCurrency(receitaExtra.totalMultas)}
+                        </p>
+                      </div>
+                      <p className="text-lg font-bold text-yellow-600">
+                        {formatCurrency(receitaExtra.total)}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
                     <div>
