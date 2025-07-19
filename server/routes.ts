@@ -1174,6 +1174,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(despesa);
     } catch (error) {
       console.error("Error creating despesa:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ message: "Validation error", details: error.issues });
+      }
       res.status(500).json({ message: "Internal server error" });
     }
   });

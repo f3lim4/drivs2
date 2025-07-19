@@ -324,6 +324,8 @@ export const despesas = pgTable("despesas", {
 export const insertDespesaSchema = createInsertSchema(despesas).omit({
   createdAt: true,
   updatedAt: true,
+}).extend({
+  valor: z.union([z.string(), z.number()]).transform((val) => val.toString()),
 });
 
 // Manutencoes table
