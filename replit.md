@@ -10,6 +10,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-19: Remoção do Card Receita Extra dos Relatórios Financeiros - CONCLUÍDO ✅
+- ✅ **Card "Receita Extra" removido** - Eliminada seção específica para juros e multas nos relatórios financeiros
+- ✅ **Cálculo de receita total ajustado** - Removida receita extra do total de receitas nos relatórios  
+- ✅ **Receita semanal mantida** - Dashboard continua incluindo juros e multas no cálculo semanal
+- ✅ **Interface limpa** - Relatórios financeiros agora mostram apenas "Pagamentos Recebidos" e "Total Receitas"
+
 ### 2025-07-19: Correção do Valor Esperado Semanal e Sistema de Nova Despesa - CONCLUÍDO ✅
 - ✅ **Bug do botão Nova Despesa corrigido** - Função setModalNovaDespesa mudada para setModalAberto
 - ✅ **Valor semanal esperado corrigido** - Removido ajuste fixo para R$ 5.075, agora calcula automaticamente
