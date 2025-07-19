@@ -3,7 +3,7 @@ import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { testConnection, db } from "./db";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, contratos } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, insertTemplateContratoSchema, contratos } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import fs from "fs";
@@ -11,6 +11,7 @@ import path from "path";
 import multer from "multer";
 import OpenAI from "openai";
 import { PDFDocument } from "pdf-lib";
+import crypto from "crypto";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Test database connection first
@@ -939,11 +940,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/template-contratos", async (req, res) => {
     try {
-      const template = await storage.createTemplateContrato(req.body);
+      console.log("POST /api/template-contratos - Body:", req.body);
+      
+      // Validar usando o schema Zod
+      const validatedData = insertTemplateContratoSchema.omit({ id: true, createdAt: true }).parse(req.body);
+      
+      console.log("Dados validados:", validatedData);
+      const template = await storage.createTemplateContrato(validatedData);
+      console.log("Template criado com sucesso:", template);
+      
       res.json(template);
     } catch (error) {
       console.error("Error creating template contrato:", error);
-      res.status(500).json({ message: "Internal server error" });
+      
+      // Se é erro de validação Zod
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          message: "Dados inválidos", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).json({ message: "Internal server error", error: error.message });
     }
   });
 
