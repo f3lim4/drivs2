@@ -21,9 +21,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { insertDespesaSchema } from '@shared/schema';
 
-const despesaFormSchema = insertDespesaSchema.omit({ id: true }).extend({
-  valor: z.union([z.string(), z.number()]).transform((val) => val.toString())
-});
+const despesaFormSchema = insertDespesaSchema.omit({ id: true });
 
 export function NovaDespesaModal() {
   const [open, setOpen] = useState(false);
