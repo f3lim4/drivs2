@@ -54,6 +54,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
   const { alugueis } = useAlugueis();
   const { veiculos } = useVeiculos();
   const [aluguelSelecionado, setAluguelSelecionado] = useState<string | null>(null);
+  const [pagamentoAtrasado, setPagamentoAtrasado] = useState(false);
   const { data: valorSemanal } = useAluguelValorSemanal(aluguelSelecionado);
   const { updateInfracao } = useInfracoes();
 
@@ -98,6 +99,14 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
       })));
     }
   }, [infracoesEmAberto.length]);
+
+  // Limpar campos de juros e multa quando checkbox de pagamento atrasado for desmarcado
+  useEffect(() => {
+    if (!pagamentoAtrasado) {
+      form.setValue('valorJuros', '0');
+      form.setValue('valorMulta', '0');
+    }
+  }, [pagamentoAtrasado, form]);
 
   // Calcular valor total das infrações selecionadas
   const valorTotalInfracoesSelecionadas = infracoesSelecionadas
@@ -243,6 +252,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
     form.reset();
     setAluguelSelecionado(null);
     setInfracoesSelecionadas([]);
+    setPagamentoAtrasado(false);
   };
 
   return (
@@ -435,57 +445,74 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                 />
               </div>
 
-              {/* Seção de Receita Extra */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-green-800 mb-3 flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" />
-                  Receita Extra
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Juros */}
-                  <FormField
-                    control={form.control}
-                    name="valorJuros"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Juros (R$)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Multa */}
-                  <FormField
-                    control={form.control}
-                    name="valorMulta"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Multa (R$)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <p className="text-xs text-green-700 mt-2">
-                  Valores de juros e multa aparecerão como receita extra nos relatórios financeiros
-                </p>
+              {/* Checkbox para pagamento atrasado */}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="pagamento-atrasado"
+                  checked={pagamentoAtrasado}
+                  onCheckedChange={setPagamentoAtrasado}
+                />
+                <label 
+                  htmlFor="pagamento-atrasado" 
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Pagamento Atrasado
+                </label>
               </div>
+
+              {/* Seção de Receita Extra - só aparece se pagamento atrasado estiver marcado */}
+              {pagamentoAtrasado && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-green-800 mb-3 flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    Receita Extra
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Juros */}
+                    <FormField
+                      control={form.control}
+                      name="valorJuros"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Juros (R$)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Multa */}
+                    <FormField
+                      control={form.control}
+                      name="valorMulta"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Multa (R$)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <p className="text-xs text-green-700 mt-2">
+                    Valores de juros e multa aparecerão como receita extra nos relatórios financeiros
+                  </p>
+                </div>
+              )}
 
               {/* Checkbox para pagamento parcial (apenas para aluguéis) */}
               {tipoSelecionado === 'aluguel' && (
