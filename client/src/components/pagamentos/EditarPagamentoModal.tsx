@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -9,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import type { Pagamento, Motorista, InsertPagamento } from '@shared/schema';
 
 const formSchema = z.object({
@@ -17,6 +19,8 @@ const formSchema = z.object({
   descricao: z.string().optional(),
   valorTotal: z.string().min(1, 'Valor total é obrigatório'),
   valorPago: z.string().min(1, 'Valor pago é obrigatório'),
+  valorJuros: z.string().optional(),
+  valorMulta: z.string().optional(),
   dataPagamento: z.string().min(1, 'Data é obrigatória'),
   observacoes: z.string().optional(),
 });
@@ -32,6 +36,9 @@ interface EditarPagamentoModalProps {
 }
 
 export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motoristas }: EditarPagamentoModalProps) {
+  // Estado para controlar se é pagamento atrasado
+  const [pagamentoAtrasado, setPagamentoAtrasado] = useState(false);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,6 +47,8 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
       descricao: pagamento.descricao || '',
       valorTotal: pagamento.valorTotal.toString(),
       valorPago: pagamento.valorPago.toString(),
+      valorJuros: pagamento.valorJuros?.toString() || '0',
+      valorMulta: pagamento.valorMulta?.toString() || '0',
       dataPagamento: new Date(pagamento.dataPagamento).toISOString().split('T')[0],
       observacoes: pagamento.observacoes || '',
     },
@@ -48,17 +57,30 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
   // Atualizar valores quando o pagamento mudar
   useEffect(() => {
     if (pagamento) {
+      const temJurosOuMulta = (pagamento.valorJuros && pagamento.valorJuros > 0) || (pagamento.valorMulta && pagamento.valorMulta > 0);
+      setPagamentoAtrasado(temJurosOuMulta);
+      
       form.reset({
         motoristaId: pagamento.motoristaId,
         tipo: pagamento.tipo as any,
         descricao: pagamento.descricao || '',
         valorTotal: pagamento.valorTotal.toString(),
         valorPago: pagamento.valorPago.toString(),
+        valorJuros: pagamento.valorJuros?.toString() || '0',
+        valorMulta: pagamento.valorMulta?.toString() || '0',
         dataPagamento: new Date(pagamento.dataPagamento).toISOString().split('T')[0],
         observacoes: pagamento.observacoes || '',
       });
     }
   }, [pagamento, form]);
+
+  // Limpar campos de juros e multa quando checkbox de pagamento atrasado for desmarcado
+  useEffect(() => {
+    if (!pagamentoAtrasado) {
+      form.setValue('valorJuros', '0');
+      form.setValue('valorMulta', '0');
+    }
+  }, [pagamentoAtrasado, form]);
 
   const valorTotalInput = form.watch('valorTotal');
   const valorPagoInput = form.watch('valorPago');
@@ -82,6 +104,8 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
       descricao: data.descricao || undefined,
       valorTotal: data.valorTotal,
       valorPago: data.valorPago,
+      valorJuros: data.valorJuros || '0.00',
+      valorMulta: data.valorMulta || '0.00',
       valorRestante: valorRestante.toString(),
       dataPagamento: data.dataPagamento,
       status: getStatus(),
@@ -89,6 +113,11 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
     };
 
     onSubmit(updates);
+    handleClose();
+  };
+
+  const handleClose = () => {
+    setPagamentoAtrasado(false);
     onClose();
   };
 
@@ -100,7 +129,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Pagamento</DialogTitle>
@@ -239,6 +268,75 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                 )}
               />
             </div>
+
+            {/* Checkbox para pagamento atrasado */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="pagamento-atrasado-edit"
+                checked={pagamentoAtrasado}
+                onCheckedChange={setPagamentoAtrasado}
+              />
+              <label 
+                htmlFor="pagamento-atrasado-edit" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Pagamento Atrasado
+              </label>
+            </div>
+
+            {/* Seção de Receita Extra - só aparece se pagamento atrasado estiver marcado */}
+            {pagamentoAtrasado && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-green-800 mb-3 flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Receita Extra
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Juros */}
+                  <FormField
+                    control={form.control}
+                    name="valorJuros"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Juros (R$)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Multa */}
+                  <FormField
+                    control={form.control}
+                    name="valorMulta"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Multa (R$)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <p className="text-xs text-green-700 mt-2">
+                  Valores de juros e multa aparecerão como receita extra nos relatórios financeiros
+                </p>
+              </div>
+            )}
 
             {/* Resumo */}
             {valorTotal > 0 && (
