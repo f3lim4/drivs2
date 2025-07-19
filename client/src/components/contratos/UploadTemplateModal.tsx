@@ -27,6 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useTemplateContratos } from '@/hooks/useTemplateContratos';
 
 const templateSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
@@ -46,9 +47,9 @@ export function UploadTemplateModal({
   onOpenChange, 
   onTemplateUploaded 
 }: UploadTemplateModalProps) {
-  const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
   const { toast } = useToast();
+  const { createTemplate } = useTemplateContratos();
 
   const form = useForm<TemplateFormData>({
     resolver: zodResolver(templateSchema),
@@ -85,24 +86,13 @@ export function UploadTemplateModal({
       });
       return;
     }
-
-    setLoading(true);
     
     try {
-      const response = await fetch('/api/template-contratos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...data,
-          locadoraId: profile.locadoraId,
-        }),
+      await createTemplate.mutateAsync({
+        ...data,
+        locadoraId: profile.locadoraId,
+        ativo: true,
       });
-
-      if (!response.ok) {
-        throw new Error('Falha ao salvar template');
-      }
 
       toast({
         title: "Template Salvo",
@@ -120,8 +110,6 @@ export function UploadTemplateModal({
         description: "Falha ao salvar template. Tente novamente.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -194,12 +182,12 @@ export function UploadTemplateModal({
                     type="button"
                     variant="outline"
                     onClick={() => onOpenChange(false)}
-                    disabled={loading}
+                    disabled={createTemplate.isPending}
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={loading}>
-                    {loading ? 'Salvando...' : 'Salvar Template'}
+                  <Button type="submit" disabled={createTemplate.isPending}>
+                    {createTemplate.isPending ? 'Salvando...' : 'Salvar Template'}
                   </Button>
                 </DialogFooter>
               </form>
