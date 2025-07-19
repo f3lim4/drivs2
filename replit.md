@@ -10,13 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-19: Correção Crítica do Bug de Validação de Despesa e Data Atual - CONCLUÍDO ✅
+### 2025-07-19: Correção Crítica do Bug de Validação de Despesa e Sistema Anti-Duplicata - CONCLUÍDO ✅
 - ✅ **Erro "Expected string, received number" corrigido** - Schema Zod agora aceita números e strings no campo valor
 - ✅ **Transformação automática implementada** - Números são convertidos automaticamente para strings
 - ✅ **Sistema de despesas funcional** - Criação de despesas pelo modal agora funciona perfeitamente
 - ✅ **Validação flexível** - Backend aceita tanto 50 (número) quanto "50" (string) no campo valor
 - ✅ **Bug de seleção de data corrigido** - Removida restrição que impedia selecionar data atual (19/07/2025)
 - ✅ **Calendar otimizado** - Agora permite seleção de todas as datas válidas incluindo hoje
+- ✅ **Sistema anti-duplicata implementado** - Verificação automática de despesas duplicadas no backend
+- ✅ **Detecção inteligente** - Compara veículo, categoria, valor, data e descrição para identificar duplicatas
+- ✅ **Mensagens específicas** - Frontend alerta sobre despesas duplicadas com mensagem clara
+- ✅ **Validação backend** - API retorna erro 409 quando detecta tentativa de criar despesa duplicada
 - ✅ **Logs de debug removidos** - Interface limpa após identificar e corrigir a causa raiz
 - ✅ **Schema otimizado** - Função z.union() com transform() garante compatibilidade total
 

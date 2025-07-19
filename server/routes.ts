@@ -1170,6 +1170,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/despesas", async (req, res) => {
     try {
       const validatedData = insertDespesaSchema.omit({ id: true }).parse(req.body);
+      
+      // Verificar se já existe despesa similar (mesmo veículo, categoria, valor e data)
+      const existingDespesas = await storage.getDespesasByLocadora(validatedData.locadoraId);
+      const possibleDuplicate = existingDespesas.find(despesa => {
+        const sameVehicle = despesa.veiculoId === validatedData.veiculoId;
+        const sameCategory = despesa.categoria === validatedData.categoria;
+        const sameValue = parseFloat(despesa.valor) === parseFloat(validatedData.valor);
+        const sameDate = despesa.data === validatedData.data;
+        const sameDescription = despesa.descricao?.trim().toLowerCase() === validatedData.descricao?.trim().toLowerCase();
+        
+        return sameVehicle && sameCategory && sameValue && sameDate && sameDescription;
+      });
+
+      if (possibleDuplicate) {
+        return res.status(409).json({ 
+          message: "Duplicate expense detected",
+          details: "Uma despesa igual já existe para este veículo na mesma data"
+        });
+      }
+      
       const despesa = await storage.createDespesa(validatedData);
       res.json(despesa);
     } catch (error) {

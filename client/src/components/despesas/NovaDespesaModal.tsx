@@ -144,11 +144,20 @@ export function NovaDespesaModal() {
       setSelectedVehicles([]);
     } catch (error) {
       console.error('Error creating despesa:', error);
-      toast({
-        title: 'Erro ao criar despesa',
-        description: 'Tente novamente mais tarde.',
-        variant: 'destructive',
-      });
+      
+      if (error.message === 'DUPLICATE') {
+        toast({
+          title: 'Despesa duplicada',
+          description: 'Uma despesa igual já existe para este veículo na mesma data com o mesmo valor.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Erro ao criar despesa',
+          description: 'Tente novamente mais tarde.',
+          variant: 'destructive',
+        });
+      }
     }
   };
 

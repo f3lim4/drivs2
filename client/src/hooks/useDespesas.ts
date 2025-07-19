@@ -124,7 +124,13 @@ export function useDespesas() {
         body: JSON.stringify(despesa),
       });
       
-      if (!response.ok) throw new Error('Failed to create despesa');
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 409) {
+          throw new Error('DUPLICATE');
+        }
+        throw new Error(errorData.message || 'Failed to create despesa');
+      }
       return response.json();
     },
     onSuccess: (data) => {
