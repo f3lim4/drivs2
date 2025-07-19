@@ -1482,21 +1482,17 @@ export class DatabaseStorage implements IStorage {
 
   async getAtividadesByLocadoraEUsuario(locadoraId: string, usuario?: string): Promise<Atividade[]> {
     try {
-      console.log('[DEBUG] Storage - Buscando atividades:', { locadoraId, usuario });
-      
       // Criar a condição base
       let whereCondition;
       
       if (usuario && usuario.trim() !== '') {
         // Se usuário foi especificado, filtrar por locadora E usuário
-        console.log('[DEBUG] Storage - Filtrando por usuário:', usuario);
         whereCondition = and(
           eq(atividades.locadoraId, locadoraId),
           eq(atividades.usuario, usuario)
         );
       } else {
         // Se não, filtrar apenas por locadora
-        console.log('[DEBUG] Storage - Filtrando apenas por locadora');
         whereCondition = eq(atividades.locadoraId, locadoraId);
       }
 
@@ -1506,7 +1502,6 @@ export class DatabaseStorage implements IStorage {
         .orderBy(desc(atividades.timestamp))
         .limit(50); // Limitar aos 50 mais recentes
       
-      console.log('[DEBUG] Storage - Resultado:', result.length, 'atividades encontradas');
       return result;
     } catch (error) {
       console.error('Error getting atividades by locadora e usuario:', error);

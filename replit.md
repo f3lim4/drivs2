@@ -10,16 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-18: Sistema de Atividades Recentes com Dados Reais - CONCLUÍDO ✅
+### 2025-07-19: Sistema de Atividades Filtrado por Usuário - CONCLUÍDO ✅
 - ✅ **Sistema de atividades implementado** - Rastreamento automático de todas as ações importantes do sistema
 - ✅ **Banco de dados funcional** - Tabela atividades com campos locadoraId, usuario, acao, entidade, detalhes e timestamp
-- ✅ **API REST completa** - Endpoints para buscar e criar atividades com isolamento perfeito por locadora
+- ✅ **API REST completa** - Endpoints para buscar e criar atividades com filtro por usuário específico
 - ✅ **Componente visual elegante** - Interface com ícones específicos, badges coloridos e formatação temporal
-- ✅ **Isolamento garantido** - Cada locadora vê apenas suas próprias atividades filtradas por locadoraId
-- ✅ **Dados reais funcionando** - Sistema mostra atividades reais de diferentes usuários da mesma locadora
-- ✅ **Atividades diversas** - Exemplos: operador@drivs.me, financeiro@drivs.me, gerente@drivs.me, admin@drivs.com.br
+- ✅ **Filtro por usuário logado** - Cada usuário vê apenas suas próprias atividades, não de outros usuários da locadora
+- ✅ **Backend atualizado** - Nova função getAtividadesByLocadoraEUsuario para filtrar por locadora E usuário
+- ✅ **Frontend otimizado** - Hook useAtividades envia email do usuário logado na requisição
+- ✅ **Isolamento completo** - Sistema funciona tanto para admin quanto para locadoras individuais
 - ✅ **Integração automática** - Atividades capturadas automaticamente quando ações são executadas
-- ✅ **Funcionalidade validada** - Dados reais exibidos corretamente no dashboard com usuários específicos
+- ✅ **Funcionalidade validada** - Sistema filtra corretamente: 5 atividades para admin@drivs.com.br, 0 para drivs.me@gmail.com
 
 ### 2025-07-18: Sistema de Alertas de Manutenção Avançado - CONCLUÍDO ✅
 - ✅ **Modal "Nova Manutenção" restaurado ao formato original** - Revertido layout compacto para formato espaçado preferido pelo usuário
