@@ -399,20 +399,46 @@ export default function Contratos() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
+      {/* Header da Página */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Contratos</h1>
+          <p className="text-gray-600">Gerencie contratos e templates de locação</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="outline"
+            onClick={() => setShowTemplatesModal(true)}
+            className="flex items-center gap-2"
+          >
+            <FileText className="w-4 h-4" />
+            Templates
+          </Button>
+          
+          <Button 
+            onClick={() => setShowNovoContratoModal(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Gerar Contrato
+          </Button>
+        </div>
+      </div>
+
       {/* Cards de Estatísticas */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Total de Contratos */}
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-blue-700">TOTAL DE CONTRATOS</p>
-                <p className="text-2xl font-bold text-blue-800">{totalContratos}</p>
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center space-y-0.5">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-blue-700">TOTAL DE CONTRATOS</p>
+                <p className="text-xl font-bold text-blue-800">{totalContratos}</p>
                 <p className="text-xs text-blue-600">
                   {contratosAtivos} ativos
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center ml-auto">
                 <FileText className="w-6 h-6 text-blue-700" />
               </div>
             </div>
@@ -420,17 +446,17 @@ export default function Contratos() {
         </Card>
 
         {/* Contratos Ativos */}
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-green-700">CONTRATOS ATIVOS</p>
-                <p className="text-2xl font-bold text-green-800">{contratosAtivos}</p>
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center space-y-0.5">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-green-700">CONTRATOS ATIVOS</p>
+                <p className="text-xl font-bold text-green-800">{contratosAtivos}</p>
                 <p className="text-xs text-green-600">
                   {contratosFinalizados} finalizados
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center ml-auto">
                 <TrendingUp className="w-6 h-6 text-green-700" />
               </div>
             </div>
@@ -438,17 +464,17 @@ export default function Contratos() {
         </Card>
 
         {/* Valor Total */}
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-purple-700">VALOR TOTAL</p>
-                <p className="text-2xl font-bold text-purple-800">{formatCurrency(valorTotal)}</p>
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center space-y-0.5">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-purple-700">VALOR TOTAL</p>
+                <p className="text-xl font-bold text-purple-800">{formatCurrency(valorTotal)}</p>
                 <p className="text-xs text-purple-600">
                   Soma dos contratos
                 </p>
               </div>
-              <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center ml-auto">
                 <DollarSign className="w-6 h-6 text-purple-700" />
               </div>
             </div>
@@ -456,17 +482,17 @@ export default function Contratos() {
         </Card>
 
         {/* Contratos Cancelados */}
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-red-700">CANCELADOS</p>
-                <p className="text-2xl font-bold text-red-800">{contratosCancelados}</p>
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center space-y-0.5">
+              <div className="space-y-0.5">
+                <p className="text-xs font-medium text-red-700">CANCELADOS</p>
+                <p className="text-xl font-bold text-red-800">{contratosCancelados}</p>
                 <p className="text-xs text-red-600">
                   Contratos cancelados
                 </p>
               </div>
-              <div className="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center ml-auto">
                 <X className="w-6 h-6 text-red-700" />
               </div>
             </div>
@@ -510,25 +536,6 @@ export default function Contratos() {
                   <SelectItem value="cancelado">Cancelado</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="space-y-2 flex gap-2">
-              <Button 
-                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-2 px-4 text-sm"
-                onClick={() => setShowNovoContratoModal(true)}
-              >
-                <Plus className="w-4 h-4" />
-                Gerar Contrato
-              </Button>
-              
-              <Button 
-                variant="outline"
-                onClick={() => setShowTemplatesModal(true)}
-                className="flex items-center gap-2 py-2 px-4 text-sm"
-              >
-                <FileText className="w-4 h-4" />
-                Templates
-              </Button>
             </div>
           </div>
         </CardContent>
