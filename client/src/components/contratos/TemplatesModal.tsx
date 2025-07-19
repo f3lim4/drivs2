@@ -58,6 +58,62 @@ export function TemplatesModal({ isOpen, onClose }: TemplatesModalProps) {
               </Button>
             </div>
 
+            {/* Templates Enviados */}
+            {templates && templates.length > 0 && (
+              <Card className="bg-gray-50 border-gray-200">
+                <CardHeader>
+                  <CardTitle className="text-gray-800 flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Meus Templates Enviados
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Data de Envio</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {templates.map((template) => (
+                        <TableRow key={template.id}>
+                          <TableCell className="font-medium">{template.nome}</TableCell>
+                          <TableCell>{new Date(template.createdAt).toLocaleDateString('pt-BR')}</TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleExcluirTemplate(template.id)}
+                              disabled={isExcluindoTemplate}
+                              className="flex items-center gap-1"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Excluir
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Mensagem quando não há templates */}
+            {(!templates || templates.length === 0) && (
+              <Card className="bg-yellow-50 border-yellow-200">
+                <CardContent className="pt-6">
+                  <div className="text-center text-yellow-700">
+                    <FileText className="w-12 h-12 mx-auto mb-2 text-yellow-500" />
+                    <p className="font-medium">Nenhum template enviado ainda</p>
+                    <p className="text-sm">Use o botão "Enviar Template" acima para adicionar seu primeiro template personalizado.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Passo a passo */}
             <Card className="bg-green-50 border-green-200">
               <CardHeader>
@@ -105,66 +161,6 @@ export function TemplatesModal({ isOpen, onClose }: TemplatesModalProps) {
 
             {/* Variáveis Disponíveis */}
             <VariaveisTemplate />
-
-            {/* Lista de templates */}
-            {isLoading ? (
-              <div className="text-center py-8">
-                <div className="text-muted-foreground">Carregando templates...</div>
-              </div>
-            ) : templates.length === 0 ? (
-              <Card>
-                <CardContent className="p-8">
-                  <div className="text-center text-muted-foreground">
-                    <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <p>Nenhum template personalizado encontrado</p>
-                    <p className="text-sm">Clique em "Enviar Template" para adicionar um novo</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Templates Personalizados ({templates.length})</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>NOME</TableHead>
-                        <TableHead>TIPO</TableHead>
-                        <TableHead>CRIADO EM</TableHead>
-                        <TableHead>AÇÕES</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {templates.map((template) => (
-                        <TableRow key={template.id}>
-                          <TableCell>
-                            <p className="font-medium">{template.nome}</p>
-                          </TableCell>
-                          <TableCell>
-                            <p className="capitalize">{template.tipo}</p>
-                          </TableCell>
-                          <TableCell>
-                            <p>{new Date(template.createdAt).toLocaleDateString('pt-BR')}</p>
-                          </TableCell>
-                          <TableCell>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleExcluirTemplate(template.id)}
-                              title="Excluir"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </DialogContent>
       </Dialog>
