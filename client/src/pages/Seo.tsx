@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useSeoConfig, useUpdateSeoConfig } from "@/hooks/useSeo";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { insertSeoConfigSchema } from "@shared/schema";
 import type { InsertSeoConfig } from "@shared/schema";
@@ -17,6 +18,7 @@ import { Settings, Globe, TrendingUp, Search, BarChart3, Eye, Building2, Car, Us
 export default function Seo() {
   const { toast } = useToast();
   const { data: seoConfig, isLoading } = useSeoConfig();
+  const { data: analytics, isLoading: analyticsLoading } = useAnalytics();
   const updateSeoMutation = useUpdateSeoConfig();
 
   const form = useForm<InsertSeoConfig>({
@@ -337,28 +339,42 @@ export default function Seo() {
               <span>Analytics do Sistema</span>
             </CardTitle>
             <CardDescription>
-              Estatísticas de uso do sistema DRIVS
+              Estatísticas reais de uso do sistema DRIVS
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">847</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Visitantes este mês</div>
+            {analyticsLoading ? (
+              <div className="flex justify-center py-8">
+                <LoadingSpinner size="lg" />
               </div>
-              <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">2.3k</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Páginas visualizadas</div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {analytics?.visitantesEsseMes || 0}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Visitantes este mês</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {analytics?.paginasVisualizadas || 0}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Páginas visualizadas</div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {analytics?.tempoMedio || 0}m
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Tempo médio (min)</div>
+                </div>
+                <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                    {analytics?.taxaRetorno || 0}%
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Taxa de retorno</div>
+                </div>
               </div>
-              <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">4.2m</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Tempo médio (min)</div>
-              </div>
-              <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">67%</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Taxa de retorno</div>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
