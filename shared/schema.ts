@@ -326,6 +326,7 @@ export const insertDespesaSchema = createInsertSchema(despesas).omit({
   updatedAt: true,
 }).extend({
   valor: z.union([z.string(), z.number()]).transform((val) => val.toString()),
+  data: z.string(),
 });
 
 // Manutencoes table

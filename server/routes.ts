@@ -13,6 +13,15 @@ import OpenAI from "openai";
 import { PDFDocument } from "pdf-lib";
 import crypto from "crypto";
 
+// Função para converter data brasileira (dd/MM/yyyy) para formato ISO
+const convertBrazilianDate = (dateStr: string): string => {
+  if (dateStr.includes('/')) {
+    const [day, month, year] = dateStr.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  }
+  return dateStr;
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Test database connection first
   console.log("Testing database connection...");
@@ -1169,7 +1178,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/despesas", async (req, res) => {
     try {
-      const validatedData = insertDespesaSchema.omit({ id: true }).parse(req.body);
+      // Converter data brasileira antes da validação
+      const requestData = { ...req.body };
+      if (requestData.data && typeof requestData.data === 'string') {
+        requestData.data = convertBrazilianDate(requestData.data);
+      }
+      
+      const validatedData = insertDespesaSchema.omit({ id: true }).parse(requestData);
+      
+      console.log('[DESPESA] Dados recebidos:', {
+        original: req.body,
+        converted: requestData,
+        validated: validatedData
+      });
       
       // Verificar se já existe despesa similar (mesmo veículo, categoria, valor e data)
       const existingDespesas = await storage.getDespesasByLocadora(validatedData.locadoraId);
