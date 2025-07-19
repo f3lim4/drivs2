@@ -47,9 +47,6 @@ export function TemplatesModal({ isOpen, onClose }: TemplatesModalProps) {
           </DialogHeader>
           
           <div className="space-y-4">
-            {/* Variáveis Disponíveis */}
-            <VariaveisTemplate />
-
             {/* Botão para upload de novo template */}
             <div className="flex justify-end">
               <Button 
@@ -60,6 +57,54 @@ export function TemplatesModal({ isOpen, onClose }: TemplatesModalProps) {
                 Enviar Template
               </Button>
             </div>
+
+            {/* Passo a passo */}
+            <Card className="bg-green-50 border-green-200">
+              <CardHeader>
+                <CardTitle className="text-green-800 flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Como Criar um Template Personalizado
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 text-sm text-green-700">
+                  <div className="flex items-start gap-3">
+                    <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</span>
+                    <div>
+                      <p className="font-semibold">Crie seu documento</p>
+                      <p>Use Word, Google Docs ou qualquer editor de texto para criar seu contrato personalizado.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">2</span>
+                    <div>
+                      <p className="font-semibold">Adicione as variáveis</p>
+                      <p>Copie as variáveis abaixo e cole no seu documento onde os dados devem aparecer.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">3</span>
+                    <div>
+                      <p className="font-semibold">Salve como PDF</p>
+                      <p>Exporte ou salve seu documento como PDF mantendo as variáveis no formato correto.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">4</span>
+                    <div>
+                      <p className="font-semibold">Faça o upload</p>
+                      <p>Clique em "Enviar Template" acima e selecione seu arquivo PDF personalizado.</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Variáveis Disponíveis */}
+            <VariaveisTemplate />
 
             {/* Lista de templates */}
             {isLoading ? (
