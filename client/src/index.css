@@ -3,6 +3,41 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animações de carros */
+@keyframes moveRight {
+  0% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(calc(100vw + 100px));
+    opacity: 0;
+  }
+}
+
+@keyframes moveLeft {
+  0% {
+    transform: translateX(calc(100vw + 100px));
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+}
+
 /* DRIVS Design System - Sistema de cores e estilos baseado no layout da locadora */
 
 @layer base {

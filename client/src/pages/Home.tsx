@@ -147,6 +147,57 @@ export default function Home() {
           {/* Animated Lines */}
           <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent animate-pulse"></div>
           <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/30 to-transparent animate-pulse delay-700"></div>
+          
+          {/* Moving Cars */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {/* Car 1 - Moving left to right */}
+            <div className="absolute top-1/3 left-0 w-16 h-8 opacity-25" style={{
+              animation: 'moveRight 20s linear infinite'
+            }}>
+              <div className="flex items-center">
+                <div className="w-16 h-8 bg-gradient-to-r from-blue-400/60 to-cyan-400/60 rounded-xl shadow-lg flex items-center justify-center">
+                  <Car className="h-5 w-5 text-white/80" />
+                </div>
+                <div className="w-24 h-1 bg-gradient-to-r from-blue-400/50 to-transparent ml-2 animate-pulse"></div>
+              </div>
+            </div>
+            
+            {/* Car 2 - Moving right to left */}
+            <div className="absolute top-2/3 right-0 w-16 h-8 opacity-20" style={{
+              animation: 'moveLeft 25s linear infinite 3s'
+            }}>
+              <div className="flex items-center flex-row-reverse">
+                <div className="w-16 h-8 bg-gradient-to-r from-purple-400/60 to-pink-400/60 rounded-xl shadow-lg flex items-center justify-center">
+                  <Car className="h-5 w-5 text-white/80" />
+                </div>
+                <div className="w-24 h-1 bg-gradient-to-l from-purple-400/50 to-transparent mr-2 animate-pulse"></div>
+              </div>
+            </div>
+            
+            {/* Car 3 - Moving left to right slower */}
+            <div className="absolute top-1/2 left-0 w-14 h-7 opacity-15" style={{
+              animation: 'moveRight 30s linear infinite 8s'
+            }}>
+              <div className="flex items-center">
+                <div className="w-14 h-7 bg-gradient-to-r from-emerald-400/60 to-green-400/60 rounded-lg shadow-lg flex items-center justify-center">
+                  <Car className="h-4 w-4 text-white/80" />
+                </div>
+                <div className="w-20 h-1 bg-gradient-to-r from-emerald-400/40 to-transparent ml-1 animate-pulse"></div>
+              </div>
+            </div>
+            
+            {/* Car 4 - Moving right to left diagonal */}
+            <div className="absolute top-1/4 right-0 w-14 h-7 opacity-18" style={{
+              animation: 'moveLeft 35s linear infinite 12s'
+            }}>
+              <div className="flex items-center flex-row-reverse">
+                <div className="w-14 h-7 bg-gradient-to-r from-yellow-400/60 to-orange-400/60 rounded-lg shadow-lg flex items-center justify-center">
+                  <Car className="h-4 w-4 text-white/80" />
+                </div>
+                <div className="w-18 h-1 bg-gradient-to-l from-yellow-400/40 to-transparent mr-1 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div className="relative z-10 container mx-auto px-4 text-center">
