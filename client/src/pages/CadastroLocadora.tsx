@@ -394,43 +394,44 @@ export default function CadastroLocadora() {
                   />
                 </div>
 
-                {/* CEP com busca automática */}
-                <div className="space-y-2 w-48">
-                  <Label htmlFor="cep">CEP *</Label>
-                  <Input
-                    id="cep"
-                    value={formData.cep}
-                    onChange={(e) => {
-                      updateFormData('cep', e.target.value);
-                      buscarEnderecoPorCEP(e.target.value);
-                    }}
-                    placeholder="00000-000"
-                    required
-                    maxLength={9}
-                    className="w-full"
-                  />
-                </div>
+                {/* CEP, Endereço e Número na mesma linha */}
+                <div className="col-span-2 grid grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="cep">CEP *</Label>
+                    <Input
+                      id="cep"
+                      value={formData.cep}
+                      onChange={(e) => {
+                        updateFormData('cep', e.target.value);
+                        buscarEnderecoPorCEP(e.target.value);
+                      }}
+                      placeholder="00000-000"
+                      required
+                      maxLength={9}
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="endereco">Endereço *</Label>
-                  <Input
-                    id="endereco"
-                    value={formData.endereco}
-                    onChange={(e) => updateFormData('endereco', e.target.value)}
-                    placeholder="Será preenchido automaticamente pelo CEP"
-                    required
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endereco">Endereço *</Label>
+                    <Input
+                      id="endereco"
+                      value={formData.endereco}
+                      onChange={(e) => updateFormData('endereco', e.target.value)}
+                      placeholder="Preenchimento automático"
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="numero">Número *</Label>
-                  <Input
-                    id="numero"
-                    value={formData.numero}
-                    onChange={(e) => updateFormData('numero', e.target.value)}
-                    placeholder="123"
-                    required
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="numero">Número *</Label>
+                    <Input
+                      id="numero"
+                      value={formData.numero}
+                      onChange={(e) => updateFormData('numero', e.target.value)}
+                      placeholder="123"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
