@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
@@ -94,6 +95,7 @@ interface LocadoraData {
 export default function Perfil() {
   const { profile, isLocadora, isAdmin } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [locadora, setLocadora] = useState<LocadoraData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -332,6 +334,11 @@ export default function Perfil() {
       
       setLocadora(updatedData);
       setEditMode(false);
+
+      // Invalidar cache para forçar reload dos dados da locadora em todos os contextos
+      await queryClient.invalidateQueries({
+        queryKey: ['/api/locadoras']
+      });
 
       toast({
         title: "Perfil atualizado",
