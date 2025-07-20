@@ -148,90 +148,55 @@ export default function Home() {
           <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent animate-pulse"></div>
           <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/30 to-transparent animate-pulse delay-700"></div>
           
-          {/* Moving Cars */}
+          {/* Moving Light Trails */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {/* Car 1 - Moving left to right */}
-            <div className="absolute top-1/3 left-0 w-16 h-8 opacity-25" style={{
+            {/* Trail 1 - Moving left to right */}
+            <div className="absolute top-1/3 left-0 opacity-40" style={{
               animation: 'moveRight 20s linear infinite'
             }}>
-              <div className="flex items-center">
-                <div className="w-16 h-8 bg-gradient-to-r from-blue-400/60 to-cyan-400/60 rounded-xl shadow-lg flex items-center justify-center">
-                  <Car className="h-5 w-5 text-white/80" />
-                </div>
-                <div className="w-24 h-1 bg-gradient-to-r from-blue-400/50 to-transparent ml-2 animate-pulse"></div>
-              </div>
+              <div className="w-32 h-1 bg-gradient-to-r from-blue-400/80 via-cyan-400/60 to-transparent animate-pulse"></div>
             </div>
             
-            {/* Car 2 - Moving right to left */}
-            <div className="absolute top-2/3 right-0 w-16 h-8 opacity-20" style={{
+            {/* Trail 2 - Moving right to left */}
+            <div className="absolute top-2/3 right-0 opacity-35" style={{
               animation: 'moveLeft 25s linear infinite 3s'
             }}>
-              <div className="flex items-center flex-row-reverse">
-                <div className="w-16 h-8 bg-gradient-to-r from-purple-400/60 to-pink-400/60 rounded-xl shadow-lg flex items-center justify-center">
-                  <Car className="h-5 w-5 text-white/80" />
-                </div>
-                <div className="w-24 h-1 bg-gradient-to-l from-purple-400/50 to-transparent mr-2 animate-pulse"></div>
-              </div>
+              <div className="w-32 h-1 bg-gradient-to-l from-purple-400/80 via-pink-400/60 to-transparent animate-pulse"></div>
             </div>
             
-            {/* Car 3 - Moving left to right slower */}
-            <div className="absolute top-1/2 left-0 w-14 h-7 opacity-15" style={{
+            {/* Trail 3 - Moving left to right slower */}
+            <div className="absolute top-1/2 left-0 opacity-30" style={{
               animation: 'moveRight 30s linear infinite 8s'
             }}>
-              <div className="flex items-center">
-                <div className="w-14 h-7 bg-gradient-to-r from-emerald-400/60 to-green-400/60 rounded-lg shadow-lg flex items-center justify-center">
-                  <Car className="h-4 w-4 text-white/80" />
-                </div>
-                <div className="w-20 h-1 bg-gradient-to-r from-emerald-400/40 to-transparent ml-1 animate-pulse"></div>
-              </div>
+              <div className="w-28 h-1 bg-gradient-to-r from-emerald-400/70 via-green-400/50 to-transparent animate-pulse"></div>
             </div>
             
-            {/* Car 4 - Moving right to left diagonal */}
-            <div className="absolute top-1/4 right-0 w-14 h-7 opacity-18" style={{
+            {/* Trail 4 - Moving right to left */}
+            <div className="absolute top-1/4 right-0 opacity-32" style={{
               animation: 'moveLeft 35s linear infinite 12s'
             }}>
-              <div className="flex items-center flex-row-reverse">
-                <div className="w-14 h-7 bg-gradient-to-r from-yellow-400/60 to-orange-400/60 rounded-lg shadow-lg flex items-center justify-center">
-                  <Car className="h-4 w-4 text-white/80" />
-                </div>
-                <div className="w-18 h-1 bg-gradient-to-l from-yellow-400/40 to-transparent mr-1 animate-pulse"></div>
-              </div>
+              <div className="w-28 h-1 bg-gradient-to-l from-yellow-400/70 via-orange-400/50 to-transparent animate-pulse"></div>
             </div>
             
-            {/* Moto - Moving left to right fast */}
-            <div className="absolute top-1/5 left-0 w-12 h-6 opacity-22" style={{
+            {/* Fast Trail (Moto) - Moving left to right */}
+            <div className="absolute top-1/5 left-0 opacity-45" style={{
               animation: 'moveRight 15s linear infinite 5s'
             }}>
-              <div className="flex items-center">
-                <div className="w-12 h-6 bg-gradient-to-r from-red-400/70 to-pink-400/70 rounded-lg shadow-lg flex items-center justify-center">
-                  <Bike className="h-4 w-4 text-white/90" />
-                </div>
-                <div className="w-16 h-0.5 bg-gradient-to-r from-red-400/60 to-transparent ml-1 animate-pulse"></div>
-              </div>
+              <div className="w-24 h-0.5 bg-gradient-to-r from-red-400/90 via-pink-400/70 to-transparent animate-pulse"></div>
             </div>
             
-            {/* Caminhão - Moving right to left slow */}
-            <div className="absolute top-4/5 right-0 w-20 h-10 opacity-20" style={{
+            {/* Heavy Trail (Caminhão) - Moving right to left */}
+            <div className="absolute top-4/5 right-0 opacity-35" style={{
               animation: 'moveLeft 40s linear infinite 18s'
             }}>
-              <div className="flex items-center flex-row-reverse">
-                <div className="w-20 h-10 bg-gradient-to-r from-gray-400/60 to-slate-400/60 rounded-xl shadow-lg flex items-center justify-center">
-                  <Truck className="h-6 w-6 text-white/80" />
-                </div>
-                <div className="w-28 h-1.5 bg-gradient-to-l from-gray-400/50 to-transparent mr-2 animate-pulse"></div>
-              </div>
+              <div className="w-40 h-1.5 bg-gradient-to-l from-gray-400/70 via-slate-400/50 to-transparent animate-pulse"></div>
             </div>
             
-            {/* Moto 2 - Moving right to left */}
-            <div className="absolute top-3/5 right-0 w-11 h-5 opacity-19" style={{
+            {/* Fast Trail 2 (Moto) - Moving right to left */}
+            <div className="absolute top-3/5 right-0 opacity-38" style={{
               animation: 'moveLeft 18s linear infinite 25s'
             }}>
-              <div className="flex items-center flex-row-reverse">
-                <div className="w-11 h-5 bg-gradient-to-r from-indigo-400/70 to-blue-400/70 rounded-lg shadow-lg flex items-center justify-center">
-                  <Bike className="h-3 w-3 text-white/90" />
-                </div>
-                <div className="w-14 h-0.5 bg-gradient-to-l from-indigo-400/60 to-transparent mr-1 animate-pulse"></div>
-              </div>
+              <div className="w-22 h-0.5 bg-gradient-to-l from-indigo-400/85 via-blue-400/65 to-transparent animate-pulse"></div>
             </div>
           </div>
         </div>
