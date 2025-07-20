@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-20: LoadingSpinner Simplificado - CONCLUÍDO ✅
+- ✅ **Sistema de loading unificado** - Todos os ícones de carregamento agora mostram apenas ícone de carro
+- ✅ **Configuração simplificada** - Removida lógica complexa de alternância de ícones baseada em tipos de veículos
+- ✅ **Performance otimizada** - Eliminadas dependências desnecessárias e lógica de estado complexa
+- ✅ **Interface consistente** - LoadingSpinner sempre mostra ícone de carro com animação bounce
+- ✅ **Banco atualizado** - Locadora configurada apenas com tipo "carro" no campo tipos_veiculos
+
 ### 2025-07-20: Sistema de Ordenação e Paginação na Aba Histórico - CONCLUÍDO ✅
 - ✅ **Estados de ordenação implementados** - sortHistorico com valor padrão "mais-recente"
 - ✅ **Estados de paginação adicionados** - currentPageHistorico, itemsPerPageHistorico e funções handlers
