@@ -78,7 +78,7 @@ export default function RelatoriosFinanceiros() {
   });
 
   // Verificar dados carregados
-  const isDataReady = despesas && veiculos && alugueis && pagamentos;
+  const isDataReady = !!(despesas && veiculos && alugueis && pagamentos);
   
   // Cálculos básicos
   const monthStart = startOfMonth(selectedMonth);
