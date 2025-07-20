@@ -26,7 +26,7 @@ import { useMotoristas } from '@/hooks/useMotoristas';
 import { useManutencoes } from '@/hooks/useManutencoes';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
+import { DetalhesVeiculoAnaliseModal } from '@/components/relatorios/DetalhesVeiculoAnaliseModal';
 import { NovaDespesaModal } from '@/components/despesas/NovaDespesaModal';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Pagination } from '@/components/ui/pagination';
@@ -2166,7 +2166,7 @@ export default function RelatoriosFinanceiros() {
 
       {/* Modal de detalhes do veículo */}
       {veiculoDetalhes && (
-        <DetalhesVeiculoModal
+        <DetalhesVeiculoAnaliseModal
           isOpen={!!veiculoDetalhes}
           onClose={() => setVeiculoDetalhes(null)}
           dadosVeiculo={veiculoDetalhes}
