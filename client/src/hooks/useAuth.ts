@@ -104,12 +104,15 @@ export function useAuth() {
   const isAdmin = profile?.type === 'admin';
   const isLocadora = profile?.type === 'locadora';
 
+  const isAuthenticated = !!profile;
+  console.log('useAuth - Return values:', { profile: !!profile, isLoading, isAuthenticated });
+  
   return {
     profile,
     isAdmin,
     isLocadora,
     isLoading,
-    isAuthenticated: !!profile,
+    isAuthenticated,
     login,
     register,
     logout
