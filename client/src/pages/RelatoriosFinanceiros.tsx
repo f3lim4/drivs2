@@ -1859,6 +1859,164 @@ export default function RelatoriosFinanceiros() {
           </Card>
         </TabsContent>
 
+        {/* Aba Análise por Veículo */}
+        <TabsContent value="veiculos" className="space-y-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Análise por Veículo</CardTitle>
+                <CardDescription>
+                  Relatório detalhado de receitas e despesas por veículo
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-4">
+                <Select value={sortVeiculos} onValueChange={setSortVeiculos}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mais-lucrativos">Mais Lucrativos</SelectItem>
+                    <SelectItem value="menos-lucrativos">Menos Lucrativos</SelectItem>
+                    <SelectItem value="maior-receita">Maior Receita</SelectItem>
+                    <SelectItem value="menor-receita">Menor Receita</SelectItem>
+                    <SelectItem value="maior-despesa">Maior Despesa</SelectItem>
+                    <SelectItem value="menor-despesa">Menor Despesa</SelectItem>
+                    <SelectItem value="placa-az">Placa (A-Z)</SelectItem>
+                    <SelectItem value="placa-za">Placa (Z-A)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {veiculos.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">
+                    Nenhum veículo encontrado.
+                  </p>
+                ) : (
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="text-left p-3 border-b">Veículo</th>
+                            <th className="text-left p-3 border-b">Status</th>
+                            <th className="text-left p-3 border-b">Receita Mensal</th>
+                            <th className="text-left p-3 border-b">Despesas Fixas</th>
+                            <th className="text-left p-3 border-b">Lucro Líquido</th>
+                            <th className="text-left p-3 border-b">Margem %</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {veiculos.map((veiculo) => {
+                            // Buscar aluguel ativo para este veículo
+                            const aluguelAtivo = filteredData.alugueisAtivos.find(a => a.veiculoId === veiculo.id);
+                            const receitaMensal = aluguelAtivo ? Number(aluguelAtivo.valorMensal || 0) : 0;
+                            
+                            // Calcular despesas fixas do veículo
+                            const despesasFixasVeiculo = 
+                              (veiculo.ipva ? Number(veiculo.ipva) / 12 : 0) +
+                              (veiculo.valorSeguroMensal ? Number(veiculo.valorSeguroMensal) : 0) +
+                              (veiculo.valorRastreadorMensal ? Number(veiculo.valorRastreadorMensal) : 0);
+                            
+                            const lucroLiquido = receitaMensal - despesasFixasVeiculo;
+                            const margemLucro = receitaMensal > 0 ? (lucroLiquido / receitaMensal) * 100 : 0;
+                            
+                            return (
+                              <tr key={veiculo.id} className="border-b hover:bg-gray-50">
+                                <td className="p-3">
+                                  <div>
+                                    <div className="font-medium">{veiculo.placa}</div>
+                                    <div className="text-sm text-gray-500">{veiculo.marca} {veiculo.modelo}</div>
+                                  </div>
+                                </td>
+                                <td className="p-3">
+                                  <span className={`px-2 py-1 rounded-full text-xs ${
+                                    veiculo.status === 'alugado' 
+                                      ? 'bg-green-100 text-green-700' 
+                                      : 'bg-gray-100 text-gray-700'
+                                  }`}>
+                                    {veiculo.status === 'alugado' ? 'Alugado' : 'Disponível'}
+                                  </span>
+                                </td>
+                                <td className="p-3 font-semibold text-green-600">
+                                  {formatCurrency(receitaMensal)}
+                                </td>
+                                <td className="p-3 font-semibold text-red-600">
+                                  {formatCurrency(despesasFixasVeiculo)}
+                                </td>
+                                <td className="p-3 font-semibold">
+                                  <span className={lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                    {formatCurrency(lucroLiquido)}
+                                  </span>
+                                </td>
+                                <td className="p-3 font-semibold">
+                                  <span className={margemLucro >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                    {margemLucro.toFixed(1)}%
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Paginação */}
+                    <div className="border-t pt-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-700">
+                            Itens por página:
+                          </span>
+                          <Select
+                            value={itemsPerPageVeiculos.toString()}
+                            onValueChange={(value) => handleItemsPerPageChangeVeiculos(parseInt(value))}
+                          >
+                            <SelectTrigger className="w-16">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="20">20</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-700">
+                            Página {currentPageVeiculos} de {Math.ceil(veiculos.length / itemsPerPageVeiculos)} 
+                            ({veiculos.length} itens)
+                          </span>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePageChangeVeiculos(currentPageVeiculos - 1)}
+                              disabled={currentPageVeiculos === 1}
+                            >
+                              Anterior
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePageChangeVeiculos(currentPageVeiculos + 1)}
+                              disabled={currentPageVeiculos === Math.ceil(veiculos.length / itemsPerPageVeiculos)}
+                            >
+                              Próxima
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Aba Análise por Motorista */}
         <TabsContent value="motoristas" className="space-y-4">
           <Card>
