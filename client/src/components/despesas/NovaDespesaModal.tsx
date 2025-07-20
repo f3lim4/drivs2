@@ -22,7 +22,18 @@ import { useToast } from '@/hooks/use-toast';
 import { insertDespesaSchema } from '@shared/schema';
 import { parse } from 'date-fns';
 
-const despesaFormSchema = insertDespesaSchema.omit({ id: true });
+const despesaFormSchema = insertDespesaSchema.omit({ id: true }).extend({
+  categoria: z.string().min(1, 'Categoria é obrigatória'),
+  descricao: z.string().min(1, 'Descrição é obrigatória'),
+  valor: z.union([
+    z.string().min(1, 'Valor é obrigatório').refine((val) => {
+      const num = parseFloat(val.replace(',', '.'));
+      return !isNaN(num) && num > 0;
+    }, 'Valor deve ser maior que zero'),
+    z.number().min(0.01, 'Valor deve ser maior que zero')
+  ]),
+  data: z.string().min(1, 'Data é obrigatória'),
+});
 
 // Função para converter data brasileira (dd/MM/yyyy) para Date
 const parseDate = (dateStr: string): Date | undefined => {
@@ -250,7 +261,7 @@ export function NovaDespesaModal() {
                 name="categoria"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Categoria</FormLabel>
+                    <FormLabel>Categoria *</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -271,7 +282,7 @@ export function NovaDespesaModal() {
               />
 
               <FormItem>
-                <FormLabel>Veículos</FormLabel>
+                <FormLabel>Veículos (opcional)</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -342,7 +353,7 @@ export function NovaDespesaModal() {
               name="descricao"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição</FormLabel>
+                  <FormLabel>Descrição *</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Descrição da despesa" />
                   </FormControl>
@@ -358,7 +369,7 @@ export function NovaDespesaModal() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Valor
+                      Valor *
                       {categoria === 'seguro' && veiculoId && veiculoId !== 'sem-veiculo' && (
                         <span className="text-xs text-green-600 ml-2">(preenchido automaticamente)</span>
                       )}
@@ -390,7 +401,7 @@ export function NovaDespesaModal() {
                 name="data"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Data</FormLabel>
+                    <FormLabel>Data *</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
