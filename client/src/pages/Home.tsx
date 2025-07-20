@@ -503,11 +503,11 @@ export default function Home() {
                 </div>
                 
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-2xl blur-sm"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent rounded-2xl blur-sm"></div>
                   <Button 
                     onClick={handleLogin}
                     size="lg" 
-                    className="relative border border-white/30 text-white hover:bg-white/20 hover:border-white/50 bg-white/10 backdrop-blur-lg px-10 py-4 text-xl font-bold transition-all duration-500 hover:scale-105 shadow-2xl"
+                    className="relative border border-white/40 text-white hover:bg-white/10 hover:border-white/60 bg-transparent backdrop-blur-lg px-10 py-4 text-xl font-bold transition-all duration-500 hover:scale-105 shadow-2xl"
                   >
                     Fazer Login
                   </Button>
