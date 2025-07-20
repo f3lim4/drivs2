@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ArrowRight, Users, Car, FileText, BarChart3, Shield, Clock, Building2, Zap, TrendingUp } from "lucide-react";
+import { CheckCircle, ArrowRight, Users, Car, FileText, BarChart3, Shield, Clock, Building2, Zap, TrendingUp, Truck, Bike } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import drivsLogo from "@/assets/drivs-logo.png";
 
@@ -195,6 +195,42 @@ export default function Home() {
                   <Car className="h-4 w-4 text-white/80" />
                 </div>
                 <div className="w-18 h-1 bg-gradient-to-l from-yellow-400/40 to-transparent mr-1 animate-pulse"></div>
+              </div>
+            </div>
+            
+            {/* Moto - Moving left to right fast */}
+            <div className="absolute top-1/5 left-0 w-12 h-6 opacity-22" style={{
+              animation: 'moveRight 15s linear infinite 5s'
+            }}>
+              <div className="flex items-center">
+                <div className="w-12 h-6 bg-gradient-to-r from-red-400/70 to-pink-400/70 rounded-lg shadow-lg flex items-center justify-center">
+                  <Bike className="h-4 w-4 text-white/90" />
+                </div>
+                <div className="w-16 h-0.5 bg-gradient-to-r from-red-400/60 to-transparent ml-1 animate-pulse"></div>
+              </div>
+            </div>
+            
+            {/* Caminhão - Moving right to left slow */}
+            <div className="absolute top-4/5 right-0 w-20 h-10 opacity-20" style={{
+              animation: 'moveLeft 40s linear infinite 18s'
+            }}>
+              <div className="flex items-center flex-row-reverse">
+                <div className="w-20 h-10 bg-gradient-to-r from-gray-400/60 to-slate-400/60 rounded-xl shadow-lg flex items-center justify-center">
+                  <Truck className="h-6 w-6 text-white/80" />
+                </div>
+                <div className="w-28 h-1.5 bg-gradient-to-l from-gray-400/50 to-transparent mr-2 animate-pulse"></div>
+              </div>
+            </div>
+            
+            {/* Moto 2 - Moving right to left */}
+            <div className="absolute top-3/5 right-0 w-11 h-5 opacity-19" style={{
+              animation: 'moveLeft 18s linear infinite 25s'
+            }}>
+              <div className="flex items-center flex-row-reverse">
+                <div className="w-11 h-5 bg-gradient-to-r from-indigo-400/70 to-blue-400/70 rounded-lg shadow-lg flex items-center justify-center">
+                  <Bike className="h-3 w-3 text-white/90" />
+                </div>
+                <div className="w-14 h-0.5 bg-gradient-to-l from-indigo-400/60 to-transparent mr-1 animate-pulse"></div>
               </div>
             </div>
           </div>
