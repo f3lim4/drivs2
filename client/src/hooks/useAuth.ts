@@ -20,12 +20,9 @@ export function useAuth() {
   useEffect(() => {
     // Check for existing session in localStorage
     const savedProfile = localStorage.getItem('drivs_profile');
-    console.log('useAuth - localStorage drivs_profile:', savedProfile);
-    
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile);
-        console.log('useAuth - Profile parsed:', profile);
         
         // CORREÇÃO AUTOMÁTICA: Atualizar CNPJ incorreto no localStorage
         if (profile.locadoraId === '5076457100170') {
@@ -35,13 +32,10 @@ export function useAuth() {
         }
         
         setProfile(profile);
-        console.log('useAuth - Profile set:', profile);
       } catch (error) {
         console.error('Error parsing saved profile:', error);
         localStorage.removeItem('drivs_profile');
       }
-    } else {
-      console.log('useAuth - No saved profile found');
     }
     setIsLoading(false);
   }, []);
@@ -104,15 +98,12 @@ export function useAuth() {
   const isAdmin = profile?.type === 'admin';
   const isLocadora = profile?.type === 'locadora';
 
-  const isAuthenticated = !!profile;
-  console.log('useAuth - Return values:', { profile: !!profile, isLoading, isAuthenticated });
-  
   return {
     profile,
     isAdmin,
     isLocadora,
     isLoading,
-    isAuthenticated,
+    isAuthenticated: !!profile,
     login,
     register,
     logout
