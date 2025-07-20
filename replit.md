@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-20: Correção de Duplicação de Manutenções no Histórico - CONCLUÍDO ✅
+- ✅ **Bug de duplicação corrigido** - Manutenções apareciam duplicadas no histórico (despesa convertida + manutenção original)
+- ✅ **Filtro de despesas implementado** - Removidas despesas com ID iniciando em "manutencao_" do histórico
+- ✅ **Dados limpos** - Histórico agora mostra apenas manutenções originais, sem as conversões duplicadas
+- ✅ **Sistema otimizado** - useDespesas converte manutenções para cálculos, mas histórico usa dados originais
+- ✅ **Interface correta** - Uma única entrada por manutenção no histórico de despesas
+
 ### 2025-07-20: Reorganização dos Cards na Aba Despesas Fixas - CONCLUÍDO ✅
 - ✅ **Cards superiores removidos** - Eliminados cards de totais por categoria do topo da aba "Despesas Fixas"
 - ✅ **Análise por categoria mantida** - Seção "Análise por Categoria" mantida na parte inferior da aba

@@ -381,15 +381,18 @@ export default function RelatoriosFinanceiros() {
   const historicoOrdenado = useMemo(() => {
     // Combinar despesas e manutenções
     const itensCombinados = [
-      ...filteredDataBySearch.despesasPeriodo.map(despesa => ({
-        ...despesa,
-        tipo: 'despesa',
-        data: despesa.data,
-        valor: parseFloat(despesa.valor || '0'),
-        categoria: despesa.categoria,
-        descricao: despesa.descricao,
-        veiculoId: despesa.veiculoId
-      })),
+      // Filtrar despesas para remover as convertidas de manutenções (evitar duplicatas)
+      ...filteredDataBySearch.despesasPeriodo
+        .filter(despesa => !despesa.id.startsWith('manutencao_'))
+        .map(despesa => ({
+          ...despesa,
+          tipo: 'despesa',
+          data: despesa.data,
+          valor: parseFloat(despesa.valor || '0'),
+          categoria: despesa.categoria,
+          descricao: despesa.descricao,
+          veiculoId: despesa.veiculoId
+        })),
       ...filteredDataBySearch.manutencoes.map(manutencao => {
         // Para manutenções concluídas, usar data de conclusão; caso contrário, data de início
         const dataManutencao = manutencao.status === 'concluida' && manutencao.dataConclusao 
