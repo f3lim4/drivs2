@@ -82,8 +82,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Transparente */}
-      <header className="absolute top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-white/20">
+      {/* Header Ultra Transparente */}
+      <header className="absolute top-0 left-0 right-0 z-50 bg-white/20 backdrop-blur-lg shadow-sm border-b border-white/10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center">
             <img 
@@ -93,20 +93,31 @@ export default function Home() {
             />
           </div>
           
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#recursos" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Recursos</a>
-            <a href="#beneficios" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Benefícios</a>
-            <a href="#casos" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Casos de Sucesso</a>
-            <Button variant="ghost" onClick={handleLogin} className="text-blue-600 hover:text-blue-700 font-medium">
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#recursos" className="text-white/90 hover:text-white transition-colors font-medium">Recursos</a>
+            <a href="#beneficios" className="text-white/90 hover:text-white transition-colors font-medium">Benefícios</a>
+            <a href="#casos" className="text-white/90 hover:text-white transition-colors font-medium">Casos de Sucesso</a>
+            <Button onClick={handleDemo} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg px-6">
+              30 Dias Grátis
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleLogin} 
+              className="border-white text-white hover:bg-white hover:text-gray-900 font-medium bg-white/10 backdrop-blur-sm px-6"
+            >
               Login
             </Button>
           </nav>
           
-          <div className="flex gap-3">
-            <Button onClick={handleDemo} className="hidden md:flex bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
+          <div className="flex gap-3 md:hidden">
+            <Button onClick={handleDemo} className="bg-blue-600 hover:bg-blue-700 text-white text-sm">
               30 Dias Grátis
             </Button>
-            <Button onClick={handleLogin} className="md:hidden bg-blue-600 hover:bg-blue-700 text-white">
+            <Button 
+              variant="outline" 
+              onClick={handleLogin} 
+              className="border-white text-white hover:bg-white hover:text-gray-900 bg-white/10 backdrop-blur-sm text-sm"
+            >
               Login
             </Button>
           </div>
