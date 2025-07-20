@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Trash2, Plus, Edit, ChevronDown } from 'lucide-react';
+import { Calendar, TrendingUp, TrendingDown, DollarSign, Car, AlertTriangle, FileText, Eye, Trash2, Plus, Edit, ChevronDown, X } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { format, subMonths, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
@@ -80,6 +80,30 @@ export default function RelatoriosFinanceiros() {
   const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
   const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('maior-total');
   const [sortHistorico, setSortHistorico] = useState<string>('mais-recente');
+  
+  // Estados de filtros do histórico
+  const [filtroTipo, setFiltroTipo] = useState('todos');
+  const [filtroCategoria, setFiltroCategoria] = useState('todas');
+  const [filtroVeiculo, setFiltroVeiculo] = useState('todos');
+  const [filtroStatus, setFiltroStatus] = useState('todos');
+
+  // Função para limpar todos os filtros
+  const limparFiltros = () => {
+    setFiltroTipo('todos');
+    setFiltroCategoria('todas');
+    setFiltroVeiculo('todos');
+    setFiltroStatus('todos');
+    setCurrentPageHistorico(1);
+  };
+
+  // Redefinir página quando filtros mudarem
+  useEffect(() => {
+    setCurrentPageHistorico(1);
+  }, [filtroTipo, filtroCategoria, filtroVeiculo, filtroStatus]);
+
+  // Verificar se há filtros ativos
+  const temFiltrosAtivos = filtroTipo !== 'todos' || filtroCategoria !== 'todas' || 
+                          filtroVeiculo !== 'todos' || filtroStatus !== 'todos';
   
   // Estados de paginação para a aba "Despesas Fixas"
   const [currentPageDespesasFixas, setCurrentPageDespesasFixas] = useState(1);
@@ -1276,6 +1300,99 @@ export default function RelatoriosFinanceiros() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                {/* Filtros */}
+                <Card className="border border-gray-200 bg-gray-50/50">
+                  <CardContent className="p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {/* Filtro por Tipo */}
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Tipo</label>
+                        <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Todos os tipos" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todos">Todos os tipos</SelectItem>
+                            <SelectItem value="Despesa Fixa">Despesa Fixa</SelectItem>
+                            <SelectItem value="Despesa Manual">Despesa Manual</SelectItem>
+                            <SelectItem value="Manutenção">Manutenção</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Filtro por Categoria */}
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Categoria</label>
+                        <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Todas as categorias" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todas">Todas as categorias</SelectItem>
+                            <SelectItem value="IPVA">IPVA</SelectItem>
+                            <SelectItem value="Seguro">Seguro</SelectItem>
+                            <SelectItem value="Rastreador">Rastreador</SelectItem>
+                            <SelectItem value="Financiamento">Financiamento</SelectItem>
+                            <SelectItem value="Manutenção">Manutenção</SelectItem>
+                            <SelectItem value="emprestimo">Empréstimo</SelectItem>
+                            <SelectItem value="lavagem">Lavagem</SelectItem>
+                            <SelectItem value="combustivel">Combustível</SelectItem>
+                            <SelectItem value="multa">Multa</SelectItem>
+                            <SelectItem value="licenciamento">Licenciamento</SelectItem>
+                            <SelectItem value="outros">Outros</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Filtro por Veículo */}
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Veículo</label>
+                        <Select value={filtroVeiculo} onValueChange={setFiltroVeiculo}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Todos os veículos" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todos">Todos os veículos</SelectItem>
+                            <SelectItem value="sem-veiculo">Sem Veículo</SelectItem>
+                            {veiculos.map(veiculo => (
+                              <SelectItem key={veiculo.id} value={veiculo.placa}>
+                                {veiculo.placa} - {veiculo.modelo}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Filtro por Status */}
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">Status</label>
+                        <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Todos os status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todos">Todos os status</SelectItem>
+                            <SelectItem value="Automático">Automático</SelectItem>
+                            <SelectItem value="pendente">Pendente</SelectItem>
+                            <SelectItem value="pago">Pago</SelectItem>
+                            <SelectItem value="concluida">Concluída</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Botão para limpar filtros */}
+                    {temFiltrosAtivos && (
+                      <div className="mt-4 flex justify-end">
+                        <Button variant="outline" size="sm" onClick={limparFiltros}>
+                          <X className="h-4 w-4 mr-2" />
+                          Limpar Filtros
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
                 {/* Tabela de todas as despesas */}
                 <div className="overflow-x-auto">
                   <Table>
@@ -1405,8 +1522,38 @@ export default function RelatoriosFinanceiros() {
                           });
                         });
 
+                        // Aplicar filtros
+                        const despesasFiltradas = todasDespesas.filter(despesa => {
+                          // Filtro por tipo
+                          if (filtroTipo !== 'todos' && despesa.tipo !== filtroTipo) {
+                            return false;
+                          }
+
+                          // Filtro por categoria
+                          if (filtroCategoria !== 'todas' && despesa.categoria !== filtroCategoria) {
+                            return false;
+                          }
+
+                          // Filtro por veículo
+                          if (filtroVeiculo !== 'todos') {
+                            if (filtroVeiculo === 'sem-veiculo' && despesa.veiculo) {
+                              return false;
+                            }
+                            if (filtroVeiculo !== 'sem-veiculo' && (!despesa.veiculo || despesa.veiculo.placa !== filtroVeiculo)) {
+                              return false;
+                            }
+                          }
+
+                          // Filtro por status
+                          if (filtroStatus !== 'todos' && despesa.status !== filtroStatus) {
+                            return false;
+                          }
+
+                          return true;
+                        });
+
                         // Aplicar ordenação
-                        const despesasOrdenadas = todasDespesas.sort((a, b) => {
+                        const despesasOrdenadas = despesasFiltradas.sort((a, b) => {
                           switch (sortHistorico) {
                             case 'mais-recente':
                               const createdAtA = new Date(a.createdAt);
@@ -1514,36 +1661,124 @@ export default function RelatoriosFinanceiros() {
                 
                 {/* Paginação */}
                 {(() => {
-                  const totalItems = (() => {
-                    let total = 0;
-                    
-                    // Contar despesas fixas
-                    veiculos.forEach(veiculo => {
-                      if (veiculo.ipva && veiculo.ipva > 0) total++;
-                      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) total++;
-                      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) total++;
-                      if (veiculo.financiado && veiculo.valorFinanciamento) total++;
-                    });
-                    
-                    // Contar manutenções
-                    filteredData.manutencoes.forEach(manutencao => {
-                      const valor = manutencao.valorFinal || manutencao.valorOrcamento;
-                      if (valor && parseFloat(valor) > 0) total++;
-                    });
-                    
-                    // Contar despesas manuais
-                    despesas.filter(despesa => despesa.categoria !== 'financiamento').forEach(() => {
-                      total++;
-                    });
-                    
-                    return total;
-                  })();
+                  // Construir o mesmo array de dados para contar os filtrados
+                  const todasDespesas = [];
                   
-                  return totalItems > 0 && (
+                  // Adicionar despesas fixas mensais
+                  veiculos.forEach(veiculo => {
+                    const dataAtual = new Date().toISOString().split('T')[0];
+                    
+                    // IPVA mensal
+                    if (veiculo.ipva && veiculo.ipva > 0) {
+                      todasDespesas.push({
+                        tipo: 'Despesa Fixa',
+                        categoria: 'IPVA',
+                        veiculo: veiculo,
+                        status: 'Automático'
+                      });
+                    }
+                    
+                    // Seguro mensal
+                    if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+                      todasDespesas.push({
+                        tipo: 'Despesa Fixa',
+                        categoria: 'Seguro',
+                        veiculo: veiculo,
+                        status: 'Automático'
+                      });
+                    }
+                    
+                    // Rastreador mensal
+                    if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+                      todasDespesas.push({
+                        tipo: 'Despesa Fixa',
+                        categoria: 'Rastreador',
+                        veiculo: veiculo,
+                        status: 'Automático'
+                      });
+                    }
+                    
+                    // Financiamento mensal
+                    if (veiculo.financiado && veiculo.valorFinanciamento) {
+                      todasDespesas.push({
+                        tipo: 'Despesa Fixa',
+                        categoria: 'Financiamento',
+                        veiculo: veiculo,
+                        status: 'Automático'
+                      });
+                    }
+                  });
+                  
+                  // Adicionar manutenções concluídas
+                  filteredData.manutencoes.forEach(manutencao => {
+                    const valor = manutencao.valorFinal || manutencao.valorOrcamento;
+                    if (valor && parseFloat(valor) > 0) {
+                      const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
+                      todasDespesas.push({
+                        tipo: 'Manutenção',
+                        categoria: 'Manutenção',
+                        veiculo: veiculo,
+                        status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente'
+                      });
+                    }
+                  });
+                  
+                  // Adicionar despesas manuais
+                  despesas.filter(despesa => despesa.categoria !== 'financiamento').forEach(despesa => {
+                    const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
+                    todasDespesas.push({
+                      tipo: 'Despesa Manual',
+                      categoria: despesa.categoria,
+                      veiculo: veiculo,
+                      status: 'Manual'
+                    });
+                  });
+
+                  // Aplicar os mesmos filtros
+                  const despesasFiltradas = todasDespesas.filter(despesa => {
+                    // Filtro por tipo
+                    if (filtroTipo !== 'todos' && despesa.tipo !== filtroTipo) {
+                      return false;
+                    }
+
+                    // Filtro por categoria
+                    if (filtroCategoria !== 'todas' && despesa.categoria !== filtroCategoria) {
+                      return false;
+                    }
+
+                    // Filtro por veículo
+                    if (filtroVeiculo !== 'todos') {
+                      if (filtroVeiculo === 'sem-veiculo' && despesa.veiculo) {
+                        return false;
+                      }
+                      if (filtroVeiculo !== 'sem-veiculo' && (!despesa.veiculo || despesa.veiculo.placa !== filtroVeiculo)) {
+                        return false;
+                      }
+                    }
+
+                    // Filtro por status
+                    if (filtroStatus !== 'todos' && despesa.status !== filtroStatus) {
+                      return false;
+                    }
+
+                    return true;
+                  });
+                  
+                  const totalItemsFiltrados = despesasFiltradas.length;
+                  
+                  return totalItemsFiltrados > 0 && (
                     <div className="border-t pt-4 mt-4">
+                      <div className="mb-2 text-sm text-gray-600">
+                        Mostrando {totalItemsFiltrados} de {todasDespesas.length} registros
+                        {temFiltrosAtivos && (
+                          <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                            Filtros aplicados
+                          </span>
+                        )}
+                      </div>
                       <Pagination
                         currentPage={currentPageHistorico}
-                        totalItems={totalItems}
+                        totalItems={totalItemsFiltrados}
                         itemsPerPage={itemsPerPageHistorico}
                         onPageChange={handlePageChangeHistorico}
                         onItemsPerPageChange={handleItemsPerPageChangeHistorico}
