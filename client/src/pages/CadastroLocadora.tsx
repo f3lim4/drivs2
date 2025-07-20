@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, ArrowLeft, Upload, Image } from 'lucide-react';
+import { Car, ArrowLeft, Upload, Image, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -487,96 +487,106 @@ export default function CadastroLocadora() {
 
               </div>
 
-              {/* Logo da Empresa - Último campo */}
-              <div className="space-y-4 pt-6 border-t">
-                <h3 className="text-lg font-medium flex items-center">
-                  <Image className="h-5 w-5 mr-2" />
-                  Logo da Empresa (Opcional)
-                </h3>
-                
+              {/* Logo da Empresa e Senhas lado a lado */}
+              <div className="grid grid-cols-2 gap-6 pt-6 border-t">
+                {/* Coluna Logo */}
                 <div className="space-y-4">
-                  {/* Preview do logo */}
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
-                      {logoPreview ? (
-                        <img 
-                          src={logoPreview} 
-                          alt="Logo da empresa" 
-                          className="w-full h-full object-contain rounded-lg"
-                        />
-                      ) : (
-                        <Image className="w-8 h-8 text-gray-400" />
+                  <h3 className="text-lg font-medium flex items-center">
+                    <Image className="h-5 w-5 mr-2" />
+                    Logo da Empresa (Opcional)
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    {/* Preview do logo */}
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
+                        {logoPreview ? (
+                          <img 
+                            src={logoPreview} 
+                            alt="Logo da empresa" 
+                            className="w-full h-full object-contain rounded-lg"
+                          />
+                        ) : (
+                          <Image className="w-8 h-8 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-600">
+                          {logoPreview ? 'Logo selecionado' : 'Nenhum logo selecionado'}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Formatos aceitos: JPG, PNG, SVG (máximo 5MB)
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Controles de upload */}
+                    <div className="flex space-x-2">
+                      <Label htmlFor="logo-upload" className="cursor-pointer">
+                        <div className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 transition-colors">
+                          <Upload className="w-4 h-4" />
+                          <span className="text-sm font-medium">
+                            {uploadingLogo ? 'Carregando...' : 'Selecionar Logo'}
+                          </span>
+                        </div>
+                      </Label>
+                      <input
+                        id="logo-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleLogoUpload}
+                        disabled={uploadingLogo}
+                      />
+                      {logoPreview && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleRemoveLogo}
+                          disabled={uploadingLogo}
+                        >
+                          Remover
+                        </Button>
                       )}
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-600">
-                        {logoPreview ? 'Logo selecionado' : 'Nenhum logo selecionado'}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Formatos aceitos: JPG, PNG, SVG (máximo 5MB)
-                      </p>
+                  </div>
+                </div>
+
+                {/* Coluna Senhas */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center">
+                    <Lock className="h-5 w-5 mr-2" />
+                    Credenciais de Acesso
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="senha">Senha *</Label>
+                      <Input
+                        id="senha"
+                        type="password"
+                        value={formData.senha}
+                        onChange={(e) => updateFormData('senha', e.target.value)}
+                        placeholder=""
+                        required
+                        minLength={6}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmarSenha">Confirmar Senha *</Label>
+                      <Input
+                        id="confirmarSenha"
+                        type="password"
+                        value={formData.confirmarSenha}
+                        onChange={(e) => updateFormData('confirmarSenha', e.target.value)}
+                        placeholder=""
+                        required
+                        minLength={6}
+                      />
                     </div>
                   </div>
-
-                  {/* Controles de upload */}
-                  <div className="flex space-x-2">
-                    <Label htmlFor="logo-upload" className="cursor-pointer">
-                      <div className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 transition-colors">
-                        <Upload className="w-4 h-4" />
-                        <span className="text-sm font-medium">
-                          {uploadingLogo ? 'Carregando...' : 'Selecionar Logo'}
-                        </span>
-                      </div>
-                    </Label>
-                    <input
-                      id="logo-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleLogoUpload}
-                      disabled={uploadingLogo}
-                    />
-                    {logoPreview && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleRemoveLogo}
-                        disabled={uploadingLogo}
-                      >
-                        Remover
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Senha e Confirmar Senha na mesma linha - Após logo */}
-              <div className="grid grid-cols-2 gap-3 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="senha">Senha *</Label>
-                  <Input
-                    id="senha"
-                    type="password"
-                    value={formData.senha}
-                    onChange={(e) => updateFormData('senha', e.target.value)}
-                    placeholder=""
-                    required
-                    minLength={6}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirmarSenha">Confirmar Senha *</Label>
-                  <Input
-                    id="confirmarSenha"
-                    type="password"
-                    value={formData.confirmarSenha}
-                    onChange={(e) => updateFormData('confirmarSenha', e.target.value)}
-                    placeholder=""
-                    required
-                    minLength={6}
-                  />
                 </div>
               </div>
 
