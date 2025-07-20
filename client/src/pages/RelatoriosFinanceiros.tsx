@@ -1100,11 +1100,12 @@ export default function RelatoriosFinanceiros() {
 
       {/* Tabs de Análise */}
       <Tabs defaultValue="despesas" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="despesas">Despesas</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
+          <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
 
         <TabsContent value="despesas" className="space-y-4">
@@ -1275,91 +1276,91 @@ export default function RelatoriosFinanceiros() {
             </div>
           </div>
         </TabsContent>
-      </Tabs>
 
-      {/* Seção Histórico de Despesas - movido para fora das abas */}
-      <div className="space-y-4 mt-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
+        {/* Aba Histórico */}
+        <TabsContent value="historico" className="space-y-4">
+          <Card>
+            <CardHeader>
               <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
               <CardDescription>
                 Histórico filtrado baseado na busca realizada - dados reais
               </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {filteredDataBySearch.despesasPeriodo.length === 0 && filteredDataBySearch.manutencoes.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
-                  {searchTerm || filterType !== 'todos' 
-                    ? 'Nenhum resultado encontrado para os filtros aplicados.' 
-                    : 'Nenhuma despesa encontrada no período selecionado.'}
-                </p>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="text-left p-3 border-b">Veículo</th>
-                        <th className="text-left p-3 border-b">Categoria</th>
-                        <th className="text-left p-3 border-b">Descrição</th>
-                        <th className="text-left p-3 border-b">Valor</th>
-                        <th className="text-left p-3 border-b">Data</th>
-                        <th className="text-left p-3 border-b">Tipo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {/* Despesas filtradas */}
-                      {filteredDataBySearch.despesasPeriodo.map((despesa) => {
-                        const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
-                        return (
-                          <tr key={despesa.id} className="border-b hover:bg-gray-50">
-                            <td className="p-3">{veiculo?.placa || 'N/A'}</td>
-                            <td className="p-3 capitalize">{despesa.categoria}</td>
-                            <td className="p-3">{despesa.descricao}</td>
-                            <td className="p-3 font-semibold text-red-600">
-                              {formatCurrency(parseFloat(despesa.valor))}
-                            </td>
-                            <td className="p-3">{format(new Date(despesa.data), 'dd/MM/yyyy')}</td>
-                            <td className="p-3">
-                              <span className="px-2 py-1 rounded-full text-xs bg-red-100 text-red-700">
-                                Despesa
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                      
-                      {/* Manutenções filtradas */}
-                      {filteredDataBySearch.manutencoes.map((manutencao) => {
-                        const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
-                        const valor = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
-                        return (
-                          <tr key={manutencao.id} className="border-b hover:bg-gray-50">
-                            <td className="p-3">{veiculo?.placa || 'N/A'}</td>
-                            <td className="p-3">Manutenção</td>
-                            <td className="p-3">{manutencao.descricao}</td>
-                            <td className="p-3 font-semibold text-orange-600">
-                              {formatCurrency(valor)}
-                            </td>
-                            <td className="p-3">{format(new Date(manutencao.dataInicio), 'dd/MM/yyyy')}</td>
-                            <td className="p-3">
-                              <span className="px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-700">
-                                Manutenção
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredDataBySearch.despesasPeriodo.length === 0 && filteredDataBySearch.manutencoes.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">
+                    {searchTerm || filterType !== 'todos' 
+                      ? 'Nenhum resultado encontrado para os filtros aplicados.' 
+                      : 'Nenhuma despesa encontrada no período selecionado.'}
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="text-left p-3 border-b">Veículo</th>
+                          <th className="text-left p-3 border-b">Categoria</th>
+                          <th className="text-left p-3 border-b">Descrição</th>
+                          <th className="text-left p-3 border-b">Valor</th>
+                          <th className="text-left p-3 border-b">Data</th>
+                          <th className="text-left p-3 border-b">Tipo</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {/* Despesas filtradas */}
+                        {filteredDataBySearch.despesasPeriodo.map((despesa) => {
+                          const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
+                          return (
+                            <tr key={despesa.id} className="border-b hover:bg-gray-50">
+                              <td className="p-3">{veiculo?.placa || 'N/A'}</td>
+                              <td className="p-3 capitalize">{despesa.categoria}</td>
+                              <td className="p-3">{despesa.descricao}</td>
+                              <td className="p-3 font-semibold text-red-600">
+                                {formatCurrency(parseFloat(despesa.valor))}
+                              </td>
+                              <td className="p-3">{format(new Date(despesa.data), 'dd/MM/yyyy')}</td>
+                              <td className="p-3">
+                                <span className="px-2 py-1 rounded-full text-xs bg-red-100 text-red-700">
+                                  Despesa
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        
+                        {/* Manutenções filtradas */}
+                        {filteredDataBySearch.manutencoes.map((manutencao) => {
+                          const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
+                          const valor = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
+                          return (
+                            <tr key={manutencao.id} className="border-b hover:bg-gray-50">
+                              <td className="p-3">{veiculo?.placa || 'N/A'}</td>
+                              <td className="p-3">Manutenção</td>
+                              <td className="p-3">{manutencao.descricao}</td>
+                              <td className="p-3 font-semibold text-orange-600">
+                                {formatCurrency(valor)}
+                              </td>
+                              <td className="p-3">{format(new Date(manutencao.dataInicio), 'dd/MM/yyyy')}</td>
+                              <td className="p-3">
+                                <span className="px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-700">
+                                  Manutenção
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+
 
       {/* Modal duplicado removido - usando componente NovaDespesaModal */}
 
