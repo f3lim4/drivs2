@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-20: Sistema de Ordenação e Paginação na Aba Histórico - CONCLUÍDO ✅
+- ✅ **Estados de ordenação implementados** - sortHistorico com valor padrão "mais-recente"
+- ✅ **Estados de paginação adicionados** - currentPageHistorico, itemsPerPageHistorico e funções handlers
+- ✅ **Lógica de dados unificada** - historicoOrdenado combina despesas e manutenções em um array único
+- ✅ **Sistema de ordenação completo** - 8 opções: data (recente/antiga), valor (maior/menor), categoria (A-Z/Z-A), veículo (A-Z/Z-A)
+- ✅ **Paginação funcional** - historicoPaginado com controles de página anterior/próxima
+- ✅ **Interface atualizada** - Dropdown de ordenação no header, controles de paginação no rodapé
+- ✅ **Dados combinados inteligentemente** - Despesas e manutenções mescladas com tipos visuais diferenciados
+- ✅ **Controle de itens por página** - Opções de 10, 20 ou 50 itens por página
+- ✅ **Sistema totalmente funcional** - Ordenação, paginação e busca funcionando em harmonia
+
 ### 2025-07-20: Investigação de Bug de Exclusão de Aluguéis - EM ANDAMENTO 🔍
 - 🔍 **Bug identificado** - Erro ao excluir aluguéis com problema de isolamento de locadoraId
 - 🔍 **Logs de debug adicionados** - Frontend e backend monitorando tentativas de exclusão
