@@ -83,6 +83,7 @@ export default function RelatoriosFinanceiros() {
   const [sortVeiculos, setSortVeiculos] = useState<string>('mais-lucrativos');
   const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
   const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('maior-total');
+  const [sortHistorico, setSortHistorico] = useState<string>('mais-recente');
 
   
   // Estados de paginação para a aba "Despesas Fixas"
@@ -128,6 +129,21 @@ export default function RelatoriosFinanceiros() {
   const handleItemsPerPageChangeMotoristas = (items: number) => {
     setItemsPerPageMotoristas(items);
     setCurrentPageMotoristas(1);
+  };
+
+  // Estados de paginação para a aba "Histórico"
+  const [currentPageHistorico, setCurrentPageHistorico] = useState(1);
+  const [itemsPerPageHistorico, setItemsPerPageHistorico] = useState(10);
+  
+  // Função para alterar página
+  const handlePageChangeHistorico = (page: number) => {
+    setCurrentPageHistorico(page);
+  };
+  
+  // Função para alterar itens por página
+  const handleItemsPerPageChangeHistorico = (items: number) => {
+    setItemsPerPageHistorico(items);
+    setCurrentPageHistorico(1);
   };
 
   // Schema atualizado para multi-seleção de veículos
@@ -351,6 +367,73 @@ export default function RelatoriosFinanceiros() {
     
     return result;
   }, [filteredData, searchTerm, filterType, veiculos]);
+
+  // Dados do histórico ordenados e paginados
+  const historicoOrdenado = useMemo(() => {
+    // Combinar despesas e manutenções
+    const itensCombinados = [
+      ...filteredDataBySearch.despesasPeriodo.map(despesa => ({
+        ...despesa,
+        tipo: 'despesa',
+        data: despesa.data,
+        valor: parseFloat(despesa.valor || '0'),
+        categoria: despesa.categoria,
+        descricao: despesa.descricao,
+        veiculoId: despesa.veiculoId
+      })),
+      ...filteredDataBySearch.manutencoes.map(manutencao => ({
+        ...manutencao,
+        tipo: 'manutencao',
+        data: manutencao.dataConclusao || manutencao.dataAgendada,
+        valor: parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0'),
+        categoria: 'manutencao',
+        descricao: manutencao.descricao,
+        veiculoId: manutencao.veiculoId
+      }))
+    ];
+
+    // Aplicar ordenação
+    const itensOrdenados = itensCombinados.sort((a, b) => {
+      const dataA = new Date(a.data);
+      const dataB = new Date(b.data);
+      
+      switch (sortHistorico) {
+        case 'mais-recente':
+          return dataB.getTime() - dataA.getTime();
+        case 'mais-antiga':
+          return dataA.getTime() - dataB.getTime();
+        case 'maior-valor':
+          return b.valor - a.valor;
+        case 'menor-valor':
+          return a.valor - b.valor;
+        case 'categoria-az':
+          return a.categoria.localeCompare(b.categoria);
+        case 'categoria-za':
+          return b.categoria.localeCompare(a.categoria);
+        case 'veiculo-az':
+          const veiculoA = veiculos.find(v => v.id === a.veiculoId)?.placa || '';
+          const veiculoB = veiculos.find(v => v.id === b.veiculoId)?.placa || '';
+          return veiculoA.localeCompare(veiculoB);
+        case 'veiculo-za':
+          const veiculoA2 = veiculos.find(v => v.id === a.veiculoId)?.placa || '';
+          const veiculoB2 = veiculos.find(v => v.id === b.veiculoId)?.placa || '';
+          return veiculoB2.localeCompare(veiculoA2);
+        default:
+          return dataB.getTime() - dataA.getTime();
+      }
+    });
+
+    return itensOrdenados;
+  }, [filteredDataBySearch.despesasPeriodo, filteredDataBySearch.manutencoes, sortHistorico, veiculos]);
+
+  // Paginação do histórico
+  const historicoPaginado = useMemo(() => {
+    const startIndex = (currentPageHistorico - 1) * itemsPerPageHistorico;
+    const endIndex = startIndex + itemsPerPageHistorico;
+    return historicoOrdenado.slice(startIndex, endIndex);
+  }, [historicoOrdenado, currentPageHistorico, itemsPerPageHistorico]);
+
+  const totalPaginasHistorico = Math.ceil(historicoOrdenado.length / itemsPerPageHistorico);
 
   // Cálculo simplificado das despesas fixas dos veículos
   const despesasFixasVeiculos = useMemo(() => {
@@ -1280,79 +1363,132 @@ export default function RelatoriosFinanceiros() {
         {/* Aba Histórico */}
         <TabsContent value="historico" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
-              <CardDescription>
-                Histórico filtrado baseado na busca realizada - dados reais
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
+                <CardDescription>
+                  Histórico filtrado baseado na busca realizada - dados reais
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-4">
+                <Select value={sortHistorico} onValueChange={setSortHistorico}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mais-recente">Mais Recente</SelectItem>
+                    <SelectItem value="mais-antiga">Mais Antiga</SelectItem>
+                    <SelectItem value="maior-valor">Maior Valor</SelectItem>
+                    <SelectItem value="menor-valor">Menor Valor</SelectItem>
+                    <SelectItem value="categoria-az">Categoria (A-Z)</SelectItem>
+                    <SelectItem value="categoria-za">Categoria (Z-A)</SelectItem>
+                    <SelectItem value="veiculo-az">Veículo (A-Z)</SelectItem>
+                    <SelectItem value="veiculo-za">Veículo (Z-A)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {filteredDataBySearch.despesasPeriodo.length === 0 && filteredDataBySearch.manutencoes.length === 0 ? (
+                {historicoOrdenado.length === 0 ? (
                   <p className="text-gray-500 text-center py-8">
                     {searchTerm || filterType !== 'todos' 
                       ? 'Nenhum resultado encontrado para os filtros aplicados.' 
                       : 'Nenhuma despesa encontrada no período selecionado.'}
                   </p>
                 ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="text-left p-3 border-b">Veículo</th>
-                          <th className="text-left p-3 border-b">Categoria</th>
-                          <th className="text-left p-3 border-b">Descrição</th>
-                          <th className="text-left p-3 border-b">Valor</th>
-                          <th className="text-left p-3 border-b">Data</th>
-                          <th className="text-left p-3 border-b">Tipo</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {/* Despesas filtradas */}
-                        {filteredDataBySearch.despesasPeriodo.map((despesa) => {
-                          const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
-                          return (
-                            <tr key={despesa.id} className="border-b hover:bg-gray-50">
-                              <td className="p-3">{veiculo?.placa || 'N/A'}</td>
-                              <td className="p-3 capitalize">{despesa.categoria}</td>
-                              <td className="p-3">{despesa.descricao}</td>
-                              <td className="p-3 font-semibold text-red-600">
-                                {formatCurrency(parseFloat(despesa.valor))}
-                              </td>
-                              <td className="p-3">{format(new Date(despesa.data), 'dd/MM/yyyy')}</td>
-                              <td className="p-3">
-                                <span className="px-2 py-1 rounded-full text-xs bg-red-100 text-red-700">
-                                  Despesa
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })}
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="text-left p-3 border-b">Veículo</th>
+                            <th className="text-left p-3 border-b">Categoria</th>
+                            <th className="text-left p-3 border-b">Descrição</th>
+                            <th className="text-left p-3 border-b">Valor</th>
+                            <th className="text-left p-3 border-b">Data</th>
+                            <th className="text-left p-3 border-b">Tipo</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {historicoPaginado.map((item) => {
+                            const veiculo = veiculos.find(v => v.id === item.veiculoId);
+                            return (
+                              <tr key={item.id} className="border-b hover:bg-gray-50">
+                                <td className="p-3">{veiculo?.placa || 'N/A'}</td>
+                                <td className="p-3 capitalize">{item.categoria}</td>
+                                <td className="p-3">{item.descricao}</td>
+                                <td className={`p-3 font-semibold ${
+                                  item.tipo === 'despesa' ? 'text-red-600' : 'text-orange-600'
+                                }`}>
+                                  {formatCurrency(item.valor)}
+                                </td>
+                                <td className="p-3">{format(new Date(item.data), 'dd/MM/yyyy')}</td>
+                                <td className="p-3">
+                                  <span className={`px-2 py-1 rounded-full text-xs ${
+                                    item.tipo === 'despesa' 
+                                      ? 'bg-red-100 text-red-700' 
+                                      : 'bg-orange-100 text-orange-700'
+                                  }`}>
+                                    {item.tipo === 'despesa' ? 'Despesa' : 'Manutenção'}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Paginação */}
+                    <div className="border-t pt-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-700">
+                            Itens por página:
+                          </span>
+                          <Select
+                            value={itemsPerPageHistorico.toString()}
+                            onValueChange={(value) => handleItemsPerPageChangeHistorico(parseInt(value))}
+                          >
+                            <SelectTrigger className="w-16">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="20">20</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                         
-                        {/* Manutenções filtradas */}
-                        {filteredDataBySearch.manutencoes.map((manutencao) => {
-                          const veiculo = veiculos.find(v => v.id === manutencao.veiculoId);
-                          const valor = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
-                          return (
-                            <tr key={manutencao.id} className="border-b hover:bg-gray-50">
-                              <td className="p-3">{veiculo?.placa || 'N/A'}</td>
-                              <td className="p-3">Manutenção</td>
-                              <td className="p-3">{manutencao.descricao}</td>
-                              <td className="p-3 font-semibold text-orange-600">
-                                {formatCurrency(valor)}
-                              </td>
-                              <td className="p-3">{format(new Date(manutencao.dataInicio), 'dd/MM/yyyy')}</td>
-                              <td className="p-3">
-                                <span className="px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-700">
-                                  Manutenção
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-700">
+                            Página {currentPageHistorico} de {totalPaginasHistorico} 
+                            ({historicoOrdenado.length} itens)
+                          </span>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePageChangeHistorico(currentPageHistorico - 1)}
+                              disabled={currentPageHistorico === 1}
+                            >
+                              Anterior
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePageChangeHistorico(currentPageHistorico + 1)}
+                              disabled={currentPageHistorico === totalPaginasHistorico}
+                            >
+                              Próxima
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             </CardContent>
