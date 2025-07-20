@@ -370,22 +370,25 @@ export default function RelatoriosFinanceiros() {
     const itensOrdenados = itensCombinados.sort((a, b) => {
       const dataA = new Date(a.data);
       const dataB = new Date(b.data);
+      const createdAtA = new Date(a.createdAt || a.data);
+      const createdAtB = new Date(b.createdAt || b.data);
       
       switch (sortHistorico) {
         case 'mais-recente':
-          // Primeiro por data, depois por tipo (manutenções concluídas primeiro)
-          if (dataB.getTime() !== dataA.getTime()) {
-            return dataB.getTime() - dataA.getTime();
+          // Ordenar por data de criação (quando foi cadastrado no sistema)
+          if (createdAtB.getTime() !== createdAtA.getTime()) {
+            return createdAtB.getTime() - createdAtA.getTime();
           }
-          // Se mesma data, manutenções concluídas primeiro
+          // Se mesma data de criação, manutenções concluídas primeiro
           if (a.tipo === 'manutencao' && a.status === 'concluida' && b.tipo !== 'manutencao') return -1;
           if (b.tipo === 'manutencao' && b.status === 'concluida' && a.tipo !== 'manutencao') return 1;
           return 0;
         case 'mais-antiga':
-          if (dataA.getTime() !== dataB.getTime()) {
-            return dataA.getTime() - dataB.getTime();
+          // Ordenar por data de criação (mais antiga primeiro)
+          if (createdAtA.getTime() !== createdAtB.getTime()) {
+            return createdAtA.getTime() - createdAtB.getTime();
           }
-          // Se mesma data, manutenções concluídas primeiro
+          // Se mesma data de criação, manutenções concluídas primeiro
           if (a.tipo === 'manutencao' && a.status === 'concluida' && b.tipo !== 'manutencao') return -1;
           if (b.tipo === 'manutencao' && b.status === 'concluida' && a.tipo !== 'manutencao') return 1;
           return 0;
@@ -1360,7 +1363,7 @@ export default function RelatoriosFinanceiros() {
               <div>
                 <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
                 <CardDescription>
-                  Histórico completo com dupla datação: <strong>Data da Despesa</strong> (quando aconteceu) e <strong>Cadastrado em</strong> (quando foi registrado no sistema)
+                  Histórico completo com dupla datação. <strong>Ordenação "Mais Recente"</strong> usa data de cadastro no sistema, enquanto <strong>Data da Despesa</strong> mostra quando realmente aconteceu.
                 </CardDescription>
               </div>
               <div className="flex items-center gap-4">
@@ -1369,8 +1372,8 @@ export default function RelatoriosFinanceiros() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="mais-recente">Mais Recente</SelectItem>
-                    <SelectItem value="mais-antiga">Mais Antiga</SelectItem>
+                    <SelectItem value="mais-recente">Mais Recente (por cadastro)</SelectItem>
+                    <SelectItem value="mais-antiga">Mais Antiga (por cadastro)</SelectItem>
                     <SelectItem value="maior-valor">Maior Valor</SelectItem>
                     <SelectItem value="menor-valor">Menor Valor</SelectItem>
                     <SelectItem value="categoria-az">Categoria (A-Z)</SelectItem>
