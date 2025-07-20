@@ -52,7 +52,7 @@ export function NovaDespesaModal() {
       categoria: '',
       descricao: '',
       valor: 0,
-      data: format(new Date(), 'dd/MM/yyyy'),
+      data: format(new Date(), 'yyyy-MM-dd'),
       tipo: 'despesa',
       status: 'pendente',
       observacoes: '',
@@ -369,7 +369,7 @@ export function NovaDespesaModal() {
                             )}
                           >
                             {field.value ? (
-                              format(new Date(field.value), 'dd/MM/yyyy', { locale: pt })
+                              format(new Date(field.value), 'dd/MM/yyyy')
                             ) : (
                               <span>Selecione a data</span>
                             )}
