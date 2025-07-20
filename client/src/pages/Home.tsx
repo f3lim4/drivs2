@@ -208,25 +208,64 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Banner Interativo com Estatísticas */}
-          <div className="bg-gradient-to-br from-gray-900 to-blue-900 rounded-2xl p-8 mb-16 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
+          {/* Banner Futurista com Estatísticas */}
+          <div className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 rounded-3xl p-8 mb-16 text-white overflow-hidden border border-blue-500/20">
+            {/* Grid Pattern Background */}
+            <div className="absolute inset-0 opacity-20">
+              <div className="absolute inset-0" style={{
+                backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+                backgroundSize: '20px 20px'
+              }}></div>
+            </div>
+            
+            {/* Glowing Orbs */}
+            <div className="absolute top-0 left-1/4 w-32 h-32 bg-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-700"></div>
+            <div className="absolute top-1/2 left-0 w-24 h-24 bg-cyan-400/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
+            
+            {/* Animated Lines */}
+            <div className="absolute inset-0">
+              <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent animate-pulse"></div>
+              <div className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/30 to-transparent animate-pulse delay-500"></div>
+            </div>
+            
+            {/* Content */}
             <div className="relative z-10">
               <div className="grid md:grid-cols-3 gap-8 text-center">
-                <div className="group hover:scale-105 transition-transform duration-300">
-                  <div className="text-4xl font-bold text-blue-300 mb-2">500+</div>
-                  <div className="text-lg font-medium mb-1">Locadoras Ativas</div>
-                  <div className="text-sm text-gray-300">Empresas que confiam no DRIVS</div>
+                <div className="group cursor-pointer">
+                  <div className="relative p-6 rounded-2xl border border-blue-400/20 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-blue-400/40 transition-all duration-500 hover:scale-105">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-2xl"></div>
+                    <div className="relative">
+                      <div className="text-5xl font-bold bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent mb-2 group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-500">500+</div>
+                      <div className="text-lg font-semibold mb-1 text-blue-100">Locadoras Ativas</div>
+                      <div className="text-sm text-blue-300/80">Empresas que confiam no DRIVS</div>
+                    </div>
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/0 via-blue-400/5 to-blue-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  </div>
                 </div>
-                <div className="group hover:scale-105 transition-transform duration-300">
-                  <div className="text-4xl font-bold text-green-300 mb-2">25K+</div>
-                  <div className="text-lg font-medium mb-1">Veículos Gerenciados</div>
-                  <div className="text-sm text-gray-300">Frota total na plataforma</div>
+                
+                <div className="group cursor-pointer">
+                  <div className="relative p-6 rounded-2xl border border-emerald-400/20 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-emerald-400/40 transition-all duration-500 hover:scale-105">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-2xl"></div>
+                    <div className="relative">
+                      <div className="text-5xl font-bold bg-gradient-to-r from-emerald-300 to-green-300 bg-clip-text text-transparent mb-2 group-hover:from-emerald-200 group-hover:to-green-200 transition-all duration-500">25K+</div>
+                      <div className="text-lg font-semibold mb-1 text-emerald-100">Veículos Gerenciados</div>
+                      <div className="text-sm text-emerald-300/80">Frota total na plataforma</div>
+                    </div>
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/0 via-emerald-400/5 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  </div>
                 </div>
-                <div className="group hover:scale-105 transition-transform duration-300">
-                  <div className="text-4xl font-bold text-purple-300 mb-2">99.9%</div>
-                  <div className="text-lg font-medium mb-1">Uptime</div>
-                  <div className="text-sm text-gray-300">Disponibilidade garantida</div>
+                
+                <div className="group cursor-pointer">
+                  <div className="relative p-6 rounded-2xl border border-purple-400/20 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-purple-400/40 transition-all duration-500 hover:scale-105">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl"></div>
+                    <div className="relative">
+                      <div className="text-5xl font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent mb-2 group-hover:from-purple-200 group-hover:to-pink-200 transition-all duration-500">99.9%</div>
+                      <div className="text-lg font-semibold mb-1 text-purple-100">Uptime</div>
+                      <div className="text-sm text-purple-300/80">Disponibilidade garantida</div>
+                    </div>
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500/0 via-purple-400/5 to-purple-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  </div>
                 </div>
               </div>
             </div>
