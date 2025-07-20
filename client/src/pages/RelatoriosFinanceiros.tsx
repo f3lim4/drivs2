@@ -85,6 +85,10 @@ export default function RelatoriosFinanceiros() {
   const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('maior-total');
   const [sortHistorico, setSortHistorico] = useState<string>('mais-recente');
 
+  // Estados de paginação para histórico
+  const [currentPageHistorico, setCurrentPageHistorico] = useState(1);
+  const [itemsPerPageHistorico, setItemsPerPageHistorico] = useState(10);
+
   
   // Estados de paginação para a aba "Despesas Fixas"
   const [currentPageDespesasFixas, setCurrentPageDespesasFixas] = useState(1);
@@ -131,9 +135,7 @@ export default function RelatoriosFinanceiros() {
     setCurrentPageMotoristas(1);
   };
 
-  // Estados de paginação para a aba "Histórico"
-  const [currentPageHistorico, setCurrentPageHistorico] = useState(1);
-  const [itemsPerPageHistorico, setItemsPerPageHistorico] = useState(10);
+
   
   // Função para alterar página
   const handlePageChangeHistorico = (page: number) => {
@@ -453,23 +455,23 @@ export default function RelatoriosFinanceiros() {
       let despesasMensais = 0;
       
       // IPVA mensal (anual dividido por 12)
-      if (veiculo.ipva && veiculo.ipva > 0) {
-        despesasMensais += parseFloat(veiculo.ipva) / 12;
+      if (veiculo.ipva && Number(veiculo.ipva) > 0) {
+        despesasMensais += Number(veiculo.ipva) / 12;
       }
       
       // Seguro mensal
-      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
-        despesasMensais += parseFloat(veiculo.valorSeguroMensal);
+      if (veiculo.valorSeguroMensal && Number(veiculo.valorSeguroMensal) > 0) {
+        despesasMensais += Number(veiculo.valorSeguroMensal);
       }
       
       // Rastreador mensal
-      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
-        despesasMensais += parseFloat(veiculo.valorRastreadorMensal);
+      if (veiculo.valorRastreadorMensal && Number(veiculo.valorRastreadorMensal) > 0) {
+        despesasMensais += Number(veiculo.valorRastreadorMensal);
       }
       
-      // Financiamento mensal
-      if (veiculo.financiado && veiculo.valorFinanciamento) {
-        despesasMensais += parseFloat(veiculo.valorFinanciamento);
+      // Financiamento mensal (removido campos que não existem no schema)
+      if (veiculo.valorFinanciamento && Number(veiculo.valorFinanciamento) > 0) {
+        despesasMensais += Number(veiculo.valorFinanciamento) / 12; // Dividido por 12 para valor mensal
       }
       
       // Manutenções do mês selecionado
@@ -503,23 +505,23 @@ export default function RelatoriosFinanceiros() {
       let despesasFixas = 0;
       
       // IPVA mensal
-      if (veiculo.ipva && veiculo.ipva > 0) {
-        despesasFixas += parseFloat(veiculo.ipva) / 12;
+      if (veiculo.ipva && Number(veiculo.ipva) > 0) {
+        despesasFixas += Number(veiculo.ipva) / 12;
       }
       
       // Seguro mensal
-      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
-        despesasFixas += parseFloat(veiculo.valorSeguroMensal);
+      if (veiculo.valorSeguroMensal && Number(veiculo.valorSeguroMensal) > 0) {
+        despesasFixas += Number(veiculo.valorSeguroMensal);
       }
       
       // Rastreador mensal
-      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
-        despesasFixas += parseFloat(veiculo.valorRastreadorMensal);
+      if (veiculo.valorRastreadorMensal && Number(veiculo.valorRastreadorMensal) > 0) {
+        despesasFixas += Number(veiculo.valorRastreadorMensal);
       }
       
       // Financiamento mensal
-      if (veiculo.financiado && veiculo.valorFinanciamento) {
-        despesasFixas += parseFloat(veiculo.valorFinanciamento);
+      if (veiculo.valorFinanciamento && Number(veiculo.valorFinanciamento) > 0) {
+        despesasFixas += Number(veiculo.valorFinanciamento) / 12; // Dividido por 12 para valor mensal
       }
       
       return total + despesasFixas;
@@ -537,9 +539,9 @@ export default function RelatoriosFinanceiros() {
 
   const receitaPagamentos = useMemo(() => {
     return pagamentos
-      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
+      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.dataPagamento || p.dataVencimento), { start: monthStart, end: monthEnd }))
       .reduce((total, pagamento) => {
-        const valor = parseFloat(pagamento.valor || '0');
+        const valor = Number(pagamento.valorTotal || '0');
         return total + (isNaN(valor) ? 0 : valor);
       }, 0);
   }, [pagamentos, monthStart, monthEnd]);
@@ -547,9 +549,9 @@ export default function RelatoriosFinanceiros() {
   // Taxa administrativa de aluguéis
   const receitaTaxaAdministrativa = useMemo(() => {
     return pagamentos
-      .filter(p => p.status === 'pago' && p.tipo === 'taxa administrativa' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
+      .filter(p => p.status === 'pago' && p.tipo === 'taxa administrativa' && isWithinInterval(new Date(p.dataPagamento || p.dataVencimento), { start: monthStart, end: monthEnd }))
       .reduce((total, pagamento) => {
-        const valor = parseFloat(pagamento.valor || '0');
+        const valor = Number(pagamento.valorTotal || '0');
         return total + (isNaN(valor) ? 0 : valor);
       }, 0);
   }, [pagamentos, monthStart, monthEnd]);
@@ -983,6 +985,59 @@ export default function RelatoriosFinanceiros() {
     };
   };
 
+  // Dados para aba "Despesas Fixas" - ordenação e paginação
+  const despesasFixasDetalhadas = useMemo(() => {
+    return veiculos.map(veiculo => {
+      const ipva = veiculo.ipva ? Number(veiculo.ipva) / 12 : 0;
+      const seguro = veiculo.valorSeguroMensal ? Number(veiculo.valorSeguroMensal) : 0;
+      const rastreador = veiculo.valorRastreadorMensal ? Number(veiculo.valorRastreadorMensal) : 0;
+      const financiamento = veiculo.valorFinanciamento ? Number(veiculo.valorFinanciamento) / 12 : 0;
+      const totalMensal = ipva + seguro + rastreador + financiamento;
+      
+      return {
+        veiculo: veiculo.placa || 'N/A',
+        ipva,
+        seguro,
+        rastreador,
+        financiamento,
+        totalMensal
+      };
+    });
+  }, [veiculos]);
+
+  const despesasFixasOrdenadas = useMemo(() => {
+    return [...despesasFixasDetalhadas].sort((a, b) => {
+      switch (sortDespesasFixas) {
+        case 'maior-total':
+          return b.totalMensal - a.totalMensal;
+        case 'menor-total':
+          return a.totalMensal - b.totalMensal;
+        case 'maior-ipva':
+          return b.ipva - a.ipva;
+        case 'menor-ipva':
+          return a.ipva - b.ipva;
+        case 'maior-seguro':
+          return b.seguro - a.seguro;
+        case 'menor-seguro':
+          return a.seguro - b.seguro;
+        case 'placa-az':
+          return a.veiculo.localeCompare(b.veiculo);
+        case 'placa-za':
+          return b.veiculo.localeCompare(a.veiculo);
+        default:
+          return b.totalMensal - a.totalMensal;
+      }
+    });
+  }, [despesasFixasDetalhadas, sortDespesasFixas]);
+
+  const totalPaginasDespesasFixas = Math.ceil(despesasFixasOrdenadas.length / itemsPerPageDespesasFixas);
+  const despesasFixasPaginadas = despesasFixasOrdenadas.slice(
+    (currentPageDespesasFixas - 1) * itemsPerPageDespesasFixas,
+    currentPageDespesasFixas * itemsPerPageDespesasFixas
+  );
+
+
+
   return (
     <div className="space-y-6 p-6">
       {/* Seletor de mês e botão Nova Despesa (apenas para locadoras) */}
@@ -1369,6 +1424,242 @@ export default function RelatoriosFinanceiros() {
               <p className="text-sm text-blue-600">Período</p>
             </div>
           </div>
+        </TabsContent>
+
+        {/* Aba Despesas Fixas */}
+        <TabsContent value="despesas-fixas" className="space-y-4">
+          {/* Cards de totais por categoria */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <h4 className="font-medium text-yellow-700 mb-2">IPVA</h4>
+              <p className="text-xl font-bold text-yellow-800">
+                {formatCurrency(
+                  veiculos.reduce((total, v) => total + (v.ipva ? Number(v.ipva) / 12 : 0), 0)
+                )}
+              </p>
+              <p className="text-sm text-yellow-600">Mensal</p>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h4 className="font-medium text-green-700 mb-2">Seguros</h4>
+              <p className="text-xl font-bold text-green-800">
+                {formatCurrency(
+                  veiculos.reduce((total, v) => total + (v.valorSeguroMensal ? Number(v.valorSeguroMensal) : 0), 0)
+                )}
+              </p>
+              <p className="text-sm text-green-600">Mensal</p>
+            </div>
+            <div className="bg-indigo-50 p-4 rounded-lg">
+              <h4 className="font-medium text-indigo-700 mb-2">Rastreadores</h4>
+              <p className="text-xl font-bold text-indigo-800">
+                {formatCurrency(
+                  veiculos.reduce((total, v) => total + (v.valorRastreadorMensal ? Number(v.valorRastreadorMensal) : 0), 0)
+                )}
+              </p>
+              <p className="text-sm text-indigo-600">Mensal</p>
+            </div>
+            <div className="bg-pink-50 p-4 rounded-lg">
+              <h4 className="font-medium text-pink-700 mb-2">Financiamento</h4>
+              <p className="text-xl font-bold text-pink-800">
+                {formatCurrency(
+                  veiculos.reduce((total, v) => total + (v.valorFinanciamento ? Number(v.valorFinanciamento) / 12 : 0), 0)
+                )}
+              </p>
+              <p className="text-sm text-pink-600">Mensal</p>
+            </div>
+          </div>
+
+          {/* Tabela detalhada por veículo */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Despesas Fixas por Veículo</CardTitle>
+                <CardDescription>
+                  Detalhamento das despesas fixas mensais de cada veículo
+                </CardDescription>
+              </div>
+              <div className="flex items-center gap-4">
+                <Select value={sortDespesasFixas} onValueChange={setSortDespesasFixas}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="maior-total">Maior Total</SelectItem>
+                    <SelectItem value="menor-total">Menor Total</SelectItem>
+                    <SelectItem value="maior-ipva">Maior IPVA</SelectItem>
+                    <SelectItem value="menor-ipva">Menor IPVA</SelectItem>
+                    <SelectItem value="maior-seguro">Maior Seguro</SelectItem>
+                    <SelectItem value="menor-seguro">Menor Seguro</SelectItem>
+                    <SelectItem value="placa-az">Placa (A-Z)</SelectItem>
+                    <SelectItem value="placa-za">Placa (Z-A)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {despesasFixasOrdenadas.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">
+                  Nenhum veículo com despesas fixas encontrado.
+                </p>
+              ) : (
+                <>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="text-left p-3 border-b">Veículo</th>
+                          <th className="text-left p-3 border-b">IPVA</th>
+                          <th className="text-left p-3 border-b">Seguro</th>
+                          <th className="text-left p-3 border-b">Rastreador</th>
+                          <th className="text-left p-3 border-b">Financiamento</th>
+                          <th className="text-left p-3 border-b font-bold">Total Mensal</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {despesasFixasPaginadas.map((item) => (
+                          <tr key={item.veiculo} className="hover:bg-gray-50">
+                            <td className="p-3 border-b">
+                              <div className="font-medium">{item.veiculo}</div>
+                            </td>
+                            <td className="p-3 border-b text-yellow-600">
+                              {formatCurrency(item.ipva)}
+                            </td>
+                            <td className="p-3 border-b text-green-600">
+                              {formatCurrency(item.seguro)}
+                            </td>
+                            <td className="p-3 border-b text-indigo-600">
+                              {formatCurrency(item.rastreador)}
+                            </td>
+                            <td className="p-3 border-b text-pink-600">
+                              {formatCurrency(item.financiamento)}
+                            </td>
+                            <td className="p-3 border-b">
+                              <span className="font-bold text-red-600">
+                                {formatCurrency(item.totalMensal)}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Paginação */}
+                  {totalPaginasDespesasFixas > 1 && (
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Itens por página:</span>
+                        <Select value={itemsPerPageDespesasFixas.toString()} onValueChange={(value) => setItemsPerPageDespesasFixas(parseInt(value))}>
+                          <SelectTrigger className="w-16">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="10">10</SelectItem>
+                            <SelectItem value="20">20</SelectItem>
+                            <SelectItem value="50">50</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setCurrentPageDespesasFixas(Math.max(1, currentPageDespesasFixas - 1))}
+                          disabled={currentPageDespesasFixas === 1}
+                          className="px-3 py-1 bg-gray-100 text-gray-700 rounded disabled:opacity-50"
+                        >
+                          Anterior
+                        </button>
+                        <span className="text-sm text-gray-600">
+                          {currentPageDespesasFixas} de {totalPaginasDespesasFixas}
+                        </span>
+                        <button
+                          onClick={() => setCurrentPageDespesasFixas(Math.min(totalPaginasDespesasFixas, currentPageDespesasFixas + 1))}
+                          disabled={currentPageDespesasFixas === totalPaginasDespesasFixas}
+                          className="px-3 py-1 bg-gray-100 text-gray-700 rounded disabled:opacity-50"
+                        >
+                          Próxima
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Análise por categoria */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise por Categoria</CardTitle>
+              <CardDescription>
+                Distribuição das despesas fixas por categoria
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {/* IPVA */}
+                <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-yellow-800">IPVA</p>
+                    <p className="text-sm text-yellow-600">Imposto sobre veículos</p>
+                  </div>
+                  <p className="text-lg font-bold text-yellow-600">
+                    {formatCurrency(
+                      veiculos.reduce((total, v) => total + (v.ipva ? Number(v.ipva) / 12 : 0), 0)
+                    )}
+                  </p>
+                </div>
+
+                {/* Seguros */}
+                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-green-800">Seguros</p>
+                    <p className="text-sm text-green-600">Seguro dos veículos</p>
+                  </div>
+                  <p className="text-lg font-bold text-green-600">
+                    {formatCurrency(
+                      veiculos.reduce((total, v) => total + (v.valorSeguroMensal ? Number(v.valorSeguroMensal) : 0), 0)
+                    )}
+                  </p>
+                </div>
+
+                {/* Rastreadores */}
+                <div className="flex justify-between items-center p-3 bg-indigo-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-indigo-800">Rastreadores</p>
+                    <p className="text-sm text-indigo-600">Monitoramento GPS</p>
+                  </div>
+                  <p className="text-lg font-bold text-indigo-600">
+                    {formatCurrency(
+                      veiculos.reduce((total, v) => total + (v.valorRastreadorMensal ? Number(v.valorRastreadorMensal) : 0), 0)
+                    )}
+                  </p>
+                </div>
+
+                {/* Financiamento */}
+                <div className="flex justify-between items-center p-3 bg-pink-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-pink-800">Financiamento</p>
+                    <p className="text-sm text-pink-600">Parcelas mensais</p>
+                  </div>
+                  <p className="text-lg font-bold text-pink-600">
+                    {formatCurrency(
+                      veiculos.reduce((total, v) => total + (v.valorFinanciamento ? Number(v.valorFinanciamento) / 12 : 0), 0)
+                    )}
+                  </p>
+                </div>
+
+                {/* Total */}
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
+                  <div>
+                    <p className="font-bold text-gray-800">TOTAL MENSAL</p>
+                    <p className="text-sm text-gray-600">Soma de todas as despesas fixas</p>
+                  </div>
+                  <p className="text-xl font-bold text-red-600">
+                    {formatCurrency(totalDespesasFixasPuras)}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Aba Histórico */}
