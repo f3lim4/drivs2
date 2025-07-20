@@ -30,6 +30,9 @@ export default function CadastroLocadora() {
     confirmarSenha: '',
     telefone: '',
     endereco: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
     cidade: '',
     estado: '',
     cep: '',
@@ -50,6 +53,7 @@ export default function CadastroLocadora() {
           setFormData(prev => ({
             ...prev,
             endereco: data.logradouro || '',
+            bairro: data.bairro || '',
             cidade: data.localidade || '',
             estado: data.uf || ''
           }));
@@ -401,12 +405,44 @@ export default function CadastroLocadora() {
                   />
                 </div>
 
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2">
                   <Label htmlFor="endereco">Endereço *</Label>
                   <Input
                     id="endereco"
                     value={formData.endereco}
                     onChange={(e) => updateFormData('endereco', e.target.value)}
+                    placeholder="Será preenchido automaticamente pelo CEP"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="numero">Número *</Label>
+                  <Input
+                    id="numero"
+                    value={formData.numero}
+                    onChange={(e) => updateFormData('numero', e.target.value)}
+                    placeholder="123"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="complemento">Complemento</Label>
+                  <Input
+                    id="complemento"
+                    value={formData.complemento}
+                    onChange={(e) => updateFormData('complemento', e.target.value)}
+                    placeholder="Apto, casa, bloco..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bairro">Bairro *</Label>
+                  <Input
+                    id="bairro"
+                    value={formData.bairro}
+                    onChange={(e) => updateFormData('bairro', e.target.value)}
                     placeholder="Será preenchido automaticamente pelo CEP"
                     required
                   />
