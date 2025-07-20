@@ -368,30 +368,33 @@ export default function CadastroLocadora() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="senha">Senha *</Label>
-                  <Input
-                    id="senha"
-                    type="password"
-                    value={formData.senha}
-                    onChange={(e) => updateFormData('senha', e.target.value)}
-                    placeholder=""
-                    required
-                    minLength={6}
-                  />
-                </div>
+                {/* Senha e Confirmar Senha na mesma linha */}
+                <div className="col-span-2 grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="senha">Senha *</Label>
+                    <Input
+                      id="senha"
+                      type="password"
+                      value={formData.senha}
+                      onChange={(e) => updateFormData('senha', e.target.value)}
+                      placeholder=""
+                      required
+                      minLength={6}
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="confirmarSenha">Confirmar Senha *</Label>
-                  <Input
-                    id="confirmarSenha"
-                    type="password"
-                    value={formData.confirmarSenha}
-                    onChange={(e) => updateFormData('confirmarSenha', e.target.value)}
-                    placeholder=""
-                    required
-                    minLength={6}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmarSenha">Confirmar Senha *</Label>
+                    <Input
+                      id="confirmarSenha"
+                      type="password"
+                      value={formData.confirmarSenha}
+                      onChange={(e) => updateFormData('confirmarSenha', e.target.value)}
+                      placeholder=""
+                      required
+                      minLength={6}
+                    />
+                  </div>
                 </div>
 
                 {/* CEP, Endereço, Número e Complemento na mesma linha */}
