@@ -407,10 +407,15 @@ export default function RelatoriosFinanceiros() {
     const itensOrdenados = itensCombinados.sort((a, b) => {
       const dataA = new Date(a.data);
       const dataB = new Date(b.data);
+      const createdAtA = new Date(a.createdAt || a.data);
+      const createdAtB = new Date(b.createdAt || b.data);
       
       switch (sortHistorico) {
         case 'mais-recente':
-          // Primeiro por data, depois por tipo (manutenções concluídas primeiro)
+          // Primeiro por data de criação/alteração, depois por data da despesa
+          if (createdAtB.getTime() !== createdAtA.getTime()) {
+            return createdAtB.getTime() - createdAtA.getTime();
+          }
           if (dataB.getTime() !== dataA.getTime()) {
             return dataB.getTime() - dataA.getTime();
           }
@@ -419,6 +424,10 @@ export default function RelatoriosFinanceiros() {
           if (b.tipo === 'manutencao' && b.status === 'concluida' && a.tipo !== 'manutencao') return 1;
           return 0;
         case 'mais-antiga':
+          // Primeiro por data de criação/alteração, depois por data da despesa
+          if (createdAtA.getTime() !== createdAtB.getTime()) {
+            return createdAtA.getTime() - createdAtB.getTime();
+          }
           if (dataA.getTime() !== dataB.getTime()) {
             return dataA.getTime() - dataB.getTime();
           }
@@ -443,7 +452,10 @@ export default function RelatoriosFinanceiros() {
           const veiculoB2 = veiculos.find(v => v.id === b.veiculoId)?.placa || '';
           return veiculoB2.localeCompare(veiculoA2);
         default:
-          // Padrão: mais recente com critério de desempate
+          // Padrão: mais recente por data de criação
+          if (createdAtB.getTime() !== createdAtA.getTime()) {
+            return createdAtB.getTime() - createdAtA.getTime();
+          }
           if (dataB.getTime() !== dataA.getTime()) {
             return dataB.getTime() - dataA.getTime();
           }
@@ -1787,7 +1799,8 @@ export default function RelatoriosFinanceiros() {
                             <th className="text-left p-3 border-b">Categoria</th>
                             <th className="text-left p-3 border-b">Descrição</th>
                             <th className="text-left p-3 border-b">Valor</th>
-                            <th className="text-left p-3 border-b">Data</th>
+                            <th className="text-left p-3 border-b">Data Feita</th>
+                            <th className="text-left p-3 border-b">Data Criação</th>
                             <th className="text-left p-3 border-b">Tipo</th>
                           </tr>
                         </thead>
@@ -1807,6 +1820,11 @@ export default function RelatoriosFinanceiros() {
                                 <td className="p-3">
                                   <div className="text-sm font-medium">
                                     {format(new Date(item.data), 'dd/MM/yyyy')}
+                                  </div>
+                                </td>
+                                <td className="p-3">
+                                  <div className="text-xs text-gray-500">
+                                    {item.createdAt ? format(new Date(item.createdAt), 'dd/MM/yyyy HH:mm') : '-'}
                                   </div>
                                 </td>
                                 <td className="p-3">
