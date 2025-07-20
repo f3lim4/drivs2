@@ -395,7 +395,7 @@ export default function CadastroLocadora() {
                 </div>
 
                 {/* CEP, Endereço, Número e Complemento na mesma linha */}
-                <div className="col-span-2 grid grid-cols-4 gap-2">
+                <div className="col-span-2 grid gap-2" style={{gridTemplateColumns: '1fr 2fr 0.8fr 1fr'}}>
                   <div className="space-y-2">
                     <Label htmlFor="cep">CEP *</Label>
                     <Input
