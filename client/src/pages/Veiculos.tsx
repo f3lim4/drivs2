@@ -4,10 +4,11 @@
  */
 
 import { useState } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, Car, Eye } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Car, Bike, Truck, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useVeiculos } from '@/hooks/useVeiculos';
+import { useVehicleTypes } from '@/contexts/VehicleTypesContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -64,6 +65,18 @@ const getStatusBadge = (status: string) => {
   }
 };
 
+// Função para obter ícone dinâmico baseado nos tipos de veículos
+const getVehicleIconForPage = (vehicleTypes: string[]) => {
+  if (vehicleTypes && vehicleTypes.includes('motocicletas')) {
+    return Bike;
+  }
+  if (vehicleTypes && vehicleTypes.includes('caminhoes')) {
+    return Truck;
+  }
+  // Padrão é carro para carros ou utilitários
+  return Car;
+};
+
 // Função para obter cor do ícone do veículo baseado na cor do veículo
 const getVehicleIconColor = (cor: string) => {
   const colorMap: { [key: string]: string } = {
@@ -86,6 +99,7 @@ export default function Veiculos() {
   const { toast } = useToast();
   const { isAdmin, isLocadora } = useAuth();
   const { veiculos, loading, adicionarVeiculo, atualizarVeiculo, removerVeiculo } = useVeiculos();
+  const { vehicleTypes } = useVehicleTypes();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
@@ -306,7 +320,10 @@ export default function Veiculos() {
                 <p className="text-xs text-purple-600">Em uso</p>
               </div>
               <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center">
-                <Car className="w-5 h-5 text-purple-700" />
+                {(() => {
+                  const VehicleIcon = getVehicleIconForPage(vehicleTypes);
+                  return <VehicleIcon className="w-5 h-5 text-purple-700" />;
+                })()}
               </div>
             </div>
           </CardContent>
@@ -415,7 +432,10 @@ export default function Veiculos() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getVehicleIconColor(veiculo.cor)}`}>
-                        <Car className="w-5 h-5" />
+                        {(() => {
+                          const VehicleIcon = getVehicleIconForPage(vehicleTypes);
+                          return <VehicleIcon className="w-5 h-5" />;
+                        })()}
                       </div>
                       <div>
                         <p className="font-medium">{veiculo.marca} {veiculo.modelo}</p>
@@ -490,7 +510,10 @@ export default function Veiculos() {
 
           {filteredVeiculos.length === 0 && (
             <div className="text-center py-8">
-              <Car className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              {(() => {
+                const VehicleIcon = getVehicleIconForPage(vehicleTypes);
+                return <VehicleIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />;
+              })()}
               <p className="text-muted-foreground">Nenhum veículo encontrado</p>
               <p className="text-sm text-muted-foreground mt-1">
                 Tente ajustar os filtros ou adicionar um novo veículo
