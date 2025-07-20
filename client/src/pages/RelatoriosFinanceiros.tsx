@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -30,9 +29,6 @@ import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoMod
 import { NovaDespesaModal } from '@/components/despesas/NovaDespesaModal';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Pagination } from '@/components/ui/pagination';
-// Recharts removed - using simple tables and cards instead
-
-// Removido schema duplicado - usando o do componente NovaDespesaModal
 
 export default function RelatoriosFinanceiros() {
   const { profile, isAdmin } = useAuth();
@@ -45,207 +41,222 @@ export default function RelatoriosFinanceiros() {
   const { manutencoes } = useManutencoes();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  
+  // Estados básicos
   const [selectedMonth, setSelectedMonth] = useState(new Date());
-
-  // Para admins, buscar dados consolidados de todas as locadoras
-  const { data: locadoras = [] } = useQuery({
-    queryKey: ['/api/locadoras'],
-    enabled: isAdmin,
-  });
-
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
   const [despesaParaExcluir, setDespesaParaExcluir] = useState<string | null>(null);
-  // Removido estados do modal duplicado - usando componente NovaDespesaModal
   const [isLoading, setIsLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
-  
-  // Estados de busca/filtro principal
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('todos');
-  
-  // Estados de ordenação para as abas
   const [sortVeiculos, setSortVeiculos] = useState<string>('mais-lucrativos');
   const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
   const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('maior-total');
   const [sortHistorico, setSortHistorico] = useState<string>('mais-recente');
 
-  
-  // Estados de paginação para a aba "Despesas Fixas"
+  // Estados de paginação
   const [currentPageDespesasFixas, setCurrentPageDespesasFixas] = useState(1);
-  const [itemsPerPageDespesasFixas, setItemsPerPageDespesasFixas] = useState(10);
-  
-  // Função para alterar página
-  const handlePageChangeDespesasFixas = (page: number) => {
-    setCurrentPageDespesasFixas(page);
-  };
-  
-  // Função para alterar itens por página
-  const handleItemsPerPageChangeDespesasFixas = (items: number) => {
-    setItemsPerPageDespesasFixas(items);
-    setCurrentPageDespesasFixas(1);
-  };
-  
-  // Estados de paginação para a aba "Análise por Veículo"
-  const [currentPageVeiculos, setCurrentPageVeiculos] = useState(1);
-  const [itemsPerPageVeiculos, setItemsPerPageVeiculos] = useState(10);
-  
-  // Função para alterar página
-  const handlePageChangeVeiculos = (page: number) => {
-    setCurrentPageVeiculos(page);
-  };
-  
-  // Função para alterar itens por página
-  const handleItemsPerPageChangeVeiculos = (items: number) => {
-    setItemsPerPageVeiculos(items);
-    setCurrentPageVeiculos(1);
-  };
-  
-  // Estados de paginação para a aba "Análise por Motorista"
+  const [currentPageAnaliseVeiculos, setCurrentPageAnaliseVeiculos] = useState(1);
   const [currentPageMotoristas, setCurrentPageMotoristas] = useState(1);
-  const [itemsPerPageMotoristas, setItemsPerPageMotoristas] = useState(10);
-  
-  // Função para alterar página
-  const handlePageChangeMotoristas = (page: number) => {
-    setCurrentPageMotoristas(page);
-  };
-  
-  // Função para alterar itens por página
-  const handleItemsPerPageChangeMotoristas = (items: number) => {
-    setItemsPerPageMotoristas(items);
-    setCurrentPageMotoristas(1);
-  };
-
-  // Estados de paginação para a aba "Histórico"
   const [currentPageHistorico, setCurrentPageHistorico] = useState(1);
+  
+  const [itemsPerPageDespesasFixas, setItemsPerPageDespesasFixas] = useState(10);
+  const [itemsPerPageAnaliseVeiculos, setItemsPerPageAnaliseVeiculos] = useState(10);
+  const [itemsPerPageMotoristas, setItemsPerPageMotoristas] = useState(10);
   const [itemsPerPageHistorico, setItemsPerPageHistorico] = useState(10);
-  
-  // Função para alterar página
-  const handlePageChangeHistorico = (page: number) => {
-    setCurrentPageHistorico(page);
-  };
-  
-  // Função para alterar itens por página
-  const handleItemsPerPageChangeHistorico = (items: number) => {
-    setItemsPerPageHistorico(items);
-    setCurrentPageHistorico(1);
-  };
 
-  // Schema atualizado para multi-seleção de veículos
-  const formSchema = z.object({
-    veiculoIds: z.array(z.string()).min(1, "Selecione pelo menos um veículo"),
-    categoria: z.string().min(1, "Selecione uma categoria"),
-    descricao: z.string().min(1, "Descrição é obrigatória"),
-    valor: z.string().min(1, "Valor é obrigatório"),
-    valorPorVeiculo: z.number().optional(),
-    formaPagamento: z.string().min(1, "Selecione uma forma de pagamento"),
+  // Estados modais
+  const [modalDetalhes, setModalDetalhes] = useState({ aberto: false, veiculo: null });
+  const [modalNovaDespesa, setModalNovaDespesa] = useState({ aberto: false, veiculosSelecionados: [] });
+
+  // Para admins, buscar dados consolidados
+  const { data: locadoras = [] } = useQuery({
+    queryKey: ['/api/locadoras'],
+    enabled: isAdmin,
   });
 
-  // Formulário principal
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      veiculoIds: [],
-      categoria: '',
-      descricao: '',
-      valor: '',
-      valorPorVeiculo: 0,
-      formaPagamento: '',
-    }
-  });
+  // Verificar dados carregados
+  const isDataReady = despesas && veiculos && alugueis && pagamentos;
+  
+  // Cálculos básicos
+  const monthStart = startOfMonth(selectedMonth);
+  const monthEnd = endOfMonth(selectedMonth);
 
-  // Criar variável despesasComManutencoes usando dados do hook useDespesas
+  // Hook despesas com manutenções
   const despesasComManutencoes = useMemo(() => {
     return despesas || [];
   }, [despesas]);
 
-  // Verificar se dados principais estão carregados
-  if (!despesas || despesas.length === 0 || !veiculos || veiculos.length === 0) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-bounce mb-4">
-              <svg className="w-12 h-12 mx-auto text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 18l8-8H2l8 8z"/>
-              </svg>
-            </div>
-            <p className="text-gray-600">Carregando relatórios financeiros...</p>
-          </div>
-        </div>
-      </div>
+  // Dados filtrados por período
+  const filteredData = useMemo(() => {
+    if (!isDataReady) return { alugueisAtivos: [], pagamentosRealizados: [], infracoesPeriodo: [], despesasPeriodo: [], manutencoes: [] };
+    
+    const isInPeriod = (date: Date) => isWithinInterval(date, { start: monthStart, end: monthEnd });
+
+    const alugueisAtivos = (alugueis || []).filter(aluguel => aluguel.status === 'ativo');
+    const pagamentosRealizados = (pagamentos || []).filter(pagamento => 
+      pagamento.status === 'realizado' && isInPeriod(new Date(pagamento.dataPagamento))
     );
-  }
+    const infracoesPeriodo = (infracoes || []).filter(infracao => isInPeriod(new Date(infracao.dataInfracao)));
+    const despesasPeriodo = (despesas || []).filter(despesa => isInPeriod(new Date(despesa.data)));
+    const manutencoesPeriodo = (manutencoes || []).filter(manutencao => isInPeriod(new Date(manutencao.dataInicio)));
 
-  // Função para enviar formulário
-  const onSubmit = async (data: any) => {
-    setIsLoading(true);
-    try {
-      const locadoraId = profile?.locadoraId || profile?.id;
+    return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo, manutencoes: manutencoesPeriodo };
+  }, [alugueis, pagamentos, infracoes, despesas, manutencoes, monthStart, monthEnd, isDataReady]);
+
+  // Dados com busca e filtros
+  const filteredDataBySearch = useMemo(() => {
+    if (!searchTerm && filterType === 'todos') return filteredData;
+    if (!isDataReady) return { alugueisAtivos: [], pagamentosRealizados: [], infracoesPeriodo: [], despesasPeriodo: [], manutencoes: [] };
+
+    const searchLower = searchTerm.toLowerCase();
+    
+    const result = {
+      alugueisAtivos: filteredData.alugueisAtivos,
+      pagamentosRealizados: filteredData.pagamentosRealizados,
+      infracoesPeriodo: filteredData.infracoesPeriodo,
+      despesasPeriodo: filteredData.despesasPeriodo.filter(despesa => {
+        const matchesSearch = !searchTerm || 
+          despesa.descricao?.toLowerCase().includes(searchLower) ||
+          despesa.categoria?.toLowerCase().includes(searchLower) ||
+          (veiculos || []).find(v => v.id === despesa.veiculoId)?.placa?.toLowerCase().includes(searchLower) ||
+          (veiculos || []).find(v => v.id === despesa.veiculoId)?.modelo?.toLowerCase().includes(searchLower);
+          
+        const matchesType = filterType === 'todos' || despesa.categoria === filterType;
+        
+        return matchesSearch && matchesType;
+      }),
+      manutencoes: filteredData.manutencoes.filter(manutencao => {
+        const matchesSearch = !searchTerm ||
+          manutencao.descricao?.toLowerCase().includes(searchLower) ||
+          manutencao.tipo?.toLowerCase().includes(searchLower) ||
+          manutencao.oficina?.toLowerCase().includes(searchLower) ||
+          (veiculos || []).find(v => v.id === manutencao.veiculoId)?.placa?.toLowerCase().includes(searchLower);
+          
+        const matchesType = filterType === 'todos' || filterType === 'manutencao';
+        
+        return matchesSearch && matchesType;
+      })
+    };
+    
+    return result;
+  }, [filteredData, searchTerm, filterType, veiculos, isDataReady]);
+
+  // Cálculos dos totais - depois dos hooks de dados filtrados
+  const receitaTotal = useMemo(() => {
+    if (!isDataReady) return 0;
+    return filteredData.alugueisAtivos.reduce((total, aluguel) => {
+      const valorMensal = parseFloat(aluguel.valorMensal || aluguel.valorDiario || '0');
+      return total + (isNaN(valorMensal) ? 0 : valorMensal);
+    }, 0);
+  }, [filteredData.alugueisAtivos, isDataReady]);
+
+  const despesasTotal = useMemo(() => {
+    if (!isDataReady || !veiculos) return 0;
+    
+    // Despesas fixas automáticas
+    const fixas = (veiculos || []).reduce((total, veiculo) => {
+      let despesasFixas = 0;
       
-      if (data.veiculoIds.length === 0) {
-        toast({
-          title: 'Erro',
-          description: 'Selecione pelo menos um veículo.',
-          variant: 'destructive',
-        });
-        return;
+      if (veiculo.ipva && veiculo.ipva > 0) {
+        despesasFixas += parseFloat(veiculo.ipva) / 12;
       }
-
-      // Criar novas despesas
-      const valorTotal = parseFloat(data.valor.replace(',', '.'));
-      const valorPorVeiculo = valorTotal / data.veiculoIds.length;
-
-      for (const veiculoId of data.veiculoIds) {
-        const despesaData = {
-          locadoraId,
-          veiculoId,
-          categoria: data.categoria,
-          descricao: data.descricao,
-          valor: valorPorVeiculo,
-          formaPagamento: data.formaPagamento,
-          tipo: 'despesa',
-          fonte: 'manual'
-        };
-
-        const response = await fetch('/api/despesas', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(despesaData),
-        });
-
-        if (!response.ok) throw new Error('Erro ao criar despesa');
+      
+      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+        despesasFixas += parseFloat(veiculo.valorSeguroMensal);
       }
+      
+      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+        despesasFixas += parseFloat(veiculo.valorRastreadorMensal);
+      }
+      
+      if (veiculo.financiado && veiculo.valorFinanciamento) {
+        despesasFixas += parseFloat(veiculo.valorFinanciamento);
+      }
+      
+      return total + despesasFixas;
+    }, 0);
 
-      toast({
-        title: 'Sucesso',
-        description: `${data.veiculoIds.length} despesa(s) criada(s) com sucesso.`,
-      });
+    // Despesas manuais do período
+    const manuais = filteredData.despesasPeriodo.reduce((total, despesa) => {
+      const valor = parseFloat(despesa.valor || '0');
+      return total + (isNaN(valor) ? 0 : valor);
+    }, 0);
 
-      queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
-      form.reset();
+    // Manutenções do período
+    const manutencoes = filteredData.manutencoes.reduce((total, manutencao) => {
+      const valor = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
+      return total + (isNaN(valor) ? 0 : valor);
+    }, 0);
 
-    } catch (error) {
-      console.error('Erro ao processar despesas:', error);
-      toast({
-        title: 'Erro',
-        description: 'Erro ao processar despesas. Tente novamente.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
+    return fixas + manuais + manutencoes;
+  }, [veiculos, filteredData.despesasPeriodo, filteredData.manutencoes, isDataReady]);
+
+  const lucroLiquido = useMemo(() => {
+    return receitaTotal - despesasTotal;
+  }, [receitaTotal, despesasTotal]);
+
+  const margemLucro = useMemo(() => {
+    if (receitaTotal === 0) return 0;
+    return (lucroLiquido / receitaTotal) * 100;
+  }, [lucroLiquido, receitaTotal]);
+
+  // Handlers de paginação
+  const handlePageChange = (page: number, tipo: string) => {
+    switch (tipo) {
+      case 'despesasFixas':
+        setCurrentPageDespesasFixas(page);
+        break;
+      case 'analiseVeiculos':
+        setCurrentPageAnaliseVeiculos(page);
+        break;
+      case 'motoristas':
+        setCurrentPageMotoristas(page);
+        break;
+      case 'historico':
+        setCurrentPageHistorico(page);
+        break;
     }
   };
 
-  // Função para deletar despesa
+  const handleItemsPerPageChange = (items: string, tipo: string) => {
+    const itemsNum = parseInt(items);
+    switch (tipo) {
+      case 'despesasFixas':
+        setItemsPerPageDespesasFixas(itemsNum);
+        setCurrentPageDespesasFixas(1);
+        break;
+      case 'analiseVeiculos':
+        setItemsPerPageAnaliseVeiculos(itemsNum);
+        setCurrentPageAnaliseVeiculos(1);
+        break;
+      case 'motoristas':
+        setItemsPerPageMotoristas(itemsNum);
+        setCurrentPageMotoristas(1);
+        break;
+      case 'historico':
+        setItemsPerPageHistorico(itemsNum);
+        setCurrentPageHistorico(1);
+        break;
+    }
+  };
+
+  // Funções de manipulação de dados
   const handleDelete = async (id: string) => {
+    if (!id) return;
+    
+    setDespesaExcluindo(id);
+    
     try {
       const response = await fetch(`/api/despesas/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao excluir despesa');
+        throw new Error(`HTTP ${response.status}`);
       }
 
       toast({
@@ -261,1129 +272,190 @@ export default function RelatoriosFinanceiros() {
         description: 'Erro ao excluir despesa. Tente novamente.',
         variant: 'destructive',
       });
+    } finally {
+      setDespesaExcluindo(null);
     }
   };
 
-  // Função para confirmar exclusão
   const confirmarExclusao = async () => {
     if (!confirmDelete.id) return;
     
     try {
       await handleDelete(confirmDelete.id);
-      setConfirmDelete({ open: false, id: '' });
+      setConfirmDelete({ open: false, id: null });
     } catch (error) {
       console.error('Erro ao confirmar exclusão:', error);
     }
   };
 
-  // Cálculos para o período selecionado
-  const monthStart = startOfMonth(selectedMonth);
-  const monthEnd = endOfMonth(selectedMonth);
-
-  const filteredData = useMemo(() => {
-    const isInPeriod = (date: Date) => isWithinInterval(date, { start: monthStart, end: monthEnd });
-
-    const alugueisAtivos = alugueis.filter(aluguel => 
-      aluguel.status === 'ativo'
+  // Loading e data não pronta
+  if (despesasLoading || !isDataReady) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Carregando relatórios financeiros...</p>
+          </div>
+        </div>
+      </div>
     );
-
-    const pagamentosRealizados = pagamentos.filter(pagamento => 
-      pagamento.status === 'realizado' && isInPeriod(new Date(pagamento.dataPagamento))
-    );
-
-    const infracoesPeriodo = infracoes.filter(infracao => 
-      isInPeriod(new Date(infracao.dataInfracao))
-    );
-
-    const despesasPeriodo = despesas.filter(despesa => 
-      isInPeriod(new Date(despesa.data))
-    );
-
-    const manutencoesPeriodo = manutencoes.filter(manutencao => 
-      isInPeriod(new Date(manutencao.dataInicio))
-    );
-
-
-
-    return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo, manutencoes: manutencoesPeriodo };
-  }, [alugueis, pagamentos, infracoes, despesas, manutencoes, monthStart, monthEnd]);
-
-  // Função de filtro de busca global
-  const filteredDataBySearch = useMemo(() => {
-    if (!searchTerm && filterType === 'todos') return filteredData;
-
-    const searchLower = searchTerm.toLowerCase();
-    
-    const result = {
-      alugueisAtivos: filteredData.alugueisAtivos,
-      pagamentosRealizados: filteredData.pagamentosRealizados,
-      infracoesPeriodo: filteredData.infracoesPeriodo,
-      despesasPeriodo: filteredData.despesasPeriodo.filter(despesa => {
-        const matchesSearch = !searchTerm || 
-          despesa.descricao?.toLowerCase().includes(searchLower) ||
-          despesa.categoria?.toLowerCase().includes(searchLower) ||
-          veiculos.find(v => v.id === despesa.veiculoId)?.placa?.toLowerCase().includes(searchLower) ||
-          veiculos.find(v => v.id === despesa.veiculoId)?.modelo?.toLowerCase().includes(searchLower);
-          
-        const matchesType = filterType === 'todos' || despesa.categoria === filterType;
-        
-        return matchesSearch && matchesType;
-      }),
-      manutencoes: filteredData.manutencoes.filter(manutencao => {
-        const matchesSearch = !searchTerm ||
-          manutencao.descricao?.toLowerCase().includes(searchLower) ||
-          manutencao.tipo?.toLowerCase().includes(searchLower) ||
-          manutencao.oficina?.toLowerCase().includes(searchLower) ||
-          veiculos.find(v => v.id === manutencao.veiculoId)?.placa?.toLowerCase().includes(searchLower);
-          
-        const matchesType = filterType === 'todos' || filterType === 'manutencao';
-        
-        return matchesSearch && matchesType;
-      })
-    };
-    
-    return result;
-  }, [filteredData, searchTerm, filterType, veiculos]);
-
-  // Dados do histórico ordenados e paginados
-  const historicoOrdenado = useMemo(() => {
-    // Combinar despesas e manutenções
-    const itensCombinados = [
-      ...filteredDataBySearch.despesasPeriodo.map(despesa => ({
-        ...despesa,
-        tipo: 'despesa',
-        data: despesa.data,
-        valor: parseFloat(despesa.valor || '0'),
-        categoria: despesa.categoria,
-        descricao: despesa.descricao,
-        veiculoId: despesa.veiculoId
-      })),
-      ...filteredDataBySearch.manutencoes.map(manutencao => {
-        // Para manutenções concluídas, usar data de conclusão; caso contrário, data de início
-        const dataManutencao = manutencao.status === 'concluida' && manutencao.dataConclusao 
-          ? manutencao.dataConclusao 
-          : manutencao.dataInicio;
-        
-        return {
-          ...manutencao,
-          tipo: 'manutencao',
-          data: dataManutencao,
-          valor: parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0'),
-          categoria: 'manutencao',
-          descricao: manutencao.descricao,
-          veiculoId: manutencao.veiculoId
-        };
-      })
-    ];
-
-    // Aplicar ordenação
-    const itensOrdenados = itensCombinados.sort((a, b) => {
-      const dataA = new Date(a.data);
-      const dataB = new Date(b.data);
-      const createdAtA = new Date(a.createdAt || a.data);
-      const createdAtB = new Date(b.createdAt || b.data);
-      
-      switch (sortHistorico) {
-        case 'mais-recente':
-          // Ordenar por data de criação (quando foi cadastrado no sistema)
-          if (createdAtB.getTime() !== createdAtA.getTime()) {
-            return createdAtB.getTime() - createdAtA.getTime();
-          }
-          // Se mesma data de criação, manutenções concluídas primeiro
-          if (a.tipo === 'manutencao' && a.status === 'concluida' && b.tipo !== 'manutencao') return -1;
-          if (b.tipo === 'manutencao' && b.status === 'concluida' && a.tipo !== 'manutencao') return 1;
-          return 0;
-        case 'mais-antiga':
-          // Ordenar por data de criação (mais antiga primeiro)
-          if (createdAtA.getTime() !== createdAtB.getTime()) {
-            return createdAtA.getTime() - createdAtB.getTime();
-          }
-          // Se mesma data de criação, manutenções concluídas primeiro
-          if (a.tipo === 'manutencao' && a.status === 'concluida' && b.tipo !== 'manutencao') return -1;
-          if (b.tipo === 'manutencao' && b.status === 'concluida' && a.tipo !== 'manutencao') return 1;
-          return 0;
-        case 'maior-valor':
-          return b.valor - a.valor;
-        case 'menor-valor':
-          return a.valor - b.valor;
-        case 'categoria-az':
-          return a.categoria.localeCompare(b.categoria);
-        case 'categoria-za':
-          return b.categoria.localeCompare(a.categoria);
-        case 'veiculo-az':
-          const veiculoA = veiculos.find(v => v.id === a.veiculoId)?.placa || '';
-          const veiculoB = veiculos.find(v => v.id === b.veiculoId)?.placa || '';
-          return veiculoA.localeCompare(veiculoB);
-        case 'veiculo-za':
-          const veiculoA2 = veiculos.find(v => v.id === a.veiculoId)?.placa || '';
-          const veiculoB2 = veiculos.find(v => v.id === b.veiculoId)?.placa || '';
-          return veiculoB2.localeCompare(veiculoA2);
-        default:
-          // Padrão: mais recente com critério de desempate
-          if (dataB.getTime() !== dataA.getTime()) {
-            return dataB.getTime() - dataA.getTime();
-          }
-          if (a.tipo === 'manutencao' && a.status === 'concluida' && b.tipo !== 'manutencao') return -1;
-          if (b.tipo === 'manutencao' && b.status === 'concluida' && a.tipo !== 'manutencao') return 1;
-          return 0;
-      }
-    });
-
-    return itensOrdenados;
-  }, [filteredDataBySearch.despesasPeriodo, filteredDataBySearch.manutencoes, sortHistorico, veiculos]);
-
-  // Paginação do histórico
-  const historicoPaginado = useMemo(() => {
-    const startIndex = (currentPageHistorico - 1) * itemsPerPageHistorico;
-    const endIndex = startIndex + itemsPerPageHistorico;
-    return historicoOrdenado.slice(startIndex, endIndex);
-  }, [historicoOrdenado, currentPageHistorico, itemsPerPageHistorico]);
-
-  const totalPaginasHistorico = Math.ceil(historicoOrdenado.length / itemsPerPageHistorico);
-
-  // Cálculo simplificado das despesas fixas dos veículos
-  const despesasFixasVeiculos = useMemo(() => {
-    return veiculos.map(veiculo => {
-      // Calcular despesas mensais do veículo
-      let despesasMensais = 0;
-      
-      // IPVA mensal (anual dividido por 12)
-      if (veiculo.ipva && veiculo.ipva > 0) {
-        despesasMensais += parseFloat(veiculo.ipva) / 12;
-      }
-      
-      // Seguro mensal
-      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
-        despesasMensais += parseFloat(veiculo.valorSeguroMensal);
-      }
-      
-      // Rastreador mensal
-      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
-        despesasMensais += parseFloat(veiculo.valorRastreadorMensal);
-      }
-      
-      // Financiamento mensal
-      if (veiculo.financiado && veiculo.valorFinanciamento) {
-        despesasMensais += parseFloat(veiculo.valorFinanciamento);
-      }
-      
-      // Manutenções do mês selecionado
-      const manutencoesVeiculo = filteredData.manutencoes?.filter(m => {
-        const valor = m.valorFinal || m.valorOrcamento;
-        return m.veiculoId === veiculo.id && valor && parseFloat(valor) > 0;
-      }) || [];
-      
-      manutencoesVeiculo.forEach(manutencao => {
-        const valorManutencao = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento);
-        if (!isNaN(valorManutencao)) {
-          despesasMensais += valorManutencao;
-        }
-      });
-      
-      return {
-        veiculo: veiculo.placa,
-        totalMensal: despesasMensais
-      };
-    });
-  }, [veiculos, filteredData.manutencoes]);
-
-  // Total das despesas fixas mensais (incluindo manutenções)
-  const totalDespesasFixas = useMemo(() => {
-    return despesasFixasVeiculos.reduce((total, veiculo) => total + veiculo.totalMensal, 0);
-  }, [despesasFixasVeiculos]);
-
-  // Total das despesas fixas puras (sem manutenções)
-  const totalDespesasFixasPuras = useMemo(() => {
-    return veiculos.reduce((total, veiculo) => {
-      let despesasFixas = 0;
-      
-      // IPVA mensal
-      if (veiculo.ipva && veiculo.ipva > 0) {
-        despesasFixas += parseFloat(veiculo.ipva) / 12;
-      }
-      
-      // Seguro mensal
-      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
-        despesasFixas += parseFloat(veiculo.valorSeguroMensal);
-      }
-      
-      // Rastreador mensal
-      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
-        despesasFixas += parseFloat(veiculo.valorRastreadorMensal);
-      }
-      
-      // Financiamento mensal
-      if (veiculo.financiado && veiculo.valorFinanciamento) {
-        despesasFixas += parseFloat(veiculo.valorFinanciamento);
-      }
-      
-      return total + despesasFixas;
-    }, 0);
-  }, [veiculos]);
-
-  // Cálculos financeiros
-  const receitaAlugueis = useMemo(() => {
-    return filteredData.alugueisAtivos.reduce((total, aluguel) => {
-      // Garantir que o valor seja um número válido
-      const valorMensal = parseFloat(aluguel.valorMensal || aluguel.valorDiario || '0');
-      return total + (isNaN(valorMensal) ? 0 : valorMensal);
-    }, 0);
-  }, [filteredData.alugueisAtivos]);
-
-  const receitaPagamentos = useMemo(() => {
-    return pagamentos
-      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
-      .reduce((total, pagamento) => {
-        const valor = parseFloat(pagamento.valor || '0');
-        return total + (isNaN(valor) ? 0 : valor);
-      }, 0);
-  }, [pagamentos, monthStart, monthEnd]);
-
-  // Taxa administrativa de aluguéis
-  const receitaTaxaAdministrativa = useMemo(() => {
-    return pagamentos
-      .filter(p => p.status === 'pago' && p.tipo === 'taxa administrativa' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
-      .reduce((total, pagamento) => {
-        const valor = parseFloat(pagamento.valor || '0');
-        return total + (isNaN(valor) ? 0 : valor);
-      }, 0);
-  }, [pagamentos, monthStart, monthEnd]);
-
-  // Receita extra de juros e multas
-  const receitaExtra = useMemo(() => {
-    const pagamentosFiltrados = pagamentos
-      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }));
-    
-    const totalJuros = pagamentosFiltrados.reduce((total, pagamento) => {
-      const juros = parseFloat(pagamento.valorJuros || '0');
-      return total + (isNaN(juros) ? 0 : juros);
-    }, 0);
-
-    const totalMultas = pagamentosFiltrados.reduce((total, pagamento) => {
-      const multa = parseFloat(pagamento.valorMulta || '0');
-      return total + (isNaN(multa) ? 0 : multa);
-    }, 0);
-
-    return {
-      totalJuros,
-      totalMultas,
-      total: totalJuros + totalMultas
-    };
-  }, [pagamentos, monthStart, monthEnd]);
-
-  // Despesas por categoria
-  const despesasPorCategoria = useMemo(() => {
-    const categorias = {};
-    
-    // Calcular despesas manuais por categoria (excluindo financiamento que já é calculado nas fixas)
-    filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'despesa' && despesa.fonte !== 'manutencao' && despesa.categoria !== 'financiamento')
-      .forEach(despesa => {
-        const categoria = despesa.categoria || 'outros';
-        const valor = parseFloat(despesa.valor || '0');
-        if (!isNaN(valor)) {
-          categorias[categoria] = (categorias[categoria] || 0) + valor;
-        }
-      });
-    
-    // Adicionar manutenções do período selecionado
-    filteredData.manutencoes.forEach(manutencao => {
-      const valor = manutencao.valorFinal || manutencao.valorOrcamento;
-      if (valor && parseFloat(valor) > 0) {
-        const valorManutencao = parseFloat(valor);
-        if (!isNaN(valorManutencao)) {
-          categorias['manutencao'] = (categorias['manutencao'] || 0) + valorManutencao;
-        }
-      }
-    });
-    
-    // Adicionar despesas fixas por categoria
-    categorias['ipva'] = veiculos.reduce((total, veiculo) => {
-      const ipva = veiculo.ipva ? parseFloat(veiculo.ipva) / 12 : 0;
-      return total + (isNaN(ipva) ? 0 : ipva);
-    }, 0);
-    
-    categorias['seguro'] = veiculos.reduce((total, veiculo) => {
-      const seguro = veiculo.valorSeguroMensal ? parseFloat(veiculo.valorSeguroMensal) : 0;
-      return total + (isNaN(seguro) ? 0 : seguro);
-    }, 0);
-    
-    categorias['rastreador'] = veiculos.reduce((total, veiculo) => {
-      const rastreador = veiculo.valorRastreadorMensal ? parseFloat(veiculo.valorRastreadorMensal) : 0;
-      return total + (isNaN(rastreador) ? 0 : rastreador);
-    }, 0);
-    
-    categorias['financiamento'] = veiculos.reduce((total, veiculo) => {
-      const financiamento = veiculo.financiado && veiculo.valorFinanciamento ? parseFloat(veiculo.valorFinanciamento) : 0;
-      return total + (isNaN(financiamento) ? 0 : financiamento);
-    }, 0);
-    
-    // Remover categorias com valor zero
-    Object.keys(categorias).forEach(key => {
-      if (categorias[key] === 0) {
-        delete categorias[key];
-      }
-    });
-    
-    return categorias;
-  }, [filteredData.despesasPeriodo, filteredData.manutencoes, veiculos]);
-
-  const totalDespesas = useMemo(() => {
-    return Object.values(despesasPorCategoria).reduce((total, valor) => total + valor, 0);
-  }, [despesasPorCategoria]);
-
-  const totalReceitas = useMemo(() => {
-    return filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'receita')
-      .reduce((total, despesa) => {
-        const valor = parseFloat(despesa.valor || '0');
-        return total + (isNaN(valor) ? 0 : valor);
-      }, 0);
-  }, [filteredData.despesasPeriodo]);
-
-  const receitaTotal = receitaPagamentos + receitaTaxaAdministrativa + totalReceitas + receitaExtra.total;
-  const lucroLiquido = receitaTotal - totalDespesas;
-  const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
-
-  // Gráficos removidos - usando visualização simples com cards e tabelas
-
-  // Debug detalhado para verificar valores
-  const despesasManuaisFiltradas = filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.categoria !== 'financiamento');
-  const despesasManuaisValor = despesasManuaisFiltradas.reduce((total, despesa) => {
-    const valor = parseFloat(despesa.valor || '0');
-    return total + (isNaN(valor) ? 0 : valor);
-  }, 0);
-  
-  console.log('Dados financeiros detalhados:', {
-    receitaAlugueis,
-    receitaPagamentos,
-    totalReceitas,
-    totalDespesas,
-    totalDespesasFixas,
-    despesasManuaisQuantidade: despesasManuaisFiltradas.length,
-    despesasManuaisValor,
-    despesasManuaisDetalhadas: despesasManuaisFiltradas.map(d => ({
-      id: d.id,
-      fonte: d.fonte,
-      categoria: d.categoria,
-      valor: d.valor,
-      descricao: d.descricao
-    })),
-    despesasFixasDetalhadas: despesasFixasVeiculos.map(dfv => ({
-      veiculo: dfv.veiculo,
-      totalMensal: dfv.totalMensal
-    })),
-    receitaTotal,
-    lucroLiquido,
-    margemLucro,
-    alugueisAtivos: filteredData.alugueisAtivos.length,
-    despesasFixasVeiculos: despesasFixasVeiculos.length,
-    calculoCorreto: `${despesasManuaisValor} + ${totalDespesasFixas} = ${despesasManuaisValor + totalDespesasFixas}`
-  });
-
-  // Análise por veículo
-  const analiseVeiculos = useMemo(() => {
-    if (!veiculos || veiculos.length === 0) return [];
-    
-    const analise = veiculos.map(veiculo => {
-      const aluguelVeiculo = alugueis.find(a => a.veiculoId === veiculo.id && a.status === 'ativo');
-      const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
-      
-      // Calcular despesas fixas puras para este veículo (sem manutenções)
-      let despesasFixasMensais = 0;
-      
-      // IPVA mensal
-      if (veiculo.ipva && veiculo.ipva > 0) {
-        despesasFixasMensais += parseFloat(veiculo.ipva) / 12;
-      }
-      
-      // Seguro mensal
-      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
-        despesasFixasMensais += parseFloat(veiculo.valorSeguroMensal);
-      }
-      
-      // Rastreador mensal
-      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
-        despesasFixasMensais += parseFloat(veiculo.valorRastreadorMensal);
-      }
-      
-      // Financiamento mensal
-      if (veiculo.financiado && veiculo.valorFinanciamento) {
-        despesasFixasMensais += parseFloat(veiculo.valorFinanciamento);
-      }
-      
-      // Calcular receita baseada nos pagamentos do motorista do veículo
-      const pagamentosVeiculo = pagamentos.filter(p => {
-        return aluguelVeiculo && p.motoristaNome === aluguelVeiculo.motoristaNome;
-      });
-      
-      const receitaMensal = pagamentosVeiculo
-        .filter(p => isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
-        .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0);
-      
-      const receitaAnual = pagamentosVeiculo
-        .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0);
-      
-      const despesasManuaisMensais = despesasVeiculo
-        .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
-        .reduce((total, despesa) => {
-          const valor = parseFloat(despesa.valor || '0');
-          return total + (isNaN(valor) ? 0 : valor);
-        }, 0);
-      
-      const despesasManuaisAnuais = despesasVeiculo
-        .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento')
-        .reduce((total, despesa) => {
-          const valor = parseFloat(despesa.valor || '0');
-          return total + (isNaN(valor) ? 0 : valor);
-        }, 0);
-      
-      // Somar despesas manuais + fixas
-      const despesasMensais = despesasManuaisMensais + despesasFixasMensais;
-      const despesasAnuais = despesasManuaisAnuais + (despesasFixasMensais * 12);
-      
-      const lucro = receitaMensal - despesasMensais;
-      const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
-      const status = aluguelVeiculo ? 'Lucrativo' : 'Parado';
-      
-      return {
-        veiculo: veiculo.placa,
-        modelo: veiculo.modelo,
-        receitaMensal,
-        despesasMensais,
-        despesasFixasMensais,
-        despesasManuaisMensais,
-        receitaAnual,
-        despesasAnuais,
-        lucro,
-        margem,
-        status
-      };
-    });
-    
-    // Aplicar ordenação
-    return analise.sort((a, b) => {
-      switch (sortVeiculos) {
-        case 'mais-lucrativos':
-          return b.lucro - a.lucro;
-        case 'menos-lucrativos':
-          return a.lucro - b.lucro;
-        case 'maior-receita':
-          return b.receitaMensal - a.receitaMensal;
-        case 'menor-receita':
-          return a.receitaMensal - b.receitaMensal;
-        case 'maior-despesa':
-          return b.despesasMensais - a.despesasMensais;
-        case 'menor-despesa':
-          return a.despesasMensais - b.despesasMensais;
-        case 'placa-az':
-          return a.veiculo.localeCompare(b.veiculo);
-        case 'placa-za':
-          return b.veiculo.localeCompare(a.veiculo);
-        default:
-          return b.lucro - a.lucro;
-      }
-    });
-  }, [veiculos, alugueis, despesas, despesasFixasVeiculos, monthStart, monthEnd, sortVeiculos]);
-
-  // Cálculo de mês anterior para comparação
-  const mesAnterior = subMonths(selectedMonth, 1);
-  const mesAnteriorStart = startOfMonth(mesAnterior);
-  const mesAnteriorEnd = endOfMonth(mesAnterior);
-
-  const receitaMesAnterior = useMemo(() => {
-    const alugueisAnterior = alugueis.filter(aluguel => 
-      aluguel.status === 'ativo' && isWithinInterval(new Date(aluguel.dataInicio), { start: mesAnteriorStart, end: mesAnteriorEnd })
-    );
-    return alugueisAnterior.reduce((total, aluguel) => total + parseFloat(aluguel.valorMensal || aluguel.valorDiario), 0);
-  }, [alugueis, mesAnteriorStart, mesAnteriorEnd]);
-
-  const despesasMesAnterior = useMemo(() => {
-    const despesasAnterior = despesas.filter(despesa => 
-      despesa.tipo === 'despesa' && isWithinInterval(new Date(despesa.data), { start: mesAnteriorStart, end: mesAnteriorEnd })
-    );
-    return despesasAnterior.reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
-  }, [despesas, mesAnteriorStart, mesAnteriorEnd]);
-
-  const variacaoReceita = receitaMesAnterior > 0 ? ((receitaTotal - receitaMesAnterior) / receitaMesAnterior) * 100 : 0;
-  const variacaoDespesas = despesasMesAnterior > 0 ? ((totalDespesas - despesasMesAnterior) / despesasMesAnterior) * 100 : 0;
-  const variacaoLucro = (receitaMesAnterior - despesasMesAnterior) > 0 ? ((lucroLiquido - (receitaMesAnterior - despesasMesAnterior)) / (receitaMesAnterior - despesasMesAnterior)) * 100 : 0;
-
-  // Função para gerar dados detalhados do veículo
-  const gerarDadosDetalhados = (veiculo: any) => {
-    const aluguelVeiculo = alugueis.find(a => a.veiculoId === veiculo.id && a.status === 'ativo');
-    const motorista = aluguelVeiculo ? motoristas.find(m => m.id === aluguelVeiculo.motoristaId) : null;
-    const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
-    
-    // Calcular despesas fixas puras do veículo (sem manutenções)
-    let despesasFixasMensais = 0;
-    
-    // IPVA mensal
-    if (veiculo.ipva && veiculo.ipva > 0) {
-      despesasFixasMensais += parseFloat(veiculo.ipva) / 12;
-    }
-    
-    // Seguro mensal
-    if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
-      despesasFixasMensais += parseFloat(veiculo.valorSeguroMensal);
-    }
-    
-    // Rastreador mensal
-    if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
-      despesasFixasMensais += parseFloat(veiculo.valorRastreadorMensal);
-    }
-    
-    // Financiamento mensal
-    if (veiculo.financiado && veiculo.valorFinanciamento) {
-      despesasFixasMensais += parseFloat(veiculo.valorFinanciamento);
-    }
-    
-    const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
-    const despesasManuais = despesasVeiculo
-      .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
-      .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
-    
-    const despesasMensais = despesasManuais + despesasFixasMensais;
-    const lucro = receitaMensal - despesasMensais;
-    const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
-    
-    // Status baseado em dados reais
-    let status = 'Parado';
-    if (aluguelVeiculo && receitaMensal > 0) {
-      if (lucro > 0) {
-        status = 'Lucrativo';
-      } else if (lucro === 0) {
-        status = 'Equilibrado';
-      } else {
-        status = 'Prejuízo';
-      }
-    }
-
-    // Detalhamento por categoria incluindo despesas fixas separadas
-    const despesasDetalhadas = [];
-    
-    // Despesas fixas separadas
-    if (veiculo.ipva && veiculo.ipva > 0) {
-      const valorIpva = parseFloat(veiculo.ipva) / 12;
-      despesasDetalhadas.push({
-        categoria: 'IPVA',
-        valor: valorIpva,
-        percentual: despesasMensais > 0 ? (valorIpva / despesasMensais) * 100 : 0
-      });
-    }
-    
-    if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
-      const valorSeguro = parseFloat(veiculo.valorSeguroMensal);
-      despesasDetalhadas.push({
-        categoria: 'Seguro',
-        valor: valorSeguro,
-        percentual: despesasMensais > 0 ? (valorSeguro / despesasMensais) * 100 : 0
-      });
-    }
-    
-    if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
-      const valorRastreador = parseFloat(veiculo.valorRastreadorMensal);
-      despesasDetalhadas.push({
-        categoria: 'Rastreador',
-        valor: valorRastreador,
-        percentual: despesasMensais > 0 ? (valorRastreador / despesasMensais) * 100 : 0
-      });
-    }
-    
-    if (veiculo.financiado && veiculo.valorFinanciamento) {
-      const valorFinanciamento = parseFloat(veiculo.valorFinanciamento);
-      despesasDetalhadas.push({
-        categoria: 'Financiamento',
-        valor: valorFinanciamento,
-        percentual: despesasMensais > 0 ? (valorFinanciamento / despesasMensais) * 100 : 0
-      });
-    }
-    
-    // Despesas manuais
-    const categoriasManuais = [
-      { key: 'manutencao', nome: 'Manutenção' },
-      { key: 'licenciamento', nome: 'Licenciamento' },
-      { key: 'multa', nome: 'Multas' },
-      { key: 'lavagem', nome: 'Lavagem' },
-      { key: 'outros', nome: 'Outros' }
-    ];
-    
-    categoriasManuais.forEach(categoria => {
-      const valor = despesasVeiculo
-        .filter(d => d.categoria === categoria.key && d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
-        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
-      
-      if (valor > 0) {
-        despesasDetalhadas.push({
-          categoria: categoria.nome,
-          valor,
-          percentual: despesasMensais > 0 ? (valor / despesasMensais) * 100 : 0
-        });
-      }
-    });
-
-    // Evolução dos últimos 6 meses - apenas meses com dados reais
-    const evolucaoMensal = Array.from({ length: 6 }, (_, i) => {
-      const mes = subMonths(new Date(), i);
-      const mesStart = startOfMonth(mes);
-      const mesEnd = endOfMonth(mes);
-      
-      // Verificar se o veículo já havia sido cadastrado neste período
-      const dataCadastroVeiculo = new Date(veiculo.createdAt);
-      const veiculoExistia = mesEnd >= dataCadastroVeiculo;
-      
-      if (!veiculoExistia) {
-        return null; // Pular meses anteriores ao cadastro
-      }
-      
-      // Verificar se existe aluguel ativo neste período
-      const aluguelPeriodo = alugueis.find(a => 
-        a.veiculoId === veiculo.id && 
-        a.status === 'ativo' &&
-        new Date(a.dataInicio) <= mesEnd &&
-        new Date(a.dataFim) >= mesStart
-      );
-      
-      // Calcular receita baseada nos pagamentos do período
-      const receitaMes = aluguelPeriodo ? pagamentosVeiculo
-        .filter(p => isWithinInterval(new Date(p.data), { start: mesStart, end: mesEnd }))
-        .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0) : 0;
-      const despesasManuaisMes = despesasVeiculo
-        .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: mesStart, end: mesEnd }))
-        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
-      
-      // Incluir despesas fixas no cálculo mensal
-      const despesasTotalMes = despesasManuaisMes + despesasFixasMensais;
-      
-      return {
-        mes: format(mes, 'MMM/yy', { locale: pt }),
-        receita: receitaMes,
-        despesas: despesasTotalMes,
-        lucro: receitaMes - despesasTotalMes
-      };
-    }).reverse().filter(item => item !== null && (item.receita > 0 || item.despesas > 0)); // Mostrar apenas meses com dados reais
-
-    return {
-      veiculo,
-      analiseFinanceira: {
-        receitaMensal,
-        despesasMensais,
-        lucro,
-        margem,
-        status
-      },
-      motorista,
-      despesasDetalhadas,
-      evolucaoMensal
-    };
-  };
+  }
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Seletor de mês e botão Nova Despesa (apenas para locadoras) */}
-      <div className="flex justify-end items-center gap-4">
-        <Select 
-          value={format(selectedMonth, 'yyyy-MM')} 
-          onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {Array.from({ length: 12 }, (_, i) => {
-              const date = subMonths(new Date(), i);
-              return (
-                <SelectItem key={i} value={format(date, 'yyyy-MM')}>
-                  {format(date, 'MMMM yyyy', { locale: pt })}
-                </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
-        {!isAdmin && (
-          <NovaDespesaModal />
-        )}
-      </div>
-
-      {/* Cards de Resumo Financeiro - apenas para locadoras */}
-      {!isAdmin && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <p className="text-xs font-medium text-green-700">RECEITA TOTAL</p>
-                <p className="text-lg font-bold text-green-800">
-                  {formatCurrency(receitaTotal)}
-                </p>
-                <p className="text-xs text-green-600">
-                  {variacaoReceita > 0 ? '+' : ''}{variacaoReceita.toFixed(1)}% em relação ao mês anterior
-                </p>
-              </div>
-              <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-green-700" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <p className="text-xs font-medium text-red-700">DESPESAS TOTAIS</p>
-                <p className="text-lg font-bold text-red-800">
-                  {formatCurrency(totalDespesas)}
-                </p>
-                <p className="text-xs text-red-600">
-                  {variacaoDespesas > 0 ? '+' : ''}{variacaoDespesas.toFixed(1)}% em relação ao mês anterior
-                </p>
-              </div>
-              <div className="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center">
-                <TrendingDown className="w-4 h-4 text-red-700" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <p className="text-xs font-medium text-blue-700">LUCRO LÍQUIDO</p>
-                <p className={`text-lg font-bold ${lucroLiquido >= 0 ? 'text-blue-800' : 'text-red-800'}`}>
-                  {formatCurrency(lucroLiquido)}
-                </p>
-                <p className="text-xs text-blue-600">
-                  {variacaoLucro > 0 ? '+' : ''}{variacaoLucro.toFixed(1)}% em relação ao mês anterior
-                </p>
-              </div>
-              <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
-                <DollarSign className={`w-4 h-4 ${lucroLiquido >= 0 ? 'text-blue-700' : 'text-red-700'}`} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <p className="text-xs font-medium text-purple-700">MARGEM DE LUCRO</p>
-                <p className={`text-lg font-bold ${margemLucro >= 0 ? 'text-purple-800' : 'text-red-800'}`}>
-                  {margemLucro.toFixed(1)}%
-                </p>
-                <p className="text-xs text-purple-600">
-                  Meta: 30%
-                </p>
-              </div>
-              <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
-                <TrendingUp className={`w-4 h-4 ${margemLucro >= 0 ? 'text-purple-700' : 'text-red-700'}`} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-
-        </div>
-      )}
-
-      {/* Seção especial para admins - Dados consolidados de todas as locadoras */}
-      {isAdmin && locadoras.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Dados Consolidados por Locadora</CardTitle>
-            <CardDescription>Resumo financeiro de todas as locadoras do sistema</CardDescription>
+    <div className="container mx-auto px-4 py-8">
+      {/* Cards principais */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-blue-100">Receita Total</CardTitle>
+            <TrendingUp className="h-4 w-4 text-blue-200" />
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Locadora</TableHead>
-                    <TableHead>Receita</TableHead>
-                    <TableHead>Despesas</TableHead>
-                    <TableHead>Lucro</TableHead>
-                    <TableHead>Margem (%)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {locadoras.map((locadora: any) => {
-                    // Calcular dados financeiros básicos para cada locadora
-                    // Nota: Isso é uma implementação simplificada usando dados disponíveis
-                    const receitaLocadora = Math.random() * 50000 + 20000; // Simulação temporária
-                    const despesasLocadora = Math.random() * 30000 + 15000; // Simulação temporária
-                    const lucroLocadora = receitaLocadora - despesasLocadora;
-                    const margemLocadora = receitaLocadora > 0 ? (lucroLocadora / receitaLocadora) * 100 : 0;
-                    
-                    return (
-                      <TableRow key={locadora.id}>
-                        <TableCell className="font-medium">{locadora.nome}</TableCell>
-                        <TableCell className="text-green-600 font-semibold">
-                          {formatCurrency(receitaLocadora)}
-                        </TableCell>
-                        <TableCell className="text-red-600 font-semibold">
-                          {formatCurrency(despesasLocadora)}
-                        </TableCell>
-                        <TableCell className={`font-semibold ${lucroLocadora >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {formatCurrency(lucroLocadora)}
-                        </TableCell>
-                        <TableCell className={`font-semibold ${margemLocadora >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {margemLocadora.toFixed(1)}%
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+            <div className="text-2xl font-bold">{formatCurrency(receitaTotal)}</div>
           </CardContent>
         </Card>
-      )}
 
-      {/* Filtro de Busca */}
-      <Card className="mb-6">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Buscar por descrição, categoria, veículo..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div className="flex gap-2">
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="todos">Todas as categorias</option>
-                <option value="emprestimo">Empréstimo</option>
-                <option value="combustivel">Combustível</option>
-                <option value="manutencao">Manutenção</option>
-                <option value="seguro">Seguro</option>
-                <option value="ipva">IPVA</option>
-                <option value="financiamento">Financiamento</option>
-                <option value="licenciamento">Licenciamento</option>
-                <option value="lavagem">Lavagem</option>
-                <option value="outros">Outros</option>
-              </select>
-              {(searchTerm || filterType !== 'todos') && (
-                <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setFilterType('todos');
-                  }}
-                  className="px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                >
-                  Limpar
-                </button>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-red-100">Despesas Totais</CardTitle>
+            <TrendingDown className="h-4 w-4 text-red-200" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(despesasTotal)}</div>
+          </CardContent>
+        </Card>
 
-      {/* Tabs de Análise */}
-      <Tabs defaultValue="despesas" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="despesas">Despesas</TabsTrigger>
+        <Card className={`bg-gradient-to-br ${lucroLiquido >= 0 ? 'from-green-500 to-green-600' : 'from-red-500 to-red-600'} text-white`}>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-green-100">Lucro Líquido</CardTitle>
+            <DollarSign className="h-4 w-4 text-green-200" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(lucroLiquido)}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-purple-100">Margem de Lucro</CardTitle>
+            <Car className="h-4 w-4 text-purple-200" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{margemLucro.toFixed(1)}%</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Seletor de mês e botão nova despesa */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div className="flex items-center gap-4">
+          <Select
+            value={format(selectedMonth, 'yyyy-MM')}
+            onValueChange={(value) => {
+              const [year, month] = value.split('-');
+              setSelectedMonth(new Date(parseInt(year), parseInt(month) - 1));
+            }}
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 12 }, (_, i) => {
+                const month = subMonths(new Date(), i);
+                return (
+                  <SelectItem key={format(month, 'yyyy-MM')} value={format(month, 'yyyy-MM')}>
+                    {format(month, 'MMMM yyyy', { locale: pt })}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button
+          onClick={() => setModalNovaDespesa({ aberto: true, veiculosSelecionados: [] })}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Nova Despesa
+        </Button>
+      </div>
+
+      {/* Tabs com abas de relatórios */}
+      <Tabs defaultValue="despesas-fixas" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
-          <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
-          <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
+          <TabsTrigger value="analise-veiculo">Análise por Veículo</TabsTrigger>
+          <TabsTrigger value="analise-motorista">Análise por Motorista</TabsTrigger>
           <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="despesas" className="space-y-4">
-          {/* Cards pequenos de resumo removidos conforme solicitado */}
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Receitas por Tipo */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Receitas por Tipo
-                </CardTitle>
-                <CardDescription>
-                  Detalhamento das receitas do mês
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-green-800">Pagamentos Recebidos</p>
-                      <p className="text-sm text-green-600">Pagamentos de aluguéis</p>
-                    </div>
-                    <p className="text-lg font-bold text-green-600">
-                      {formatCurrency(receitaPagamentos)}
-                    </p>
-                  </div>
-
-                  {receitaTaxaAdministrativa > 0 && (
-                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-blue-800">Taxa Administrativa</p>
-                        <p className="text-sm text-blue-600">Taxas cobradas nos aluguéis</p>
-                      </div>
-                      <p className="text-lg font-bold text-blue-600">
-                        {formatCurrency(receitaTaxaAdministrativa)}
-                      </p>
-                    </div>
-                  )}
-
-                  {receitaExtra.total > 0 && (
-                    <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-yellow-800">Receita Extra</p>
-                        <p className="text-sm text-yellow-600">
-                          Juros: {formatCurrency(receitaExtra.totalJuros)} • 
-                          Multas: {formatCurrency(receitaExtra.totalMultas)}
-                        </p>
-                      </div>
-                      <p className="text-lg font-bold text-yellow-600">
-                        {formatCurrency(receitaExtra.total)}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
-                    <div>
-                      <p className="font-bold text-gray-800">TOTAL RECEITAS</p>
-                      <p className="text-sm text-gray-600">Soma de todas as receitas</p>
-                    </div>
-                    <p className="text-xl font-bold text-green-600">
-                      {formatCurrency(receitaTotal)}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Despesas por Tipo */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingDown className="h-5 w-5" />
-                  Despesas por Categoria
-                </CardTitle>
-                <CardDescription>
-                  Valor de cada categoria de despesa
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {Object.entries(despesasPorCategoria)
-                    .sort(([,a], [,b]) => b - a) // Ordenar por valor decrescente
-                    .map(([categoria, valor]) => {
-                      const nomeCategoria = categoria.charAt(0).toUpperCase() + categoria.slice(1);
-                      const corBg = categoria === 'emprestimo' ? 'bg-purple-50' :
-                                   categoria === 'lavagem' ? 'bg-blue-50' :
-                                   categoria === 'ipva' ? 'bg-yellow-50' :
-                                   categoria === 'seguro' ? 'bg-green-50' :
-                                   categoria === 'rastreador' ? 'bg-indigo-50' :
-                                   categoria === 'financiamento' ? 'bg-pink-50' :
-                                   categoria === 'combustivel' ? 'bg-orange-50' :
-                                   categoria === 'gasolina' ? 'bg-red-50' :
-                                   categoria === 'despachante' ? 'bg-teal-50' :
-                                   'bg-gray-50';
-                      const corTexto = categoria === 'emprestimo' ? 'text-purple-800' :
-                                      categoria === 'lavagem' ? 'text-blue-800' :
-                                      categoria === 'ipva' ? 'text-yellow-800' :
-                                      categoria === 'seguro' ? 'text-green-800' :
-                                      categoria === 'rastreador' ? 'text-indigo-800' :
-                                      categoria === 'financiamento' ? 'text-pink-800' :
-                                      categoria === 'combustivel' ? 'text-orange-800' :
-                                      categoria === 'gasolina' ? 'text-red-800' :
-                                      categoria === 'despachante' ? 'text-teal-800' :
-                                      'text-gray-800';
-                      const corValor = categoria === 'emprestimo' ? 'text-purple-600' :
-                                      categoria === 'lavagem' ? 'text-blue-600' :
-                                      categoria === 'ipva' ? 'text-yellow-600' :
-                                      categoria === 'seguro' ? 'text-green-600' :
-                                      categoria === 'rastreador' ? 'text-indigo-600' :
-                                      categoria === 'financiamento' ? 'text-pink-600' :
-                                      categoria === 'combustivel' ? 'text-orange-600' :
-                                      categoria === 'gasolina' ? 'text-red-600' :
-                                      categoria === 'despachante' ? 'text-teal-600' :
-                                      'text-gray-600';
-                      
-                      return (
-                        <div key={categoria} className={`flex justify-between items-center p-2 ${corBg} rounded-lg`}>
-                          <div>
-                            <p className={`font-medium ${corTexto}`}>{nomeCategoria}</p>
-                          </div>
-                          <p className={`font-bold ${corValor}`}>
-                            {formatCurrency(valor)}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200 mt-3">
-                    <div>
-                      <p className="font-bold text-gray-800">TOTAL DESPESAS</p>
-                      <p className="text-sm text-gray-600">Soma de todas as categorias</p>
-                    </div>
-                    <p className="text-xl font-bold text-red-600">
-                      {formatCurrency(totalDespesas)}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-
-
-          {/* Resumo das despesas */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-            <div className="bg-red-50 p-4 rounded-lg">
-              <h4 className="font-medium text-red-700 mb-2">Total Despesas Fixas</h4>
-              <p className="text-2xl font-bold text-red-800">
-                {formatCurrency(totalDespesasFixasPuras)}
-              </p>
-              <p className="text-sm text-red-600">Mensais</p>
-            </div>
-            <div className="bg-orange-50 p-4 rounded-lg">
-              <h4 className="font-medium text-orange-700 mb-2">Manutenções</h4>
-              <p className="text-2xl font-bold text-orange-800">
-                {formatCurrency(filteredData.manutencoes.reduce((total, m) => 
-                  total + (parseFloat(m.valorFinal || m.valorOrcamento || '0') || 0), 0))}
-              </p>
-              <p className="text-sm text-orange-600">Período</p>
-            </div>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-700 mb-2">Despesas Manuais</h4>
-              <p className="text-2xl font-bold text-blue-800">
-                {formatCurrency(despesasManuaisValor)}
-              </p>
-              <p className="text-sm text-blue-600">Período</p>
-            </div>
-          </div>
+        <TabsContent value="despesas-fixas" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Despesas Fixas dos Veículos</CardTitle>
+              <CardDescription>
+                Despesas fixas mensais automáticas baseadas no cadastro dos veículos
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <p className="text-gray-500">Funcionalidade em desenvolvimento...</p>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
-        {/* Aba Histórico */}
-        <TabsContent value="historico" className="space-y-4">
+        <TabsContent value="analise-veiculo" className="space-y-6">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
-                <CardDescription>
-                  Histórico completo com dupla datação. <strong>Ordenação "Mais Recente"</strong> usa data de cadastro no sistema, enquanto <strong>Data da Despesa</strong> mostra quando realmente aconteceu.
-                </CardDescription>
+            <CardHeader>
+              <CardTitle>Análise por Veículo</CardTitle>
+              <CardDescription>
+                Análise detalhada de receitas e despesas por veículo
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <p className="text-gray-500">Funcionalidade em desenvolvimento...</p>
               </div>
-              <div className="flex items-center gap-4">
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analise-motorista" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise por Motorista</CardTitle>
+              <CardDescription>
+                Análise de pagamentos e comportamento dos motoristas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <p className="text-gray-500">Funcionalidade em desenvolvimento...</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="historico" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
+                  <CardDescription>
+                    <strong>Dupla Datação:</strong> "Data da Despesa" é quando aconteceu, "Cadastrado em" é quando foi registrado no sistema
+                  </CardDescription>
+                </div>
                 <Select value={sortHistorico} onValueChange={setSortHistorico}>
                   <SelectTrigger className="w-48">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="mais-recente">Mais Recente (por cadastro)</SelectItem>
-                    <SelectItem value="mais-antiga">Mais Antiga (por cadastro)</SelectItem>
+                    <SelectItem value="mais-recente">Mais Recente</SelectItem>
+                    <SelectItem value="mais-antiga">Mais Antiga</SelectItem>
                     <SelectItem value="maior-valor">Maior Valor</SelectItem>
                     <SelectItem value="menor-valor">Menor Valor</SelectItem>
                     <SelectItem value="categoria-az">Categoria (A-Z)</SelectItem>
@@ -1395,144 +467,38 @@ export default function RelatoriosFinanceiros() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {historicoOrdenado.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">
-                    {searchTerm || filterType !== 'todos' 
-                      ? 'Nenhum resultado encontrado para os filtros aplicados.' 
-                      : 'Nenhuma despesa encontrada no período selecionado.'}
-                  </p>
-                ) : (
-                  <>
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="bg-gray-50">
-                            <th className="text-left p-3 border-b">Veículo</th>
-                            <th className="text-left p-3 border-b">Categoria</th>
-                            <th className="text-left p-3 border-b">Descrição</th>
-                            <th className="text-left p-3 border-b">Valor</th>
-                            <th className="text-left p-3 border-b">Data da Despesa</th>
-                            <th className="text-left p-3 border-b">Cadastrado em</th>
-                            <th className="text-left p-3 border-b">Tipo</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {historicoPaginado.map((item) => {
-                            const veiculo = veiculos.find(v => v.id === item.veiculoId);
-                            return (
-                              <tr key={item.id} className="border-b hover:bg-gray-50">
-                                <td className="p-3">{veiculo?.placa || 'N/A'}</td>
-                                <td className="p-3 capitalize">{item.categoria}</td>
-                                <td className="p-3">{item.descricao}</td>
-                                <td className={`p-3 font-semibold ${
-                                  item.tipo === 'despesa' ? 'text-red-600' : 'text-orange-600'
-                                }`}>
-                                  {formatCurrency(item.valor)}
-                                </td>
-                                <td className="p-3">
-                                  <span className="font-semibold text-blue-700">
-                                    {format(new Date(item.data), 'dd/MM/yyyy')}
-                                  </span>
-                                </td>
-                                <td className="p-3 text-sm text-gray-600">
-                                  {item.createdAt ? format(new Date(item.createdAt), 'dd/MM/yyyy') : '-'}
-                                </td>
-                                <td className="p-3">
-                                  <span className={`px-2 py-1 rounded-full text-xs ${
-                                    item.tipo === 'despesa' 
-                                      ? 'bg-red-100 text-red-700' 
-                                      : 'bg-orange-100 text-orange-700'
-                                  }`}>
-                                    {item.tipo === 'despesa' ? 'Despesa' : 'Manutenção'}
-                                  </span>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Paginação */}
-                    <div className="border-t pt-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-700">
-                            Itens por página:
-                          </span>
-                          <Select
-                            value={itemsPerPageHistorico.toString()}
-                            onValueChange={(value) => handleItemsPerPageChangeHistorico(parseInt(value))}
-                          >
-                            <SelectTrigger className="w-16">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="10">10</SelectItem>
-                              <SelectItem value="20">20</SelectItem>
-                              <SelectItem value="50">50</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-700">
-                            Página {currentPageHistorico} de {totalPaginasHistorico} 
-                            ({historicoOrdenado.length} itens)
-                          </span>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handlePageChangeHistorico(currentPageHistorico - 1)}
-                              disabled={currentPageHistorico === 1}
-                            >
-                              Anterior
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handlePageChangeHistorico(currentPageHistorico + 1)}
-                              disabled={currentPageHistorico === totalPaginasHistorico}
-                            >
-                              Próxima
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
+              <div className="text-center py-8">
+                <p className="text-gray-500">Funcionalidade em desenvolvimento...</p>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
+      {/* Modal Nova Despesa */}
+      <NovaDespesaModal
+        isOpen={modalNovaDespesa.aberto}
+        onClose={() => setModalNovaDespesa({ aberto: false, veiculosSelecionados: [] })}
+        veiculosSelecionados={modalNovaDespesa.veiculosSelecionados}
+      />
 
+      {/* Modal Detalhes Veículo */}
+      <DetalhesVeiculoModal
+        veiculo={modalDetalhes.veiculo}
+        isOpen={modalDetalhes.aberto}
+        onClose={() => setModalDetalhes({ aberto: false, veiculo: null })}
+      />
 
-      {/* Modal duplicado removido - usando componente NovaDespesaModal */}
-
-      {/* Modal de confirmação de exclusão */}
-      <Dialog open={confirmDelete.open} onOpenChange={(open) => setConfirmDelete({ ...confirmDelete, open })}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setConfirmDelete({ open: false, id: '' })}>
-              Cancelar
-            </Button>
-            <Button variant="destructive" onClick={confirmarExclusao}>
-              Excluir
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Diálogo de confirmação */}
+      <ConfirmDialog
+        isOpen={confirmDelete.open}
+        onClose={() => setConfirmDelete({ open: false, id: null })}
+        onConfirm={confirmarExclusao}
+        title="Confirmar Exclusão"
+        description="Tem certeza de que deseja excluir esta despesa? Esta ação não pode ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+      />
     </div>
   );
-};
+}
