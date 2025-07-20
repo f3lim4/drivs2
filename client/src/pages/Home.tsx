@@ -484,7 +484,7 @@ export default function Home() {
           </h2>
           <p className="text-xl md:text-2xl mb-12 text-blue-100 max-w-3xl mx-auto leading-relaxed">
             Comece hoje mesmo com 30 dias gratuitos e veja como o DRIVS pode 
-            otimizar as operações da sua empresa sem compromisso.
+            otimizar as operações da sua empresa.
           </p>
           
           {/* Banner Futurista com Botões */}
@@ -509,10 +509,6 @@ export default function Home() {
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
                   <span>30 dias grátis</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
-                  <span>Sem compromisso</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></div>
