@@ -1408,17 +1408,17 @@ export default function RelatoriosFinanceiros() {
                         const despesasOrdenadas = todasDespesas.sort((a, b) => {
                           switch (sortHistorico) {
                             case 'mais-recente':
-                              const dataA = new Date(a.data);
-                              const dataB = new Date(b.data);
-                              if (dataA.getTime() === dataB.getTime()) {
-                                // Se as datas são iguais, priorizar manutenções
+                              const createdAtA = new Date(a.createdAt);
+                              const createdAtB = new Date(b.createdAt);
+                              if (createdAtA.getTime() === createdAtB.getTime()) {
+                                // Se as datas de criação são iguais, priorizar manutenções
                                 if (a.tipo === 'Manutenção' && b.tipo !== 'Manutenção') return -1;
                                 if (a.tipo !== 'Manutenção' && b.tipo === 'Manutenção') return 1;
                                 return 0;
                               }
-                              return dataB.getTime() - dataA.getTime();
+                              return createdAtB.getTime() - createdAtA.getTime();
                             case 'mais-antiga':
-                              return new Date(a.data).getTime() - new Date(b.data).getTime();
+                              return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
                             case 'maior-valor':
                               return b.valor - a.valor;
                             case 'menor-valor':
@@ -1432,7 +1432,7 @@ export default function RelatoriosFinanceiros() {
                             case 'categoria-za':
                               return b.categoria.localeCompare(a.categoria);
                             default:
-                              return new Date(b.data).getTime() - new Date(a.data).getTime();
+                              return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
                           }
                         });
 
