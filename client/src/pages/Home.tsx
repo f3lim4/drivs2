@@ -19,33 +19,33 @@ export default function Home() {
   const recursos = [
     {
       icon: Car,
-      titulo: "Gestão de Frota",
-      descricao: "Controle completo de veículos, manutenções e disponibilidade."
+      titulo: "Gestão de Frota Completa",
+      descricao: "Controle total de veículos, status de disponibilidade, manutenções programadas, histórico detalhado e documentação digital de cada veículo da frota."
     },
     {
       icon: Users,
-      titulo: "Gestão de Clientes",
-      descricao: "Cadastro completo de motoristas e histórico de locações."
+      titulo: "Gestão de Clientes e Motoristas",
+      descricao: "Cadastro completo com documentos digitais, histórico de locações, CNH automática, scoring de clientes e relatórios de comportamento."
     },
     {
       icon: FileText,
-      titulo: "Contratos Digitais",
-      descricao: "Geração automática de contratos com validade jurídica."
+      titulo: "Contratos Inteligentes",
+      descricao: "Geração automática de contratos personalizados, templates editáveis, assinatura digital, validade jurídica garantida e controle de vencimentos."
     },
     {
       icon: BarChart3,
-      titulo: "Relatórios Financeiros",
-      descricao: "Analytics completos de receitas, despesas e lucratividade."
+      titulo: "Business Intelligence",
+      descricao: "Dashboards interativos, relatórios financeiros avançados, análise de lucratividade por veículo, previsões e insights estratégicos em tempo real."
     },
     {
       icon: Shield,
-      titulo: "Segurança de Dados",
-      descricao: "Proteção total com backup automático e criptografia."
+      titulo: "Segurança Enterprise",
+      descricao: "Backup automático na nuvem, criptografia de ponta, controle de acesso por usuário, logs de auditoria e conformidade com LGPD."
     },
     {
       icon: Clock,
-      titulo: "Automação",
-      descricao: "Processos automatizados que reduzem trabalho manual."
+      titulo: "Automação Inteligente",
+      descricao: "Notificações automáticas, cobrança recorrente, lembretes de vencimento, integração com bancos e redução de 80% no trabalho manual."
     }
   ];
 
@@ -84,18 +84,30 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Car className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-800">DRIVS</span>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/logo_drivs.png" 
+              alt="DRIVS Logo" 
+              className="w-10 h-10"
+            />
+            <span className="text-2xl font-bold text-gray-800">DRIVS</span>
           </div>
-          <div className="flex gap-4">
-            <Button variant="outline" onClick={handleLogin}>
-              Acessar Sistema
+          
+          <nav className="hidden md:flex items-center gap-6">
+            <a href="#recursos" className="text-gray-600 hover:text-blue-600 transition-colors">Recursos</a>
+            <a href="#beneficios" className="text-gray-600 hover:text-blue-600 transition-colors">Benefícios</a>
+            <a href="#casos" className="text-gray-600 hover:text-blue-600 transition-colors">Casos de Sucesso</a>
+            <Button variant="ghost" onClick={handleLogin} className="text-blue-600 hover:text-blue-700">
+              Login
             </Button>
-            <Button onClick={handleDemo}>
+          </nav>
+          
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={handleDemo} className="hidden md:flex">
               Solicitar Demo
+            </Button>
+            <Button onClick={handleLogin} className="md:hidden">
+              Login
             </Button>
           </div>
         </div>
@@ -115,8 +127,46 @@ export default function Home() {
           
           <p className="text-xl md:text-2xl mb-8 text-gray-600 max-w-4xl mx-auto">
             Sistema integrado que centraliza operações, automatiza processos e fornece 
-            insights estratégicos para locadoras de veículos de todos os portes.
+            insights estratégicos para locadoras de veículos de todos os portes. 
+            Controle total da sua frota com tecnologia de ponta.
           </p>
+          
+          {/* Banner Interativo com Features */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 mb-8 max-w-6xl mx-auto border border-blue-100">
+            <div className="grid md:grid-cols-4 gap-6">
+              <div className="text-center group cursor-pointer hover:bg-white hover:shadow-lg rounded-xl p-4 transition-all duration-300">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
+                  <Car className="h-6 w-6 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-1">Gestão de Frota</h3>
+                <p className="text-sm text-gray-600">Controle completo de veículos</p>
+              </div>
+              
+              <div className="text-center group cursor-pointer hover:bg-white hover:shadow-lg rounded-xl p-4 transition-all duration-300">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
+                  <BarChart3 className="h-6 w-6 text-green-600" />
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-1">Relatórios</h3>
+                <p className="text-sm text-gray-600">Analytics em tempo real</p>
+              </div>
+              
+              <div className="text-center group cursor-pointer hover:bg-white hover:shadow-lg rounded-xl p-4 transition-all duration-300">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
+                  <FileText className="h-6 w-6 text-purple-600" />
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-1">Contratos</h3>
+                <p className="text-sm text-gray-600">Geração automática</p>
+              </div>
+              
+              <div className="text-center group cursor-pointer hover:bg-white hover:shadow-lg rounded-xl p-4 transition-all duration-300">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-200 transition-colors">
+                  <Shield className="h-6 w-6 text-orange-600" />
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-1">Segurança</h3>
+                <p className="text-sm text-gray-600">Dados protegidos</p>
+              </div>
+            </div>
+          </div>
 
           <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-8">
             <Button 
@@ -142,8 +192,50 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Recursos Section */}
+      {/* Sistema Completo Section */}
       <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <Badge className="mb-4 bg-blue-100 text-blue-800 px-4 py-2">
+              Sistema Completo
+            </Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+              Tudo que sua locadora precisa em um só lugar
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              O DRIVS é mais que um software - é uma plataforma completa que revoluciona 
+              a gestão de locadoras com tecnologia avançada e interface intuitiva.
+            </p>
+          </div>
+
+          {/* Banner Interativo com Estatísticas */}
+          <div className="bg-gradient-to-br from-gray-900 to-blue-900 rounded-2xl p-8 mb-16 text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
+            <div className="relative z-10">
+              <div className="grid md:grid-cols-3 gap-8 text-center">
+                <div className="group hover:scale-105 transition-transform duration-300">
+                  <div className="text-4xl font-bold text-blue-300 mb-2">500+</div>
+                  <div className="text-lg font-medium mb-1">Locadoras Ativas</div>
+                  <div className="text-sm text-gray-300">Empresas que confiam no DRIVS</div>
+                </div>
+                <div className="group hover:scale-105 transition-transform duration-300">
+                  <div className="text-4xl font-bold text-green-300 mb-2">25K+</div>
+                  <div className="text-lg font-medium mb-1">Veículos Gerenciados</div>
+                  <div className="text-sm text-gray-300">Frota total na plataforma</div>
+                </div>
+                <div className="group hover:scale-105 transition-transform duration-300">
+                  <div className="text-4xl font-bold text-purple-300 mb-2">99.9%</div>
+                  <div className="text-lg font-medium mb-1">Uptime</div>
+                  <div className="text-sm text-gray-300">Disponibilidade garantida</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Recursos Section */}
+      <section id="recursos" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
@@ -173,7 +265,7 @@ export default function Home() {
       </section>
 
       {/* Benefícios Section */}
-      <section className="py-16 bg-gray-50">
+      <section id="beneficios" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -231,7 +323,7 @@ export default function Home() {
       </section>
 
       {/* Casos de Uso */}
-      <section className="py-16 bg-white">
+      <section id="casos" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
@@ -302,10 +394,12 @@ export default function Home() {
       <footer className="bg-gray-900 text-white py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Car className="h-5 w-5 text-white" />
-              </div>
+            <div className="flex items-center gap-3 mb-4 md:mb-0">
+              <img 
+                src="/logo_drivs.png" 
+                alt="DRIVS Logo" 
+                className="w-8 h-8"
+              />
               <span className="text-xl font-bold">DRIVS</span>
             </div>
             
