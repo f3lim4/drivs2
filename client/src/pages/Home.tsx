@@ -104,7 +104,7 @@ export default function Home() {
           
           <div className="flex gap-3">
             <Button variant="outline" onClick={handleDemo} className="hidden md:flex">
-              Solicitar Demo
+              30 Dias Grátis
             </Button>
             <Button onClick={handleLogin} className="md:hidden">
               Login
@@ -174,7 +174,7 @@ export default function Home() {
               size="lg" 
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
             >
-              Solicitar Demonstração <ArrowRight className="ml-2 h-5 w-5" />
+              30 Dias Grátis <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
               variant="outline"
@@ -187,7 +187,7 @@ export default function Home() {
           </div>
 
           <p className="text-sm text-gray-500">
-            Teste gratuito por 30 dias • Sem compromisso • Suporte incluso
+            30 dias grátis • Sem compromisso • Configuração inclusa
           </p>
         </div>
       </section>
@@ -365,8 +365,8 @@ export default function Home() {
             Pronto para transformar sua locadora?
           </h2>
           <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Agende uma demonstração personalizada e veja como o DRIVS pode 
-            otimizar as operações da sua empresa.
+            Comece hoje mesmo com 30 dias gratuitos e veja como o DRIVS pode 
+            otimizar as operações da sua empresa sem compromisso.
           </p>
           
           <div className="flex flex-col md:flex-row gap-4 justify-center">
@@ -376,7 +376,7 @@ export default function Home() {
               variant="secondary"
               className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg font-semibold"
             >
-              Solicitar Demonstração
+              Começar 30 Dias Grátis
             </Button>
             <Button 
               onClick={handleLogin}
