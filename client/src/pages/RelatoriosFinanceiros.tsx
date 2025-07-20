@@ -83,31 +83,7 @@ export default function RelatoriosFinanceiros() {
   const [sortVeiculos, setSortVeiculos] = useState<string>('mais-lucrativos');
   const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
   const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('maior-total');
-  const [sortHistorico, setSortHistorico] = useState<string>('mais-recente');
-  
-  // Estados de filtros do histórico
-  const [filtroTipo, setFiltroTipo] = useState('todos');
-  const [filtroCategoria, setFiltroCategoria] = useState('todas');
-  const [filtroVeiculo, setFiltroVeiculo] = useState('todos');
-  const [filtroStatus, setFiltroStatus] = useState('todos');
 
-  // Função para limpar todos os filtros
-  const limparFiltros = () => {
-    setFiltroTipo('todos');
-    setFiltroCategoria('todas');
-    setFiltroVeiculo('todos');
-    setFiltroStatus('todos');
-    setCurrentPageHistorico(1);
-  };
-
-  // Redefinir página quando filtros mudarem
-  useEffect(() => {
-    setCurrentPageHistorico(1);
-  }, [filtroTipo, filtroCategoria, filtroVeiculo, filtroStatus]);
-
-  // Verificar se há filtros ativos
-  const temFiltrosAtivos = filtroTipo !== 'todos' || filtroCategoria !== 'todas' || 
-                          filtroVeiculo !== 'todos' || filtroStatus !== 'todos';
   
   // Estados de paginação para a aba "Despesas Fixas"
   const [currentPageDespesasFixas, setCurrentPageDespesasFixas] = useState(1);
@@ -152,21 +128,6 @@ export default function RelatoriosFinanceiros() {
   const handleItemsPerPageChangeMotoristas = (items: number) => {
     setItemsPerPageMotoristas(items);
     setCurrentPageMotoristas(1);
-  };
-  
-  // Estados de paginação para a aba "Histórico"
-  const [currentPageHistorico, setCurrentPageHistorico] = useState(1);
-  const [itemsPerPageHistorico, setItemsPerPageHistorico] = useState(10);
-  
-  // Função para alterar página
-  const handlePageChangeHistorico = (page: number) => {
-    setCurrentPageHistorico(page);
-  };
-  
-  // Função para alterar itens por página
-  const handleItemsPerPageChangeHistorico = (items: number) => {
-    setItemsPerPageHistorico(items);
-    setCurrentPageHistorico(1);
   };
 
   // Schema atualizado para multi-seleção de veículos
@@ -442,7 +403,7 @@ export default function RelatoriosFinanceiros() {
     return despesasFixasVeiculos.reduce((total, veiculo) => total + veiculo.totalMensal, 0);
   }, [despesasFixasVeiculos]);
 
-  // Total das despesas fixas puras (sem manutenções) - para o card do histórico
+  // Total das despesas fixas puras (sem manutenções)
   const totalDespesasFixasPuras = useMemo(() => {
     return veiculos.reduce((total, veiculo) => {
       let despesasFixas = 0;
@@ -913,69 +874,6 @@ export default function RelatoriosFinanceiros() {
       };
     }).reverse().filter(item => item !== null && (item.receita > 0 || item.despesas > 0)); // Mostrar apenas meses com dados reais
 
-    // Preparar histórico financeiro detalhado
-    const historico = {
-      receitas: pagamentos
-        .filter(p => {
-          // Encontrar o aluguel relacionado ao pagamento
-          const aluguelRelacionado = alugueis.find(a => a.motoristaNome === p.motoristaNome);
-          return aluguelRelacionado && aluguelRelacionado.veiculoId === veiculo.id;
-        })
-        .map(pagamento => ({
-          id: pagamento.id,
-          tipo: 'Pagamento',
-          descricao: `Pagamento de ${pagamento.motoristaNome}`,
-          valor: parseFloat(pagamento.valor || '0'),
-          data: pagamento.data
-        })),
-      despesas: [
-        // Despesas manuais
-        ...despesasVeiculo
-          .filter(d => d.tipo === 'despesa')
-          .map(despesa => ({
-            id: despesa.id,
-            tipo: 'Despesa Manual',
-            categoria: despesa.categoria,
-            descricao: despesa.descricao || `Despesa de ${despesa.categoria}`,
-            valor: parseFloat(despesa.valor || '0'),
-            data: despesa.data
-          })),
-        // Despesas fixas separadas (transformar em histórico mensal)
-        ...(veiculo.ipva && veiculo.ipva > 0 ? [{
-          id: `ipva-${veiculo.id}`,
-          tipo: 'Despesa Fixa',
-          categoria: 'IPVA',
-          descricao: 'IPVA mensal',
-          valor: parseFloat(veiculo.ipva) / 12,
-          data: format(new Date(), 'yyyy-MM-dd')
-        }] : []),
-        ...(veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0 ? [{
-          id: `seguro-${veiculo.id}`,
-          tipo: 'Despesa Fixa',
-          categoria: 'Seguro',
-          descricao: 'Seguro mensal',
-          valor: parseFloat(veiculo.valorSeguroMensal),
-          data: format(new Date(), 'yyyy-MM-dd')
-        }] : []),
-        ...(veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0 ? [{
-          id: `rastreador-${veiculo.id}`,
-          tipo: 'Despesa Fixa',
-          categoria: 'Rastreador',
-          descricao: 'Rastreador mensal',
-          valor: parseFloat(veiculo.valorRastreadorMensal),
-          data: format(new Date(), 'yyyy-MM-dd')
-        }] : []),
-        ...(veiculo.financiado && veiculo.valorFinanciamento ? [{
-          id: `financiamento-${veiculo.id}`,
-          tipo: 'Despesa Fixa',
-          categoria: 'Financiamento',
-          descricao: 'Financiamento mensal',
-          valor: parseFloat(veiculo.valorFinanciamento),
-          data: format(new Date(), 'yyyy-MM-dd')
-        }] : [])
-      ].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
-    };
-
     return {
       veiculo,
       analiseFinanceira: {
@@ -987,8 +885,7 @@ export default function RelatoriosFinanceiros() {
       },
       motorista,
       despesasDetalhadas,
-      evolucaoMensal,
-      historico
+      evolucaoMensal
     };
   };
 
