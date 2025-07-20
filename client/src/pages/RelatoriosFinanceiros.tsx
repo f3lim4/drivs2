@@ -515,13 +515,26 @@ export default function RelatoriosFinanceiros() {
   }, [filteredData, searchTerm, filterType, veiculos, isDataReady]);
 
   // Cálculos dos totais - depois dos hooks de dados filtrados
-  const receitaTotal = useMemo(() => {
+  const receitaAlugueis = useMemo(() => {
     if (!isDataReady) return 0;
     return filteredData.alugueisAtivos.reduce((total, aluguel) => {
       const valorMensal = parseFloat(aluguel.valorMensal || aluguel.valorDiario || '0');
       return total + (isNaN(valorMensal) ? 0 : valorMensal);
     }, 0);
   }, [filteredData.alugueisAtivos, isDataReady]);
+
+  const receitaMultasJuros = useMemo(() => {
+    if (!isDataReady) return 0;
+    return filteredData.pagamentosRealizados.reduce((total, pagamento) => {
+      const juros = parseFloat(pagamento.juros || '0');
+      const multa = parseFloat(pagamento.multa || '0');
+      return total + juros + multa;
+    }, 0);
+  }, [filteredData.pagamentosRealizados, isDataReady]);
+
+  const receitaTotal = useMemo(() => {
+    return receitaAlugueis + receitaMultasJuros;
+  }, [receitaAlugueis, receitaMultasJuros]);
 
   const despesasTotal = useMemo(() => {
     if (!isDataReady || !veiculos) return 0;
@@ -572,6 +585,43 @@ export default function RelatoriosFinanceiros() {
     if (receitaTotal === 0) return 0;
     return (lucroLiquido / receitaTotal) * 100;
   }, [lucroLiquido, receitaTotal]);
+
+  // Cálculo de despesas por categoria para a aba "Despesas"
+  const despesasPorCategoria = useMemo(() => {
+    if (!isDataReady || !veiculos) return [];
+
+    const categorias = new Map();
+
+    // Despesas manuais por categoria
+    filteredData.despesasPeriodo.forEach(despesa => {
+      const categoria = despesa.categoria || 'outros';
+      const valor = parseFloat(despesa.valor || '0');
+      if (!categorias.has(categoria)) {
+        categorias.set(categoria, 0);
+      }
+      categorias.set(categoria, categorias.get(categoria) + valor);
+    });
+
+    // Manutenções (categoria "manutenção")
+    const valorManutencoes = filteredData.manutencoes.reduce((total, manutencao) => {
+      const valor = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
+      return total + (isNaN(valor) ? 0 : valor);
+    }, 0);
+    
+    if (valorManutencoes > 0) {
+      categorias.set('manutenção', (categorias.get('manutenção') || 0) + valorManutencoes);
+    }
+
+    // Converter Map para array e calcular percentuais
+    const categoriasArray = Array.from(categorias.entries()).map(([nome, valor]) => ({
+      nome,
+      valor,
+      porcentagem: (valor / despesasTotal) * 100
+    }));
+
+    // Ordenar por valor (maior para menor)
+    return categoriasArray.sort((a, b) => b.valor - a.valor);
+  }, [filteredData.despesasPeriodo, filteredData.manutencoes, despesasTotal, veiculos, isDataReady]);
 
   // Handlers de paginação
   const handlePageChange = (page: number, tipo: string) => {
@@ -749,13 +799,99 @@ export default function RelatoriosFinanceiros() {
       </div>
 
       {/* Tabs com abas de relatórios */}
-      <Tabs defaultValue="despesas-fixas" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="despesas" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="despesas">Despesas</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
           <TabsTrigger value="analise-veiculo">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="analise-motorista">Análise por Motorista</TabsTrigger>
           <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="despesas" className="space-y-6">
+          {/* Cards de Receitas e Despesas por Categoria */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Receitas por Tipo */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Receitas por Tipo</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between py-2">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                      <span className="font-medium">Aluguéis</span>
+                    </div>
+                    <span className="font-bold">{formatCurrency(receitaAlugueis)}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="font-medium">Multas e Juros</span>
+                    </div>
+                    <span className="font-bold">{formatCurrency(receitaMultasJuros)}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 pt-4 border-t-2 border-blue-200 bg-blue-50 rounded px-3">
+                    <span className="font-bold text-blue-700">Total Receitas</span>
+                    <span className="font-bold text-blue-800">{formatCurrency(receitaTotal)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Despesas por Categoria */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Despesas por Categoria</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                <div className="space-y-2">
+                  {despesasPorCategoria.map((categoria, index) => (
+                    <div key={categoria.nome} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-3 h-3 rounded-full ${
+                          categoria.nome === 'manutenção' ? 'bg-red-500' :
+                          categoria.nome === 'combustível' ? 'bg-orange-500' :
+                          categoria.nome === 'seguro' ? 'bg-green-500' :
+                          categoria.nome === 'licenciamento' ? 'bg-blue-500' :
+                          categoria.nome === 'lavagem' ? 'bg-cyan-500' :
+                          categoria.nome === 'peças' ? 'bg-purple-500' :
+                          categoria.nome === 'multa' ? 'bg-yellow-500' :
+                          'bg-gray-500'
+                        }`}></div>
+                        <span className="font-medium capitalize">{categoria.nome}</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full ${
+                              categoria.nome === 'manutenção' ? 'bg-red-500' :
+                              categoria.nome === 'combustível' ? 'bg-orange-500' :
+                              categoria.nome === 'seguro' ? 'bg-green-500' :
+                              categoria.nome === 'licenciamento' ? 'bg-blue-500' :
+                              categoria.nome === 'lavagem' ? 'bg-cyan-500' :
+                              categoria.nome === 'peças' ? 'bg-purple-500' :
+                              categoria.nome === 'multa' ? 'bg-yellow-500' :
+                              'bg-gray-500'
+                            }`}
+                            style={{ width: `${categoria.porcentagem}%` }}
+                          ></div>
+                        </div>
+                        <span className="font-bold w-20 text-right">{formatCurrency(categoria.valor)}</span>
+                        <span className="text-sm text-gray-500 w-12 text-right">{categoria.porcentagem.toFixed(1)}%</span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between py-2 pt-4 border-t-2 border-red-200 bg-red-50 rounded px-3">
+                    <span className="font-bold text-red-700">Total Despesas</span>
+                    <span className="font-bold text-red-800">{formatCurrency(despesasTotal)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         <TabsContent value="despesas-fixas" className="space-y-6">
           {/* Tabela de Despesas Fixas */}
