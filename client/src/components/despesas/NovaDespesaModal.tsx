@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CalendarIcon, Plus, Info } from 'lucide-react';
+import { CalendarIcon, Plus, Info, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -249,42 +249,59 @@ export function NovaDespesaModal() {
 
               <FormItem>
                 <FormLabel>Veículos</FormLabel>
-                <div className="border rounded-lg p-4 space-y-3 max-h-48 overflow-y-auto">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="select-all"
-                        checked={selectedVehicles.length === veiculos.length}
-                        onCheckedChange={handleSelectAllVehicles}
-                      />
-                      <label htmlFor="select-all" className="text-sm font-medium">
-                        Todos ({veiculos.length})
-                      </label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between"
+                      >
+                        {selectedVehicles.length === 0 
+                          ? "Selecionar veículos" 
+                          : selectedVehicles.length === 1 
+                            ? `${veiculos.find(v => v.id === selectedVehicles[0])?.placa} - ${veiculos.find(v => v.id === selectedVehicles[0])?.modelo}`
+                            : `${selectedVehicles.length} veículos selecionados`
+                        }
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0">
+                    <div className="p-4 space-y-3 max-h-60 overflow-y-auto">
+                      <div className="flex items-center justify-between">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleSelectAllVehicles(true)}
+                          className="text-xs"
+                        >
+                          Selecionar Todos
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setSelectedVehicles([])}
+                          className="text-xs"
+                        >
+                          Limpar Seleção
+                        </Button>
+                      </div>
+                      {veiculos.map((veiculo) => (
+                        <div key={veiculo.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={veiculo.id}
+                            checked={selectedVehicles.includes(veiculo.id)}
+                            onCheckedChange={(checked) => handleVehicleSelection(veiculo.id, checked as boolean)}
+                          />
+                          <label htmlFor={veiculo.id} className="text-sm cursor-pointer flex-1">
+                            {veiculo.placa} - {veiculo.modelo}
+                          </label>
+                        </div>
+                      ))}
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="select-none"
-                        checked={selectedVehicles.length === 0}
-                        onCheckedChange={(checked) => checked && setSelectedVehicles([])}
-                      />
-                      <label htmlFor="select-none" className="text-sm text-gray-600">
-                        Nenhum
-                      </label>
-                    </div>
-                  </div>
-                  {veiculos.map((veiculo) => (
-                    <div key={veiculo.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={veiculo.id}
-                        checked={selectedVehicles.includes(veiculo.id)}
-                        onCheckedChange={(checked) => handleVehicleSelection(veiculo.id, checked as boolean)}
-                      />
-                      <label htmlFor={veiculo.id} className="text-sm">
-                        {veiculo.modelo} - {veiculo.placa}
-                      </label>
-                    </div>
-                  ))}
-                </div>
+                  </PopoverContent>
+                </Popover>
                 {selectedVehicles.length > 0 && (
                   <div className="flex items-center space-x-2 text-sm text-blue-600">
                     <Info className="h-4 w-4" />
