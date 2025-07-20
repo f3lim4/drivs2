@@ -31,6 +31,7 @@ export const locadoras = pgTable("locadoras", {
   email: text("email").notNull().unique(),
   telefone: text("telefone").notNull().unique(),
   endereco: text("endereco").notNull(),
+  numero: text("numero").notNull(),
   cidade: text("cidade").notNull(),
   estado: text("estado").notNull(),
   cep: text("cep").notNull(),

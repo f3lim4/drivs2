@@ -34,6 +34,7 @@ export default function CadastroLocadora() {
     estado: '',
     cep: '',
     responsavel: '',
+    numero: '',
     logo: ''
   });
 
@@ -166,6 +167,7 @@ export default function CadastroLocadora() {
           email: formData.email,
           telefone: formData.telefone,
           endereco: formData.endereco,
+          numero: formData.numero,
           cidade: formData.cidade,
           estado: formData.estado,
           cep: formData.cep,
@@ -415,6 +417,17 @@ export default function CadastroLocadora() {
                     id="cep"
                     value={formData.cep}
                     onChange={(e) => updateFormData('cep', e.target.value)}
+                    placeholder=""
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="numero">Número *</Label>
+                  <Input
+                    id="numero"
+                    value={formData.numero}
+                    onChange={(e) => updateFormData('numero', e.target.value)}
                     placeholder=""
                     required
                   />
