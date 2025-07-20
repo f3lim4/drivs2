@@ -34,9 +34,46 @@ export default function CadastroLocadora() {
     estado: '',
     cep: '',
     responsavel: '',
-    numero: '',
     logo: ''
   });
+
+  // Função para buscar endereço por CEP
+  const buscarEnderecoPorCEP = async (cep: string) => {
+    const cepLimpo = cep.replace(/\D/g, '');
+    
+    if (cepLimpo.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+        const data = await response.json();
+        
+        if (!data.erro) {
+          setFormData(prev => ({
+            ...prev,
+            endereco: data.logradouro || '',
+            cidade: data.localidade || '',
+            estado: data.uf || ''
+          }));
+          
+          toast({
+            title: "Endereço encontrado!",
+            description: `${data.logradouro}, ${data.localidade} - ${data.uf}`,
+          });
+        } else {
+          toast({
+            title: "CEP não encontrado",
+            description: "Verifique o CEP digitado e tente novamente.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Erro ao buscar CEP",
+          description: "Não foi possível consultar o endereço. Tente novamente.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
 
   // Função para converter arquivo para base64
   const fileToBase64 = (file: File): Promise<string> => {
@@ -167,7 +204,6 @@ export default function CadastroLocadora() {
           email: formData.email,
           telefone: formData.telefone,
           endereco: formData.endereco,
-          numero: formData.numero,
           cidade: formData.cidade,
           estado: formData.estado,
           cep: formData.cep,
@@ -348,13 +384,80 @@ export default function CadastroLocadora() {
                   />
                 </div>
 
+                {/* CEP com busca automática */}
+                <div className="space-y-2">
+                  <Label htmlFor="cep">CEP *</Label>
+                  <Input
+                    id="cep"
+                    value={formData.cep}
+                    onChange={(e) => {
+                      updateFormData('cep', e.target.value);
+                      buscarEnderecoPorCEP(e.target.value);
+                    }}
+                    placeholder="00000-000"
+                    required
+                    maxLength={9}
+                  />
+                </div>
+
+                {/* Logo da Empresa */}
+                <div className="space-y-2">
+                  <Label>Logo da Empresa (Opcional)</Label>
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
+                      {logoPreview ? (
+                        <img 
+                          src={logoPreview} 
+                          alt="Logo da empresa" 
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      ) : (
+                        <Image className="w-8 h-8 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex space-x-2">
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => document.getElementById('logo-upload')?.click()}
+                          disabled={uploadingLogo}
+                        >
+                          {uploadingLogo ? 'Enviando...' : (logoPreview ? 'Alterar Logo' : 'Selecionar Logo')}
+                        </Button>
+                        {logoPreview && (
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            size="sm"
+                            onClick={handleRemoveLogo}
+                          >
+                            Remover
+                          </Button>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        JPG, PNG, SVG (máx. 5MB)
+                      </p>
+                    </div>
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/svg+xml"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="endereco">Endereço *</Label>
                   <Input
                     id="endereco"
                     value={formData.endereco}
                     onChange={(e) => updateFormData('endereco', e.target.value)}
-                    placeholder=""
+                    placeholder="Será preenchido automaticamente pelo CEP"
                     required
                   />
                 </div>
@@ -365,7 +468,7 @@ export default function CadastroLocadora() {
                     id="cidade"
                     value={formData.cidade}
                     onChange={(e) => updateFormData('cidade', e.target.value)}
-                    placeholder=""
+                    placeholder="Será preenchida automaticamente pelo CEP"
                     required
                   />
                 </div>
@@ -377,7 +480,7 @@ export default function CadastroLocadora() {
                     onValueChange={(value) => updateFormData('estado', value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione o estado" />
+                      <SelectValue placeholder="Será preenchido automaticamente pelo CEP" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="AC">Acre</SelectItem>
@@ -411,92 +514,10 @@ export default function CadastroLocadora() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cep">CEP *</Label>
-                  <Input
-                    id="cep"
-                    value={formData.cep}
-                    onChange={(e) => updateFormData('cep', e.target.value)}
-                    placeholder=""
-                    required
-                  />
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="numero">Número *</Label>
-                  <Input
-                    id="numero"
-                    value={formData.numero}
-                    onChange={(e) => updateFormData('numero', e.target.value)}
-                    placeholder=""
-                    required
-                  />
-                </div>
               </div>
 
-              {/* Logo da Empresa */}
-              <div className="space-y-4 pt-4 border-t">
-                <h3 className="text-lg font-medium flex items-center">
-                  <Image className="h-5 w-5 mr-2" />
-                  Logo da Empresa (Opcional)
-                </h3>
-                
-                <div className="space-y-4">
-                  {/* Preview do logo */}
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
-                      {logoPreview ? (
-                        <img 
-                          src={logoPreview} 
-                          alt="Logo da empresa" 
-                          className="w-full h-full object-contain rounded-lg"
-                        />
-                      ) : (
-                        <Image className="w-8 h-8 text-gray-400" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-600">
-                        {logoPreview ? 'Logo selecionado' : 'Nenhum logo selecionado'}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        Formatos aceitos: JPG, PNG, SVG (máximo 5MB)
-                      </p>
-                    </div>
-                  </div>
 
-                  {/* Controles de upload */}
-                  <div className="flex space-x-2">
-                    <Label htmlFor="logo-upload" className="cursor-pointer">
-                      <div className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 transition-colors">
-                        <Upload className="w-4 h-4" />
-                        <span className="text-sm font-medium">
-                          {uploadingLogo ? 'Carregando...' : 'Selecionar Logo'}
-                        </span>
-                      </div>
-                    </Label>
-                    <input
-                      id="logo-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleLogoUpload}
-                      disabled={uploadingLogo}
-                    />
-                    {logoPreview && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleRemoveLogo}
-                        disabled={uploadingLogo}
-                      >
-                        Remover
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button 
