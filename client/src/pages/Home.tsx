@@ -82,8 +82,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      {/* Header Transparente */}
+      <header className="absolute top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-white/20">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center">
             <img 
@@ -94,76 +94,119 @@ export default function Home() {
           </div>
           
           <nav className="hidden md:flex items-center gap-6">
-            <a href="#recursos" className="text-gray-600 hover:text-blue-600 transition-colors">Recursos</a>
-            <a href="#beneficios" className="text-gray-600 hover:text-blue-600 transition-colors">Benefícios</a>
-            <a href="#casos" className="text-gray-600 hover:text-blue-600 transition-colors">Casos de Sucesso</a>
-            <Button variant="ghost" onClick={handleLogin} className="text-blue-600 hover:text-blue-700">
+            <a href="#recursos" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Recursos</a>
+            <a href="#beneficios" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Benefícios</a>
+            <a href="#casos" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Casos de Sucesso</a>
+            <Button variant="ghost" onClick={handleLogin} className="text-blue-600 hover:text-blue-700 font-medium">
               Login
             </Button>
           </nav>
           
           <div className="flex gap-3">
-            <Button variant="outline" onClick={handleDemo} className="hidden md:flex">
+            <Button onClick={handleDemo} className="hidden md:flex bg-blue-600 hover:bg-blue-700 text-white shadow-lg">
               30 Dias Grátis
             </Button>
-            <Button onClick={handleLogin} className="md:hidden">
+            <Button onClick={handleLogin} className="md:hidden bg-blue-600 hover:bg-blue-700 text-white">
               Login
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 text-center">
-          <Badge className="mb-6 bg-blue-100 text-blue-800 px-4 py-2">
+      {/* Hero Section Futurista */}
+      <section className="relative pt-24 pb-16 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+              backgroundSize: '40px 40px'
+            }}></div>
+          </div>
+          
+          {/* Floating Orbs */}
+          <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-cyan-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+          
+          {/* Animated Lines */}
+          <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent animate-pulse"></div>
+          <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/30 to-transparent animate-pulse delay-700"></div>
+        </div>
+        
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <Badge className="mb-6 bg-blue-500/20 text-blue-200 border border-blue-400/30 px-6 py-3 backdrop-blur-sm">
             Sistema de Gestão para Locadoras
           </Badge>
           
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
             Plataforma Completa para<br />
-            <span className="text-blue-600">Gestão de Locadoras</span>
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">
+              Gestão de Locadoras
+            </span>
           </h1>
           
-          <p className="text-xl md:text-2xl mb-8 text-gray-600 max-w-4xl mx-auto">
+          <p className="text-xl md:text-2xl mb-12 text-blue-100 max-w-4xl mx-auto leading-relaxed">
             Sistema integrado que centraliza operações, automatiza processos e fornece 
             insights estratégicos para locadoras de veículos de todos os portes. 
             Controle total da sua frota com tecnologia de ponta.
           </p>
           
-          {/* Banner Interativo com Features */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 mb-8 max-w-6xl mx-auto border border-blue-100">
-            <div className="grid md:grid-cols-4 gap-6">
-              <div className="text-center group cursor-pointer hover:bg-white hover:shadow-lg rounded-xl p-4 transition-all duration-300">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-200 transition-colors">
-                  <Car className="h-6 w-6 text-blue-600" />
+          {/* Banner Futurista com Features */}
+          <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 mb-8 max-w-6xl mx-auto border border-white/20 shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-3xl"></div>
+            
+            <div className="relative z-10 grid md:grid-cols-4 gap-6">
+              <div className="text-center group cursor-pointer">
+                <div className="relative p-6 rounded-2xl border border-blue-400/30 bg-white/5 backdrop-blur-sm hover:bg-white/15 hover:border-blue-400/50 transition-all duration-500 hover:scale-105">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent rounded-2xl"></div>
+                  <div className="relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <Car className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-white mb-2 text-lg">Gestão de Frota</h3>
+                    <p className="text-blue-200 text-sm">Controle completo de veículos</p>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">Gestão de Frota</h3>
-                <p className="text-sm text-gray-600">Controle completo de veículos</p>
               </div>
               
-              <div className="text-center group cursor-pointer hover:bg-white hover:shadow-lg rounded-xl p-4 transition-all duration-300">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-green-200 transition-colors">
-                  <BarChart3 className="h-6 w-6 text-green-600" />
+              <div className="text-center group cursor-pointer">
+                <div className="relative p-6 rounded-2xl border border-emerald-400/30 bg-white/5 backdrop-blur-sm hover:bg-white/15 hover:border-emerald-400/50 transition-all duration-500 hover:scale-105">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-2xl"></div>
+                  <div className="relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <BarChart3 className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-white mb-2 text-lg">Relatórios</h3>
+                    <p className="text-emerald-200 text-sm">Analytics em tempo real</p>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">Relatórios</h3>
-                <p className="text-sm text-gray-600">Analytics em tempo real</p>
               </div>
               
-              <div className="text-center group cursor-pointer hover:bg-white hover:shadow-lg rounded-xl p-4 transition-all duration-300">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-purple-200 transition-colors">
-                  <FileText className="h-6 w-6 text-purple-600" />
+              <div className="text-center group cursor-pointer">
+                <div className="relative p-6 rounded-2xl border border-purple-400/30 bg-white/5 backdrop-blur-sm hover:bg-white/15 hover:border-purple-400/50 transition-all duration-500 hover:scale-105">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-transparent rounded-2xl"></div>
+                  <div className="relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <FileText className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-white mb-2 text-lg">Contratos</h3>
+                    <p className="text-purple-200 text-sm">Geração automática</p>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">Contratos</h3>
-                <p className="text-sm text-gray-600">Geração automática</p>
               </div>
               
-              <div className="text-center group cursor-pointer hover:bg-white hover:shadow-lg rounded-xl p-4 transition-all duration-300">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-200 transition-colors">
-                  <Shield className="h-6 w-6 text-orange-600" />
+              <div className="text-center group cursor-pointer">
+                <div className="relative p-6 rounded-2xl border border-orange-400/30 bg-white/5 backdrop-blur-sm hover:bg-white/15 hover:border-orange-400/50 transition-all duration-500 hover:scale-105">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-transparent rounded-2xl"></div>
+                  <div className="relative">
+                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <Shield className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-white mb-2 text-lg">Segurança</h3>
+                    <p className="text-orange-200 text-sm">Dados protegidos</p>
+                  </div>
                 </div>
-                <h3 className="font-semibold text-gray-800 mb-1">Segurança</h3>
-                <p className="text-sm text-gray-600">Dados protegidos</p>
               </div>
             </div>
           </div>
@@ -172,7 +215,7 @@ export default function Home() {
             <Button 
               onClick={handleDemo}
               size="lg" 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 text-lg shadow-2xl border border-blue-400/30 backdrop-blur-sm"
             >
               30 Dias Grátis <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
@@ -180,13 +223,13 @@ export default function Home() {
               variant="outline"
               onClick={handleLogin}
               size="lg" 
-              className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 text-lg"
+              className="border-white/30 text-white hover:bg-white/10 px-8 py-3 text-lg backdrop-blur-sm"
             >
               Acessar Sistema
             </Button>
           </div>
 
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-blue-300">
             30 dias grátis • Sem compromisso • Configuração inclusa
           </p>
         </div>
