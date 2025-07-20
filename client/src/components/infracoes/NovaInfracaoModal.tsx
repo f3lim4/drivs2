@@ -185,7 +185,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       
       const infracaoData = {
         ...data,
-        locadoraId: profile?.locadoraId || profile?.id || '',
+        locadoraId: profile?.locadoraId || '',
         valorOriginal: valorOriginal.toFixed(2),
         valorDesconto: taxaAdminValor.toFixed(2), // Salva o valor calculado da taxa, não a porcentagem
         valorFinal: parseFloat(data.valorFinal).toFixed(2),
