@@ -19,6 +19,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Interface atualizada** - Dropdown de ordenação no header, controles de paginação no rodapé
 - ✅ **Dados combinados inteligentemente** - Despesas e manutenções mescladas com tipos visuais diferenciados
 - ✅ **Controle de itens por página** - Opções de 10, 20 ou 50 itens por página
+- ✅ **Ordenação por data real corrigida** - Usa data da despesa/manutenção ao invés de data de criação
+- ✅ **Sistema de priorização** - Manutenções concluídas aparecem primeiro em caso de empate de data
 - ✅ **Sistema totalmente funcional** - Ordenação, paginação e busca funcionando em harmonia
 
 ### 2025-07-20: Investigação de Bug de Exclusão de Aluguéis - EM ANDAMENTO 🔍
