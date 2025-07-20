@@ -247,7 +247,7 @@ export default function Home() {
           </div>
 
           <p className="text-sm text-blue-300">
-            30 dias grátis • Sem compromisso • Configuração inclusa
+            30 dias grátis • Configuração inclusa
           </p>
         </div>
       </section>
