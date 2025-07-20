@@ -492,26 +492,15 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-3xl"></div>
             
             <div className="relative z-10">
-              <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
+              <div className="flex justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-2xl blur-sm"></div>
                   <Button 
                     onClick={handleDemo}
                     size="lg" 
-                    className="relative bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-10 py-4 text-xl font-bold shadow-2xl border border-blue-400/30 backdrop-blur-sm transition-all duration-500 hover:scale-105"
+                    className="relative bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-12 py-4 text-xl font-bold shadow-2xl border border-blue-400/30 backdrop-blur-sm transition-all duration-500 hover:scale-105"
                   >
                     Começar 30 Dias Grátis
-                  </Button>
-                </div>
-                
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent rounded-2xl blur-sm"></div>
-                  <Button 
-                    onClick={handleLogin}
-                    size="lg" 
-                    className="relative border border-white/40 text-white hover:bg-white/10 hover:border-white/60 bg-transparent backdrop-blur-lg px-10 py-4 text-xl font-bold transition-all duration-500 hover:scale-105 shadow-2xl"
-                  >
-                    Fazer Login
                   </Button>
                 </div>
               </div>
