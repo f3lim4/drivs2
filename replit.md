@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-20: Sistema de Ordenação e Paginação na Aba Histórico - CONCLUÍDO ✅
+### 2025-07-20: Sistema de Ordenação e Paginação na Aba Histórico com Dupla Datação - CONCLUÍDO ✅
 - ✅ **Estados de ordenação implementados** - sortHistorico com valor padrão "mais-recente"
 - ✅ **Estados de paginação adicionados** - currentPageHistorico, itemsPerPageHistorico e funções handlers
 - ✅ **Lógica de dados unificada** - historicoOrdenado combina despesas e manutenções em um array único
@@ -21,6 +21,9 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Controle de itens por página** - Opções de 10, 20 ou 50 itens por página
 - ✅ **Ordenação por data real corrigida** - Usa data da despesa/manutenção ao invés de data de criação
 - ✅ **Sistema de priorização** - Manutenções concluídas aparecem primeiro em caso de empate de data
+- ✅ **Sistema de dupla datação implementado** - Coluna "Data da Despesa" e coluna "Cadastrado em"
+- ✅ **Interface explicativa** - Descrição clara da diferença entre data da despesa e data de cadastro
+- ✅ **Visual diferenciado** - Data da despesa em azul (principal) e data de cadastro em cinza (secundária)
 - ✅ **Sistema totalmente funcional** - Ordenação, paginação e busca funcionando em harmonia
 
 ### 2025-07-20: Investigação de Bug de Exclusão de Aluguéis - EM ANDAMENTO 🔍

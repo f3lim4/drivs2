@@ -1360,7 +1360,7 @@ export default function RelatoriosFinanceiros() {
               <div>
                 <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
                 <CardDescription>
-                  Histórico filtrado baseado na busca realizada - dados reais
+                  Histórico completo com dupla datação: <strong>Data da Despesa</strong> (quando aconteceu) e <strong>Cadastrado em</strong> (quando foi registrado no sistema)
                 </CardDescription>
               </div>
               <div className="flex items-center gap-4">
@@ -1399,7 +1399,8 @@ export default function RelatoriosFinanceiros() {
                             <th className="text-left p-3 border-b">Categoria</th>
                             <th className="text-left p-3 border-b">Descrição</th>
                             <th className="text-left p-3 border-b">Valor</th>
-                            <th className="text-left p-3 border-b">Data</th>
+                            <th className="text-left p-3 border-b">Data da Despesa</th>
+                            <th className="text-left p-3 border-b">Cadastrado em</th>
                             <th className="text-left p-3 border-b">Tipo</th>
                           </tr>
                         </thead>
@@ -1416,7 +1417,14 @@ export default function RelatoriosFinanceiros() {
                                 }`}>
                                   {formatCurrency(item.valor)}
                                 </td>
-                                <td className="p-3">{format(new Date(item.data), 'dd/MM/yyyy')}</td>
+                                <td className="p-3">
+                                  <span className="font-semibold text-blue-700">
+                                    {format(new Date(item.data), 'dd/MM/yyyy')}
+                                  </span>
+                                </td>
+                                <td className="p-3 text-sm text-gray-600">
+                                  {item.createdAt ? format(new Date(item.createdAt), 'dd/MM/yyyy') : '-'}
+                                </td>
                                 <td className="p-3">
                                   <span className={`px-2 py-1 rounded-full text-xs ${
                                     item.tipo === 'despesa' 
