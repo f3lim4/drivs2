@@ -340,6 +340,16 @@ export default function Perfil() {
         queryKey: ['/api/locadoras']
       });
 
+      // Disparar evento personalizado para notificar outros contextos sobre a atualização
+      console.log('Perfil - Disparando evento profileUpdated com tipos:', selectedVehicleTypes);
+      const profileUpdateEvent = new CustomEvent('profileUpdated', {
+        detail: { 
+          locadoraId: profile.locadoraId,
+          tiposVeiculos: selectedVehicleTypes 
+        }
+      });
+      window.dispatchEvent(profileUpdateEvent);
+
       toast({
         title: "Perfil atualizado",
         description: "Os dados da locadora foram atualizados com sucesso.",
