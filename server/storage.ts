@@ -510,7 +510,7 @@ export class DatabaseStorage implements IStorage {
       ))
       .where(eq(alugueis.locadoraId, locadoraId));
     
-    console.log(`[SECURITY] Aluguéis encontrados para locadora ${locadoraId}:`, alugueisData.length);
+
     
     return alugueisData.map(aluguel => ({
       ...aluguel,
