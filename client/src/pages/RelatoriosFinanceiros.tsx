@@ -1390,12 +1390,6 @@ export default function RelatoriosFinanceiros() {
                         
                         // Adicionar despesas manuais
                         despesas.filter(despesa => despesa.categoria !== 'financiamento').forEach(despesa => {
-                          console.log('Despesa com datas:', { 
-                            id: despesa.id, 
-                            data: despesa.data, 
-                            createdAt: despesa.createdAt,
-                            updatedAt: despesa.updatedAt 
-                          });
                           const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
                           todasDespesas.push({
                             id: `despesa-${despesa.id}`,
