@@ -38,10 +38,15 @@ const despesaFormSchema = insertDespesaSchema.omit({ id: true }).extend({
 // Função para converter data brasileira (dd/MM/yyyy) para Date
 const parseDate = (dateStr: string): Date | undefined => {
   try {
+    if (!dateStr) return undefined;
+    
     if (dateStr.includes('/')) {
-      return parse(dateStr, 'dd/MM/yyyy', new Date());
+      const parsed = parse(dateStr, 'dd/MM/yyyy', new Date());
+      return isNaN(parsed.getTime()) ? undefined : parsed;
     }
-    return new Date(dateStr);
+    
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? undefined : date;
   } catch {
     return undefined;
   }
@@ -64,7 +69,7 @@ export function NovaDespesaModal() {
       categoria: '',
       descricao: '',
       valor: '',
-      data: format(new Date(), 'yyyy-MM-dd'),
+      data: format(new Date(), 'dd/MM/yyyy'),
       tipo: 'despesa',
       status: 'pendente',
       observacoes: '',
@@ -179,7 +184,7 @@ export function NovaDespesaModal() {
         categoria: '',
         descricao: '',
         valor: '',
-        data: format(new Date(), 'yyyy-MM-dd'),
+        data: format(new Date(), 'dd/MM/yyyy'),
         tipo: 'despesa',
         status: 'pendente',
         observacoes: '',
@@ -437,7 +442,7 @@ export function NovaDespesaModal() {
                             )}
                           >
                             {field.value ? (
-                              format(new Date(field.value), 'dd/MM/yyyy')
+                              field.value
                             ) : (
                               <span>Selecione a data</span>
                             )}
@@ -449,10 +454,15 @@ export function NovaDespesaModal() {
                         <Calendar
                           mode="single"
                           selected={field.value ? parseDate(field.value) : undefined}
-                          onSelect={(date) => field.onChange(date ? format(date, 'dd/MM/yyyy') : '')}
+                          onSelect={(date) => {
+                            if (date) {
+                              field.onChange(format(date, 'dd/MM/yyyy'));
+                            } else {
+                              field.onChange('');
+                            }
+                          }}
                           disabled={(date) => date < new Date('1900-01-01')}
                           initialFocus
-
                         />
                       </PopoverContent>
                     </Popover>
