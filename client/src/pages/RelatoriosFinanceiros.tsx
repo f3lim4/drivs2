@@ -27,6 +27,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
 import { NovaDespesaModal } from '@/components/despesas/NovaDespesaModal';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Pagination } from '@/components/ui/pagination';
 
@@ -120,9 +121,8 @@ export default function RelatoriosFinanceiros() {
       // Rastreador mensal
       const rastreadorMensal = veiculo.valorRastreadorMensal ? parseFloat(veiculo.valorRastreadorMensal) : 0;
       
-      // Financiamento mensal
-      const financiamentoMensal = veiculo.financiado && veiculo.valorFinanciamento ? 
-        parseFloat(veiculo.valorFinanciamento) : 0;
+      // Financiamento mensal (se aplicável)
+      const financiamentoMensal = 0; // Remover até campo ser implementado
 
       const total = ipvaMensal + seguroMensal + rastreadorMensal + financiamentoMensal;
 
@@ -200,13 +200,13 @@ export default function RelatoriosFinanceiros() {
     return veiculos.map((veiculo: any) => {
       // Encontrar aluguel ativo para receita
       const aluguelAtivo = filteredData.alugueisAtivos.find((a: any) => a.veiculoId === veiculo.id);
-      const receitaMensal = aluguelAtivo ? parseFloat(aluguelAtivo.valorMensal || '0') : 0;
+      const receitaMensal = aluguelAtivo ? parseFloat(aluguelAtivo.valorMensal || aluguelAtivo.valorDiario * 30 || '0') : 0;
 
       // Calcular despesas fixas do veículo
       const ipva = veiculo.ipva ? parseFloat(veiculo.ipva) / 12 : 0;
       const seguro = veiculo.valorSeguro ? parseFloat(veiculo.valorSeguro) : 0;
       const rastreador = veiculo.valorRastreadorMensal ? parseFloat(veiculo.valorRastreadorMensal) : 0;
-      const financiamento = veiculo.financiado && veiculo.valorFinanciamento ? parseFloat(veiculo.valorFinanciamento) : 0;
+      const financiamento = 0; // Campo de financiamento ainda não implementado
 
       // Somar despesas manuais do período para este veículo
       const despesasManuais = filteredData.despesasPeriodo
