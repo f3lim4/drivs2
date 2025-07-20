@@ -292,23 +292,49 @@ export default function Perfil() {
   }, [profile?.locadoraId, profile?.email, form, toast, isAdmin, isLocadora]);
 
   const onSubmit = async (data: PerfilFormData) => {
-    if (!profile?.locadoraId) return;
+    console.log('onSubmit chamado com dados:', data);
+    console.log('profile?.locadoraId:', profile?.locadoraId);
+    
+    if (!profile?.locadoraId) {
+      console.error('Erro: locadoraId não encontrado no perfil');
+      toast({
+        title: "Erro",
+        description: "ID da locadora não encontrado. Tente fazer login novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
       setSaving(true);
+      
+      // Preparar dados para envio, incluindo tipos de veículos
+      const dataToSend = {
+        ...data,
+        tiposVeiculos: selectedVehicleTypes
+      };
+      
+      console.log('Dados sendo enviados:', dataToSend);
+      
       const response = await fetch(`/api/locadoras/${profile.locadoraId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(dataToSend),
       });
 
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error('Erro ao atualizar dados');
+        const errorData = await response.text();
+        console.error('Erro do servidor:', errorData);
+        throw new Error(`Erro ao atualizar dados: ${response.status}`);
       }
 
       const updatedData = await response.json();
+      console.log('Dados atualizados recebidos:', updatedData);
+      
       setLocadora(updatedData);
       setEditMode(false);
 
@@ -320,7 +346,7 @@ export default function Perfil() {
       console.error('Erro ao atualizar:', error);
       toast({
         title: "Erro ao atualizar",
-        description: "Não foi possível atualizar os dados. Tente novamente.",
+        description: `Não foi possível atualizar os dados: ${error.message}`,
         variant: "destructive",
       });
     } finally {
