@@ -32,7 +32,15 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { DrivsHeader } from '@/components/layout/DrivsHeader';
-import { User, Building, Phone, Mail, MapPin, Calendar, CreditCard, Lock, Upload, Image } from 'lucide-react';
+import { User, Building, Phone, Mail, MapPin, Calendar, CreditCard, Lock, Upload, Image, Car, Bike, Truck, Bus } from 'lucide-react';
+
+// Tipos de veículos disponíveis
+const tiposVeiculosDisponiveis = [
+  { id: 'carros', label: 'Carros', icon: Car },
+  { id: 'motos', label: 'Motocicletas', icon: Bike },
+  { id: 'caminhoes', label: 'Caminhões', icon: Truck },
+  { id: 'utilitarios', label: 'Utilitários', icon: Bus },
+] as const;
 
 // Schema de validação para perfil da locadora (sem plano)
 const perfilSchema = z.object({
@@ -47,6 +55,7 @@ const perfilSchema = z.object({
   cep: z.string().min(8, 'CEP deve ter 8 dígitos'),
   responsavel: z.string().min(1, 'Responsável é obrigatório'),
   logo: z.string().optional(), // Logo é opcional
+  tiposVeiculos: z.array(z.string()).optional(), // Array de tipos de veículos
 });
 
 // Schema de validação para troca de senha
@@ -73,6 +82,7 @@ interface LocadoraData {
   cidade: string;
   estado: string;
   cep: string;
+  tiposVeiculos?: string[];
   responsavel: string;
   logo?: string;
   status: string;
@@ -92,6 +102,7 @@ export default function Perfil() {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [selectedVehicleTypes, setSelectedVehicleTypes] = useState<string[]>([]);
 
   // Função para recarregar o perfil do servidor
   const reloadProfile = async () => {
@@ -172,6 +183,17 @@ export default function Perfil() {
     form.setValue('logo', '');
   };
 
+  // Função para alternar tipo de veículo selecionado
+  const toggleVehicleType = (typeId: string) => {
+    setSelectedVehicleTypes(prev => {
+      const updated = prev.includes(typeId) 
+        ? prev.filter(id => id !== typeId)
+        : [...prev, typeId];
+      form.setValue('tiposVeiculos', updated);
+      return updated;
+    });
+  };
+
   const form = useForm<PerfilFormData>({
     resolver: zodResolver(perfilSchema),
     defaultValues: {
@@ -234,6 +256,10 @@ export default function Perfil() {
           setLocadora(data);
           setLogoPreview(data.logo || null);
           
+          // Configurar tipos de veículos selecionados
+          const tipos = data.tiposVeiculos || ['carros']; // Default para carros se não houver tipos definidos
+          setSelectedVehicleTypes(tipos);
+          
           // Atualizar form com os dados
           form.reset({
             nome: data.nome,
@@ -247,6 +273,7 @@ export default function Perfil() {
             cep: data.cep,
             responsavel: data.responsavel,
             logo: data.logo || '',
+            tiposVeiculos: tipos,
           });
         } catch (error) {
           console.error('Erro ao carregar locadora:', error);
@@ -649,6 +676,53 @@ export default function Perfil() {
                       </div>
                     )}
                   </div>
+                </div>
+
+                <Separator />
+
+                {/* Tipos de Veículos */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center">
+                    <Car className="h-5 w-5 mr-2" />
+                    Tipos de Veículos da Sua Frota
+                  </h3>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {tiposVeiculosDisponiveis.map((tipo) => {
+                      const IconComponent = tipo.icon;
+                      const isSelected = selectedVehicleTypes.includes(tipo.id);
+                      
+                      return (
+                        <div
+                          key={tipo.id}
+                          onClick={() => editMode && toggleVehicleType(tipo.id)}
+                          className={`
+                            p-4 rounded-lg border cursor-pointer transition-all duration-200
+                            ${isSelected 
+                              ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm' 
+                              : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                            }
+                            ${editMode ? 'cursor-pointer' : 'cursor-default opacity-60'}
+                          `}
+                        >
+                          <div className="flex flex-col items-center space-y-2">
+                            <IconComponent className="h-8 w-8" />
+                            <span className="text-sm font-medium">{tipo.label}</span>
+                            {isSelected && (
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  <p className="text-sm text-gray-500">
+                    {editMode 
+                      ? 'Selecione os tipos de veículos que sua locadora trabalha. Isso afetará os ícones exibidos no sistema.'
+                      : `Sua locadora trabalha com: ${selectedVehicleTypes.map(id => tiposVeiculosDisponiveis.find(t => t.id === id)?.label).join(', ')}`
+                    }
+                  </p>
                 </div>
 
                 <Separator />

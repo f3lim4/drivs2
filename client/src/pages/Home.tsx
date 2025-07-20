@@ -5,21 +5,32 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, ArrowRight, Users, Car, FileText, BarChart3, Shield, Clock, Building2, Zap, TrendingUp, Truck, Bike, Bus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import drivsLogo from "@/assets/drivs-logo.png";
+import { useVehicleTypes, VehicleType } from "@/contexts/VehicleTypesContext";
+
+// Mapeamento de tipos de veículos para ícones
+const vehicleIconMap: Record<VehicleType, any> = {
+  carro: Car,
+  moto: Bike,
+  caminhao: Truck,
+  utilitario: Bus
+};
 
 // Componente de ícone animado para frota
 function AnimatedFleetIcon({ size = "h-6 w-6" }) {
   const [currentIconIndex, setCurrentIconIndex] = useState(0);
-  const vehicleIcons = [Car, Bike, Truck, Bus]; // Car, Moto, Caminhão, Utilitário
+  
+  // Para homepage pública, mostrar todos os tipos por padrão
+  const defaultVehicleIcons = [Car, Bike, Truck, Bus];
   
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIconIndex((prev) => (prev + 1) % vehicleIcons.length);
+      setCurrentIconIndex((prev) => (prev + 1) % defaultVehicleIcons.length);
     }, 2000); // Troca a cada 2 segundos
     
     return () => clearInterval(interval);
   }, []);
   
-  const CurrentIcon = vehicleIcons[currentIconIndex];
+  const CurrentIcon = defaultVehicleIcons[currentIconIndex];
   
   return (
     <div className="transition-all duration-500 ease-in-out">
