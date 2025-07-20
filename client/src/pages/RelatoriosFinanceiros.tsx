@@ -43,31 +43,6 @@ export default function RelatoriosFinanceiros() {
   const { veiculos } = useVeiculos();
   const { motoristas } = useMotoristas();
   const { manutencoes } = useManutencoes();
-  
-  // Criar variável despesasComManutencoes usando dados do hook useDespesas
-  const despesasComManutencoes = useMemo(() => {
-    return despesas || [];
-  }, [despesas]);
-
-  // Verificar se dados principais estão carregados
-  const isDataLoading = despesasLoading || !despesas || !veiculos || !alugueis || !pagamentos;
-  
-  if (isDataLoading) {
-    return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-bounce mb-4">
-              <svg className="w-12 h-12 mx-auto text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 18l8-8H2l8 8z"/>
-              </svg>
-            </div>
-            <p className="text-gray-600">Carregando relatórios financeiros...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -178,6 +153,29 @@ export default function RelatoriosFinanceiros() {
       formaPagamento: '',
     }
   });
+
+  // Criar variável despesasComManutencoes usando dados do hook useDespesas
+  const despesasComManutencoes = useMemo(() => {
+    return despesas || [];
+  }, [despesas]);
+
+  // Verificar se dados principais estão carregados
+  if (!despesas || despesas.length === 0 || !veiculos || veiculos.length === 0) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-bounce mb-4">
+              <svg className="w-12 h-12 mx-auto text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 18l8-8H2l8 8z"/>
+              </svg>
+            </div>
+            <p className="text-gray-600">Carregando relatórios financeiros...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Função para enviar formulário
   const onSubmit = async (data: any) => {
