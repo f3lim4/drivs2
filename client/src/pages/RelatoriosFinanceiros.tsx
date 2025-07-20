@@ -483,11 +483,22 @@ export default function RelatoriosFinanceiros() {
       />
 
       {/* Modal Detalhes Veículo */}
-      <DetalhesVeiculoModal
-        veiculo={modalDetalhes.veiculo}
-        isOpen={modalDetalhes.aberto}
-        onClose={() => setModalDetalhes({ aberto: false, veiculo: null })}
-      />
+      {modalDetalhes.veiculo && (
+        <DetalhesVeiculoModal
+          veiculo={modalDetalhes.veiculo}
+          analiseFinanceira={{
+            receitaMensal: 0,
+            despesasMensais: 0,
+            lucro: 0,
+            margem: 0,
+            status: 'Parado'
+          }}
+          despesasDetalhadas={[]}
+          evolucaoMensal={[]}
+          isOpen={modalDetalhes.aberto}
+          onClose={() => setModalDetalhes({ aberto: false, veiculo: null })}
+        />
+      )}
 
       {/* Diálogo de confirmação */}
       <ConfirmDialog

@@ -11,15 +11,15 @@ import { pt } from 'date-fns/locale';
 import { formatCurrency } from '@/lib/utils';
 
 interface DetalhesVeiculoModalProps {
-  veiculo: {
+  veiculo?: {
     id: string;
     placa: string;
     modelo: string;
     marca: string;
     cor: string;
     ano: number;
-  };
-  analiseFinanceira: {
+  } | null;
+  analiseFinanceira?: {
     receitaMensal: number;
     despesasMensais: number;
     lucro: number;
@@ -30,12 +30,12 @@ interface DetalhesVeiculoModalProps {
     nome: string;
     cpf: string;
   };
-  despesasDetalhadas: Array<{
+  despesasDetalhadas?: Array<{
     categoria: string;
     valor: number;
     percentual: number;
   }>;
-  evolucaoMensal: Array<{
+  evolucaoMensal?: Array<{
     mes: string;
     receita: number;
     despesas: number;
@@ -58,17 +58,26 @@ interface DetalhesVeiculoModalProps {
       data: string;
     }>;
   };
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export function DetalhesVeiculoModal({
   veiculo,
   analiseFinanceira,
   motorista,
-  despesasDetalhadas,
-  evolucaoMensal,
-  historico
+  despesasDetalhadas = [],
+  evolucaoMensal = [],
+  historico,
+  isOpen = false,
+  onClose
 }: DetalhesVeiculoModalProps) {
   const [open, setOpen] = useState(false);
+  
+  // Se não há veículo selecionado, não renderizar o modal
+  if (!veiculo || !analiseFinanceira) {
+    return null;
+  }
 
   const categoriasLabels = {
     combustivel: 'Combustível',
@@ -122,8 +131,12 @@ export function DetalhesVeiculoModal({
   const risco = getRisco(analiseFinanceira.margem);
   const recomendacao = getRecomendacao(analiseFinanceira.margem, analiseFinanceira.status);
 
+  // Usar props isOpen e onClose se fornecidas, senão usar estado interno
+  const modalOpen = isOpen !== undefined ? isOpen : open;
+  const handleOpenChange = onClose ? (open: boolean) => !open && onClose() : setOpen;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={modalOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm">
           <Eye className="h-4 w-4" />
