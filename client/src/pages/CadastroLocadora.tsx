@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, ArrowLeft, Upload, Image, Lock } from 'lucide-react';
+import { Car, ArrowLeft, Upload, Image, Lock, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -329,6 +329,19 @@ export default function CadastroLocadora() {
           </CardHeader>
           
           <CardContent>
+            {/* Aviso sobre dados únicos */}
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                <p className="text-sm font-medium text-yellow-800">Dados que devem ser únicos:</p>
+              </div>
+              <ul className="text-xs text-yellow-700 space-y-1">
+                <li>• Email deve ser único (não pode repetir)</li>
+                <li>• Telefone deve ser único (não pode repetir)</li>
+                <li>• CNPJ deve ser único (não pode repetir)</li>
+              </ul>
+            </div>
+            
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Nome Fantasia, Razão Social e CNPJ na mesma linha */}
