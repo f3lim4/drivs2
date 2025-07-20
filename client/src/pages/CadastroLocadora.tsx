@@ -384,70 +384,74 @@ export default function CadastroLocadora() {
                   />
                 </div>
 
-                {/* CEP com busca automática */}
-                <div className="space-y-2">
-                  <Label htmlFor="cep">CEP *</Label>
-                  <Input
-                    id="cep"
-                    value={formData.cep}
-                    onChange={(e) => {
-                      updateFormData('cep', e.target.value);
-                      buscarEnderecoPorCEP(e.target.value);
-                    }}
-                    placeholder="00000-000"
-                    required
-                    maxLength={9}
-                  />
-                </div>
+                {/* CEP e Logo na mesma linha */}
+                <div className="flex gap-4 md:col-span-2">
+                  {/* CEP com busca automática */}
+                  <div className="space-y-2 w-48">
+                    <Label htmlFor="cep">CEP *</Label>
+                    <Input
+                      id="cep"
+                      value={formData.cep}
+                      onChange={(e) => {
+                        updateFormData('cep', e.target.value);
+                        buscarEnderecoPorCEP(e.target.value);
+                      }}
+                      placeholder="00000-000"
+                      required
+                      maxLength={9}
+                      className="w-full"
+                    />
+                  </div>
 
-                {/* Logo da Empresa */}
-                <div className="space-y-2">
-                  <Label>Logo da Empresa (Opcional)</Label>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
-                      {logoPreview ? (
-                        <img 
-                          src={logoPreview} 
-                          alt="Logo da empresa" 
-                          className="w-full h-full object-contain rounded-lg"
-                        />
-                      ) : (
-                        <Image className="w-8 h-8 text-gray-400" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex space-x-2">
-                        <Button 
-                          type="button"
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => document.getElementById('logo-upload')?.click()}
-                          disabled={uploadingLogo}
-                        >
-                          {uploadingLogo ? 'Enviando...' : (logoPreview ? 'Alterar Logo' : 'Selecionar Logo')}
-                        </Button>
-                        {logoPreview && (
+                  {/* Logo da Empresa */}
+                  <div className="space-y-2 flex-1">
+                    <Label>Logo da Empresa (Opcional)</Label>
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center border">
+                        {logoPreview ? (
+                          <img 
+                            src={logoPreview} 
+                            alt="Logo da empresa" 
+                            className="w-full h-full object-contain rounded-lg"
+                          />
+                        ) : (
+                          <Image className="w-6 h-6 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex space-x-2">
                           <Button 
                             type="button"
                             variant="outline" 
                             size="sm"
-                            onClick={handleRemoveLogo}
+                            onClick={() => document.getElementById('logo-upload')?.click()}
+                            disabled={uploadingLogo}
                           >
-                            Remover
+                            {uploadingLogo ? 'Enviando...' : (logoPreview ? 'Alterar' : 'Selecionar')}
                           </Button>
-                        )}
+                          {logoPreview && (
+                            <Button 
+                              type="button"
+                              variant="outline" 
+                              size="sm"
+                              onClick={handleRemoveLogo}
+                            >
+                              Remover
+                            </Button>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          JPG, PNG, SVG (máx. 5MB)
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        JPG, PNG, SVG (máx. 5MB)
-                      </p>
+                      <input
+                        id="logo-upload"
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/svg+xml"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                      />
                     </div>
-                    <input
-                      id="logo-upload"
-                      type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/svg+xml"
-                      onChange={handleLogoUpload}
-                      className="hidden"
-                    />
                   </div>
                 </div>
 
