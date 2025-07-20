@@ -247,7 +247,7 @@ export default function Home() {
           </div>
 
           <p className="text-sm text-blue-300">
-            30 dias grátis • Configuração inclusa
+            30 dias grátis
           </p>
         </div>
       </section>
@@ -505,14 +505,10 @@ export default function Home() {
                 </div>
               </div>
               
-              <div className="mt-8 flex flex-wrap justify-center gap-6 text-blue-200">
+              <div className="mt-8 flex justify-center text-blue-200">
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
                   <span>30 dias grátis</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></div>
-                  <span>Configuração inclusa</span>
                 </div>
               </div>
             </div>
