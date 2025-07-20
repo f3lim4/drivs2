@@ -1843,7 +1843,8 @@ export default function RelatoriosFinanceiros() {
                                   </span>
                                 </td>
                                 <td className="p-3">
-                                  {item.fonte === 'despesa' && (
+                                  {/* Despesas manuais (IDs normais) podem ser excluídas */}
+                                  {!item.id.startsWith('manutencao_') && !item.id.startsWith('financiamento_') && item.tipo === 'despesa' && (
                                     <Button
                                       variant="ghost"
                                       size="sm"
@@ -1853,7 +1854,8 @@ export default function RelatoriosFinanceiros() {
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
                                   )}
-                                  {item.fonte === 'manutencao' && (
+                                  {/* Despesas automáticas (manutenção, financiamento) não podem ser excluídas */}
+                                  {(item.id.startsWith('manutencao_') || item.id.startsWith('financiamento_')) && (
                                     <span className="text-gray-400 text-xs">-</span>
                                   )}
                                 </td>
