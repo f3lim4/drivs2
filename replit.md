@@ -59,6 +59,29 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Emojis estratégicos** - Símbolos que chamam atenção nos resultados de busca
 - ✅ **Abordagem positiva** - Removido foco em perdas, enfatizado ganhos e soluções
 
+### 2025-07-20: Correção Crítica do CNPJ da Locadora Principal - CONCLUÍDO ✅
+- ✅ **CNPJ corrigido no banco de dados** - Alterado de "5076457100170" para "50764571000170" (CNPJ completo com 14 dígitos)
+- ✅ **Tabela locadoras atualizada** - Campo id e cnpj corrigidos para valor correto
+- ✅ **Referências atualizadas em todas as tabelas** - Chaves estrangeiras atualizadas em:
+  - ✅ 10 veículos na tabela veiculos
+  - ✅ 10 motoristas na tabela motoristas  
+  - ✅ 10 aluguéis na tabela alugueis
+  - ✅ 18 pagamentos na tabela pagamentos
+  - ✅ 18 despesas na tabela despesas
+  - ✅ 13 atividades na tabela atividades
+  - ✅ 1 manutenção na tabela manutencoes
+  - ✅ 1 template na tabela template_contratos
+- ✅ **Integridade dos dados mantida** - Todos os relacionamentos funcionando corretamente
+- ✅ **Sistema operacional** - Aplicação reiniciada e funcionando com CNPJ correto
+
+### 2025-07-20: Sistema de Tipos de Veículos Dinâmico Implementado - CONCLUÍDO ✅
+- ✅ **VehicleTypesContext criado** - Sistema de contexto para gerenciar tipos de veículos por locadora
+- ✅ **Campo tipos_veiculos adicionado** - Migração SQL para armazenar seleção da locadora
+- ✅ **Interface de seleção implementada** - Seção no perfil para escolher tipos de veículos
+- ✅ **Ícones dinâmicos** - Homepage adapta animação baseada na seleção da empresa
+- ✅ **4 tipos disponíveis** - Carros, motocicletas, caminhões e utilitários
+- ✅ **Integração completa** - Backend e frontend sincronizados para sistema dinâmico
+
 ### 2025-07-20: Otimização Final da Homepage Institucional - CONCLUÍDO ✅
 - ✅ **Design glassmorphism ultra-transparente** - Header com bg-white/20 e backdrop-blur-lg
 - ✅ **Botões futuristas consistentes** - Todos botões secundários com transparência total
