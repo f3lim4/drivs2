@@ -295,6 +295,8 @@ export default function RelatoriosFinanceiros() {
       isInPeriod(new Date(manutencao.dataInicio))
     );
 
+
+
     return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo, manutencoes: manutencoesPeriodo };
   }, [alugueis, pagamentos, infracoes, despesas, manutencoes, monthStart, monthEnd]);
 
