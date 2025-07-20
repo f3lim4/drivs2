@@ -82,6 +82,9 @@ export default function RelatoriosFinanceiros() {
   // Estado para o modal de detalhes do veículo
   const [veiculoDetalhes, setVeiculoDetalhes] = useState<any>(null);
   
+  // Estado para o modal de detalhes do motorista
+  const [motoristaDetalhes, setMotoristaDetalhes] = useState<any>(null);
+  
   // Estados de ordenação para as abas
   const [sortVeiculos, setSortVeiculos] = useState<string>('mais-lucrativos');
   const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
@@ -288,6 +291,17 @@ export default function RelatoriosFinanceiros() {
         description: 'Erro ao excluir despesa. Tente novamente.',
         variant: 'destructive',
       });
+    }
+  };
+
+  // Função para ver detalhes do motorista
+  const handleVerDetalhesMotorista = (item: any) => {
+    // Encontrar o veículo do motorista
+    const veiculo = veiculos.find(v => v.placa === item.veiculoPlaca);
+    if (veiculo) {
+      // Gerar dados detalhados do veículo associado ao motorista
+      const dadosDetalhados = gerarDadosDetalhados(veiculo, selectedMonth);
+      setMotoristaDetalhes(dadosDetalhados);
     }
   };
 
@@ -2069,6 +2083,7 @@ export default function RelatoriosFinanceiros() {
                       <table className="w-full border-collapse">
                         <thead>
                           <tr className="bg-gray-50">
+                            <th className="text-left p-3 border-b">Ver</th>
                             <th className="text-left p-3 border-b">Motorista</th>
                             <th className="text-left p-3 border-b">CPF</th>
                             <th className="text-left p-3 border-b">Veículo</th>
@@ -2080,6 +2095,16 @@ export default function RelatoriosFinanceiros() {
                         <tbody>
                           {analiseMotoristasPaginada.map((item) => (
                             <tr key={item.motoristaId} className="border-b hover:bg-gray-50">
+                              <td className="p-3">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleVerDetalhesMotorista(item)}
+                                  className="text-blue-600 hover:text-blue-800"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </td>
                               <td className="p-3 font-medium">{item.motoristaNome}</td>
                               <td className="p-3 text-gray-600">{item.motoristaCpf}</td>
                               <td className="p-3">{item.veiculoPlaca}</td>
@@ -2170,6 +2195,16 @@ export default function RelatoriosFinanceiros() {
           isOpen={!!veiculoDetalhes}
           onClose={() => setVeiculoDetalhes(null)}
           dadosVeiculo={veiculoDetalhes}
+          selectedMonth={selectedMonth}
+        />
+      )}
+
+      {/* Modal de detalhes do motorista */}
+      {motoristaDetalhes && (
+        <DetalhesVeiculoAnaliseModal
+          isOpen={!!motoristaDetalhes}
+          onClose={() => setMotoristaDetalhes(null)}
+          dadosVeiculo={motoristaDetalhes}
           selectedMonth={selectedMonth}
         />
       )}
