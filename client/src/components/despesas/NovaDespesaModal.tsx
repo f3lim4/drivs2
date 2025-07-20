@@ -51,7 +51,7 @@ export function NovaDespesaModal() {
       veiculoId: '',
       categoria: '',
       descricao: '',
-      valor: 0,
+      valor: '',
       data: format(new Date(), 'yyyy-MM-dd'),
       tipo: 'despesa',
       status: 'pendente',
@@ -104,10 +104,21 @@ export function NovaDespesaModal() {
 
   const onSubmit = async (data: z.infer<typeof despesaFormSchema>) => {
     try {
+      // Converter valor para número
+      const valorNumerico = parseFloat(data.valor.toString().replace(',', '.')) || 0;
+      
+      if (valorNumerico <= 0) {
+        toast({
+          title: 'Valor inválido',
+          description: 'Por favor, insira um valor maior que zero.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // Se há múltiplos veículos selecionados, criar uma despesa para cada
       if (selectedVehicles.length > 1) {
-        const valorTotal = parseFloat(data.valor.toString().replace(',', '.'));
-        const valorPorVeiculo = (valorTotal / selectedVehicles.length).toFixed(2);
+        const valorPorVeiculo = (valorNumerico / selectedVehicles.length).toFixed(2);
         
         // Criar uma despesa para cada veículo selecionado
         const promises = selectedVehicles.map(veiculoId => 
@@ -130,6 +141,7 @@ export function NovaDespesaModal() {
         await createDespesa({
           ...data,
           veiculoId: selectedVehicles[0],
+          valor: valorNumerico,
         });
         toast({
           title: 'Despesa criada com sucesso',
@@ -140,6 +152,7 @@ export function NovaDespesaModal() {
         await createDespesa({
           ...data,
           veiculoId: 'sem-veiculo',
+          valor: valorNumerico,
         });
         toast({
           title: 'Despesa criada com sucesso',
@@ -148,7 +161,17 @@ export function NovaDespesaModal() {
       }
       
       setOpen(false);
-      form.reset();
+      form.reset({
+        locadoraId: profile?.locadoraId || '',
+        veiculoId: '',
+        categoria: '',
+        descricao: '',
+        valor: '',
+        data: format(new Date(), 'yyyy-MM-dd'),
+        tipo: 'despesa',
+        status: 'pendente',
+        observacoes: '',
+      });
       setSelectedVehicles([]);
     } catch (error) {
       console.error('Error creating despesa:', error);
@@ -345,8 +368,16 @@ export function NovaDespesaModal() {
                         {...field} 
                         type="number"
                         step="0.01"
-                        placeholder="0,00"
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        min="0"
+                        placeholder=""
+                        inputMode="decimal"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Só permite números, vírgula e ponto
+                          if (value === '' || /^[0-9]+([.,][0-9]*)?$/.test(value)) {
+                            field.onChange(value);
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
