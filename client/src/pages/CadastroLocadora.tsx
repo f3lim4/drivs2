@@ -368,35 +368,6 @@ export default function CadastroLocadora() {
                   </div>
                 </div>
 
-                {/* Senha e Confirmar Senha na mesma linha */}
-                <div className="col-span-2 grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="senha">Senha *</Label>
-                    <Input
-                      id="senha"
-                      type="password"
-                      value={formData.senha}
-                      onChange={(e) => updateFormData('senha', e.target.value)}
-                      placeholder=""
-                      required
-                      minLength={6}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmarSenha">Confirmar Senha *</Label>
-                    <Input
-                      id="confirmarSenha"
-                      type="password"
-                      value={formData.confirmarSenha}
-                      onChange={(e) => updateFormData('confirmarSenha', e.target.value)}
-                      placeholder=""
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-
                 {/* CEP, Endereço, Número e Complemento na mesma linha */}
                 <div className="col-span-2 grid gap-2" style={{gridTemplateColumns: '1fr 2fr 0.8fr 1fr'}}>
                   <div className="space-y-2">
@@ -577,6 +548,35 @@ export default function CadastroLocadora() {
                       </Button>
                     )}
                   </div>
+                </div>
+              </div>
+
+              {/* Senha e Confirmar Senha na mesma linha - Após logo */}
+              <div className="grid grid-cols-2 gap-3 pt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="senha">Senha *</Label>
+                  <Input
+                    id="senha"
+                    type="password"
+                    value={formData.senha}
+                    onChange={(e) => updateFormData('senha', e.target.value)}
+                    placeholder=""
+                    required
+                    minLength={6}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmarSenha">Confirmar Senha *</Label>
+                  <Input
+                    id="confirmarSenha"
+                    type="password"
+                    value={formData.confirmarSenha}
+                    onChange={(e) => updateFormData('confirmarSenha', e.target.value)}
+                    placeholder=""
+                    required
+                    minLength={6}
+                  />
                 </div>
               </div>
 
