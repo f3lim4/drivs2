@@ -185,6 +185,9 @@ export function NovaDespesaModal() {
     'outros'
   ];
 
+  // Debug: forçar reload das categorias
+  console.log('Categorias disponíveis:', categorias);
+
   const categoriasLabels = {
     combustivel: 'Combustível',
     gasolina: 'Gasolina',
