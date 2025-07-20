@@ -39,7 +39,7 @@ export default function RelatoriosFinanceiros() {
   const { alugueis } = useAlugueis();
   const { pagamentos } = usePagamentos();
   const { infracoes } = useInfracoes();
-  const { despesas } = useDespesas();
+  const { despesas, isLoading: despesasLoading } = useDespesas();
   const { veiculos } = useVeiculos();
   const { motoristas } = useMotoristas();
   const { manutencoes } = useManutencoes();
@@ -49,17 +49,25 @@ export default function RelatoriosFinanceiros() {
     return despesas || [];
   }, [despesas]);
 
-  // Debug - verificar se dados estão sendo carregados
-  useEffect(() => {
-    if (despesas?.length === 0) {
-      console.log('⚠️ PROBLEMA: Despesas vazias detectadas!', {
-        despesas: despesas?.length || 0,
-        despesasComManutencoes: despesasComManutencoes?.length || 0,
-        manutencoes: manutencoes?.length || 0,
-        veiculos: veiculos?.length || 0
-      });
-    }
-  }, [despesas, despesasComManutencoes, manutencoes, veiculos]);
+  // Verificar se dados principais estão carregados
+  const isDataLoading = despesasLoading || !despesas || !veiculos || !alugueis || !pagamentos;
+  
+  if (isDataLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-bounce mb-4">
+              <svg className="w-12 h-12 mx-auto text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 18l8-8H2l8 8z"/>
+              </svg>
+            </div>
+            <p className="text-gray-600">Carregando relatórios financeiros...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
