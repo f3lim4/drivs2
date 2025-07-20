@@ -10,6 +10,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-20: Investigação de Bug de Exclusão de Aluguéis - EM ANDAMENTO 🔍
+- 🔍 **Bug identificado** - Erro ao excluir aluguéis com problema de isolamento de locadoraId
+- 🔍 **Logs de debug adicionados** - Frontend e backend monitorando tentativas de exclusão
+- 🔍 **Inconsistência detectada** - Sistema usando locadoraId incorreto (6edb7523-6d36-4518-89b9-2b8a322b98a6 vs 50764571000170)
+- 🔍 **Investigação em curso** - Analisando origem da inconsistência nos IDs
+- ⏳ **Aguardando teste** - Logs implementados para capturar dados detalhados do erro
+
+### 2025-07-20: Otimização de Categorias de Despesas - CONCLUÍDO ✅
+- ✅ **Categoria "gasolina" removida** - Eliminada duplicação com "combustível"
+- ✅ **Lista organizada alfabeticamente** - Categorias reordenadas para melhor usabilidade
+- ✅ **"Outros" posicionado no final** - Posicionamento lógico da categoria genérica
+- ✅ **Interface limpa** - Sistema de categorias mais organizado e intuitivo
+
 ### 2025-07-20: Correção Crítica do Sistema de Criação de Despesas - CONCLUÍDO ✅
 - ✅ **Bug crítico corrigido** - Campo locadoraId não estava sendo enviado corretamente na criação de despesas
 - ✅ **Validação de autenticação adicionada** - Sistema agora verifica se usuário está autenticado antes de criar despesa

@@ -698,21 +698,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/alugueis/:id", async (req, res) => {
     try {
+      console.log('[DELETE ALUGUEL] Iniciando exclusão:', {
+        aluguelId: req.params.id,
+        timestamp: new Date().toISOString()
+      });
+      
       // Buscar dados do aluguel antes de deletar para atualizar o veículo
       const aluguel = await storage.getAluguel(req.params.id);
       if (!aluguel) {
+        console.log('[DELETE ALUGUEL] Aluguel não encontrado:', req.params.id);
         return res.status(404).json({ message: "Aluguel not found" });
       }
       
+      console.log('[DELETE ALUGUEL] Dados do aluguel encontrado:', {
+        id: aluguel.id,
+        locadoraId: aluguel.locadoraId,
+        veiculoId: aluguel.veiculoId,
+        motoristaId: aluguel.motoristaId
+      });
+      
       await storage.deleteAluguel(req.params.id);
+      console.log('[DELETE ALUGUEL] Aluguel excluído do banco');
       
       // Atualizar status do veículo para "disponivel"
       await storage.updateVeiculo(aluguel.veiculoId, { status: 'disponivel' });
+      console.log('[DELETE ALUGUEL] Status do veículo atualizado para disponível');
       
       res.json({ message: "Aluguel deleted successfully" });
     } catch (error) {
-      console.error("Error deleting aluguel:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("[DELETE ALUGUEL] Error deleting aluguel:", error);
+      res.status(500).json({ message: "Internal server error", error: error.message });
     }
   });
 
