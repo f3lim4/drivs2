@@ -384,75 +384,21 @@ export default function CadastroLocadora() {
                   />
                 </div>
 
-                {/* CEP e Logo na mesma linha */}
-                <div className="flex gap-4 md:col-span-2">
-                  {/* CEP com busca automática */}
-                  <div className="space-y-2 w-48">
-                    <Label htmlFor="cep">CEP *</Label>
-                    <Input
-                      id="cep"
-                      value={formData.cep}
-                      onChange={(e) => {
-                        updateFormData('cep', e.target.value);
-                        buscarEnderecoPorCEP(e.target.value);
-                      }}
-                      placeholder="00000-000"
-                      required
-                      maxLength={9}
-                      className="w-full"
-                    />
-                  </div>
-
-                  {/* Logo da Empresa */}
-                  <div className="space-y-2 flex-1">
-                    <Label>Logo da Empresa (Opcional)</Label>
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center border">
-                        {logoPreview ? (
-                          <img 
-                            src={logoPreview} 
-                            alt="Logo da empresa" 
-                            className="w-full h-full object-contain rounded-lg"
-                          />
-                        ) : (
-                          <Image className="w-6 h-6 text-gray-400" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex space-x-2">
-                          <Button 
-                            type="button"
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => document.getElementById('logo-upload')?.click()}
-                            disabled={uploadingLogo}
-                          >
-                            {uploadingLogo ? 'Enviando...' : (logoPreview ? 'Alterar' : 'Selecionar')}
-                          </Button>
-                          {logoPreview && (
-                            <Button 
-                              type="button"
-                              variant="outline" 
-                              size="sm"
-                              onClick={handleRemoveLogo}
-                            >
-                              Remover
-                            </Button>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          JPG, PNG, SVG (máx. 5MB)
-                        </p>
-                      </div>
-                      <input
-                        id="logo-upload"
-                        type="file"
-                        accept="image/jpeg,image/jpg,image/png,image/svg+xml"
-                        onChange={handleLogoUpload}
-                        className="hidden"
-                      />
-                    </div>
-                  </div>
+                {/* CEP com busca automática */}
+                <div className="space-y-2 w-48">
+                  <Label htmlFor="cep">CEP *</Label>
+                  <Input
+                    id="cep"
+                    value={formData.cep}
+                    onChange={(e) => {
+                      updateFormData('cep', e.target.value);
+                      buscarEnderecoPorCEP(e.target.value);
+                    }}
+                    placeholder="00000-000"
+                    required
+                    maxLength={9}
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
@@ -521,7 +467,69 @@ export default function CadastroLocadora() {
 
               </div>
 
+              {/* Logo da Empresa - Último campo */}
+              <div className="space-y-4 pt-6 border-t">
+                <h3 className="text-lg font-medium flex items-center">
+                  <Image className="h-5 w-5 mr-2" />
+                  Logo da Empresa (Opcional)
+                </h3>
+                
+                <div className="space-y-4">
+                  {/* Preview do logo */}
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
+                      {logoPreview ? (
+                        <img 
+                          src={logoPreview} 
+                          alt="Logo da empresa" 
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      ) : (
+                        <Image className="w-8 h-8 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-600">
+                        {logoPreview ? 'Logo selecionado' : 'Nenhum logo selecionado'}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Formatos aceitos: JPG, PNG, SVG (máximo 5MB)
+                      </p>
+                    </div>
+                  </div>
 
+                  {/* Controles de upload */}
+                  <div className="flex space-x-2">
+                    <Label htmlFor="logo-upload" className="cursor-pointer">
+                      <div className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 transition-colors">
+                        <Upload className="w-4 h-4" />
+                        <span className="text-sm font-medium">
+                          {uploadingLogo ? 'Carregando...' : 'Selecionar Logo'}
+                        </span>
+                      </div>
+                    </Label>
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleLogoUpload}
+                      disabled={uploadingLogo}
+                    />
+                    {logoPreview && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRemoveLogo}
+                        disabled={uploadingLogo}
+                      >
+                        Remover
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button 
