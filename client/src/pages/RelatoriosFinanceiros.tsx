@@ -184,68 +184,45 @@ export default function RelatoriosFinanceiros() {
         return;
       }
 
-      if (editando && despesaEditando) {
-        // Modo edição - editar despesa existente
-        const response = await fetch(`/api/despesas/${despesaEditando.id}`, {
-          method: 'PUT',
+      // Criar novas despesas
+      const valorTotal = parseFloat(data.valor.replace(',', '.'));
+      const valorPorVeiculo = valorTotal / data.veiculoIds.length;
+
+      for (const veiculoId of data.veiculoIds) {
+        const despesaData = {
+          locadoraId,
+          veiculoId,
+          categoria: data.categoria,
+          descricao: data.descricao,
+          valor: valorPorVeiculo,
+          formaPagamento: data.formaPagamento,
+          tipo: 'despesa',
+          fonte: 'manual'
+        };
+
+        const response = await fetch('/api/despesas', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            veiculoId: data.veiculoIds[0], // Para edição, usar apenas o primeiro veículo
-            categoria: data.categoria,
-            descricao: data.descricao,
-            valor: parseFloat(data.valor.replace(',', '.')),
-            formaPagamento: data.formaPagamento,
-            locadoraId,
-            tipo: 'despesa',
-            fonte: 'manual'
-          }),
+          body: JSON.stringify(despesaData),
         });
 
-        if (!response.ok) throw new Error('Erro ao editar despesa');
-
-        toast({
-          title: 'Sucesso',
-          description: 'Despesa editada com sucesso.',
-        });
-      } else {
-        // Modo criação - criar novas despesas
-        const valorTotal = parseFloat(data.valor.replace(',', '.'));
-        const valorPorVeiculo = valorTotal / data.veiculoIds.length;
-
-        for (const veiculoId of data.veiculoIds) {
-          const despesaData = {
-            locadoraId,
-            veiculoId,
-            categoria: data.categoria,
-            descricao: data.descricao,
-            valor: valorPorVeiculo.toFixed(2),
-            data: format(new Date(), 'yyyy-MM-dd'),
-            formaPagamento: data.formaPagamento,
-            tipo: 'despesa',
-            fonte: 'manual'
-          };
-
-          const response = await fetch('/api/despesas', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(despesaData),
-          });
-
-          if (!response.ok) throw new Error('Erro ao criar despesa');
-        }
-
-        toast({
-          title: 'Sucesso',
-          description: `${data.veiculoIds.length} despesa(s) criada(s) com sucesso.`,
-        });
+        if (!response.ok) throw new Error('Erro ao criar despesa');
       }
 
-      // Removido setModalAberto - usando componente NovaDespesaModal
-      queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
+      toast({
+        title: 'Sucesso',
+        description: `${data.veiculoIds.length} despesa(s) criada(s) com sucesso.`,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
+      setModalAberto(false);
+      form.reset();
+
     } catch (error) {
+      console.error('Erro ao processar despesas:', error);
       toast({
         title: 'Erro',
-        description: 'Erro ao processar despesa.',
+        description: 'Erro ao processar despesas. Tente novamente.',
         variant: 'destructive',
       });
     } finally {
@@ -253,19 +230,10 @@ export default function RelatoriosFinanceiros() {
     }
   };
 
-  // Removido useEffect e abrirModalEdicao - usando componente NovaDespesaModal
-
-  // Função para abrir modal de exclusão
-  const abrirModalExclusao = (id: string) => {
-    setConfirmDelete({ open: true, id });
-  };
-
-  // Função para confirmar exclusão
-  const confirmarExclusao = async () => {
-    if (!confirmDelete.id) return;
-    
+  // Função para deletar despesa
+  const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/despesas/${confirmDelete.id}`, {
+      const response = await fetch(`/api/despesas/${id}`, {
         method: 'DELETE',
       });
 
@@ -273,32 +241,20 @@ export default function RelatoriosFinanceiros() {
         throw new Error('Erro ao excluir despesa');
       }
 
-      // Invalidar cache específico com locadoraId
-      const locadoraIdForDelete = profile?.locadoraId || profile?.id;
-      await queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraIdForDelete] });
-      await queryClient.refetchQueries({ queryKey: ['/api/despesas', locadoraIdForDelete] });
-      setConfirmDelete({ open: false, id: null });
-      
       toast({
-        title: "Despesa excluída",
-        description: "A despesa foi excluída com sucesso.",
-        variant: "default",
+        title: 'Sucesso',
+        description: 'Despesa excluída com sucesso.',
       });
+
+      queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
     } catch (error) {
       console.error('Erro ao excluir despesa:', error);
       toast({
-        title: "Erro",
-        description: "Não foi possível excluir a despesa. Tente novamente.",
-        variant: "destructive",
+        title: 'Erro',
+        description: 'Erro ao excluir despesa. Tente novamente.',
+        variant: 'destructive',
       });
     }
-  };
-
-
-
-  // Função para cancelar exclusão
-  const cancelarExclusao = () => {
-    setDespesaParaExcluir(null);
   };
 
   // Cálculos para o período selecionado
@@ -381,15 +337,22 @@ export default function RelatoriosFinanceiros() {
         descricao: despesa.descricao,
         veiculoId: despesa.veiculoId
       })),
-      ...filteredDataBySearch.manutencoes.map(manutencao => ({
-        ...manutencao,
-        tipo: 'manutencao',
-        data: manutencao.dataConclusao || manutencao.dataAgendada,
-        valor: parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0'),
-        categoria: 'manutencao',
-        descricao: manutencao.descricao,
-        veiculoId: manutencao.veiculoId
-      }))
+      ...filteredDataBySearch.manutencoes.map(manutencao => {
+        // Para manutenções concluídas, usar data de conclusão; caso contrário, data de início
+        const dataManutencao = manutencao.status === 'concluida' && manutencao.dataConclusao 
+          ? manutencao.dataConclusao 
+          : manutencao.dataInicio;
+        
+        return {
+          ...manutencao,
+          tipo: 'manutencao',
+          data: dataManutencao,
+          valor: parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0'),
+          categoria: 'manutencao',
+          descricao: manutencao.descricao,
+          veiculoId: manutencao.veiculoId
+        };
+      })
     ];
 
     // Aplicar ordenação
@@ -399,9 +362,22 @@ export default function RelatoriosFinanceiros() {
       
       switch (sortHistorico) {
         case 'mais-recente':
-          return dataB.getTime() - dataA.getTime();
+          // Primeiro por data, depois por tipo (manutenções concluídas primeiro)
+          if (dataB.getTime() !== dataA.getTime()) {
+            return dataB.getTime() - dataA.getTime();
+          }
+          // Se mesma data, manutenções concluídas primeiro
+          if (a.tipo === 'manutencao' && a.status === 'concluida' && b.tipo !== 'manutencao') return -1;
+          if (b.tipo === 'manutencao' && b.status === 'concluida' && a.tipo !== 'manutencao') return 1;
+          return 0;
         case 'mais-antiga':
-          return dataA.getTime() - dataB.getTime();
+          if (dataA.getTime() !== dataB.getTime()) {
+            return dataA.getTime() - dataB.getTime();
+          }
+          // Se mesma data, manutenções concluídas primeiro
+          if (a.tipo === 'manutencao' && a.status === 'concluida' && b.tipo !== 'manutencao') return -1;
+          if (b.tipo === 'manutencao' && b.status === 'concluida' && a.tipo !== 'manutencao') return 1;
+          return 0;
         case 'maior-valor':
           return b.valor - a.valor;
         case 'menor-valor':
@@ -419,7 +395,13 @@ export default function RelatoriosFinanceiros() {
           const veiculoB2 = veiculos.find(v => v.id === b.veiculoId)?.placa || '';
           return veiculoB2.localeCompare(veiculoA2);
         default:
-          return dataB.getTime() - dataA.getTime();
+          // Padrão: mais recente com critério de desempate
+          if (dataB.getTime() !== dataA.getTime()) {
+            return dataB.getTime() - dataA.getTime();
+          }
+          if (a.tipo === 'manutencao' && a.status === 'concluida' && b.tipo !== 'manutencao') return -1;
+          if (b.tipo === 'manutencao' && b.status === 'concluida' && a.tipo !== 'manutencao') return 1;
+          return 0;
       }
     });
 
