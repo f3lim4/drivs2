@@ -1524,45 +1524,6 @@ export default function RelatoriosFinanceiros() {
 
         {/* Aba Despesas Fixas */}
         <TabsContent value="despesas-fixas" className="space-y-2">
-          {/* Cards de totais por categoria */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-yellow-50 p-4 rounded-lg">
-              <h4 className="font-medium text-yellow-700 mb-2">IPVA</h4>
-              <p className="text-xl font-bold text-yellow-800">
-                {formatCurrency(
-                  veiculos.reduce((total, v) => total + (v.ipva ? Number(v.ipva) / 12 : 0), 0)
-                )}
-              </p>
-              <p className="text-sm text-yellow-600">Mensal</p>
-            </div>
-            <div className="bg-green-50 p-4 rounded-lg">
-              <h4 className="font-medium text-green-700 mb-2">Seguros</h4>
-              <p className="text-xl font-bold text-green-800">
-                {formatCurrency(
-                  veiculos.reduce((total, v) => total + (v.valorSeguroMensal ? Number(v.valorSeguroMensal) : 0), 0)
-                )}
-              </p>
-              <p className="text-sm text-green-600">Mensal</p>
-            </div>
-            <div className="bg-indigo-50 p-4 rounded-lg">
-              <h4 className="font-medium text-indigo-700 mb-2">Rastreadores</h4>
-              <p className="text-xl font-bold text-indigo-800">
-                {formatCurrency(
-                  veiculos.reduce((total, v) => total + (v.valorRastreadorMensal ? Number(v.valorRastreadorMensal) : 0), 0)
-                )}
-              </p>
-              <p className="text-sm text-indigo-600">Mensal</p>
-            </div>
-            <div className="bg-pink-50 p-4 rounded-lg">
-              <h4 className="font-medium text-pink-700 mb-2">Financiamento</h4>
-              <p className="text-xl font-bold text-pink-800">
-                {formatCurrency(
-                  veiculos.reduce((total, v) => total + (v.valorFinanciamento ? Number(v.valorFinanciamento) : 0), 0)
-                )}
-              </p>
-              <p className="text-sm text-pink-600">Mensal</p>
-            </div>
-          </div>
 
           {/* Tabela detalhada por veículo */}
           <Card>
@@ -1681,7 +1642,81 @@ export default function RelatoriosFinanceiros() {
             </CardContent>
           </Card>
 
+          {/* Análise por categoria */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Análise por Categoria</CardTitle>
+              <CardDescription>
+                Distribuição das despesas fixas por categoria
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {/* IPVA */}
+                <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-yellow-800">IPVA</p>
+                    <p className="text-sm text-yellow-600">Imposto sobre veículos</p>
+                  </div>
+                  <p className="text-lg font-bold text-yellow-600">
+                    {formatCurrency(
+                      veiculos.reduce((total, v) => total + (v.ipva ? Number(v.ipva) / 12 : 0), 0)
+                    )}
+                  </p>
+                </div>
 
+                {/* Seguros */}
+                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-green-800">Seguros</p>
+                    <p className="text-sm text-green-600">Seguro dos veículos</p>
+                  </div>
+                  <p className="text-lg font-bold text-green-600">
+                    {formatCurrency(
+                      veiculos.reduce((total, v) => total + (v.valorSeguroMensal ? Number(v.valorSeguroMensal) : 0), 0)
+                    )}
+                  </p>
+                </div>
+
+                {/* Rastreadores */}
+                <div className="flex justify-between items-center p-3 bg-indigo-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-indigo-800">Rastreadores</p>
+                    <p className="text-sm text-indigo-600">Monitoramento GPS</p>
+                  </div>
+                  <p className="text-lg font-bold text-indigo-600">
+                    {formatCurrency(
+                      veiculos.reduce((total, v) => total + (v.valorRastreadorMensal ? Number(v.valorRastreadorMensal) : 0), 0)
+                    )}
+                  </p>
+                </div>
+
+                {/* Financiamento */}
+                <div className="flex justify-between items-center p-3 bg-pink-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-pink-800">Financiamento</p>
+                    <p className="text-sm text-pink-600">Parcelas mensais</p>
+                  </div>
+                  <p className="text-lg font-bold text-pink-600">
+                    {formatCurrency(
+                      veiculos.reduce((total, v) => total + (v.valorFinanciamento ? Number(v.valorFinanciamento) : 0), 0)
+                    )}
+                  </p>
+                </div>
+
+                {/* Total */}
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
+                  <div>
+                    <p className="font-bold text-gray-800">TOTAL MENSAL</p>
+                    <p className="text-sm text-gray-600">Soma de todas as despesas fixas</p>
+                  </div>
+                  <p className="text-xl font-bold text-red-600">
+                    {formatCurrency(totalDespesasFixasPuras)}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Aba Histórico */}

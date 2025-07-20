@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-20: Reorganização dos Cards na Aba Despesas Fixas - CONCLUÍDO ✅
+- ✅ **Cards superiores removidos** - Eliminados cards de totais por categoria do topo da aba "Despesas Fixas"
+- ✅ **Análise por categoria mantida** - Seção "Análise por Categoria" mantida na parte inferior da aba
+- ✅ **Interface otimizada** - Aba inicia diretamente com a tabela detalhada por veículo
+- ✅ **Cards detalhados preservados** - Mantidos cards com informações individuais (IPVA, Seguros, Rastreadores, Financiamento)
+- ✅ **Melhor fluxo visual** - Tabela primeiro, análise detalhada depois
+
 ### 2025-07-20: Remoção Completa do Sistema de Tipos de Veículos da Página de Perfil - CONCLUÍDO ✅
 - ✅ **Seção de tipos de veículos removida** - Eliminada seção "Tipos de Veículos da Sua Frota" da página de Perfil
 - ✅ **Código limpo** - Removidas todas as variáveis, funções e imports relacionados aos tipos de veículos
