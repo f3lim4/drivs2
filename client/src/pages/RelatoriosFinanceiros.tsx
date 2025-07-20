@@ -1794,6 +1794,14 @@ export default function RelatoriosFinanceiros() {
                         <tbody>
                           {historicoPaginado.map((item) => {
                             const veiculo = veiculos.find(v => v.id === item.veiculoId);
+                            console.log('Item do histórico:', {
+                              id: item.id,
+                              data: item.data,
+                              createdAt: (item as any).createdAt,
+                              dataInicio: (item as any).dataInicio,
+                              dataConclusao: (item as any).dataConclusao,
+                              tipo: item.tipo
+                            });
                             return (
                               <tr key={item.id} className="border-b hover:bg-gray-50">
                                 <td className="p-3">{veiculo?.placa || 'N/A'}</td>
