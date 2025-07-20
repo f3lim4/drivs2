@@ -39,6 +39,7 @@ import { NovoAluguelModal } from '@/components/alugueis/NovoAluguelModal';
 import { EditarAluguelModal } from '@/components/alugueis/EditarAluguelModal';
 import { ExcluirAluguelDialog } from '@/components/alugueis/ExcluirAluguelDialog';
 import { formatCurrency } from '@/lib/utils';
+import { registrarAtividade } from '@/utils/activityLogger';
 
 export default function Alugueis() {
   const { isAdmin, isLocadora, profile } = useAuth();
@@ -80,11 +81,13 @@ export default function Alugueis() {
     enabled: !!profile?.locadoraId,
   });
 
+
+
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
     if (!locadoraId) return 'Locadora';
     if (locadorasLoading) return 'Carregando...';
-    if (!locadoras || locadoras.length === 0) return 'Sem dados';
+    if (!Array.isArray(locadoras) || locadoras.length === 0) return 'Sem dados';
     
     const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
     return locadora ? locadora.nome : `ID: ${locadoraId}`;
@@ -96,10 +99,8 @@ export default function Alugueis() {
   // Limpar cache de queries antigas quando o profile muda
   useEffect(() => {
     if (profile?.locadoraId) {
-      // Invalidar queries antigas que podem ter usado profile.id incorretamente
-      queryClient.invalidateQueries({ queryKey: ['/api/alugueis'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/veiculos'] });
+      // Invalidar TODAS as queries antigas que podem ter dados de outras locadoras
+      queryClient.clear();
     }
   }, [profile?.locadoraId, queryClient]);
 
@@ -107,9 +108,10 @@ export default function Alugueis() {
 
   // Formatação dos aluguéis para exibição
   const alugueisFormatados = useMemo(() => {
+    if (!Array.isArray(alugueis)) return [];
     return alugueis.map((aluguel: any) => {
       // Buscar dados do veículo para ter acesso ao valor semanal
-      const veiculo = veiculos.find((v: any) => v.id === aluguel.veiculoId);
+      const veiculo = Array.isArray(veiculos) ? veiculos.find((v: any) => v.id === aluguel.veiculoId) : null;
       const valorSemanal = veiculo?.valorSemanal ? parseFloat(veiculo.valorSemanal) : 0;
       
       return {

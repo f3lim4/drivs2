@@ -30,7 +30,15 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: async ({ queryKey }) => {
-        const response = await fetch(queryKey[0] as string);
+        let url = queryKey[0] as string;
+        
+        // Se há parâmetros adicionais na queryKey, adicionar como query parameters
+        if (queryKey.length > 1 && queryKey[1]) {
+          const locadoraId = queryKey[1] as string;
+          url += `?locadoraId=${encodeURIComponent(locadoraId)}`;
+        }
+        
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
