@@ -295,71 +295,77 @@ export default function CadastroLocadora() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nome">Nome Fantasia *</Label>
-                  <Input
-                    id="nome"
-                    value={formData.nome}
-                    onChange={(e) => updateFormData('nome', e.target.value)}
-                    placeholder=""
-                    required
-                  />
+                {/* Nome Fantasia, Razão Social e CNPJ na mesma linha */}
+                <div className="col-span-2 grid grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="nome">Nome Fantasia *</Label>
+                    <Input
+                      id="nome"
+                      value={formData.nome}
+                      onChange={(e) => updateFormData('nome', e.target.value)}
+                      placeholder=""
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="razaoSocial">Razão Social *</Label>
+                    <Input
+                      id="razaoSocial"
+                      value={formData.razaoSocial}
+                      onChange={(e) => updateFormData('razaoSocial', e.target.value)}
+                      placeholder=""
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="cnpj">CNPJ *</Label>
+                    <Input
+                      id="cnpj"
+                      value={formData.cnpj}
+                      onChange={(e) => updateFormData('cnpj', e.target.value)}
+                      placeholder=""
+                      required
+                    />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="responsavel">Responsável *</Label>
-                  <Input
-                    id="responsavel"
-                    value={formData.responsavel}
-                    onChange={(e) => updateFormData('responsavel', e.target.value)}
-                    placeholder=""
-                    required
-                  />
-                </div>
+                {/* Email, Telefone e Responsável na mesma linha */}
+                <div className="col-span-2 grid grid-cols-3 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => updateFormData('email', e.target.value)}
+                      placeholder=""
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="razaoSocial">Razão Social *</Label>
-                  <Input
-                    id="razaoSocial"
-                    value={formData.razaoSocial}
-                    onChange={(e) => updateFormData('razaoSocial', e.target.value)}
-                    placeholder=""
-                    required
-                  />
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="telefone">Telefone *</Label>
+                    <Input
+                      id="telefone"
+                      value={formData.telefone}
+                      onChange={(e) => updateFormData('telefone', e.target.value)}
+                      placeholder=""
+                      required
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cnpj">CNPJ *</Label>
-                  <Input
-                    id="cnpj"
-                    value={formData.cnpj}
-                    onChange={(e) => updateFormData('cnpj', e.target.value)}
-                    placeholder=""
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => updateFormData('email', e.target.value)}
-                    placeholder=""
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="telefone">Telefone *</Label>
-                  <Input
-                    id="telefone"
-                    value={formData.telefone}
-                    onChange={(e) => updateFormData('telefone', e.target.value)}
-                    placeholder=""
-                    required
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="responsavel">Responsável *</Label>
+                    <Input
+                      id="responsavel"
+                      value={formData.responsavel}
+                      onChange={(e) => updateFormData('responsavel', e.target.value)}
+                      placeholder=""
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
