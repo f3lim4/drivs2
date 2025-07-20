@@ -21,6 +21,7 @@ export default function CadastroLocadora() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     razaoSocial: '',
@@ -146,6 +147,20 @@ export default function CadastroLocadora() {
     setFormData({ ...formData, logo: '' });
   };
 
+  // Função para verificar se email já existe
+  const checkEmailExists = async (email: string) => {
+    if (!email || !email.includes('@')) return;
+    
+    try {
+      const response = await fetch(`/api/profiles/check-email?email=${encodeURIComponent(email)}`);
+      const data = await response.json();
+      setEmailExists(data.exists);
+    } catch (error) {
+      // Se der erro, não bloqueia o usuário
+      setEmailExists(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -189,6 +204,9 @@ export default function CadastroLocadora() {
 
       if (!authResponse.ok) {
         const error = await authResponse.json();
+        if (error.message === 'User already exists') {
+          throw new Error('Este email já está cadastrado. Use outro email ou faça login se já tem uma conta.');
+        }
         throw new Error(error.message || 'Erro ao criar usuário');
       }
 
@@ -223,6 +241,16 @@ export default function CadastroLocadora() {
 
       if (!locadoraResponse.ok) {
         const error = await locadoraResponse.json();
+        // Tratar erros específicos de duplicação
+        if (error.message && error.message.includes('telefone')) {
+          throw new Error('Este telefone já está cadastrado. Use outro número de telefone.');
+        }
+        if (error.message && error.message.includes('cnpj')) {
+          throw new Error('Este CNPJ já está cadastrado. Verifique o CNPJ informado.');
+        }
+        if (error.message && error.message.includes('email')) {
+          throw new Error('Este email já está cadastrado. Use outro email.');
+        }
         throw new Error(error.message || 'Erro ao criar locadora');
       }
 
@@ -256,6 +284,11 @@ export default function CadastroLocadora() {
         description: errorMessage,
         variant: "destructive",
       });
+      
+      // Se o erro for de usuário existente, limpar apenas o campo email
+      if (error instanceof Error && error.message.includes('já está cadastrado')) {
+        setFormData(prev => ({ ...prev, email: '' }));
+      }
     } finally {
       setIsLoading(false);
     }
