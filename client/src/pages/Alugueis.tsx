@@ -64,20 +64,20 @@ export default function Alugueis() {
 
   // Carregamento de aluguéis usando React Query
   const { data: alugueis = [], isLoading: loading } = useQuery({
-    queryKey: ['/api/alugueis', profile?.id],
-    enabled: !!profile?.id,
+    queryKey: ['/api/alugueis', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
   });
 
   // Buscar pagamentos para cálculo da receita real
   const { data: pagamentos = [] } = useQuery({
-    queryKey: ['/api/pagamentos', profile?.id],
-    enabled: !!profile?.id,
+    queryKey: ['/api/pagamentos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
   });
 
   // Buscar veículos para ter acesso ao valor semanal
   const { data: veiculos = [] } = useQuery({
-    queryKey: ['/api/veiculos', profile?.id],
-    enabled: !!profile?.id,
+    queryKey: ['/api/veiculos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
   });
 
   // Função para encontrar o nome da locadora
@@ -90,16 +90,20 @@ export default function Alugueis() {
     return locadora ? locadora.nome : `ID: ${locadoraId}`;
   };
 
-  // Para usuários locadora, buscar o nome da locadora diretamente usando o ID do perfil
-  const nomeLocadoraAtual = isLocadora && profile?.id ? getLocadoraName(profile.id) : null;
+  // Para usuários locadora, buscar o nome da locadora diretamente usando o locadoraId do perfil
+  const nomeLocadoraAtual = isLocadora && profile?.locadoraId ? getLocadoraName(profile.locadoraId) : null;
 
-  // Logs para debug
-  console.log('Alugueis - Fazendo requisição para locadora:', profile?.id);
-  console.log('Aluguéis - Verificando isolamento:', {
-    locadoraId: profile?.id,
-    alugueisTotal: alugueis.length,
-    primeiroAluguel: alugueis[0]?.locadoraId || 'N/A',
-  });
+  // Limpar cache de queries antigas quando o profile muda
+  useEffect(() => {
+    if (profile?.locadoraId) {
+      // Invalidar queries antigas que podem ter usado profile.id incorretamente
+      queryClient.invalidateQueries({ queryKey: ['/api/alugueis'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/veiculos'] });
+    }
+  }, [profile?.locadoraId, queryClient]);
+
+
 
   // Formatação dos aluguéis para exibição
   const alugueisFormatados = useMemo(() => {

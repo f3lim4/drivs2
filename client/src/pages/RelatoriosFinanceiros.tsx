@@ -181,7 +181,7 @@ export default function RelatoriosFinanceiros() {
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      const locadoraId = profile?.locadoraId || profile?.id;
+      const locadoraId = profile?.locadoraId;
       
       if (data.veiculoIds.length === 0) {
         toast({
