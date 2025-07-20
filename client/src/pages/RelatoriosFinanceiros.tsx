@@ -586,6 +586,67 @@ export default function RelatoriosFinanceiros() {
     return (lucroLiquido / receitaTotal) * 100;
   }, [lucroLiquido, receitaTotal]);
 
+  // Cálculo de despesas por tipo para a aba "Despesas"
+  const despesasPorTipo = useMemo(() => {
+    if (!isDataReady || !veiculos) return [];
+
+    // Despesas fixas automáticas
+    const fixas = (veiculos || []).reduce((total, veiculo) => {
+      let despesasFixas = 0;
+      
+      if (veiculo.ipva && veiculo.ipva > 0) {
+        despesasFixas += parseFloat(veiculo.ipva) / 12;
+      }
+      
+      if (veiculo.valorSeguroMensal && veiculo.valorSeguroMensal > 0) {
+        despesasFixas += parseFloat(veiculo.valorSeguroMensal);
+      }
+      
+      if (veiculo.valorRastreadorMensal && veiculo.valorRastreadorMensal > 0) {
+        despesasFixas += parseFloat(veiculo.valorRastreadorMensal);
+      }
+      
+      if (veiculo.financiado && veiculo.valorFinanciamento) {
+        despesasFixas += parseFloat(veiculo.valorFinanciamento);
+      }
+      
+      return total + despesasFixas;
+    }, 0);
+
+    // Despesas manuais do período
+    const manuais = filteredData.despesasPeriodo.reduce((total, despesa) => {
+      const valor = parseFloat(despesa.valor || '0');
+      return total + (isNaN(valor) ? 0 : valor);
+    }, 0);
+
+    // Manutenções do período
+    const manutencoes = filteredData.manutencoes.reduce((total, manutencao) => {
+      const valor = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
+      return total + (isNaN(valor) ? 0 : valor);
+    }, 0);
+
+    const tipos = [
+      {
+        nome: 'Despesas Fixas',
+        valor: fixas,
+        porcentagem: (fixas / despesasTotal) * 100
+      },
+      {
+        nome: 'Despesas Manuais',
+        valor: manuais,
+        porcentagem: (manuais / despesasTotal) * 100
+      },
+      {
+        nome: 'Manutenções',
+        valor: manutencoes,
+        porcentagem: (manutencoes / despesasTotal) * 100
+      }
+    ];
+
+    // Filtrar apenas tipos com valor > 0
+    return tipos.filter(tipo => tipo.valor > 0).sort((a, b) => b.valor - a.valor);
+  }, [veiculos, filteredData.despesasPeriodo, filteredData.manutencoes, despesasTotal, isDataReady]);
+
   // Cálculo de despesas por categoria para a aba "Despesas"
   const despesasPorCategoria = useMemo(() => {
     if (!isDataReady || !veiculos) return [];
