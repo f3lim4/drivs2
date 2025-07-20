@@ -79,6 +79,9 @@ export default function RelatoriosFinanceiros() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('todos');
   
+  // Estado para o modal de detalhes do veículo
+  const [veiculoDetalhes, setVeiculoDetalhes] = useState<any>(null);
+  
   // Estados de ordenação para as abas
   const [sortVeiculos, setSortVeiculos] = useState<string>('mais-lucrativos');
   const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
@@ -1899,6 +1902,7 @@ export default function RelatoriosFinanceiros() {
                       <table className="w-full border-collapse">
                         <thead>
                           <tr className="bg-gray-50">
+                            <th className="text-left p-3 border-b w-16">Ver</th>
                             <th className="text-left p-3 border-b">Veículo</th>
                             <th className="text-left p-3 border-b">Status</th>
                             <th className="text-left p-3 border-b">Receita Mensal</th>
@@ -1924,6 +1928,16 @@ export default function RelatoriosFinanceiros() {
                             
                             return (
                               <tr key={veiculo.id} className="border-b hover:bg-gray-50">
+                                <td className="p-3">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setVeiculoDetalhes(gerarDadosDetalhados(veiculo))}
+                                    className="h-8 w-8 p-0 hover:bg-blue-100"
+                                  >
+                                    <Eye className="h-4 w-4 text-blue-600" />
+                                  </Button>
+                                </td>
                                 <td className="p-3">
                                   <div>
                                     <div className="font-medium">{veiculo.placa}</div>
@@ -2149,6 +2163,16 @@ export default function RelatoriosFinanceiros() {
 
 
       {/* Modal duplicado removido - usando componente NovaDespesaModal */}
+
+      {/* Modal de detalhes do veículo */}
+      {veiculoDetalhes && (
+        <DetalhesVeiculoModal
+          isOpen={!!veiculoDetalhes}
+          onClose={() => setVeiculoDetalhes(null)}
+          dadosVeiculo={veiculoDetalhes}
+          selectedMonth={selectedMonth}
+        />
+      )}
 
       {/* Modal de confirmação de exclusão */}
       <Dialog open={confirmDelete.open} onOpenChange={(open) => setConfirmDelete({ ...confirmDelete, open })}>
