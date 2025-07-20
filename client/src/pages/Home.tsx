@@ -198,6 +198,62 @@ export default function Home() {
             }}>
               <div className="w-22 h-0.5 bg-gradient-to-l from-indigo-400/85 via-blue-400/65 to-transparent animate-pulse"></div>
             </div>
+            
+            {/* Trail 8 - Moving left to right diagonal */}
+            <div className="absolute top-1/6 left-0 opacity-42" style={{
+              animation: 'moveRight 22s linear infinite 15s'
+            }}>
+              <div className="w-30 h-1 bg-gradient-to-r from-teal-400/75 via-cyan-400/55 to-transparent animate-pulse"></div>
+            </div>
+            
+            {/* Trail 9 - Moving right to left fast */}
+            <div className="absolute top-5/6 right-0 opacity-36" style={{
+              animation: 'moveLeft 16s linear infinite 28s'
+            }}>
+              <div className="w-26 h-0.5 bg-gradient-to-l from-rose-400/80 via-pink-400/60 to-transparent animate-pulse"></div>
+            </div>
+            
+            {/* Trail 10 - Moving left to right slow */}
+            <div className="absolute top-2/5 left-0 opacity-33" style={{
+              animation: 'moveRight 38s linear infinite 20s'
+            }}>
+              <div className="w-35 h-1.5 bg-gradient-to-r from-amber-400/70 via-yellow-400/50 to-transparent animate-pulse"></div>
+            </div>
+            
+            {/* Trail 11 - Moving right to left medium */}
+            <div className="absolute top-1/8 right-0 opacity-40" style={{
+              animation: 'moveLeft 28s linear infinite 32s'
+            }}>
+              <div className="w-28 h-1 bg-gradient-to-l from-lime-400/75 via-green-400/55 to-transparent animate-pulse"></div>
+            </div>
+            
+            {/* Trail 12 - Moving left to right very fast */}
+            <div className="absolute top-7/8 left-0 opacity-44" style={{
+              animation: 'moveRight 12s linear infinite 35s'
+            }}>
+              <div className="w-20 h-0.5 bg-gradient-to-r from-violet-400/90 via-purple-400/70 to-transparent animate-pulse"></div>
+            </div>
+            
+            {/* Trail 13 - Moving right to left diagonal */}
+            <div className="absolute top-3/8 right-0 opacity-37" style={{
+              animation: 'moveLeft 32s linear infinite 40s'
+            }}>
+              <div className="w-34 h-1 bg-gradient-to-l from-sky-400/75 via-blue-400/55 to-transparent animate-pulse"></div>
+            </div>
+            
+            {/* Trail 14 - Moving left to right medium-fast */}
+            <div className="absolute top-5/8 left-0 opacity-39" style={{
+              animation: 'moveRight 24s linear infinite 44s'
+            }}>
+              <div className="w-29 h-1 bg-gradient-to-r from-orange-400/80 via-red-400/60 to-transparent animate-pulse"></div>
+            </div>
+            
+            {/* Trail 15 - Moving right to left super slow */}
+            <div className="absolute top-1/12 right-0 opacity-34" style={{
+              animation: 'moveLeft 45s linear infinite 48s'
+            }}>
+              <div className="w-38 h-1.5 bg-gradient-to-l from-slate-400/70 via-gray-400/50 to-transparent animate-pulse"></div>
+            </div>
           </div>
         </div>
         
