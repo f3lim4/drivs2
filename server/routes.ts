@@ -666,6 +666,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Atualizar status do veículo para "alugado"
       await storage.updateVeiculo(veiculoId, { status: 'alugado' });
       
+      // AUTO-REGISTRO DE TAXA ADMINISTRATIVA: Se houver taxa administrativa, registrar como receita
+      if (result.data.taxaAdmin && parseFloat(result.data.taxaAdmin) > 0) {
+        console.log('[AUTO-RECEITA] Registrando taxa administrativa:', {
+          aluguelId: aluguel.id,
+          taxaAdmin: result.data.taxaAdmin,
+          motoristaId: result.data.motoristaId
+        });
+        
+        const receitaTaxa = {
+          id: `taxa_${aluguel.id}_${Date.now()}`,
+          locadoraId: result.data.locadoraId,
+          motoristaId: result.data.motoristaId,
+          aluguelId: aluguel.id,
+          tipo: 'taxa administrativa',
+          descricao: `Taxa administrativa - Aluguel veículo ${veiculo.placa}`,
+          valorTotal: result.data.taxaAdmin,
+          valorPago: result.data.taxaAdmin,
+          valorRestante: "0.00",
+          valorJuros: "0.00",
+          valorMulta: "0.00",
+          dataPagamento: result.data.dataInicio,
+          status: 'pago',
+          observacoes: 'Taxa administrativa registrada automaticamente'
+        };
+        
+        await storage.createPagamento(receitaTaxa);
+        console.log('[AUTO-RECEITA] Taxa administrativa registrada como receita');
+      }
+      
       res.json(aluguel);
     } catch (error) {
       console.error("Error creating aluguel:", error);

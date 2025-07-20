@@ -448,6 +448,16 @@ export default function RelatoriosFinanceiros() {
       }, 0);
   }, [pagamentos, monthStart, monthEnd]);
 
+  // Taxa administrativa de aluguéis
+  const receitaTaxaAdministrativa = useMemo(() => {
+    return pagamentos
+      .filter(p => p.status === 'pago' && p.tipo === 'taxa administrativa' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
+      .reduce((total, pagamento) => {
+        const valor = parseFloat(pagamento.valor || '0');
+        return total + (isNaN(valor) ? 0 : valor);
+      }, 0);
+  }, [pagamentos, monthStart, monthEnd]);
+
   // Receita extra de juros e multas
   const receitaExtra = useMemo(() => {
     const pagamentosFiltrados = pagamentos
@@ -540,7 +550,7 @@ export default function RelatoriosFinanceiros() {
       }, 0);
   }, [filteredData.despesasPeriodo]);
 
-  const receitaTotal = receitaPagamentos + totalReceitas + receitaExtra.total;
+  const receitaTotal = receitaPagamentos + receitaTaxaAdministrativa + totalReceitas + receitaExtra.total;
   const lucroLiquido = receitaTotal - totalDespesas;
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
@@ -1140,6 +1150,18 @@ export default function RelatoriosFinanceiros() {
                       {formatCurrency(receitaPagamentos)}
                     </p>
                   </div>
+
+                  {receitaTaxaAdministrativa > 0 && (
+                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                      <div>
+                        <p className="font-medium text-blue-800">Taxa Administrativa</p>
+                        <p className="text-sm text-blue-600">Taxas cobradas nos aluguéis</p>
+                      </div>
+                      <p className="text-lg font-bold text-blue-600">
+                        {formatCurrency(receitaTaxaAdministrativa)}
+                      </p>
+                    </div>
+                  )}
 
                   {receitaExtra.total > 0 && (
                     <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
