@@ -28,7 +28,17 @@ export function useDespesas() {
       if (!manutencoesResponse.ok) throw new Error('Failed to fetch manutencoes');
       const manutencoes = await manutencoesResponse.json();
       
-
+      // Debug das manutenções
+      console.log('Debug Manutenções:', {
+        total: manutencoes.length,
+        manutencoes: manutencoes.map((m: Manutencao) => ({
+          id: m.id,
+          valorOrcamento: m.valorOrcamento,
+          valorFinal: m.valorFinal,
+          status: m.status,
+          statusPagamento: m.statusPagamento
+        }))
+      });
       
       // Converter manutenções em despesas
       const despesasManutencao = manutencoes
@@ -36,7 +46,13 @@ export function useDespesas() {
           // Prioriza valorFinal se disponível, senão usa valorOrcamento
           const valor = manutencao.valorFinal || manutencao.valorOrcamento || '0.00';
           
-
+          console.log('Convertendo manutenção:', {
+            id: manutencao.id,
+            valorOrcamento: manutencao.valorOrcamento,
+            valorFinal: manutencao.valorFinal,
+            valorUsado: valor,
+            status: manutencao.status
+          });
           
           return {
             id: `manutencao_${manutencao.id}`,
@@ -86,7 +102,14 @@ export function useDespesas() {
       
       const todasDespesas = [...despesasManuais, ...despesasManutencao, ...despesasFinanciamento];
       
-
+      console.log('Despesas - Verificando isolamento:', {
+        locadoraId,
+        despesasTotal: todasDespesas.length,
+        despesasManuais: despesasManuais.length,
+        despesasManutencao: despesasManutencao.length,
+        despesasFinanciamento: despesasFinanciamento.length,
+        primeiraDespesa: todasDespesas[0]?.locadoraId
+      });
       
       return todasDespesas as Despesa[];
     },

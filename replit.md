@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-20: Sistema de Ordenação e Paginação na Aba Histórico com Dupla Datação - CONCLUÍDO ✅
+### 2025-07-20: Sistema de Ordenação e Paginação na Aba Histórico - CONCLUÍDO ✅
 - ✅ **Estados de ordenação implementados** - sortHistorico com valor padrão "mais-recente"
 - ✅ **Estados de paginação adicionados** - currentPageHistorico, itemsPerPageHistorico e funções handlers
 - ✅ **Lógica de dados unificada** - historicoOrdenado combina despesas e manutenções em um array único
@@ -21,20 +21,14 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Controle de itens por página** - Opções de 10, 20 ou 50 itens por página
 - ✅ **Ordenação por data real corrigida** - Usa data da despesa/manutenção ao invés de data de criação
 - ✅ **Sistema de priorização** - Manutenções concluídas aparecem primeiro em caso de empate de data
-- ✅ **Sistema de dupla datação implementado** - Coluna "Data da Despesa" e coluna "Cadastrado em"
-- ✅ **Interface explicativa** - Descrição clara da diferença entre data da despesa e data de cadastro
-- ✅ **Visual diferenciado** - Data da despesa em azul (principal) e data de cadastro em cinza (secundária)
 - ✅ **Sistema totalmente funcional** - Ordenação, paginação e busca funcionando em harmonia
 
-### 2025-07-20: Bug Crítico de Validação isDataReady Corrigido - CONCLUÍDO ✅
-- ✅ **Erro de React Hooks resolvido** - Corrigido "Rendered fewer hooks than expected" em RelatoriosFinanceiros.tsx
-- ✅ **DetalhesVeiculoModal.tsx corrigido** - Interfaces opcionais implementadas para prevenir crashes
-- ✅ **Tratamento null/undefined** - Verificações defensivas adicionadas em todas as propriedades do modal
-- ✅ **Renderização condicional** - Modal só renderiza quando veiculo não é null
-- ✅ **Props obrigatórias fornecidas** - analiseFinanceira e despesasDetalhadas com valores padrão
-- ✅ **Validação isDataReady corrigida** - Problema crítico onde arrays eram comparados diretamente
-- ✅ **Sistema financeiro restaurado** - Todos os dados e cards dos relatórios financeiros funcionando
-- ✅ **Conversão boolean implementada** - `!!()` forçando conversão correta para validação de dados
+### 2025-07-20: Investigação de Bug de Exclusão de Aluguéis - EM ANDAMENTO 🔍
+- 🔍 **Bug identificado** - Erro ao excluir aluguéis com problema de isolamento de locadoraId
+- 🔍 **Logs de debug adicionados** - Frontend e backend monitorando tentativas de exclusão
+- 🔍 **Inconsistência detectada** - Sistema usando locadoraId incorreto (6edb7523-6d36-4518-89b9-2b8a322b98a6 vs 50764571000170)
+- 🔍 **Investigação em curso** - Analisando origem da inconsistência nos IDs
+- ⏳ **Aguardando teste** - Logs implementados para capturar dados detalhados do erro
 
 ### 2025-07-20: Otimização de Categorias de Despesas - CONCLUÍDO ✅
 - ✅ **Categoria "gasolina" removida** - Eliminada duplicação com "combustível"
