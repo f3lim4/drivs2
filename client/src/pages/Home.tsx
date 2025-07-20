@@ -1,10 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, ArrowRight, Users, Car, FileText, BarChart3, Shield, Clock, Building2, Zap, TrendingUp, Truck, Bike } from "lucide-react";
+import { CheckCircle, ArrowRight, Users, Car, FileText, BarChart3, Shield, Clock, Building2, Zap, TrendingUp, Truck, Bike, Bus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import drivsLogo from "@/assets/drivs-logo.png";
+
+// Componente de ícone animado para frota
+function AnimatedFleetIcon() {
+  const [currentIconIndex, setCurrentIconIndex] = useState(0);
+  const vehicleIcons = [Car, Bike, Truck, Bus]; // Car, Moto, Caminhão, Utilitário
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIconIndex((prev) => (prev + 1) % vehicleIcons.length);
+    }, 2000); // Troca a cada 2 segundos
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  const CurrentIcon = vehicleIcons[currentIconIndex];
+  
+  return (
+    <div className="transition-all duration-500 ease-in-out">
+      <CurrentIcon className="h-6 w-6" />
+    </div>
+  );
+}
 
 export default function Home() {
   const navigate = useNavigate();
@@ -19,7 +41,7 @@ export default function Home() {
 
   const recursos = [
     {
-      icon: Car,
+      icon: AnimatedFleetIcon,
       titulo: "Gestão de Frota Completa",
       descricao: "Controle total de veículos, status de disponibilidade, manutenções programadas, histórico detalhado e documentação digital de cada veículo da frota."
     },
