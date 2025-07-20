@@ -230,7 +230,7 @@ export default function Perfil() {
 
         try {
           setLoading(true);
-          const response = await fetch(`/api/locadoras/${currentProfile.locadoraId}`);
+          const response = await fetch(`/api/locadoras/${currentProfile?.locadoraId}`);
           
           if (!response.ok) {
             throw new Error(`Erro ao carregar dados da locadora: ${response.status}`);
@@ -376,7 +376,7 @@ export default function Perfil() {
       console.error('Erro ao trocar senha:', error);
       toast({
         title: "Erro ao alterar senha",
-        description: error.message || "Não foi possível alterar a senha. Verifique se a senha atual está correta.",
+        description: (error as Error).message || "Não foi possível alterar a senha. Verifique se a senha atual está correta.",
         variant: "destructive",
       });
     } finally {
