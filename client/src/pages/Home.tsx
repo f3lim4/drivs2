@@ -455,34 +455,80 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-blue-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Pronto para transformar sua locadora?
+      {/* CTA Section Futurista */}
+      <section className="relative py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 text-white overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+              backgroundSize: '40px 40px'
+            }}></div>
+          </div>
+          
+          {/* Floating Orbs */}
+          <div className="absolute top-10 right-20 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-10 left-20 w-64 h-64 bg-purple-500/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 right-1/4 w-32 h-32 bg-cyan-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+          
+          {/* Animated Lines */}
+          <div className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent animate-pulse"></div>
+          <div className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/30 to-transparent animate-pulse delay-700"></div>
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+            Pronto para <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-purple-400 bg-clip-text text-transparent">transformar</span> sua locadora?
           </h2>
-          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl mb-12 text-blue-100 max-w-3xl mx-auto leading-relaxed">
             Comece hoje mesmo com 30 dias gratuitos e veja como o DRIVS pode 
             otimizar as operações da sua empresa sem compromisso.
           </p>
           
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Button 
-              onClick={handleDemo}
-              size="lg" 
-              variant="secondary"
-              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg font-semibold"
-            >
-              Começar 30 Dias Grátis
-            </Button>
-            <Button 
-              onClick={handleLogin}
-              size="lg" 
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 text-lg"
-            >
-              Fazer Login
-            </Button>
+          {/* Banner Futurista com Botões */}
+          <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 mb-8 max-w-4xl mx-auto border border-white/20 shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-3xl"></div>
+            
+            <div className="relative z-10">
+              <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-2xl blur-sm"></div>
+                  <Button 
+                    onClick={handleDemo}
+                    size="lg" 
+                    className="relative bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-10 py-4 text-xl font-bold shadow-2xl border border-blue-400/30 backdrop-blur-sm transition-all duration-500 hover:scale-105"
+                  >
+                    Começar 30 Dias Grátis
+                  </Button>
+                </div>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-2xl blur-sm"></div>
+                  <Button 
+                    onClick={handleLogin}
+                    size="lg" 
+                    className="relative border border-white/30 text-white hover:bg-white/20 hover:border-white/50 bg-white/10 backdrop-blur-lg px-10 py-4 text-xl font-bold transition-all duration-500 hover:scale-105 shadow-2xl"
+                  >
+                    Fazer Login
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="mt-8 flex flex-wrap justify-center gap-6 text-blue-200">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                  <span>30 dias grátis</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
+                  <span>Sem compromisso</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full mr-2"></div>
+                  <span>Configuração inclusa</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
