@@ -305,6 +305,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(locadora);
     } catch (error) {
       console.error("Error creating locadora:", error);
+      
+      // Tratar erros de duplicação específicos
+      if (error instanceof Error && error.message.includes('duplicate key')) {
+        if (error.message.includes('telefone')) {
+          return res.status(400).json({ message: "Este telefone já está cadastrado" });
+        }
+        if (error.message.includes('cnpj')) {
+          return res.status(400).json({ message: "Este CNPJ já está cadastrado" });
+        }
+        if (error.message.includes('email')) {
+          return res.status(400).json({ message: "Este email já está cadastrado" });
+        }
+        return res.status(400).json({ message: "Dados já existem no sistema" });
+      }
+      
       res.status(500).json({ message: "Internal server error" });
     }
   });
