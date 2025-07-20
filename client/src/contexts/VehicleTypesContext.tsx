@@ -21,6 +21,8 @@ export function VehicleTypesProvider({ children }: { children: React.ReactNode }
   const { data: locadoraData, isLoading } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId],
     enabled: !!profile?.locadoraId && profile?.type === 'locadora',
+    staleTime: 0, // Sempre buscar dados atualizados
+    refetchOnWindowFocus: true, // Recarregar quando voltar ao foco
   });
 
   // Atualizar estado quando dados da locadora carregarem
