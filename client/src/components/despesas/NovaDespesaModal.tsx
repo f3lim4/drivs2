@@ -133,6 +133,18 @@ export function NovaDespesaModal() {
         return;
       }
 
+      // Garantir que locadoraId está sempre presente
+      const locadoraId = profile?.locadoraId || '';
+      
+      if (!locadoraId) {
+        toast({
+          title: 'Erro de autenticação',
+          description: 'Não foi possível identificar sua locadora. Faça login novamente.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // Se há múltiplos veículos selecionados, criar uma despesa para cada
       if (selectedVehicles.length > 1) {
         const valorPorVeiculo = (valorNumerico / selectedVehicles.length).toFixed(2);
@@ -141,6 +153,7 @@ export function NovaDespesaModal() {
         const promises = selectedVehicles.map(veiculoId => 
           createDespesa({
             ...data,
+            locadoraId,
             veiculoId,
             valor: parseFloat(valorPorVeiculo),
             descricao: `${data.descricao} (${selectedVehicles.length} veículos - R$ ${valorPorVeiculo} cada)`,
@@ -157,6 +170,7 @@ export function NovaDespesaModal() {
         // Se apenas um veículo selecionado
         await createDespesa({
           ...data,
+          locadoraId,
           veiculoId: selectedVehicles[0],
           valor: valorNumerico,
         });
@@ -168,6 +182,7 @@ export function NovaDespesaModal() {
         // Se nenhum veículo selecionado, criar despesa sem veículo específico
         await createDespesa({
           ...data,
+          locadoraId,
           veiculoId: 'sem-veiculo',
           valor: valorNumerico,
         });
@@ -179,7 +194,7 @@ export function NovaDespesaModal() {
       
       setOpen(false);
       form.reset({
-        locadoraId: profile?.locadoraId || '',
+        locadoraId: locadoraId,
         veiculoId: '',
         categoria: '',
         descricao: '',
