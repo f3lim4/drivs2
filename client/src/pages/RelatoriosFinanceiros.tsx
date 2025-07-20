@@ -51,12 +51,14 @@ export default function RelatoriosFinanceiros() {
 
   // Debug - verificar se dados estão sendo carregados
   useEffect(() => {
-    console.log('RelatoriosFinanceiros - Dados carregados:', {
-      despesas: despesas?.length || 0,
-      despesasComManutencoes: despesasComManutencoes?.length || 0,
-      manutencoes: manutencoes?.length || 0,
-      veiculos: veiculos?.length || 0
-    });
+    if (despesas?.length === 0) {
+      console.log('⚠️ PROBLEMA: Despesas vazias detectadas!', {
+        despesas: despesas?.length || 0,
+        despesasComManutencoes: despesasComManutencoes?.length || 0,
+        manutencoes: manutencoes?.length || 0,
+        veiculos: veiculos?.length || 0
+      });
+    }
   }, [despesas, despesasComManutencoes, manutencoes, veiculos]);
   const queryClient = useQueryClient();
   const { toast } = useToast();
