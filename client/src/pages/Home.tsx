@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, ArrowRight, Users, Car, FileText, BarChart3, Shield, Clock, Building2, Zap, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import drivsLogo from "@/assets/drivs-logo.png";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -86,9 +87,9 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img 
-              src="/logo_drivs.png" 
+              src={drivsLogo} 
               alt="DRIVS Logo" 
-              className="w-10 h-10"
+              className="h-10"
             />
             <span className="text-2xl font-bold text-gray-800">DRIVS</span>
           </div>
@@ -396,9 +397,9 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-3 mb-4 md:mb-0">
               <img 
-                src="/logo_drivs.png" 
+                src={drivsLogo} 
                 alt="DRIVS Logo" 
-                className="w-8 h-8"
+                className="h-8"
               />
               <span className="text-xl font-bold">DRIVS</span>
             </div>
