@@ -100,26 +100,30 @@ export default function Home() {
             <Button onClick={handleDemo} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg px-6">
               30 Dias Grátis
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleLogin} 
-              className="border-white text-white hover:bg-white hover:text-gray-900 font-medium bg-white/10 backdrop-blur-sm px-6"
-            >
-              Login
-            </Button>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-lg blur-sm"></div>
+              <Button 
+                onClick={handleLogin} 
+                className="relative border border-white/30 text-white hover:bg-white/20 hover:border-white/50 font-medium bg-white/10 backdrop-blur-lg px-6 transition-all duration-500 hover:scale-105 shadow-2xl"
+              >
+                Login
+              </Button>
+            </div>
           </nav>
           
           <div className="flex gap-3 md:hidden">
             <Button onClick={handleDemo} className="bg-blue-600 hover:bg-blue-700 text-white text-sm">
               30 Dias Grátis
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleLogin} 
-              className="border-white text-white hover:bg-white hover:text-gray-900 bg-white/10 backdrop-blur-sm text-sm"
-            >
-              Login
-            </Button>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-lg blur-sm"></div>
+              <Button 
+                onClick={handleLogin} 
+                className="relative border border-white/30 text-white hover:bg-white/20 hover:border-white/50 bg-white/10 backdrop-blur-lg text-sm transition-all duration-500 hover:scale-105 shadow-xl"
+              >
+                Login
+              </Button>
+            </div>
           </div>
         </div>
       </header>
