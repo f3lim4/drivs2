@@ -38,12 +38,13 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Integração com dados reais** - Sistema mostra detalhes financeiros do veículo que o motorista aluga
 - ✅ **Consistência visual** - Mesmo padrão de ícone e comportamento das outras abas de análise
 
-### 2025-07-20: Investigação de Bug de Exclusão de Aluguéis - EM ANDAMENTO 🔍
-- 🔍 **Bug identificado** - Erro ao excluir aluguéis com problema de isolamento de locadoraId
-- 🔍 **Logs de debug adicionados** - Frontend e backend monitorando tentativas de exclusão
-- 🔍 **Inconsistência detectada** - Sistema usando locadoraId incorreto (6edb7523-6d36-4518-89b9-2b8a322b98a6 vs 50764571000170)
-- 🔍 **Investigação em curso** - Analisando origem da inconsistência nos IDs
-- ⏳ **Aguardando teste** - Logs implementados para capturar dados detalhados do erro
+### 2025-07-20: Correção Crítica do Cálculo de Financiamento - CONCLUÍDO ✅
+- ✅ **Bug crítico corrigido** - valorFinanciamento estava sendo dividido por 12 incorretamente
+- ✅ **Entendimento correto** - valorFinanciamento armazena valor mensal (R$ 1.352,00), não anual
+- ✅ **Duas funções corrigidas** - despesasFixasVeiculos e totalDespesasFixasPuras em RelatoriosFinanceiros.tsx
+- ✅ **Hook useDespesas corrigido** - Removida divisão por quantidadeParcelas desnecessária
+- ✅ **Valores corretos** - FMQ0A25 agora mostra R$ 1.352,00 mensal ao invés de R$ 112,67
+- ✅ **Sistema consistente** - Todos os cálculos de despesas fixas usando valores mensais corretos
 
 ### 2025-07-20: Otimização de Categorias de Despesas - CONCLUÍDO ✅
 - ✅ **Categoria "gasolina" removida** - Eliminada duplicação com "combustível"
