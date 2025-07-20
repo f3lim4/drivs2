@@ -503,9 +503,9 @@ export default function RelatoriosFinanceiros() {
         despesasMensais += Number(veiculo.valorRastreadorMensal);
       }
       
-      // Financiamento mensal (removido campos que não existem no schema)
+      // Financiamento mensal (valorFinanciamento já é valor mensal)
       if (veiculo.valorFinanciamento && Number(veiculo.valorFinanciamento) > 0) {
-        despesasMensais += Number(veiculo.valorFinanciamento) / 12; // Dividido por 12 para valor mensal
+        despesasMensais += Number(veiculo.valorFinanciamento); // Valor já é mensal
       }
       
       // Manutenções do mês selecionado
@@ -555,7 +555,7 @@ export default function RelatoriosFinanceiros() {
       
       // Financiamento mensal
       if (veiculo.valorFinanciamento && Number(veiculo.valorFinanciamento) > 0) {
-        despesasFixas += Number(veiculo.valorFinanciamento) / 12; // Dividido por 12 para valor mensal
+        despesasFixas += Number(veiculo.valorFinanciamento); // Valor já é mensal
       }
       
       return total + despesasFixas;
