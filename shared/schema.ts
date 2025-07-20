@@ -38,6 +38,7 @@ export const locadoras = pgTable("locadoras", {
   logo: text("logo"), // URL ou base64 do logo da locadora
   status: text("status").notNull().default("pendente"), // 'ativa', 'inativa', 'pendente'
   plano: text("plano").notNull().default("basico"), // 'basico', 'premium', 'enterprise'
+  tiposVeiculos: text("tipos_veiculos").array().notNull().default(['carro']), // tipos de veículos que a locadora trabalha
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

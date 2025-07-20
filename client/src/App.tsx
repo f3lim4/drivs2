@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { VehicleTypesProvider } from "@/contexts/VehicleTypesContext";
 import { DrivsLayout } from "@/components/layout/DrivsLayout";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import Dashboard from "./pages/Dashboard";
@@ -43,15 +44,16 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/cadastro-locadora" element={<CadastroLocadora />} />
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/" element={<Home />} />
+    <VehicleTypesProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/cadastro-locadora" element={<CadastroLocadora />} />
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={
             <AuthGuard>
               <DrivsLayout><Dashboard /></DrivsLayout>
@@ -127,6 +129,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+    </VehicleTypesProvider>
   </QueryClientProvider>
 );
 
