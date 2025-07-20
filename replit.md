@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-20: Correção Crítica do Sistema de Criação de Despesas - CONCLUÍDO ✅
+- ✅ **Bug crítico corrigido** - Campo locadoraId não estava sendo enviado corretamente na criação de despesas
+- ✅ **Validação de autenticação adicionada** - Sistema agora verifica se usuário está autenticado antes de criar despesa
+- ✅ **Garantia de isolamento** - locadoraId sempre presente e validado em todas as operações de despesa
+- ✅ **Despesas órfãs corrigidas** - Atualizado banco para incluir locadoraId nas despesas sem esse campo
+- ✅ **Interface funcional** - Nova despesa modal agora funciona 100% corretamente
+- ✅ **Dados consistentes** - Todas as despesas agora aparecem corretamente nos relatórios financeiros
+
 ### 2025-07-19: Correção Crítica do Bug de Validação de Despesa e Sistema Anti-Duplicata - CONCLUÍDO ✅
 - ✅ **Duplicação de schema corrigida** - Removida duplicação entre shared/schema.ts e modal que causava conflito de validação
 - ✅ **Schema unificado implementado** - Modal agora usa apenas insertDespesaSchema do shared sem sobrescrever
