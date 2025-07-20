@@ -394,8 +394,8 @@ export default function CadastroLocadora() {
                   />
                 </div>
 
-                {/* CEP, Endereço e Número na mesma linha */}
-                <div className="col-span-2 grid grid-cols-3 gap-3">
+                {/* CEP, Endereço, Número e Complemento na mesma linha */}
+                <div className="col-span-2 grid grid-cols-4 gap-2">
                   <div className="space-y-2">
                     <Label htmlFor="cep">CEP *</Label>
                     <Input
@@ -417,7 +417,7 @@ export default function CadastroLocadora() {
                       id="endereco"
                       value={formData.endereco}
                       onChange={(e) => updateFormData('endereco', e.target.value)}
-                      placeholder="Preenchimento automático"
+                      placeholder="Automático"
                       required
                     />
                   </div>
@@ -432,16 +432,16 @@ export default function CadastroLocadora() {
                       required
                     />
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="complemento">Complemento</Label>
-                  <Input
-                    id="complemento"
-                    value={formData.complemento}
-                    onChange={(e) => updateFormData('complemento', e.target.value)}
-                    placeholder="Apto, casa, bloco..."
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="complemento">Complemento</Label>
+                    <Input
+                      id="complemento"
+                      value={formData.complemento}
+                      onChange={(e) => updateFormData('complemento', e.target.value)}
+                      placeholder="Apto..."
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -450,7 +450,7 @@ export default function CadastroLocadora() {
                     id="bairro"
                     value={formData.bairro}
                     onChange={(e) => updateFormData('bairro', e.target.value)}
-                    placeholder="Será preenchido automaticamente pelo CEP"
+                    placeholder="Preenchimento automático pelo CEP"
                     required
                   />
                 </div>
