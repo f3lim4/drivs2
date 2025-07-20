@@ -1281,7 +1281,8 @@ export default function RelatoriosFinanceiros() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Data</TableHead>
+                        <TableHead>Data da Despesa</TableHead>
+                        <TableHead>Criado em</TableHead>
                         <TableHead>Veículo</TableHead>
                         <TableHead>Tipo</TableHead>
                         <TableHead>Categoria</TableHead>
@@ -1445,6 +1446,9 @@ export default function RelatoriosFinanceiros() {
                           return (
                           <TableRow key={despesa.id}>
                             <TableCell>{formatDate(despesa.data)}</TableCell>
+                            <TableCell className="text-sm text-gray-600">
+                              {formatDate(despesa.createdAt)}
+                            </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Car className="h-4 w-4 text-blue-600" />
