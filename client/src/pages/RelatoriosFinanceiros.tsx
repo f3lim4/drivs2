@@ -1225,6 +1225,7 @@ export default function RelatoriosFinanceiros() {
                                    categoria === 'financiamento' ? 'bg-pink-50' :
                                    categoria === 'combustivel' ? 'bg-orange-50' :
                                    categoria === 'gasolina' ? 'bg-red-50' :
+                                   categoria === 'despachante' ? 'bg-teal-50' :
                                    'bg-gray-50';
                       const corTexto = categoria === 'emprestimo' ? 'text-purple-800' :
                                       categoria === 'lavagem' ? 'text-blue-800' :
@@ -1234,6 +1235,7 @@ export default function RelatoriosFinanceiros() {
                                       categoria === 'financiamento' ? 'text-pink-800' :
                                       categoria === 'combustivel' ? 'text-orange-800' :
                                       categoria === 'gasolina' ? 'text-red-800' :
+                                      categoria === 'despachante' ? 'text-teal-800' :
                                       'text-gray-800';
                       const corValor = categoria === 'emprestimo' ? 'text-purple-600' :
                                       categoria === 'lavagem' ? 'text-blue-600' :
@@ -1243,6 +1245,7 @@ export default function RelatoriosFinanceiros() {
                                       categoria === 'financiamento' ? 'text-pink-600' :
                                       categoria === 'combustivel' ? 'text-orange-600' :
                                       categoria === 'gasolina' ? 'text-red-600' :
+                                      categoria === 'despachante' ? 'text-teal-600' :
                                       'text-gray-600';
                       
                       return (

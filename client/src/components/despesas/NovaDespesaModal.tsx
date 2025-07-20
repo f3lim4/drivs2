@@ -171,6 +171,7 @@ export function NovaDespesaModal() {
   const categorias = [
     'combustivel',
     'gasolina',
+    'despachante',
     'manutencao',
     'seguro',
     'licenciamento',
@@ -187,6 +188,7 @@ export function NovaDespesaModal() {
   const categoriasLabels = {
     combustivel: 'Combustível',
     gasolina: 'Gasolina',
+    despachante: 'Despachante',
     manutencao: 'Manutenção',
     seguro: 'Seguro',
     licenciamento: 'Licenciamento',
