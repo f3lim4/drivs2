@@ -1087,7 +1087,7 @@ export default function RelatoriosFinanceiros() {
       const ipva = veiculo.ipva ? Number(veiculo.ipva) / 12 : 0;
       const seguro = veiculo.valorSeguroMensal ? Number(veiculo.valorSeguroMensal) : 0;
       const rastreador = veiculo.valorRastreadorMensal ? Number(veiculo.valorRastreadorMensal) : 0;
-      const financiamento = veiculo.valorFinanciamento ? Number(veiculo.valorFinanciamento) / 12 : 0;
+      const financiamento = veiculo.valorFinanciamento ? Number(veiculo.valorFinanciamento) : 0;
       const totalMensal = ipva + seguro + rastreador + financiamento;
       
       return {
@@ -1557,7 +1557,7 @@ export default function RelatoriosFinanceiros() {
               <h4 className="font-medium text-pink-700 mb-2">Financiamento</h4>
               <p className="text-xl font-bold text-pink-800">
                 {formatCurrency(
-                  veiculos.reduce((total, v) => total + (v.valorFinanciamento ? Number(v.valorFinanciamento) / 12 : 0), 0)
+                  veiculos.reduce((total, v) => total + (v.valorFinanciamento ? Number(v.valorFinanciamento) : 0), 0)
                 )}
               </p>
               <p className="text-sm text-pink-600">Mensal</p>
