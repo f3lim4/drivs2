@@ -207,16 +207,25 @@ export function NovoContratoModal({
       const valorMensal = data.valorSemanal * 4;
       const valorTotal = valorMensal * data.tempoContrato;
 
-      // Cria novo contrato
-      const novoContrato = {
-        tipo: 'locacao' as const,
-        titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
-        cliente: aluguel.motoristaNome,
-        valor: valorTotal.toString(),
-        dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
-        dataFim: format(dataFim, 'yyyy-MM-dd'),
-        status: 'ativo' as const,
-        template: `CONTRATO DE LOCAÇÃO DE VEÍCULO
+      // Buscar template selecionado ou usar padrão
+      let templateContent = '';
+      
+      console.log('Template ID selecionado:', data.templateId);
+      console.log('Templates disponíveis:', templates);
+      
+      if (data.templateId && data.templateId !== 'default') {
+        // Buscar template personalizado
+        const templateSelecionado = templates.find(t => t.id === data.templateId);
+        console.log('Template encontrado:', templateSelecionado);
+        if (templateSelecionado) {
+          templateContent = templateSelecionado.conteudo;
+          console.log('Usando template personalizado:', templateSelecionado.nome);
+        }
+      }
+      
+      // Se não encontrou template personalizado ou selecionou padrão, usar template padrão
+      if (!templateContent) {
+        templateContent = `CONTRATO DE LOCAÇÃO DE VEÍCULO
 
 LOCADOR: ${locadorInfo.nome}, Ramo de atividade: Locação de Veículos, portador do CNPJ: ${locadorInfo.cnpj}, cuja
 sede se encontra na ${locadorInfo.endereco}. 
@@ -312,7 +321,19 @@ contratadas, assinam o presente instrumento em Embu das Artes - SP, ${format(dat
             ${aluguel.motoristaNome}                          ${locadorInfo.responsavel}
                 LOCATÁRIO                                    LOCADORA
 
-Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`
+Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
+      }
+
+      // Cria novo contrato
+      const novoContrato = {
+        tipo: 'locacao' as const,
+        titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
+        cliente: aluguel.motoristaNome,
+        valor: valorTotal.toString(),
+        dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
+        dataFim: format(dataFim, 'yyyy-MM-dd'),
+        status: 'ativo' as const,
+        template: templateContent
       };
 
       // Usa o hook para criar o contrato
