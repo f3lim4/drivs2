@@ -10,6 +10,7 @@ import {
   Car, 
   Bike,
   Truck,
+  Bus,
   FileText, 
   File,
   TrendingUp,
@@ -24,10 +25,9 @@ import {
   Search
 } from 'lucide-react';
 import logoPath from "@assets/icone_1752434737434.png";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useVehicleTypes } from '@/contexts/VehicleTypesContext';
 import {
   Sidebar,
   SidebarContent,
@@ -129,24 +129,25 @@ const navigationItems = [
   }
 ];
 
-// Função para obter ícone dinâmico baseado nos tipos de veículos
-const getVehicleIcon = (vehicleTypes: string[]) => {
-  if (vehicleTypes.includes('motocicletas')) {
-    return Bike;
-  }
-  if (vehicleTypes.includes('caminhoes')) {
-    return Truck;
-  }
-  // Padrão é carro para carros ou utilitários
-  return Car;
-};
+// Ícones de veículos para alternância
+const vehicleIcons = [Car, Bike, Truck, Bus];
+const vehicleIconNames = ['Carro', 'Moto', 'Caminhão', 'Utilitário'];
 
 export function DrivsSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   const { profile, isAdmin, isLocadora } = useAuth();
-  const { vehicleTypes } = useVehicleTypes();
   const { isMobile, setOpenMobile } = useSidebar();
+  const [currentVehicleIconIndex, setCurrentVehicleIconIndex] = useState(0);
+
+  // Alternar ícone de veículo a cada 3 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentVehicleIconIndex((prev) => (prev + 1) % vehicleIcons.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Filtrar itens baseado no tipo de usuário e aplicar ícone dinâmico
   const filteredNavigationItems = navigationItems.filter(item => {
@@ -158,11 +159,12 @@ export function DrivsSidebar() {
     }
     return true;
   }).map(item => {
-    // Aplicar ícone dinâmico para veículos baseado na seleção da locadora
-    if (item.url === '/veiculos' && vehicleTypes && vehicleTypes.length > 0) {
+    // Aplicar ícone alternante para veículos
+    if (item.url === '/veiculos') {
       return {
         ...item,
-        icon: getVehicleIcon(vehicleTypes)
+        icon: vehicleIcons[currentVehicleIconIndex],
+        description: `Gestão de ${vehicleIconNames[currentVehicleIconIndex].toLowerCase()}s`
       };
     }
     return item;
