@@ -292,11 +292,13 @@ export default function Perfil() {
   }, [profile?.locadoraId, profile?.email, form, toast, isAdmin, isLocadora]);
 
   const onSubmit = async (data: PerfilFormData) => {
-    console.log('onSubmit chamado com dados:', data);
-    console.log('profile?.locadoraId:', profile?.locadoraId);
+    // Verificar se está realmente em modo de edição
+    if (!editMode) {
+      console.log('onSubmit chamado fora do modo de edição - ignorando');
+      return;
+    }
     
     if (!profile?.locadoraId) {
-      console.error('Erro: locadoraId não encontrado no perfil');
       toast({
         title: "Erro",
         description: "ID da locadora não encontrado. Tente fazer login novamente.",
@@ -314,8 +316,6 @@ export default function Perfil() {
         tiposVeiculos: selectedVehicleTypes
       };
       
-      console.log('Dados sendo enviados:', dataToSend);
-      
       const response = await fetch(`/api/locadoras/${profile.locadoraId}`, {
         method: 'PUT',
         headers: {
@@ -323,17 +323,12 @@ export default function Perfil() {
         },
         body: JSON.stringify(dataToSend),
       });
-
-      console.log('Response status:', response.status);
       
       if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Erro do servidor:', errorData);
         throw new Error(`Erro ao atualizar dados: ${response.status}`);
       }
 
       const updatedData = await response.json();
-      console.log('Dados atualizados recebidos:', updatedData);
       
       setLocadora(updatedData);
       setEditMode(false);
@@ -346,7 +341,7 @@ export default function Perfil() {
       console.error('Erro ao atualizar:', error);
       toast({
         title: "Erro ao atualizar",
-        description: `Não foi possível atualizar os dados: ${error.message}`,
+        description: "Não foi possível atualizar os dados. Tente novamente.",
         variant: "destructive",
       });
     } finally {
