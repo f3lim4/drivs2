@@ -215,7 +215,6 @@ export default function RelatoriosFinanceiros() {
       });
 
       queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
-      setModalAberto(false);
       form.reset();
 
     } catch (error) {
@@ -247,6 +246,36 @@ export default function RelatoriosFinanceiros() {
       });
 
       queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
+    } catch (error) {
+      console.error('Erro ao excluir despesa:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao excluir despesa. Tente novamente.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Função para confirmar exclusão
+  const confirmarExclusao = async () => {
+    if (!confirmDelete.id) return;
+    
+    try {
+      const response = await fetch(`/api/despesas/${confirmDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao excluir despesa');
+      }
+
+      toast({
+        title: 'Sucesso',
+        description: 'Despesa excluída com sucesso.',
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['/api/despesas'] });
+      setConfirmDelete({ open: false, id: null });
     } catch (error) {
       console.error('Erro ao excluir despesa:', error);
       toast({
