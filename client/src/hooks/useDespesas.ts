@@ -51,6 +51,8 @@ export function useDespesas() {
             tipo: 'despesa',
             fonte: 'manutencao',
             manutencaoId: manutencao.id,
+            createdAt: manutencao.createdAt,
+            updatedAt: manutencao.updatedAt,
           };
         });
       
