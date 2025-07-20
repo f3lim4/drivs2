@@ -1794,14 +1794,6 @@ export default function RelatoriosFinanceiros() {
                         <tbody>
                           {historicoPaginado.map((item) => {
                             const veiculo = veiculos.find(v => v.id === item.veiculoId);
-                            console.log('Item do histórico:', {
-                              id: item.id,
-                              data: item.data,
-                              createdAt: (item as any).createdAt,
-                              dataInicio: (item as any).dataInicio,
-                              dataConclusao: (item as any).dataConclusao,
-                              tipo: item.tipo
-                            });
                             return (
                               <tr key={item.id} className="border-b hover:bg-gray-50">
                                 <td className="p-3">{veiculo?.placa || 'N/A'}</td>
@@ -1812,7 +1804,11 @@ export default function RelatoriosFinanceiros() {
                                 }`}>
                                   {formatCurrency(item.valor)}
                                 </td>
-                                <td className="p-3">{format(new Date(item.data), 'dd/MM/yyyy')}</td>
+                                <td className="p-3">
+                                  <div className="text-sm font-medium">
+                                    {format(new Date(item.data), 'dd/MM/yyyy')}
+                                  </div>
+                                </td>
                                 <td className="p-3">
                                   <span className={`px-2 py-1 rounded-full text-xs ${
                                     item.tipo === 'despesa' 
