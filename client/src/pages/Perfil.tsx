@@ -887,49 +887,51 @@ export default function Perfil() {
                   </div>
                 </div>
 
-
-
-                {/* Botões */}
-                <div className="flex justify-end space-x-2">
-                  {editMode ? (
-                    <>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => {
-                          setEditMode(false);
-                          form.reset();
-                        }}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button type="submit" disabled={saving}>
-                        {saving ? 'Salvando...' : 'Salvar Alterações'}
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setShowPasswordForm(true)}
-                      >
-                        <div className="h-4 w-4 mr-2 flex items-center justify-center">
-                          <Lock className="w-full h-full" />
-                        </div>
-                        Trocar Senha
-                      </Button>
-                      <Button
-                        type="button"
-                        onClick={() => setEditMode(true)}
-                      >
-                        Editar Perfil
-                      </Button>
-                    </>
-                  )}
-                </div>
+                {/* Botões de ação dentro do formulário (apenas submit) */}
+                {editMode && (
+                  <div className="flex justify-end space-x-2">
+                    <Button type="submit" disabled={saving}>
+                      {saving ? 'Salvando...' : 'Salvar Alterações'}
+                    </Button>
+                  </div>
+                )}
               </form>
             </Form>
+
+            {/* Botões de controle fora do formulário */}
+            <div className="flex justify-end space-x-2 mt-4">
+              {editMode ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setEditMode(false);
+                    form.reset();
+                  }}
+                >
+                  Cancelar
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowPasswordForm(true)}
+                  >
+                    <div className="h-4 w-4 mr-2 flex items-center justify-center">
+                      <Lock className="w-full h-full" />
+                    </div>
+                    Trocar Senha
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => setEditMode(true)}
+                  >
+                    Editar Perfil
+                  </Button>
+                </>
+              )}
+            </div>
           </CardContent>
         </Card>
 
