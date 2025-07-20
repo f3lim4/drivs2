@@ -27,22 +27,12 @@ import { useManutencoes } from '@/hooks/useManutencoes';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { DetalhesVeiculoModal } from '@/components/relatorios/DetalhesVeiculoModal';
+import { NovaDespesaModal } from '@/components/despesas/NovaDespesaModal';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Pagination } from '@/components/ui/pagination';
 // Recharts removed - using simple tables and cards instead
 
-// Schema para formulário de nova despesa
-const novaDespesaSchema = z.object({
-  veiculoId: z.string().optional(), // Não obrigatório quando usa multi-seleção
-  categoria: z.string().min(1, "Selecione uma categoria"),
-  descricao: z.string().min(1, "Descrição é obrigatória"),
-  valor: z.string().min(1, "Valor é obrigatório"),
-  data: z.string().min(1, "Data é obrigatória"),
-  status: z.enum(['pendente', 'pago']).default('pendente'),
-  formaPagamento: z.enum(['dinheiro', 'cartao_credito', 'cartao_debito', 'pix', 'transferencia', 'boleto']).optional()
-});
-
-type NovaDespesaData = z.infer<typeof novaDespesaSchema>;
+// Removido schema duplicado - usando o do componente NovaDespesaModal
 
 export default function RelatoriosFinanceiros() {
   const { profile, isAdmin } = useAuth();
@@ -80,10 +70,7 @@ export default function RelatoriosFinanceiros() {
 
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
   const [despesaParaExcluir, setDespesaParaExcluir] = useState<string | null>(null);
-  const [modalAberto, setModalAberto] = useState(false);
-  const [modalEditarDespesa, setModalEditarDespesa] = useState(false);
-  const [despesaEditando, setDespesaEditando] = useState<any>(null);
-  const [editando, setEditando] = useState(false);
+  // Removido estados do modal duplicado - usando componente NovaDespesaModal
   const [isLoading, setIsLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
@@ -248,13 +235,12 @@ export default function RelatoriosFinanceiros() {
         });
       }
 
-      setModalAberto(false);
-      form.reset();
+      // Removido setModalAberto - usando componente NovaDespesaModal
       queryClient.invalidateQueries({ queryKey: ['/api/despesas', locadoraId] });
     } catch (error) {
       toast({
         title: 'Erro',
-        description: editando ? 'Erro ao editar despesa.' : 'Erro ao criar despesa.',
+        description: 'Erro ao processar despesa.',
         variant: 'destructive',
       });
     } finally {
@@ -262,42 +248,7 @@ export default function RelatoriosFinanceiros() {
     }
   };
 
-  // Limpar formulário quando modal fecha
-  useEffect(() => {
-    if (!modalAberto) {
-      form.reset();
-      setEditando(false);
-      setDespesaEditando(null);
-    }
-  }, [modalAberto, form]);
-
-
-
-  // Função para editar despesa - usando onSubmit quando em modo edição
-
-  // Função para abrir modal de edição
-  const abrirModalEdicao = (despesa: any) => {
-    // Apenas permite editar despesas manuais
-    if (despesa.fonte !== 'manual') {
-      toast({
-        title: 'Não é possível editar',
-        description: 'Apenas despesas manuais podem ser editadas.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    setDespesaEditando(despesa);
-    setEditando(true);
-    form.reset({
-      veiculoIds: [despesa.veiculoId],
-      categoria: despesa.categoria || '',
-      descricao: despesa.descricao || '',
-      valor: despesa.valor?.toString() || '',
-      formaPagamento: despesa.formaPagamento || '',
-    });
-    setModalAberto(true);
-  };
+  // Removido useEffect e abrirModalEdicao - usando componente NovaDespesaModal
 
   // Função para abrir modal de exclusão
   const abrirModalExclusao = (id: string) => {
@@ -989,13 +940,7 @@ export default function RelatoriosFinanceiros() {
           </SelectContent>
         </Select>
         {!isAdmin && (
-          <Button onClick={() => {
-            console.log('Botão Nova Despesa clicado');
-            setModalAberto(true);
-          }} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Nova Despesa
-          </Button>
+          <NovaDespesaModal />
         )}
       </div>
 
@@ -2128,200 +2073,7 @@ export default function RelatoriosFinanceiros() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{editando ? 'Editar Despesa' : 'Nova Despesa'}</DialogTitle>
-            <DialogDescription>
-              {editando ? 'Atualize os dados da despesa.' : 'Adicione uma nova despesa manual.'}
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="veiculoIds"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Veículos</FormLabel>
-                    <FormControl>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-between"
-                            type="button"
-                          >
-                            {field.value?.length === 0 ? 'Selecionar' :
-                             field.value?.length === 1 ? 
-                               veiculos.find(v => v.id === field.value[0])?.placa + ' - ' + veiculos.find(v => v.id === field.value[0])?.modelo :
-                               `${field.value?.length} veículos`}
-                            <ChevronDown className="h-4 w-4 opacity-50" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-full min-w-[300px]">
-                          <div className="p-2">
-                            <div className="flex gap-2 mb-2">
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                onClick={() => field.onChange(veiculos.map(v => v.id))}
-                              >
-                                Todos
-                              </Button>
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                onClick={() => field.onChange([])}
-                              >
-                                Limpar
-                              </Button>
-                            </div>
-                            {veiculos.map(veiculo => (
-                              <DropdownMenuCheckboxItem
-                                key={veiculo.id}
-                                checked={field.value?.includes(veiculo.id)}
-                                onCheckedChange={(checked) => {
-                                  const current = field.value || [];
-                                  if (checked) {
-                                    field.onChange([...current, veiculo.id]);
-                                  } else {
-                                    field.onChange(current.filter(id => id !== veiculo.id));
-                                  }
-                                }}
-                              >
-                                {veiculo.placa} - {veiculo.modelo}
-                              </DropdownMenuCheckboxItem>
-                            ))}
-                          </div>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="categoria"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Categoria</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecionar" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="combustivel">Combustível</SelectItem>
-                          <SelectItem value="manutencao">Manutenção</SelectItem>
-                          <SelectItem value="licenciamento">Licenciamento</SelectItem>
-                          <SelectItem value="lavagem">Lavagem</SelectItem>
-                          <SelectItem value="emprestimo">Empréstimo</SelectItem>
-                          <SelectItem value="outros">Outros</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="valor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Valor Total</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          step="0.01" 
-                          placeholder="0,00" 
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="descricao"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descrição</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Descrição da despesa" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="data"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="date" 
-                        {...field}
-                        value={field.value ? format(new Date(field.value), 'yyyy-MM-dd') : ''}
-                        onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="formaPagamento"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Forma de Pagamento</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecionar" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                        <SelectItem value="cartao">Cartão</SelectItem>
-                        <SelectItem value="pix">PIX</SelectItem>
-                        <SelectItem value="transferencia">Transferência</SelectItem>
-                        <SelectItem value="boleto">Boleto</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setModalAberto(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Salvando..." : editando ? "Atualizar" : "Salvar"}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      {/* Modal duplicado removido - usando componente NovaDespesaModal */}
 
       {/* Modal de confirmação de exclusão */}
       <Dialog open={confirmDelete.open} onOpenChange={(open) => setConfirmDelete({ ...confirmDelete, open })}>
