@@ -264,6 +264,11 @@ export default function RelatoriosFinanceiros() {
     }
   };
 
+  // Função para excluir despesa com confirmação
+  const handleExcluirDespesa = (despesaId: string) => {
+    setConfirmDelete({ open: true, id: despesaId });
+  };
+
   // Função para confirmar exclusão
   const confirmarExclusao = async () => {
     if (!confirmDelete.id) return;
@@ -1802,6 +1807,7 @@ export default function RelatoriosFinanceiros() {
                             <th className="text-left p-3 border-b">Data Feita</th>
                             <th className="text-left p-3 border-b">Data Criação</th>
                             <th className="text-left p-3 border-b">Tipo</th>
+                            <th className="text-left p-3 border-b">Ações</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1835,6 +1841,21 @@ export default function RelatoriosFinanceiros() {
                                   }`}>
                                     {item.tipo === 'despesa' ? 'Despesa' : 'Manutenção'}
                                   </span>
+                                </td>
+                                <td className="p-3">
+                                  {item.fonte === 'despesa' && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleExcluirDespesa(item.id)}
+                                      className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                  {item.fonte === 'manutencao' && (
+                                    <span className="text-gray-400 text-xs">-</span>
+                                  )}
                                 </td>
                               </tr>
                             );
