@@ -228,16 +228,16 @@ export function NovaDespesaModal() {
   const categorias = [
     'combustivel',
     'despachante',
-    'manutencao',
-    'seguro',
-    'licenciamento',
-    'ipva',
-    'multa',
-    'lavagem',
-    'pneus',
-    'revisao',
-    'reparo',
     'emprestimo',
+    'ipva',
+    'lavagem',
+    'licenciamento',
+    'manutencao',
+    'multa',
+    'pneus',
+    'reparo',
+    'revisao',
+    'seguro',
     'outros'
   ];
 
