@@ -1327,7 +1327,7 @@ export default function RelatoriosFinanceiros() {
       </Card>
 
       {/* Tabs de Análise */}
-      <Tabs defaultValue="despesas" className="space-y-4">
+      <Tabs defaultValue="despesas" className="space-y-2">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="despesas">Despesas</TabsTrigger>
           <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
@@ -1336,7 +1336,7 @@ export default function RelatoriosFinanceiros() {
           <TabsTrigger value="historico">Histórico</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="despesas" className="space-y-2 pt-2">
+        <TabsContent value="despesas" className="space-y-2">
           {/* Cards pequenos de resumo removidos conforme solicitado */}
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1506,7 +1506,7 @@ export default function RelatoriosFinanceiros() {
         </TabsContent>
 
         {/* Aba Despesas Fixas */}
-        <TabsContent value="despesas-fixas" className="space-y-2 pt-2">
+        <TabsContent value="despesas-fixas" className="space-y-2">
           {/* Cards de totais por categoria */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-yellow-50 p-4 rounded-lg">
@@ -1742,7 +1742,7 @@ export default function RelatoriosFinanceiros() {
         </TabsContent>
 
         {/* Aba Histórico */}
-        <TabsContent value="historico" className="space-y-2 pt-2">
+        <TabsContent value="historico" className="space-y-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -1877,7 +1877,7 @@ export default function RelatoriosFinanceiros() {
         </TabsContent>
 
         {/* Aba Análise por Veículo */}
-        <TabsContent value="veiculos" className="space-y-2 pt-2">
+        <TabsContent value="veiculos" className="space-y-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -2046,7 +2046,7 @@ export default function RelatoriosFinanceiros() {
         </TabsContent>
 
         {/* Aba Análise por Motorista */}
-        <TabsContent value="motoristas" className="space-y-2 pt-2">
+        <TabsContent value="motoristas" className="space-y-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
