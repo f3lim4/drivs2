@@ -1281,8 +1281,8 @@ export default function RelatoriosFinanceiros() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Data da Despesa</TableHead>
                         <TableHead>Criado em</TableHead>
+                        <TableHead>Data da Despesa</TableHead>
                         <TableHead>Veículo</TableHead>
                         <TableHead>Tipo</TableHead>
                         <TableHead>Categoria</TableHead>
@@ -1383,13 +1383,19 @@ export default function RelatoriosFinanceiros() {
                               valor: parseFloat(valor),
                               status: manutencao.statusPagamento === 'pago' ? 'Pago' : 'Pendente',
                               formaPagamento: manutencao.formaPagamento || 'Não informado',
-                              createdAt: dataOriginal
+                              createdAt: manutencao.createdAt || dataOriginal // Usar data de criação real
                             });
                           }
                         });
                         
                         // Adicionar despesas manuais
                         despesas.filter(despesa => despesa.categoria !== 'financiamento').forEach(despesa => {
+                          console.log('Despesa com datas:', { 
+                            id: despesa.id, 
+                            data: despesa.data, 
+                            createdAt: despesa.createdAt,
+                            updatedAt: despesa.updatedAt 
+                          });
                           const veiculo = veiculos.find(v => v.id === despesa.veiculoId);
                           todasDespesas.push({
                             id: `despesa-${despesa.id}`,
@@ -1401,7 +1407,7 @@ export default function RelatoriosFinanceiros() {
                             valor: parseFloat(despesa.valor),
                             status: 'Manual',
                             formaPagamento: despesa.formaPagamento || 'Não informado',
-                            createdAt: despesa.createdAt || despesa.data
+                            createdAt: despesa.createdAt // Usar sempre a data real do banco
                           });
                         });
 
@@ -1445,10 +1451,10 @@ export default function RelatoriosFinanceiros() {
                         return despesasPaginadas.map(despesa => {
                           return (
                           <TableRow key={despesa.id}>
-                            <TableCell>{formatDate(despesa.data)}</TableCell>
                             <TableCell className="text-sm text-gray-600">
                               {formatDate(despesa.createdAt)}
                             </TableCell>
+                            <TableCell>{formatDate(despesa.data)}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Car className="h-4 w-4 text-blue-600" />
