@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CalendarIcon, Plus, Info, ChevronDown } from 'lucide-react';
+import { CalendarIcon, Plus, Info, ChevronDown, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -50,6 +50,7 @@ const parseDate = (dateStr: string): Date | undefined => {
 export function NovaDespesaModal() {
   const [open, setOpen] = useState(false);
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
+  const [searchVehicle, setSearchVehicle] = useState('');
   const { profile } = useAuth();
   const { createDespesa, isCreating } = useDespesas();
   const { veiculos } = useVeiculos();
@@ -184,6 +185,7 @@ export function NovaDespesaModal() {
         observacoes: '',
       });
       setSelectedVehicles([]);
+      setSearchVehicle('');
     } catch (error) {
       console.error('Error creating despesa:', error);
       
@@ -220,8 +222,7 @@ export function NovaDespesaModal() {
     'outros'
   ];
 
-  // Debug: forçar reload das categorias
-  console.log('Categorias disponíveis:', categorias);
+
 
   const categoriasLabels = {
     combustivel: 'Combustível',
@@ -302,7 +303,18 @@ export function NovaDespesaModal() {
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="w-[400px] p-0">
-                    <div className="p-4 space-y-3 max-h-60 overflow-y-auto">
+                    <div className="p-4 space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                      {/* Campo de busca */}
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          placeholder="Buscar veículo por placa ou modelo..."
+                          value={searchVehicle}
+                          onChange={(e) => setSearchVehicle(e.target.value)}
+                          className="pl-10 text-sm"
+                        />
+                      </div>
+                      
                       <div className="flex items-center justify-between">
                         <Button 
                           variant="ghost" 
@@ -321,7 +333,19 @@ export function NovaDespesaModal() {
                           Limpar Seleção
                         </Button>
                       </div>
-                      {veiculos.map((veiculo) => (
+                      
+                      {/* Lista de veículos filtrada */}
+                      {veiculos
+                        .filter((veiculo) => {
+                          if (!searchVehicle) return true;
+                          const search = searchVehicle.toLowerCase();
+                          return (
+                            veiculo.placa?.toLowerCase().includes(search) ||
+                            veiculo.modelo?.toLowerCase().includes(search) ||
+                            veiculo.marca?.toLowerCase().includes(search)
+                          );
+                        })
+                        .map((veiculo) => (
                         <div key={veiculo.id} className="flex items-center space-x-2">
                           <Checkbox
                             id={veiculo.id}
