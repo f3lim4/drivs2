@@ -28,20 +28,9 @@ export function VehicleTypesProvider({ children }: { children: React.ReactNode }
     refetchOnMount: true, // Sempre refetch ao montar
   });
 
-  // Debug - Log dos dados da locadora
-  useEffect(() => {
-    if (locadoraData) {
-      console.log('VehicleTypesContext - Dados da locadora carregados:', {
-        tiposVeiculos: locadoraData.tiposVeiculos,
-        selectedTypes: selectedTypes
-      });
-    }
-  }, [locadoraData, selectedTypes]);
-
   // Atualizar estado quando dados da locadora carregarem
   useEffect(() => {
     if (locadoraData?.tiposVeiculos) {
-      console.log('VehicleTypesContext - Atualizando selectedTypes:', locadoraData.tiposVeiculos);
       setSelectedTypes(locadoraData.tiposVeiculos);
     }
   }, [locadoraData]);
@@ -49,7 +38,6 @@ export function VehicleTypesProvider({ children }: { children: React.ReactNode }
   // Escutar mudanças no localStorage para invalidar cache
   useEffect(() => {
     const handleStorageChange = () => {
-      console.log('VehicleTypesContext - Storage change detected, refetching...');
       if (profile?.locadoraId) {
         queryClient.invalidateQueries({
           queryKey: ['/api/locadoras', profile.locadoraId],
@@ -62,7 +50,6 @@ export function VehicleTypesProvider({ children }: { children: React.ReactNode }
     
     // Custom event listener para mudanças internas
     const handleProfileUpdate = () => {
-      console.log('VehicleTypesContext - Profile update detected, refetching...');
       if (profile?.locadoraId) {
         queryClient.invalidateQueries({
           queryKey: ['/api/locadoras', profile.locadoraId],
