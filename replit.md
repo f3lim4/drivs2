@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-20: Remoção Completa do Sistema de Tipos de Veículos da Página de Perfil - CONCLUÍDO ✅
+- ✅ **Seção de tipos de veículos removida** - Eliminada seção "Tipos de Veículos da Sua Frota" da página de Perfil
+- ✅ **Código limpo** - Removidas todas as variáveis, funções e imports relacionados aos tipos de veículos
+- ✅ **Interface simplificada** - Página de perfil agora tem foco apenas nos dados essenciais da empresa
+- ✅ **Schema atualizado** - Removido campo `tiposVeiculos` do schema de validação
+- ✅ **Estado removido** - Eliminadas variáveis selectedVehicleTypes e toggleVehicleType
+- ✅ **API otimizada** - Dados de tipos de veículos não são mais enviados nas atualizações de perfil
+
 ### 2025-07-20: LoadingSpinner Simplificado - CONCLUÍDO ✅
 - ✅ **Sistema de loading unificado** - Todos os ícones de carregamento agora mostram apenas ícone de carro
 - ✅ **Configuração simplificada** - Removida lógica complexa de alternância de ícones baseada em tipos de veículos
