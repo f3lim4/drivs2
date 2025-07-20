@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Car, ArrowLeft } from 'lucide-react';
+import { Car, ArrowLeft, Upload, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +18,9 @@ export default function CadastroLocadora() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     razaoSocial: '',
@@ -30,8 +33,76 @@ export default function CadastroLocadora() {
     cidade: '',
     estado: '',
     cep: '',
-    responsavel: ''
+    responsavel: '',
+    logo: ''
   });
+
+  // Função para converter arquivo para base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
+  // Função para upload de logo
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo de arquivo
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/svg+xml'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Formato inválido",
+        description: "Apenas arquivos JPG, PNG e SVG são aceitos.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validar tamanho (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "O arquivo deve ter no máximo 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setUploadingLogo(true);
+      const base64String = await fileToBase64(file);
+      
+      setLogoFile(file);
+      setLogoPreview(base64String);
+      setFormData({ ...formData, logo: base64String });
+      
+      toast({
+        title: "Logo carregado",
+        description: "Logo da empresa foi carregado com sucesso.",
+      });
+    } catch (error) {
+      console.error('Erro ao carregar logo:', error);
+      toast({
+        title: "Erro ao carregar logo",
+        description: "Não foi possível carregar o logo. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  // Função para remover logo
+  const handleRemoveLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    setFormData({ ...formData, logo: '' });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +170,7 @@ export default function CadastroLocadora() {
           estado: formData.estado,
           cep: formData.cep,
           responsavel: formData.responsavel,
+          logo: formData.logo,
           plano: 'basico',
           status: 'ativa'
         }),
@@ -346,6 +418,70 @@ export default function CadastroLocadora() {
                     placeholder=""
                     required
                   />
+                </div>
+              </div>
+
+              {/* Logo da Empresa */}
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium flex items-center">
+                  <Image className="h-5 w-5 mr-2" />
+                  Logo da Empresa (Opcional)
+                </h3>
+                
+                <div className="space-y-4">
+                  {/* Preview do logo */}
+                  <div className="flex items-center space-x-4">
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
+                      {logoPreview ? (
+                        <img 
+                          src={logoPreview} 
+                          alt="Logo da empresa" 
+                          className="w-full h-full object-contain rounded-lg"
+                        />
+                      ) : (
+                        <Image className="w-8 h-8 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-600">
+                        {logoPreview ? 'Logo selecionado' : 'Nenhum logo selecionado'}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Formatos aceitos: JPG, PNG, SVG (máximo 5MB)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Controles de upload */}
+                  <div className="flex space-x-2">
+                    <Label htmlFor="logo-upload" className="cursor-pointer">
+                      <div className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 transition-colors">
+                        <Upload className="w-4 h-4" />
+                        <span className="text-sm font-medium">
+                          {uploadingLogo ? 'Carregando...' : 'Selecionar Logo'}
+                        </span>
+                      </div>
+                    </Label>
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleLogoUpload}
+                      disabled={uploadingLogo}
+                    />
+                    {logoPreview && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRemoveLogo}
+                        disabled={uploadingLogo}
+                      >
+                        Remover
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
 
