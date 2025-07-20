@@ -234,14 +234,16 @@ export default function Home() {
             >
               30 Dias Grátis <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button 
-              variant="outline"
-              onClick={handleLogin}
-              size="lg" 
-              className="border-white/30 text-white hover:bg-white/10 px-8 py-3 text-lg backdrop-blur-sm"
-            >
-              Acessar Sistema
-            </Button>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent rounded-lg blur-sm"></div>
+              <Button 
+                onClick={handleLogin}
+                size="lg" 
+                className="relative border border-white/40 text-white hover:bg-white/10 hover:border-white/60 bg-transparent backdrop-blur-lg px-8 py-3 text-lg transition-all duration-500 hover:scale-105 shadow-2xl"
+              >
+                Acessar Sistema
+              </Button>
+            </div>
           </div>
 
           <p className="text-sm text-blue-300">
