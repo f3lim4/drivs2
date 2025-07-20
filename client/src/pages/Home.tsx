@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import drivsLogo from "@/assets/drivs-logo.png";
 
 // Componente de ícone animado para frota
-function AnimatedFleetIcon() {
+function AnimatedFleetIcon({ size = "h-6 w-6" }) {
   const [currentIconIndex, setCurrentIconIndex] = useState(0);
   const vehicleIcons = [Car, Bike, Truck, Bus]; // Car, Moto, Caminhão, Utilitário
   
@@ -23,7 +23,7 @@ function AnimatedFleetIcon() {
   
   return (
     <div className="transition-all duration-500 ease-in-out">
-      <CurrentIcon className="h-6 w-6" />
+      <CurrentIcon className={size} />
     </div>
   );
 }
@@ -307,7 +307,9 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent rounded-2xl"></div>
                   <div className="relative">
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                      <Car className="h-8 w-8 text-white" />
+                      <div className="text-white">
+                        <AnimatedFleetIcon size="h-8 w-8" />
+                      </div>
                     </div>
                     <h3 className="font-bold text-white mb-2 text-lg">Gestão de Frota</h3>
                     <p className="text-blue-200 text-sm">Controle completo de veículos</p>
