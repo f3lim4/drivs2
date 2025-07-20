@@ -85,13 +85,12 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <img 
               src={drivsLogo} 
               alt="DRIVS Logo" 
               className="h-10"
             />
-            <span className="text-2xl font-bold text-gray-800">DRIVS</span>
           </div>
           
           <nav className="hidden md:flex items-center gap-6">
@@ -395,13 +394,12 @@ export default function Home() {
       <footer className="bg-gray-900 text-white py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-3 mb-4 md:mb-0">
+            <div className="flex items-center mb-4 md:mb-0">
               <img 
                 src={drivsLogo} 
                 alt="DRIVS Logo" 
                 className="h-8"
               />
-              <span className="text-xl font-bold">DRIVS</span>
             </div>
             
             <div className="text-sm text-gray-400">
