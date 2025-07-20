@@ -8,6 +8,8 @@ import {
   LayoutDashboard, 
   Users, 
   Car, 
+  Bike,
+  Truck,
   FileText, 
   File,
   TrendingUp,
@@ -25,6 +27,7 @@ import logoPath from "@assets/icone_1752434737434.png";
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useVehicleTypes } from '@/contexts/VehicleTypesContext';
 import {
   Sidebar,
   SidebarContent,
@@ -126,13 +129,26 @@ const navigationItems = [
   }
 ];
 
+// Função para obter ícone dinâmico baseado nos tipos de veículos
+const getVehicleIcon = (vehicleTypes: string[]) => {
+  if (vehicleTypes.includes('motocicletas')) {
+    return Bike;
+  }
+  if (vehicleTypes.includes('caminhoes')) {
+    return Truck;
+  }
+  // Padrão é carro para carros ou utilitários
+  return Car;
+};
+
 export function DrivsSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   const { profile, isAdmin, isLocadora } = useAuth();
+  const { vehicleTypes } = useVehicleTypes();
   const { isMobile, setOpenMobile } = useSidebar();
 
-  // Filtrar itens baseado no tipo de usuário
+  // Filtrar itens baseado no tipo de usuário e aplicar ícone dinâmico
   const filteredNavigationItems = navigationItems.filter(item => {
     if (item.adminOnly) {
       return isAdmin;
@@ -141,6 +157,15 @@ export function DrivsSidebar() {
       return isLocadora;
     }
     return true;
+  }).map(item => {
+    // Aplicar ícone dinâmico para veículos baseado na seleção da locadora
+    if (item.url === '/veiculos' && vehicleTypes && vehicleTypes.length > 0) {
+      return {
+        ...item,
+        icon: getVehicleIcon(vehicleTypes)
+      };
+    }
+    return item;
   });
 
   // Função para verificar se a rota está ativa
