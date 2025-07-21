@@ -127,30 +127,18 @@ const criarPagamentosRecorrentes = async (
     
     // Se data de início é no passado, cria pagamentos até hoje + próximo
     if (dataInicioContrato <= hoje) {
-      // Calcula quantos pagamentos deveriam ter sido feitos até hoje
-      let diasPassados = Math.floor((hoje.getTime() - dataPrimeiroPagamento.getTime()) / (1000 * 60 * 60 * 24));
+      // CORREÇÃO: Calcula quantos pagamentos por tempo de contrato
+      // Se o contrato é de 7 semanas, deve ter 7 pagamentos semanais
+      quantidadePagamentos = tempoContrato;
       
-      switch (recorrencia) {
-        case 'semanal':
-          quantidadePagamentos = Math.floor(diasPassados / 7) + 2; // +2 para incluir atual e próximo
-          break;
-        case 'quinzenal':
-          quantidadePagamentos = Math.floor(diasPassados / 14) + 2;
-          break;
-        case 'mensal':
-          quantidadePagamentos = Math.floor(diasPassados / 30) + 2;
-          break;
-      }
-      
-      // Mínimo de 1, máximo de 20 para não criar muitos pagamentos
-      quantidadePagamentos = Math.max(1, Math.min(quantidadePagamentos, 20));
-      
-      console.log(`[DEBUG PASSADO] Contrato iniciado no passado:`, {
+      console.log('[DEBUG CORRIGIDO] Contrato no passado:', {
+        tempoContrato,
+        quantidadePagamentos,
         dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
-        hoje: format(hoje, 'dd/MM/yyyy'),
-        diasPassados,
-        quantidadePagamentos
+        hoje: format(hoje, 'dd/MM/yyyy')
       });
+      
+
       
     } else {
       // Se data de início é no futuro, cria apenas 1 pagamento (1 dia antes do vencimento)
@@ -183,7 +171,14 @@ const criarPagamentosRecorrentes = async (
     for (let i = 0; i < quantidadePagamentos; i++) {
       const dataPagamento = calcularProximaData(dataPrimeiroPagamento, recorrencia, i);
       
-      const finalLocadoraId = profile?.locadoraId || profile?.id || '';
+      // CRÍTICO: Buscar locadoraId corretamente do perfil
+      const finalLocadoraId = profile?.locadoraId || '';
+      
+      if (!finalLocadoraId) {
+        console.error('[ERRO CRÍTICO] locadoraId não encontrado no perfil:', profile);
+        throw new Error('LocadoraId não disponível para criar pagamentos');
+      }
+      
       console.log('[DEBUG PAGAMENTO] LocadoraId final:', finalLocadoraId);
       
       const pagamento = {
@@ -336,10 +331,10 @@ export function NovoContratoModal({
           const veiculosData = await veiculosResponse.json();
           console.log('[MODAL DEBUG] Veículos carregados:', veiculosData.length);
           // Filtra apenas veículos disponíveis
-          console.log('[MODAL DEBUG] Status dos veículos:', veiculosData.map(v => ({ placa: v.placa, status: v.status })));
+          console.log('[MODAL DEBUG] Status dos veículos:', veiculosData.map((v: any) => ({ placa: v.placa, status: v.status })));
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => veiculo.status === 'disponivel');
           console.log('[MODAL DEBUG] Veículos disponíveis:', veiculosDisponiveis.length);
-          console.log('[MODAL DEBUG] Veículos filtrados:', veiculosDisponiveis.map(v => ({ placa: v.placa, marca: v.marca, modelo: v.modelo })));
+          console.log('[MODAL DEBUG] Veículos filtrados:', veiculosDisponiveis.map((v: any) => ({ placa: v.placa, marca: v.marca, modelo: v.modelo })));
           setVeiculos(veiculosDisponiveis);
         } else {
           console.error('[MODAL DEBUG] Erro ao carregar veículos:', veiculosResponse.status);
@@ -396,7 +391,7 @@ export function NovoContratoModal({
           });
           
           console.log('[MODAL DEBUG] Motoristas disponíveis:', motoristasDisponiveis.length);
-          console.log('[MODAL DEBUG] Motoristas filtrados:', motoristasDisponiveis.map(m => ({ nome: m.nome, vencimento: m.vencimentoCnh })));
+          console.log('[MODAL DEBUG] Motoristas filtrados:', motoristasDisponiveis.map((m: any) => ({ nome: m.nome, vencimento: m.vencimentoCnh })));
           setMotoristas(motoristasDisponiveis);
         } else {
           console.error('[MODAL DEBUG] Erro ao carregar motoristas:', motoristasResponse.status);
