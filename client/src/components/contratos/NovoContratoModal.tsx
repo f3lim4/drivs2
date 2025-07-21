@@ -629,8 +629,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               
-              {/* SELEÇÃO DE VEÍCULO E MOTORISTA */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* SELEÇÃO DE VEÍCULO, MOTORISTA E TEMPLATE */}
+              <div className="grid grid-cols-3 gap-4">
                 {/* SELEÇÃO DE VEÍCULO */}
                 <FormField
                   control={form.control}
@@ -708,10 +708,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                     </FormItem>
                   )}
                 />
-              </div>
 
-              {/* TEMPLATE, DATA DE INÍCIO E TEMPO DE CONTRATO */}
-              <div className="grid grid-cols-3 gap-4">
                 {/* TEMPLATE */}
                 <FormField
                   control={form.control}
@@ -740,7 +737,10 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                     </FormItem>
                   )}
                 />
+              </div>
 
+              {/* DATA DE INÍCIO E TEMPO DE CONTRATO */}
+              <div className="grid grid-cols-2 gap-4">
                 {/* DATA DE INÍCIO */}
                 <FormField
                   control={form.control}
@@ -753,7 +753,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                           <Input
                             type="date"
                             className="h-10"
-                            value={field.value ? format(field.value, "yyyy-MM-dd") : ""}
+                            value={field.value && field.value instanceof Date && !isNaN(field.value.getTime()) ? format(field.value, "yyyy-MM-dd") : ""}
                             onChange={(e) => {
                               const value = e.target.value;
                               if (value) {
