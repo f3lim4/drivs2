@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-21: Lógica Inteligente de Pagamentos por Data de Contrato - CONCLUÍDO ✅
+- ✅ **Lógica de datas implementada** - Contratos passados vs futuros geram quantidades diferentes de pagamentos
+- ✅ **Contratos passados otimizados** - Data de início anterior a hoje gera pagamentos até semana atual + próximo
+- ✅ **Contratos futuros controlados** - Data de início futura gera apenas 1 pagamento preventivo
+- ✅ **Teste real validado** - Contrato 28/abril/2025 gerou 14 pagamentos ao invés de 208
+- ✅ **Algoritmo inteligente** - Calcula dias passados e converte para quantidade de pagamentos por recorrência
+- ✅ **Limite de segurança** - Máximo 20 pagamentos para evitar sobrecarga no sistema
+- ✅ **Status 'em_aberto' funcionando** - Pagamentos criados com status correto para interface
+- ✅ **Bug locadoraId corrigido** - Pagamentos agora salvos com ID correto da locadora
+- ✅ **R$ 7.700,00 gerados** - 14 pagamentos × R$ 550 cada, valor real baseado nas datas
+- ✅ **Performance otimizada** - Sistema não mais gera centenas de pagamentos desnecessários
+
 ### 2025-07-21: Interface de Contratos Simplificada - Sistema de Aluguéis Otimizado - CONCLUÍDO ✅
 - ✅ **Filtro de motoristas otimizado** - Sistema mostra apenas motoristas SEM aluguéis ativos associados
 - ✅ **Lógica de seleção inteligente** - Carrega aluguéis primeiro, depois filtra motoristas disponíveis
