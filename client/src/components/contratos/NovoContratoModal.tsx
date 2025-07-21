@@ -692,7 +692,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                                     {motorista.nome}
                                   </span>
                                   <span className="text-sm text-muted-foreground">
-                                    CPF: {motorista.cpf} • CNH válida até {new Date(motorista.vencimentoCnh).toLocaleDateString('pt-BR')}
+                                    CPF: {motorista.cpf}
                                   </span>
                                 </div>
                               </SelectItem>
