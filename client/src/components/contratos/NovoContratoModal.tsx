@@ -147,40 +147,53 @@ const criarPagamentosRecorrentes = async (
       const dataPagamento = calcularProximaData(dataPrimeiroPagamento, recorrencia, i);
       
       const pagamento = {
+        id: crypto.randomUUID(),
+        locadoraId: profile?.locadoraId || '',
         motoristaId,
         aluguelId,
         tipo: 'aluguel',
         descricao: `Pagamento ${recorrencia} ${i + 1}/${quantidadePagamentos}`,
-        valorTotal: valorPagamento,
-        valorPago: 0,
-        valorRestante: valorPagamento,
+        valorTotal: valorPagamento.toFixed(2),
+        valorPago: '0.00',
+        valorRestante: valorPagamento.toFixed(2),
         dataPagamento: format(dataPagamento, 'yyyy-MM-dd'),
         status: 'em_aberto',
         observacoes: `Pagamento criado automaticamente - recorrência ${recorrencia}`,
-        valorJuros: 0,
-        valorMulta: 0
+        valorJuros: '0.00',
+        valorMulta: '0.00'
       };
       
+      console.log(`[PAYMENT] Criando pagamento ${i + 1}:`, pagamento);
       pagamentos.push(pagamento);
     }
 
     // Cria todos os pagamentos no banco
+    let pagamentosCriados = 0;
     for (const pagamento of pagamentos) {
-      const response = await fetch('/api/pagamentos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(pagamento),
-      });
+      try {
+        const response = await fetch('/api/pagamentos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(pagamento),
+        });
 
-      if (!response.ok) {
-        console.error('Erro ao criar pagamento:', await response.text());
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`[PAYMENT ERROR] Erro ao criar pagamento ${pagamento.id}:`, errorText);
+        } else {
+          const resultado = await response.json();
+          console.log(`[PAYMENT SUCCESS] Pagamento criado:`, resultado);
+          pagamentosCriados++;
+        }
+      } catch (error) {
+        console.error(`[PAYMENT CATCH] Erro ao processar pagamento ${pagamento.id}:`, error);
       }
     }
 
-    console.log(`${pagamentos.length} pagamentos recorrentes criados com sucesso`);
-    return pagamentos.length;
+    console.log(`[PAYMENTS RESULT] ${pagamentosCriados}/${pagamentos.length} pagamentos recorrentes criados com sucesso`);
+    return pagamentosCriados;
     
   } catch (error) {
     console.error('Erro ao criar pagamentos recorrentes:', error);
