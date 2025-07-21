@@ -844,7 +844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Registrar tentativa de criação
       contratoCreationCache.set(cacheKey, agora);
       
-      // VERIFICAÇÃO DUPLA: Contrato existente E aluguel ativo
+      // VERIFICAÇÃO DUPLA: Contrato existente E aluguel ativo (COM TOLERÂNCIA PARA NOVOS ALUGUÉIS)
       const contratosExistentes = await storage.getContratosByLocadora(result.data.locadoraId);
       const contratoExistente = contratosExistentes.find(c => 
         c.cliente === result.data.cliente && 
@@ -858,11 +858,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         a.status === 'ativo'
       );
       
-      if (contratoExistente || aluguelAtivo) {
+      // Se há aluguel ativo, verificar se foi criado recentemente (últimos 2 minutos)
+      // Isso permite que o contrato seja criado logo após o aluguel no mesmo processo
+      let aluguelRecentePermitido = false;
+      if (aluguelAtivo) {
+        const agora = new Date();
+        const criadoEm = new Date(aluguelAtivo.createdAt || aluguelAtivo.dataInicio);
+        const diferencaMinutos = (agora.getTime() - criadoEm.getTime()) / (1000 * 60);
+        
+        if (diferencaMinutos <= 2) {
+          aluguelRecentePermitido = true;
+          console.log('[ANTI-DUPLICATE] Aluguel recente detectado - PERMITINDO criação de contrato:', {
+            cliente: result.data.cliente,
+            aluguelId: aluguelAtivo.id,
+            criadoHa: `${diferencaMinutos.toFixed(1)} minutos`,
+            permitido: true
+          });
+        }
+      }
+      
+      // Bloquear apenas se há contrato existente OU aluguel antigo (não recente)
+      if (contratoExistente || (aluguelAtivo && !aluguelRecentePermitido)) {
         console.log('[ANTI-DUPLICATE] Duplicação detectada:', {
           cliente: result.data.cliente,
           contratoExistente: !!contratoExistente,
           aluguelAtivo: !!aluguelAtivo,
+          aluguelRecentePermitido,
           contratoId: contratoExistente?.id,
           aluguelId: aluguelAtivo?.id
         });
