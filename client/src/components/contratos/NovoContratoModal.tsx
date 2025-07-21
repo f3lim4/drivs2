@@ -716,44 +716,43 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 />
               </div>
 
-
-
-              {/* TEMPLATE */}
-              <FormField
-                control={form.control}
-                name="templateId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Template de Contrato</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Usar template padrão" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="default">
-                          Template Padrão DRIVS
-                        </SelectItem>
-                        {templates.map((template: any) => (
-                          <SelectItem key={template.id} value={template.id}>
-                            {template.nome}
+              {/* TEMPLATE, DATA DE INÍCIO E TEMPO DE CONTRATO */}
+              <div className="grid grid-cols-3 gap-4">
+                {/* TEMPLATE */}
+                <FormField
+                  control={form.control}
+                  name="templateId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Template de Contrato</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Usar template padrão" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="default">
+                            Template Padrão DRIVS
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                          {templates.map((template: any) => (
+                            <SelectItem key={template.id} value={template.id}>
+                              {template.nome}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {/* DATA DE INÍCIO E TEMPO DE CONTRATO */}
-              <div className="grid grid-cols-2 gap-4">
+                {/* DATA DE INÍCIO */}
                 <FormField
                   control={form.control}
                   name="dataInicio"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem>
                       <FormLabel>Data de Início *</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -761,7 +760,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                             <Button
                               variant="outline"
                               className={cn(
-                                "w-full pl-3 text-left font-normal",
+                                "w-full pl-3 text-left font-normal h-10",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
@@ -789,6 +788,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                   )}
                 />
 
+                {/* TEMPO DE CONTRATO */}
                 <FormField
                   control={form.control}
                   name="tempoContrato"
