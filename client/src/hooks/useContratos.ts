@@ -118,18 +118,37 @@ export function useContratos() {
   // Excluir contrato
   const deleteContrato = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`/api/contratos/${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete contrato');
+      // Se for um aluguel ativo (ID prefixado com "aluguel_"), extrair o ID real
+      if (id.startsWith('aluguel_')) {
+        const realAluguelId = id.replace('aluguel_', '');
+        console.log(`Excluindo aluguel ativo: ${realAluguelId}`);
+        
+        const response = await fetch(`/api/alugueis/${realAluguelId}`, {
+          method: 'DELETE',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to delete aluguel');
+        }
+        
+        return response.json();
+      } else {
+        // É um contrato formal
+        console.log(`Excluindo contrato formal: ${id}`);
+        const response = await fetch(`/api/contratos/${id}`, {
+          method: 'DELETE',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to delete contrato');
+        }
+        
+        return response.json();
       }
-      
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contratos', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['alugueis', locadoraId] });
     },
   });
 
