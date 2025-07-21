@@ -1170,9 +1170,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pagamentos", async (req, res) => {
     try {
       const { locadoraId } = req.query;
+      
+      console.log("[DEBUG PAGAMENTOS] Requisição recebida:", {
+        locadoraId,
+        url: req.url,
+        headers: req.headers
+      });
+      
       const pagamentos = locadoraId
         ? await storage.getPagamentosByLocadora(locadoraId as string)
         : await storage.getAllPagamentos();
+        
+      console.log("[DEBUG PAGAMENTOS] Pagamentos retornados:", {
+        locadoraId,
+        total: pagamentos.length,
+        primeirosPagamentos: pagamentos.slice(0, 2).map(p => ({
+          id: p.id,
+          motoristaId: p.motoristaId,
+          motoristaNome: p.motoristaNome
+        }))
+      });
+      
       res.json(pagamentos);
     } catch (error) {
       console.error("Error fetching pagamentos:", error);

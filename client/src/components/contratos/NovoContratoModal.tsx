@@ -522,8 +522,8 @@ export function NovoContratoModal({
         motoristaId: motorista.id,
         veiculoId: veiculo.id,
         motoristaNome: motorista.nome,
+        veiculoPlaca: veiculo.placa, // ✅ CORRIGIDO: usar placa ao invés de modelo
         veiculoModelo: `${veiculo.marca} ${veiculo.modelo}`,
-        veiculoPlaca: veiculo.placa,
         valorMensal: valorMensalAluguel,
         caucao: data.caucao,
         status: 'ativo'
