@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-21: Sistema de Pagamentos Automáticos Totalmente Corrigido - CONCLUÍDO ✅
+- ✅ **PROBLEMA CRÍTICO RESOLVIDO** - Pagamentos não apareciam na página por 2 motivos principais
+- ✅ **Bug locadoraId vazio corrigido** - Sistema usava profile?.locadoraId || profile?.id resultando em string vazia
+- ✅ **Validação de erro implementada** - Sistema agora impede criação de pagamentos sem locadoraId válido
+- ✅ **Bug quantidade de pagamentos corrigido** - Era 14 ao invés de 7 por causa de cálculo de dias passados
+- ✅ **Lógica simplificada** - Agora usa tempoContrato direto (7 semanas = 7 pagamentos exatos)
+- ✅ **Banco de dados limpo** - Removidos 103 pagamentos inválidos com locadoraId NULL
+- ✅ **Pagamentos automáticos habilitados** - Checkbox marcado por padrão para criar pagamentos sempre
+- ✅ **Configuração inteligente** - Data padrão "amanhã" e recorrência "semanal" pré-configuradas
+- ✅ **Sistema operacional** - Novos contratos criam automaticamente os pagamentos corretos
+- ✅ **Funcionalidade validada** - Pagamentos aparecem na página Pagamentos com locadoraId correto
+
 ### 2025-07-21: Sistema Unificado de Contratos com Exclusão Corrigida - CONCLUÍDO ✅
 - ✅ **Problema arquitetural identificado** - Aluguéis ativos não apareciam na página Contratos (eram entidades separadas)
 - ✅ **Hook useContratos expandido** - Agora busca contratos formais + aluguéis ativos

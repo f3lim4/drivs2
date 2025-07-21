@@ -294,9 +294,9 @@ export function NovoContratoModal({
       valorSemanal: 0,
       caucao: 0,
       templateId: 'default',
-      pagamentoRecorrente: false,
-      dataPrimeiroPagamento: undefined,
-      recorrencia: undefined,
+      pagamentoRecorrente: true, // ✅ HABILITADO POR PADRÃO
+      dataPrimeiroPagamento: getAmanha(), // ✅ DATA PADRÃO
+      recorrencia: 'semanal', // ✅ RECORRÊNCIA PADRÃO
     },
   });
 
@@ -761,9 +761,9 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           valorSemanal: 0,
           caucao: 0,
           templateId: 'default',
-          pagamentoRecorrente: false,
-          dataPrimeiroPagamento: undefined,
-          recorrencia: undefined,
+          pagamentoRecorrente: true, // ✅ HABILITADO POR PADRÃO
+          dataPrimeiroPagamento: getAmanha(), // ✅ DATA PADRÃO
+          recorrencia: 'semanal', // ✅ RECORRÊNCIA PADRÃO
         });
         setContratoGerado(false);
         processandoRef.current = false; // Reset do ref também
