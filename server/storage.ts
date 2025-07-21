@@ -696,13 +696,23 @@ export class DatabaseStorage implements IStorage {
 
   async createPagamento(pagamento: InsertPagamento): Promise<Pagamento> {
     try {
+      console.log("[STORAGE] Criando pagamento - dados recebidos:", JSON.stringify(pagamento, null, 2));
+      
       const pagamentoData = {
         ...pagamento,
         id: pagamento.id || crypto.randomUUID(),
       };
       
+      console.log("[STORAGE] Dados para inserção:", JSON.stringify(pagamentoData, null, 2));
+      
       // Inserir diretamente sem returning para evitar problemas com joins
-      await db.insert(pagamentos).values(pagamentoData);
+      const insertResult = await db.insert(pagamentos).values(pagamentoData);
+      
+      console.log("[STORAGE] Resultado da inserção:", insertResult);
+      
+      // Verificar se foi realmente inserido
+      const verification = await db.select().from(pagamentos).where(eq(pagamentos.id, pagamentoData.id));
+      console.log("[STORAGE] Verificação após inserção:", verification);
       
       // Retornar o objeto construído manualmente
       return {
@@ -724,7 +734,7 @@ export class DatabaseStorage implements IStorage {
         motoristaContato: ''
       };
     } catch (error) {
-      console.error('Error creating pagamento:', error);
+      console.error('[STORAGE ERROR] Erro ao criar pagamento:', error);
       throw error;
     }
   }
