@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-21: Interface de Contratos Simplificada - Sistema de Aluguéis Otimizado - CONCLUÍDO ✅
+- ✅ **Filtro de motoristas otimizado** - Sistema mostra apenas motoristas SEM aluguéis ativos associados
+- ✅ **Lógica de seleção inteligente** - Carrega aluguéis primeiro, depois filtra motoristas disponíveis
+- ✅ **Opção "Ou selecionar de Aluguel Ativo" removida** - Interface simplificada com foco apenas em novos contratos
+- ✅ **Schema do formulário limpo** - Campo aluguelId removido, sistema sempre cria novos aluguéis
+- ✅ **Função handleAluguelChange removida** - Código simplificado sem lógica desnecessária
+- ✅ **Correção de variáveis duplicadas** - Bug de valorMensal corrigido com renomeação para valorMensalAluguel
+- ✅ **Interface streamlined** - Modal de contratos agora trabalha exclusivamente com recursos disponíveis
+- ✅ **Logs de debug adicionados** - Sistema monitora motoristas totais vs disponíveis para contratos
+- ✅ **Arquitetura consolidada** - Criação de contratos focada apenas em motoristas e veículos livres
+
 ### 2025-07-21: Remoção da Página de Aluguéis - Arquitetura Otimizada - CONCLUÍDO ✅
 - ✅ **Página de Aluguéis removida** - Funcionalidade redundante eliminada do sistema
 - ✅ **Lógica arquitetural** - Página de Contratos já gera aluguéis automaticamente ao criar contrato

@@ -53,7 +53,6 @@ import { useToast } from '@/hooks/use-toast';
 
 // Schema de validação
 const contratoSchema = z.object({
-  aluguelId: z.string().optional(), // Opcional para novos contratos
   motoristaId: z.string().min(1, 'Motorista é obrigatório'),
   veiculoId: z.string().min(1, 'Veículo é obrigatório'),
   dataInicio: z.date({
@@ -163,9 +162,7 @@ export function NovoContratoModal({
             return cnhValida && !temAluguelAtivo;
           });
           
-          console.log('Motoristas totais:', motoristasData.length);
-          console.log('Aluguéis ativos:', alugueisAtivos.length);
-          console.log('Motoristas disponíveis (sem aluguel):', motoristasDisponiveis.length);
+
           
           setMotoristas(motoristasDisponiveis);
         }
@@ -179,17 +176,7 @@ export function NovoContratoModal({
     loadData();
   }, [open, profile?.locadoraId]);
 
-  // Altera automaticamente os valores quando um aluguel é selecionado
-  const handleAluguelChange = (aluguelId: string) => {
-    const aluguel = alugueis.find(a => a.id === aluguelId);
-    if (aluguel) {
-      form.setValue('aluguelId', aluguelId);
-      form.setValue('valorSemanal', Number(aluguel.valorMensal) / 4 || 0); // Converte mensal para semanal
-      form.setValue('caucao', Number(aluguel.caucao) || 0);
-      form.setValue('motoristaId', aluguel.motoristaId);
-      form.setValue('veiculoId', aluguel.veiculoId);
-    }
-  };
+
 
   const onSubmit = async (data: ContratoFormData) => {
     try {
@@ -197,66 +184,58 @@ export function NovoContratoModal({
       
       let aluguel;
       
-      // Se tem aluguelId e não é "novo", usa o aluguel existente
-      if (data.aluguelId && data.aluguelId !== "novo") {
-        aluguel = alugueis.find(a => a.id === data.aluguelId);
-        if (!aluguel) {
-          throw new Error('Aluguel selecionado não encontrado');
-        }
-      } else {
-        // Cria novo aluguel com veículo e motorista selecionados
-        if (!data.veiculoId || !data.motoristaId) {
-          throw new Error('Veículo e motorista são obrigatórios');
-        }
-        
-        // Busca dados do veículo e motorista
-        const veiculo = veiculos.find(v => v.id === data.veiculoId);
-        const motorista = motoristas.find(m => m.id === data.motoristaId);
-        
-        if (!veiculo || !motorista) {
-          throw new Error('Veículo ou motorista não encontrado');
-        }
-        
-        // Cria aluguel temporário para o contrato
-        const valorMensal = data.valorSemanal * 4; // Converte semanal para mensal
-        
-        // Cria o aluguel no banco primeiro
-        const novoAluguel = {
-          motoristaId: data.motoristaId,
-          veiculoId: data.veiculoId,
-          dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
-          valorMensal: valorMensal,
-          caucao: data.caucao,
-          status: 'ativo'
-        };
-        
-        const aluguelResponse = await fetch('/api/alugueis', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(novoAluguel),
-        });
-        
-        if (!aluguelResponse.ok) {
-          throw new Error('Erro ao criar aluguel');
-        }
-        
-        const aluguelCriado = await aluguelResponse.json();
-        
-        // Cria objeto compatível com a estrutura esperada
-        aluguel = {
-          id: aluguelCriado.id,
-          motoristaId: motorista.id,
-          veiculoId: veiculo.id,
-          motoristaNome: motorista.nome,
-          veiculoModelo: `${veiculo.marca} ${veiculo.modelo}`,
-          veiculoPlaca: veiculo.placa,
-          valorMensal: valorMensal,
-          caucao: data.caucao,
-          status: 'ativo'
-        };
+      // Sempre cria novo aluguel com veículo e motorista selecionados
+      if (!data.veiculoId || !data.motoristaId) {
+        throw new Error('Veículo e motorista são obrigatórios');
       }
+      
+      // Busca dados do veículo e motorista
+      const veiculo = veiculos.find(v => v.id === data.veiculoId);
+      const motorista = motoristas.find(m => m.id === data.motoristaId);
+      
+      if (!veiculo || !motorista) {
+        throw new Error('Veículo ou motorista não encontrado');
+      }
+      
+      // Cria aluguel temporário para o contrato
+      const valorMensalAluguel = data.valorSemanal * 4; // Converte semanal para mensal
+      
+      // Cria o aluguel no banco primeiro
+      const novoAluguel = {
+        motoristaId: data.motoristaId,
+        veiculoId: data.veiculoId,
+        dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
+        valorMensal: valorMensalAluguel,
+        caucao: data.caucao,
+        status: 'ativo'
+      };
+      
+      const aluguelResponse = await fetch('/api/alugueis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(novoAluguel),
+      });
+      
+      if (!aluguelResponse.ok) {
+        throw new Error('Erro ao criar aluguel');
+      }
+      
+      const aluguelCriado = await aluguelResponse.json();
+      
+      // Cria objeto compatível com a estrutura esperada
+      aluguel = {
+        id: aluguelCriado.id,
+        motoristaId: motorista.id,
+        veiculoId: veiculo.id,
+        motoristaNome: motorista.nome,
+        veiculoModelo: `${veiculo.marca} ${veiculo.modelo}`,
+        veiculoPlaca: veiculo.placa,
+        valorMensal: valorMensalAluguel,
+        caucao: data.caucao,
+        status: 'ativo'
+      };
 
       console.log('Aluguel para contrato:', aluguel);
 
@@ -559,47 +538,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 )}
               />
 
-              {/* ALUGUEL ATIVO (OPCIONAL) */}
-              <FormField
-                control={form.control}
-                name="aluguelId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Ou selecionar de Aluguel Ativo</FormLabel>
-                    <Select 
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        handleAluguelChange(value);
-                      }} 
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecionar aluguel existente (opcional)" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="novo">Criar novo aluguel</SelectItem>
-                        {alugueis.length > 0 ? (
-                          alugueis.map((aluguel) => (
-                            <SelectItem key={aluguel.id} value={aluguel.id}>
-                              <div className="flex flex-col">
-                                <span className="font-medium">
-                                  {aluguel.motoristaNome} • {aluguel.veiculoModelo}
-                                </span>
-                                <span className="text-sm text-muted-foreground">
-                                  Placa: {aluguel.veiculoPlaca} • R$ {Number(aluguel.valorMensal).toFixed(2)}/mês
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))
-                        ) : null}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
 
               {/* TEMPLATE */}
               <FormField
