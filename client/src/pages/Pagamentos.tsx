@@ -166,6 +166,8 @@ export default function Pagamentos() {
   // Debug: Log dos pagamentos para verificar estrutura
   console.log('[PAGAMENTOS DEBUG] Total de pagamentos:', pagamentosFiltrados.length);
   console.log('[PAGAMENTOS DEBUG] Primeiro pagamento:', pagamentosFiltrados[0]);
+  console.log('[PAGAMENTOS DEBUG] LocadoraId:', profile?.locadoraId || profile?.id);
+  console.log('[PAGAMENTOS DEBUG] Profile completo:', profile);
 
   // Estatísticas (baseado nos dados filtrados) - usando 'em_aberto' em vez de 'pendente'
   const totalPendente = pagamentosFiltrados
