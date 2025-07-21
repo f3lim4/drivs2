@@ -172,7 +172,12 @@ const criarPagamentosRecorrentes = async (
       const dataPagamento = calcularProximaData(dataPrimeiroPagamento, recorrencia, i);
       
       // CRÍTICO: Buscar locadoraId corretamente do perfil
-      const finalLocadoraId = profile?.locadoraId || '';
+      const finalLocadoraId = profile?.locadoraId || profile?.id || '';
+      
+      console.log('[DEBUG PROFILE] Profile completo:', profile);
+      console.log('[DEBUG PROFILE] profile.locadoraId:', profile?.locadoraId);
+      console.log('[DEBUG PROFILE] profile.id:', profile?.id);
+      console.log('[DEBUG PROFILE] finalLocadoraId:', finalLocadoraId);
       
       if (!finalLocadoraId) {
         console.error('[ERRO CRÍTICO] locadoraId não encontrado no perfil:', profile);
