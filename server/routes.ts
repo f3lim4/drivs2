@@ -844,18 +844,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Registrar tentativa de criação
       contratoCreationCache.set(cacheKey, agora);
       
-      // Verificar se já existe contrato ativo para o mesmo cliente (motorista)
+      // VERIFICAÇÃO DUPLA: Contrato existente E aluguel ativo
       const contratosExistentes = await storage.getContratosByLocadora(result.data.locadoraId);
       const contratoExistente = contratosExistentes.find(c => 
         c.cliente === result.data.cliente && 
         c.status === 'ativo'
       );
       
-      if (contratoExistente) {
-        console.log('[DEBUG] Contrato duplicado detectado para:', result.data.cliente);
+      // Verificar se há aluguel ativo para o mesmo motorista
+      const alugueis = await storage.getAlugueisByLocadora(result.data.locadoraId);
+      const aluguelAtivo = alugueis.find(a => 
+        a.motoristaNome === result.data.cliente && 
+        a.status === 'ativo'
+      );
+      
+      if (contratoExistente || aluguelAtivo) {
+        console.log('[ANTI-DUPLICATE] Duplicação detectada:', {
+          cliente: result.data.cliente,
+          contratoExistente: !!contratoExistente,
+          aluguelAtivo: !!aluguelAtivo,
+          contratoId: contratoExistente?.id,
+          aluguelId: aluguelAtivo?.id
+        });
         return res.status(400).json({ 
-          message: "Já existe um contrato ativo para este motorista",
-          motorista: result.data.cliente
+          message: "Já existe um contrato/aluguel ativo para este motorista",
+          motorista: result.data.cliente,
+          contratoExistente: !!contratoExistente,
+          aluguelAtivo: !!aluguelAtivo
         });
       }
       

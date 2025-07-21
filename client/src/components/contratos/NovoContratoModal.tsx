@@ -440,9 +440,16 @@ export function NovoContratoModal({
       return;
     }
     
-    // Marca como processando IMEDIATAMENTE
+    // BLOQUEIO IMEDIATO: Marca como processando antes de qualquer operação
     processandoRef.current = true;
     console.log('🔒 LOCKED: Processamento iniciado, ref = true');
+    
+    // PREVINE EVENTOS DE FORMULÁRIO ADICIONAIS
+    const formElement = document.querySelector('form');
+    if (formElement) {
+      formElement.style.pointerEvents = 'none';
+      console.log('🚫 FORM DISABLED: Eventos de formulário bloqueados');
+    }
     
     try {
       console.log('[FORM DEBUG] Dados do formulário recebidos:', data);
@@ -765,6 +772,14 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         });
         setContratoGerado(false);
         processandoRef.current = false; // Reset do ref também
+        
+        // REABILITA FORMULÁRIO
+        const formElement = document.querySelector('form');
+        if (formElement) {
+          formElement.style.pointerEvents = 'auto';
+          console.log('✅ FORM ENABLED: Eventos de formulário reabilitados');
+        }
+        
         console.log('🔄 RESET: Todos os estados resetados após sucesso');
       }, 2000); // 2 segundos para mostrar "Contrato Gerado"
       
@@ -781,6 +796,14 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
     } finally {
       // Reset do ref em caso de erro
       processandoRef.current = false;
+      
+      // REABILITA FORMULÁRIO EM CASO DE ERRO
+      const formElement = document.querySelector('form');
+      if (formElement) {
+        formElement.style.pointerEvents = 'auto';
+        console.log('✅ FORM ENABLED: Eventos reabilitados após erro');
+      }
+      
       console.log('🔓 UNLOCKED: Ref resetado após erro/conclusão');
     }
   };
