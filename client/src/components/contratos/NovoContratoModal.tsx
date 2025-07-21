@@ -313,6 +313,12 @@ export function NovoContratoModal({
   };
 
   const onSubmit = async (data: ContratoFormData) => {
+    // Verificar se já está processando
+    if (createContrato.isPending) {
+      console.log('PREVENTED: Já está processando um contrato');
+      return;
+    }
+    
     try {
       console.log('Iniciando envio do formulário com dados:', data);
       
@@ -932,15 +938,26 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={createContrato.isPending}
+                  disabled={createContrato.isPending || !form.formState.isValid}
                   onClick={() => {
-                    console.log('Botão clicado');
+                    if (createContrato.isPending) {
+                      console.log('CLICK BLOCKED: Já está processando');
+                      return;
+                    }
+                    console.log('Botão clicado - processando contrato');
                     console.log('Valores do formulário:', form.getValues());
                     console.log('Erros do formulário:', form.formState.errors);
                     console.log('isValid:', form.formState.isValid);
                   }}
                 >
-                  {createContrato.isPending ? 'Gerando...' : 'Gerar Contrato'}
+                  {createContrato.isPending ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      Gerando Contrato...
+                    </>
+                  ) : (
+                    'Gerar Contrato'
+                  )}
                 </Button>
               </DialogFooter>
             </form>
