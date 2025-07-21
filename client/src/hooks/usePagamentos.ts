@@ -13,7 +13,13 @@ export function usePagamentos() {
     queryFn: async () => {
       if (!locadoraId) return [];
       
-      const response = await fetch(`/api/pagamentos?locadoraId=${locadoraId}`);
+      const response = await fetch(`/api/pagamentos?locadoraId=${locadoraId}`, {
+        // FORÇA CACHE BUST
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (!response.ok) throw new Error('Failed to fetch pagamentos');
       
       const data = await response.json();
@@ -21,12 +27,17 @@ export function usePagamentos() {
       console.log('Pagamentos - Verificando isolamento:', {
         locadoraId,
         pagamentosTotal: data.length,
-        primeiroPagamento: data[0]?.locadoraId
+        primeiroPagamento: data[0]?.locadoraId,
+        url: `/api/pagamentos?locadoraId=${locadoraId}`,
+        responseData: data
       });
       
       return data as Pagamento[];
     },
     enabled: !!locadoraId,
+    // FORÇA REFETCH SEMPRE
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const createMutation = useMutation({
