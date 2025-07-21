@@ -10,6 +10,7 @@ import * as z from 'zod';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -62,6 +63,19 @@ const contratoSchema = z.object({
   valorSemanal: z.number().min(0.01, 'Valor semanal deve ser maior que 0'),
   caucao: z.number().min(0, 'Caução deve ser maior ou igual a 0'),
   templateId: z.string().optional(),
+  // Campos de pagamento recorrente
+  pagamentoRecorrente: z.boolean().default(false),
+  dataPrimeiroPagamento: z.date().optional(),
+  recorrencia: z.enum(['semanal', 'quinzenal', 'mensal']).optional(),
+}).refine((data) => {
+  // Se pagamento recorrente está ativado, campos são obrigatórios
+  if (data.pagamentoRecorrente) {
+    return data.dataPrimeiroPagamento && data.recorrencia;
+  }
+  return true;
+}, {
+  message: 'Data do primeiro pagamento e recorrência são obrigatórios quando pagamento recorrente está ativado',
+  path: ['pagamentoRecorrente'],
 });
 
 type ContratoFormData = z.infer<typeof contratoSchema>;
@@ -71,6 +85,114 @@ interface NovoContratoModalProps {
   onOpenChange: (open: boolean) => void;
   onContratoGerado: (contrato: Contrato) => void;
 }
+
+// Função para calcular datas de recorrência
+const calcularProximaData = (dataBase: Date, recorrencia: string, incremento: number): Date => {
+  const novaData = new Date(dataBase);
+  
+  switch (recorrencia) {
+    case 'semanal':
+      novaData.setDate(novaData.getDate() + (7 * incremento));
+      break;
+    case 'quinzenal':
+      novaData.setDate(novaData.getDate() + (15 * incremento));
+      break;
+    case 'mensal':
+      novaData.setMonth(novaData.getMonth() + incremento);
+      break;
+  }
+  
+  return novaData;
+};
+
+// Função para criar pagamentos recorrentes
+const criarPagamentosRecorrentes = async (
+  aluguelId: string,
+  motoristaId: string,
+  dataPrimeiroPagamento: Date,
+  recorrencia: 'semanal' | 'quinzenal' | 'mensal',
+  valorSemanal: number,
+  tempoContrato: number
+) => {
+  try {
+    const auth = JSON.parse(localStorage.getItem('auth') || '{}');
+    const profile = auth.user;
+    
+    // Calcula quantos pagamentos criar baseado na recorrência e tempo de contrato
+    let quantidadePagamentos = 0;
+    switch (recorrencia) {
+      case 'semanal':
+        quantidadePagamentos = tempoContrato * 4; // 4 semanas por mês
+        break;
+      case 'quinzenal':
+        quantidadePagamentos = tempoContrato * 2; // 2 quinzenas por mês
+        break;
+      case 'mensal':
+        quantidadePagamentos = tempoContrato; // 1 pagamento por mês
+        break;
+    }
+
+    // Calcula valor do pagamento baseado na recorrência
+    let valorPagamento = 0;
+    switch (recorrencia) {
+      case 'semanal':
+        valorPagamento = valorSemanal;
+        break;
+      case 'quinzenal':
+        valorPagamento = valorSemanal * 2;
+        break;
+      case 'mensal':
+        valorPagamento = valorSemanal * 4;
+        break;
+    }
+
+    const pagamentos = [];
+    
+    // Cria array de pagamentos
+    for (let i = 0; i < quantidadePagamentos; i++) {
+      const dataPagamento = calcularProximaData(dataPrimeiroPagamento, recorrencia, i);
+      
+      const pagamento = {
+        motoristaId,
+        aluguelId,
+        tipo: 'aluguel',
+        descricao: `Pagamento ${recorrencia} ${i + 1}/${quantidadePagamentos}`,
+        valorTotal: valorPagamento,
+        valorPago: 0,
+        valorRestante: valorPagamento,
+        dataPagamento: format(dataPagamento, 'yyyy-MM-dd'),
+        status: 'em_aberto',
+        observacoes: `Pagamento criado automaticamente - recorrência ${recorrencia}`,
+        valorJuros: 0,
+        valorMulta: 0
+      };
+      
+      pagamentos.push(pagamento);
+    }
+
+    // Cria todos os pagamentos no banco
+    for (const pagamento of pagamentos) {
+      const response = await fetch('/api/pagamentos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(pagamento),
+      });
+
+      if (!response.ok) {
+        console.error('Erro ao criar pagamento:', await response.text());
+      }
+    }
+
+    console.log(`${pagamentos.length} pagamentos recorrentes criados com sucesso`);
+    return pagamentos.length;
+    
+  } catch (error) {
+    console.error('Erro ao criar pagamentos recorrentes:', error);
+    return 0;
+  }
+};
 
 export function NovoContratoModal({ 
   open, 
@@ -420,6 +542,25 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         `Novo contrato gerado: ${aluguel.motoristaNome} - ${aluguel.veiculoModelo} (${aluguel.veiculoPlaca})`
       );
 
+      // Criar pagamentos recorrentes se habilitado
+      if (data.pagamentoRecorrente && data.dataPrimeiroPagamento && data.recorrencia) {
+        const quantidadePagamentos = await criarPagamentosRecorrentes(
+          aluguelCriado.id,
+          data.motoristaId,
+          data.dataPrimeiroPagamento,
+          data.recorrencia,
+          data.valorSemanal,
+          data.tempoContrato
+        );
+        
+        if (quantidadePagamentos > 0) {
+          toast({
+            title: "Pagamentos Recorrentes Criados",
+            description: `${quantidadePagamentos} pagamentos ${data.recorrencia}s foram criados automaticamente com status "Em Aberto".`,
+          });
+        }
+      }
+
       onContratoGerado(contratoCriado);
       onOpenChange(false);
       form.reset({
@@ -431,6 +572,9 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         valorSemanal: 0,
         caucao: 0,
         templateId: 'default',
+        pagamentoRecorrente: false,
+        dataPrimeiroPagamento: undefined,
+        recorrencia: undefined,
       });
       
     } catch (error) {
@@ -677,6 +821,99 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                     </FormItem>
                   )}
                 />
+              </div>
+
+              {/* SEÇÃO DE PAGAMENTO RECORRENTE */}
+              <div className="space-y-4 border-t pt-4">
+                <FormField
+                  control={form.control}
+                  name="pagamentoRecorrente"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          Configurar Pagamentos Recorrentes
+                        </FormLabel>
+                        <p className="text-sm text-muted-foreground">
+                          Criar automaticamente os pagamentos com datas de vencimento baseadas na recorrência
+                        </p>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                {form.watch('pagamentoRecorrente') && (
+                  <div className="grid grid-cols-2 gap-4 ml-6">
+                    <FormField
+                      control={form.control}
+                      name="dataPrimeiroPagamento"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Data do Primeiro Pagamento *</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "dd/MM/yyyy", { locale: ptBR })
+                                  ) : (
+                                    <span>dd/mm/aaaa</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                initialFocus
+                                className={cn("p-3 pointer-events-auto")}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="recorrencia"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Recorrência *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecionar recorrência" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="semanal">Semanal</SelectItem>
+                              <SelectItem value="quinzenal">Quinzenal</SelectItem>
+                              <SelectItem value="mensal">Mensal</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
               </div>
 
               <DialogFooter>
