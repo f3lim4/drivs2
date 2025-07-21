@@ -184,8 +184,8 @@ export function NovoContratoModal({
       
       let aluguel;
       
-      // Se tem aluguelId, usa o aluguel existente
-      if (data.aluguelId) {
+      // Se tem aluguelId e não é "novo", usa o aluguel existente
+      if (data.aluguelId && data.aluguelId !== "novo") {
         aluguel = alugueis.find(a => a.id === data.aluguelId);
         if (!aluguel) {
           throw new Error('Aluguel selecionado não encontrado');
@@ -566,7 +566,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">Criar novo aluguel</SelectItem>
+                        <SelectItem value="novo">Criar novo aluguel</SelectItem>
                         {alugueis.length > 0 ? (
                           alugueis.map((aluguel) => (
                             <SelectItem key={aluguel.id} value={aluguel.id}>
