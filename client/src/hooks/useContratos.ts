@@ -25,8 +25,8 @@ export function useContratos() {
       return response.json();
     },
     enabled: !!locadoraId,
-    staleTime: 30000, // 30 segundos
-    cacheTime: 60000, // 1 minuto
+    staleTime: 0, // Sempre buscar dados frescos
+    cacheTime: 0, // Não manter cache
   });
 
   // Criar contrato
