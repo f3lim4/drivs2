@@ -371,6 +371,10 @@ export function NovoContratoModal({
     }
     
     try {
+      console.log('[FORM DEBUG] Dados do formulário recebidos:', data);
+      console.log('[FORM DEBUG] Checkbox pagamento recorrente:', data.pagamentoRecorrente);
+      console.log('[FORM DEBUG] Data primeiro pagamento:', data.dataPrimeiroPagamento);
+      console.log('[FORM DEBUG] Recorrência:', data.recorrencia);
       console.log('Iniciando envio do formulário com dados:', data);
       
       let aluguel;
@@ -625,7 +629,14 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
       );
 
       // Criar pagamentos recorrentes se habilitado
+      console.log('[DEBUG PAGAMENTOS] Verificando criação automática:', {
+        pagamentoRecorrente: data.pagamentoRecorrente,
+        dataPrimeiroPagamento: data.dataPrimeiroPagamento,
+        recorrencia: data.recorrencia
+      });
+      
       if (data.pagamentoRecorrente && data.dataPrimeiroPagamento && data.recorrencia) {
+        console.log('[DEBUG PAGAMENTOS] Iniciando criação de pagamentos recorrentes...');
         const quantidadePagamentos = await criarPagamentosRecorrentes(
           aluguel.id,
           data.motoristaId,
@@ -636,12 +647,22 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           data.dataInicio  // Passa a data de início do contrato
         );
         
+        console.log('[DEBUG PAGAMENTOS] Quantidade criada:', quantidadePagamentos);
+        
         if (quantidadePagamentos > 0) {
           toast({
             title: "Pagamentos Recorrentes Criados",
             description: `${quantidadePagamentos} pagamentos ${data.recorrencia}s foram criados automaticamente com status "Em Aberto".`,
           });
+        } else {
+          console.log('[DEBUG PAGAMENTOS] Nenhum pagamento foi criado');
         }
+      } else {
+        console.log('[DEBUG PAGAMENTOS] Criação de pagamentos recorrentes DESABILITADA:', {
+          habilitado: data.pagamentoRecorrente,
+          temData: !!data.dataPrimeiroPagamento,
+          temRecorrencia: !!data.recorrencia
+        });
       }
 
       // Marcar contrato como gerado para desabilitar botão
