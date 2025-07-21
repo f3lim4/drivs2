@@ -363,9 +363,9 @@ export function NovoContratoModal({
   };
 
   const onSubmit = async (data: ContratoFormData) => {
-    // Verificar se já está processando
+    // BLOQUEIO CRÍTICO: Evita duplo clique e múltiplas submissões
     if (createContrato.isPending) {
-      console.log('PREVENTED: Já está processando um contrato');
+      console.log('🚫 BLOCKED: Contrato já está sendo processado');
       return;
     }
     
@@ -990,16 +990,6 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 <Button 
                   type="submit" 
                   disabled={createContrato.isPending || !form.formState.isValid}
-                  onClick={() => {
-                    if (createContrato.isPending) {
-                      console.log('CLICK BLOCKED: Já está processando');
-                      return;
-                    }
-                    console.log('Botão clicado - processando contrato');
-                    console.log('Valores do formulário:', form.getValues());
-                    console.log('Erros do formulário:', form.formState.errors);
-                    console.log('isValid:', form.formState.isValid);
-                  }}
                 >
                   {createContrato.isPending ? (
                     <>
