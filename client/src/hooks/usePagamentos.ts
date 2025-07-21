@@ -6,7 +6,7 @@ export function usePagamentos() {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
 
-  const locadoraId = profile?.locadoraId;
+  const locadoraId = profile?.locadoraId || profile?.id;
 
   const query = useQuery({
     queryKey: ['/api/pagamentos', locadoraId],
