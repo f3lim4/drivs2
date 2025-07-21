@@ -223,6 +223,13 @@ export const insertContratoSchema = createInsertSchema(contratos).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  valor: z.union([z.string(), z.number()]).transform((val) => {
+    if (typeof val === 'number') {
+      return val.toString();
+    }
+    return val;
+  }),
 });
 
 export const insertTemplateContratoSchema = createInsertSchema(templateContratos).omit({
