@@ -247,6 +247,7 @@ export function NovoContratoModal({
   const [veiculos, setVeiculos] = useState<any[]>([]);
   const [motoristas, setMotoristas] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [contratoGerado, setContratoGerado] = useState(false);
   const { profile } = useAuth();
   const userProfile = profile;
   const { toast } = useToast();
@@ -643,20 +644,28 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         }
       }
 
-      onContratoGerado(contratoCriado);
-      onOpenChange(false);
-      form.reset({
-        motoristaId: '',
-        veiculoId: '',
-        dataInicio: getAmanha(),
-        tempoContrato: 1,
-        valorSemanal: 0,
-        caucao: 0,
-        templateId: 'default',
-        pagamentoRecorrente: false,
-        dataPrimeiroPagamento: undefined,
-        recorrencia: undefined,
-      });
+      // Marcar contrato como gerado para desabilitar botão
+      setContratoGerado(true);
+      
+      // Aguardar um pouco para mostrar o estado "Contrato Gerado"
+      setTimeout(() => {
+        onContratoGerado(contratoCriado);
+        onOpenChange(false);
+        // Reset do formulário e estado quando modal fechar
+        form.reset({
+          motoristaId: '',
+          veiculoId: '',
+          dataInicio: getAmanha(),
+          tempoContrato: 1,
+          valorSemanal: 0,
+          caucao: 0,
+          templateId: 'default',
+          pagamentoRecorrente: false,
+          dataPrimeiroPagamento: undefined,
+          recorrencia: undefined,
+        });
+        setContratoGerado(false);
+      }, 2000); // 2 segundos para mostrar "Contrato Gerado"
       
     } catch (error: any) {
       console.error('[FRONTEND] ERRO COMPLETO ao gerar contrato:', error);
@@ -989,13 +998,15 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={createContrato.isPending || !form.formState.isValid}
+                  disabled={createContrato.isPending || !form.formState.isValid || contratoGerado}
                 >
                   {createContrato.isPending ? (
                     <>
                       <LoadingSpinner size="sm" />
                       Gerando Contrato...
                     </>
+                  ) : contratoGerado ? (
+                    '✅ Contrato Gerado'
                   ) : (
                     'Gerar Contrato'
                   )}

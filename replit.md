@@ -10,14 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-21: Bug de Duplo Clique em Contratos Corrigido - CONCLUÍDO ✅
+### 2025-07-21: Bug de Duplo Clique em Contratos Corrigido + Sistema de Estados do Botão - CONCLUÍDO ✅
 - ✅ **Problema de duplo clique resolvido** - Botão "Gerar Contrato" não permite mais múltiplos cliques
 - ✅ **Handler onClick redundante removido** - Mantido apenas onSubmit do formulário para controle único
 - ✅ **Bloqueio crítico implementado** - Estado isPending previne execução múltipla
-- ✅ **Feedback visual melhorado** - Botão muda para "Gerando Contrato..." e permanece desabilitado
+- ✅ **Sistema de estados do botão implementado** - 3 estados: Normal → "Gerando Contrato..." → "✅ Contrato Gerado"
+- ✅ **Desabilitação pós-geração** - Botão fica desabilitado após sucesso por 2 segundos
+- ✅ **Feedback visual completo** - Mostra progresso e confirmação de sucesso antes de fechar modal
 - ✅ **Logs de debug otimizados** - Mensagens claras para detectar tentativas de duplo clique
-- ✅ **Controle de estado robusto** - disabled={createContrato.isPending} funciona corretamente
-- ✅ **Sistema estável** - Geração de contratos agora é processo único e confiável
+- ✅ **Controle de estado robusto** - disabled={createContrato.isPending || contratoGerado} funciona corretamente
+- ✅ **Reset automático** - Estado volta ao normal quando modal for aberto novamente
+- ✅ **Sistema estável** - Geração de contratos agora é processo único, visual e confiável
 
 ### 2025-07-21: Sistema de Pagamentos Totalmente Corrigido - CONCLUÍDO ✅
 - ✅ **Erro crítico frontend resolvido** - Hook usePagamentos corrigido para usar locadoraId correto
