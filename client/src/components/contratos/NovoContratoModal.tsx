@@ -3,7 +3,7 @@
  * Formulário com dados do motorista, veículo e condições da locação
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -257,13 +257,15 @@ export function NovoContratoModal({
   const [motoristas, setMotoristas] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [contratoGerado, setContratoGerado] = useState(false);
+  const processandoRef = useRef(false); // Proteção adicional via ref
   const { profile } = useAuth();
   
   // Reset do estado quando modal abrir
   useEffect(() => {
     if (open) {
       setContratoGerado(false);
-      console.log('🔄 RESET: Modal aberto, estado contratoGerado resetado');
+      processandoRef.current = false;
+      console.log('🔄 RESET: Modal aberto, todos os estados resetados');
     }
   }, [open]);
   const userProfile = profile;
@@ -428,14 +430,19 @@ export function NovoContratoModal({
   };
 
   const onSubmit = async (data: ContratoFormData) => {
-    // BLOQUEIO CRÍTICO: Evita duplo clique e múltiplas submissões
-    if (createContrato.isPending || contratoGerado) {
-      console.log('🚫 BLOCKED: Contrato já está sendo processado ou foi gerado', {
+    // BLOQUEIO TRIPLO: Evita duplo clique e múltiplas submissões
+    if (createContrato.isPending || contratoGerado || processandoRef.current) {
+      console.log('🚫 BLOCKED: Contrato já está sendo processado', {
         isPending: createContrato.isPending,
-        contratoGerado: contratoGerado
+        contratoGerado: contratoGerado,
+        processandoRef: processandoRef.current
       });
       return;
     }
+    
+    // Marca como processando IMEDIATAMENTE
+    processandoRef.current = true;
+    console.log('🔒 LOCKED: Processamento iniciado, ref = true');
     
     try {
       console.log('[FORM DEBUG] Dados do formulário recebidos:', data);
@@ -737,6 +744,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
 
       // Marcar contrato como gerado para desabilitar botão
       setContratoGerado(true);
+      console.log('✅ SUCCESS: Contrato gerado com sucesso');
       
       // Aguardar um pouco para mostrar o estado "Contrato Gerado"
       setTimeout(() => {
@@ -756,6 +764,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           recorrencia: undefined,
         });
         setContratoGerado(false);
+        processandoRef.current = false; // Reset do ref também
+        console.log('🔄 RESET: Todos os estados resetados após sucesso');
       }, 2000); // 2 segundos para mostrar "Contrato Gerado"
       
     } catch (error: any) {
@@ -769,7 +779,9 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         variant: "destructive",
       });
     } finally {
-      // setLoading(false); // Removido porque não usamos mais loading local
+      // Reset do ref em caso de erro
+      processandoRef.current = false;
+      console.log('🔓 UNLOCKED: Ref resetado após erro/conclusão');
     }
   };
 
@@ -1089,10 +1101,10 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={createContrato.isPending || contratoGerado}
+                  disabled={createContrato.isPending || contratoGerado || processandoRef.current}
                   className={contratoGerado ? "bg-green-600 hover:bg-green-600" : ""}
                 >
-                  {createContrato.isPending ? (
+                  {createContrato.isPending || processandoRef.current ? (
                     <>
                       <LoadingSpinner size="sm" />
                       Gerando Contrato...

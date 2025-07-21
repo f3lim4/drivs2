@@ -1,0 +1,83 @@
+CONTRATO DE LOCAÇÃO DE VEÍCULO COM OPÇÃO DE COMPRA
+
+Pelo presente instrumento particular, de um lado:
+
+LOCADOR: {{NOME_LOCADORA}}, inscrita no CNPJ sob o nº {{CNPJ}}, com sede na {{ENDERECO_LOCADORA}}, doravante denominada LOCADORA.
+
+E de outro lado:
+
+LOCATÁRIO: {{NOME_MOTORISTA}}, nascido em {{DATA_NASCIMENTO}}, portador do CPF nº {{CPF_MOTORISTA}}, RG nº {{RG_MOTORISTA}}, CNH nº {{CNH_MOTORISTA}}, telefone {{TELEFONE_MOTORISTA}}, residente à {{ENDERECO_MOTORISTA}}, doravante denominado LOCATÁRIO.
+
+As partes acima identificadas têm, entre si, justo e contratado o que segue:
+
+CLÁUSULA 1: OBJETO
+
+O presente contrato tem como objeto a locação do veículo {{MARCA_VEICULO}} {{MODELO_VEICULO}}, ano {{ANO_VEICULO}}, cor {{COR_VEICULO}}, placa {{PLACA_VEICULO}}, chassi {{CHASSI_VEICULO}}, Renavam {{RENAVAM_VEICULO}}, de propriedade da LOCADORA, ao LOCATÁRIO, com opção de compra ao final do contrato.
+
+O veículo deverá ser utilizado exclusivamente para transporte de passageiros via aplicativos (como Uber, 99, etc.) ou entrega de produtos, sendo vedado seu uso para qualquer outra finalidade.
+
+CLÁUSULA 2: CONDIÇÕES FINANCEIRAS
+
+Valor da entrada (caução): R$ {{CAUCAO}}
+
+Valor das parcelas semanais: R$ {{VALOR_SEMANAL}}
+
+Início do contrato: {{DATA_INICIO}}
+
+Prazo de duração: {{MESES_CONTRATO}} meses
+
+O LOCATÁRIO é responsável pelo pagamento mensal do seguro do veículo (realizado pela seguradora Loovi) e do IPVA.
+
+CLÁUSULA 3: AQUISIÇÃO DO VEÍCULO
+
+O veículo será transferido ao nome do LOCATÁRIO somente após o pagamento integral de todas as parcelas e demais obrigações contratuais, sem atrasos ou inadimplências. Caso haja descumprimento contratual, o veículo será recolhido, sem direito a restituição de valores pagos.
+
+CLÁUSULA 4: UTILIZAÇÃO DO VEÍCULO
+
+Uso exclusivo do LOCATÁRIO.
+
+Proibido emprestar, alugar, vender ou sublocar o veículo.
+
+Proibido sair do estado de São Paulo sem autorização expressa da LOCADORA.
+
+Proibido uso para qualquer fim ilícito, incluindo transporte de drogas ou produtos ilegais. A violação resultará em rescisão imediata do contrato e comunicação às autoridades.
+
+CLÁUSULA 5: MANUTENÇÃO
+
+Toda manutenção é de responsabilidade do LOCATÁRIO e deverá ser feita com mecânico autorizado pela LOCADORA.
+
+Veículo com pneus carecas, sem manutenção ou em más condições será recolhido imediatamente.
+
+CLÁUSULA 6: LIMITE DE QUILOMETRAGEM
+
+O veículo possui limite mensal de {{LIMITE_KM}} km. Quilometragem excedente poderá ser cobrada conforme tabela definida pela LOCADORA.
+
+CLÁUSULA 7: MULTAS DE TRÂNSITO
+
+Multas devem ser assinadas e pagas pelo LOCATÁRIO em até 15 dias.
+
+Multas não pagas resultarão em multa adicional de 4x o valor da infração.
+
+Atraso superior a 20 dias: recolhimento do veículo e cobrança do dobro da multa.
+
+CLÁUSULA 8: VISTORIA E ENTREGA DO VEÍCULO
+
+O veículo será entregue com vistoria completa documentada em fotos e vídeos.
+
+O LOCATÁRIO deverá apresentar o veículo semanalmente para inspeção.
+
+CLÁUSULA 9: INADIMPLÊNCIA
+
+Atraso de qualquer parcela acarretará em multa de 10% e juros de 10% ao mês.
+
+Com 2 dias de atraso, o veículo poderá ser recolhido e cobradas as diárias pendentes.
+
+CLÁUSULA 10: RESCISÃO CONTRATUAL
+
+Em caso de quebra de contrato por parte do LOCATÁRIO, incluindo inadimplência, uso indevido ou recusa de devolução do veículo, será aplicada multa contratual de R$ 3.000,00 (três mil reais), além da devolução imediata do veículo nas mesmas condições da entrega.
+
+E por estarem de pleno acordo, assinam o presente instrumento.
+
+Local e Data: ________________, //
+
+Assinatura LOCATÁRIA: ____________________________________Assinatura LOCADORA: ____________________________________Testemunha 1: ____________________________________Testemunha 2: ____________________________________
