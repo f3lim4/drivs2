@@ -135,26 +135,39 @@ export function NovoContratoModal({
           setVeiculos(veiculosDisponiveis);
         }
 
-        // Carrega motoristas ativos (todos com CNH válida)
+        // Carrega aluguéis primeiro para filtrar motoristas
+        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${profile.locadoraId}`);
+        let alugueisAtivos: any[] = [];
+        if (alugueisResponse.ok) {
+          const alugueisData = await alugueisResponse.json();
+          alugueisAtivos = alugueisData.filter((aluguel: any) => aluguel.status === 'ativo');
+          setAlugueis(alugueisAtivos);
+        }
+
+        // Carrega motoristas disponíveis (sem aluguéis ativos)
         const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${profile.locadoraId}`);
         if (motoristasResponse.ok) {
           const motoristasData = await motoristasResponse.json();
-          // Filtra motoristas com CNH válida
+          // Filtra motoristas com CNH válida e sem aluguéis ativos
           const now = new Date();
-          const motoristasAtivos = motoristasData.filter((motorista: any) => {
+          const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
             if (!motorista.vencimentoCnh) return false;
             const vencimento = new Date(motorista.vencimentoCnh);
-            return vencimento > now; // CNH não vencida
+            const cnhValida = vencimento > now; // CNH não vencida
+            
+            // Verifica se o motorista não tem aluguéis ativos
+            const temAluguelAtivo = alugueisAtivos.some((aluguel: any) => 
+              aluguel.motoristaCpf === motorista.id || aluguel.motoristaId === motorista.id
+            );
+            
+            return cnhValida && !temAluguelAtivo;
           });
-          setMotoristas(motoristasAtivos);
-        }
-
-        // Ainda carrega aluguéis para manter compatibilidade
-        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${profile.locadoraId}`);
-        if (alugueisResponse.ok) {
-          const alugueisData = await alugueisResponse.json();
-          const alugueisAtivos = alugueisData.filter((aluguel: any) => aluguel.status === 'ativo');
-          setAlugueis(alugueisAtivos);
+          
+          console.log('Motoristas totais:', motoristasData.length);
+          console.log('Aluguéis ativos:', alugueisAtivos.length);
+          console.log('Motoristas disponíveis (sem aluguel):', motoristasDisponiveis.length);
+          
+          setMotoristas(motoristasDisponiveis);
         }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
