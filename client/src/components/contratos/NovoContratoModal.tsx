@@ -228,14 +228,16 @@ export function NovoContratoModal({
   const form = useForm<ContratoFormData>({
     resolver: zodResolver(contratoSchema),
     defaultValues: {
-      aluguelId: '',
       motoristaId: '',
       veiculoId: '',
       dataInicio: getAmanha(),
-      tempoContrato: '' as any,
+      tempoContrato: 1,
       valorSemanal: 0,
       caucao: 0,
       templateId: 'default',
+      pagamentoRecorrente: false,
+      dataPrimeiroPagamento: undefined,
+      recorrencia: undefined,
     },
   });
 
@@ -408,7 +410,7 @@ export function NovoContratoModal({
       
       if (data.templateId && data.templateId !== 'default') {
         // Buscar template personalizado
-        const templateSelecionado = templates.find(t => t.id === data.templateId);
+        const templateSelecionado = templates.find((t: any) => t.id === data.templateId);
         console.log('Template encontrado:', templateSelecionado);
         if (templateSelecionado) {
           templateContent = templateSelecionado.conteudo;
@@ -423,7 +425,7 @@ export function NovoContratoModal({
 LOCADOR: ${locadorInfo.nome}, Ramo de atividade: Locação de Veículos, portador do CNPJ: ${locadorInfo.cnpj}, cuja
 sede se encontra na ${locadorInfo.endereco}. 
 
-LOCATÁRIO: ${aluguel.motoristaNome}, Telefone: ${aluguel.motoristaContato}
+LOCATÁRIO: ${aluguel.motoristaNome}, Telefone: ${aluguel.motoristaId}
 profissão: Motorista de Aplicativo. As partes acima identificadas têm, entre si, justo e acertado o presente Contrato de Locação de
 Automóvel que se regerá pelas cláusulas seguintes e pelas condições descritas no presente.
 
@@ -522,7 +524,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         tipo: 'locacao' as const,
         titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
         cliente: aluguel.motoristaNome,
-        valor: valorTotal.toString(),
+        valor: valorTotal,
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFim, 'yyyy-MM-dd'),
         status: 'ativo' as const,
@@ -545,7 +547,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
       // Criar pagamentos recorrentes se habilitado
       if (data.pagamentoRecorrente && data.dataPrimeiroPagamento && data.recorrencia) {
         const quantidadePagamentos = await criarPagamentosRecorrentes(
-          aluguelCriado.id,
+          aluguel.id,
           data.motoristaId,
           data.dataPrimeiroPagamento,
           data.recorrencia,
@@ -564,11 +566,10 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
       onContratoGerado(contratoCriado);
       onOpenChange(false);
       form.reset({
-        aluguelId: '',
         motoristaId: '',
         veiculoId: '',
         dataInicio: getAmanha(),
-        tempoContrato: '' as any,
+        tempoContrato: 1,
         valorSemanal: 0,
         caucao: 0,
         templateId: 'default',
@@ -577,10 +578,14 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         recorrencia: undefined,
       });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao gerar contrato:', error);
       console.error('Stack trace:', error.stack);
-      console.error('Dados do contrato:', { aluguel, dadosVeiculo, data, userProfile });
+      toast({
+        title: "Erro",
+        description: "Erro ao criar contrato. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       // setLoading(false); // Removido porque não usamos mais loading local
     }
@@ -701,7 +706,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                         <SelectItem value="default">
                           Template Padrão DRIVS
                         </SelectItem>
-                        {templates.map((template) => (
+                        {templates.map((template: any) => (
                           <SelectItem key={template.id} value={template.id}>
                             {template.nome}
                           </SelectItem>
