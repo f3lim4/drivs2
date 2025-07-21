@@ -82,9 +82,9 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
 
   // Buscar infrações em aberto do motorista selecionado
   const { data: infracoesByMotorista = [] } = useInfracoesByMotorista(motoristaId);
-  const infracoesEmAberto = infracoesByMotorista.filter(infracao => 
+  const infracoesEmAberto = infracoesByMotorista?.filter(infracao => 
     infracao.status === 'pendente' && !infracao.dataPagamento
-  );
+  ) || [];
 
   // Estado para controlar infrações selecionadas
   const [infracoesSelecionadas, setInfracoesSelecionadas] = useState<InfracaoSelecionada[]>([]);
@@ -110,11 +110,11 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
 
   // Calcular valor total das infrações selecionadas
   const valorTotalInfracoesSelecionadas = infracoesSelecionadas
-    .filter(inf => inf.selecionada)
-    .reduce((total, inf) => {
-      const infracao = infracoesEmAberto.find(i => i.id === inf.id);
+    ?.filter(inf => inf.selecionada)
+    ?.reduce((total, inf) => {
+      const infracao = infracoesEmAberto?.find(i => i.id === inf.id);
       return total + (infracao ? parseFloat(infracao.valorFinal) : 0);
-    }, 0);
+    }, 0) || 0;
 
   // Função para toggle seleção de infração
   const toggleInfracaoSelecionada = (infracaoId: string) => {
