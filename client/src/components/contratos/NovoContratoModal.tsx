@@ -718,7 +718,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFim, 'yyyy-MM-dd'),
         status: 'ativo' as const,
-        template: templateContent
+        template: templateContent,
+        veiculoId: data.veiculoId // ✅ INCLUIR VEÍCULO ID NO CONTRATO
       };
 
       console.log('[FRONTEND] Criando contrato com dados:', novoContrato);
