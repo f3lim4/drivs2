@@ -348,9 +348,9 @@ export function NovoContratoModal({
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFimAluguel, 'yyyy-MM-dd'),
         tempoContrato: data.tempoContrato,
-        valorMensal: valorMensalAluguel,
-        valorTotal: valorTotalAluguel,
-        caucao: data.caucao,
+        valorMensal: valorMensalAluguel.toFixed(2),
+        valorTotal: valorTotalAluguel.toFixed(2),
+        caucao: data.caucao.toFixed(2),
         status: 'ativo'
       };
       

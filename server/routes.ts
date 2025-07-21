@@ -648,11 +648,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/alugueis", async (req, res) => {
     try {
-      console.log('[DEBUG] POST /api/alugueis - Body recebido:', JSON.stringify(req.body, null, 2));
-      
       const result = insertAluguelSchema.safeParse(req.body);
       if (!result.success) {
-        console.error('[DEBUG] Erro de validação:', result.error.errors);
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
