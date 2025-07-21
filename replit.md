@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-21: Sistema Unificado de Contratos - Aluguéis Ativos Integrados - CONCLUÍDO ✅
+### 2025-07-21: Sistema Unificado de Contratos com Exclusão Corrigida - CONCLUÍDO ✅
 - ✅ **Problema arquitetural identificado** - Aluguéis ativos não apareciam na página Contratos (eram entidades separadas)
 - ✅ **Hook useContratos expandido** - Agora busca contratos formais + aluguéis ativos
 - ✅ **Conversão automática implementada** - Aluguéis ativos convertidos para formato de contratos
@@ -18,9 +18,10 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Badge diferenciador** - "Aluguel Ativo" (azul) vs contratos formais (outline)
 - ✅ **Dados completos exibidos** - Motorista, veículo, placa, marca, modelo, valores
 - ✅ **Sistema operacional** - 4 aluguéis ativos agora aparecem corretamente na página Contratos
-- ✅ **Arquitetura melhorada** - Sistema unificado permite gestão centralizada de todos os contratos
-- ✅ **Logs de debug detalhados** - Logs individuais mostram filtros de motoristas e veículos
-- ✅ **Modal de contratos validado** - 6 motoristas e 7 veículos disponíveis corretamente filtrados
+- ✅ **CRÍTICO: Exclusão corrigida** - Sistema detecta IDs prefixados "aluguel_" e roteia para endpoint correto
+- ✅ **Endpoint inteligente** - Aluguéis deletados via /api/alugueis/, contratos via /api/contratos/
+- ✅ **Cache duplo invalidado** - Sistema invalida tanto contratos quanto aluguéis após exclusão
+- ✅ **Modal de exclusão aprimorado** - Mostra informações corretas para ambos os tipos
 
 ### 2025-07-21: Bug de Duplo Clique em Contratos Corrigido + Sistema de Estados do Botão - CONCLUÍDO ✅
 - ✅ **Problema de duplo clique resolvido** - Botão "Gerar Contrato" não permite mais múltiplos cliques
@@ -32,6 +33,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Logs de debug otimizados** - Mensagens claras para detectar tentativas de duplo clique
 - ✅ **Controle de estado robusto** - disabled={createContrato.isPending || contratoGerado} funciona corretamente
 - ✅ **Reset automático** - Estado volta ao normal quando modal for aberto novamente
+- ✅ **Sistema estável** - Geração de contratos agora é processo único, visual e confiável
 - ✅ **Sistema estável** - Geração de contratos agora é processo único, visual e confiável
 
 ### 2025-07-21: Sistema de Pagamentos Totalmente Corrigido - CONCLUÍDO ✅

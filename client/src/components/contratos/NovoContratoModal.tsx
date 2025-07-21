@@ -258,6 +258,14 @@ export function NovoContratoModal({
   const [loadingData, setLoadingData] = useState(true);
   const [contratoGerado, setContratoGerado] = useState(false);
   const { profile } = useAuth();
+  
+  // Reset do estado quando modal abrir
+  useEffect(() => {
+    if (open) {
+      setContratoGerado(false);
+      console.log('🔄 RESET: Modal aberto, estado contratoGerado resetado');
+    }
+  }, [open]);
   const userProfile = profile;
   const { toast } = useToast();
   
@@ -421,8 +429,11 @@ export function NovoContratoModal({
 
   const onSubmit = async (data: ContratoFormData) => {
     // BLOQUEIO CRÍTICO: Evita duplo clique e múltiplas submissões
-    if (createContrato.isPending) {
-      console.log('🚫 BLOCKED: Contrato já está sendo processado');
+    if (createContrato.isPending || contratoGerado) {
+      console.log('🚫 BLOCKED: Contrato já está sendo processado ou foi gerado', {
+        isPending: createContrato.isPending,
+        contratoGerado: contratoGerado
+      });
       return;
     }
     
@@ -1078,7 +1089,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={createContrato.isPending || !form.formState.isValid || contratoGerado}
+                  disabled={createContrato.isPending || contratoGerado}
+                  className={contratoGerado ? "bg-green-600 hover:bg-green-600" : ""}
                 >
                   {createContrato.isPending ? (
                     <>
