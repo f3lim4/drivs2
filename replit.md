@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-21: Sistema de Debug para Pagamentos Automáticos Implementado - EM PROGRESSO 🔍
+- ✅ **Debug logs completos adicionados** - Sistema monitora todo fluxo de criação de pagamentos
+- ✅ **Validação TypeScript corrigida** - Campo valor agora usa parseFloat() para number
+- ✅ **Logs de formulário implementados** - Rastreia dados do checkbox e campos obrigatórios
+- ✅ **Debug na validação Zod** - Mostra se campos de pagamento recorrente estão válidos
+- ✅ **Investigação da condição** - Verifica se pagamentoRecorrente && dataPrimeiroPagamento && recorrencia
+- 🔍 **Teste em andamento** - Aguardando teste manual para identificar causa raiz do problema
+- 📊 **Status atual** - Contratos sendo criados, mas pagamentos automáticos não funcionando
+
 ### 2025-07-21: Bug de Duplo Clique em Contratos Corrigido + Sistema de Estados do Botão - CONCLUÍDO ✅
 - ✅ **Problema de duplo clique resolvido** - Botão "Gerar Contrato" não permite mais múltiplos cliques
 - ✅ **Handler onClick redundante removido** - Mantido apenas onSubmit do formulário para controle único
