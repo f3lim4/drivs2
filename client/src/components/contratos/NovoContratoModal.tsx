@@ -125,26 +125,48 @@ const criarPagamentosRecorrentes = async (
     
     let quantidadePagamentos = 0;
     
-    // Se data de início é no passado, cria pagamentos até hoje + próximo
+    // CORREÇÃO CRÍTICA: tempoContrato é em MESES, pagamentos são SEMANAIS
+    // Calcula data final do contrato (tempoContrato meses após início)
+    const dataFinalContrato = new Date(dataInicioContrato);
+    dataFinalContrato.setMonth(dataFinalContrato.getMonth() + tempoContrato);
+    
+    console.log('[DEBUG] Cálculo de pagamentos:', {
+      tempoContratoMeses: tempoContrato,
+      dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
+      dataFinal: format(dataFinalContrato, 'dd/MM/yyyy'),
+      hoje: format(hoje, 'dd/MM/yyyy')
+    });
+    
+    // Se data de início é no passado, cria pagamentos até hoje
     if (dataInicioContrato <= hoje) {
-      // CORREÇÃO: Calcula quantos pagamentos por tempo de contrato
-      // Se o contrato é de 7 semanas, deve ter 7 pagamentos semanais
-      quantidadePagamentos = tempoContrato;
+      // Calcula quantos pagamentos semanais já passaram desde o primeiro pagamento
+      const dataBase = new Date(dataPrimeiroPagamento);
+      dataBase.setHours(0, 0, 0, 0);
       
-      console.log('[DEBUG CORRIGIDO] Contrato no passado:', {
-        tempoContrato,
-        quantidadePagamentos,
-        dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
-        hoje: format(hoje, 'dd/MM/yyyy')
+      let dataAtual = new Date(dataBase);
+      quantidadePagamentos = 0;
+      
+      // Conta quantas semanas se passaram desde o primeiro pagamento até hoje
+      while (dataAtual <= hoje && quantidadePagamentos < 20) { // Limite de segurança
+        quantidadePagamentos++;
+        dataAtual = calcularProximaData(dataBase, recorrencia, quantidadePagamentos);
+      }
+      
+      // Adiciona +1 para o próximo pagamento (1 dia antes do vencimento)
+      quantidadePagamentos += 1;
+      
+      console.log('[DEBUG PASSADO] Contrato iniciado no passado:', {
+        primeiroPagamento: format(dataPrimeiroPagamento, 'dd/MM/yyyy'),
+        pagamentosAteHoje: quantidadePagamentos - 1,
+        proximoPagamento: 1,
+        totalPagamentos: quantidadePagamentos
       });
-      
-
       
     } else {
       // Se data de início é no futuro, cria apenas 1 pagamento (1 dia antes do vencimento)
       quantidadePagamentos = 1;
       
-      console.log(`[DEBUG FUTURO] Contrato iniciado no futuro:`, {
+      console.log('[DEBUG FUTURO] Contrato iniciado no futuro:', {
         dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
         hoje: format(hoje, 'dd/MM/yyyy'),
         quantidadePagamentos
