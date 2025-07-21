@@ -1147,12 +1147,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/pagamentos", async (req, res) => {
     try {
+      console.log("[PAGAMENTO API] Dados recebidos:", JSON.stringify(req.body, null, 2));
       const validatedData = insertPagamentoSchema.parse(req.body);
+      console.log("[PAGAMENTO API] Dados validados:", JSON.stringify(validatedData, null, 2));
       const pagamento = await storage.createPagamento(validatedData);
+      console.log("[PAGAMENTO API] Pagamento criado:", JSON.stringify(pagamento, null, 2));
       res.json(pagamento);
     } catch (error) {
-      console.error("Error creating pagamento:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("[PAGAMENTO API ERROR] Erro ao criar pagamento:", error);
+      res.status(500).json({ message: "Internal server error", error: error.message });
     }
   });
 
