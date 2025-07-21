@@ -183,9 +183,12 @@ const criarPagamentosRecorrentes = async (
     for (let i = 0; i < quantidadePagamentos; i++) {
       const dataPagamento = calcularProximaData(dataPrimeiroPagamento, recorrencia, i);
       
+      const finalLocadoraId = profile?.locadoraId || profile?.id || '';
+      console.log('[DEBUG PAGAMENTO] LocadoraId final:', finalLocadoraId);
+      
       const pagamento = {
         id: crypto.randomUUID(),
-        locadoraId: profile?.locadoraId || profile?.id || '',
+        locadoraId: finalLocadoraId,
         motoristaId,
         aluguelId,
         tipo: 'aluguel',
@@ -295,33 +298,60 @@ export function NovoContratoModal({
   // Carrega dados dos veículos e motoristas disponíveis
   useEffect(() => {
     const loadData = async () => {
-      if (!open || !profile?.locadoraId) return;
+      console.log('[MODAL DEBUG] Carregando dados...', { 
+        open, 
+        profileLocadoraId: profile?.locadoraId,
+        profileId: profile?.id,
+        fullProfile: profile 
+      });
+      
+      if (!open) {
+        console.log('[MODAL DEBUG] Modal fechado, cancelando carregamento');
+        return;
+      }
+      
+      const locadoraId = profile?.locadoraId || profile?.id;
+      if (!locadoraId) {
+        console.log('[MODAL DEBUG] Nenhum locadoraId encontrado');
+        return;
+      }
       
       setLoadingData(true);
       
       try {
         // Carrega veículos disponíveis
-        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${profile.locadoraId}`);
+        console.log('[MODAL DEBUG] Carregando veículos...');
+        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
+          console.log('[MODAL DEBUG] Veículos carregados:', veiculosData.length);
           // Filtra apenas veículos disponíveis
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => veiculo.status === 'disponivel');
+          console.log('[MODAL DEBUG] Veículos disponíveis:', veiculosDisponiveis.length);
           setVeiculos(veiculosDisponiveis);
+        } else {
+          console.error('[MODAL DEBUG] Erro ao carregar veículos:', veiculosResponse.status);
         }
 
         // Carrega aluguéis primeiro para filtrar motoristas
-        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${profile.locadoraId}`);
+        console.log('[MODAL DEBUG] Carregando aluguéis...');
+        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${locadoraId}`);
         let alugueisAtivos: any[] = [];
         if (alugueisResponse.ok) {
           const alugueisData = await alugueisResponse.json();
           alugueisAtivos = alugueisData.filter((aluguel: any) => aluguel.status === 'ativo');
+          console.log('[MODAL DEBUG] Aluguéis ativos:', alugueisAtivos.length);
           setAlugueis(alugueisAtivos);
+        } else {
+          console.error('[MODAL DEBUG] Erro ao carregar aluguéis:', alugueisResponse.status);
         }
 
         // Carrega motoristas disponíveis (sem aluguéis ativos)
-        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${profile.locadoraId}`);
+        console.log('[MODAL DEBUG] Carregando motoristas...');
+        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`);
         if (motoristasResponse.ok) {
           const motoristasData = await motoristasResponse.json();
+          console.log('[MODAL DEBUG] Motoristas carregados:', motoristasData.length);
           // Filtra motoristas com CNH válida e sem aluguéis ativos
           const now = new Date();
           const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
@@ -337,9 +367,10 @@ export function NovoContratoModal({
             return cnhValida && !temAluguelAtivo;
           });
           
-
-          
+          console.log('[MODAL DEBUG] Motoristas disponíveis:', motoristasDisponiveis.length);
           setMotoristas(motoristasDisponiveis);
+        } else {
+          console.error('[MODAL DEBUG] Erro ao carregar motoristas:', motoristasResponse.status);
         }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -349,7 +380,7 @@ export function NovoContratoModal({
     };
 
     loadData();
-  }, [open, profile?.locadoraId]);
+  }, [open, profile?.locadoraId, profile?.id]);
 
   // Função para preencher valor semanal e caução automaticamente quando veículo é selecionado
   const handleVeiculoChange = (veiculoId: string) => {
@@ -407,9 +438,10 @@ export function NovoContratoModal({
       dataFimAluguel.setMonth(dataFimAluguel.getMonth() + data.tempoContrato);
       
       // Cria o aluguel no banco primeiro
+      const locadoraId = profile?.locadoraId || profile?.id;
       const novoAluguel = {
         id: crypto.randomUUID(),
-        locadoraId: profile?.locadoraId,
+        locadoraId: locadoraId,
         motoristaId: data.motoristaId,
         veiculoId: data.veiculoId,
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
@@ -420,6 +452,8 @@ export function NovoContratoModal({
         caucao: data.caucao.toFixed(2),
         status: 'ativo'
       };
+      
+      console.log('[DEBUG] Criando aluguel com locadoraId:', locadoraId);
       
       const aluguelResponse = await fetch('/api/alugueis', {
         method: 'POST',
