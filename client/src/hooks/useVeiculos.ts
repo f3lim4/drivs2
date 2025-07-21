@@ -1,25 +1,23 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
 import { Veiculo } from '@/types';
 
 export function useVeiculos() {
   const { isLocadora, profile } = useAuth();
-  const { toast } = useToast();
+  const locadoraId = profile?.locadoraId;
   const queryClient = useQueryClient();
-  const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  // Função para buscar veículos
-  const fetchVeiculos = async () => {
-    if (!profile) return;
-    
-    setLoading(true);
-    try {
+  // Buscar veículos com React Query
+  const { 
+    data: veiculos = [], 
+    isLoading: loading, 
+    error 
+  } = useQuery({
+    queryKey: ['veiculos', locadoraId],
+    queryFn: async () => {
       let url = '/api/veiculos';
-      if (isLocadora && profile?.locadoraId) {
-        url += `?locadoraId=${profile.locadoraId}`;
+      if (isLocadora && locadoraId) {
+        url += `?locadoraId=${locadoraId}`;
       }
 
       console.log('useVeiculos - Fazendo requisição para:', url);
@@ -36,116 +34,97 @@ export function useVeiculos() {
       }
 
       const data = await response.json();
-    
-    // FILTRO TRIPLO DE SEGURANÇA: Sempre filtrar no frontend também
-    let veiculosFiltrados = data;
-    if (isLocadora && profile?.locadoraId) {
-      veiculosFiltrados = data.filter((v: any) => v.locadoraId === profile.locadoraId);
       
-      // PROTEÇÃO EXTRA: Se ainda houver veículos de outras locadoras, limpar tudo
-      const temVeiculosDeOutrasLocadoras = veiculosFiltrados.some(v => v.locadoraId !== profile.locadoraId);
-      if (temVeiculosDeOutrasLocadoras) {
-        console.error('SECURITY ALERT: Dados de outras locadoras detectados, limpando array');
-        throw new Error('Dados inconsistentes detectados');
+      // FILTRO DE SEGURANÇA: Verificar se todos os veículos pertencem à locadora
+      if (isLocadora && locadoraId) {
+        const filteredData = data.filter((v: any) => v.locadoraId === locadoraId);
+        
+        // Log de segurança se houver dados mistos
+        if (filteredData.length !== data.length) {
+          console.warn('SECURITY ALERT: Veículos de outras locadoras removidos');
+        }
+        
+        console.log('useVeiculos - Verificando isolamento:', {
+          locadoraId,
+          veiculosTotal: filteredData.length,
+          primeiroVeiculo: filteredData[0]?.locadoraId,
+          segundoVeiculo: filteredData[1]?.locadoraId
+        });
+        
+        return filteredData.map(formatVeiculo);
       }
-    }
 
-    // VALIDAÇÃO ADICIONAL: Garantir que todos os veículos pertencem à locadora correta
-    if (isLocadora && profile?.locadoraId) {
-      const todosVeiculosCorretos = veiculosFiltrados.every(v => v.locadoraId === profile.locadoraId);
-      if (!todosVeiculosCorretos) {
-        console.error('SECURITY ALERT: Veículos de outras locadoras detectados, retornando array vazio');
-        throw new Error('Violação de segurança detectada');
-      }
-    }
+      return data.map(formatVeiculo);
+    },
+    enabled: !!profile,
+    staleTime: 30000, // 30 segundos
+    gcTime: 60000, // 1 minuto
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+  });
 
-    // Converter dados do banco para formato esperado
-    const veiculosFormatados: Veiculo[] = veiculosFiltrados.map((v: any) => {
-      return {
-        id: v.id,
-        placa: v.placa,
-        marca: v.marca,
-        modelo: v.modelo,
-        ano: v.ano,
-        cor: v.cor,
-        categoria: v.categoria,
-        renavam: v.renavam,
-        chassi: v.chassi,
-        combustivel: v.combustivel,
-        quilometragem: v.quilometragem,
-        valorSemanal: parseFloat(v.valorSemanal),
-        caucao: parseFloat(v.caucao),
-        taxaAdministrativa: v.taxaAdministrativa ? parseFloat(v.taxaAdministrativa) : null,
-        limiteQuilometragem: v.limiteQuilometragem,
-        valorLimiteKm: v.valorLimiteKm,
-        ultimaRevisao: v.ultimaRevisao,
-        proximaRevisao: v.proximaRevisao,
-        seguradora: v.seguradora,
-        numeroApolice: v.numeroApolice,
-        vigenciaSeguro: v.vigenciaSeguro,
-        valorSeguroMensal: v.valorSeguroMensal ? parseFloat(v.valorSeguroMensal) : null,
-        valorVeiculo: v.valorVeiculo ? parseFloat(v.valorVeiculo) : null,
-        ipva: v.ipva ? parseFloat(v.ipva) : null,
-        rastreador: v.rastreador,
-        valorRastreadorMensal: v.valorRastreadorMensal ? parseFloat(v.valorRastreadorMensal) : null,
-        dataCompra: v.dataCompra,
-        financiado: v.financiado,
-        valorFinanciamento: v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : null,
-        quantidadeParcelas: v.quantidadeParcelas,
-        status: v.status as 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel',
-        // Campos de compatibilidade
-        valorDiario: parseFloat(v.valorSemanal) / 7,
-        valorCaucao: parseFloat(v.caucao),
-        kmLimite: v.limiteQuilometragem === 'limitada' && v.valorLimiteKm 
-          ? `${v.valorLimiteKm} km/semana` 
-          : v.limiteQuilometragem,
-        seguro: v.seguradora || 'Não informado',
-        // Dados da locadora
-        locadoraNome: v.locadoraNome,
-      };
-    });
+  // Função para formatar dados do veículo
+  const formatVeiculo = (v: any): Veiculo => ({
+    id: v.id,
+    placa: v.placa,
+    marca: v.marca,
+    modelo: v.modelo,
+    ano: v.ano,
+    cor: v.cor,
+    categoria: v.categoria,
+    renavam: v.renavam,
+    chassi: v.chassi,
+    combustivel: v.combustivel,
+    quilometragem: v.quilometragem,
+    valorSemanal: parseFloat(v.valorSemanal),
+    caucao: parseFloat(v.caucao),
+    taxaAdministrativa: v.taxaAdministrativa ? parseFloat(v.taxaAdministrativa) : undefined,
+    limiteQuilometragem: v.limiteQuilometragem,
+    valorLimiteKm: v.valorLimiteKm,
+    ultimaRevisao: v.ultimaRevisao,
+    proximaRevisao: v.proximaRevisao,
+    seguradora: v.seguradora,
+    numeroApolice: v.numeroApolice,
+    vigenciaSeguro: v.vigenciaSeguro,
+    valorSeguroMensal: v.valorSeguroMensal ? parseFloat(v.valorSeguroMensal) : undefined,
+    valorVeiculo: v.valorVeiculo ? parseFloat(v.valorVeiculo) : undefined,
+    ipva: v.ipva ? parseFloat(v.ipva) : undefined,
+    rastreador: v.rastreador,
+    valorRastreadorMensal: v.valorRastreadorMensal ? parseFloat(v.valorRastreadorMensal) : undefined,
+    dataCompra: v.dataCompra,
+    financiado: v.financiado,
+    valorFinanciamento: v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : undefined,
+    quantidadeParcelas: v.quantidadeParcelas,
+    status: v.status as 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel',
+    // Campos de compatibilidade
+    valorDiario: parseFloat(v.valorSemanal) / 7,
+    valorCaucao: parseFloat(v.caucao),
+    kmLimite: v.limiteQuilometragem === 'limitada' && v.valorLimiteKm 
+      ? `${v.valorLimiteKm} km/semana` 
+      : v.limiteQuilometragem,
+    seguro: v.seguradora || 'Não informado',
+    // Dados da locadora
+    locadoraNome: v.locadoraNome,
+  });
 
-    // Log apenas se houver problemas para debug
-    if (isLocadora && veiculosFiltrados.length > 1) {
-      console.log('useVeiculos - Verificando isolamento:', {
-        locadoraId: profile?.locadoraId,
-        veiculosTotal: veiculosFiltrados.length,
-        primeiroVeiculo: veiculosFiltrados[0]?.locadoraId,
-        segundoVeiculo: veiculosFiltrados[1]?.locadoraId
-      });
-    }
-    
-    setVeiculos(veiculosFormatados);
-    setLoading(false);
-    } catch (error) {
-      console.error('Erro ao carregar veículos:', error);
-      setLoading(false);
-    }
+  // Adicionar veículo
+  const adicionarVeiculo = () => {
+    queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
   };
 
-  // Carregar veículos quando o perfil estiver disponível
-  useEffect(() => {
-    if (profile) {
-      fetchVeiculos();
-    }
-  }, [profile, isLocadora]);
-
-  const adicionarVeiculo = (novoVeiculo: Veiculo) => {
-    fetchVeiculos();
+  const atualizarVeiculo = () => {
+    queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
   };
 
-  const atualizarVeiculo = (veiculoAtualizado: Veiculo) => {
-    fetchVeiculos();
-  };
-
-  const removerVeiculo = (veiculoId: string) => {
-    fetchVeiculos();
+  const removerVeiculo = () => {
+    queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
   };
 
   return {
     veiculos,
     loading,
-    carregarVeiculos: fetchVeiculos,
+    error,
+    carregarVeiculos: () => queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] }),
     adicionarVeiculo,
     atualizarVeiculo,
     removerVeiculo,
