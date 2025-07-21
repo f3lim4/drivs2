@@ -77,7 +77,7 @@ export function usePagamentos() {
       try {
         const { registrarAtividade } = await import('@/utils/activityLogger');
         await registrarAtividade(
-          locadoraId,
+          locadoraId || '',
           profile?.email || 'usuario@drivs.me',
           'editar',
           'pagamento',
@@ -98,7 +98,7 @@ export function usePagamentos() {
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       // Buscar dados do pagamento antes de excluir para o log
-      const pagamentoPrevio = data?.find(p => p.id === id);
+      const pagamentoPrevio = query.data?.find(p => p.id === id);
       
       const response = await fetch(`/api/pagamentos/${id}`, {
         method: 'DELETE',
@@ -110,7 +110,7 @@ export function usePagamentos() {
       try {
         const { registrarAtividade } = await import('@/utils/activityLogger');
         await registrarAtividade(
-          locadoraId,
+          locadoraId || '',
           profile?.email || 'usuario@drivs.me',
           'excluir',
           'pagamento',

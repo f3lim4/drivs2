@@ -451,7 +451,11 @@ export default function Pagamentos() {
           open={showExcluir}
           onClose={() => setShowExcluir(false)}
           pagamento={pagamentoSelecionado}
-          onConfirm={() => deletePagamento(pagamentoSelecionado.id)}
+          onConfirm={() => {
+            console.log('🗑️ Tentando excluir pagamento:', pagamentoSelecionado.id);
+            deletePagamento(pagamentoSelecionado.id);
+            setShowExcluir(false);
+          }}
         />
       )}
     </div>
