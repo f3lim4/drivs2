@@ -83,6 +83,17 @@ export function useContratos() {
       if (!response.ok) {
         const errorData = await response.text();
         console.error('Erro na resposta:', errorData);
+        
+        // Tentar fazer parse do JSON de erro para mensagem mais amigável
+        try {
+          const errorJson = JSON.parse(errorData);
+          if (errorJson.message && errorJson.message.includes('contrato/aluguel ativo')) {
+            throw new Error(`Este motorista já possui um contrato/aluguel ativo. Finalize o contrato atual antes de criar um novo.`);
+          }
+        } catch (parseError) {
+          // Se não conseguir fazer parse, usa mensagem original
+        }
+        
         throw new Error(`Failed to create contrato: ${response.status} - ${errorData}`);
       }
       
