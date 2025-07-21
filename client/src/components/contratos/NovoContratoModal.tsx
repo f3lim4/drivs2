@@ -326,8 +326,10 @@ export function NovoContratoModal({
           const veiculosData = await veiculosResponse.json();
           console.log('[MODAL DEBUG] Veículos carregados:', veiculosData.length);
           // Filtra apenas veículos disponíveis
+          console.log('[MODAL DEBUG] Status dos veículos:', veiculosData.map(v => ({ placa: v.placa, status: v.status })));
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => veiculo.status === 'disponivel');
           console.log('[MODAL DEBUG] Veículos disponíveis:', veiculosDisponiveis.length);
+          console.log('[MODAL DEBUG] Veículos filtrados:', veiculosDisponiveis.map(v => ({ placa: v.placa, marca: v.marca, modelo: v.modelo })));
           setVeiculos(veiculosDisponiveis);
         } else {
           console.error('[MODAL DEBUG] Erro ao carregar veículos:', veiculosResponse.status);
@@ -354,20 +356,37 @@ export function NovoContratoModal({
           console.log('[MODAL DEBUG] Motoristas carregados:', motoristasData.length);
           // Filtra motoristas com CNH válida e sem aluguéis ativos
           const now = new Date();
+          console.log('[MODAL DEBUG] Data atual para comparação CNH:', now.toISOString().split('T')[0]);
+          console.log('[MODAL DEBUG] Aluguéis ativos IDs:', alugueisAtivos.map(a => ({ motoristaId: a.motoristaId, motoristaCpf: a.motoristaCpf })));
+          
           const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
-            if (!motorista.vencimentoCnh) return false;
-            const vencimento = new Date(motorista.vencimentoCnh);
-            const cnhValida = vencimento > now; // CNH não vencida
+            // Debug para cada motorista
+            const temVencimento = !!motorista.vencimentoCnh;
+            let cnhValida = false;
+            if (temVencimento) {
+              const vencimento = new Date(motorista.vencimentoCnh);
+              cnhValida = vencimento > now;
+            }
             
-            // Verifica se o motorista não tem aluguéis ativos
             const temAluguelAtivo = alugueisAtivos.some((aluguel: any) => 
               aluguel.motoristaCpf === motorista.id || aluguel.motoristaId === motorista.id
             );
             
-            return cnhValida && !temAluguelAtivo;
+            const disponivel = temVencimento && cnhValida && !temAluguelAtivo;
+            
+            console.log(`[MOTORISTA DEBUG] ${motorista.nome}:`, {
+              temVencimento,
+              vencimento: motorista.vencimentoCnh,
+              cnhValida,
+              temAluguelAtivo,
+              disponivel
+            });
+            
+            return disponivel;
           });
           
           console.log('[MODAL DEBUG] Motoristas disponíveis:', motoristasDisponiveis.length);
+          console.log('[MODAL DEBUG] Motoristas filtrados:', motoristasDisponiveis.map(m => ({ nome: m.nome, vencimento: m.vencimentoCnh })));
           setMotoristas(motoristasDisponiveis);
         } else {
           console.error('[MODAL DEBUG] Erro ao carregar motoristas:', motoristasResponse.status);
