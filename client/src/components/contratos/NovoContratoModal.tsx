@@ -64,6 +64,12 @@ const contratoSchema = z.object({
 }).refine((data) => {
   // Se pagamento recorrente está ativado, campos são obrigatórios
   if (data.pagamentoRecorrente) {
+    console.log('[VALIDATION DEBUG] Pagamento recorrente ativo, validando campos:', {
+      temData: !!data.dataPrimeiroPagamento,
+      temRecorrencia: !!data.recorrencia,
+      data: data.dataPrimeiroPagamento,
+      recorrencia: data.recorrencia
+    });
     return data.dataPrimeiroPagamento && data.recorrencia;
   }
   return true;
@@ -605,7 +611,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         tipo: 'locacao' as const,
         titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
         cliente: aluguel.motoristaNome,
-        valor: valorTotal.toFixed(2),
+        valor: parseFloat(valorTotal.toFixed(2)),
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFim, 'yyyy-MM-dd'),
         status: 'ativo' as const,
