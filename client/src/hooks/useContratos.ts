@@ -31,8 +31,40 @@ export function useContratos() {
       const todosAlugueis = await alugueisResponse.json();
       const alugueisAtivos = todosAlugueis.filter((aluguel: any) => aluguel.status === 'ativo');
 
-      // Converter aluguéis ativos em formato de contratos
-      const contratosDeAlugueis = alugueisAtivos.map((aluguel: any) => ({
+      // Buscar dados dos motoristas para fazer a comparação correta
+      const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`);
+      if (!motoristasResponse.ok) throw new Error('Failed to fetch motoristas');
+      const motoristas = await motoristasResponse.json();
+      
+      // Criar mapa de CPF -> Nome para comparação
+      const cpfParaNome = new Map();
+      motoristas.forEach((m: any) => {
+        cpfParaNome.set(m.id, m.nome); // m.id é o CPF
+      });
+
+      // Filtrar aluguéis que NÃO têm contrato formal correspondente
+      const alugueisMotoristas = alugueisAtivos.map((a: any) => a.motoristaId); // CPFs
+      const contratosClientes = contratosFormais.map((c: any) => c.cliente); // Nomes
+      
+      // Converter CPFs dos aluguéis para nomes para comparação
+      const alugueisNomes = alugueisMotoristas.map(cpf => cpfParaNome.get(cpf));
+      
+      console.log('[CONTRATOS DEBUG]', {
+        alugueisAtivos: alugueisAtivos.length,
+        contratosFormais: contratosFormais.length,
+        alugueisMotoristas, // CPFs
+        contratosClientes, // Nomes
+        alugueisNomes, // Nomes convertidos dos CPFs
+        intersecao: alugueisNomes.filter(nome => contratosClientes.includes(nome))
+      });
+
+      // Converter apenas aluguéis que NÃO têm contrato formal correspondente
+      const aluguelsSemContrato = alugueisAtivos.filter((aluguel: any) => {
+        const nomeMotorista = cpfParaNome.get(aluguel.motoristaId);
+        return !contratosClientes.includes(nomeMotorista);
+      });
+
+      const contratosDeAlugueis = aluguelsSemContrato.map((aluguel: any) => ({
         id: `aluguel_${aluguel.id}`,
         locadoraId: aluguel.locadoraId,
         motoristaId: aluguel.motoristaId,
@@ -54,7 +86,7 @@ export function useContratos() {
         updatedAt: aluguel.updatedAt,
       }));
 
-      // Combinar contratos formais + aluguéis ativos
+      // Combinar contratos formais + aluguéis sem contrato formal
       return [...contratosFormais, ...contratosDeAlugueis];
     },
     enabled: !!locadoraId,
