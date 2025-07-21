@@ -9,7 +9,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import Dashboard from "./pages/Dashboard";
 import Motoristas from "./pages/Motoristas";
 import Veiculos from "./pages/Veiculos";
-import Alugueis from "./pages/Alugueis";
+
 import Contratos from "./pages/Contratos";
 import Locadoras from "./pages/Locadoras";
 import Pagamentos from "./pages/Pagamentos";
@@ -77,11 +77,7 @@ const App = () => (
               <DrivsLayout><Veiculos /></DrivsLayout>
             </AuthGuard>
           } />
-          <Route path="/alugueis" element={
-            <AuthGuard>
-              <DrivsLayout><Alugueis /></DrivsLayout>
-            </AuthGuard>
-          } />
+
           <Route path="/contratos" element={
             <AuthGuard>
               <DrivsLayout><Contratos /></DrivsLayout>
