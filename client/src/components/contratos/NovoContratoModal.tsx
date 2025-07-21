@@ -544,7 +544,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         tipo: 'locacao' as const,
         titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
         cliente: aluguel.motoristaNome,
-        valor: valorTotal,
+        valor: valorTotal.toFixed(2),
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFim, 'yyyy-MM-dd'),
         status: 'ativo' as const,
