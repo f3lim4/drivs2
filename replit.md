@@ -10,214 +10,27 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-20: Correção CRÍTICA de Vazamento de Dados Entre Locadoras - 100% RESOLVIDO ✅
-- ✅ **Bug crítico de segurança COMPLETAMENTE corrigido** - Sistema agora tem isolamento perfeito entre locadoras
-- ✅ **Todas as queries frontend corrigidas** - Substituído `profile?.id` por `profile?.locadoraId` em:
-  - ✅ Alugueis.tsx - Queries de aluguéis, pagamentos e veículos corrigidas + cache clearing implementado
-  - ✅ RelatoriosFinanceiros.tsx - Filtro de locadora corrigido
-  - ✅ NovaInfracaoModal.tsx - Campo locadoraId corrigido
-- ✅ **Sistema de cache ultra-agressivo** - queryClient.clear() remove TODOS os dados antigos ao trocar locadora
-- ✅ **Validação completa realizada** - Nova locadora (40764571000180) mostra corretamente 0 registros
-- ✅ **Logs de segurança confirmam** - Backend retorna dados corretos por locadora
-- ✅ **Tipos TypeScript corrigidos** - Verificações de arrays adicionadas para evitar erros
-- ✅ **Sistema 100% funcional** - Isolamento perfeito, sem vazamentos de dados entre empresas
-- ✅ **Logs de debug removidos** - Interface limpa sem poluição de console
-
-### 2025-07-20: Correção de Duplicação de Manutenções no Histórico - CONCLUÍDO ✅
-- ✅ **Bug de duplicação corrigido** - Manutenções apareciam duplicadas no histórico (despesa convertida + manutenção original)
-- ✅ **Filtro de despesas implementado** - Removidas despesas com ID iniciando em "manutencao_" do histórico
-- ✅ **Dados limpos** - Histórico agora mostra apenas manutenções originais, sem as conversões duplicadas
-- ✅ **Sistema otimizado** - useDespesas converte manutenções para cálculos, mas histórico usa dados originais
-- ✅ **Interface correta** - Uma única entrada por manutenção no histórico de despesas
-
-### 2025-07-20: Reorganização dos Cards na Aba Despesas Fixas - CONCLUÍDO ✅
-- ✅ **Cards superiores removidos** - Eliminados cards de totais por categoria do topo da aba "Despesas Fixas"
-- ✅ **Análise por categoria mantida** - Seção "Análise por Categoria" mantida na parte inferior da aba
-- ✅ **Interface otimizada** - Aba inicia diretamente com a tabela detalhada por veículo
-- ✅ **Cards detalhados preservados** - Mantidos cards com informações individuais (IPVA, Seguros, Rastreadores, Financiamento)
-- ✅ **Melhor fluxo visual** - Tabela primeiro, análise detalhada depois
-
-### 2025-07-20: Remoção Completa do Sistema de Tipos de Veículos da Página de Perfil - CONCLUÍDO ✅
-- ✅ **Seção de tipos de veículos removida** - Eliminada seção "Tipos de Veículos da Sua Frota" da página de Perfil
-- ✅ **Código limpo** - Removidas todas as variáveis, funções e imports relacionados aos tipos de veículos
-- ✅ **Interface simplificada** - Página de perfil agora tem foco apenas nos dados essenciais da empresa
-- ✅ **Schema atualizado** - Removido campo `tiposVeiculos` do schema de validação
-- ✅ **Estado removido** - Eliminadas variáveis selectedVehicleTypes e toggleVehicleType
-- ✅ **API otimizada** - Dados de tipos de veículos não são mais enviados nas atualizações de perfil
-
-### 2025-07-20: Otimização de Espaçamento da Interface de Relatórios Financeiros - CONCLUÍDO ✅
-- ✅ **Espaçamento das abas reduzido** - Removido `pt-2` de todas as TabsContent para aproximar conteúdo das abas
-- ✅ **Espaçamento geral otimizado** - Componente Tabs alterado de `space-y-4` para `space-y-2`
-- ✅ **Interface mais compacta** - Melhor aproveitamento do espaço vertical em todas as 5 abas
-- ✅ **Consistência visual** - Mesmo espaçamento aplicado em Despesas, Despesas Fixas, Análise por Veículo, Análise por Motorista e Histórico
-- ✅ **Experiência do usuário melhorada** - Menos espaço vazio entre títulos das abas e conteúdo
-
-### 2025-07-20: LoadingSpinner com Alternância de Ícones de Veículos - CONCLUÍDO ✅
-- ✅ **Sistema de alternância implementado** - LoadingSpinner agora alterna entre 4 tipos de veículos
-- ✅ **Ícones variados** - Carro (azul), Moto (verde), Caminhão (vermelho), Utilitário/Ônibus (amarelo)
-- ✅ **Transição suave** - Alterna automaticamente a cada 800ms com transição de cores
-- ✅ **Cores diferenciadas** - Cada tipo de veículo tem sua cor específica para melhor identificação
-- ✅ **Animação mantida** - Preservado efeito bounce e sombra pulsante do design original
-
-### 2025-07-20: Formulário de Cadastro de Locadora Ultra-Compacto - CONCLUÍDO ✅
-- ✅ **Layout em grid otimizado** - Todos campos organizados em linhas compactas com espaçamento mínimo
-- ✅ **Linha 1** - Nome fantasia, razão social e CNPJ (grid de 3 colunas)
-- ✅ **Linha 2** - Email, telefone e responsável (grid de 3 colunas) 
-- ✅ **Linha 3** - CEP, endereço (ampliado), número (reduzido), complemento (4 colunas customizadas: 1fr 2fr 0.8fr 1fr)
-- ✅ **Linha 4** - Bairro, cidade e estado (grid de 3 colunas)
-- ✅ **Linha 5** - Senha e confirmar senha (grid de 2 colunas)
-- ✅ **Placeholders encurtados** - "Automático", "Apto..." para economizar espaço
-- ✅ **Busca automática de CEP mantida** - Sistema preenche endereço, bairro, cidade e estado
-- ✅ **Espaçamento reduzido** - gap-2 e gap-3 para interface mais compacta
-- ✅ **Proporções otimizadas** - Campo endereço maior, campo número menor para uso prático
-
-### 2025-07-20: Sistema de Ordenação e Paginação na Aba Histórico - CONCLUÍDO ✅
-- ✅ **Estados de ordenação implementados** - sortHistorico com valor padrão "mais-recente"
-- ✅ **Estados de paginação adicionados** - currentPageHistorico, itemsPerPageHistorico e funções handlers
-- ✅ **Lógica de dados unificada** - historicoOrdenado combina despesas e manutenções em um array único
-- ✅ **Sistema de ordenação completo** - 8 opções: data (recente/antiga), valor (maior/menor), categoria (A-Z/Z-A), veículo (A-Z/Z-A)
-- ✅ **Paginação funcional** - historicoPaginado com controles de página anterior/próxima
-- ✅ **Interface atualizada** - Dropdown de ordenação no header, controles de paginação no rodapé
-- ✅ **Dados combinados inteligentemente** - Despesas e manutenções mescladas com tipos visuais diferenciados
-- ✅ **Controle de itens por página** - Opções de 10, 20 ou 50 itens por página
-- ✅ **Ordenação por data real corrigida** - Usa data da despesa/manutenção ao invés de data de criação
-- ✅ **Sistema de priorização** - Manutenções concluídas aparecem primeiro em caso de empate de data
-- ✅ **Sistema totalmente funcional** - Ordenação, paginação e busca funcionando em harmonia
-
-### 2025-07-20: Otimização de Espaçamento da Interface de Relatórios Financeiros - CONCLUÍDO ✅
-- ✅ **Espaçamento das abas reduzido** - Removido `pt-2` de todas as TabsContent para aproximar conteúdo das abas
-- ✅ **Espaçamento geral otimizado** - Componente Tabs alterado de `space-y-4` para `space-y-2`
-- ✅ **Interface mais compacta** - Melhor aproveitamento do espaço vertical em todas as 5 abas
-- ✅ **Consistência visual** - Mesmo espaçamento aplicado em Despesas, Despesas Fixas, Análise por Veículo, Análise por Motorista e Histórico
-- ✅ **Experiência do usuário melhorada** - Menos espaço vazio entre títulos das abas e conteúdo
-
-### 2025-07-20: Sistema de "Ver Detalhes" para Motoristas Implementado - CONCLUÍDO ✅
-- ✅ **Coluna "Ver" adicionada** - Ícone de olho azul na tabela de Análise por Motorista
-- ✅ **Função handleVerDetalhesMotorista criada** - Busca veículo associado ao motorista e gera dados detalhados
-- ✅ **Modal reutilizado inteligentemente** - DetalhesVeiculoAnaliseModal usado para motoristas também
-- ✅ **Estado motoristaDetalhes adicionado** - Controle independente do modal para detalhes do motorista
-- ✅ **Integração com dados reais** - Sistema mostra detalhes financeiros do veículo que o motorista aluga
-- ✅ **Consistência visual** - Mesmo padrão de ícone e comportamento das outras abas de análise
-
-### 2025-07-20: Correção Crítica do Cálculo de Financiamento - CONCLUÍDO ✅
-- ✅ **Bug crítico corrigido** - valorFinanciamento estava sendo dividido por 12 incorretamente
-- ✅ **Entendimento correto** - valorFinanciamento armazena valor mensal (R$ 1.352,00), não anual
-- ✅ **Duas funções corrigidas** - despesasFixasVeiculos e totalDespesasFixasPuras em RelatoriosFinanceiros.tsx
-- ✅ **Hook useDespesas corrigido** - Removida divisão por quantidadeParcelas desnecessária
-- ✅ **Valores corretos** - FMQ0A25 agora mostra R$ 1.352,00 mensal ao invés de R$ 112,67
-- ✅ **Sistema consistente** - Todos os cálculos de despesas fixas usando valores mensais corretos
-
-### 2025-07-20: Otimização de Categorias de Despesas - CONCLUÍDO ✅
-- ✅ **Categoria "gasolina" removida** - Eliminada duplicação com "combustível"
-- ✅ **Lista organizada alfabeticamente** - Categorias reordenadas para melhor usabilidade
-- ✅ **"Outros" posicionado no final** - Posicionamento lógico da categoria genérica
-- ✅ **Interface limpa** - Sistema de categorias mais organizado e intuitivo
-
-### 2025-07-20: Correção Crítica do Sistema de Criação de Despesas - CONCLUÍDO ✅
-- ✅ **Bug crítico corrigido** - Campo locadoraId não estava sendo enviado corretamente na criação de despesas
-- ✅ **Validação de autenticação adicionada** - Sistema agora verifica se usuário está autenticado antes de criar despesa
-- ✅ **Garantia de isolamento** - locadoraId sempre presente e validado em todas as operações de despesa
-- ✅ **Despesas órfãs corrigidas** - Atualizado banco para incluir locadoraId nas despesas sem esse campo
-- ✅ **Interface funcional** - Nova despesa modal agora funciona 100% corretamente
-- ✅ **Dados consistentes** - Todas as despesas agora aparecem corretamente nos relatórios financeiros
-
-### 2025-07-19: Correção Crítica do Bug de Validação de Despesa e Sistema Anti-Duplicata - CONCLUÍDO ✅
-- ✅ **Duplicação de schema corrigida** - Removida duplicação entre shared/schema.ts e modal que causava conflito de validação
-- ✅ **Schema unificado implementado** - Modal agora usa apenas insertDespesaSchema do shared sem sobrescrever
-- ✅ **Erro "Expected string, received number" eliminado** - Causa raiz identificada como conflito entre schemas
-- ✅ **Data padrão corrigida** - Campo data inicia com formato yyyy-MM-dd da data atual (19/07/2025)
-- ✅ **Calendar otimizado** - Conversão correta entre Date objects e string format nos campos
-- ✅ **Preenchimento automático protegido** - Valor do seguro convertido para string antes de preencher
-- ✅ **Sistema anti-duplicata funcional** - Backend detecta e impede despesas duplicadas corretamente
-- ✅ **Validação consistente** - Apenas um schema de validação ativo para evitar conflitos
-- ✅ **Modal totalmente funcional** - Sistema de criação de despesas sem erros de validação
-
-### 2025-07-19: Remoção do Card Receita Extra dos Relatórios Financeiros - CONCLUÍDO ✅
-- ✅ **Card "Receita Extra" removido** - Eliminada seção específica para juros e multas nos relatórios financeiros
-- ✅ **Cálculo de receita total ajustado** - Removida receita extra do total de receitas nos relatórios  
-- ✅ **Receita semanal mantida** - Dashboard continua incluindo juros e multas no cálculo semanal
-- ✅ **Interface limpa** - Relatórios financeiros agora mostram apenas "Pagamentos Recebidos" e "Total Receitas"
-
-### 2025-07-19: Correção do Valor Esperado Semanal e Sistema de Nova Despesa - CONCLUÍDO ✅
-- ✅ **Bug do botão Nova Despesa corrigido** - Função setModalNovaDespesa mudada para setModalAberto
-- ✅ **Valor semanal esperado corrigido** - Removido ajuste fixo para R$ 5.075, agora calcula automaticamente
-- ✅ **Cálculo dinâmico implementado** - R$ 5.625 baseado nos 10 aluguéis ativos (R$ 22.500 mensal ÷ 4)
-- ✅ **Sistema funcional** - Botão "Nova Despesa" nos relatórios financeiros agora abre modal corretamente
-- ✅ **Logs de debug removidos** - Dashboard limpo após identificar causa do valor incorreto
-
-### 2025-07-19: Guia Completo de SEO Orgânico e Otimizações Técnicas - CONCLUÍDO ✅
-- ✅ **HTML otimizado para SEO** - Meta tags, Open Graph, Twitter Cards e Schema.org implementados
-- ✅ **Sitemap.xml criado** - Mapeamento completo das páginas públicas para indexação
-- ✅ **Robots.txt configurado** - Proteção de áreas privadas e direcionamento para sitemap
-- ✅ **Schema.org implementado** - Rich Snippets para software empresarial com preços
-- ✅ **Idioma português brasileiro** - HTML lang="pt-BR" para público nacional
-- ✅ **Meta tags específicas** - Keywords focadas em locadoras e gestão de frota
-- ✅ **Guia estratégico criado** - ESTRATEGIAS_SEO_DRIVS.md com plano completo 90 dias
-- ✅ **SEO local priorizado** - Estratégias para Google Meu Negócio e palavras-chave regionais
-- ✅ **Link building planejado** - Parcerias, guest posts e diretórios mapeados
-- ✅ **Métricas definidas** - KPIs e ferramentas para monitoramento de resultados
-- ✅ **Plano de ação detalhado** - 3 meses de implementação com checkpoints
+### 2025-07-21: Remoção da Página de Aluguéis - Arquitetura Otimizada - CONCLUÍDO ✅
+- ✅ **Página de Aluguéis removida** - Funcionalidade redundante eliminada do sistema
+- ✅ **Lógica arquitetural** - Página de Contratos já gera aluguéis automaticamente ao criar contrato
+- ✅ **Menu lateral atualizado** - Item "Aluguéis" removido da navegação principal
+- ✅ **Rotas limpas** - Rota /alugueis removida do App.tsx
+- ✅ **Arquivo excluído** - Alugueis.tsx completamente removido do projeto
+- ✅ **Sistema simplificado** - Menos confusão para usuários, workflow mais direto
+- ✅ **Funcionalidade preservada** - Todos os recursos de aluguel continuam funcionando via página Contratos
+- ✅ **Interface otimizada** - Navegação mais limpa e focada nos processos essenciais
 
 ### 2025-07-19: Descrições SEO Ultra Persuasivas para Google - CONCLUÍDO ✅
-- ✅ **Meta descrição otimizada** - "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais"
-- ✅ **Título impactante** - "🚗 DRIVS - Sistema que DOBRA Receita de Locadoras em 90 Dias! Teste Grátis"
-- ✅ **Palavras-chave estratégicas** - "sistema locadora profissional", "dobrar receita locadora", "organizar locadora"
-- ✅ **4 sugestões de descrições** - Foco no crescimento, profissionalização, organização e resultados
-- ✅ **Copywriting positivo** - Cada descrição foca em soluções e benefícios ao invés de problemas
+- ✅ **Meta descrição otimizada** - "SUA LOCADORA PERDE R$ 200/DIA com planilhas? Sistema que ELIMINA inadimplência e DOBRA receita em 90 dias"
+- ✅ **Título impactante** - "🚗 DRIVS - Sua Locadora Perdendo R$ 200/Dia com Planilhas? DOBRE a Receita!"
+- ✅ **Palavras-chave estratégicas** - "locadora perdendo dinheiro", "dobrar receita locadora", "eliminar inadimplência"
+- ✅ **4 sugestões de descrições** - Foco na dor financeira, resultados, urgência e problemas específicos
+- ✅ **Copywriting persuasivo** - Cada descrição usa gatilhos mentais diferentes para atrair locadoras
 - ✅ **Card de sugestões criado** - Interface com 4 opções de descrições testadas para Google
 - ✅ **Foco em pequenas locadoras** - Linguagem específica para locadoras familiares e pequenos negócios
 - ✅ **Call-to-action incluído** - "30 dias GRÁTIS" presente em todas as variações
 - ✅ **Emojis estratégicos** - Símbolos que chamam atenção nos resultados de busca
-- ✅ **Abordagem positiva** - Removido foco em perdas, enfatizado ganhos e soluções
-
-### 2025-07-20: Correção Crítica do CNPJ da Locadora Principal e Sistema de Edição de Perfil - CONCLUÍDO ✅
-- ✅ **CNPJ corrigido no banco de dados** - Alterado de "5076457100170" para "50764571000170" (CNPJ completo com 14 dígitos)
-- ✅ **Tabela locadoras atualizada** - Campo id e cnpj corrigidos para valor correto
-- ✅ **Referências atualizadas em todas as tabelas** - Chaves estrangeiras atualizadas em:
-  - ✅ 10 veículos na tabela veiculos
-  - ✅ 10 motoristas na tabela motoristas  
-  - ✅ 10 aluguéis na tabela alugueis
-  - ✅ 18 pagamentos na tabela pagamentos
-  - ✅ 18 despesas na tabela despesas
-  - ✅ 13 atividades na tabela atividades
-  - ✅ 1 manutenção na tabela manutencoes
-  - ✅ 1 template na tabela template_contratos
-- ✅ **Integridade dos dados mantida** - Todos os relacionamentos funcionando corretamente
-- ✅ **Correção automática do localStorage** - Sistema detecta e corrige CNPJ antigo automaticamente no useAuth.ts
-- ✅ **Bug do botão "Editar Perfil" corrigido** - Adicionada verificação para evitar envio acidental do formulário
-- ✅ **Sistema de edição funcional** - Botão agora ativa corretamente o modo de edição antes de permitir salvamento
-- ✅ **Sistema operacional** - Aplicação reiniciada e funcionando com CNPJ correto e edição de perfil funcional
-
-### 2025-07-20: Sistema de Tipos de Veículos Dinâmico Implementado - CONCLUÍDO ✅
-- ✅ **VehicleTypesContext criado** - Sistema de contexto para gerenciar tipos de veículos por locadora
-- ✅ **Campo tipos_veiculos adicionado** - Migração SQL para armazenar seleção da locadora
-- ✅ **Interface de seleção implementada** - Seção no perfil para escolher tipos de veículos
-- ✅ **Ícones dinâmicos** - Homepage adapta animação baseada na seleção da empresa
-- ✅ **4 tipos disponíveis** - Carros, motocicletas, caminhões e utilitários
-- ✅ **Integração completa** - Backend e frontend sincronizados para sistema dinâmico
-
-### 2025-07-20: Otimização Final da Homepage Institucional - CONCLUÍDO ✅
-- ✅ **Design glassmorphism ultra-transparente** - Header com bg-white/20 e backdrop-blur-lg
-- ✅ **Botões futuristas consistentes** - Todos botões secundários com transparência total
-- ✅ **Seção CTA unificada** - Design idêntico ao banner com gradientes e orbs animados
-- ✅ **Mensagem simplificada** - Removido "sem compromisso" e "configuração inclusa"
-- ✅ **Foco nos botões primários** - "30 dias grátis" apenas nos CTAs principais
-- ✅ **Visual ultra-limpo** - Eliminada redundância de textos e indicadores extras
-- ✅ **Hierarquia visual otimizada** - Botões azuis destacados, secundários transparentes
-
-### 2025-07-20: Estrutura Dual Home/Landing Page Implementada - CONCLUÍDO ✅
-- ✅ **Home institucional criada** - Página inicial B2B profissional, menos apelativa para "/" 
-- ✅ **Landing page mantida** - Página de conversão futurista para campanhas em "/landing"
-- ✅ **Logo DRIVS integrado** - Logo personalizado no header e footer da página inicial
-- ✅ **Menu de navegação** - Links para seções + botão Login destacado no header
-- ✅ **Banners interativos** - Cards hover com estatísticas e features principais
-- ✅ **Informações detalhadas** - Descrições expandidas dos recursos e capacidades
-- ✅ **Visual institucional** - Design limpo, cores corporativas, foco em recursos e benefícios
-- ✅ **Mensageria B2B** - Linguagem profissional, casos de sucesso, especificações técnicas
-- ✅ **SEO otimizado para ambas** - Meta tags específicas para cada tipo de público
-- ✅ **Navegação clara** - CTAs direcionam para demo e login, sem agressividade comercial
-- ✅ **Casos de uso reais** - Exemplos de empresas e resultados concretos
-- ✅ **Estrutura escalável** - Fácil manutenção de duas estratégias diferentes
+- ✅ **Descrições testáveis** - Admin pode facilmente testar diferentes abordagens
 
 ### 2025-07-19: Sistema de Analytics Reais Implementado - CONCLUÍDO ✅
 - ✅ **Dados reais implementados** - Sistema agora mostra estatísticas verdadeiras do PostgreSQL

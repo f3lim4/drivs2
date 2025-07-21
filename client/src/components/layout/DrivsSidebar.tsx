@@ -60,12 +60,7 @@ const navigationItems = [
     icon: Car,
     description: 'Gestão de frota'
   },
-  {
-    title: 'Aluguéis',
-    url: '/alugueis',
-    icon: TrendingUp,
-    description: 'Contratos de locação'
-  },
+
   {
     title: 'Contratos',
     url: '/contratos',
