@@ -323,13 +323,23 @@ export function NovoContratoModal({
       
       // Cria aluguel temporário para o contrato
       const valorMensalAluguel = data.valorSemanal * 4; // Converte semanal para mensal
+      const valorTotalAluguel = valorMensalAluguel * data.tempoContrato; // Valor total baseado no tempo de contrato
+      
+      // Calcula data final
+      const dataFimAluguel = new Date(data.dataInicio);
+      dataFimAluguel.setMonth(dataFimAluguel.getMonth() + data.tempoContrato);
       
       // Cria o aluguel no banco primeiro
       const novoAluguel = {
+        id: crypto.randomUUID(),
+        locadoraId: profile?.locadoraId,
         motoristaId: data.motoristaId,
         veiculoId: data.veiculoId,
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
+        dataFim: format(dataFimAluguel, 'yyyy-MM-dd'),
+        tempoContrato: data.tempoContrato,
         valorMensal: valorMensalAluguel,
+        valorTotal: valorTotalAluguel,
         caucao: data.caucao,
         status: 'ativo'
       };
