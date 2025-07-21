@@ -583,12 +583,12 @@ export default function Contratos() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>CLIENTE</TableHead>
+                      <TableHead>MOTORISTA/CLIENTE</TableHead>
+                      <TableHead>VEÍCULO</TableHead>
                       <TableHead>TIPO</TableHead>
                       <TableHead>VALOR</TableHead>
                       <TableHead>DATA INÍCIO</TableHead>
                       <TableHead>STATUS</TableHead>
-                      <TableHead>UPLOAD</TableHead>
                       <TableHead>AÇÕES</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -596,42 +596,46 @@ export default function Contratos() {
                     {paginatedContratos.map((contrato) => (
                       <TableRow key={contrato.id}>
                         <TableCell>
-                          <p className="font-medium">{contrato.cliente}</p>
+                          <p className="font-medium">{contrato.motoristaNome || contrato.cliente || 'N/A'}</p>
+                          {contrato.motoristaCpf && (
+                            <p className="text-xs text-muted-foreground">{contrato.motoristaCpf}</p>
+                          )}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="capitalize">
-                            {contrato.tipo}
+                          {contrato.veiculoPlaca ? (
+                            <div>
+                              <p className="font-medium">{contrato.veiculoPlaca}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {contrato.veiculoMarca} {contrato.veiculoModelo}
+                              </p>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">N/A</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={contrato.tipo === 'aluguel_ativo' ? 'default' : 'outline'} 
+                            className={contrato.tipo === 'aluguel_ativo' ? 'bg-blue-500 text-white' : 'capitalize'}
+                          >
+                            {contrato.tipo === 'aluguel_ativo' ? 'Aluguel Ativo' : contrato.tipo}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <p className="font-medium">R$ {parseFloat(contrato.valor).toFixed(2)}</p>
+                          <p className="font-medium">
+                            R$ {parseFloat(contrato.valorMensal || contrato.valor || '0').toFixed(2)}
+                          </p>
+                          {contrato.valorSemanal && (
+                            <p className="text-xs text-muted-foreground">
+                              R$ {parseFloat(contrato.valorSemanal).toFixed(2)}/sem
+                            </p>
+                          )}
                         </TableCell>
                         <TableCell>
                           <p>{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
                         </TableCell>
                         <TableCell>
                           {getStatusBadge(contrato.status)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-1">
-                            {contrato.arquivoAssinado ? (
-                              <div className="flex items-center gap-1">
-                                <CheckCircle className="w-4 h-4 text-green-600" />
-                                <span className="text-xs text-green-600">Enviado</span>
-                              </div>
-                            ) : (
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => handleUploadContrato(contrato)}
-                                title="Enviar Contrato Assinado"
-                                className="text-xs"
-                              >
-                                <Upload className="w-4 h-4 mr-1" />
-                                Enviar
-                              </Button>
-                            )}
-                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
@@ -704,6 +708,13 @@ export default function Contratos() {
       <UploadTemplateModal
         open={showUploadTemplateModal}
         onOpenChange={setShowUploadTemplateModal}
+        onTemplateUploaded={() => {
+          setShowUploadTemplateModal(false);
+          toast({
+            title: "Template salvo!",
+            description: "Template de contrato foi salvo com sucesso.",
+          });
+        }}
       />
 
       <TemplatesModal
@@ -717,6 +728,10 @@ export default function Contratos() {
             open={showVisualizarModal}
             onOpenChange={setShowVisualizarModal}
             contrato={selectedContrato}
+            onEditar={() => {
+              setShowVisualizarModal(false);
+              setShowEditarModal(true);
+            }}
           />
           
           <EditarContratoModal 

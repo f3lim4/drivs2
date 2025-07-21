@@ -12,7 +12,7 @@ export function useContratos() {
   const locadoraId = profile?.locadoraId;
   const queryClient = useQueryClient();
 
-  // Buscar contratos
+  // Buscar contratos (incluindo aluguéis ativos como contratos)
   const { 
     data: contratos = [], 
     isLoading, 
@@ -20,9 +20,42 @@ export function useContratos() {
   } = useQuery({
     queryKey: ['contratos', locadoraId],
     queryFn: async () => {
-      const response = await fetch(`/api/contratos?locadoraId=${locadoraId}`);
-      if (!response.ok) throw new Error('Failed to fetch contratos');
-      return response.json();
+      // Buscar contratos formais
+      const contratosResponse = await fetch(`/api/contratos?locadoraId=${locadoraId}`);
+      if (!contratosResponse.ok) throw new Error('Failed to fetch contratos');
+      const contratosFormais = await contratosResponse.json();
+
+      // Buscar aluguéis ativos para incluir como contratos
+      const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${locadoraId}`);
+      if (!alugueisResponse.ok) throw new Error('Failed to fetch alugueis');
+      const todosAlugueis = await alugueisResponse.json();
+      const alugueisAtivos = todosAlugueis.filter((aluguel: any) => aluguel.status === 'ativo');
+
+      // Converter aluguéis ativos em formato de contratos
+      const contratosDeAlugueis = alugueisAtivos.map((aluguel: any) => ({
+        id: `aluguel_${aluguel.id}`,
+        locadoraId: aluguel.locadoraId,
+        motoristaId: aluguel.motoristaId,
+        motoristaNome: aluguel.motoristaNome,
+        motoristaCpf: aluguel.motoristaCpf,
+        veiculoId: aluguel.veiculoId,
+        veiculoPlaca: aluguel.veiculoPlaca,
+        veiculoMarca: aluguel.veiculoMarca,
+        veiculoModelo: aluguel.veiculoModelo,
+        dataInicio: aluguel.dataInicio,
+        dataFim: aluguel.dataFim,
+        valorMensal: aluguel.valorMensal,
+        valorSemanal: aluguel.valorSemanal,
+        caucao: aluguel.caucao,
+        observacoes: aluguel.observacoes,
+        status: 'ativo',
+        tipo: 'aluguel_ativo', // Identificador para diferenciar
+        createdAt: aluguel.createdAt,
+        updatedAt: aluguel.updatedAt,
+      }));
+
+      // Combinar contratos formais + aluguéis ativos
+      return [...contratosFormais, ...contratosDeAlugueis];
     },
     enabled: !!locadoraId,
     staleTime: 0, // Sempre buscar dados frescos

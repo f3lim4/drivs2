@@ -10,18 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-21: Sistema de Debug para Pagamentos Automáticos Implementado - CONCLUÍDO ✅
-- ✅ **Debug logs completos adicionados** - Sistema monitora todo fluxo de criação de pagamentos
-- ✅ **Erro TypeScript Schema corrigido** - Campo valor aceita number e converte para string
-- ✅ **Logs de formulário implementados** - Rastreia dados do checkbox e campos obrigatórios
-- ✅ **Debug na validação Zod** - Mostra se campos de pagamento recorrente estão válidos
-- ✅ **Investigação da condição** - Verifica se pagamentoRecorrente && dataPrimeiroPagamento && recorrencia
-- ✅ **Problema de validação resolvido** - insertContratoSchema agora aceita valor como number ou string
-- ✅ **Modal de contratos corrigido** - Logs detalhados para carregamento de motoristas e veículos
-- ✅ **LocadoraId corrigido** - Fallback profile?.locadoraId || profile?.id implementado
-- ✅ **Filtros validados** - Sistema filtra corretamente: 3 motoristas com contratos ativos, 1 CNH vencida
-- ✅ **Debug granular implementado** - Logs individuais mostram exatamente por que cada item é incluído/excluído
-- ✅ **Sistema operacional** - Modal mostra 6 motoristas e 7 veículos disponíveis corretamente
+### 2025-07-21: Sistema Unificado de Contratos - Aluguéis Ativos Integrados - CONCLUÍDO ✅
+- ✅ **Problema arquitetural identificado** - Aluguéis ativos não apareciam na página Contratos (eram entidades separadas)
+- ✅ **Hook useContratos expandido** - Agora busca contratos formais + aluguéis ativos
+- ✅ **Conversão automática implementada** - Aluguéis ativos convertidos para formato de contratos
+- ✅ **Interface unificada criada** - Página Contratos mostra ambos os tipos em tabela única
+- ✅ **Badge diferenciador** - "Aluguel Ativo" (azul) vs contratos formais (outline)
+- ✅ **Dados completos exibidos** - Motorista, veículo, placa, marca, modelo, valores
+- ✅ **Sistema operacional** - 4 aluguéis ativos agora aparecem corretamente na página Contratos
+- ✅ **Arquitetura melhorada** - Sistema unificado permite gestão centralizada de todos os contratos
+- ✅ **Logs de debug detalhados** - Logs individuais mostram filtros de motoristas e veículos
+- ✅ **Modal de contratos validado** - 6 motoristas e 7 veículos disponíveis corretamente filtrados
 
 ### 2025-07-21: Bug de Duplo Clique em Contratos Corrigido + Sistema de Estados do Botão - CONCLUÍDO ✅
 - ✅ **Problema de duplo clique resolvido** - Botão "Gerar Contrato" não permite mais múltiplos cliques
