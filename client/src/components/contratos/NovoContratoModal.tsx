@@ -619,7 +619,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Gerar Novo Contrato</DialogTitle>
           <DialogDescription>
@@ -635,83 +635,86 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               
-              {/* SELEÇÃO DE VEÍCULO */}
-              <FormField
-                control={form.control}
-                name="veiculoId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Veículo Disponível *</FormLabel>
-                    <Select onValueChange={handleVeiculoChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecionar veículo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {veiculos.length > 0 ? (
-                          veiculos.map((veiculo) => (
-                            <SelectItem key={veiculo.id} value={veiculo.id}>
-                              <div className="flex flex-col">
-                                <span className="font-medium">
-                                  {veiculo.placa} • {veiculo.marca} {veiculo.modelo}
-                                </span>
-                                <span className="text-sm text-muted-foreground">
-                                  {veiculo.ano} • {veiculo.cor} • {veiculo.quilometragem?.toLocaleString()} km
-                                </span>
-                              </div>
+              {/* SELEÇÃO DE VEÍCULO E MOTORISTA */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* SELEÇÃO DE VEÍCULO */}
+                <FormField
+                  control={form.control}
+                  name="veiculoId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Veículo Disponível *</FormLabel>
+                      <Select onValueChange={handleVeiculoChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecionar veículo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {veiculos.length > 0 ? (
+                            veiculos.map((veiculo) => (
+                              <SelectItem key={veiculo.id} value={veiculo.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {veiculo.placa} • {veiculo.marca} {veiculo.modelo}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">
+                                    {veiculo.ano} • {veiculo.cor} • {veiculo.quilometragem?.toLocaleString()} km
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="none" disabled>
+                              Nenhum veículo disponível
                             </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="none" disabled>
-                            Nenhum veículo disponível
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {/* SELEÇÃO DE MOTORISTA */}
-              <FormField
-                control={form.control}
-                name="motoristaId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Motorista Disponível *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecionar motorista" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {motoristas.length > 0 ? (
-                          motoristas.map((motorista) => (
-                            <SelectItem key={motorista.id} value={motorista.id}>
-                              <div className="flex flex-col">
-                                <span className="font-medium">
-                                  {motorista.nome}
-                                </span>
-                                <span className="text-sm text-muted-foreground">
-                                  CPF: {motorista.cpf} • CNH válida até {new Date(motorista.vencimentoCnh).toLocaleDateString('pt-BR')}
-                                </span>
-                              </div>
+                {/* SELEÇÃO DE MOTORISTA */}
+                <FormField
+                  control={form.control}
+                  name="motoristaId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Motorista Disponível *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecionar motorista" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {motoristas.length > 0 ? (
+                            motoristas.map((motorista) => (
+                              <SelectItem key={motorista.id} value={motorista.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {motorista.nome}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">
+                                    CPF: {motorista.cpf} • CNH válida até {new Date(motorista.vencimentoCnh).toLocaleDateString('pt-BR')}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="none" disabled>
+                              Nenhum motorista com CNH válida
                             </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="none" disabled>
-                            Nenhum motorista com CNH válida
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
 
 
