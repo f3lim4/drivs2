@@ -546,7 +546,40 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getContratosByLocadora(locadoraId: string): Promise<Contrato[]> {
-    return await db.select().from(contratos).where(eq(contratos.locadoraId, locadoraId));
+    try {
+      // Buscar contratos com join para incluir informações do veículo
+      const result = await db.select({
+        // Dados do contrato
+        id: contratos.id,
+        locadoraId: contratos.locadoraId,
+        veiculoId: contratos.veiculoId,
+        tipo: contratos.tipo,
+        titulo: contratos.titulo,
+        cliente: contratos.cliente,
+        valor: contratos.valor,
+        dataInicio: contratos.dataInicio,
+        dataFim: contratos.dataFim,
+        status: contratos.status,
+        template: contratos.template,
+        arquivoAssinado: contratos.arquivoAssinado,
+        dataAssinatura: contratos.dataAssinatura,
+        createdAt: contratos.createdAt,
+        updatedAt: contratos.updatedAt,
+        // Dados do veículo (quando veiculo_id existe)
+        veiculoPlaca: veiculos.placa,
+        veiculoMarca: veiculos.marca,
+        veiculoModelo: veiculos.modelo,
+      })
+      .from(contratos)
+      .leftJoin(veiculos, eq(contratos.veiculoId, veiculos.id))
+      .where(eq(contratos.locadoraId, locadoraId));
+      
+      return result;
+    } catch (error) {
+      console.error('Error in getContratosByLocadora:', error);
+      // Fallback para query simples se o join falhar
+      return await db.select().from(contratos).where(eq(contratos.locadoraId, locadoraId));
+    }
   }
 
   async getContrato(id: string): Promise<Contrato | undefined> {

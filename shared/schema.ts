@@ -162,6 +162,7 @@ export const alugueis = pgTable("alugueis", {
 export const contratos = pgTable("contratos", {
   id: text("id").primaryKey(),
   locadoraId: text("locadora_id").notNull(),
+  veiculoId: text("veiculo_id"), // Referência ao veículo (opcional para compatibilidade)
   tipo: text("tipo").notNull().default("locacao"), // 'locacao', 'compra', 'servico'
   titulo: text("titulo").notNull(),
   cliente: text("cliente").notNull(),
