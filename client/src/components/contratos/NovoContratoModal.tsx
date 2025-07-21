@@ -106,24 +106,55 @@ const criarPagamentosRecorrentes = async (
   dataPrimeiroPagamento: Date,
   recorrencia: 'semanal' | 'quinzenal' | 'mensal',
   valorSemanal: number,
-  tempoContrato: number
+  tempoContrato: number,
+  dataInicioContrato: Date
 ) => {
   try {
     const auth = JSON.parse(localStorage.getItem('auth') || '{}');
     const profile = auth.user;
     
-    // Calcula quantos pagamentos criar baseado na recorrência e tempo de contrato
+    // Data atual para comparação
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    
     let quantidadePagamentos = 0;
-    switch (recorrencia) {
-      case 'semanal':
-        quantidadePagamentos = tempoContrato * 4; // 4 semanas por mês
-        break;
-      case 'quinzenal':
-        quantidadePagamentos = tempoContrato * 2; // 2 quinzenas por mês
-        break;
-      case 'mensal':
-        quantidadePagamentos = tempoContrato; // 1 pagamento por mês
-        break;
+    
+    // Se data de início é no passado, cria pagamentos até hoje + próximo
+    if (dataInicioContrato <= hoje) {
+      // Calcula quantos pagamentos deveriam ter sido feitos até hoje
+      let diasPassados = Math.floor((hoje.getTime() - dataPrimeiroPagamento.getTime()) / (1000 * 60 * 60 * 24));
+      
+      switch (recorrencia) {
+        case 'semanal':
+          quantidadePagamentos = Math.floor(diasPassados / 7) + 2; // +2 para incluir atual e próximo
+          break;
+        case 'quinzenal':
+          quantidadePagamentos = Math.floor(diasPassados / 14) + 2;
+          break;
+        case 'mensal':
+          quantidadePagamentos = Math.floor(diasPassados / 30) + 2;
+          break;
+      }
+      
+      // Mínimo de 1, máximo de 20 para não criar muitos pagamentos
+      quantidadePagamentos = Math.max(1, Math.min(quantidadePagamentos, 20));
+      
+      console.log(`[DEBUG PASSADO] Contrato iniciado no passado:`, {
+        dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
+        hoje: format(hoje, 'dd/MM/yyyy'),
+        diasPassados,
+        quantidadePagamentos
+      });
+      
+    } else {
+      // Se data de início é no futuro, cria apenas 1 pagamento (1 dia antes do vencimento)
+      quantidadePagamentos = 1;
+      
+      console.log(`[DEBUG FUTURO] Contrato iniciado no futuro:`, {
+        dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
+        hoje: format(hoje, 'dd/MM/yyyy'),
+        quantidadePagamentos
+      });
     }
 
     // Calcula valor do pagamento baseado na recorrência
@@ -600,7 +631,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           data.dataPrimeiroPagamento,
           data.recorrencia,
           data.valorSemanal,
-          data.tempoContrato
+          data.tempoContrato,
+          data.dataInicio  // Passa a data de início do contrato
         );
         
         if (quantidadePagamentos > 0) {
