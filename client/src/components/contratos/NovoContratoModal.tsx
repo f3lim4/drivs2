@@ -602,11 +602,13 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
       });
       
     } catch (error: any) {
-      console.error('Erro ao gerar contrato:', error);
-      console.error('Stack trace:', error.stack);
+      console.error('[FRONTEND] ERRO COMPLETO ao gerar contrato:', error);
+      console.error('[FRONTEND] Stack trace:', error.stack);
+      console.error('[FRONTEND] Mensagem do erro:', error.message);
+      console.error('[FRONTEND] Response error:', error.response);
       toast({
         title: "Erro",
-        description: "Erro ao criar contrato. Tente novamente.",
+        description: error.message || "Erro ao criar contrato. Tente novamente.",
         variant: "destructive",
       });
     } finally {
