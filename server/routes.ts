@@ -844,6 +844,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/contratos/:id", async (req, res) => {
     try {
+      // Buscar o contrato para obter informações do aluguel
+      const contrato = await storage.getContrato(req.params.id);
+      
+      if (contrato) {
+        // Buscar aluguéis relacionados ao contrato
+        const alugueis = await storage.getAluguelsByLocadora(contrato.locadoraId);
+        const aluguelRelacionado = alugueis.find(a => 
+          a.motoristaNome === contrato.cliente || 
+          (contrato.titulo && contrato.titulo.includes(a.veiculoPlaca))
+        );
+        
+        if (aluguelRelacionado) {
+          console.log(`[CONTRACT DELETE] Excluindo aluguel relacionado: ${aluguelRelacionado.id}`);
+          await storage.deleteAluguel(aluguelRelacionado.id);
+          
+          // Atualizar status do veículo para disponível
+          console.log(`[CONTRACT DELETE] Liberando veículo: ${aluguelRelacionado.veiculoId}`);
+          await storage.updateVeiculo(aluguelRelacionado.veiculoId, { status: 'disponivel' });
+        }
+      }
+      
+      // Excluir o contrato
       await storage.deleteContrato(req.params.id);
       res.json({ message: "Contrato deleted successfully" });
     } catch (error) {
