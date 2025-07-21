@@ -808,12 +808,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/contratos", async (req, res) => {
     try {
+      console.log('[DEBUG] POST /api/contratos - Body recebido:', JSON.stringify(req.body, null, 2));
+      
       const result = insertContratoSchema.safeParse(req.body);
       if (!result.success) {
+        console.error('[DEBUG] Erro de validação do contrato:', result.error.errors);
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
+      console.log('[DEBUG] Dados validados, criando contrato...');
       const contrato = await storage.createContrato(result.data);
+      console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
       res.json(contrato);
     } catch (error) {
       console.error("Error creating contrato:", error);
