@@ -806,6 +806,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cache para prevenir contratos duplicados por duplo clique
+  const contratoCreationCache = new Map();
+
   app.post("/api/contratos", async (req, res) => {
     try {
       console.log('[DEBUG] POST /api/contratos - Body recebido:', JSON.stringify(req.body, null, 2));
@@ -815,6 +818,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error('[DEBUG] Erro de validação do contrato:', result.error.errors);
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
+      
+      // PROTEÇÃO CONTRA DUPLO CLIQUE: Verificar se já há criação em andamento
+      const cacheKey = `${result.data.locadoraId}-${result.data.cliente}-${result.data.dataInicio}`;
+      const agora = Date.now();
+      
+      if (contratoCreationCache.has(cacheKey)) {
+        const tempoUltimaCreacao = contratoCreationCache.get(cacheKey);
+        const diferencaTempo = agora - tempoUltimaCreacao;
+        
+        // Se tentativa de criação em menos de 10 segundos, bloquear
+        if (diferencaTempo < 10000) {
+          console.log('[ANTI-DUPLICATE] Tentativa de criação duplicada bloqueada:', {
+            cacheKey,
+            diferencaTempo,
+            ultimaCreacao: new Date(tempoUltimaCreacao).toISOString()
+          });
+          return res.status(429).json({ 
+            message: "Aguarde antes de criar outro contrato",
+            tempoEspera: Math.ceil((10000 - diferencaTempo) / 1000)
+          });
+        }
+      }
+      
+      // Registrar tentativa de criação
+      contratoCreationCache.set(cacheKey, agora);
       
       // Verificar se já existe contrato ativo para o mesmo cliente (motorista)
       const contratosExistentes = await storage.getContratosByLocadora(result.data.locadoraId);
@@ -834,6 +862,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('[DEBUG] Dados validados, criando contrato...');
       const contrato = await storage.createContrato(result.data);
       console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
+      
+      // Limpar cache após criação bem-sucedida
+      setTimeout(() => {
+        contratoCreationCache.delete(cacheKey);
+        console.log('[ANTI-DUPLICATE] Cache limpo para:', cacheKey);
+      }, 15000); // 15 segundos
+      
       res.json(contrato);
     } catch (error) {
       console.error("Error creating contrato:", error);
