@@ -551,8 +551,11 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         template: templateContent
       };
 
+      console.log('[FRONTEND] Criando contrato com dados:', novoContrato);
+      
       // Usa o hook para criar o contrato
       const contratoCriado = await createContrato.mutateAsync(novoContrato);
+      console.log('[FRONTEND] Contrato criado:', contratoCriado);
       
       // Log da atividade
       await registrarAtividade(
