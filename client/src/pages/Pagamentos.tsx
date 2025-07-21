@@ -412,11 +412,10 @@ export default function Pagamentos() {
       {/* Paginação */}
       <Pagination
         currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-        itemsPerPage={itemsPerPage}
-        onItemsPerPageChange={handleItemsPerPageChange}
         totalItems={pagamentosFiltrados.length}
+        itemsPerPage={itemsPerPage}
+        onPageChange={handlePageChange}
+        onItemsPerPageChange={handleItemsPerPageChange}
       />
 
       {/* Modais */}
@@ -425,6 +424,7 @@ export default function Pagamentos() {
           open={showNovoPagamento}
           onClose={() => setShowNovoPagamento(false)}
           onSubmit={createPagamento}
+          motoristas={motoristas || []}
         />
       )}
 
@@ -441,7 +441,8 @@ export default function Pagamentos() {
           open={showEditar}
           onClose={() => setShowEditar(false)}
           pagamento={pagamentoSelecionado}
-          onSubmit={(data) => updatePagamento({ id: pagamentoSelecionado.id, ...data })}
+          onSubmit={(updates) => updatePagamento({ id: pagamentoSelecionado.id, updates })}
+          motoristas={motoristas || []}
         />
       )}
 
