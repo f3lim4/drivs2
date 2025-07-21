@@ -816,6 +816,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
+      // Verificar se já existe contrato ativo para o mesmo cliente (motorista)
+      const contratosExistentes = await storage.getContratosByLocadora(result.data.locadoraId);
+      const contratoExistente = contratosExistentes.find(c => 
+        c.cliente === result.data.cliente && 
+        c.status === 'ativo'
+      );
+      
+      if (contratoExistente) {
+        console.log('[DEBUG] Contrato duplicado detectado para:', result.data.cliente);
+        return res.status(400).json({ 
+          message: "Já existe um contrato ativo para este motorista",
+          motorista: result.data.cliente
+        });
+      }
+      
       console.log('[DEBUG] Dados validados, criando contrato...');
       const contrato = await storage.createContrato(result.data);
       console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
@@ -849,7 +864,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (contrato) {
         // Buscar aluguéis relacionados ao contrato
-        const alugueis = await storage.getAluguelsByLocadora(contrato.locadoraId);
+        const alugueis = await storage.getAlugueisByLocadora(contrato.locadoraId);
         const aluguelRelacionado = alugueis.find(a => 
           a.motoristaNome === contrato.cliente || 
           (contrato.titulo && contrato.titulo.includes(a.veiculoPlaca))
