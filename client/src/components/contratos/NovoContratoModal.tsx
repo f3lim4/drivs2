@@ -300,7 +300,23 @@ export function NovoContratoModal({
     loadData();
   }, [open, profile?.locadoraId]);
 
-
+  // Função para preencher valor semanal e caução automaticamente quando veículo é selecionado
+  const handleVeiculoChange = (veiculoId: string) => {
+    const veiculo = veiculos.find(v => v.id === veiculoId);
+    if (veiculo) {
+      // Preenche automaticamente valor semanal e caução do veículo
+      const valorSemanal = parseFloat(veiculo.valorSemanal) || 0;
+      const caucao = parseFloat(veiculo.caucao) || 0;
+      
+      form.setValue('veiculoId', veiculoId);
+      form.setValue('valorSemanal', valorSemanal);
+      form.setValue('caucao', caucao);
+      
+      console.log(`Veículo selecionado: ${veiculo.marca} ${veiculo.modelo} (${veiculo.placa})`);
+      console.log(`Valor semanal preenchido: R$ ${valorSemanal.toFixed(2)}`);
+      console.log(`Caução preenchida: R$ ${caucao.toFixed(2)}`);
+    }
+  };
 
   const onSubmit = async (data: ContratoFormData) => {
     try {
@@ -626,7 +642,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Veículo Disponível *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={handleVeiculoChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecionar veículo" />
