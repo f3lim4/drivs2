@@ -148,7 +148,7 @@ const criarPagamentosRecorrentes = async (
       
       const pagamento = {
         id: crypto.randomUUID(),
-        locadoraId: profile?.locadoraId || '',
+        locadoraId: profile?.locadoraId || profile?.id || '',
         motoristaId,
         aluguelId,
         tipo: 'aluguel',
@@ -162,6 +162,12 @@ const criarPagamentosRecorrentes = async (
         valorJuros: '0.00',
         valorMulta: '0.00'
       };
+      
+      console.log(`[DEBUG] Profile para pagamento:`, { 
+        profileId: profile?.id, 
+        profileLocadoraId: profile?.locadoraId,
+        pagamentoLocadoraId: pagamento.locadoraId 
+      });
       
       console.log(`[PAYMENT] Criando pagamento ${i + 1}:`, pagamento);
       pagamentos.push(pagamento);
