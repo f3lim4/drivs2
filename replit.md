@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Reestruturação de Campos de Contratos para Flexibilidade - CONCLUÍDO ✅
+- ✅ **CAMPO "TEMPO MESES" SUBSTITUÍDO** - Substituído por "Tempo Mínimo de Contrato (meses)" para maior clareza
+- ✅ **CAMPO "DATA FINAL" ADICIONADO** - Novo campo opcional permitindo definir data de término específica
+- ✅ **CONTRATOS RENOVÁVEIS IMPLEMENTADOS** - Data Final vazia indica contrato sem término fixo
+- ✅ **SCHEMA ATUALIZADO** - Campos `tempoMinimoContrato` e `dataFinal` adicionados com validação
+- ✅ **INTERFACE REFORMULADA** - Layout em 3 colunas: Data Início | Data Final | Tempo Mínimo
+- ✅ **HELPER TEXT ADICIONADO** - "Deixe vazio para contrato renovável" orienta sobre uso do campo Data Final
+- ✅ **LÓGICA DE CÁLCULO CORRIGIDA** - Sistema considera data final fornecida ou calcula baseado no tempo mínimo
+- ✅ **TODOS OS COMPONENTES ATUALIZADOS** - Modal de criação, visualização e edição de contratos
+- ✅ **TIPOS TYPESCRIPT ATUALIZADOS** - Interfaces e schemas corrigidos para nova estrutura
+- ✅ **DEFAULTS CONFIGURADOS** - Valores padrão adequados para novos campos no formulário
+
 ### 2025-07-22: Sistema de Pagamentos Anteriores Automático - CONCLUÍDO ✅
 - ✅ **CHECKBOX PAGAMENTOS ANTERIORES** - Adicionado checkbox "Pagamentos Anteriores - Marcar como Pago" no modal de contratos
 - ✅ **LÓGICA INTELIGENTE IMPLEMENTADA** - Sistema marca automaticamente pagamentos desde data inicial até penúltima semana como "pago total"
