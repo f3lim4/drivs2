@@ -334,9 +334,6 @@ export default function Pagamentos() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-semibold">Lista de Pagamentos</CardTitle>
             <div className="flex items-center gap-4">
-              <div className="text-sm text-muted-foreground">
-                {pagamentosFiltrados.length} de {pagamentos.length} pagamentos
-              </div>
               <Select value={sortOrder} onValueChange={setSortOrder}>
                 <SelectTrigger className="w-48">
                   <SelectValue />
