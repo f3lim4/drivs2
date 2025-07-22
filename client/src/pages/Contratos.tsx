@@ -402,12 +402,14 @@ export default function Contratos() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'em_aberto':
+        return <Badge variant="outline" className="bg-gray-50 text-gray-700">Em Aberto</Badge>;
       case 'ativo':
-        return <Badge variant="default" className="bg-success text-success-foreground">Ativo</Badge>;
-      case 'finalizado':
-        return <Badge variant="secondary">Finalizado</Badge>;
+        return <Badge variant="default" className="bg-green-600 text-white">Ativo</Badge>;
       case 'cancelado':
-        return <Badge variant="destructive">Cancelado</Badge>;
+        return <Badge variant="destructive" className="bg-red-600 text-white">Cancelado</Badge>;
+      case 'encerrado':
+        return <Badge variant="secondary" className="bg-gray-600 text-white">Encerrado</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }

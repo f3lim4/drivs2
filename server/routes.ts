@@ -898,6 +898,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/contratos/:id/activate", async (req, res) => {
+    try {
+      console.log(`[CONTRACT-ACTIVATE] Ativando contrato ${req.params.id} via upload...`);
+      
+      // Buscar contrato atual
+      const contratos = await storage.getAllContratos();
+      const contrato = contratos.find(c => c.id === req.params.id);
+      
+      if (!contrato) {
+        return res.status(404).json({ message: "Contrato não encontrado" });
+      }
+      
+      if (contrato.status !== 'em_aberto') {
+        return res.status(400).json({ message: `Contrato não pode ser ativado. Status atual: ${contrato.status}` });
+      }
+      
+      // Ativar contrato
+      const contratoAtivado = await storage.updateContrato(req.params.id, {
+        ...contrato,
+        status: 'ativo',
+        dataAssinatura: new Date()
+      });
+      
+      console.log(`[CONTRACT-ACTIVATE] Contrato ${req.params.id} ativado com sucesso`);
+      res.json(contratoAtivado);
+      
+    } catch (error) {
+      console.error("Error activating contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.put("/api/contratos/:id", async (req, res) => {
     try {
       // Validate the request body
@@ -912,6 +944,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (result.data.status && (result.data.status === 'encerrado' || result.data.status === 'cancelado')) {
         console.log(`[PAGAMENTOS AUTOMÁTICOS] Status alterado para ${result.data.status} - parando geração automática`);
         // O sistema automático irá detectar na próxima verificação que o contrato não está mais ativo
+      }
+      
+      // Se arquivo foi enviado/aprovado, mudar status para "ativo"
+      if (result.data.arquivoAssinado && (!contrato.status || contrato.status === 'em_aberto')) {
+        console.log(`[CONTRATO] Upload detectado - mudando status de '${contrato.status}' para 'ativo'`);
+        result.data.status = 'ativo';
+        result.data.dataAssinatura = new Date();
       }
       
       res.json(contrato);
