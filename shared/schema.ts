@@ -171,9 +171,7 @@ export const contratos = pgTable("contratos", {
   valorSemanal: decimal("valor_semanal", { precision: 10, scale: 2 }), // Valor semanal do contrato
   tempoContrato: integer("tempo_contrato"), // Duração em meses
   dataInicio: date("data_inicio").notNull(),
-  dataFim: date("data_fim"),
-  // Campos da reestruturação de contratos flexíveis
-  dataFinal: date("data_final"), // Nova data final opcional para contratos renováveis
+  dataFim: date("data_fim"), // Data final opcional para contratos renováveis
   tempoMinimoContrato: integer("tempo_minimo_contrato"), // Tempo mínimo em meses
   caucao: decimal("caucao", { precision: 10, scale: 2 }), // Caução do contrato
   // Status com 4 estados: em_aberto, ativo, cancelado, encerrado
