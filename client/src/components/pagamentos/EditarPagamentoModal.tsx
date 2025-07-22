@@ -38,6 +38,8 @@ interface EditarPagamentoModalProps {
 export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motoristas }: EditarPagamentoModalProps) {
   // Estado para controlar se é pagamento atrasado
   const [pagamentoAtrasado, setPagamentoAtrasado] = useState(false);
+  // Estado para controlar o checkbox de copiar valor total
+  const [copiarValorTotal, setCopiarValorTotal] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -118,7 +120,17 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
 
   const handleClose = () => {
     setPagamentoAtrasado(false);
+    setCopiarValorTotal(false);
     onClose();
+  };
+
+  // Função para copiar valor total para valor pago
+  const handleCopiarValorTotal = (checked: boolean) => {
+    setCopiarValorTotal(checked);
+    if (checked) {
+      const valorTotal = form.getValues('valorTotal');
+      form.setValue('valorPago', valorTotal);
+    }
   };
 
   const formatCurrency = (value: number) => {
@@ -216,7 +228,22 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                 name="valorTotal"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Valor Total</FormLabel>
+                    <div className="flex items-center space-x-2">
+                      <FormLabel>Valor Total</FormLabel>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="copiar-valor"
+                          checked={copiarValorTotal}
+                          onCheckedChange={handleCopiarValorTotal}
+                        />
+                        <label
+                          htmlFor="copiar-valor"
+                          className="text-xs text-muted-foreground cursor-pointer"
+                        >
+                          Copiar para Valor Pago
+                        </label>
+                      </div>
+                    </div>
                     <FormControl>
                       <Input
                         type="number"
