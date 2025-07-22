@@ -81,7 +81,7 @@ export function useContratos() {
         caucao: aluguel.caucao,
         observacoes: aluguel.observacoes,
         status: 'ativo',
-        tipo: 'aluguel_ativo', // Identificador para diferenciar
+        tipo: 'Ativo', // Status unificado para aluguéis ativos
         createdAt: aluguel.createdAt,
         updatedAt: aluguel.updatedAt,
       }));

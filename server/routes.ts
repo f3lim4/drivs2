@@ -858,32 +858,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         a.status === 'ativo'
       );
       
-      // Se há aluguel ativo, verificar se foi criado recentemente (últimos 2 minutos)
-      // Isso permite que o contrato seja criado logo após o aluguel no mesmo processo
-      let aluguelRecentePermitido = false;
-      if (aluguelAtivo) {
-        const agora = new Date();
-        const criadoEm = new Date(aluguelAtivo.createdAt || aluguelAtivo.dataInicio);
-        const diferencaMinutos = (agora.getTime() - criadoEm.getTime()) / (1000 * 60);
-        
-        if (diferencaMinutos <= 2) {
-          aluguelRecentePermitido = true;
-          console.log('[ANTI-DUPLICATE] Aluguel recente detectado - PERMITINDO criação de contrato:', {
-            cliente: result.data.cliente,
-            aluguelId: aluguelAtivo.id,
-            criadoHa: `${diferencaMinutos.toFixed(1)} minutos`,
-            permitido: true
-          });
-        }
-      }
-      
-      // Bloquear apenas se há contrato existente OU aluguel antigo (não recente)
-      if (contratoExistente || (aluguelAtivo && !aluguelRecentePermitido)) {
+      // BLOQUEAR SEMPRE: Não permitir múltiplos contratos/aluguéis ativos
+      if (contratoExistente || aluguelAtivo) {
         console.log('[ANTI-DUPLICATE] Duplicação detectada:', {
           cliente: result.data.cliente,
           contratoExistente: !!contratoExistente,
           aluguelAtivo: !!aluguelAtivo,
-          aluguelRecentePermitido,
           contratoId: contratoExistente?.id,
           aluguelId: aluguelAtivo?.id
         });
