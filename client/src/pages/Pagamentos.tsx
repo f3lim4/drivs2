@@ -356,7 +356,6 @@ export default function Pagamentos() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Código</TableHead>
                 <TableHead>Motorista</TableHead>
                 <TableHead>Veículo</TableHead>
                 <TableHead>Descrição</TableHead>
@@ -370,11 +369,6 @@ export default function Pagamentos() {
             <TableBody>
               {paginatedPagamentos.map((pagamento) => (
                 <TableRow key={pagamento.id}>
-                  <TableCell>
-                    <div className="font-mono text-sm font-semibold text-blue-600">
-                      {pagamento.codigoPagamento || 'N/D'}
-                    </div>
-                  </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
