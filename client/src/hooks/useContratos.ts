@@ -86,8 +86,14 @@ export function useContratos() {
         updatedAt: aluguel.updatedAt,
       }));
 
-      // Combinar contratos formais + aluguéis sem contrato formal
-      return [...contratosFormais, ...contratosDeAlugueis];
+      // Modificar tipo dos contratos formais ativos para "Ativo"
+      const contratosFormaisCorrigidos = contratosFormais.map((contrato: any) => ({
+        ...contrato,
+        tipo: contrato.status === 'ativo' ? 'Ativo' : contrato.tipo // Se status é ativo, tipo deve ser "Ativo"
+      }));
+
+      // Combinar contratos formais corrigidos + aluguéis sem contrato formal
+      return [...contratosFormaisCorrigidos, ...contratosDeAlugueis];
     },
     enabled: !!locadoraId,
     staleTime: 0, // Sempre buscar dados frescos
