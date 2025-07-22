@@ -24,12 +24,14 @@ Preferred communication style: Simple, everyday language.
 - ✅ **LÓGICA RETROATIVA IMPLEMENTADA** - Sistema gera automaticamente pagamentos em atraso desde data inicial até hoje
 - ✅ **DETECÇÃO INTELIGENTE DE DATAS** - Identifica quando primeiro pagamento é anterior à data atual
 - ✅ **CÁLCULO AUTOMÁTICO DE INTERVALOS** - Computa exatamente quantos pagamentos devem existir (semanal/quinzenal/mensal)
-- ✅ **MARCAÇÃO CONDICIONAL COMO PAGO** - Se checkbox marcado, pagamentos retroativos criados como "pago_total"
+- ✅ **MARCAÇÃO CONDICIONAL COMO PAGO** - Se checkbox marcado, pagamentos retroativos criados como "pago"
 - ✅ **PRÓXIMO PAGAMENTO GARANTIDO** - Sempre cria próximo pagamento como "em_aberto" para continuidade
 - ✅ **INTEGRAÇÃO COMPLETA** - Nova função `criarPagamentosRecorrentes()` com parâmetro `marcarAnterioresComoPago`
 - ✅ **NOTIFICAÇÕES DETALHADAS** - Toast mostra quantos retroativos + próximo foram criados
 - ✅ **CÓDIGO LIMPO** - Removida lógica duplicada do endpoint separado, tudo integrado numa função
 - ✅ **LOGS COMPLETOS** - Sistema monitora criação passo-a-passo para debugging
+- ✅ **SCHEMA COMPLIANCE TOTAL** - Todos campos obrigatórios preenchidos (tipo, valorTotal, valorPago, valorRestante)
+- ✅ **STATUS CORRIGIDOS** - Uso correto de 'pago', 'em_aberto' conforme schema
 - ✅ **ZERO ERROS LSP** - Código sem problemas TypeScript, totalmente funcional
 
 ### 2025-07-22: Layout Ultra-Compacto de Contratos - Linha Única - CONCLUÍDO ✅
