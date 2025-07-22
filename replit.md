@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Sistema de Pagamentos Anteriores Automático - CONCLUÍDO ✅
+- ✅ **CHECKBOX PAGAMENTOS ANTERIORES** - Adicionado checkbox "Pagamentos Anteriores - Marcar como Pago" no modal de contratos
+- ✅ **LÓGICA INTELIGENTE IMPLEMENTADA** - Sistema marca automaticamente pagamentos desde data inicial até penúltima semana como "pago total"
+- ✅ **ENDPOINT BACKEND CRIADO** - `/api/pagamentos/marcar-anteriores-pagos` para processar marcação automática
+- ✅ **CÁLCULO DE DATA LIMITE** - Penúltima semana calculada baseada na recorrência (semanal, quinzenal, mensal)
+- ✅ **FEEDBACK VISUAL COMPLETO** - Toast notifications informam quantos pagamentos foram marcados como pagos
+- ✅ **INTEGRAÇÃO COM FORMULÁRIO** - Campo `marcarPagamentosAnteriores` adicionado ao schema e formulário
+- ✅ **VALIDAÇÃO DE DADOS** - Sistema verifica se há pagamentos em aberto antes de processar marcação
+- ✅ **OBSERVAÇÕES AUTOMÁTICAS** - Pagamentos marcados recebem observação explicativa
+- ✅ **COMPATIBILIDADE TOTAL** - Funciona com todos os tipos de recorrência e tipos de pagamento
+
 ### 2025-07-22: Interface de Contratos Otimizada - Coluna Valor Removida - CONCLUÍDO ✅
 - ✅ **COLUNA VALOR REMOVIDA** - Tabela de contratos não exibe mais a coluna "VALOR"
 - ✅ **LAYOUT SIMPLIFICADO** - Interface mais limpa sem informações redundantes de valor

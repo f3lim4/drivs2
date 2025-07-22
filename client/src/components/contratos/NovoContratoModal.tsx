@@ -65,6 +65,8 @@ const contratoSchema = z.object({
   // Novos campos para controle de pagamentos
   tipoPagamento: z.enum(['ilimitado', 'limitado']).default('ilimitado'),
   quantidadePagamentos: z.number().min(1).optional(),
+  // Campo para marcar pagamentos anteriores como pagos
+  marcarPagamentosAnteriores: z.boolean().default(false),
 }).refine((data) => {
   // Se pagamento recorrente está ativado, campos são obrigatórios
   if (data.pagamentoRecorrente) {
@@ -360,6 +362,7 @@ export function NovoContratoModal({
       recorrencia: 'semanal', // ✅ RECORRÊNCIA PADRÃO
       tipoPagamento: 'ilimitado', // ✅ TIPO PADRÃO
       quantidadePagamentos: undefined, // ✅ QUANTIDADE OPCIONAL
+      marcarPagamentosAnteriores: false, // ✅ PAGAMENTOS ANTERIORES DESMARCADO POR PADRÃO
     },
   });
 
@@ -776,7 +779,46 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         
         console.log('[DEBUG PAGAMENTOS] Quantidade criada:', quantidadePagamentos);
         
-        if (quantidadePagamentos > 0) {
+        // Se checkbox "Pagamentos Anteriores" estiver marcado, marcar pagamentos anteriores como pagos
+        if (data.marcarPagamentosAnteriores && quantidadePagamentos > 0) {
+          console.log('[DEBUG PAGAMENTOS ANTERIORES] Iniciando marcação de pagamentos anteriores como pagos...');
+          try {
+            const response = await fetch('/api/pagamentos/marcar-anteriores-pagos', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                motoristaId: data.motoristaId,
+                dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
+                recorrencia: data.recorrencia
+              }),
+            });
+            
+            if (response.ok) {
+              const resultado = await response.json();
+              console.log('[DEBUG PAGAMENTOS ANTERIORES] Resultado:', resultado);
+              toast({
+                title: "Pagamentos Recorrentes Criados e Atualizados",
+                description: `${quantidadePagamentos} pagamentos criados. ${resultado.pagamentosAtualizados} pagamentos anteriores marcados como "pago total".`,
+              });
+            } else {
+              console.error('[DEBUG PAGAMENTOS ANTERIORES] Erro na marcação:', response.statusText);
+              toast({
+                title: "Pagamentos Recorrentes Criados",
+                description: `${quantidadePagamentos} pagamentos ${data.recorrencia}s foram criados automaticamente. Erro ao marcar pagamentos anteriores.`,
+                variant: "destructive",
+              });
+            }
+          } catch (error) {
+            console.error('[DEBUG PAGAMENTOS ANTERIORES] Erro na requisição:', error);
+            toast({
+              title: "Pagamentos Recorrentes Criados",
+              description: `${quantidadePagamentos} pagamentos ${data.recorrencia}s foram criados automaticamente. Erro ao marcar pagamentos anteriores.`,
+              variant: "destructive",
+            });
+          }
+        } else if (quantidadePagamentos > 0) {
           toast({
             title: "Pagamentos Recorrentes Criados",
             description: `${quantidadePagamentos} pagamentos ${data.recorrencia}s foram criados automaticamente com status "Em Aberto".`,
@@ -814,6 +856,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           recorrencia: 'semanal', // ✅ RECORRÊNCIA PADRÃO
           tipoPagamento: 'ilimitado', // ✅ TIPO PADRÃO
           quantidadePagamentos: undefined, // ✅ QUANTIDADE OPCIONAL
+          marcarPagamentosAnteriores: false, // ✅ PAGAMENTOS ANTERIORES DESMARCADO POR PADRÃO
         });
         setContratoGerado(false);
         processandoRef.current = false; // Reset do ref também
@@ -1214,6 +1257,32 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                       />
                     )}
                   </div>
+                )}
+
+                {/* CHECKBOX PARA MARCAR PAGAMENTOS ANTERIORES COMO PAGOS */}
+                {form.watch('pagamentoRecorrente') && (
+                  <FormField
+                    control={form.control}
+                    name="marcarPagamentosAnteriores"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 ml-6 border-t pt-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            Pagamentos Anteriores - Marcar como Pago
+                          </FormLabel>
+                          <p className="text-sm text-muted-foreground">
+                            Marca automaticamente como "pago total" todos os pagamentos desde a data inicial até a penúltima semana (data atual)
+                          </p>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
                 )}
               </div>
 
