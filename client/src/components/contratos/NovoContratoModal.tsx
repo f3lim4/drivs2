@@ -241,47 +241,65 @@ const criarPagamentosRecorrentes = async (
       }
     }
     
-    // PRÓXIMO PAGAMENTO: Só criar se for para uma data futura
-    // Calcular próxima data de vencimento baseada na data do primeiro pagamento
-    const proximaDataVencimento = new Date(dataPrimeiro);
+    // PAGAMENTO DA SEMANA ATUAL: Criar apenas se não foi marcado como pago nos retroativos
+    // Calcular qual seria o pagamento da semana atual
+    const pagamentoSemanaAtual = new Date(dataPrimeiro);
     let semanaAtual = 0;
     
-    // Encontrar a próxima semana que ainda não passou
-    while (proximaDataVencimento <= hoje) {
+    // Encontrar a semana que incluí hoje (pode ser hoje ou antes)
+    while (pagamentoSemanaAtual <= hoje) {
+      const proximaSemana = new Date(pagamentoSemanaAtual);
+      proximaSemana.setDate(proximaSemana.getDate() + 7);
+      
+      // Se a próxima semana já passou de hoje, então a atual é a certa
+      if (proximaSemana > hoje) {
+        break;
+      }
+      
       semanaAtual++;
-      proximaDataVencimento.setDate(dataPrimeiro.getDate() + (semanaAtual * 7));
+      pagamentoSemanaAtual.setDate(dataPrimeiro.getDate() + (semanaAtual * 7));
     }
     
-    console.log('[PRÓXIMO PAGAMENTO] Calculado para:', format(proximaDataVencimento, 'dd/MM/yyyy'));
+    console.log('[SEMANA ATUAL] Pagamento da semana atual:', format(pagamentoSemanaAtual, 'dd/MM/yyyy'));
     
-    const proximoPagamento = {
-      id: crypto.randomUUID(),
-      aluguelId,
-      motoristaId,
-      locadoraId: profile.locadoraId,
-      dataPagamento: format(proximaDataVencimento, 'yyyy-MM-dd'),
-      valorTotal: valorSemanal.toString(),
-      valorPago: "0",
-      valorRestante: valorSemanal.toString(),
-      valorJuros: "0.00",
-      valorMulta: "0.00",
-      status: 'em_aberto',
-      tipo: 'aluguel',
-      descricao: 'Próximo pagamento semanal',
-      observacoes: 'Próximo pagamento semanal',
-      automatico: true
-    };
+    // Só criar o pagamento da semana atual se não foi criado como retroativo pago
+    const devecriarSemanaAtual = !marcarAnterioresComoPago || pagamentoSemanaAtual >= hoje;
     
-    const responseProximo = await fetch('/api/pagamentos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(proximoPagamento)
-    });
-    
-    if (responseProximo.ok) {
-      pagamentosCriados++;
-      console.log('[PRÓXIMO PAGAMENTO] Criado para:', format(proximaDataVencimento, 'dd/MM/yyyy'));
+    if (devecriarSemanaAtual) {
+      const pagamentoAtual = {
+        id: crypto.randomUUID(),
+        aluguelId,
+        motoristaId,
+        locadoraId: profile.locadoraId,
+        dataPagamento: format(pagamentoSemanaAtual, 'yyyy-MM-dd'),
+        valorTotal: valorSemanal.toString(),
+        valorPago: "0",
+        valorRestante: valorSemanal.toString(),
+        valorJuros: "0.00",
+        valorMulta: "0.00",
+        status: 'em_aberto',
+        tipo: 'aluguel',
+        descricao: 'Pagamento da semana atual',
+        observacoes: 'Pagamento da semana atual',
+        automatico: true
+      };
+      
+      const responseAtual = await fetch('/api/pagamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pagamentoAtual)
+      });
+      
+      if (responseAtual.ok) {
+        pagamentosCriados++;
+        console.log('[SEMANA ATUAL] Criado pagamento para:', format(pagamentoSemanaAtual, 'dd/MM/yyyy'));
+      }
+    } else {
+      console.log('[SEMANA ATUAL] Não criado - já incluído nos retroativos pagos');
     }
+    
+    // IMPORTANTE: NÃO criar pagamento da próxima semana aqui
+    // Isso será feito pelo sistema automático 1 dia antes do vencimento
 
     console.log(`[RESULTADO FINAL] ${pagamentosCriados} pagamentos criados (${pagamentosRetroativos} retroativos + 1 próximo)`);
     
