@@ -84,8 +84,8 @@ export function DetalhesPagamentoModal({ open, onClose, pagamento }: DetalhesPag
                   <p className="font-medium">{pagamento.motoristaNome}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-gray-500">Contato:</span>
-                  <p className="font-medium">{pagamento.motoristaContato}</p>
+                  <span className="text-sm text-gray-500">CPF:</span>
+                  <p className="font-medium">{pagamento.motoristaId}</p>
                 </div>
               </div>
 
