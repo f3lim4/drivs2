@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Sistema de Pagamentos Totalmente Padronizado - CONCLUÍDO ✅
+- ✅ **PADRONIZAÇÃO COMPLETA** - Status de pagamentos unificado para "em_aberto" em todo o sistema
+- ✅ **SCHEMA ATUALIZADO** - Campo status na tabela pagamentos com default "em_aberto"
+- ✅ **BANCO SINCRONIZADO** - Comando SQL confirma que não há registros "pendente" no banco
+- ✅ **NOTIFICAÇÕES CORRIGIDAS** - Hook useNotifications usando "em_aberto" para pagamentos
+- ✅ **FRONTEND PADRONIZADO** - Página Pagamentos, dropdowns e filtros usando "em_aberto"
+- ✅ **MODAIS ATUALIZADOS** - Badges e status nos modais de detalhes e exclusão corrigidos
+- ✅ **INTERFACE CONSISTENTE** - Label "Total em Aberto" ao invés de "Total Pendente"
+- ✅ **ORDENAÇÃO CORRIGIDA** - Dropdown "Em Aberto Primeiro" funcionando corretamente
+- ✅ **CÓDIGO LIMPO** - Removidas todas as referências "pendente" do sistema de pagamentos
+- ✅ **SISTEMA FUNCIONAL** - Pagamentos funcionando com terminologia consistente
+
 ### 2025-07-22: Sistema de Contratos Totalmente Funcional - CONCLUÍDO ✅
 - ✅ **BUG CRÍTICO RESOLVIDO** - Campo vencimentoCnh corrigido (camelCase vs snake_case)
 - ✅ **JEANE DISPONÍVEL** - Motorista aparece corretamente no dropdown (CNH válida até 2031)
