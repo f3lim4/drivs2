@@ -468,7 +468,8 @@ export function NovoContratoModal({
       }
       
       // Cria aluguel temporário para o contrato
-      const valorMensalAluguel = data.valorSemanal * 4; // Converte semanal para mensal
+      // CORREÇÃO: Usa fórmula corrigida baseada em dias reais do mês
+      const valorMensalAluguel = data.valorSemanal * 4.35; // 30.44 dias/mês ÷ 7 dias/semana = 4.35
       const valorTotalAluguel = valorMensalAluguel * data.tempoContrato; // Valor total baseado no tempo de contrato
       
       // Calcula data final
@@ -558,7 +559,8 @@ export function NovoContratoModal({
       dataFim.setMonth(dataFim.getMonth() + data.tempoContrato);
 
       // Calcula valor total
-      const valorMensal = data.valorSemanal * 4;
+      // CORREÇÃO: Usa fórmula corrigida baseada em dias reais do mês
+      const valorMensal = data.valorSemanal * 4.35; // 30.44 dias/mês ÷ 7 dias/semana = 4.35
       const valorTotal = valorMensal * data.tempoContrato;
 
       // Buscar template selecionado ou usar padrão
