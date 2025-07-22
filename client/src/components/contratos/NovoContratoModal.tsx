@@ -345,15 +345,7 @@ export function NovoContratoModal({
         const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
-          console.log('DEBUG: Todos os veículos carregados:', veiculosData.map((v: any) => ({ placa: v.placa, status: v.status, id: v.id })));
-          
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => veiculo.status === 'disponivel');
-          console.log('DEBUG: Veículos filtrados (disponível):', veiculosDisponiveis.map((v: any) => ({ placa: v.placa, status: v.status, id: v.id })));
-          
-          // Verifica se EUQ8D22 está na lista
-          const euq8d22 = veiculosData.find((v: any) => v.placa === 'EUQ8D22');
-          console.log('DEBUG: EUQ8D22 encontrado:', euq8d22 ? { placa: euq8d22.placa, status: euq8d22.status, id: euq8d22.id } : 'NÃO ENCONTRADO');
-          
           setVeiculos(veiculosDisponiveis);
         }
 
