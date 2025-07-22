@@ -731,6 +731,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.status) {
         const novoStatusVeiculo = req.body.status === 'ativo' ? 'alugado' : 'disponivel';
         await storage.updateVeiculo(aluguel.veiculoId, { status: novoStatusVeiculo });
+        
+        // Se status mudou para finalizado ou cancelado, parar pagamentos automáticos
+        if (req.body.status === 'finalizado' || req.body.status === 'cancelado') {
+          console.log(`[PAGAMENTOS AUTOMÁTICOS] Status alterado para ${req.body.status} - parando geração automática para aluguel ${req.params.id}`);
+          // O sistema automático irá detectar na próxima verificação que o aluguel não está mais ativo
+        }
       }
       
       res.json(aluguel);

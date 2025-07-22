@@ -1,7 +1,8 @@
-// Sistema de Pagamentos Automáticos para Contratos Ativos
+// Sistema de Pagamentos Automáticos para Aluguéis Ativos
 import { db } from './db';
 import { contratos, pagamentos, alugueis } from '../shared/schema';
 import { eq, and, desc } from 'drizzle-orm';
+import crypto from 'crypto';
 
 interface PagamentoAutomatico {
   id: string;
@@ -19,21 +20,21 @@ interface PagamentoAutomatico {
   codigoPagamento: string | null;
 }
 
-// Função para gerar próximo pagamento para contratos ativos
+// Função para gerar próximo pagamento para aluguéis ativos
 export const gerarProximosPagamentos = async () => {
   try {
-    console.log('[PAGAMENTOS AUTOMÁTICOS] Iniciando verificação de contratos ativos...');
+    console.log('[PAGAMENTOS AUTOMÁTICOS] Iniciando verificação de aluguéis ativos...');
 
-    // Buscar todos os contratos ativos
-    const contratosAtivos = await db
+    // Buscar todos os aluguéis ativos
+    const alugueisAtivos = await db
       .select()
-      .from(contratos)
-      .where(eq(contratos.status, 'ativo'));
+      .from(alugueis)
+      .where(eq(alugueis.status, 'ativo'));
 
-    console.log(`[PAGAMENTOS AUTOMÁTICOS] Encontrados ${contratosAtivos.length} contratos ativos`);
+    console.log(`[PAGAMENTOS AUTOMÁTICOS] Encontrados ${alugueisAtivos.length} aluguéis ativos`);
 
-    for (const contrato of contratosAtivos) {
-      await processarContratoAtivo(contrato);
+    for (const aluguel of alugueisAtivos) {
+      await processarAluguelAtivo(aluguel);
     }
 
     console.log('[PAGAMENTOS AUTOMÁTICOS] Verificação concluída');
@@ -42,15 +43,17 @@ export const gerarProximosPagamentos = async () => {
   }
 };
 
-// Processar cada contrato ativo individualmente
-const processarContratoAtivo = async (contrato: any) => {
+// Processar cada aluguel ativo individualmente
+const processarAluguelAtivo = async (aluguel: any) => {
   try {
-    // Buscar último pagamento do contrato
+    console.log(`[PROCESSANDO] Aluguel ${aluguel.id} - Motorista: ${aluguel.motoristaId}`);
+    
+    // Buscar último pagamento do aluguel
     const ultimosPagamentos = await db
       .select()
       .from(pagamentos)
       .where(and(
-        eq(pagamentos.aluguelId, contrato.aluguelId),
+        eq(pagamentos.aluguelId, aluguel.id),
         eq(pagamentos.automatico, true)
       ))
       .orderBy(desc(pagamentos.dataPagamento))
@@ -59,16 +62,18 @@ const processarContratoAtivo = async (contrato: any) => {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
-    // Se não há pagamentos, usar data de início do contrato
+    // Se não há pagamentos, usar data de início do aluguel
     let proximaDataPagamento: Date;
     
     if (ultimosPagamentos.length === 0) {
       // Primeiro pagamento baseado na data de início
-      proximaDataPagamento = new Date(contrato.dataInicio);
+      proximaDataPagamento = new Date(aluguel.dataInicio);
+      console.log(`[PRIMEIRO PAGAMENTO] Aluguel ${aluguel.id} - Data: ${proximaDataPagamento.toDateString()}`);
     } else {
       const ultimoPagamento = ultimosPagamentos[0];
       proximaDataPagamento = new Date(ultimoPagamento.dataPagamento);
       proximaDataPagamento.setDate(proximaDataPagamento.getDate() + 7); // Próxima semana
+      console.log(`[PRÓXIMO PAGAMENTO] Aluguel ${aluguel.id} - Data: ${proximaDataPagamento.toDateString()}`);
     }
 
     // Verificar se precisa criar pagamento (1 dia antes do vencimento)
@@ -76,16 +81,19 @@ const processarContratoAtivo = async (contrato: any) => {
     dataLimite.setDate(dataLimite.getDate() - 1); // 1 dia antes
 
     if (hoje >= dataLimite) {
-      await criarPagamentoAutomatico(contrato, proximaDataPagamento);
+      console.log(`[CRIANDO] Pagamento para aluguel ${aluguel.id} - Vencimento: ${proximaDataPagamento.toDateString()}`);
+      await criarPagamentoAutomatico(aluguel, proximaDataPagamento);
+    } else {
+      console.log(`[AGUARDANDO] Aluguel ${aluguel.id} - Criar em: ${dataLimite.toDateString()}`);
     }
 
   } catch (error) {
-    console.error(`[ERRO CONTRATO ${contrato.id}]`, error);
+    console.error(`[ERRO ALUGUEL ${aluguel.id}]`, error);
   }
 };
 
-// Criar pagamento automático para contrato
-const criarPagamentoAutomatico = async (contrato: any, dataVencimento: Date) => {
+// Criar pagamento automático para aluguel
+const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
   try {
     // Verificar se já existe pagamento para esta data
     const dataFormatada = dataVencimento.toISOString().split('T')[0]; // YYYY-MM-DD
@@ -93,49 +101,52 @@ const criarPagamentoAutomatico = async (contrato: any, dataVencimento: Date) => 
       .select()
       .from(pagamentos)
       .where(and(
-        eq(pagamentos.aluguelId, contrato.aluguelId),
+        eq(pagamentos.aluguelId, aluguel.id),
         eq(pagamentos.dataPagamento, dataFormatada)
       ))
       .limit(1);
 
     if (pagamentoExistente.length > 0) {
-      console.log(`[SKIP] Pagamento já existe para ${contrato.aluguelId} em ${dataVencimento.toDateString()}`);
+      console.log(`[SKIP] Pagamento já existe para aluguel ${aluguel.id} em ${dataVencimento.toDateString()}`);
       return;
     }
+
+    // Calcular valor semanal baseado no valor mensal
+    const valorSemanal = parseFloat(aluguel.valorMensal) / 4.35; // Conversão mensal para semanal
 
     // Criar novo pagamento automático
     const novoPagamento: PagamentoAutomatico = {
       id: crypto.randomUUID(),
-      aluguelId: contrato.aluguelId,
-      motoristaId: contrato.motoristaId,
-      locadoraId: contrato.locadoraId,
+      aluguelId: aluguel.id,
+      motoristaId: aluguel.motoristaId,
+      locadoraId: aluguel.locadoraId,
       dataPagamento: dataFormatada,
-      valorTotal: contrato.valorSemanal?.toString() || '0',
+      valorTotal: valorSemanal.toFixed(2),
       valorPago: '0',
-      valorRestante: contrato.valorSemanal?.toString() || '0',
+      valorRestante: valorSemanal.toFixed(2),
       status: 'em_aberto',
       tipo: 'aluguel',
-      descricao: 'Pagamento gerado automaticamente pelo sistema',
+      descricao: 'Pagamento semanal gerado automaticamente pelo sistema',
       automatico: true,
       codigoPagamento: `PAG-AUTO-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
     };
 
     await db.insert(pagamentos).values([novoPagamento]);
 
-    console.log(`[PAGAMENTO CRIADO] Contrato ${contrato.id} - Vencimento: ${dataVencimento.toDateString()}`);
+    console.log(`[PAGAMENTO CRIADO] Aluguel ${aluguel.id} - Valor: R$ ${valorSemanal.toFixed(2)} - Vencimento: ${dataVencimento.toDateString()}`);
 
   } catch (error) {
-    console.error(`[ERRO CRIAÇÃO PAGAMENTO] Contrato ${contrato.id}:`, error);
+    console.error(`[ERRO CRIAÇÃO PAGAMENTO] Aluguel ${aluguel.id}:`, error);
   }
 };
 
-// Função para parar pagamentos automáticos quando contrato encerra
-export const pararPagamentosAutomaticos = async (contratoId: string, status: string) => {
-  if (status === 'encerrado' || status === 'cancelado') {
-    console.log(`[PAGAMENTOS AUTOMÁTICOS] Parando geração para contrato ${contratoId} - Status: ${status}`);
+// Função para parar pagamentos automáticos quando aluguel encerra
+export const pararPagamentosAutomaticos = async (aluguelId: string, status: string) => {
+  if (status === 'finalizado' || status === 'cancelado') {
+    console.log(`[PAGAMENTOS AUTOMÁTICOS] Parando geração para aluguel ${aluguelId} - Status: ${status}`);
     
-    // Aqui podemos adicionar lógica adicional se necessário
-    // Por exemplo, marcar pagamentos futuros como cancelados
+    // O sistema automático irá detectar na próxima verificação que o aluguel não está mais ativo
+    // e não criará mais pagamentos para este aluguel
   }
 };
 
