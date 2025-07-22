@@ -203,17 +203,21 @@ const criarPagamentosRecorrentes = async (
             aluguelId,
             motoristaId,
             locadoraId: profile.locadoraId,
-            dataVencimento: dataVencimento,
-            valorTotal: valorSemanal, // Sempre valor semanal
-            valorPago: marcarAnterioresComoPago ? valorSemanal : 0,
-            valorRestante: marcarAnterioresComoPago ? 0 : valorSemanal,
+            dataPagamento: format(dataVencimento, 'yyyy-MM-dd'), // Campo correto: dataPagamento
+            valorTotal: valorSemanal.toString(), // Converter para string
+            valorPago: marcarAnterioresComoPago ? valorSemanal.toString() : "0",
+            valorRestante: marcarAnterioresComoPago ? "0" : valorSemanal.toString(),
+            valorJuros: "0.00",
+            valorMulta: "0.00", 
             status: statusPagamento,
             tipo: 'aluguel',
+            descricao: marcarAnterioresComoPago 
+              ? `Pagamento retroativo ${i + 1} - Marcado automaticamente como pago`
+              : `Pagamento retroativo ${i + 1} - semanal`,
             observacoes: marcarAnterioresComoPago 
               ? `Pagamento retroativo ${i + 1} - Marcado automaticamente como pago`
               : `Pagamento retroativo ${i + 1} - semanal`,
-            automatico: true,
-            codigoPagamento: `PAG-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+            automatico: true
           };
 
           console.log('[RETROATIVO CRIADO]', {
@@ -248,15 +252,17 @@ const criarPagamentosRecorrentes = async (
       aluguelId,
       motoristaId,
       locadoraId: profile.locadoraId,
-      dataVencimento: proximaDataVencimento,
-      valorTotal: valorSemanal, // Sempre valor semanal
-      valorPago: 0,
-      valorRestante: valorSemanal,
+      dataPagamento: format(proximaDataVencimento, 'yyyy-MM-dd'), // Campo correto: dataPagamento
+      valorTotal: valorSemanal.toString(), // Converter para string
+      valorPago: "0",
+      valorRestante: valorSemanal.toString(),
+      valorJuros: "0.00",
+      valorMulta: "0.00",
       status: 'em_aberto',
       tipo: 'aluguel',
+      descricao: 'Próximo pagamento (1 dia antes da próxima semana)',
       observacoes: 'Próximo pagamento (1 dia antes da próxima semana)',
-      automatico: true,
-      codigoPagamento: `PAG-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+      automatico: true
     };
     
     const responseProximo = await fetch('/api/pagamentos', {
@@ -720,10 +726,11 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
 
       // Cria novo contrato
       const novoContrato = {
+        locadoraId: profile?.locadoraId || '',
         tipo: 'locacao' as const,
         titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
         cliente: aluguel.motoristaNome,
-        valor: parseFloat(valorTotal.toFixed(2)),
+        valor: valorTotal.toFixed(2), // Enviar como string
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFim, 'yyyy-MM-dd'),
         status: 'em_aberto' as const, // Inicia sempre como em_aberto

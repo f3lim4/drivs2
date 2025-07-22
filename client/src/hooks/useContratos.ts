@@ -4,7 +4,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Contrato } from '@/types';
+import { Contrato, InsertContrato } from '@shared/schema';
 import { useAuth } from './useAuth';
 
 export function useContratos() {
@@ -47,7 +47,7 @@ export function useContratos() {
       const contratosClientes = contratosFormais.map((c: any) => c.cliente); // Nomes
       
       // Converter CPFs dos aluguéis para nomes para comparação
-      const alugueisNomes = alugueisMotoristas.map(cpf => cpfParaNome.get(cpf));
+      const alugueisNomes = alugueisMotoristas.map((cpf: string) => cpfParaNome.get(cpf));
       
       console.log('[CONTRATOS DEBUG]', {
         alugueisAtivos: alugueisAtivos.length,
@@ -55,12 +55,12 @@ export function useContratos() {
         alugueisMotoristas, // CPFs
         contratosClientes, // Nomes
         alugueisNomes, // Nomes convertidos dos CPFs
-        intersecao: alugueisNomes.filter(nome => contratosClientes.includes(nome))
+        intersecao: alugueisNomes.filter((nome: string) => contratosClientes.includes(nome))
       });
 
       // Converter apenas aluguéis que NÃO têm contrato formal correspondente
       const aluguelsSemContrato = alugueisAtivos.filter((aluguel: any) => {
-        const nomeMotorista = cpfParaNome.get(aluguel.motoristaId);
+        const nomeMotorista: string = cpfParaNome.get(aluguel.motoristaId);
         return !contratosClientes.includes(nomeMotorista);
       });
 
@@ -97,12 +97,12 @@ export function useContratos() {
     },
     enabled: !!locadoraId,
     staleTime: 0, // Sempre buscar dados frescos
-    cacheTime: 0, // Não manter cache
+    gcTime: 0, // Não manter cache
   });
 
   // Criar contrato
   const createContrato = useMutation({
-    mutationFn: async (contrato: Omit<Contrato, 'id' | 'createdAt' | 'updatedAt'>) => {
+    mutationFn: async (contrato: InsertContrato) => {
       const contratoData = {
         ...contrato,
         locadoraId,
