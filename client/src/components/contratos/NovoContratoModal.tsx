@@ -442,7 +442,10 @@ export function NovoContratoModal({
             const disponivel = temVencimento && cnhValida && !temAluguelAtivo;
             
             return disponivel;
-          });
+          }).map((motorista: any) => ({
+            ...motorista,
+            nome: motorista.nome.trim() // Remove espaços extras do nome
+          }));
           
           setMotoristas(motoristasDisponiveis);
         }
