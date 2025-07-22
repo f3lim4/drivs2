@@ -915,7 +915,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                                     {motorista.nome}
                                   </span>
                                   <span className="text-sm text-muted-foreground">
-                                    CPF: {motorista.cpf}
+                                    CPF: {motorista.id}
                                   </span>
                                 </div>
                               </SelectItem>
