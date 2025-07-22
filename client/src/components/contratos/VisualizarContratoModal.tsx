@@ -17,6 +17,7 @@ import { Printer, Edit, Download, User, Car, FileText, Calendar } from 'lucide-r
 import { Contrato } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
+import { formatDate } from '@/lib/utils';
 import jsPDF from 'jspdf';
 
 interface VisualizarContratoModalProps {
@@ -444,14 +445,14 @@ export function VisualizarContratoModal({
               <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Data de Início</p>
-                  <p className="font-semibold">{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
+                  <p className="font-semibold">{formatDate(contrato.dataInicio)}</p>
                 </div>
-                {contrato.dataFim && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Data de Término</p>
-                    <p className="font-semibold">{new Date(contrato.dataFim).toLocaleDateString('pt-BR')}</p>
-                  </div>
-                )}
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Data de Término</p>
+                  <p className="font-semibold">
+                    {contrato.dataFim ? formatDate(contrato.dataFim) : 'Indeterminada'}
+                  </p>
+                </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Status</p>
                   <Badge variant={getBadgeVariant(contrato.status)}>
