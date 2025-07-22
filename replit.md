@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Coluna TIPO Removida da Tabela de Contratos - Interface Simplificada - CONCLUÍDO ✅
+- ✅ **COLUNA TIPO REMOVIDA** - Eliminada coluna "TIPO" da tabela de contratos conforme solicitado
+- ✅ **INTERFACE LIMPA** - Tabela mais compacta com 6 colunas: Motorista, Veículo, Data Início, Status, Upload, Ações
+- ✅ **LÓGICA PRESERVADA** - Sistema ainda diferencia tipos internamente mas não exibe na interface
+- ✅ **VALIDAÇÃO MANTIDA** - Proteção contra duplicação de contratos continua funcionando
+- ✅ **EXPERIÊNCIA SIMPLIFICADA** - Usuários não veem mais informação redundante de tipo
+
 ### 2025-07-22: Bug Jeane Dropdown Totalmente Resolvido - Espaços Extras Identificados - CONCLUÍDO ✅
 - ✅ **CAUSA RAIZ IDENTIFICADA** - Nomes de motoristas com espaços extras no final causavam problemas no Shadcn Select
 - ✅ **SOLUÇÃO APLICADA** - Função trim() implementada para remover espaços extras de todos os nomes
