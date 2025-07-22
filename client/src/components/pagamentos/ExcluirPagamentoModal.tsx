@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/utils';
 import type { Pagamento } from '@shared/schema';
 
 interface ExcluirPagamentoModalProps {
@@ -21,9 +22,7 @@ export function ExcluirPagamentoModal({ open, onClose, pagamento, onConfirm }: E
     }).format(numValue);
   };
 
-  const formatDate = (date: string | Date) => {
-    return new Date(date).toLocaleDateString('pt-BR');
-  };
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {

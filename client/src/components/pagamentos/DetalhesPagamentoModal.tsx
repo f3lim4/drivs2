@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { formatDate } from '@/lib/utils';
 import type { Pagamento } from '@shared/schema';
 
 interface DetalhesPagamentoModalProps {
@@ -21,9 +22,7 @@ export function DetalhesPagamentoModal({ open, onClose, pagamento }: DetalhesPag
     }).format(numValue);
   };
 
-  const formatDate = (date: string | Date) => {
-    return new Date(date).toLocaleDateString('pt-BR');
-  };
+
 
   const formatDateTime = (date: string | Date) => {
     return new Date(date).toLocaleString('pt-BR');
