@@ -234,6 +234,14 @@ export const insertContratoSchema = createInsertSchema(contratos).omit({
     }
     return val;
   }),
+  valorSemanal: z.union([z.string(), z.number()]).optional().transform((val) => {
+    if (val === undefined) return undefined;
+    if (typeof val === 'number') {
+      return val.toString();
+    }
+    return val;
+  }),
+  tempoContrato: z.number().optional(),
 });
 
 export const insertTemplateContratoSchema = createInsertSchema(templateContratos).omit({
