@@ -307,10 +307,15 @@ export function NovoContratoModal({
     console.log('Templates no modal:', templates);
   }, [templates]);
 
-  // Função para obter a data de amanhã
+  // Função para obter a data de amanhã sem problemas de timezone
   const getAmanha = () => {
-    const amanha = new Date();
-    amanha.setDate(amanha.getDate() + 1);
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = hoje.getMonth();
+    const dia = hoje.getDate();
+    
+    // Cria nova data local para amanhã
+    const amanha = new Date(ano, mes, dia + 1);
     return amanha;
   };
 
@@ -942,7 +947,10 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                             onChange={(e) => {
                               const value = e.target.value;
                               if (value) {
-                                field.onChange(new Date(value));
+                                // Cria data local sem conversões de timezone
+                                const [ano, mes, dia] = value.split('-').map(Number);
+                                const dataLocal = new Date(ano, mes - 1, dia);
+                                field.onChange(dataLocal);
                               } else {
                                 field.onChange(undefined);
                               }
@@ -1063,7 +1071,10 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                               onChange={(e) => {
                                 const value = e.target.value;
                                 if (value) {
-                                  field.onChange(new Date(value));
+                                  // Cria data local sem conversões de timezone
+                                  const [ano, mes, dia] = value.split('-').map(Number);
+                                  const dataLocal = new Date(ano, mes - 1, dia);
+                                  field.onChange(dataLocal);
                                 } else {
                                   field.onChange(undefined);
                                 }
