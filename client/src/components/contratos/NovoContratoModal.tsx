@@ -62,20 +62,34 @@ const contratoSchema = z.object({
   pagamentoRecorrente: z.boolean().default(false),
   dataPrimeiroPagamento: z.date().optional(),
   recorrencia: z.enum(['semanal', 'quinzenal', 'mensal']).optional(),
+  // Novos campos para controle de pagamentos
+  tipoPagamento: z.enum(['ilimitado', 'limitado']).default('ilimitado'),
+  quantidadePagamentos: z.number().min(1).optional(),
 }).refine((data) => {
   // Se pagamento recorrente está ativado, campos são obrigatórios
   if (data.pagamentoRecorrente) {
     console.log('[VALIDATION DEBUG] Pagamento recorrente ativo, validando campos:', {
       temData: !!data.dataPrimeiroPagamento,
       temRecorrencia: !!data.recorrencia,
-      data: data.dataPrimeiroPagamento,
-      recorrencia: data.recorrencia
+      tipoPagamento: data.tipoPagamento,
+      quantidadePagamentos: data.quantidadePagamentos
     });
-    return data.dataPrimeiroPagamento && data.recorrencia;
+    
+    // Validação básica
+    if (!data.dataPrimeiroPagamento || !data.recorrencia) {
+      return false;
+    }
+    
+    // Se é limitado, deve ter quantidade
+    if (data.tipoPagamento === 'limitado' && !data.quantidadePagamentos) {
+      return false;
+    }
+    
+    return true;
   }
   return true;
 }, {
-  message: 'Data do primeiro pagamento e recorrência são obrigatórios quando pagamento recorrente está ativado',
+  message: 'Preencha todos os campos obrigatórios de pagamento',
   path: ['pagamentoRecorrente'],
 });
 
@@ -114,7 +128,9 @@ const criarPagamentosRecorrentes = async (
   recorrencia: 'semanal' | 'quinzenal' | 'mensal',
   valorSemanal: number,
   tempoContrato: number,
-  dataInicioContrato: Date
+  dataInicioContrato: Date,
+  tipoPagamento: 'ilimitado' | 'limitado' = 'ilimitado',
+  quantidadePagamentos?: number
 ) => {
   try {
     const auth = JSON.parse(localStorage.getItem('drivs_profile') || '{}');
@@ -141,20 +157,27 @@ const criarPagamentosRecorrentes = async (
     const diffTime = dataFinalContrato.getTime() - dataInicioContrato.getTime();
     const totalDiasContrato = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    // Calcula quantos pagamentos baseado na recorrência e duração total
-    switch (recorrencia) {
-      case 'semanal':
-        // Para pagamentos semanais: total de semanas no contrato
-        quantidadePagamentos = Math.ceil(totalDiasContrato / 7);
-        break;
-      case 'quinzenal':
-        // Para pagamentos quinzenais: total de quinzenas no contrato
-        quantidadePagamentos = Math.ceil(totalDiasContrato / 15);
-        break;
-      case 'mensal':
-        // Para pagamentos mensais: usa o número de meses do contrato
-        quantidadePagamentos = tempoContrato;
-        break;
+    // Calcula quantos pagamentos baseado no tipo e recorrência
+    if (tipoPagamento === 'limitado' && quantidadePagamentos) {
+      // Usa quantidade específica definida pelo usuário
+      console.log('[DEBUG] Pagamento limitado: usando quantidade específica:', quantidadePagamentos);
+    } else {
+      // Pagamento ilimitado: calcula baseado na duração total do contrato
+      switch (recorrencia) {
+        case 'semanal':
+          // Para pagamentos semanais: total de semanas no contrato
+          quantidadePagamentos = Math.ceil(totalDiasContrato / 7);
+          break;
+        case 'quinzenal':
+          // Para pagamentos quinzenais: total de quinzenas no contrato
+          quantidadePagamentos = Math.ceil(totalDiasContrato / 15);
+          break;
+        case 'mensal':
+          // Para pagamentos mensais: usa o número de meses do contrato
+          quantidadePagamentos = tempoContrato;
+          break;
+      }
+      console.log('[DEBUG] Pagamento ilimitado: calculado automaticamente:', quantidadePagamentos);
     }
     
     // Limite de segurança para evitar sobrecarga
@@ -335,6 +358,8 @@ export function NovoContratoModal({
       pagamentoRecorrente: true, // ✅ HABILITADO POR PADRÃO
       dataPrimeiroPagamento: getAmanha(), // ✅ DATA PADRÃO
       recorrencia: 'semanal', // ✅ RECORRÊNCIA PADRÃO
+      tipoPagamento: 'ilimitado', // ✅ TIPO PADRÃO
+      quantidadePagamentos: undefined, // ✅ QUANTIDADE OPCIONAL
     },
   });
 
@@ -744,7 +769,9 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           data.recorrencia,
           data.valorSemanal,
           data.tempoContrato,
-          data.dataInicio  // Passa a data de início do contrato
+          data.dataInicio,  // Passa a data de início do contrato
+          data.tipoPagamento,  // Tipo: ilimitado ou limitado
+          data.quantidadePagamentos  // Quantidade específica (se limitado)
         );
         
         console.log('[DEBUG PAGAMENTOS] Quantidade criada:', quantidadePagamentos);
@@ -785,6 +812,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           pagamentoRecorrente: true, // ✅ HABILITADO POR PADRÃO
           dataPrimeiroPagamento: getAmanha(), // ✅ DATA PADRÃO
           recorrencia: 'semanal', // ✅ RECORRÊNCIA PADRÃO
+          tipoPagamento: 'ilimitado', // ✅ TIPO PADRÃO
+          quantidadePagamentos: undefined, // ✅ QUANTIDADE OPCIONAL
         });
         setContratoGerado(false);
         processandoRef.current = false; // Reset do ref também
@@ -1079,58 +1108,130 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 />
 
                 {form.watch('pagamentoRecorrente') && (
-                  <div className="grid grid-cols-2 gap-4 ml-6">
-                    <FormField
-                      control={form.control}
-                      name="dataPrimeiroPagamento"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Data do Primeiro Pagamento *</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="date"
-                              className="h-10"
-                              value={field.value && field.value instanceof Date && !isNaN(field.value.getTime()) ? format(field.value, "yyyy-MM-dd") : ""}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                if (value) {
-                                  // Cria data local sem conversões de timezone
-                                  const [ano, mes, dia] = value.split('-').map(Number);
-                                  const dataLocal = new Date(ano, mes - 1, dia);
-                                  field.onChange(dataLocal);
-                                } else {
-                                  field.onChange(undefined);
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="recorrencia"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Recorrência *</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <div className="space-y-4 ml-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="dataPrimeiroPagamento"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Data do Primeiro Pagamento *</FormLabel>
                             <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecionar recorrência" />
-                              </SelectTrigger>
+                              <Input
+                                type="date"
+                                className="h-10"
+                                value={field.value && field.value instanceof Date && !isNaN(field.value.getTime()) ? format(field.value, "yyyy-MM-dd") : ""}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value) {
+                                    // Cria data local sem conversões de timezone
+                                    const [ano, mes, dia] = value.split('-').map(Number);
+                                    const dataLocal = new Date(ano, mes - 1, dia);
+                                    field.onChange(dataLocal);
+                                  } else {
+                                    field.onChange(undefined);
+                                  }
+                                }}
+                              />
                             </FormControl>
-                            <SelectContent>
-                              <SelectItem value="semanal">Semanal</SelectItem>
-                              <SelectItem value="quinzenal">Quinzenal</SelectItem>
-                              <SelectItem value="mensal">Mensal</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="recorrencia"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Recorrência *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecionar recorrência" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="semanal">Semanal</SelectItem>
+                                <SelectItem value="quinzenal">Quinzenal</SelectItem>
+                                <SelectItem value="mensal">Mensal</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* NOVA SEÇÃO: CONFIGURAÇÃO DE PAGAMENTOS */}
+                    <div className="space-y-4 border-t pt-4">
+                      <div className="text-sm font-medium text-gray-700">Configuração dos Pagamentos</div>
+                      
+                      <FormField
+                        control={form.control}
+                        name="tipoPagamento"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tipo de Pagamento *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Selecionar tipo" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="ilimitado">
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">Ilimitado</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      Continua cobrando enquanto o contrato estiver ativo
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="limitado">
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">Limitado</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      Cobra apenas um número específico de pagamentos
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {form.watch('tipoPagamento') === 'limitado' && (
+                        <FormField
+                          control={form.control}
+                          name="quantidadePagamentos"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Quantidade de Pagamentos *</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder="Ex: 12"
+                                  min="1"
+                                  max="200"
+                                  value={field.value || ''}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    field.onChange(value ? parseInt(value) : undefined);
+                                  }}
+                                />
+                              </FormControl>
+                              <p className="text-xs text-muted-foreground">
+                                Número total de pagamentos que serão cobrados
+                              </p>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       )}
-                    />
+                    </div>
                   </div>
                 )}
               </div>
