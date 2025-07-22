@@ -218,9 +218,9 @@ export default function Pagamentos() {
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-blue-700">Total de Pagamentos</p>
-                <p className="text-xl font-bold text-blue-800">{pagamentosFiltrados.length}</p>
-                <p className="text-xs text-blue-600">Todos os registros</p>
+                <p className="text-xs font-medium text-blue-700">Total Geral</p>
+                <p className="text-xl font-bold text-blue-800">{formatCurrency(totalGeral)}</p>
+                <p className="text-xs text-blue-600">{pagamentosFiltrados.length} pagamentos</p>
               </div>
               <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
                 <Calculator className="w-5 h-5 text-blue-700" />
@@ -233,9 +233,9 @@ export default function Pagamentos() {
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-green-700">Pagos</p>
-                <p className="text-xl font-bold text-green-800">{pagamentosFiltrados.filter(p => p.status === 'pago').length}</p>
-                <p className="text-xs text-green-600">Recebidos</p>
+                <p className="text-xs font-medium text-green-700">Total Recebido</p>
+                <p className="text-xl font-bold text-green-800">{formatCurrency(totalRecebido)}</p>
+                <p className="text-xs text-green-600">{pagamentosFiltrados.filter(p => p.status === 'pago').length} pagamentos</p>
               </div>
               <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-700" />
@@ -244,16 +244,16 @@ export default function Pagamentos() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg h-32">
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-purple-700">Em Aberto</p>
-                <p className="text-xl font-bold text-purple-800">{pagamentosFiltrados.filter(p => p.status === 'em_aberto').length}</p>
-                <p className="text-xs text-purple-600">Pendentes</p>
+                <p className="text-xs font-medium text-red-700">Total Pendente</p>
+                <p className="text-xl font-bold text-red-800">{formatCurrency(totalPendente)}</p>
+                <p className="text-xs text-red-600">{pagamentosFiltrados.filter(p => p.status === 'em_aberto').length} pagamentos</p>
               </div>
-              <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-purple-700" />
+              <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-red-700" />
               </div>
             </div>
           </CardContent>
@@ -263,9 +263,9 @@ export default function Pagamentos() {
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-orange-700">Parciais</p>
-                <p className="text-xl font-bold text-orange-800">{pagamentosFiltrados.filter(p => p.status === 'parcial').length}</p>
-                <p className="text-xs text-orange-600">Em andamento</p>
+                <p className="text-xs font-medium text-orange-700">Total Parciais</p>
+                <p className="text-xl font-bold text-orange-800">{formatCurrency(totalParcial)}</p>
+                <p className="text-xs text-orange-600">{pagamentosFiltrados.filter(p => p.status === 'parcial').length} pagamentos</p>
               </div>
               <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center">
                 <Clock className="w-5 h-5 text-orange-700" />
