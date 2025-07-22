@@ -908,25 +908,18 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                         </FormControl>
                         <SelectContent>
                           {motoristas.length > 0 ? (
-                            motoristas.map((motorista) => {
-                              console.log('[RENDER DEBUG] Renderizando motorista:', {
-                                id: motorista.id,
-                                nome: motorista.nome,
-                                key: motorista.id
-                              });
-                              return (
-                                <SelectItem key={motorista.id} value={motorista.id}>
-                                  <div className="flex flex-col">
-                                    <span className="font-medium">
-                                      {motorista.nome}
-                                    </span>
-                                    <span className="text-sm text-muted-foreground">
-                                      CPF: {motorista.id}
-                                    </span>
-                                  </div>
-                                </SelectItem>
-                              );
-                            })
+                            motoristas.map((motorista) => (
+                              <SelectItem key={motorista.id} value={motorista.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {motorista.nome}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">
+                                    CPF: {motorista.id}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))
                           ) : (
                             <SelectItem value="none" disabled>
                               Nenhum motorista com CNH válida
