@@ -1,4 +1,4 @@
-import { Calendar, DollarSign, FileText, User, Clock, Car } from 'lucide-react';
+import { Calendar, DollarSign, FileText, User, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -106,36 +106,32 @@ export function DetalhesPagamentoModal({ open, onClose, pagamento }: DetalhesPag
                   <p className="font-medium">{pagamento.descricao}</p>
                 </div>
               )}
+
+              {/* Informações do Veículo */}
+              {(pagamento as any).veiculoPlaca && (
+                <>
+                  <Separator className="my-4" />
+                  <div>
+                    <span className="text-sm text-gray-500 font-medium mb-2 block">Veículo:</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <span className="text-sm text-gray-500">Placa:</span>
+                        <p className="font-medium">{(pagamento as any).veiculoPlaca}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">Marca:</span>
+                        <p className="font-medium">{(pagamento as any).veiculoMarca}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">Modelo:</span>
+                        <p className="font-medium">{(pagamento as any).veiculoModelo}</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
-
-          {/* Informações do Veículo */}
-          {(pagamento as any).veiculoPlaca && (
-            <Card className="bg-blue-50 border-blue-200">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-800">
-                  <Car className="h-5 w-5" />
-                  Veículo Alugado
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <span className="text-sm text-blue-600 font-medium">Placa:</span>
-                    <p className="font-semibold text-blue-800">{(pagamento as any).veiculoPlaca}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-blue-600 font-medium">Marca:</span>
-                    <p className="font-semibold text-blue-800">{(pagamento as any).veiculoMarca}</p>
-                  </div>
-                  <div>
-                    <span className="text-sm text-blue-600 font-medium">Modelo:</span>
-                    <p className="font-semibold text-blue-800">{(pagamento as any).veiculoModelo}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Informações financeiras */}
           <Card>
