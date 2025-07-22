@@ -467,10 +467,37 @@ export function NovoContratoModal({
         throw new Error('Veículo ou motorista não encontrado');
       }
       
-      // Cria aluguel temporário para o contrato
-      // CORREÇÃO: Usa fórmula corrigida baseada em dias reais do mês
-      const valorMensalAluguel = data.valorSemanal * 4.35; // 30.44 dias/mês ÷ 7 dias/semana = 4.35
-      const valorTotalAluguel = valorMensalAluguel * data.tempoContrato; // Valor total baseado no tempo de contrato
+      // CÁLCULO EXATO: Conta o número real de semanas no período do contrato
+      const dataInicioContrato = new Date(data.dataInicio);
+      const dataFimContrato = new Date(dataInicioContrato);
+      dataFimContrato.setMonth(dataFimContrato.getMonth() + data.tempoContrato);
+      
+      // Calcula dias totais no período
+      const totalDias = Math.ceil((dataFimContrato.getTime() - dataInicioContrato.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // Calcula semanas exatas
+      const semanasCompletas = Math.floor(totalDias / 7);
+      const diasRestantes = totalDias % 7;
+      
+      // Se há 3+ dias restantes, conta como semana adicional
+      const totalSemanas = semanasCompletas + (diasRestantes >= 3 ? 1 : 0);
+      
+      // Valor total baseado no número exato de semanas
+      const valorTotalExato = totalSemanas * data.valorSemanal;
+      const valorMensalCalculado = valorTotalExato / data.tempoContrato; // Para compatibilidade com o banco
+      
+      console.log(`📊 CÁLCULO EXATO DO CONTRATO:
+• Período: ${dataInicioContrato.toLocaleDateString()} até ${dataFimContrato.toLocaleDateString()}
+• Total de dias: ${totalDias}
+• Semanas completas: ${semanasCompletas}
+• Dias restantes: ${diasRestantes}
+• Total de semanas para cobrança: ${totalSemanas}
+• Valor semanal: R$ ${data.valorSemanal.toFixed(2)}
+• Valor total exato: R$ ${valorTotalExato.toFixed(2)}
+• Valor mensal calculado: R$ ${valorMensalCalculado.toFixed(2)}`);
+      
+      const valorMensalAluguel = valorMensalCalculado;
+      const valorTotalAluguel = valorTotalExato;
       
       // Calcula data final
       const dataFimAluguel = new Date(data.dataInicio);
@@ -558,10 +585,9 @@ export function NovoContratoModal({
       const dataFim = new Date(data.dataInicio);
       dataFim.setMonth(dataFim.getMonth() + data.tempoContrato);
 
-      // Calcula valor total
-      // CORREÇÃO: Usa fórmula corrigida baseada em dias reais do mês
-      const valorMensal = data.valorSemanal * 4.35; // 30.44 dias/mês ÷ 7 dias/semana = 4.35
-      const valorTotal = valorMensal * data.tempoContrato;
+      // Usa os valores já calculados com semanas exatas
+      const valorMensal = valorMensalAluguel; // Já calculado acima com semanas exatas
+      const valorTotal = valorTotalAluguel; // Já calculado com semanas exatas
 
       // Buscar template selecionado ou usar padrão
       let templateContent = '';
