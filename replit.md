@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-01-22: Correção Crítica de Datas de Vencimento - Bug de Timezone Resolvido - CONCLUÍDO ✅
+- ✅ **PROBLEMA IDENTIFICADO** - Datas de vencimento aparecendo 1 dia adiantadas em todos os pagamentos
+- ✅ **CAUSA RAIZ ENCONTRADA** - Múltiplas funções formatDate() espalhadas pelo sistema causando conflitos de timezone
+- ✅ **FUNÇÃO PROBLEMÁTICA LOCALIZADA** - `new Date(date).toLocaleDateString()` interpreta YYYY-MM-DD como UTC
+- ✅ **PÁGINAS CORRIGIDAS** - client/src/pages/Pagamentos.tsx usando formatDate do utils.ts
+- ✅ **MODAIS CORRIGIDOS** - DetalhesPagamentoModal.tsx e ExcluirPagamentoModal.tsx padronizados
+- ✅ **FUNÇÃO TIMEZONE-SAFE APLICADA** - Todas as datas agora usam formatDate() do lib/utils.ts
+- ✅ **SISTEMA VALIDADO** - Usuário confirmou que datas estão aparecendo corretamente
+- ✅ **ARQUITETURA UNIFICADA** - Eliminadas funções formatDate duplicadas, código padronizado
+
 ### 2025-01-22: Sistema de Códigos Únicos de Pagamento Implementado - CONCLUÍDO ✅
 - ✅ **FUNÇÃO gerarCodigoPagamento() CRIADA** - Sistema gera códigos únicos no formato "PAG-XXXXXX"
 - ✅ **CAMPO codigo_pagamento ADICIONADO** - Banco de dados atualizado com campo único para identificação
