@@ -10,12 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-22: Layout Compacto de Contratos Otimizado - CONCLUÍDO ✅
-- ✅ **LAYOUT EM DUAS LINHAS IMPLEMENTADO** - Formulário reorganizado para melhor aproveitamento do espaço
-- ✅ **LINHA 1: DATA DE INÍCIO E DATA FINAL** - Dois campos de data na primeira linha
-- ✅ **LINHA 2: TEMPO, VALOR E CAUÇÃO** - Três campos numéricos na segunda linha
-- ✅ **INTERFACE MAIS COMPACTA** - Redução significativa da altura do modal de contratos
-- ✅ **EXPERIÊNCIA OTIMIZADA** - Interface mais limpa e organizada conforme preferência do usuário
+### 2025-07-22: Layout Ultra-Compacto de Contratos - Linha Única - CONCLUÍDO ✅
+- ✅ **LAYOUT EM UMA ÚNICA LINHA** - Todos os 5 campos principais organizados em uma linha horizontal
+- ✅ **GRID DE 5 COLUNAS** - Data Início | Data Final | Tempo Mínimo | Valor Semanal | Caução
+- ✅ **MÁXIMO APROVEITAMENTO DE ESPAÇO** - Interface ultra-compacta conforme preferência específica
+- ✅ **GAP REDUZIDO** - Espaçamento otimizado com gap-3 para melhor densidade visual
+- ✅ **CORREÇÕES DE LSP** - Todas as referências `tempoContrato` substituídas por `tempoMinimoContrato`
+- ✅ **FUNCIONALIDADE PRESERVADA** - Sistema de cálculos e validações mantido integralmente
 
 ### 2025-07-22: Reestruturação de Campos de Contratos para Flexibilidade - CONCLUÍDO ✅
 - ✅ **CAMPO "TEMPO MESES" SUBSTITUÍDO** - Substituído por "Tempo Mínimo de Contrato (meses)" para maior clareza

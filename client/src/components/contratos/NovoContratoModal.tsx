@@ -177,7 +177,7 @@ const criarPagamentosRecorrentes = async (
           break;
         case 'mensal':
           // Para pagamentos mensais: usa o número de meses do contrato
-          quantidadePagamentos = tempoContrato;
+          quantidadePagamentos = tempoMinimoContrato;
           break;
       }
       console.log('[DEBUG] Pagamento ilimitado: calculado automaticamente:', quantidadePagamentos);
@@ -197,7 +197,7 @@ const criarPagamentosRecorrentes = async (
         ? `${totalDiasContrato} dias ÷ 7 dias/semana = ${quantidadePagamentos} pagamentos`
         : recorrencia === 'quinzenal'
         ? `${totalDiasContrato} dias ÷ 15 dias/quinzena = ${quantidadePagamentos} pagamentos`
-        : `${tempoContrato} meses = ${quantidadePagamentos} pagamentos mensais`
+        : `${tempoMinimoContrato} meses = ${quantidadePagamentos} pagamentos mensais`
     });
 
     // CORREÇÃO: Calcula valor baseado nos dias reais do período, não apenas semanas
@@ -612,7 +612,7 @@ export function NovoContratoModal({
 
       // Calcula data final
       const dataFim = new Date(data.dataInicio);
-      dataFim.setMonth(dataFim.getMonth() + data.tempoContrato);
+      dataFim.setMonth(dataFim.getMonth() + data.tempoMinimoContrato);
 
       // Usa os valores já calculados com semanas exatas
       const valorMensal = valorMensalAluguel; // Já calculado acima com semanas exatas
@@ -779,7 +779,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           data.dataPrimeiroPagamento,
           data.recorrencia,
           data.valorSemanal,
-          data.tempoContrato,
+          data.tempoMinimoContrato,
           data.dataInicio,  // Passa a data de início do contrato
           data.tipoPagamento,  // Tipo: ilimitado ou limitado
           data.quantidadePagamentos  // Quantidade específica (se limitado)
@@ -1033,8 +1033,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 />
               </div>
 
-              {/* LINHA 1: DATA DE INÍCIO E DATA FINAL */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* TODOS OS CAMPOS EM UMA ÚNICA LINHA */}
+              <div className="grid grid-cols-5 gap-3">
                 {/* DATA DE INÍCIO */}
                 <FormField
                   control={form.control}
@@ -1102,10 +1102,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                     </FormItem>
                   )}
                 />
-              </div>
-              
-              {/* LINHA 2: TEMPO MÍNIMO, VALOR SEMANAL E CAUÇÃO */}
-              <div className="grid grid-cols-3 gap-4">
+
                 {/* TEMPO MÍNIMO DE CONTRATO */}
                 <FormField
                   control={form.control}
