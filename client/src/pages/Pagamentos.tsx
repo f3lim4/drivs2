@@ -141,7 +141,7 @@ export default function Pagamentos() {
           return parseFloat(a.valorTotal || '0') - parseFloat(b.valorTotal || '0');
         case 'status-pago':
           return a.status === 'pago' ? -1 : b.status === 'pago' ? 1 : 0;
-        case 'status-pendente':
+        case 'status-em_aberto':
           return a.status === 'em_aberto' ? -1 : b.status === 'em_aberto' ? 1 : 0;
         default:
           return 0;
@@ -168,11 +168,7 @@ export default function Pagamentos() {
     setCurrentPage(1);
   };
 
-  // Debug: Log dos pagamentos para verificar estrutura
-  console.log('[PAGAMENTOS DEBUG] Total de pagamentos:', pagamentosFiltrados.length);
-  console.log('[PAGAMENTOS DEBUG] Primeiro pagamento:', pagamentosFiltrados[0]);
-  console.log('[PAGAMENTOS DEBUG] LocadoraId:', profile?.locadoraId || profile?.id);
-  console.log('[PAGAMENTOS DEBUG] Profile completo:', profile);
+
 
   // Estatísticas (baseado nos dados filtrados) - usando 'em_aberto' em vez de 'pendente'
   const totalPendente = pagamentosFiltrados
@@ -190,14 +186,7 @@ export default function Pagamentos() {
   const totalGeral = pagamentosFiltrados
     .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
 
-  console.log('[PAGAMENTOS DEBUG] Totais calculados:', {
-    totalPendente,
-    totalRecebido,
-    totalParcial,
-    totalGeral,
-    statusEmAberto: pagamentosFiltrados.filter(p => p.status === 'em_aberto').length,
-    statusPago: pagamentosFiltrados.filter(p => p.status === 'pago').length
-  });
+
 
   if (isLoading) {
     return (
@@ -343,7 +332,7 @@ export default function Pagamentos() {
                   <SelectItem value="valor-maior">Maior Valor</SelectItem>
                   <SelectItem value="valor-menor">Menor Valor</SelectItem>
                   <SelectItem value="status-pago">Pagos Primeiro</SelectItem>
-                  <SelectItem value="status-pendente">Em Aberto Primeiro</SelectItem>
+                  <SelectItem value="status-em_aberto">Em Aberto Primeiro</SelectItem>
                 </SelectContent>
               </Select>
             </div>
