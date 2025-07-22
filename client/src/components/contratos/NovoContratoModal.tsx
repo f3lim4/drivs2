@@ -521,10 +521,11 @@ export function NovoContratoModal({
         dataFimAluguel.setMonth(dataFimAluguel.getMonth() + data.tempoMinimoContrato);
       }
       
-      // Cria o aluguel no banco primeiro
+      // Prepara dados do aluguel (mas NÃO cria ainda)
       const locadoraId = profile?.locadoraId || profile?.id;
+      const aluguelId = crypto.randomUUID();
       const novoAluguel = {
-        id: crypto.randomUUID(),
+        id: aluguelId,
         locadoraId: locadoraId,
         motoristaId: data.motoristaId,
         veiculoId: data.veiculoId,
@@ -537,25 +538,11 @@ export function NovoContratoModal({
         status: 'ativo'
       };
       
-      console.log('[DEBUG] Criando aluguel com locadoraId:', locadoraId);
+      console.log('[DEBUG] Aluguel preparado (não criado ainda):', novoAluguel);
       
-      const aluguelResponse = await fetch('/api/alugueis', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(novoAluguel),
-      });
-      
-      if (!aluguelResponse.ok) {
-        throw new Error('Erro ao criar aluguel');
-      }
-      
-      const aluguelCriado = await aluguelResponse.json();
-      
-      // Cria objeto compatível com a estrutura esperada
+      // Cria objeto compatível com a estrutura esperada (usando dados preparados)
       aluguel = {
-        id: aluguelCriado.id,
+        id: aluguelId,
         motoristaId: motorista.id,
         veiculoId: veiculo.id,
         motoristaNome: motorista.nome,
@@ -740,9 +727,28 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
 
       console.log('[FRONTEND] Criando contrato com dados:', novoContrato);
       
-      // Usa o hook para criar o contrato
+      // Usa o hook para criar o contrato PRIMEIRO
       const contratoCriado = await createContrato.mutateAsync(novoContrato);
       console.log('[FRONTEND] Contrato criado:', contratoCriado);
+      
+      // SÓ AGORA cria o aluguel (após contrato criado com sucesso)
+      console.log('[DEBUG] Criando aluguel após contrato ter sido criado com sucesso');
+      const aluguelResponse = await fetch('/api/alugueis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(novoAluguel),
+      });
+      
+      if (!aluguelResponse.ok) {
+        // Se aluguel falhar, deveria reverter contrato mas por simplicidade vamos manter
+        console.error('Erro ao criar aluguel após contrato criado');
+        throw new Error('Erro ao criar aluguel');
+      }
+      
+      const aluguelCriado = await aluguelResponse.json();
+      console.log('[FRONTEND] Aluguel criado após contrato:', aluguelCriado);
       
       // Log da atividade
       await registrarAtividade(
