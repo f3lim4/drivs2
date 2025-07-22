@@ -462,7 +462,7 @@ export function VisualizarContratoModal({
                   <p className="text-sm font-medium text-gray-600">
                     {contrato.dataFim ? 'Data de Término' : 'Tipo de Contrato'}
                   </p>
-                  <p className="font-semibold">
+                  <div className="font-semibold">
                     {contrato.dataFim ? (
                       formatDate(contrato.dataFim)
                     ) : (
@@ -470,7 +470,7 @@ export function VisualizarContratoModal({
                         Renovável
                       </Badge>
                     )}
-                  </p>
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Status</p>
@@ -483,21 +483,10 @@ export function VisualizarContratoModal({
               {/* INFORMAÇÕES ADICIONAIS PARA CONTRATO RENOVÁVEL */}
               {!contrato.dataFim && (
                 <div className="mt-4 pt-4 border-t">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <div>
                       <p className="text-sm font-medium text-gray-600">Tempo Mínimo de Contrato</p>
                       <p className="font-semibold">{contrato.tempoMinimoContrato || 1} mês{contrato.tempoMinimoContrato > 1 ? 'es' : ''}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Próxima Avaliação</p>
-                      <p className="font-semibold text-blue-600">
-                        {(() => {
-                          const dataInicio = new Date(contrato.dataInicio);
-                          const proximaAvaliacao = new Date(dataInicio);
-                          proximaAvaliacao.setMonth(proximaAvaliacao.getMonth() + (contrato.tempoMinimoContrato || 1));
-                          return formatDate(proximaAvaliacao.toISOString().split('T')[0]);
-                        })()}
-                      </p>
                     </div>
                   </div>
                   <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
