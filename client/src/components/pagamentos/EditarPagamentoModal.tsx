@@ -150,34 +150,6 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            {/* Informações do Veículo */}
-            {(pagamento as any).veiculoPlaca && (
-              <Card className="bg-blue-50 border-blue-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-blue-800 flex items-center gap-2">
-                    <Car className="w-4 h-4" />
-                    Veículo Alugado
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="text-blue-600 font-medium">Placa:</span>
-                      <p className="text-blue-800">{(pagamento as any).veiculoPlaca}</p>
-                    </div>
-                    <div>
-                      <span className="text-blue-600 font-medium">Marca:</span>
-                      <p className="text-blue-800">{(pagamento as any).veiculoMarca}</p>
-                    </div>
-                    <div>
-                      <span className="text-blue-600 font-medium">Modelo:</span>
-                      <p className="text-blue-800">{(pagamento as any).veiculoModelo}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Motorista */}
               <FormField
