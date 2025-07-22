@@ -599,7 +599,6 @@ export default function Contratos() {
                     <TableRow>
                       <TableHead>MOTORISTA/CLIENTE</TableHead>
                       <TableHead>VEÍCULO</TableHead>
-                      <TableHead>TIPO</TableHead>
                       <TableHead>DATA INÍCIO</TableHead>
                       <TableHead>STATUS</TableHead>
                       <TableHead>UPLOAD</TableHead>
@@ -627,15 +626,6 @@ export default function Contratos() {
                             <span className="text-muted-foreground">N/A</span>
                           )}
                         </TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={contrato.tipo === 'Ativo' ? 'default' : 'outline'} 
-                            className={contrato.tipo === 'Ativo' ? 'bg-blue-500 text-white' : 'capitalize'}
-                          >
-                            {contrato.tipo === 'Ativo' ? 'Ativo' : contrato.tipo}
-                          </Badge>
-                        </TableCell>
-
                         <TableCell>
                           <p>{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
                         </TableCell>
