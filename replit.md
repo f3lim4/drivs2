@@ -10,7 +10,9 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-22: Sistema de Pagamentos com Semana Atual Totalmente Corrigido - CONCLUÍDO ✅
+### 2025-07-22: Campo Descrição Pagamentos Compactado + Sistema Totalmente Corrigido - CONCLUÍDO ✅
+- ✅ **CAMPO DESCRIÇÃO OTIMIZADO** - Reduzido de max-w-xs para max-w-[120px] na tabela de pagamentos
+- ✅ **INTERFACE MAIS LIMPA** - Texto menor (text-sm) e indicador "Auto" simplificado
 - ✅ **LÓGICA DE PAGAMENTOS SEGUNDA-FEIRA** - Sistema reconhece que pagamentos são sempre segundas
 - ✅ **SEMANA ATUAL INCLUÍDA** - Quando checkbox marcado, semana atual também fica como "pago"
 - ✅ **CÁLCULO MATEMÁTICO CORRETO** - Math.floor(diffDias / 7) para determinar semanas desde primeiro pagamento
