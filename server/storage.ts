@@ -664,21 +664,41 @@ export class DatabaseStorage implements IStorage {
     try {
       const result = await db.select().from(pagamentos).where(eq(pagamentos.locadoraId, locadoraId));
       
-      // Buscar dados dos motoristas separadamente para evitar problemas com joins
-      const pagamentosComMotoristas = await Promise.all(
+      // Buscar dados dos motoristas e veículos separadamente para evitar problemas com joins
+      const pagamentosEnriquecidos = await Promise.all(
         result.map(async (pagamento) => {
           const motorista = await db.select().from(motoristas).where(eq(motoristas.id, pagamento.motoristaId)).limit(1);
+          
+          let veiculoData = null;
+          // Se o pagamento tem aluguelId, buscar dados do veículo via aluguel
+          if (pagamento.aluguelId) {
+            const aluguel = await db.select().from(alugueis).where(eq(alugueis.id, pagamento.aluguelId)).limit(1);
+            if (aluguel[0]) {
+              const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, aluguel[0].veiculoId)).limit(1);
+              if (veiculo[0]) {
+                veiculoData = {
+                  veiculoId: veiculo[0].id,
+                  veiculoPlaca: veiculo[0].placa,
+                  veiculoMarca: veiculo[0].marca,
+                  veiculoModelo: veiculo[0].modelo
+                };
+              }
+            }
+          }
+          
           return {
             ...pagamento,
             data: pagamento.dataPagamento, // Mapear campo data corretamente
             valor: pagamento.valorPago, // Mapear campo valor corretamente
             motoristaNome: motorista[0]?.nome || '',
-            motoristaContato: motorista[0]?.telefone || ''
+            motoristaContato: motorista[0]?.telefone || '',
+            // Adicionar dados do veículo
+            ...veiculoData
           };
         })
       );
       
-      return pagamentosComMotoristas;
+      return pagamentosEnriquecidos;
     } catch (error) {
       console.error('Error in getPagamentosByLocadora:', error);
       return [];
