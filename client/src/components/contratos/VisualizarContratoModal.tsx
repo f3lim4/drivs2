@@ -480,9 +480,8 @@ export function VisualizarContratoModal({
                 {/* TEMPO MÍNIMO PARA CONTRATOS RENOVÁVEIS */}
                 {!contrato.dataFim && (
                   <div>
-                    <p className="text-base font-semibold text-gray-700">Tempo Mínimo</p>
-                    <p className="text-sm text-gray-600 -mt-1">de Contrato</p>
-                    <p className="font-semibold text-lg mt-1">{contrato.tempoMinimoContrato || 1} mês{(contrato.tempoMinimoContrato || 1) > 1 ? 'es' : ''}</p>
+                    <p className="text-sm font-medium text-gray-600">Tempo Mínimo</p>
+                    <p className="font-semibold">{contrato.tempoMinimoContrato || 1} mês{(contrato.tempoMinimoContrato || 1) > 1 ? 'es' : ''}</p>
                   </div>
                 )}
               </div>

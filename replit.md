@@ -10,14 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-### 2025-07-22: Interface "Tempo Mínimo de Contrato" com Formatação Hierárquica - CONCLUÍDO ✅
-- ✅ **TÍTULO PRINCIPAL DESTACADO** - "Tempo Mínimo" em text-base font-semibold para maior destaque
-- ✅ **SUBTÍTULO MENOR** - "de Contrato (meses)" em text-sm text-muted-foreground abaixo do título
-- ✅ **MODAL DE CRIAÇÃO ATUALIZADO** - NovoContratoModal.tsx com formatação hierárquica
-- ✅ **MODAL DE VISUALIZAÇÃO ATUALIZADO** - VisualizarContratoModal.tsx com formatação consistente
-- ✅ **LAYOUT VERTICAL** - Título grande seguido por subtítulo menor na linha seguinte
+### 2025-07-22: Interface "Tempo Mínimo" Simplificada e Limpa - CONCLUÍDO ✅
+- ✅ **TÍTULO SIMPLIFICADO** - Apenas "Tempo Mínimo" sem texto explicativo adicional
+- ✅ **INTERFACE LIMPA** - Removido subtítulo "de Contrato (meses)" por preferência do usuário
+- ✅ **MODAL DE CRIAÇÃO ATUALIZADO** - NovoContratoModal.tsx com título "Tempo Mínimo *"
+- ✅ **MODAL DE VISUALIZAÇÃO ATUALIZADO** - VisualizarContratoModal.tsx com título simplificado
+- ✅ **MENOS POLUIÇÃO VISUAL** - Interface mais direta e objetiva
 - ✅ **CONTRATOS RENOVÁVEIS** - Formatação aplicada especificamente para contratos sem data final
-- ✅ **CONSISTÊNCIA VISUAL** - Mesmo padrão aplicado em ambos os modais
+- ✅ **CONSISTÊNCIA MANTIDA** - Mesmo padrão aplicado em ambos os modais
 
 ### 2025-07-22: Card "VALOR TOTAL" Corrigido para Receita Mensal - CONCLUÍDO ✅
 - ✅ **CÁLCULO MENSAL IMPLEMENTADO** - Sistema soma valores mensais (valorSemanal * 4.35) ao invés de valor total dos contratos

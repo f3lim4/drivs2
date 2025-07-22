@@ -1113,8 +1113,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                   name="tempoMinimoContrato"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-base font-semibold">Tempo Mínimo</FormLabel>
-                      <p className="text-sm text-muted-foreground -mt-1 mb-2">de Contrato (meses) *</p>
+                      <FormLabel className="text-base font-semibold">Tempo Mínimo *</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
