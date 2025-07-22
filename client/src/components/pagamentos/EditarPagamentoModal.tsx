@@ -163,7 +163,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                     <FormLabel>
                       Motorista
                       {isPagamentoAutomatico && (
-                        <span className="text-xs text-muted-foreground ml-1">(Bloqueado - Pagamento Automático)</span>
+                        <span className="text-xs text-muted-foreground ml-1">(Automático)</span>
                       )}
                     </FormLabel>
                     <Select 
@@ -204,7 +204,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                     <FormLabel>
                       Tipo de Pagamento
                       {isPagamentoAutomatico && (
-                        <span className="text-xs text-muted-foreground ml-1">(Bloqueado - Pagamento Automático)</span>
+                        <span className="text-xs text-muted-foreground ml-1">(Automático)</span>
                       )}
                     </FormLabel>
                     <Select 
@@ -240,7 +240,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                   <FormLabel>
                     Descrição
                     {isPagamentoAutomatico && (
-                      <span className="text-xs text-muted-foreground ml-1">(Bloqueado - Pagamento Automático)</span>
+                      <span className="text-xs text-muted-foreground ml-1">(Automático)</span>
                     )}
                   </FormLabel>
                   <FormControl>
