@@ -34,6 +34,7 @@ import { ExcluirContratoDialog } from '@/components/contratos/ExcluirContratoDia
 import { useTemplateContratos } from '@/hooks/useTemplateContratos';
 import { Contrato } from '@/types';
 import jsPDF from 'jspdf';
+import { calcularContratoExato } from '@/utils/contratoCalculos';
 
 export default function Contratos() {
   const { isAdmin, isLocadora, profile } = useAuth();
@@ -379,12 +380,22 @@ export default function Contratos() {
   const contratosFinalizados = contratos.filter(c => c.status === 'finalizado').length;
   const contratosCancelados = contratos.filter(c => c.status === 'cancelado').length;
   
-  // CORREÇÃO: Calcula valor total usando fórmula corrigida
+  // CÁLCULO EXATO: Usa nova função que conta apenas semanas completas
   const valorTotal = contratos.reduce((sum, c) => {
-    if (c.valorSemanal) {
-      // Usa nova fórmula: valorSemanal * 4.35 para valor mensal correto
-      const valorMensalCorrigido = parseFloat(c.valorSemanal) * 4.35;
-      return sum + valorMensalCorrigido;
+    if (c.valorSemanal && c.dataInicio && c.tempoContrato) {
+      try {
+        // Usa função calcularContratoExato para valor total correto
+        const calculoExato = calcularContratoExato(
+          new Date(c.dataInicio),
+          parseInt(c.tempoContrato.toString()),
+          parseFloat(c.valorSemanal)
+        );
+        return sum + calculoExato.valorTotal;
+      } catch (error) {
+        console.warn('Erro ao calcular contrato exato:', error);
+        // Fallback para contratos com problemas
+        return sum + (parseFloat(c.valor) || 0);
+      }
     }
     // Fallback para contratos sem valorSemanal
     return sum + (parseFloat(c.valor) || 0);
@@ -638,11 +649,20 @@ export default function Contratos() {
                         <TableCell>
                           <p className="font-medium">
                             R$ {(() => {
-                              // CORREÇÃO: Calcula valor mensal corrigido baseado no valor semanal
-                              if (contrato.valorSemanal) {
-                                // Usa nova fórmula: valorSemanal * 4.35 (30.44 dias/mês ÷ 7 dias/semana)
-                                const valorMensalCorrigido = parseFloat(contrato.valorSemanal) * 4.35;
-                                return valorMensalCorrigido.toFixed(2);
+                              // CÁLCULO EXATO: Usa nova função que conta apenas semanas completas
+                              if (contrato.valorSemanal && contrato.dataInicio && contrato.tempoContrato) {
+                                try {
+                                  const calculoExato = calcularContratoExato(
+                                    new Date(contrato.dataInicio),
+                                    parseInt(contrato.tempoContrato.toString()),
+                                    parseFloat(contrato.valorSemanal)
+                                  );
+                                  return calculoExato.valorTotal.toFixed(2);
+                                } catch (error) {
+                                  console.warn('Erro ao calcular contrato exato na exibição:', error);
+                                  // Fallback para contratos com problemas
+                                  return parseFloat(contrato.valor || '0').toFixed(2);
+                                }
                               }
                               // Fallback para contratos sem valorSemanal
                               return parseFloat(contrato.valorMensal || contrato.valor || '0').toFixed(2);
@@ -650,7 +670,21 @@ export default function Contratos() {
                           </p>
                           {contrato.valorSemanal && (
                             <p className="text-xs text-muted-foreground">
-                              R$ {parseFloat(contrato.valorSemanal).toFixed(2)}/sem
+                              R$ {parseFloat(contrato.valorSemanal).toFixed(2)}/sem ({(() => {
+                                if (contrato.dataInicio && contrato.tempoContrato) {
+                                  try {
+                                    const calculoExato = calcularContratoExato(
+                                      new Date(contrato.dataInicio),
+                                      parseInt(contrato.tempoContrato.toString()),
+                                      parseFloat(contrato.valorSemanal)
+                                    );
+                                    return calculoExato.totalSemanas;
+                                  } catch (error) {
+                                    return '?';
+                                  }
+                                }
+                                return '?';
+                              })()} semanas)
                             </p>
                           )}
                         </TableCell>

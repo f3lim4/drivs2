@@ -167,6 +167,9 @@ export const contratos = pgTable("contratos", {
   titulo: text("titulo").notNull(),
   cliente: text("cliente").notNull(),
   valor: decimal("valor", { precision: 10, scale: 2 }).notNull(),
+  // Campos para cálculo exato de semanas
+  valorSemanal: decimal("valor_semanal", { precision: 10, scale: 2 }), // Valor semanal do contrato
+  tempoContrato: integer("tempo_contrato"), // Duração em meses
   dataInicio: date("data_inicio").notNull(),
   dataFim: date("data_fim"),
   status: text("status").notNull().default("ativo"), // 'ativo', 'finalizado', 'cancelado'
