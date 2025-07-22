@@ -49,15 +49,7 @@ export default function RelatoriosFinanceiros() {
     return despesas || [];
   }, [despesas]);
 
-  // Debug - verificar se dados estão sendo carregados
-  useEffect(() => {
-    console.log('RelatoriosFinanceiros - Dados carregados:', {
-      despesas: despesas?.length || 0,
-      despesasComManutencoes: despesasComManutencoes?.length || 0,
-      manutencoes: manutencoes?.length || 0,
-      veiculos: veiculos?.length || 0
-    });
-  }, [despesas, despesasComManutencoes, manutencoes, veiculos]);
+
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -747,7 +739,7 @@ export default function RelatoriosFinanceiros() {
       }, 0);
   }, [filteredData.despesasPeriodo]);
 
-  const receitaTotal = receitaPagamentos + receitaTaxaAdministrativa + totalReceitas + receitaExtra.total;
+  const receitaTotal = receitaAlugueis + receitaTaxaAdministrativa + totalReceitas + receitaExtra.total;
   const lucroLiquido = receitaTotal - totalDespesas;
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
@@ -760,32 +752,7 @@ export default function RelatoriosFinanceiros() {
     return total + (isNaN(valor) ? 0 : valor);
   }, 0);
   
-  console.log('Dados financeiros detalhados:', {
-    receitaAlugueis,
-    receitaPagamentos,
-    totalReceitas,
-    totalDespesas,
-    totalDespesasFixas,
-    despesasManuaisQuantidade: despesasManuaisFiltradas.length,
-    despesasManuaisValor,
-    despesasManuaisDetalhadas: despesasManuaisFiltradas.map(d => ({
-      id: d.id,
-      fonte: d.fonte,
-      categoria: d.categoria,
-      valor: d.valor,
-      descricao: d.descricao
-    })),
-    despesasFixasDetalhadas: despesasFixasVeiculos.map(dfv => ({
-      veiculo: dfv.veiculo,
-      totalMensal: dfv.totalMensal
-    })),
-    receitaTotal,
-    lucroLiquido,
-    margemLucro,
-    alugueisAtivos: filteredData.alugueisAtivos.length,
-    despesasFixasVeiculos: despesasFixasVeiculos.length,
-    calculoCorreto: `${despesasManuaisValor} + ${totalDespesasFixas} = ${despesasManuaisValor + totalDespesasFixas}`
-  });
+
 
   // Análise por veículo
   const analiseVeiculos = useMemo(() => {
