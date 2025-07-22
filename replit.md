@@ -10,6 +10,22 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Interface "Tempo Mínimo de Contrato" com Formatação Hierárquica - CONCLUÍDO ✅
+- ✅ **TÍTULO PRINCIPAL DESTACADO** - "Tempo Mínimo" em text-base font-semibold para maior destaque
+- ✅ **SUBTÍTULO MENOR** - "de Contrato (meses)" em text-sm text-muted-foreground abaixo do título
+- ✅ **MODAL DE CRIAÇÃO ATUALIZADO** - NovoContratoModal.tsx com formatação hierárquica
+- ✅ **MODAL DE VISUALIZAÇÃO ATUALIZADO** - VisualizarContratoModal.tsx com formatação consistente
+- ✅ **LAYOUT VERTICAL** - Título grande seguido por subtítulo menor na linha seguinte
+- ✅ **CONTRATOS RENOVÁVEIS** - Formatação aplicada especificamente para contratos sem data final
+- ✅ **CONSISTÊNCIA VISUAL** - Mesmo padrão aplicado em ambos os modais
+
+### 2025-07-22: Card "VALOR TOTAL" Corrigido para Receita Mensal - CONCLUÍDO ✅
+- ✅ **CÁLCULO MENSAL IMPLEMENTADO** - Sistema soma valores mensais (valorSemanal * 4.35) ao invés de valor total dos contratos
+- ✅ **DESCRIÇÃO ATUALIZADA** - "Valor mensal total" para clareza do que está sendo calculado
+- ✅ **FÓRMULA CORRIGIDA** - 4.35 baseado em 30.44 dias/mês ÷ 7 dias/semana para conversão precisa
+- ✅ **VISÃO FINANCEIRA REAL** - Card agora mostra receita mensal esperada da locadora
+- ✅ **COMPATIBILIDADE MANTIDA** - Funciona com contratos renováveis e com data final
+
 ### 2025-07-22: Contratos Renováveis Totalmente Implementados - Interface Final Corrigida - CONCLUÍDO ✅
 - ✅ **SEÇÃO "PRÓXIMA AVALIAÇÃO" REMOVIDA** - Eliminada data calculada incorretamente (05/11/2025)
 - ✅ **INTERFACE LIMPA** - Modal mostra apenas "Tempo Mínimo de Contrato: 4 meses"
