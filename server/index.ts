@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import './pagamentos-automaticos'; // Inicializar sistema de pagamentos automáticos
+import { iniciarVerificacaoPeriodicaContratos } from './contract-status-checker';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -67,5 +68,10 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Inicializar sistemas automáticos
+    console.log('[SISTEMA] Iniciando sistemas automáticos...');
+    iniciarVerificacaoPeriodicaContratos();
+    console.log('[SISTEMA] Sistemas iniciados com sucesso');
   });
 })();

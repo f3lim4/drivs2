@@ -29,6 +29,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Contrato } from '@/types';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Label } from '@/components/ui/label';
 
 // Schema de validação
 const contratoSchema = z.object({
@@ -54,6 +56,7 @@ export function EditarContratoModal({
 }: EditarContratoModalProps) {
   const [loading, setLoading] = useState(false);
   const [desativando, setDesativando] = useState(false);
+  const [motivoCancelamento, setMotivoCancelamento] = useState('');
   const { profile } = useAuth();
   const { toast } = useToast();
 
@@ -141,13 +144,13 @@ export function EditarContratoModal({
     }
   };
 
-  const handleDesativarContrato = async () => {
-    if (!contrato || contrato.status === 'inativo') return;
+  const handleCancelarContrato = async () => {
+    if (!contrato || contrato.status !== 'ativo' || !motivoCancelamento.trim()) return;
 
     setDesativando(true);
     
     try {
-      // Prepara dados para desativar contrato
+      // Prepara dados para cancelar contrato
       const contratoData = {
         tipo: contrato.tipo,
         titulo: contrato.titulo,
@@ -155,7 +158,8 @@ export function EditarContratoModal({
         valor: contrato.valor,
         dataInicio: typeof contrato.dataInicio === 'string' ? contrato.dataInicio : contrato.dataInicio.toISOString().split('T')[0],
         dataFim: typeof contrato.dataFim === 'string' ? contrato.dataFim : contrato.dataFim?.toISOString().split('T')[0],
-        status: 'inativo', // Mudança principal: desativar contrato
+        status: 'cancelado', // Mudança principal: cancelar contrato
+        motivoCancelamento: motivoCancelamento.trim(), // Motivo obrigatório
         template: contrato.template,
         locadoraId: contrato.locadoraId
       };
@@ -170,34 +174,35 @@ export function EditarContratoModal({
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao desativar contrato');
+        throw new Error('Erro ao cancelar contrato');
       }
 
-      const contratoDesativado = await response.json();
+      const contratoCancelado = await response.json();
       
       // Log da atividade
       await registrarAtividade(
         profile?.locadoraId || '',
         profile?.email || 'usuario@drivs.me',
-        'desativar',
+        'cancelar',
         'contrato',
         contrato.id,
-        `Contrato desativado: ${contrato.cliente} - ${contrato.tipo}`
+        `Contrato cancelado: ${contrato.cliente} - Motivo: ${motivoCancelamento}`
       );
       
-      onContratoEditado(contratoDesativado);
+      onContratoEditado(contratoCancelado);
+      setMotivoCancelamento(''); // Limpar motivo
       onOpenChange(false);
       
       toast({
-        title: "Contrato Desativado",
-        description: `Contrato de ${contrato.cliente} foi desativado com sucesso.`,
+        title: "Contrato Cancelado",
+        description: `Contrato de ${contrato.cliente} foi cancelado com sucesso.`,
       });
       
     } catch (error) {
-      console.error('Erro ao desativar contrato:', error);
+      console.error('Erro ao cancelar contrato:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível desativar o contrato. Tente novamente.",
+        description: "Não foi possível cancelar o contrato. Tente novamente.",
         variant: "destructive",
       });
     } finally {
@@ -275,14 +280,51 @@ export function EditarContratoModal({
             <DialogFooter className="flex justify-between">
               <div>
                 {contrato?.status === 'ativo' && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    onClick={handleDesativarContrato}
-                    disabled={loading || desativando}
-                  >
-                    {desativando ? 'Desativando...' : 'Desativar Contrato'}
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        disabled={loading || desativando}
+                      >
+                        Cancelar Contrato
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Cancelar Contrato</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Esta ação cancelará o contrato permanentemente. Informe o motivo do cancelamento:
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="motivo" className="text-right">
+                            Motivo
+                          </Label>
+                          <Textarea
+                            id="motivo"
+                            value={motivoCancelamento}
+                            onChange={(e) => setMotivoCancelamento(e.target.value)}
+                            placeholder="Descreva o motivo do cancelamento..."
+                            className="col-span-3"
+                          />
+                        </div>
+                      </div>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setMotivoCancelamento('')}>
+                          Cancelar
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleCancelarContrato}
+                          disabled={!motivoCancelamento.trim() || desativando}
+                          className="bg-red-600 hover:bg-red-700"
+                        >
+                          {desativando ? 'Cancelando...' : 'Confirmar Cancelamento'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
               </div>
               <div className="flex gap-2">

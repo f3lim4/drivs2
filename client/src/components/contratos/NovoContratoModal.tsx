@@ -557,7 +557,7 @@ export function NovoContratoModal({
         veiculoModelo: `${veiculo.marca} ${veiculo.modelo}`,
         valorMensal: valorMensalAluguel,
         caucao: data.caucao,
-        status: 'ativo'
+        status: 'ativo' // Aluguel continua ativo
       };
 
       console.log('Aluguel para contrato:', aluguel);
@@ -726,7 +726,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         valor: parseFloat(valorTotal.toFixed(2)),
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFim, 'yyyy-MM-dd'),
-        status: 'ativo' as const,
+        status: 'em_aberto' as const, // Inicia sempre como em_aberto
         template: templateContent,
         veiculoId: data.veiculoId // ✅ INCLUIR VEÍCULO ID NO CONTRATO
       };

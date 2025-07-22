@@ -172,7 +172,13 @@ export const contratos = pgTable("contratos", {
   tempoContrato: integer("tempo_contrato"), // Duração em meses
   dataInicio: date("data_inicio").notNull(),
   dataFim: date("data_fim"),
-  status: text("status").notNull().default("ativo"), // 'ativo', 'finalizado', 'cancelado'
+  // Campos da reestruturação de contratos flexíveis
+  dataFinal: date("data_final"), // Nova data final opcional para contratos renováveis
+  tempoMinimoContrato: integer("tempo_minimo_contrato"), // Tempo mínimo em meses
+  caucao: decimal("caucao", { precision: 10, scale: 2 }), // Caução do contrato
+  // Status com 4 estados: em_aberto, ativo, cancelado, encerrado
+  status: text("status").notNull().default("em_aberto"), // 'em_aberto', 'ativo', 'cancelado', 'encerrado'
+  motivoCancelamento: text("motivo_cancelamento"), // Motivo quando cancelado
   template: text("template"), // conteúdo do contrato
   arquivoAssinado: text("arquivo_assinado"), // nome do arquivo assinado
   dataAssinatura: timestamp("data_assinatura"), // quando foi assinado
