@@ -218,7 +218,7 @@ const criarPagamentosRecorrentes = async (
         
         // Só cria se a data de vencimento for anterior ou igual a hoje
         if (dataVencimento <= hoje) {
-          const statusPagamento = marcarAnterioresComoPago ? 'pago_total' : 'em_aberto';
+          const statusPagamento = marcarAnterioresComoPago ? 'pago' : 'em_aberto';
           
           const pagamento = {
             id: crypto.randomUUID(),
@@ -241,7 +241,7 @@ const criarPagamentosRecorrentes = async (
             numero: i + 1,
             data: format(dataVencimento, 'dd/MM/yyyy'),
             status: statusPagamento,
-            valor: pagamento.valor
+            valor: pagamento.valorTotal
           });
           
           const response = await fetch('/api/pagamentos', {
@@ -299,7 +299,7 @@ const criarPagamentosRecorrentes = async (
 
     console.log('[PRÓXIMO PAGAMENTO CRIADO]', {
       data: format(proximaData, 'dd/MM/yyyy'),
-      valor: proximoPagamento.valor,
+      valor: proximoPagamento.valorTotal,
       status: 'em_aberto'
     });
     
@@ -321,7 +321,7 @@ const criarPagamentosRecorrentes = async (
     return {
       totalCriados: pagamentosCriados,
       retroativos: pagamentosRetroativos,
-      statusRetroativos: marcarAnterioresComoPago ? 'pago_total' : 'em_aberto'
+      statusRetroativos: marcarAnterioresComoPago ? 'pago' : 'em_aberto'
     };
 
   } catch (error) {
@@ -820,7 +820,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         // Exibir notificação baseada no resultado
         if (quantidadePagamentos.totalCriados > 0) {
           const mensagem = quantidadePagamentos.retroativos > 0 
-            ? `${quantidadePagamentos.totalCriados} pagamentos criados (${quantidadePagamentos.retroativos} retroativos${quantidadePagamentos.statusRetroativos === 'pago_total' ? ' marcados como pagos' : ''} + 1 próximo)`
+            ? `${quantidadePagamentos.totalCriados} pagamentos criados (${quantidadePagamentos.retroativos} retroativos${quantidadePagamentos.statusRetroativos === 'pago' ? ' marcados como pagos' : ''} + 1 próximo)`
             : `${quantidadePagamentos.totalCriados} pagamento${quantidadePagamentos.totalCriados > 1 ? 's' : ''} ${data.recorrencia}${quantidadePagamentos.totalCriados > 1 ? 's' : ''} criado${quantidadePagamentos.totalCriados > 1 ? 's' : ''} automaticamente`;
             
           toast({
