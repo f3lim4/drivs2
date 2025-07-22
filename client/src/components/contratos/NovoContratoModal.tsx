@@ -333,98 +333,55 @@ export function NovoContratoModal({
   // Carrega dados dos veículos e motoristas disponíveis
   useEffect(() => {
     const loadData = async () => {
-      console.log('[MODAL DEBUG] Carregando dados...', { 
-        open, 
-        profileLocadoraId: profile?.locadoraId,
-        profileId: profile?.id,
-        fullProfile: profile 
-      });
-      
-      if (!open) {
-        console.log('[MODAL DEBUG] Modal fechado, cancelando carregamento');
-        return;
-      }
+      if (!open) return;
       
       const locadoraId = profile?.locadoraId || profile?.id;
-      if (!locadoraId) {
-        console.log('[MODAL DEBUG] Nenhum locadoraId encontrado');
-        return;
-      }
+      if (!locadoraId) return;
       
       setLoadingData(true);
       
       try {
         // Carrega veículos disponíveis
-        console.log('[MODAL DEBUG] Carregando veículos...');
         const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
-          console.log('[MODAL DEBUG] Veículos carregados:', veiculosData.length);
-          // Filtra apenas veículos disponíveis
-          console.log('[MODAL DEBUG] Status dos veículos:', veiculosData.map((v: any) => ({ placa: v.placa, status: v.status })));
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => veiculo.status === 'disponivel');
-          console.log('[MODAL DEBUG] Veículos disponíveis:', veiculosDisponiveis.length);
-          console.log('[MODAL DEBUG] Veículos filtrados:', veiculosDisponiveis.map((v: any) => ({ placa: v.placa, marca: v.marca, modelo: v.modelo })));
           setVeiculos(veiculosDisponiveis);
-        } else {
-          console.error('[MODAL DEBUG] Erro ao carregar veículos:', veiculosResponse.status);
         }
 
         // Carrega aluguéis primeiro para filtrar motoristas
-        console.log('[MODAL DEBUG] Carregando aluguéis...');
         const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${locadoraId}`);
         let alugueisAtivos: any[] = [];
         if (alugueisResponse.ok) {
           const alugueisData = await alugueisResponse.json();
           alugueisAtivos = alugueisData.filter((aluguel: any) => aluguel.status === 'ativo');
-          console.log('[MODAL DEBUG] Aluguéis ativos:', alugueisAtivos.length);
           setAlugueis(alugueisAtivos);
-        } else {
-          console.error('[MODAL DEBUG] Erro ao carregar aluguéis:', alugueisResponse.status);
         }
 
         // Carrega motoristas disponíveis (sem aluguéis ativos)
-        console.log('[MODAL DEBUG] Carregando motoristas...');
         const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`);
         if (motoristasResponse.ok) {
           const motoristasData = await motoristasResponse.json();
-          console.log('[MODAL DEBUG] Motoristas carregados:', motoristasData.length);
-          // Filtra motoristas com CNH válida e sem aluguéis ativos
           const now = new Date();
-          console.log('[MODAL DEBUG] Data atual para comparação CNH:', now.toISOString().split('T')[0]);
-          console.log('[MODAL DEBUG] Aluguéis ativos IDs:', alugueisAtivos.map(a => ({ motoristaId: a.motoristaId, motoristaCpf: a.motoristaCpf })));
           
           const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
-            // Debug para cada motorista
-            const temVencimento = !!motorista.vencimentoCnh;
+            // Verifica CNH válida
+            const temVencimento = !!motorista.vencimento_cnh;
             let cnhValida = false;
             if (temVencimento) {
-              const vencimento = new Date(motorista.vencimentoCnh);
+              const vencimento = new Date(motorista.vencimento_cnh);
               cnhValida = vencimento > now;
             }
             
+            // Verifica se tem aluguel ativo
             const temAluguelAtivo = alugueisAtivos.some((aluguel: any) => 
               aluguel.motoristaCpf === motorista.id || aluguel.motoristaId === motorista.id
             );
             
-            const disponivel = temVencimento && cnhValida && !temAluguelAtivo;
-            
-            console.log(`[MOTORISTA DEBUG] ${motorista.nome}:`, {
-              temVencimento,
-              vencimento: motorista.vencimentoCnh,
-              cnhValida,
-              temAluguelAtivo,
-              disponivel
-            });
-            
-            return disponivel;
+            return temVencimento && cnhValida && !temAluguelAtivo;
           });
           
-          console.log('[MODAL DEBUG] Motoristas disponíveis:', motoristasDisponiveis.length);
-          console.log('[MODAL DEBUG] Motoristas filtrados:', motoristasDisponiveis.map((m: any) => ({ nome: m.nome, vencimento: m.vencimentoCnh })));
           setMotoristas(motoristasDisponiveis);
-        } else {
-          console.error('[MODAL DEBUG] Erro ao carregar motoristas:', motoristasResponse.status);
         }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
