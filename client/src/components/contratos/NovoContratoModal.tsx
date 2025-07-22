@@ -172,52 +172,30 @@ const criarPagamentosRecorrentes = async (
     let pagamentosCriados = 0;
     let pagamentosRetroativos = 0;
     
-    // LÓGICA INTELIGENTE: Gerar pagamentos retroativos se necessário
-    if (dataPrimeiro < hoje) {
-      console.log('[RETROATIVO] Data do primeiro pagamento é anterior à atual - gerando pagamentos em atraso');
+    // NOVA LÓGICA: Sempre gerar pagamentos desde a data de início até a semana atual
+    console.log('[PAGAMENTOS AUTOMÁTICOS] Gerando pagamentos desde data de início até semana atual');
+    
+    // Calcular quantos pagamentos devem existir desde a data inicial até hoje
+    const diffDias = Math.ceil((hoje.getTime() - dataPrimeiro.getTime()) / (1000 * 60 * 60 * 24));
+    let intervalosDias = 7; // Sempre semanal como base
+    
+    // Calcular quantos períodos semanais se passaram
+    const semanasPassadas = Math.ceil(diffDias / intervalosDias);
+    
+    console.log('[PAGAMENTOS AUTOMÁTICOS] Cálculo:', {
+      diasPassados: diffDias,
+      semanasPassadas,
+      dataPrimeiro: format(dataPrimeiro, 'dd/MM/yyyy'),
+      hoje: format(hoje, 'dd/MM/yyyy')
+    });
+    
+    // Gerar pagamentos para cada semana desde o início até agora
+    for (let i = 0; i < semanasPassadas; i++) {
+      const dataVencimento = new Date(dataPrimeiro);
+      dataVencimento.setDate(dataPrimeiro.getDate() + (i * 7));
       
-      // Calcular quantos pagamentos devem existir entre a data inicial e hoje
-      const diffDias = Math.ceil((hoje.getTime() - dataPrimeiro.getTime()) / (1000 * 60 * 60 * 24));
-      let intervalosDias = 0;
-      
-      switch (recorrencia) {
-        case 'semanal':
-          intervalosDias = 7;
-          break;
-        case 'quinzenal':
-          intervalosDias = 15;
-          break;
-        case 'mensal':
-          intervalosDias = 30; // Aproximação para cálculo
-          break;
-      }
-      
-      const quantidadeRetroativa = Math.ceil(diffDias / intervalosDias);
-      
-      console.log('[RETROATIVO] Cálculo:', {
-        diasPassados: diffDias,
-        intervaloDias: intervalosDias,
-        quantidadeRetroativa
-      });
-      
-      // Criar pagamentos retroativos
-      for (let i = 0; i < quantidadeRetroativa; i++) {
-        const dataVencimento = new Date(dataPrimeiro);
-        
-        switch (recorrencia) {
-          case 'semanal':
-            dataVencimento.setDate(dataPrimeiro.getDate() + (i * 7));
-            break;
-          case 'quinzenal':
-            dataVencimento.setDate(dataPrimeiro.getDate() + (i * 15));
-            break;
-          case 'mensal':
-            dataVencimento.setMonth(dataPrimeiro.getMonth() + i);
-            break;
-        }
-        
-        // Só cria se a data de vencimento for anterior ou igual a hoje
-        if (dataVencimento <= hoje) {
+      // Só cria se a data de vencimento for até hoje (inclui pagamentos passados)
+      if (dataVencimento <= hoje) {
           const statusPagamento = marcarAnterioresComoPago ? 'pago' : 'em_aberto';
           
           const pagamento = {
@@ -225,18 +203,17 @@ const criarPagamentosRecorrentes = async (
             aluguelId,
             motoristaId,
             locadoraId: profile.locadoraId,
-            tipo: 'aluguel', // ✅ CAMPO OBRIGATÓRIO
-            descricao: 'Aluguel Semanal', // ✅ DESCRIÇÃO PADRÃO PARA PAGAMENTOS AUTOMÁTICOS
-            automatico: true, // ✅ MARCA COMO PAGAMENTO AUTOMÁTICO
-            dataPagamento: format(dataVencimento, 'yyyy-MM-dd'), // ✅ CAMPO CORRETO
-            valorTotal: valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
-            valorPago: marcarAnterioresComoPago ? valorPagamento.toString() : '0.00', // ✅ CAMPO OBRIGATÓRIO
-            valorRestante: marcarAnterioresComoPago ? '0.00' : valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
+            dataVencimento: dataVencimento,
+            valorTotal: valorSemanal, // Sempre valor semanal
+            valorPago: marcarAnterioresComoPago ? valorSemanal : 0,
+            valorRestante: marcarAnterioresComoPago ? 0 : valorSemanal,
             status: statusPagamento,
+            tipo: 'aluguel',
             observacoes: marcarAnterioresComoPago 
               ? `Pagamento retroativo ${i + 1} - Marcado automaticamente como pago`
-              : `Pagamento retroativo ${i + 1} - ${recorrencia}`,
-            codigoPagamento: `PAG-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+              : `Pagamento retroativo ${i + 1} - semanal`,
+            automatico: true,
+            codigoPagamento: `PAG-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
           };
 
           console.log('[RETROATIVO CRIADO]', {
@@ -259,65 +236,38 @@ const criarPagamentosRecorrentes = async (
           } else {
             console.error(`✗ Erro ao criar pagamento retroativo ${i + 1}:`, await response.text());
           }
-        }
       }
     }
     
-    // SEMPRE CRIAR PRÓXIMO PAGAMENTO (como "em_aberto")
-    const proximaData = new Date(dataPrimeiro);
+    // PRÓXIMO PAGAMENTO: Criar 1 dia antes da próxima semana
+    const proximaDataVencimento = new Date(hoje);
+    proximaDataVencimento.setDate(hoje.getDate() + 6); // 6 dias = 1 dia antes da próxima semana
     
-    if (dataPrimeiro < hoje) {
-      // Se há pagamentos retroativos, calcular a próxima data baseada no último pagamento
-      const ultimoPagamentoIndex = pagamentosRetroativos;
-      
-      switch (recorrencia) {
-        case 'semanal':
-          proximaData.setDate(dataPrimeiro.getDate() + (ultimoPagamentoIndex * 7));
-          break;
-        case 'quinzenal':
-          proximaData.setDate(dataPrimeiro.getDate() + (ultimoPagamentoIndex * 15));
-          break;
-        case 'mensal':
-          proximaData.setMonth(dataPrimeiro.getMonth() + ultimoPagamentoIndex);
-          break;
-      }
-    }
-    
-    // Criar próximo pagamento sempre como "em_aberto"
     const proximoPagamento = {
       id: crypto.randomUUID(),
       aluguelId,
       motoristaId,
       locadoraId: profile.locadoraId,
-      tipo: 'aluguel', // ✅ CAMPO OBRIGATÓRIO
-      descricao: 'Aluguel Semanal', // ✅ DESCRIÇÃO PADRÃO PARA PAGAMENTOS AUTOMÁTICOS
-      automatico: true, // ✅ MARCA COMO PAGAMENTO AUTOMÁTICO
-      dataPagamento: format(proximaData, 'yyyy-MM-dd'), // ✅ CAMPO CORRETO
-      valorTotal: valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
-      valorPago: '0.00', // ✅ CAMPO OBRIGATÓRIO - próximo pagamento sempre em aberto
-      valorRestante: valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
-      status: 'em_aberto' as const,
-      observacoes: `Próximo pagamento - ${recorrencia}`,
-      codigoPagamento: `PAG-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+      dataVencimento: proximaDataVencimento,
+      valorTotal: valorSemanal, // Sempre valor semanal
+      valorPago: 0,
+      valorRestante: valorSemanal,
+      status: 'em_aberto',
+      tipo: 'aluguel',
+      observacoes: 'Próximo pagamento (1 dia antes da próxima semana)',
+      automatico: true,
+      codigoPagamento: `PAG-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
     };
-
-    console.log('[PRÓXIMO PAGAMENTO CRIADO]', {
-      data: format(proximaData, 'dd/MM/yyyy'),
-      valor: proximoPagamento.valorTotal,
-      status: 'em_aberto'
-    });
     
     const responseProximo = await fetch('/api/pagamentos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(proximoPagamento)
     });
-
+    
     if (responseProximo.ok) {
       pagamentosCriados++;
-      console.log(`✓ Próximo pagamento criado:`, format(proximaData, 'dd/MM/yyyy'));
-    } else {
-      console.error(`✗ Erro ao criar próximo pagamento:`, await responseProximo.text());
+      console.log('[PRÓXIMO PAGAMENTO] Criado para 1 dia antes da próxima semana:', format(proximaDataVencimento, 'dd/MM/yyyy'));
     }
 
     console.log(`[RESULTADO FINAL] ${pagamentosCriados} pagamentos criados (${pagamentosRetroativos} retroativos + 1 próximo)`);
