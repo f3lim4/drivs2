@@ -40,6 +40,9 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
   const [pagamentoAtrasado, setPagamentoAtrasado] = useState(false);
   // Estado para controlar o checkbox de copiar valor total
   const [copiarValorTotal, setCopiarValorTotal] = useState(false);
+  
+  // Verificar se é um pagamento gerado automaticamente
+  const isPagamentoAutomatico = pagamento.observacoes?.includes('Pagamento criado automaticamente') || false;
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -157,8 +160,17 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                 name="motoristaId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Motorista</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <FormLabel>
+                      Motorista
+                      {isPagamentoAutomatico && (
+                        <span className="text-xs text-muted-foreground ml-1">(Bloqueado - Pagamento Automático)</span>
+                      )}
+                    </FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      value={field.value}
+                      disabled={isPagamentoAutomatico}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione um motorista" />
@@ -189,8 +201,17 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                 name="tipo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tipo de Pagamento</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <FormLabel>
+                      Tipo de Pagamento
+                      {isPagamentoAutomatico && (
+                        <span className="text-xs text-muted-foreground ml-1">(Bloqueado - Pagamento Automático)</span>
+                      )}
+                    </FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      value={field.value}
+                      disabled={isPagamentoAutomatico}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o tipo" />
@@ -216,10 +237,16 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
               name="descricao"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Descrição</FormLabel>
+                  <FormLabel>
+                    Descrição
+                    {isPagamentoAutomatico && (
+                      <span className="text-xs text-muted-foreground ml-1">(Bloqueado - Pagamento Automático)</span>
+                    )}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Descrição do pagamento..."
+                      disabled={isPagamentoAutomatico}
                       {...field}
                     />
                   </FormControl>
