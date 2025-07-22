@@ -602,6 +602,7 @@ export default function Contratos() {
                       <TableHead>TIPO</TableHead>
                       <TableHead>DATA INÍCIO</TableHead>
                       <TableHead>STATUS</TableHead>
+                      <TableHead>UPLOAD</TableHead>
                       <TableHead>AÇÕES</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -640,6 +641,22 @@ export default function Contratos() {
                         </TableCell>
                         <TableCell>
                           {getStatusBadge(contrato.status)}
+                        </TableCell>
+                        <TableCell>
+                          {contrato.arquivoAssinado ? (
+                            <Badge variant="secondary" className="bg-green-100 text-green-800">
+                              Enviado
+                            </Badge>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUploadContrato(contrato)}
+                              className="h-7 text-xs"
+                            >
+                              Enviar
+                            </Button>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
