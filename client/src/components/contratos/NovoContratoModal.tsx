@@ -225,8 +225,11 @@ const criarPagamentosRecorrentes = async (
             aluguelId,
             motoristaId,
             locadoraId: profile.locadoraId,
-            dataVencimento: format(dataVencimento, 'yyyy-MM-dd'),
-            valor: valorPagamento,
+            tipo: 'aluguel', // ✅ CAMPO OBRIGATÓRIO
+            dataPagamento: format(dataVencimento, 'yyyy-MM-dd'), // ✅ CAMPO CORRETO
+            valorTotal: valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
+            valorPago: marcarAnterioresComoPago ? valorPagamento.toString() : '0.00', // ✅ CAMPO OBRIGATÓRIO
+            valorRestante: marcarAnterioresComoPago ? '0.00' : valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
             status: statusPagamento,
             observacoes: marcarAnterioresComoPago 
               ? `Pagamento retroativo ${i + 1} - Marcado automaticamente como pago`
@@ -284,8 +287,11 @@ const criarPagamentosRecorrentes = async (
       aluguelId,
       motoristaId,
       locadoraId: profile.locadoraId,
-      dataVencimento: format(proximaData, 'yyyy-MM-dd'),
-      valor: valorPagamento,
+      tipo: 'aluguel', // ✅ CAMPO OBRIGATÓRIO
+      dataPagamento: format(proximaData, 'yyyy-MM-dd'), // ✅ CAMPO CORRETO
+      valorTotal: valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
+      valorPago: '0.00', // ✅ CAMPO OBRIGATÓRIO - próximo pagamento sempre em aberto
+      valorRestante: valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
       status: 'em_aberto' as const,
       observacoes: `Próximo pagamento - ${recorrencia}`,
       codigoPagamento: `PAG-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
