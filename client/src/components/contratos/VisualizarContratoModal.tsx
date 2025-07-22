@@ -458,7 +458,7 @@ export function VisualizarContratoModal({
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4">
+              <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Data de Início</p>
                   <p className="font-semibold">{formatDate(contrato.dataInicio)}</p>
@@ -477,17 +477,14 @@ export function VisualizarContratoModal({
                     )}
                   </div>
                 </div>
-              </div>
-              
-              {/* TEMPO MÍNIMO PARA CONTRATOS RENOVÁVEIS */}
-              {!contrato.dataFim && (
-                <div className="mt-4 pt-4 border-t">
+                {/* TEMPO MÍNIMO PARA CONTRATOS RENOVÁVEIS */}
+                {!contrato.dataFim && (
                   <div>
                     <p className="text-sm font-medium text-gray-600">Tempo Mínimo de Contrato</p>
                     <p className="font-semibold text-lg">{contrato.tempoMinimoContrato || 1} mês{(contrato.tempoMinimoContrato || 1) > 1 ? 'es' : ''}</p>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </CardContent>
           </Card>
 
