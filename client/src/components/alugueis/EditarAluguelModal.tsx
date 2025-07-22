@@ -168,7 +168,8 @@ export function EditarAluguelModal({
       dataFim.setMonth(dataFim.getMonth() + data.tempoContrato);
 
       // Calcula valores
-      const valorMensal = veiculo.valorSemanal ? parseFloat(veiculo.valorSemanal) * 4 : 0; // 4 semanas por mês
+      // CORREÇÃO: Usa fórmula corrigida baseada em dias reais do mês
+      const valorMensal = veiculo.valorSemanal ? parseFloat(veiculo.valorSemanal) * 4.35 : 0; // 30.44 dias/mês ÷ 7 dias/semana = 4.35
       const valorTotal = valorMensal * data.tempoContrato;
 
       // Prepara dados para atualização no banco

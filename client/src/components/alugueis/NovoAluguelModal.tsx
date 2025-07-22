@@ -233,7 +233,8 @@ export function NovoAluguelModal({
       const valorSemanalNum = typeof veiculo.valorSemanal === 'string' ? 
         parseFloat(veiculo.valorSemanal.replace(',', '.')) : 
         veiculo.valorSemanal;
-      const valorMensal = valorSemanalNum * 4; // 4 semanas por mês
+      // CORREÇÃO: Usa fórmula corrigida baseada em dias reais do mês
+      const valorMensal = valorSemanalNum * 4.35; // 30.44 dias/mês ÷ 7 dias/semana = 4.35
       const valorTotal = valorMensal * data.tempoContrato;
 
       // Cria novo aluguel na API
