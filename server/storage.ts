@@ -575,6 +575,8 @@ export class DatabaseStorage implements IStorage {
         titulo: contratos.titulo,
         cliente: contratos.cliente,
         valor: contratos.valor,
+        valorSemanal: contratos.valorSemanal,
+        caucao: contratos.caucao,
         dataInicio: contratos.dataInicio,
         dataFim: contratos.dataFim,
         status: contratos.status,
