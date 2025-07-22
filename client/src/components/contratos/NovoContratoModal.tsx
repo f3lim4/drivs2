@@ -345,9 +345,7 @@ export function NovoContratoModal({
         const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
-          console.log('DEBUG: Veículos carregados:', veiculosData.map((v: any) => ({ placa: v.placa, status: v.status })));
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => veiculo.status === 'disponivel');
-          console.log('DEBUG: Veículos filtrados (disponível):', veiculosDisponiveis.map((v: any) => ({ placa: v.placa, status: v.status })));
           setVeiculos(veiculosDisponiveis);
         }
 
@@ -368,10 +366,10 @@ export function NovoContratoModal({
           
           const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
             // Verifica CNH válida
-            const temVencimento = !!motorista.vencimento_cnh;
+            const temVencimento = !!motorista.vencimentoCnh;
             let cnhValida = false;
             if (temVencimento) {
-              const vencimento = new Date(motorista.vencimento_cnh);
+              const vencimento = new Date(motorista.vencimentoCnh);
               cnhValida = vencimento > now;
             }
             
@@ -382,20 +380,11 @@ export function NovoContratoModal({
             
             const disponivel = temVencimento && cnhValida && !temAluguelAtivo;
             
-            // DEBUG temporário
-            console.log(`DEBUG ${motorista.nome}:`, {
-              temVencimento,
-              vencimento: motorista.vencimento_cnh,
-              cnhValida,
-              temAluguelAtivo,
-              disponivel,
-              agora: now.toISOString().split('T')[0]
-            });
+
             
             return disponivel;
           });
           
-          console.log('DEBUG: Motoristas filtrados:', motoristasDisponiveis.length, 'de', motoristasData.length);
           
           setMotoristas(motoristasDisponiveis);
         }
