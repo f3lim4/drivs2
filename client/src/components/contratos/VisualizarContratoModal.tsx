@@ -2,6 +2,7 @@
  * Modal para visualização completa do contrato gerado
  */
 
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,9 +11,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Printer, Edit, Download } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Printer, Edit, Download, User, Car, FileText, Calendar } from 'lucide-react';
 import { Contrato } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
 import jsPDF from 'jspdf';
 
 interface VisualizarContratoModalProps {
@@ -22,6 +26,24 @@ interface VisualizarContratoModalProps {
   onEditar: () => void;
 }
 
+interface Motorista {
+  id: string;
+  nome: string;
+  cpf: string;
+  telefone: string;
+  email?: string;
+}
+
+interface Veiculo {
+  id: string;
+  placa: string;
+  marca: string;
+  modelo: string;
+  ano: number;
+  cor: string;
+  categoria: string;
+}
+
 export function VisualizarContratoModal({ 
   open, 
   onOpenChange, 
@@ -29,6 +51,38 @@ export function VisualizarContratoModal({
   onEditar
 }: VisualizarContratoModalProps) {
   const { profile } = useAuth();
+  const [motorista, setMotorista] = useState<Motorista | null>(null);
+  const [veiculo, setVeiculo] = useState<Veiculo | null>(null);
+
+  // Buscar dados do motorista
+  const { data: motoristas } = useQuery({
+    queryKey: ['/api/motoristas', profile?.locadoraId],
+    enabled: !!profile?.locadoraId && !!contrato,
+  });
+
+  // Buscar dados do veículo
+  const { data: veiculos } = useQuery({
+    queryKey: ['/api/veiculos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId && !!contrato,
+  });
+
+  // Encontrar motorista e veículo específicos baseados no contrato
+  useEffect(() => {
+    if (!contrato || !motoristas || !veiculos) return;
+
+    // Encontrar motorista pelo nome do cliente
+    const motoristaEncontrado = motoristas.find((m: Motorista) => 
+      m.nome.toLowerCase().includes(contrato.cliente.toLowerCase()) ||
+      contrato.cliente.toLowerCase().includes(m.nome.toLowerCase())
+    );
+    setMotorista(motoristaEncontrado || null);
+
+    // Encontrar veículo pelo ID (assumindo que existe campo veiculoId no contrato)
+    const veiculoEncontrado = veiculos.find((v: Veiculo) => 
+      v.id === contrato.veiculoId
+    );
+    setVeiculo(veiculoEncontrado || null);
+  }, [contrato, motoristas, veiculos]);
   
   const handleBaixarArquivoAssinado = () => {
     if (contrato?.arquivoAssinado) {
@@ -288,6 +342,36 @@ export function VisualizarContratoModal({
     }
   };
 
+  const getBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'em_aberto':
+        return 'outline';
+      case 'ativo':
+        return 'default';
+      case 'cancelado':
+        return 'destructive';
+      case 'encerrado':
+        return 'secondary';
+      default:
+        return 'outline';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'em_aberto':
+        return 'Em Aberto';
+      case 'ativo':
+        return 'Ativo';
+      case 'cancelado':
+        return 'Cancelado';
+      case 'encerrado':
+        return 'Encerrado';
+      default:
+        return status;
+    }
+  };
+
   if (!contrato) return null;
 
   return (
@@ -295,92 +379,183 @@ export function VisualizarContratoModal({
       <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>{contrato.titulo}</span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onEditar}
-                className="flex items-center gap-2"
-              >
-                <Edit className="w-4 h-4" />
-                Editar
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBaixarPDF}
-                className="flex items-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                Baixar PDF
-              </Button>
-              {contrato.arquivoAssinado && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleBaixarArquivoAssinado()}
-                  className="flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Baixar Assinado
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleImprimir}
-                className="flex items-center gap-2"
-              >
-                <Printer className="w-4 h-4" />
-                Imprimir
-              </Button>
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5" />
+              <span>{contrato.titulo}</span>
             </div>
+            <Badge variant={getBadgeVariant(contrato.status)}>
+              {getStatusLabel(contrato.status)}
+            </Badge>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
-            <div>
-              <p className="text-sm text-muted-foreground">Cliente</p>
-              <p className="font-medium">{contrato.cliente}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Valor Semanal</p>
-              <p className="font-medium">R$ {Number(contrato.valorSemanal || 550).toFixed(2)}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Valor Caução</p>
-              <p className="font-medium">R$ {Number(contrato.caucao || 2000).toFixed(2)}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Data de Início</p>
-              <p className="font-medium">{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Data de Término</p>
-              <p className="font-medium">{contrato.dataFim ? new Date(contrato.dataFim).toLocaleDateString('pt-BR') : 'N/A'}</p>
-            </div>
-          </div>
+        <div className="space-y-6">
+          {/* INFORMAÇÕES DO CLIENTE */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Informações do Cliente
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Nome Completo</p>
+                  <p className="font-semibold">{motorista?.nome || contrato.cliente}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">CPF</p>
+                  <p className="font-semibold">{motorista?.cpf || 'Não informado'}</p>
+                </div>
+                {motorista?.telefone && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Telefone</p>
+                    <p className="font-semibold">{motorista.telefone}</p>
+                  </div>
+                )}
+                {motorista?.email && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Email</p>
+                    <p className="font-semibold">{motorista.email}</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-          <div className="border rounded-lg p-4">
-            <h3 className="font-medium mb-4">Conteúdo do Contrato</h3>
-            <div 
-              className="whitespace-pre-line text-sm font-mono bg-gray-50 p-4 rounded border max-h-96 overflow-y-auto"
-              style={{ fontSize: '11px', lineHeight: '1.4' }}
-            >
-              {contrato.template}
-            </div>
-          </div>
+          {/* VEÍCULO ALUGADO */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Car className="w-4 h-4" />
+                Veículo Alugado
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Placa</p>
+                  <p className="font-semibold">{veiculo?.placa || 'Não informado'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Marca/Modelo</p>
+                  <p className="font-semibold">{veiculo ? `${veiculo.marca} ${veiculo.modelo}` : 'Não informado'}</p>
+                </div>
+                {veiculo && (
+                  <>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Ano</p>
+                      <p className="font-semibold">{veiculo.ano}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Cor</p>
+                      <p className="font-semibold">{veiculo.cor}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Categoria</p>
+                      <p className="font-semibold">{veiculo.categoria}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* INFORMAÇÕES DO CONTRATO */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                Detalhes do Contrato
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Data de Início</p>
+                  <p className="font-semibold">{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
+                </div>
+                {contrato.dataFim && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Data de Término</p>
+                    <p className="font-semibold">{new Date(contrato.dataFim).toLocaleDateString('pt-BR')}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Valor</p>
+                  <p className="font-semibold">R$ {Number(contrato.valor).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Status</p>
+                  <Badge variant={getBadgeVariant(contrato.status)}>
+                    {getStatusLabel(contrato.status)}
+                  </Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* CONTEÚDO DO CONTRATO */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Conteúdo do Contrato</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <pre className="whitespace-pre-wrap text-sm font-mono">
+                  {contrato.template}
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-          >
-            Fechar
-          </Button>
+        <DialogFooter className="flex justify-between">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleImprimir}
+              className="flex items-center gap-2"
+            >
+              <Printer className="w-4 h-4" />
+              Imprimir
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleBaixarPDF}
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Baixar PDF
+            </Button>
+            {contrato.arquivoAssinado && (
+              <Button
+                variant="outline"
+                onClick={handleBaixarArquivoAssinado}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Baixar Assinado
+              </Button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={onEditar}
+              className="flex items-center gap-2"
+            >
+              <Edit className="w-4 h-4" />
+              Editar
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Fechar
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

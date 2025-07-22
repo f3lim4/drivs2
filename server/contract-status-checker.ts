@@ -22,7 +22,7 @@ export async function verificarContratosVencidos() {
       .where(
         and(
           eq(contratos.status, 'ativo'),
-          lte(contratos.dataFim, hoje) // Data final menor ou igual a hoje
+          lte(contratos.data_fim, hoje) // Data final menor ou igual a hoje
         )
       );
       
@@ -37,7 +37,7 @@ export async function verificarContratosVencidos() {
     
     // Encerrar cada contrato vencido
     for (const contrato of contratosVencidos) {
-      console.log(`[ENCERRANDO] Contrato ${contrato.id} - Cliente: ${contrato.cliente} - Data Final: ${contrato.dataFim}`);
+      console.log(`[ENCERRANDO] Contrato ${contrato.id} - Cliente: ${contrato.cliente} - Data Final: ${contrato.data_fim}`);
       
       // Atualizar status para 'encerrado'
       await db
@@ -51,7 +51,7 @@ export async function verificarContratosVencidos() {
       contratosEncerrados.push({
         id: contrato.id,
         cliente: contrato.cliente,
-        dataFim: contrato.dataFim
+        dataFim: contrato.data_fim
       });
       
       console.log(`[ENCERRADO] Contrato ${contrato.id} encerrado automaticamente`);
