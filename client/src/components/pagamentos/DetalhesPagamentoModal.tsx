@@ -78,12 +78,6 @@ export function DetalhesPagamentoModal({ open, onClose, pagamento }: DetalhesPag
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Código do Pagamento */}
-              <div>
-                <span className="text-sm text-gray-500">Código do Pagamento:</span>
-                <p className="font-mono text-lg font-bold text-blue-600">{pagamento.codigoPagamento || 'Não definido'}</p>
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <span className="text-sm text-gray-500">Motorista:</span>
@@ -106,12 +100,18 @@ export function DetalhesPagamentoModal({ open, onClose, pagamento }: DetalhesPag
                 </div>
               </div>
 
-              {pagamento.descricao && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {pagamento.descricao && (
+                  <div>
+                    <span className="text-sm text-gray-500">Descrição:</span>
+                    <p className="font-medium">{pagamento.descricao}</p>
+                  </div>
+                )}
                 <div>
-                  <span className="text-sm text-gray-500">Descrição:</span>
-                  <p className="font-medium">{pagamento.descricao}</p>
+                  <span className="text-sm text-gray-500">Código do Pagamento:</span>
+                  <p className="font-mono text-sm font-bold text-blue-600">{pagamento.codigoPagamento || 'Não definido'}</p>
                 </div>
-              )}
+              </div>
 
               {/* Informações do Veículo */}
               {(pagamento as any).veiculoPlaca && (
