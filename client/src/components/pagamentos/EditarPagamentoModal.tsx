@@ -59,8 +59,8 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
   // Atualizar valores quando o pagamento mudar
   useEffect(() => {
     if (pagamento) {
-      const temJurosOuMulta = (pagamento.valorJuros && pagamento.valorJuros > 0) || (pagamento.valorMulta && pagamento.valorMulta > 0);
-      setPagamentoAtrasado(temJurosOuMulta);
+      const temJurosOuMulta = (pagamento.valorJuros && Number(pagamento.valorJuros) > 0) || (pagamento.valorMulta && Number(pagamento.valorMulta) > 0);
+      setPagamentoAtrasado(!!temJurosOuMulta);
       
       form.reset({
         motoristaId: pagamento.motoristaId,
@@ -125,9 +125,10 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
   };
 
   // Função para copiar valor total para valor pago
-  const handleCopiarValorTotal = (checked: boolean) => {
-    setCopiarValorTotal(checked);
-    if (checked) {
+  const handleCopiarValorTotal = (checked: boolean | "indeterminate") => {
+    const isChecked = checked === true;
+    setCopiarValorTotal(isChecked);
+    if (isChecked) {
       const valorTotal = form.getValues('valorTotal');
       form.setValue('valorPago', valorTotal);
     }
@@ -228,22 +229,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                 name="valorTotal"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center space-x-2">
-                      <FormLabel>Valor Total</FormLabel>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="copiar-valor"
-                          checked={copiarValorTotal}
-                          onCheckedChange={handleCopiarValorTotal}
-                        />
-                        <label
-                          htmlFor="copiar-valor"
-                          className="text-xs text-muted-foreground cursor-pointer"
-                        >
-                          Copiar para Valor Pago
-                        </label>
-                      </div>
-                    </div>
+                    <FormLabel>Valor Total</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -296,12 +282,27 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
               />
             </div>
 
+            {/* Checkbox para pagamento total */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="pagamento-total-edit"
+                checked={copiarValorTotal}
+                onCheckedChange={handleCopiarValorTotal}
+              />
+              <label 
+                htmlFor="pagamento-total-edit" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Pagamento Total
+              </label>
+            </div>
+
             {/* Checkbox para pagamento atrasado */}
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="pagamento-atrasado-edit"
                 checked={pagamentoAtrasado}
-                onCheckedChange={setPagamentoAtrasado}
+                onCheckedChange={(checked) => setPagamentoAtrasado(checked === true)}
               />
               <label 
                 htmlFor="pagamento-atrasado-edit" 
