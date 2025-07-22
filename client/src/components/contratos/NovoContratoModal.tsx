@@ -426,9 +426,6 @@ export function NovoContratoModal({
           const now = new Date();
           
           const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
-            // Debug especial para Jeane
-            const isJeane = motorista.nome.includes('Jeane');
-            
             // Verifica CNH válida
             const temVencimento = !!motorista.vencimentoCnh;
             let cnhValida = false;
@@ -444,26 +441,8 @@ export function NovoContratoModal({
             
             const disponivel = temVencimento && cnhValida && !temAluguelAtivo;
             
-            if (isJeane) {
-              console.log(`[DEBUG JEANE] ${motorista.nome}:`, {
-                id: motorista.id,
-                vencimentoCnh: motorista.vencimentoCnh,
-                temVencimento,
-                cnhValida,
-                dataAtual: now.toISOString(),
-                vencimentoFormatado: temVencimento ? new Date(motorista.vencimentoCnh).toISOString() : 'N/A',
-                temAluguelAtivo,
-                alugueisAtivos: alugueisAtivos.length,
-                disponivel
-              });
-            }
-            
             return disponivel;
           });
-          
-          console.log(`[FINAL DEBUG] ${motoristasDisponiveis.length} motoristas disponíveis:`, 
-            motoristasDisponiveis.map(m => ({ nome: m.nome, id: m.id }))
-          );
           
           setMotoristas(motoristasDisponiveis);
         }
@@ -986,10 +965,6 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(() => {
-                            console.log('[RENDER DEBUG] Motoristas no render:', motoristas.map(m => ({ nome: m.nome, id: m.id })));
-                            return null;
-                          })()}
                           {motoristas.length > 0 ? (
                             motoristas.map((motorista) => (
                               <SelectItem key={motorista.id} value={motorista.id}>
