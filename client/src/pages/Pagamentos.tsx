@@ -344,11 +344,11 @@ export default function Pagamentos() {
               <TableRow>
                 <TableHead>Motorista</TableHead>
                 <TableHead>Veículo</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Descrição</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Valor</TableHead>
                 <TableHead>Vencimento</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead width="120">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -385,6 +385,9 @@ export default function Pagamentos() {
                     </div>
                   </TableCell>
                   <TableCell>
+                    {getStatusBadge(pagamento.status)}
+                  </TableCell>
+                  <TableCell>
                     <div className="max-w-xs">
                       <div className="truncate">{pagamento.descricao || 'Sem descrição'}</div>
                     </div>
@@ -397,9 +400,6 @@ export default function Pagamentos() {
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">{formatDate(pagamento.dataPagamento)}</div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(pagamento.status)}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">

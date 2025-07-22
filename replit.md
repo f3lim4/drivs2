@@ -114,6 +114,13 @@ Preferred communication style: Simple, everyday language.
 - ✅ **PROBLEMA DE NEGÓCIO RESOLVIDO** - Motoristas agora pagam valores corretos que cobrem todo o período do contrato
 - ✅ **IMPACTO FINANCEIRO CORRIGIDO** - Elimina perdas financeiras por cálculos incorretos de recorrência
 
+### 2025-07-22: Reorganização da Tabela de Pagamentos - Coluna Status na 3ª Posição - CONCLUÍDO ✅
+- ✅ **ORDEM DE COLUNAS ATUALIZADA** - Coluna "Status" movida da 7ª para 3ª posição conforme solicitação
+- ✅ **NOVA SEQUÊNCIA** - Motorista | Veículo | Status | Descrição | Tipo | Valor | Vencimento | Ações
+- ✅ **CABEÇALHOS REORGANIZADOS** - TableHeader atualizado para nova ordem das colunas
+- ✅ **CÉLULAS REORDENADAS** - TableCell de cada linha reorganizada para corresponder aos cabeçalhos
+- ✅ **INTERFACE MELHORADA** - Status mais visível na terceira posição facilita identificação rápida
+
 ### 2025-07-22: Bug Crítico Financeiro - Receita vs Pagamentos Reais Corrigido - CONCLUÍDO ✅
 - ✅ **PROBLEMA IDENTIFICADO** - Relatórios mostravam receita potencial de contratos, mas página pagamentos estava vazia
 - ✅ **CAUSA RAIZ ENCONTRADA** - Sistema calculava receita baseada em contratos ativos, não em pagamentos reais
