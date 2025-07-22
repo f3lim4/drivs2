@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Printer, Edit, Download, User, Car, FileText, Calendar } from 'lucide-react';
 import { Contrato } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDate } from '@/lib/utils';
 import jsPDF from 'jspdf';
 
@@ -52,6 +52,7 @@ export function VisualizarContratoModal({
   onEditar
 }: VisualizarContratoModalProps) {
   const { profile } = useAuth();
+  const queryClient = useQueryClient();
   const [motorista, setMotorista] = useState<Motorista | null>(null);
   const [veiculo, setVeiculo] = useState<Veiculo | null>(null);
 
@@ -66,6 +67,13 @@ export function VisualizarContratoModal({
     queryKey: ['/api/veiculos', profile?.locadoraId],
     enabled: !!profile?.locadoraId && !!contrato,
   });
+
+  // Forçar invalidação do cache quando abrir o modal para garantir dados atualizados
+  useEffect(() => {
+    if (open && contrato) {
+      queryClient.invalidateQueries({ queryKey: ['contratos'] });
+    }
+  }, [open, contrato, queryClient]);
 
   // Encontrar motorista e veículo específicos baseados no contrato
   useEffect(() => {
