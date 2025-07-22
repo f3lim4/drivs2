@@ -242,6 +242,7 @@ export const insertTemplateContratoSchema = createInsertSchema(templateContratos
 // Pagamentos table
 export const pagamentos = pgTable("pagamentos", {
   id: text("id").primaryKey(),
+  codigoPagamento: text("codigo_pagamento").notNull().unique(), // Código único para rastreamento (ex: PAG-001234)
   locadoraId: text("locadora_id").notNull(),
   motoristaId: text("motorista_id").notNull(),
   aluguelId: text("aluguel_id"), // Opcional - apenas para pagamentos de aluguel
@@ -260,6 +261,7 @@ export const pagamentos = pgTable("pagamentos", {
 });
 
 export const insertPagamentoSchema = createInsertSchema(pagamentos).omit({
+  codigoPagamento: true, // Código gerado automaticamente
   createdAt: true,
   updatedAt: true,
 });
