@@ -10,6 +10,23 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Funcionalidade Desativar Contrato Implementada - Modal de Edição Aprimorado - CONCLUÍDO ✅
+- ✅ **BOTÃO DESATIVAR ADICIONADO** - Modal de edição agora permite desativar contratos ativos
+- ✅ **LAYOUT FOOTER APRIMORADO** - Botão "Desativar Contrato" no lado esquerdo, outros botões à direita
+- ✅ **ESTADOS DE LOADING** - Indicadores visuais separados para edição e desativação
+- ✅ **VALIDAÇÃO INTELIGENTE** - Botão aparece apenas para contratos com status "ativo"
+- ✅ **ATIVIDADE REGISTRADA** - Sistema registra desativação para auditoria
+- ✅ **FEEDBACK VISUAL** - Notificações de sucesso/erro específicas para desativação
+- ✅ **INTEGRAÇÃO COMPLETA** - Atualização automática da interface após desativação
+
+### 2025-07-22: Sistema de Pagamentos Automáticos Corrigido - Aluguéis Ativos Detectados - CONCLUÍDO ✅
+- ✅ **BUG CRÍTICO CORRIGIDO** - Sistema agora trabalha com aluguéis ativos ao invés de contratos
+- ✅ **DETECÇÃO AUTOMÁTICA** - 1 aluguel ativo detectado (Henrique Oliveira gomes)
+- ✅ **CÁLCULO CORRETO** - R$ 697,32 semanal baseado em R$ 3.033,33 mensal (÷ 4.35)
+- ✅ **PAGAMENTO CRIADO** - Primeiro pagamento automático gerado com sucesso
+- ✅ **LOGS DETALHADOS** - Monitoramento completo do processo de criação
+- ✅ **INTEGRAÇÃO ROTAS** - Parada automática quando aluguel finalizado/cancelado
+
 ### 2025-07-22: Coluna TIPO Removida da Tabela de Contratos - Interface Simplificada - CONCLUÍDO ✅
 - ✅ **COLUNA TIPO REMOVIDA** - Eliminada coluna "TIPO" da tabela de contratos conforme solicitado
 - ✅ **INTERFACE LIMPA** - Tabela mais compacta com 6 colunas: Motorista, Veículo, Data Início, Status, Upload, Ações
