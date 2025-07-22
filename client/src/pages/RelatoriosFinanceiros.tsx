@@ -1342,11 +1342,11 @@ export default function RelatoriosFinanceiros() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                     <div>
-                      <p className="font-medium text-green-800">Pagamentos Recebidos</p>
-                      <p className="text-sm text-green-600">Pagamentos de aluguéis</p>
+                      <p className="font-medium text-green-800">Receita dos Aluguéis</p>
+                      <p className="text-sm text-green-600">Valor mensal dos contratos ativos</p>
                     </div>
                     <p className="text-lg font-bold text-green-600">
-                      {formatCurrency(receitaPagamentos)}
+                      {formatCurrency(receitaAlugueis)}
                     </p>
                   </div>
 
