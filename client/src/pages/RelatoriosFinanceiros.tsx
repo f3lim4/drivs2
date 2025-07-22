@@ -739,7 +739,7 @@ export default function RelatoriosFinanceiros() {
       }, 0);
   }, [filteredData.despesasPeriodo]);
 
-  const receitaTotal = receitaAlugueis + receitaTaxaAdministrativa + totalReceitas + receitaExtra.total;
+  const receitaTotal = receitaPagamentos + receitaTaxaAdministrativa + totalReceitas + receitaExtra.total;
   const lucroLiquido = receitaTotal - totalDespesas;
   const margemLucro = receitaTotal > 0 ? (lucroLiquido / receitaTotal) * 100 : 0;
 
@@ -1343,10 +1343,10 @@ export default function RelatoriosFinanceiros() {
                   <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                     <div>
                       <p className="font-medium text-green-800">Receita dos Aluguéis</p>
-                      <p className="text-sm text-green-600">Valor mensal dos contratos ativos</p>
+                      <p className="text-sm text-green-600">Pagamentos recebidos no período</p>
                     </div>
                     <p className="text-lg font-bold text-green-600">
-                      {formatCurrency(receitaAlugueis)}
+                      {formatCurrency(receitaPagamentos)}
                     </p>
                   </div>
 

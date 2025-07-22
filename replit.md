@@ -114,15 +114,15 @@ Preferred communication style: Simple, everyday language.
 - ✅ **PROBLEMA DE NEGÓCIO RESOLVIDO** - Motoristas agora pagam valores corretos que cobrem todo o período do contrato
 - ✅ **IMPACTO FINANCEIRO CORRIGIDO** - Elimina perdas financeiras por cálculos incorretos de recorrência
 
-### 2025-07-22: Cálculo de Receita Totalmente Consistente nos Relatórios Financeiros - CONCLUÍDO ✅
-- ✅ **RECEITA TOTAL CORRIGIDA** - Card principal agora usa receitaAlugueis ao invés de receitaPagamentos
-- ✅ **RECEITAS POR TIPO PADRONIZADA** - Card "Receita dos Aluguéis" também usa receitaAlugueis
-- ✅ **CONSISTÊNCIA TOTAL ALCANÇADA** - Ambos cards mostram R$ 4.000,00 baseado no potencial dos contratos ativos
-- ✅ **LÓGICA DE NEGÓCIO UNIFICADA** - Sistema prioriza valor potencial dos aluguéis vs pagamentos já processados
-- ✅ **LABELS ATUALIZADOS** - "Pagamentos Recebidos" → "Receita dos Aluguéis" para maior clareza
-- ✅ **DESCRIÇÃO MELHORADA** - "Valor mensal dos contratos ativos" explica origem do cálculo
-- ✅ **ARQUITETURA FINANCEIRA CONSOLIDADA** - Relatórios financeiros com cálculo único e consistente
-- ✅ **PROBLEMA DE INCONSISTÊNCIA RESOLVIDO** - Usuário confirmou que ambos valores agora aparecem iguais
+### 2025-07-22: Bug Crítico Financeiro - Receita vs Pagamentos Reais Corrigido - CONCLUÍDO ✅
+- ✅ **PROBLEMA IDENTIFICADO** - Relatórios mostravam receita potencial de contratos, mas página pagamentos estava vazia
+- ✅ **CAUSA RAIZ ENCONTRADA** - Sistema calculava receita baseada em contratos ativos, não em pagamentos reais
+- ✅ **RECEITA TOTAL CORRIGIDA** - Card principal agora usa receitaPagamentos (dados reais) ao invés de receitaAlugueis (potencial)
+- ✅ **CARD "RECEITA DOS ALUGUÉIS" CORRIGIDO** - Agora mostra pagamentos recebidos no período, não valor dos contratos
+- ✅ **DESCRIÇÃO ATUALIZADA** - "Pagamentos recebidos no período" ao invés de "Valor mensal dos contratos ativos"
+- ✅ **CONSISTÊNCIA TOTAL ALCANÇADA** - Relatórios financeiros agora refletem receita real baseada em pagamentos
+- ✅ **LÓGICA DE NEGÓCIO CORRIGIDA** - Sistema agora mostra receita apenas quando há pagamentos processados
+- ✅ **SINCRONIZAÇÃO PÁGINAS** - Página pagamentos e relatórios financeiros agora mostram dados consistentes
 
 ### 2025-07-22: Sistema de Pagamentos Totalmente Padronizado - CONCLUÍDO ✅
 - ✅ **PADRONIZAÇÃO COMPLETA** - Status de pagamentos unificado para "em_aberto" em todo o sistema
