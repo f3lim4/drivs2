@@ -221,16 +221,16 @@ export function EditarContratoModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            Editar Contrato
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-normal text-muted-foreground">Status atual:</span>
+          <div className="flex items-center justify-between">
+            <DialogTitle>Editar Contrato</DialogTitle>
+            <div className="flex flex-col items-end">
+              <span className="text-sm font-medium text-muted-foreground mb-1">Status atual:</span>
               {contrato?.status === 'em_aberto' && <Badge variant="secondary" className="bg-gray-100 text-gray-800">Em Aberto</Badge>}
               {contrato?.status === 'ativo' && <Badge variant="secondary" className="bg-green-100 text-green-800">Ativo</Badge>}
               {contrato?.status === 'cancelado' && <Badge variant="secondary" className="bg-red-100 text-red-800">Cancelado</Badge>}
               {contrato?.status === 'encerrado' && <Badge variant="secondary" className="bg-gray-100 text-gray-600">Encerrado</Badge>}
             </div>
-          </DialogTitle>
+          </div>
           <DialogDescription>
             Atualize as informações do contrato e altere o status se necessário.
           </DialogDescription>
