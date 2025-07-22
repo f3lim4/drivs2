@@ -170,7 +170,8 @@ export function VisualizarContratoModal({
             <h1>CONTRATO DE LOCAÇÃO DE VEÍCULO</h1>
             <div class="contract-info">
               <p><strong>Cliente:</strong> ${contrato.cliente}</p>
-              <p><strong>Valor:</strong> R$ ${Number(contrato.valor).toFixed(2)}</p>
+              <p><strong>Valor Semanal:</strong> R$ ${Number(contrato.valorSemanal || 0).toFixed(2)}</p>
+              <p><strong>Valor Caução:</strong> R$ ${Number(contrato.caucao || 0).toFixed(2)}</p>
               <p><strong>Data de Início:</strong> ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
               ${contrato.dataFim ? `<p><strong>Data de Término:</strong> ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}</p>` : ''}
             </div>
@@ -262,7 +263,10 @@ export function VisualizarContratoModal({
       pdf.text(`Cliente: ${contrato.cliente}`, margin, yPosition);
       yPosition += 6;
       
-      pdf.text(`Valor: R$ ${Number(contrato.valor).toFixed(2)}`, margin, yPosition);
+      pdf.text(`Valor Semanal: R$ ${Number(contrato.valorSemanal || 0).toFixed(2)}`, margin, yPosition);
+      yPosition += 6;
+      
+      pdf.text(`Valor Caução: R$ ${Number(contrato.caucao || 0).toFixed(2)}`, margin, yPosition);
       yPosition += 6;
       
       pdf.text(`Data de Início: ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}`, margin, yPosition);
@@ -390,88 +394,54 @@ export function VisualizarContratoModal({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* INFORMAÇÕES DO CLIENTE */}
+          {/* INFORMAÇÕES GERAIS DO CONTRATO */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Informações do Cliente
+                <FileText className="w-4 h-4" />
+                Informações do Contrato
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Nome Completo</p>
-                  <p className="font-semibold">{motorista?.nome || contrato.cliente}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">CPF</p>
-                  <p className="font-semibold">{motorista?.cpf || 'Não informado'}</p>
-                </div>
-                {motorista?.telefone && (
+              <div className="grid grid-cols-3 gap-4">
+                {/* CLIENTE */}
+                <div className="space-y-2">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Telefone</p>
-                    <p className="font-semibold">{motorista.telefone}</p>
+                    <p className="text-sm font-medium text-gray-600">Cliente</p>
+                    <p className="font-semibold">{motorista?.nome || contrato.cliente}</p>
                   </div>
-                )}
-                {motorista?.email && (
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Email</p>
-                    <p className="font-semibold">{motorista.email}</p>
+                    <p className="text-sm font-medium text-gray-600">CPF</p>
+                    <p className="font-semibold">{motorista?.cpf || 'Não informado'}</p>
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* VEÍCULO ALUGADO */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Car className="w-4 h-4" />
-                Veículo Alugado
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Placa</p>
-                  <p className="font-semibold">{veiculo?.placa || 'Não informado'}</p>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Marca/Modelo</p>
-                  <p className="font-semibold">{veiculo ? `${veiculo.marca} ${veiculo.modelo}` : 'Não informado'}</p>
-                </div>
-                {veiculo && (
-                  <>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Ano</p>
-                      <p className="font-semibold">{veiculo.ano}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Cor</p>
-                      <p className="font-semibold">{veiculo.cor}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Categoria</p>
-                      <p className="font-semibold">{veiculo.categoria}</p>
-                    </div>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* INFORMAÇÕES DO CONTRATO */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Detalhes do Contrato
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+                {/* VEÍCULO */}
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Veículo</p>
+                    <p className="font-semibold">{veiculo ? `${veiculo.marca} ${veiculo.modelo}` : 'Não informado'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Placa</p>
+                    <p className="font-semibold">{veiculo?.placa || 'Não informado'}</p>
+                  </div>
+                </div>
+
+                {/* VALORES E STATUS */}
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Valor Semanal</p>
+                    <p className="font-semibold text-green-600">R$ {Number(contrato.valorSemanal || 0).toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Valor Caução</p>
+                    <p className="font-semibold text-blue-600">R$ {Number(contrato.caucao || 0).toFixed(2)}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Data de Início</p>
                   <p className="font-semibold">{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
@@ -482,10 +452,6 @@ export function VisualizarContratoModal({
                     <p className="font-semibold">{new Date(contrato.dataFim).toLocaleDateString('pt-BR')}</p>
                   </div>
                 )}
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Valor</p>
-                  <p className="font-semibold">R$ {Number(contrato.valor).toFixed(2)}</p>
-                </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Status</p>
                   <Badge variant={getBadgeVariant(contrato.status)}>
