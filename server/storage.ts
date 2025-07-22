@@ -577,6 +577,7 @@ export class DatabaseStorage implements IStorage {
         valor: contratos.valor,
         valorSemanal: contratos.valorSemanal,
         caucao: contratos.caucao,
+        tempoMinimoContrato: contratos.tempoMinimoContrato, // ✅ INCLUIR TEMPO MÍNIMO
         dataInicio: contratos.dataInicio,
         dataFim: contratos.dataFim,
         status: contratos.status,
