@@ -377,13 +377,13 @@ export default function Pagamentos() {
                     {getStatusBadge(pagamento.status)}
                   </TableCell>
                   <TableCell>
-                    <div className="max-w-xs">
-                      <div className="truncate">{pagamento.descricao || 'Sem descrição'}</div>
+                    <div className="max-w-[120px]">
+                      <div className="truncate text-sm">{pagamento.descricao || 'Sem descrição'}</div>
                       {(pagamento as any).automatico && (
                         <div className="text-xs text-blue-600 mt-1">
                           <div className="inline-flex items-center gap-1">
                             <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                            Automático
+                            Auto
                           </div>
                         </div>
                       )}
