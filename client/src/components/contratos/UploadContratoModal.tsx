@@ -157,6 +157,16 @@ export function UploadContratoModal({
                 <p className="font-medium">{contrato.cliente}</p>
               </div>
               <div>
+                <span className="text-slate-600">Veículo:</span>
+                <p className="font-medium">
+                  {contrato.veiculoPlaca ? (
+                    `${contrato.veiculoPlaca} - ${contrato.veiculoMarca} ${contrato.veiculoModelo}`
+                  ) : (
+                    'N/A'
+                  )}
+                </p>
+              </div>
+              <div>
                 <span className="text-slate-600">Status:</span>
                 <p className="font-medium">{contrato.status}</p>
               </div>

@@ -18,6 +18,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **FUNCIONALIDADE PRESERVADA** - Valores ainda calculados para relatórios e estatísticas
 - ✅ **INTERFACE CONSISTENTE** - 7 colunas: Motorista/Cliente, Veículo, Tipo, Data Início, Status, Upload, Ações
 - ✅ **VALOR REMOVIDO DO MODAL UPLOAD** - Modal de upload não exibe mais "Valor: R$ 11050.00" na seção de detalhes
+- ✅ **VEÍCULO ADICIONADO NO MODAL** - Substituído campo valor por informações do veículo (placa, marca e modelo)
 
 ### 2025-07-22: Sistema de Configuração de Pagamentos com Layout 3-Colunas - CONCLUÍDO ✅
 - ✅ **LAYOUT 3-COLUNAS IMPLEMENTADO** - Data | Recorrência | Tipo de Pagamento na mesma linha
