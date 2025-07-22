@@ -342,7 +342,7 @@ export default function Pagamentos() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Motorista</TableHead>
+                <TableHead className="w-48">Motorista</TableHead>
                 <TableHead>Veículo</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Descrição</TableHead>
