@@ -3,13 +3,21 @@ import { Plus, Eye, Edit, Trash2, Calendar, DollarSign, User, AlertCircle, Searc
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { usePagamentos } from '@/hooks/usePagamentos';
 import { useMotoristas } from '@/hooks/useMotoristas';
 import { useAuth } from '@/hooks/useAuth';
 import { Pagination } from '@/components/ui/pagination';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { NovoPagamentoModal } from '@/components/pagamentos/NovoPagamentoModal';
 import { EditarPagamentoModal } from '@/components/pagamentos/EditarPagamentoModal';
 import { DetalhesPagamentoModal } from '@/components/pagamentos/DetalhesPagamentoModal';
@@ -196,28 +204,26 @@ export default function Pagamentos() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="p-6 border border-gray-200 rounded-lg bg-white space-y-6">
-      {/* Estatísticas com visual futurista */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
+    <div className="flex-1 space-y-6 p-6">
+      {/* Cards de estatísticas com visual futurista - igual página veículos */}
+      <div className="grid gap-6 md:grid-cols-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-red-700">Total Pendente</p>
-                <p className="text-lg font-bold text-red-800">{formatCurrency(totalPendente)}</p>
-                <p className="text-xs text-red-600">
-                  {pagamentosFiltrados.filter(p => p.status === 'em_aberto' || p.status === 'parcial').length} pagamentos
-                </p>
+                <p className="text-xs font-medium text-blue-700">Total de Pagamentos</p>
+                <p className="text-xl font-bold text-blue-800">{pagamentosFiltrados.length}</p>
+                <p className="text-xs text-blue-600">Todos os registros</p>
               </div>
-              <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-red-700" />
+              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
+                <Calculator className="w-5 h-5 text-blue-700" />
               </div>
             </div>
           </CardContent>
@@ -227,11 +233,9 @@ export default function Pagamentos() {
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-green-700">Total Recebido</p>
-                <p className="text-lg font-bold text-green-800">{formatCurrency(totalRecebido)}</p>
-                <p className="text-xs text-green-600">
-                  {pagamentosFiltrados.filter(p => p.status === 'pago').length} pagamentos
-                </p>
+                <p className="text-xs font-medium text-green-700">Pagos</p>
+                <p className="text-xl font-bold text-green-800">{pagamentosFiltrados.filter(p => p.status === 'pago').length}</p>
+                <p className="text-xs text-green-600">Recebidos</p>
               </div>
               <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-700" />
@@ -240,185 +244,210 @@ export default function Pagamentos() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg h-32">
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-yellow-700">Parciais</p>
-                <p className="text-lg font-bold text-yellow-800">{formatCurrency(totalParcial)}</p>
-                <p className="text-xs text-yellow-600">
-                  {pagamentosFiltrados.filter(p => p.status === 'parcial').length} pagamentos
-                </p>
+                <p className="text-xs font-medium text-purple-700">Em Aberto</p>
+                <p className="text-xl font-bold text-purple-800">{pagamentosFiltrados.filter(p => p.status === 'em_aberto').length}</p>
+                <p className="text-xs text-purple-600">Pendentes</p>
               </div>
-              <div className="w-10 h-10 bg-yellow-200 rounded-full flex items-center justify-center">
-                <Clock className="w-5 h-5 text-yellow-700" />
+              <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-purple-700" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-blue-700">Total Geral</p>
-                <p className="text-lg font-bold text-blue-800">{formatCurrency(totalGeral)}</p>
-                <p className="text-xs text-blue-600">
-                  {pagamentosFiltrados.length} pagamentos
-                </p>
+                <p className="text-xs font-medium text-orange-700">Parciais</p>
+                <p className="text-xl font-bold text-orange-800">{pagamentosFiltrados.filter(p => p.status === 'parcial').length}</p>
+                <p className="text-xs text-orange-600">Em andamento</p>
               </div>
-              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
-                <Calculator className="w-5 h-5 text-blue-700" />
+              <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center">
+                <Clock className="w-5 h-5 text-orange-700" />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filtros acima da tabela */}
-      <Card className="bg-gray-50 border-gray-200">
+      {/* Controles de busca e filtros - igual página veículos */}
+      <Card>
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            {/* Busca */}
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Buscar por motorista, descrição..."
+                placeholder="Buscar pagamento..."
                 value={filtroTexto}
                 onChange={(e) => setFiltroTexto(e.target.value)}
                 className="pl-10"
               />
             </div>
-            
-            <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os Status</SelectItem>
-                <SelectItem value="em_aberto">Em Aberto</SelectItem>
-                <SelectItem value="pago">Pago</SelectItem>
-                <SelectItem value="parcial">Parcial</SelectItem>
-              </SelectContent>
-            </Select>
 
-            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-              <SelectTrigger>
-                <SelectValue placeholder="Tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os Tipos</SelectItem>
-                <SelectItem value="aluguel">Aluguel</SelectItem>
-                <SelectItem value="infrações">Infrações</SelectItem>
-                <SelectItem value="manutenção">Manutenção</SelectItem>
-                <SelectItem value="outros">Outros</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Filtros */}
+            <div className="flex gap-2">
+              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os Status</SelectItem>
+                  <SelectItem value="em_aberto">Em Aberto</SelectItem>
+                  <SelectItem value="pago">Pago</SelectItem>
+                  <SelectItem value="parcial">Parcial</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Button onClick={() => setShowNovoPagamento(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Pagamento
-            </Button>
+              <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os Tipos</SelectItem>
+                  <SelectItem value="aluguel">Aluguel</SelectItem>
+                  <SelectItem value="infrações">Infrações</SelectItem>
+                  <SelectItem value="manutenção">Manutenção</SelectItem>
+                  <SelectItem value="outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+                  <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+                  <SelectItem value="nome-az">Motorista (A-Z)</SelectItem>
+                  <SelectItem value="nome-za">Motorista (Z-A)</SelectItem>
+                  <SelectItem value="valor-maior">Maior Valor</SelectItem>
+                  <SelectItem value="valor-menor">Menor Valor</SelectItem>
+                  <SelectItem value="status-pago">Pagos Primeiro</SelectItem>
+                  <SelectItem value="status-pendente">Pendentes Primeiro</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button onClick={() => setShowNovoPagamento(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Novo
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Tabela de pagamentos */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Todos os Pagamentos</h2>
-        <Select value={sortOrder} onValueChange={setSortOrder}>
-          <SelectTrigger className="w-56">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
-            <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
-            <SelectItem value="nome-az">Motorista (A-Z)</SelectItem>
-            <SelectItem value="nome-za">Motorista (Z-A)</SelectItem>
-            <SelectItem value="valor-maior">Maior Valor</SelectItem>
-            <SelectItem value="valor-menor">Menor Valor</SelectItem>
-            <SelectItem value="status-pago">Pagos Primeiro</SelectItem>
-            <SelectItem value="status-pendente">Pendentes Primeiro</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Conteúdo da tabela */}
+      {/* Tabela de pagamentos - igual página veículos */}
       <Card>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            {paginatedPagamentos.map((pagamento) => (
-              <div
-                key={pagamento.id}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900">
-                      {pagamento.motoristaNome || 'N/A'}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {pagamento.descricao || 'Sem descrição'}
-                    </p>
-                    <div className="flex items-center space-x-2 mt-1">
-                      {getStatusBadge(pagamento.status)}
-                      {getTipoBadge(pagamento.tipo)}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-lg text-gray-900">
-                    {formatCurrency(pagamento.valorTotal)}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Vencimento: {formatDate(pagamento.dataPagamento)}
-                  </p>
-                  <div className="flex items-center space-x-2 mt-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleVerDetalhes(pagamento)}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleEditar(pagamento)}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleExcluir(pagamento)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl font-semibold">Lista de Pagamentos</CardTitle>
+            <div className="text-sm text-muted-foreground">
+              {pagamentosFiltrados.length} de {pagamentos.length} pagamentos
+            </div>
           </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Motorista</TableHead>
+                <TableHead>Descrição</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead>Vencimento</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead width="120">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedPagamentos.map((pagamento) => (
+                <TableRow key={pagamento.id}>
+                  <TableCell>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="font-medium">{pagamento.motoristaNome || 'N/A'}</div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="max-w-xs">
+                      <div className="truncate">{pagamento.descricao || 'Sem descrição'}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {getTipoBadge(pagamento.tipo)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-semibold">{formatCurrency(pagamento.valorTotal)}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">{formatDate(pagamento.dataPagamento)}</div>
+                  </TableCell>
+                  <TableCell>
+                    {getStatusBadge(pagamento.status)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleVerDetalhes(pagamento)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditar(pagamento)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleExcluir(pagamento)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
           {pagamentosFiltrados.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-gray-500">Nenhum pagamento encontrado</p>
+              <p className="text-muted-foreground">Nenhum pagamento encontrado</p>
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* Paginação */}
-      <Pagination
-        currentPage={currentPage}
-        totalItems={pagamentosFiltrados.length}
-        itemsPerPage={itemsPerPage}
-        onPageChange={handlePageChange}
-        onItemsPerPageChange={handleItemsPerPageChange}
-      />
+      {pagamentosFiltrados.length > 0 && (
+        <div className="border-t pt-4">
+          <Pagination
+            currentPage={currentPage}
+            totalItems={pagamentosFiltrados.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        </div>
+      )}
 
       {/* Modais */}
       {showNovoPagamento && (
