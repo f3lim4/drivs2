@@ -34,8 +34,6 @@ import { Contrato } from '@/types';
 const contratoSchema = z.object({
   titulo: z.string().min(1, 'Título é obrigatório'),
   cliente: z.string().min(1, 'Cliente é obrigatório'),
-  valorSemanal: z.number().min(0, 'Valor semanal deve ser positivo'),
-  tempoContrato: z.number().min(1, 'Duração deve ser pelo menos 1 mês'),
   template: z.string().min(1, 'Conteúdo do contrato é obrigatório'),
 });
 
@@ -63,8 +61,6 @@ export function EditarContratoModal({
     defaultValues: {
       titulo: '',
       cliente: '',
-      valorSemanal: 0,
-      tempoContrato: 1,
       template: '',
     },
   });
@@ -75,8 +71,6 @@ export function EditarContratoModal({
       form.reset({
         titulo: contrato.titulo,
         cliente: contrato.cliente,
-        valorSemanal: typeof contrato.valorSemanal === 'string' ? parseFloat(contrato.valorSemanal) : contrato.valorSemanal || 0,
-        tempoContrato: contrato.tempoContrato || 1,
         template: contrato.template || '',
       });
     }
@@ -93,9 +87,7 @@ export function EditarContratoModal({
         tipo: contrato.tipo,
         titulo: data.titulo,
         cliente: data.cliente,
-        valorSemanal: data.valorSemanal.toString(),
-        tempoContrato: data.tempoContrato,
-        valor: (data.valorSemanal * 4.35 * data.tempoContrato).toString(), // Calcula valor total
+        valor: contrato.valor, // Mantém valor existente
         dataInicio: typeof contrato.dataInicio === 'string' ? contrato.dataInicio : contrato.dataInicio.toISOString().split('T')[0],
         dataFim: typeof contrato.dataFim === 'string' ? contrato.dataFim : contrato.dataFim?.toISOString().split('T')[0],
         status: contrato.status,
@@ -194,47 +186,7 @@ export function EditarContratoModal({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="valorSemanal"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor Semanal (R$) *</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01"
-                        placeholder="0.00" 
-                        {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              <FormField
-                control={form.control}
-                name="tempoContrato"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duração (meses) *</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        min="1"
-                        placeholder="1" 
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             {/* CONTEÚDO DO CONTRATO */}
             <FormField
