@@ -16,7 +16,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **ORDENAÇÃO ATUALIZADA** - Removidas opções "Valor (Maior)" e "Valor (Menor)" do dropdown
 - ✅ **LÓGICA LIMPA** - Código de ordenação por valor removido da função sortContratos
 - ✅ **FUNCIONALIDADE PRESERVADA** - Valores ainda calculados para relatórios e estatísticas
-- ✅ **INTERFACE CONSISTENTE** - 6 colunas: Motorista/Cliente, Veículo, Tipo, Data Início, Status, Ações
+- ✅ **INTERFACE CONSISTENTE** - 7 colunas: Motorista/Cliente, Veículo, Tipo, Data Início, Status, Upload, Ações
+- ✅ **VALOR REMOVIDO DO MODAL UPLOAD** - Modal de upload não exibe mais "Valor: R$ 11050.00" na seção de detalhes
 
 ### 2025-07-22: Sistema de Configuração de Pagamentos com Layout 3-Colunas - CONCLUÍDO ✅
 - ✅ **LAYOUT 3-COLUNAS IMPLEMENTADO** - Data | Recorrência | Tipo de Pagamento na mesma linha
