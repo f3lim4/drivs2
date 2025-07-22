@@ -165,11 +165,17 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {motoristas.map((motorista) => (
-                          <SelectItem key={motorista.id} value={motorista.id}>
-                            {motorista.nome}
-                          </SelectItem>
-                        ))}
+                        {motoristas.map((motorista) => {
+                          // Buscar placa do veículo do pagamento se for o motorista atual
+                          const placaVeiculo = pagamento && motorista.id === pagamento.motoristaId ? 
+                            (pagamento as any).veiculoPlaca : '';
+                          
+                          return (
+                            <SelectItem key={motorista.id} value={motorista.id}>
+                              {motorista.nome}{placaVeiculo ? ` - ${placaVeiculo}` : ''}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                     <FormMessage />
