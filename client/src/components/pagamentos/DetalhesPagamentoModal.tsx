@@ -34,8 +34,8 @@ export function DetalhesPagamentoModal({ open, onClose, pagamento }: DetalhesPag
         return <Badge variant="secondary" className="bg-green-100 text-green-800">Pago</Badge>;
       case 'parcial':
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Parcial</Badge>;
-      case 'pendente':
-        return <Badge variant="secondary" className="bg-red-100 text-red-800">Pendente</Badge>;
+      case 'em_aberto':
+        return <Badge variant="secondary" className="bg-red-100 text-red-800">Em Aberto</Badge>;
       case 'atrasado':
         return <Badge variant="secondary" className="bg-red-100 text-red-800">Atrasado</Badge>;
       default:

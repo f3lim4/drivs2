@@ -67,8 +67,6 @@ export default function Pagamentos() {
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Parcial</Badge>;
       case 'em_aberto':
         return <Badge variant="secondary" className="bg-red-100 text-red-800">Em Aberto</Badge>;
-      case 'pendente':
-        return <Badge variant="secondary" className="bg-red-100 text-red-800">Pendente</Badge>;
       case 'atrasado':
         return <Badge variant="secondary" className="bg-red-100 text-red-800">Atrasado</Badge>;
       default:
@@ -247,7 +245,7 @@ export default function Pagamentos() {
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-red-700">Total Pendente</p>
+                <p className="text-xs font-medium text-red-700">Total em Aberto</p>
                 <p className="text-xl font-bold text-red-800">{formatCurrency(totalPendente)}</p>
                 <p className="text-xs text-red-600">{pagamentosFiltrados.filter(p => p.status === 'em_aberto').length} pagamentos</p>
               </div>
@@ -345,7 +343,7 @@ export default function Pagamentos() {
                   <SelectItem value="valor-maior">Maior Valor</SelectItem>
                   <SelectItem value="valor-menor">Menor Valor</SelectItem>
                   <SelectItem value="status-pago">Pagos Primeiro</SelectItem>
-                  <SelectItem value="status-pendente">Pendentes Primeiro</SelectItem>
+                  <SelectItem value="status-pendente">Em Aberto Primeiro</SelectItem>
                 </SelectContent>
               </Select>
             </div>

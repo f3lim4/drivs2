@@ -153,7 +153,7 @@ export function useNotifications() {
         });
       }
 
-      if (aluguel.status === 'pendente') {
+      if (aluguel.status === 'em_aberto') {
         // Novo aluguel pendente
         notifications.push({
           id: `aluguel-pendente-${aluguel.id}`,
@@ -365,7 +365,7 @@ export function useNotifications() {
   // Notificações de infrações - alertas de prazo de pagamento
   if (infracoes.length > 0) {
     infracoes.forEach((infracao: any) => {
-      if (infracao.situacao === 'ativo' && infracao.status === 'pendente') {
+      if (infracao.situacao === 'ativo' && infracao.status === 'em_aberto') {
         const dataVencimento = new Date(infracao.dataVencimento);
         const diasParaVencer = differenceInDays(dataVencimento, today);
         
@@ -397,7 +397,7 @@ export function useNotifications() {
   // Notificações de pagamentos pendentes
   if (pagamentos.length > 0) {
     pagamentos.forEach((pagamento: any) => {
-      if (pagamento.status === 'pendente') {
+      if (pagamento.status === 'em_aberto') {
         const dataPagamento = new Date(pagamento.dataPagamento || pagamento.data);
         const diasAtras = differenceInDays(today, dataPagamento);
         
