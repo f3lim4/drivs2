@@ -127,7 +127,7 @@ export interface Contrato {
   valor: number;
   dataInicio: string;
   dataFim?: string;
-  status: 'ativo' | 'finalizado' | 'cancelado';
+  status: 'em_aberto' | 'ativo' | 'cancelado' | 'encerrado';
   template?: string;
   arquivoAssinado?: string; // Nome do arquivo de contrato assinado
   dataAssinatura?: string; // Data de assinatura do contrato
