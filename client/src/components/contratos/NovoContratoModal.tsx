@@ -1033,8 +1033,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 />
               </div>
 
-              {/* DATA DE INÍCIO, DATA FINAL, TEMPO MÍNIMO, VALOR SEMANAL E CAUÇÃO */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              {/* LINHA 1: DATA DE INÍCIO E DATA FINAL */}
+              <div className="grid grid-cols-2 gap-4">
                 {/* DATA DE INÍCIO */}
                 <FormField
                   control={form.control}
@@ -1104,6 +1104,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 />
               </div>
               
+              {/* LINHA 2: TEMPO MÍNIMO, VALOR SEMANAL E CAUÇÃO */}
               <div className="grid grid-cols-3 gap-4">
                 {/* TEMPO MÍNIMO DE CONTRATO */}
                 <FormField

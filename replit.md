@@ -10,12 +10,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Layout Compacto de Contratos Otimizado - CONCLUÍDO ✅
+- ✅ **LAYOUT EM DUAS LINHAS IMPLEMENTADO** - Formulário reorganizado para melhor aproveitamento do espaço
+- ✅ **LINHA 1: DATA DE INÍCIO E DATA FINAL** - Dois campos de data na primeira linha
+- ✅ **LINHA 2: TEMPO, VALOR E CAUÇÃO** - Três campos numéricos na segunda linha
+- ✅ **INTERFACE MAIS COMPACTA** - Redução significativa da altura do modal de contratos
+- ✅ **EXPERIÊNCIA OTIMIZADA** - Interface mais limpa e organizada conforme preferência do usuário
+
 ### 2025-07-22: Reestruturação de Campos de Contratos para Flexibilidade - CONCLUÍDO ✅
 - ✅ **CAMPO "TEMPO MESES" SUBSTITUÍDO** - Substituído por "Tempo Mínimo de Contrato (meses)" para maior clareza
 - ✅ **CAMPO "DATA FINAL" ADICIONADO** - Novo campo opcional permitindo definir data de término específica
 - ✅ **CONTRATOS RENOVÁVEIS IMPLEMENTADOS** - Data Final vazia indica contrato sem término fixo
 - ✅ **SCHEMA ATUALIZADO** - Campos `tempoMinimoContrato` e `dataFinal` adicionados com validação
-- ✅ **INTERFACE REFORMULADA** - Layout em 3 colunas: Data Início | Data Final | Tempo Mínimo
+- ✅ **INTERFACE REFORMULADA** - Layout compacto em duas linhas para melhor usabilidade
 - ✅ **HELPER TEXT ADICIONADO** - "Deixe vazio para contrato renovável" orienta sobre uso do campo Data Final
 - ✅ **LÓGICA DE CÁLCULO CORRIGIDA** - Sistema considera data final fornecida ou calcula baseado no tempo mínimo
 - ✅ **TODOS OS COMPONENTES ATUALIZADOS** - Modal de criação, visualização e edição de contratos
