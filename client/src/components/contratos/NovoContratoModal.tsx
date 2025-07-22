@@ -54,7 +54,7 @@ const contratoSchema = z.object({
   dataInicio: z.date({
     required_error: 'Data de início é obrigatória',
   }),
-  dataFinal: z.date().optional(), // Data final opcional - se não preenchida, contrato é renovável
+  dataFim: z.date().optional(), // Data final opcional - se não preenchida, contrato é renovável
   tempoMinimoContrato: z.number().min(1, 'Tempo mínimo de contrato deve ser maior que 0'),
   valorSemanal: z.number().min(0.01, 'Valor semanal deve ser maior que 0'),
   caucao: z.number().min(0, 'Caução deve ser maior ou igual a 0'),
@@ -337,7 +337,7 @@ export function NovoContratoModal({
       motoristaId: '',
       veiculoId: '',
       dataInicio: getAmanha(),
-      dataFinal: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
+      dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
       tempoMinimoContrato: 1,
       valorSemanal: 0,
       caucao: 0,
@@ -507,8 +507,8 @@ export function NovoContratoModal({
       
       // Calcula data final baseada na data final fornecida ou tempo mínimo
       let dataFimAluguel;
-      if (data.dataFinal) {
-        dataFimAluguel = data.dataFinal;
+      if (data.dataFim) {
+        dataFimAluguel = data.dataFim;
       } else {
         // Se não tiver data final, usa tempo mínimo para calcular
         dataFimAluguel = new Date(data.dataInicio);
@@ -805,7 +805,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           motoristaId: '',
           veiculoId: '',
           dataInicio: getAmanha(),
-          dataFinal: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
+          dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
           tempoMinimoContrato: 1,
           valorSemanal: 0,
           caucao: 0,
@@ -1020,7 +1020,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 {/* DATA FINAL */}
                 <FormField
                   control={form.control}
-                  name="dataFinal"
+                  name="dataFim"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Data Final</FormLabel>
