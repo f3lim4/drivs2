@@ -182,7 +182,7 @@ export function VisualizarContratoModal({
               <p><strong>Valor Semanal:</strong> R$ ${Number(contrato.valorSemanal || 0).toFixed(2)}</p>
               <p><strong>Valor Caução:</strong> R$ ${Number(contrato.caucao || 0).toFixed(2)}</p>
               <p><strong>Data de Início:</strong> ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
-              ${contrato.dataFim ? `<p><strong>Data de Término:</strong> ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}</p>` : ''}
+              ${contrato.dataFim ? `<p><strong>Data de Término:</strong> ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}</p>` : `<p><strong>Tipo:</strong> Contrato Renovável</p>`}
             </div>
             <div class="contract-content">${contrato.template}</div>
             <div class="signatures">
@@ -283,6 +283,9 @@ export function VisualizarContratoModal({
       
       if (contrato.dataFim) {
         pdf.text(`Data de Término: ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}`, margin, yPosition);
+        yPosition += 6;
+      } else {
+        pdf.text(`Tipo: Contrato Renovável`, margin, yPosition);
         yPosition += 6;
       }
       
@@ -456,9 +459,17 @@ export function VisualizarContratoModal({
                   <p className="font-semibold">{formatDate(contrato.dataInicio)}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Data de Término</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    {contrato.dataFim ? 'Data de Término' : 'Tipo de Contrato'}
+                  </p>
                   <p className="font-semibold">
-                    {contrato.dataFim ? formatDate(contrato.dataFim) : 'Indeterminada'}
+                    {contrato.dataFim ? (
+                      formatDate(contrato.dataFim)
+                    ) : (
+                      <Badge variant="secondary" className="bg-green-100 text-green-700">
+                        Renovável
+                      </Badge>
+                    )}
                   </p>
                 </div>
                 <div>
@@ -468,6 +479,34 @@ export function VisualizarContratoModal({
                   </Badge>
                 </div>
               </div>
+              
+              {/* INFORMAÇÕES ADICIONAIS PARA CONTRATO RENOVÁVEL */}
+              {!contrato.dataFim && (
+                <div className="mt-4 pt-4 border-t">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Tempo Mínimo de Contrato</p>
+                      <p className="font-semibold">{contrato.tempoMinimoContrato || 1} mês{contrato.tempoMinimoContrato > 1 ? 'es' : ''}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Próxima Avaliação</p>
+                      <p className="font-semibold text-blue-600">
+                        {(() => {
+                          const dataInicio = new Date(contrato.dataInicio);
+                          const proximaAvaliacao = new Date(dataInicio);
+                          proximaAvaliacao.setMonth(proximaAvaliacao.getMonth() + (contrato.tempoMinimoContrato || 1));
+                          return formatDate(proximaAvaliacao.toISOString().split('T')[0]);
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <p className="text-sm text-green-700">
+                      <strong>Contrato Renovável:</strong> Este contrato não possui data de término fixa e pode ser renovado automaticamente após o período mínimo.
+                    </p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

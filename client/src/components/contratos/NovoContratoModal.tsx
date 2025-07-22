@@ -610,9 +610,12 @@ export function NovoContratoModal({
         responsavel: "Responsável da Locadora"
       };
 
-      // Calcula data final
-      const dataFim = new Date(data.dataInicio);
-      dataFim.setMonth(dataFim.getMonth() + data.tempoMinimoContrato);
+      // Calcula data final apenas se fornecida, caso contrário deixa como contrato renovável
+      let dataFimContrato = null;
+      if (data.dataFim) {
+        dataFimContrato = data.dataFim;
+      }
+      // Se não tem data fim específica, o contrato é renovável (dataFimContrato = null)
 
       // Usa os valores já calculados com semanas exatas
       const valorMensal = valorMensalAluguel; // Já calculado acima com semanas exatas
@@ -742,8 +745,11 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
         cliente: aluguel.motoristaNome,
         valor: valorTotal.toFixed(2), // Enviar como string
+        valorSemanal: data.valorSemanal.toFixed(2), // ✅ INCLUIR VALOR SEMANAL
+        caucao: data.caucao.toFixed(2), // ✅ INCLUIR CAUÇÃO
+        tempoMinimoContrato: data.tempoMinimoContrato, // ✅ INCLUIR TEMPO MÍNIMO
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
-        dataFim: format(dataFim, 'yyyy-MM-dd'),
+        dataFim: dataFimContrato ? format(dataFimContrato, 'yyyy-MM-dd') : null, // ✅ NULL para contratos renováveis
         status: 'em_aberto' as const, // Inicia sempre como em_aberto
         template: templateContent,
         veiculoId: data.veiculoId // ✅ INCLUIR VEÍCULO ID NO CONTRATO
