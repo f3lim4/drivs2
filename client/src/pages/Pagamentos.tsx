@@ -317,21 +317,7 @@ export default function Pagamentos() {
                 </SelectContent>
               </Select>
 
-              <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
-                  <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
-                  <SelectItem value="nome-az">Motorista (A-Z)</SelectItem>
-                  <SelectItem value="nome-za">Motorista (Z-A)</SelectItem>
-                  <SelectItem value="valor-maior">Maior Valor</SelectItem>
-                  <SelectItem value="valor-menor">Menor Valor</SelectItem>
-                  <SelectItem value="status-pago">Pagos Primeiro</SelectItem>
-                  <SelectItem value="status-pendente">Pendentes Primeiro</SelectItem>
-                </SelectContent>
-              </Select>
+
 
               <Button onClick={() => setShowNovoPagamento(true)}>
                 <Plus className="w-4 h-4 mr-2" />
@@ -347,8 +333,25 @@ export default function Pagamentos() {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl font-semibold">Lista de Pagamentos</CardTitle>
-            <div className="text-sm text-muted-foreground">
-              {pagamentosFiltrados.length} de {pagamentos.length} pagamentos
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-muted-foreground">
+                {pagamentosFiltrados.length} de {pagamentos.length} pagamentos
+              </div>
+              <Select value={sortOrder} onValueChange={setSortOrder}>
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mais-novos">Mais Novos Primeiro</SelectItem>
+                  <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
+                  <SelectItem value="nome-az">Motorista (A-Z)</SelectItem>
+                  <SelectItem value="nome-za">Motorista (Z-A)</SelectItem>
+                  <SelectItem value="valor-maior">Maior Valor</SelectItem>
+                  <SelectItem value="valor-menor">Menor Valor</SelectItem>
+                  <SelectItem value="status-pago">Pagos Primeiro</SelectItem>
+                  <SelectItem value="status-pendente">Pendentes Primeiro</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardHeader>
