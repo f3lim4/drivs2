@@ -53,6 +53,7 @@ export function EditarContratoModal({
   onContratoEditado 
 }: EditarContratoModalProps) {
   const [loading, setLoading] = useState(false);
+  const [desativando, setDesativando] = useState(false);
   const { profile } = useAuth();
   const { toast } = useToast();
 
@@ -140,6 +141,70 @@ export function EditarContratoModal({
     }
   };
 
+  const handleDesativarContrato = async () => {
+    if (!contrato || contrato.status === 'inativo') return;
+
+    setDesativando(true);
+    
+    try {
+      // Prepara dados para desativar contrato
+      const contratoData = {
+        tipo: contrato.tipo,
+        titulo: contrato.titulo,
+        cliente: contrato.cliente,
+        valor: contrato.valor,
+        dataInicio: typeof contrato.dataInicio === 'string' ? contrato.dataInicio : contrato.dataInicio.toISOString().split('T')[0],
+        dataFim: typeof contrato.dataFim === 'string' ? contrato.dataFim : contrato.dataFim?.toISOString().split('T')[0],
+        status: 'inativo', // Mudança principal: desativar contrato
+        template: contrato.template,
+        locadoraId: contrato.locadoraId
+      };
+
+      // Chama API para desativar contrato
+      const response = await fetch(`/api/contratos/${contrato.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contratoData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao desativar contrato');
+      }
+
+      const contratoDesativado = await response.json();
+      
+      // Log da atividade
+      await registrarAtividade(
+        profile?.locadoraId || '',
+        profile?.email || 'usuario@drivs.me',
+        'desativar',
+        'contrato',
+        contrato.id,
+        `Contrato desativado: ${contrato.cliente} - ${contrato.tipo}`
+      );
+      
+      onContratoEditado(contratoDesativado);
+      onOpenChange(false);
+      
+      toast({
+        title: "Contrato Desativado",
+        description: `Contrato de ${contrato.cliente} foi desativado com sucesso.`,
+      });
+      
+    } catch (error) {
+      console.error('Erro ao desativar contrato:', error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível desativar o contrato. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setDesativando(false);
+    }
+  };
+
   if (!contrato) return null;
 
   return (
@@ -207,18 +272,32 @@ export function EditarContratoModal({
               )}
             />
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={loading}
-              >
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Salvando...' : 'Salvar Alterações'}
-              </Button>
+            <DialogFooter className="flex justify-between">
+              <div>
+                {contrato?.status === 'ativo' && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDesativarContrato}
+                    disabled={loading || desativando}
+                  >
+                    {desativando ? 'Desativando...' : 'Desativar Contrato'}
+                  </Button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  disabled={loading || desativando}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={loading || desativando}>
+                  {loading ? 'Salvando...' : 'Salvar Alterações'}
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </Form>
