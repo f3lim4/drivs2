@@ -54,7 +54,8 @@ const contratoSchema = z.object({
   dataInicio: z.date({
     required_error: 'Data de início é obrigatória',
   }),
-  tempoContrato: z.number().min(1, 'Tempo de contrato deve ser maior que 0'),
+  dataFinal: z.date().optional(), // Data final opcional - se não preenchida, contrato é renovável
+  tempoMinimoContrato: z.number().min(1, 'Tempo mínimo de contrato deve ser maior que 0'),
   valorSemanal: z.number().min(0.01, 'Valor semanal deve ser maior que 0'),
   caucao: z.number().min(0, 'Caução deve ser maior ou igual a 0'),
   templateId: z.string().optional(),
@@ -129,7 +130,7 @@ const criarPagamentosRecorrentes = async (
   dataPrimeiroPagamento: Date,
   recorrencia: 'semanal' | 'quinzenal' | 'mensal',
   valorSemanal: number,
-  tempoContrato: number,
+  tempoMinimoContrato: number,
   dataInicioContrato: Date,
   tipoPagamento: 'ilimitado' | 'limitado' = 'ilimitado',
   quantidadePagamentos?: number
@@ -146,10 +147,10 @@ const criarPagamentosRecorrentes = async (
     
     // NOVA LÓGICA CORRIGIDA: Cálculo baseado em dias reais do contrato
     const dataFinalContrato = new Date(dataInicioContrato);
-    dataFinalContrato.setMonth(dataFinalContrato.getMonth() + tempoContrato);
+    dataFinalContrato.setMonth(dataFinalContrato.getMonth() + tempoMinimoContrato);
     
     console.log('[DEBUG] Cálculo de pagamentos corrigido:', {
-      tempoContratoMeses: tempoContrato,
+      tempoMinimoContratoMeses: tempoMinimoContrato,
       dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
       dataFinal: format(dataFinalContrato, 'dd/MM/yyyy'),
       hoje: format(hoje, 'dd/MM/yyyy')
@@ -353,7 +354,8 @@ export function NovoContratoModal({
       motoristaId: '',
       veiculoId: '',
       dataInicio: getAmanha(),
-      tempoContrato: 1,
+      dataFinal: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
+      tempoMinimoContrato: 1,
       valorSemanal: 0,
       caucao: 0,
       templateId: 'default',
@@ -499,13 +501,13 @@ export function NovoContratoModal({
       // CÁLCULO EXATO: Usa nova função que conta apenas semanas completas
       const calculoContrato = calcularContratoExato(
         data.dataInicio,
-        data.tempoContrato,
+        data.tempoMinimoContrato,
         data.valorSemanal
       );
       
       // Extrai valores calculados
       const valorTotalExato = calculoContrato.valorTotal;
-      const valorMensalCalculado = valorTotalExato / data.tempoContrato; // Para compatibilidade com o banco
+      const valorMensalCalculado = valorTotalExato / data.tempoMinimoContrato; // Para compatibilidade com o banco
       
       console.log(`📊 CÁLCULO EXATO DO CONTRATO (NOVA FUNÇÃO):
 • Período: ${calculoContrato.dataInicio.toLocaleDateString()} até ${calculoContrato.dataFim.toLocaleDateString()}
@@ -520,9 +522,15 @@ export function NovoContratoModal({
       const valorMensalAluguel = valorMensalCalculado;
       const valorTotalAluguel = valorTotalExato;
       
-      // Calcula data final
-      const dataFimAluguel = new Date(data.dataInicio);
-      dataFimAluguel.setMonth(dataFimAluguel.getMonth() + data.tempoContrato);
+      // Calcula data final baseada na data final fornecida ou tempo mínimo
+      let dataFimAluguel;
+      if (data.dataFinal) {
+        dataFimAluguel = data.dataFinal;
+      } else {
+        // Se não tiver data final, usa tempo mínimo para calcular
+        dataFimAluguel = new Date(data.dataInicio);
+        dataFimAluguel.setMonth(dataFimAluguel.getMonth() + data.tempoMinimoContrato);
+      }
       
       // Cria o aluguel no banco primeiro
       const locadoraId = profile?.locadoraId || profile?.id;
@@ -533,7 +541,7 @@ export function NovoContratoModal({
         veiculoId: data.veiculoId,
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFimAluguel, 'yyyy-MM-dd'),
-        tempoContrato: data.tempoContrato,
+        tempoContrato: data.tempoMinimoContrato,
         valorMensal: valorMensalAluguel.toFixed(2),
         valorTotal: valorTotalAluguel.toFixed(2),
         caucao: data.caucao.toFixed(2),
@@ -847,7 +855,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           motoristaId: '',
           veiculoId: '',
           dataInicio: getAmanha(),
-          tempoContrato: 1,
+          dataFinal: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
+          tempoMinimoContrato: 1,
           valorSemanal: 0,
           caucao: 0,
           templateId: 'default',
@@ -1024,8 +1033,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 />
               </div>
 
-              {/* DATA DE INÍCIO, TEMPO, VALOR SEMANAL E CAUÇÃO */}
-              <div className="grid grid-cols-4 gap-4">
+              {/* DATA DE INÍCIO, DATA FINAL, TEMPO MÍNIMO, VALOR SEMANAL E CAUÇÃO */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 {/* DATA DE INÍCIO */}
                 <FormField
                   control={form.control}
@@ -1058,13 +1067,51 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                   )}
                 />
 
-                {/* TEMPO DE CONTRATO */}
+                {/* DATA FINAL */}
                 <FormField
                   control={form.control}
-                  name="tempoContrato"
+                  name="dataFinal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tempo (meses) *</FormLabel>
+                      <FormLabel>Data Final</FormLabel>
+                      <div className="relative">
+                        <FormControl>
+                          <Input
+                            type="date"
+                            className="h-10"
+                            placeholder="Deixe vazio para contrato renovável"
+                            value={field.value && field.value instanceof Date && !isNaN(field.value.getTime()) ? format(field.value, "yyyy-MM-dd") : ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value) {
+                                // Cria data local sem conversões de timezone
+                                const [ano, mes, dia] = value.split('-').map(Number);
+                                const dataLocal = new Date(ano, mes - 1, dia);
+                                field.onChange(dataLocal);
+                              } else {
+                                field.onChange(undefined);
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Deixe vazio para contrato renovável
+                        </p>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4">
+                {/* TEMPO MÍNIMO DE CONTRATO */}
+                <FormField
+                  control={form.control}
+                  name="tempoMinimoContrato"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tempo Mínimo de Contrato (meses) *</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
