@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Sistema de Pagamentos com Semana Atual Totalmente Corrigido - CONCLUÍDO ✅
+- ✅ **LÓGICA DE PAGAMENTOS SEGUNDA-FEIRA** - Sistema reconhece que pagamentos são sempre segundas
+- ✅ **SEMANA ATUAL INCLUÍDA** - Quando checkbox marcado, semana atual também fica como "pago"
+- ✅ **CÁLCULO MATEMÁTICO CORRETO** - Math.floor(diffDias / 7) para determinar semanas desde primeiro pagamento
+- ✅ **CHECKBOX INTELIGENTE** - "marcar pagamentos anteriores" marca TODOS até semana atual como pagos
+- ✅ **NOTIFICAÇÕES PRECISAS** - Mensagens refletem que semana atual também é marcada como paga
+- ✅ **SISTEMA PRODUÇÃO-READY** - Lógica completa para contratos passados e futuros funcionando
+
 ### 2025-07-22: Sistema de Pagamentos Automáticos Corrigido - Aluguéis Ativos Detectados - CONCLUÍDO ✅
 - ✅ **BUG CRÍTICO CORRIGIDO** - Sistema agora trabalha com aluguéis ativos ao invés de contratos
 - ✅ **DETECÇÃO AUTOMÁTICA** - 1 aluguel ativo detectado (Henrique Oliveira gomes)

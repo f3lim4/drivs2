@@ -246,7 +246,7 @@ const criarPagamentosRecorrentes = async (
     const diffDias = Math.floor((hoje.getTime() - dataPrimeiro.getTime()) / (1000 * 60 * 60 * 24));
     const semanasCompletas = Math.floor(diffDias / 7);
     
-    // Data do pagamento da semana atual (pode ser hoje ou alguns dias antes)
+    // Data do pagamento da semana atual (segunda-feira da semana atual)
     const pagamentoSemanaAtual = new Date(dataPrimeiro);
     pagamentoSemanaAtual.setDate(dataPrimeiro.getDate() + (semanasCompletas * 7));
     
@@ -254,50 +254,53 @@ const criarPagamentosRecorrentes = async (
       diffDias,
       semanasCompletas,
       dataCalculada: format(pagamentoSemanaAtual, 'dd/MM/yyyy'),
-      hoje: format(hoje, 'dd/MM/yyyy')
+      hoje: format(hoje, 'dd/MM/yyyy'),
+      marcarComosPago: marcarAnterioresComoPago
     });
     
-    // SEMPRE criar o pagamento da semana atual, independente do checkbox
-    // O checkbox só afeta se pagamentos ANTERIORES ficam como pago ou em aberto
-    const devecriarSemanaAtual = true; // Sempre criar semana atual
+    // Se checkbox marcado, semana atual também fica como PAGO (pois pagamentos são sempre segundas)
+    // Se checkbox desmarcado, semana atual fica como EM ABERTO
+    const statusSemanaAtual = marcarAnterioresComoPago ? 'pago' : 'em_aberto';
+    const valorPagoAtual = marcarAnterioresComoPago ? valorSemanal.toString() : "0";
+    const valorRestanteAtual = marcarAnterioresComoPago ? "0" : valorSemanal.toString();
     
-    if (devecriarSemanaAtual) {
-      const pagamentoAtual = {
-        id: crypto.randomUUID(),
-        aluguelId,
-        motoristaId,
-        locadoraId: profile.locadoraId,
-        dataPagamento: format(pagamentoSemanaAtual, 'yyyy-MM-dd'),
-        valorTotal: valorSemanal.toString(),
-        valorPago: "0",
-        valorRestante: valorSemanal.toString(),
-        valorJuros: "0.00",
-        valorMulta: "0.00",
-        status: 'em_aberto',
-        tipo: 'aluguel',
-        descricao: 'Pagamento da semana atual',
-        observacoes: 'Pagamento da semana atual',
-        automatico: true
-      };
-      
-      const responseAtual = await fetch('/api/pagamentos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(pagamentoAtual)
-      });
-      
-      if (responseAtual.ok) {
-        pagamentosCriados++;
-        console.log('[SEMANA ATUAL] Criado pagamento para:', format(pagamentoSemanaAtual, 'dd/MM/yyyy'));
-      }
-    } else {
-      console.log('[SEMANA ATUAL] Não criado - já incluído nos retroativos pagos');
+    const pagamentoAtual = {
+      id: crypto.randomUUID(),
+      aluguelId,
+      motoristaId,
+      locadoraId: profile.locadoraId,
+      dataPagamento: format(pagamentoSemanaAtual, 'yyyy-MM-dd'),
+      valorTotal: valorSemanal.toString(),
+      valorPago: valorPagoAtual,
+      valorRestante: valorRestanteAtual,
+      valorJuros: "0.00",
+      valorMulta: "0.00",
+      status: statusSemanaAtual,
+      tipo: 'aluguel',
+      descricao: marcarAnterioresComoPago 
+        ? 'Pagamento da semana atual - Marcado como pago'
+        : 'Pagamento da semana atual',
+      observacoes: marcarAnterioresComoPago 
+        ? 'Pagamento da semana atual - Marcado como pago (pagamentos são sempre segundas-feiras)'
+        : 'Pagamento da semana atual',
+      automatico: true
+    };
+    
+    const responseAtual = await fetch('/api/pagamentos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pagamentoAtual)
+    });
+    
+    if (responseAtual.ok) {
+      pagamentosCriados++;
+      console.log(`[SEMANA ATUAL] Criado pagamento para ${format(pagamentoSemanaAtual, 'dd/MM/yyyy')} como ${statusSemanaAtual.toUpperCase()}`);
     }
     
     // IMPORTANTE: NÃO criar pagamento da próxima semana aqui
     // Isso será feito pelo sistema automático 1 dia antes do vencimento
 
-    console.log(`[RESULTADO FINAL] ${pagamentosCriados} pagamentos criados (${pagamentosRetroativos} retroativos + 1 próximo)`);
+    console.log(`[RESULTADO FINAL] ${pagamentosCriados} pagamentos criados (${pagamentosRetroativos} retroativos + 1 semana atual)`);
     
     return {
       totalCriados: pagamentosCriados,
@@ -807,13 +810,24 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
         
         // Exibir notificação baseada no resultado
         if (quantidadePagamentos.totalCriados > 0) {
-          const mensagem = quantidadePagamentos.retroativos > 0 
-            ? `${quantidadePagamentos.totalCriados} pagamentos criados (${quantidadePagamentos.retroativos} retroativos${quantidadePagamentos.statusRetroativos === 'pago' ? ' marcados como pagos' : ''} + 1 próximo)`
-            : `${quantidadePagamentos.totalCriados} pagamento${quantidadePagamentos.totalCriados > 1 ? 's' : ''} ${data.recorrencia}${quantidadePagamentos.totalCriados > 1 ? 's' : ''} criado${quantidadePagamentos.totalCriados > 1 ? 's' : ''} automaticamente`;
+          let mensagem = '';
+          
+          if (quantidadePagamentos.statusRetroativos === 'pago') {
+            // Checkbox marcado - todos pagamentos como pagos
+            if (quantidadePagamentos.retroativos > 0) {
+              mensagem = `${quantidadePagamentos.totalCriados} pagamentos marcados como PAGOS (${quantidadePagamentos.retroativos} retroativos + semana atual) - pagamentos são sempre segundas`;
+            } else {
+              mensagem = `1 pagamento da semana atual marcado como PAGO - pagamentos são sempre segundas`;
+            }
+          } else {
+            // Checkbox desmarcado - todos em aberto
+            mensagem = `${quantidadePagamentos.totalCriados} pagamento${quantidadePagamentos.totalCriados > 1 ? 's' : ''} criado${quantidadePagamentos.totalCriados > 1 ? 's' : ''} como EM ABERTO`;
+          }
             
           toast({
-            title: "Pagamentos Recorrentes Criados",
+            title: "✅ Pagamentos Recorrentes Criados",
             description: mensagem,
+            duration: 4000,
           });
         } else {
           console.log('[DEBUG PAGAMENTOS] Nenhum pagamento foi criado');
