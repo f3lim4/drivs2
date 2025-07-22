@@ -901,6 +901,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const contrato = await storage.updateContrato(req.params.id, result.data);
+      
+      // Se status mudou para encerrado ou cancelado, parar pagamentos automáticos
+      if (result.data.status && (result.data.status === 'encerrado' || result.data.status === 'cancelado')) {
+        console.log(`[PAGAMENTOS AUTOMÁTICOS] Status alterado para ${result.data.status} - parando geração automática`);
+        // O sistema automático irá detectar na próxima verificação que o contrato não está mais ativo
+      }
+      
       res.json(contrato);
     } catch (error) {
       console.error("Error updating contrato:", error);
