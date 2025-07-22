@@ -21,6 +21,24 @@ import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
+// Função para gerar código único de pagamento
+const gerarCodigoPagamento = async (): Promise<string> => {
+  let codigo: string;
+  let exists: boolean;
+  
+  do {
+    // Gera um código no formato PAG-XXXXXX (6 dígitos)
+    const numero = Math.floor(100000 + Math.random() * 900000);
+    codigo = `PAG-${numero}`;
+    
+    // Verifica se já existe no banco
+    const existingPayment = await db.select().from(pagamentos).where(eq(pagamentos.codigoPagamento, codigo)).limit(1);
+    exists = existingPayment.length > 0;
+  } while (exists);
+  
+  return codigo;
+};
+
 // Storage interface for database operations
 export interface IStorage {
   // User operations
@@ -751,9 +769,13 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log("[STORAGE] Criando pagamento - dados recebidos:", JSON.stringify(pagamento, null, 2));
       
+      // Gerar código único de pagamento
+      const codigoPagamento = await gerarCodigoPagamento();
+      
       const pagamentoData = {
         ...pagamento,
         id: pagamento.id || crypto.randomUUID(),
+        codigoPagamento: codigoPagamento,
       };
       
       console.log("[STORAGE] Dados para inserção:", JSON.stringify(pagamentoData, null, 2));
@@ -770,6 +792,7 @@ export class DatabaseStorage implements IStorage {
       // Retornar o objeto construído manualmente
       return {
         id: pagamentoData.id,
+        codigoPagamento: codigoPagamento,
         locadoraId: pagamentoData.locadoraId,
         motoristaId: pagamentoData.motoristaId,
         aluguelId: pagamentoData.aluguelId || null,
