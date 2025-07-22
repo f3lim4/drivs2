@@ -409,9 +409,14 @@ export function VisualizarContratoModal({
           {/* INFORMAÇÕES GERAIS DO CONTRATO */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Informações do Contrato
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Informações do Contrato
+                </div>
+                <Badge variant={getBadgeVariant(contrato.status)}>
+                  {getStatusLabel(contrato.status)}
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -453,7 +458,7 @@ export function VisualizarContratoModal({
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-4">
+              <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Data de Início</p>
                   <p className="font-semibold">{formatDate(contrato.dataInicio)}</p>
@@ -471,12 +476,6 @@ export function VisualizarContratoModal({
                       </Badge>
                     )}
                   </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Status</p>
-                  <Badge variant={getBadgeVariant(contrato.status)}>
-                    {getStatusLabel(contrato.status)}
-                  </Badge>
                 </div>
               </div>
               
