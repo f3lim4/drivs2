@@ -241,29 +241,25 @@ const criarPagamentosRecorrentes = async (
       }
     }
     
-    // PAGAMENTO DA SEMANA ATUAL: Criar apenas se não foi marcado como pago nos retroativos
-    // Calcular qual seria o pagamento da semana atual
+    // PAGAMENTO DA SEMANA ATUAL: Criar sempre o pagamento da semana que inclui hoje
+    // Calcular quantas semanas se passaram desde o primeiro pagamento até hoje
+    const diffDias = Math.floor((hoje.getTime() - dataPrimeiro.getTime()) / (1000 * 60 * 60 * 24));
+    const semanasCompletas = Math.floor(diffDias / 7);
+    
+    // Data do pagamento da semana atual (pode ser hoje ou alguns dias antes)
     const pagamentoSemanaAtual = new Date(dataPrimeiro);
-    let semanaAtual = 0;
+    pagamentoSemanaAtual.setDate(dataPrimeiro.getDate() + (semanasCompletas * 7));
     
-    // Encontrar a semana que incluí hoje (pode ser hoje ou antes)
-    while (pagamentoSemanaAtual <= hoje) {
-      const proximaSemana = new Date(pagamentoSemanaAtual);
-      proximaSemana.setDate(proximaSemana.getDate() + 7);
-      
-      // Se a próxima semana já passou de hoje, então a atual é a certa
-      if (proximaSemana > hoje) {
-        break;
-      }
-      
-      semanaAtual++;
-      pagamentoSemanaAtual.setDate(dataPrimeiro.getDate() + (semanaAtual * 7));
-    }
+    console.log('[SEMANA ATUAL] Cálculo:', {
+      diffDias,
+      semanasCompletas,
+      dataCalculada: format(pagamentoSemanaAtual, 'dd/MM/yyyy'),
+      hoje: format(hoje, 'dd/MM/yyyy')
+    });
     
-    console.log('[SEMANA ATUAL] Pagamento da semana atual:', format(pagamentoSemanaAtual, 'dd/MM/yyyy'));
-    
-    // Só criar o pagamento da semana atual se não foi criado como retroativo pago
-    const devecriarSemanaAtual = !marcarAnterioresComoPago || pagamentoSemanaAtual >= hoje;
+    // SEMPRE criar o pagamento da semana atual, independente do checkbox
+    // O checkbox só afeta se pagamentos ANTERIORES ficam como pago ou em aberto
+    const devecriarSemanaAtual = true; // Sempre criar semana atual
     
     if (devecriarSemanaAtual) {
       const pagamentoAtual = {
