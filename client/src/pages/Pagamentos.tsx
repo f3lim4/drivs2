@@ -356,33 +356,22 @@ export default function Pagamentos() {
               {paginatedPagamentos.map((pagamento) => (
                 <TableRow key={pagamento.id}>
                   <TableCell>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <div className="font-medium">{pagamento.motoristaNome || 'N/A'}</div>
-                      </div>
+                    <div>
+                      <div className="font-medium">{pagamento.motoristaNome || 'N/A'}</div>
+                      <div className="text-xs text-muted-foreground">{pagamento.motoristaId || 'CPF não informado'}</div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center space-x-2">
-                      {pagamento.veiculoPlaca ? (
-                        <>
-                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                            <Car className="w-4 h-4 text-gray-600" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-sm">{pagamento.veiculoPlaca}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {pagamento.veiculoMarca} {pagamento.veiculoModelo}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-sm text-muted-foreground">-</div>
-                      )}
-                    </div>
+                    {pagamento.veiculoPlaca ? (
+                      <div>
+                        <div className="font-medium text-sm">{pagamento.veiculoPlaca}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {pagamento.veiculoMarca} {pagamento.veiculoModelo}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-muted-foreground">-</div>
+                    )}
                   </TableCell>
                   <TableCell>
                     {getStatusBadge(pagamento.status)}
