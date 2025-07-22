@@ -480,17 +480,12 @@ export function VisualizarContratoModal({
                 </div>
               </div>
               
-              {/* INFORMAÇÕES PARA CONTRATO RENOVÁVEL - SEM PRÓXIMA AVALIAÇÃO */}
+              {/* TEMPO MÍNIMO PARA CONTRATOS RENOVÁVEIS */}
               {!contrato.dataFim && (
                 <div className="mt-4 pt-4 border-t">
-                  <div className="mb-3">
+                  <div>
                     <p className="text-sm font-medium text-gray-600">Tempo Mínimo de Contrato</p>
-                    <p className="font-semibold">{contrato.tempoMinimoContrato || 1} mês{(contrato.tempoMinimoContrato || 1) > 1 ? 'es' : ''}</p>
-                  </div>
-                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                    <p className="text-sm text-green-700">
-                      <strong>Contrato Renovável:</strong> Este contrato não possui data de término fixa e pode ser renovado automaticamente após o período mínimo.
-                    </p>
+                    <p className="font-semibold text-lg">{contrato.tempoMinimoContrato || 1} mês{(contrato.tempoMinimoContrato || 1) > 1 ? 'es' : ''}</p>
                   </div>
                 </div>
               )}
