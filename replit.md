@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Correção Crítica - Sistema de Contratos Dropdowns Funcionando - CONCLUÍDO ✅
+- ✅ **BUG CRÍTICO IDENTIFICADO** - Campo vencimentoCnh sendo acessado incorretamente no filtro de motoristas
+- ✅ **PROBLEMA RESOLVIDO** - Código estava tentando acessar `vencimento_cnh` quando backend retorna `vencimentoCnh`
+- ✅ **MOTORISTAS DISPONÍVEIS** - 8 de 10 motoristas agora aparecem corretamente no dropdown
+- ✅ **JEANE LIBERADA** - Motorista com CNH válida até 2031 agora disponível para contratos
+- ✅ **VEÍCULO EUQ8D22 FUNCIONAL** - Aparece corretamente no dropdown de veículos disponíveis
+- ✅ **FILTRO INTELIGENTE OPERACIONAL** - Sistema verifica CNH válida e aluguéis ativos corretamente
+- ✅ **SISTEMA TESTADO** - Modal de novo contrato totalmente funcional
+- ✅ **LOGS DE DEBUG LIMPOS** - Interface otimizada sem poluição visual
+
 ### 2025-01-22: Correção Crítica de Datas de Vencimento - Bug de Timezone Resolvido - CONCLUÍDO ✅
 - ✅ **PROBLEMA IDENTIFICADO** - Datas de vencimento aparecendo 1 dia adiantadas em todos os pagamentos
 - ✅ **CAUSA RAIZ ENCONTRADA** - Múltiplas funções formatDate() espalhadas pelo sistema causando conflitos de timezone
