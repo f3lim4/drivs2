@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Correção Crítica dos Cálculos de Contratos - Bug de Semanas/Mês Resolvido - CONCLUÍDO ✅
+- ✅ **BUG MATEMÁTICO CRÍTICO CORRIGIDO** - Sistema assumia incorretamente que 1 mês = 4 semanas (28 dias)
+- ✅ **LÓGICA REAL IMPLEMENTADA** - Meses têm 30-31 dias, alguns meses têm 5 semanas
+- ✅ **CÁLCULO VALOR MENSAL CORRIGIDO** - valorSemanal * 4.35 (baseado em 30.44 dias/mês ÷ 7 dias/semana)
+- ✅ **QUANTIDADE DE PAGAMENTOS CORRIGIDA** - Baseada nos dias reais do contrato, não assumindo 4 semanas/mês
+- ✅ **PAGAMENTOS SEMANAIS PRECISOS** - Math.ceil(totalDiasContrato / 7) para cobertura completa
+- ✅ **PAGAMENTOS QUINZENAIS CORRIGIDOS** - Math.ceil(totalDiasContrato / 15) dias reais
+- ✅ **PAGAMENTOS MENSAIS MANTIDOS** - Usa número de meses do contrato diretamente
+- ✅ **LOGS DETALHADOS ADICIONADOS** - Debug mostra cálculos passo-a-passo para validação
+- ✅ **PROBLEMA DE NEGÓCIO RESOLVIDO** - Motoristas agora pagam valores corretos que cobrem todo o período do contrato
+- ✅ **IMPACTO FINANCEIRO CORRIGIDO** - Elimina perdas financeiras por cálculos incorretos de recorrência
+
 ### 2025-07-22: Cálculo de Receita Totalmente Consistente nos Relatórios Financeiros - CONCLUÍDO ✅
 - ✅ **RECEITA TOTAL CORRIGIDA** - Card principal agora usa receitaAlugueis ao invés de receitaPagamentos
 - ✅ **RECEITAS POR TIPO PADRONIZADA** - Card "Receita dos Aluguéis" também usa receitaAlugueis

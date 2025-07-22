@@ -125,65 +125,67 @@ const criarPagamentosRecorrentes = async (
     
     let quantidadePagamentos = 0;
     
-    // CORREÇÃO CRÍTICA: tempoContrato é em MESES, pagamentos são SEMANAIS
-    // Calcula data final do contrato (tempoContrato meses após início)
+    // NOVA LÓGICA CORRIGIDA: Cálculo baseado em dias reais do contrato
     const dataFinalContrato = new Date(dataInicioContrato);
     dataFinalContrato.setMonth(dataFinalContrato.getMonth() + tempoContrato);
     
-    console.log('[DEBUG] Cálculo de pagamentos:', {
+    console.log('[DEBUG] Cálculo de pagamentos corrigido:', {
       tempoContratoMeses: tempoContrato,
       dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
       dataFinal: format(dataFinalContrato, 'dd/MM/yyyy'),
       hoje: format(hoje, 'dd/MM/yyyy')
     });
     
-    // Se data de início é no passado, cria pagamentos até hoje
-    if (dataInicioContrato <= hoje) {
-      // Calcula quantos pagamentos semanais já passaram desde o primeiro pagamento
-      const dataBase = new Date(dataPrimeiroPagamento);
-      dataBase.setHours(0, 0, 0, 0);
-      
-      let dataAtual = new Date(dataBase);
-      quantidadePagamentos = 0;
-      
-      // Conta quantas semanas se passaram desde o primeiro pagamento até hoje
-      while (dataAtual <= hoje && quantidadePagamentos < 20) { // Limite de segurança
-        quantidadePagamentos++;
-        dataAtual = calcularProximaData(dataBase, recorrencia, quantidadePagamentos);
-      }
-      
-      // Adiciona +1 para o próximo pagamento (1 dia antes do vencimento)
-      quantidadePagamentos += 1;
-      
-      console.log('[DEBUG PASSADO] Contrato iniciado no passado:', {
-        primeiroPagamento: format(dataPrimeiroPagamento, 'dd/MM/yyyy'),
-        pagamentosAteHoje: quantidadePagamentos - 1,
-        proximoPagamento: 1,
-        totalPagamentos: quantidadePagamentos
-      });
-      
-    } else {
-      // Se data de início é no futuro, cria apenas 1 pagamento (1 dia antes do vencimento)
-      quantidadePagamentos = 1;
-      
-      console.log('[DEBUG FUTURO] Contrato iniciado no futuro:', {
-        dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
-        hoje: format(hoje, 'dd/MM/yyyy'),
-        quantidadePagamentos
-      });
+    // Calcula total de dias do contrato
+    const diffTime = dataFinalContrato.getTime() - dataInicioContrato.getTime();
+    const totalDiasContrato = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Calcula quantos pagamentos baseado na recorrência e duração total
+    switch (recorrencia) {
+      case 'semanal':
+        // Para pagamentos semanais: total de semanas no contrato
+        quantidadePagamentos = Math.ceil(totalDiasContrato / 7);
+        break;
+      case 'quinzenal':
+        // Para pagamentos quinzenais: total de quinzenas no contrato
+        quantidadePagamentos = Math.ceil(totalDiasContrato / 15);
+        break;
+      case 'mensal':
+        // Para pagamentos mensais: usa o número de meses do contrato
+        quantidadePagamentos = tempoContrato;
+        break;
     }
+    
+    // Limite de segurança para evitar sobrecarga
+    if (quantidadePagamentos > 50) {
+      console.warn('[LIMITE] Quantidade de pagamentos limitada a 50 para segurança');
+      quantidadePagamentos = 50;
+    }
+    
+    console.log('[DEBUG CORRIGIDO] Cálculo baseado em dias reais:', {
+      totalDiasContrato,
+      recorrencia,
+      quantidadePagamentosCalculados: quantidadePagamentos,
+      explicacao: recorrencia === 'semanal' 
+        ? `${totalDiasContrato} dias ÷ 7 dias/semana = ${quantidadePagamentos} pagamentos`
+        : recorrencia === 'quinzenal'
+        ? `${totalDiasContrato} dias ÷ 15 dias/quinzena = ${quantidadePagamentos} pagamentos`
+        : `${tempoContrato} meses = ${quantidadePagamentos} pagamentos mensais`
+    });
 
-    // Calcula valor do pagamento baseado na recorrência
+    // CORREÇÃO: Calcula valor baseado nos dias reais do período, não apenas semanas
     let valorPagamento = 0;
     switch (recorrencia) {
       case 'semanal':
         valorPagamento = valorSemanal;
         break;
       case 'quinzenal':
-        valorPagamento = valorSemanal * 2;
+        valorPagamento = valorSemanal * 2; // 2 semanas = 14 dias
         break;
       case 'mensal':
-        valorPagamento = valorSemanal * 4;
+        // CORRIGIDO: 1 mês tem aproximadamente 30.44 dias (365/12)
+        // Para garantir cobertura total: valorSemanal * (30.44/7) ≈ valorSemanal * 4.35
+        valorPagamento = valorSemanal * 4.35; // Garante cobertura dos meses com 5 semanas
         break;
     }
 
