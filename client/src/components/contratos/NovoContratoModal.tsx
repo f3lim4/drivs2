@@ -123,7 +123,7 @@ const calcularProximaData = (dataBase: Date, recorrencia: string, incremento: nu
   return novaData;
 };
 
-// Função para criar pagamentos recorrentes
+// Função para criar pagamentos recorrentes com lógica retroativa inteligente
 const criarPagamentosRecorrentes = async (
   aluguelId: string,
   motoristaId: string,
@@ -133,7 +133,8 @@ const criarPagamentosRecorrentes = async (
   tempoMinimoContrato: number,
   dataInicioContrato: Date,
   tipoPagamento: 'ilimitado' | 'limitado' = 'ilimitado',
-  quantidadePagamentos?: number
+  quantidadePagamentos?: number,
+  marcarAnterioresComoPago?: boolean
 ) => {
   try {
     const auth = JSON.parse(localStorage.getItem('drivs_profile') || '{}');
@@ -143,64 +144,18 @@ const criarPagamentosRecorrentes = async (
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     
-    let quantidadePagamentos = 0;
+    // Data do primeiro pagamento sem horas
+    const dataPrimeiro = new Date(dataPrimeiroPagamento);
+    dataPrimeiro.setHours(0, 0, 0, 0);
     
-    // NOVA LÓGICA CORRIGIDA: Cálculo baseado em dias reais do contrato
-    const dataFinalContrato = new Date(dataInicioContrato);
-    dataFinalContrato.setMonth(dataFinalContrato.getMonth() + tempoMinimoContrato);
-    
-    console.log('[DEBUG] Cálculo de pagamentos corrigido:', {
-      tempoMinimoContratoMeses: tempoMinimoContrato,
-      dataInicio: format(dataInicioContrato, 'dd/MM/yyyy'),
-      dataFinal: format(dataFinalContrato, 'dd/MM/yyyy'),
-      hoje: format(hoje, 'dd/MM/yyyy')
-    });
-    
-    // Calcula total de dias do contrato
-    const diffTime = dataFinalContrato.getTime() - dataInicioContrato.getTime();
-    const totalDiasContrato = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    // Calcula quantos pagamentos baseado no tipo e recorrência
-    if (tipoPagamento === 'limitado' && quantidadePagamentos) {
-      // Usa quantidade específica definida pelo usuário
-      console.log('[DEBUG] Pagamento limitado: usando quantidade específica:', quantidadePagamentos);
-    } else {
-      // Pagamento ilimitado: calcula baseado na duração total do contrato
-      switch (recorrencia) {
-        case 'semanal':
-          // Para pagamentos semanais: total de semanas no contrato
-          quantidadePagamentos = Math.ceil(totalDiasContrato / 7);
-          break;
-        case 'quinzenal':
-          // Para pagamentos quinzenais: total de quinzenas no contrato
-          quantidadePagamentos = Math.ceil(totalDiasContrato / 15);
-          break;
-        case 'mensal':
-          // Para pagamentos mensais: usa o número de meses do contrato
-          quantidadePagamentos = tempoMinimoContrato;
-          break;
-      }
-      console.log('[DEBUG] Pagamento ilimitado: calculado automaticamente:', quantidadePagamentos);
-    }
-    
-    // Limite de segurança para evitar sobrecarga
-    if (quantidadePagamentos > 50) {
-      console.warn('[LIMITE] Quantidade de pagamentos limitada a 50 para segurança');
-      quantidadePagamentos = 50;
-    }
-    
-    console.log('[DEBUG CORRIGIDO] Cálculo baseado em dias reais:', {
-      totalDiasContrato,
+    console.log('[PAGAMENTOS RETROATIVOS] Iniciando geração inteligente:', {
+      dataPrimeiroPagamento: format(dataPrimeiro, 'dd/MM/yyyy'),
+      dataAtual: format(hoje, 'dd/MM/yyyy'),
       recorrencia,
-      quantidadePagamentosCalculados: quantidadePagamentos,
-      explicacao: recorrencia === 'semanal' 
-        ? `${totalDiasContrato} dias ÷ 7 dias/semana = ${quantidadePagamentos} pagamentos`
-        : recorrencia === 'quinzenal'
-        ? `${totalDiasContrato} dias ÷ 15 dias/quinzena = ${quantidadePagamentos} pagamentos`
-        : `${tempoMinimoContrato} meses = ${quantidadePagamentos} pagamentos mensais`
+      marcarAnterioresComoPago
     });
-
-    // CORREÇÃO: Calcula valor baseado nos dias reais do período, não apenas semanas
+    
+    // Calcula valor por pagamento baseado na recorrência
     let valorPagamento = 0;
     switch (recorrencia) {
       case 'semanal':
@@ -210,94 +165,162 @@ const criarPagamentosRecorrentes = async (
         valorPagamento = valorSemanal * 2; // 2 semanas = 14 dias
         break;
       case 'mensal':
-        // CORRIGIDO: 1 mês tem aproximadamente 30.44 dias (365/12)
-        // Para garantir cobertura total: valorSemanal * (30.44/7) ≈ valorSemanal * 4.35
-        valorPagamento = valorSemanal * 4.35; // Garante cobertura dos meses com 5 semanas
+        valorPagamento = valorSemanal * 4.35; // Média de semanas por mês
         break;
     }
-
-    const pagamentos = [];
     
-    // Cria array de pagamentos
-    for (let i = 0; i < quantidadePagamentos; i++) {
-      const dataPagamento = calcularProximaData(dataPrimeiroPagamento, recorrencia, i);
+    let pagamentosCriados = 0;
+    let pagamentosRetroativos = 0;
+    
+    // LÓGICA INTELIGENTE: Gerar pagamentos retroativos se necessário
+    if (dataPrimeiro < hoje) {
+      console.log('[RETROATIVO] Data do primeiro pagamento é anterior à atual - gerando pagamentos em atraso');
       
-      // CRÍTICO: Buscar locadoraId corretamente do perfil
-      let finalLocadoraId = profile?.locadoraId || profile?.id || '';
+      // Calcular quantos pagamentos devem existir entre a data inicial e hoje
+      const diffDias = Math.ceil((hoje.getTime() - dataPrimeiro.getTime()) / (1000 * 60 * 60 * 24));
+      let intervalosDias = 0;
       
-      console.log('[DEBUG PROFILE] Profile completo:', profile);
-      console.log('[DEBUG PROFILE] profile.locadoraId:', profile?.locadoraId);
-      console.log('[DEBUG PROFILE] profile.id:', profile?.id);
-      console.log('[DEBUG PROFILE] finalLocadoraId:', finalLocadoraId);
-      
-      if (!finalLocadoraId) {
-        console.error('[ERRO CRÍTICO] locadoraId não encontrado no perfil:', profile);
-        console.error('[ERRO CRÍTICO] localStorage drivs_profile:', localStorage.getItem('drivs_profile'));
-        // EM VEZ DE FALHAR, USA UM ID FIXO PARA TESTE
-        console.warn('[FALLBACK] Usando locadoraId fixo para teste: 50764571000170');
-        finalLocadoraId = '50764571000170';
+      switch (recorrencia) {
+        case 'semanal':
+          intervalosDias = 7;
+          break;
+        case 'quinzenal':
+          intervalosDias = 15;
+          break;
+        case 'mensal':
+          intervalosDias = 30; // Aproximação para cálculo
+          break;
       }
       
-      console.log('[DEBUG PAGAMENTO] LocadoraId final:', finalLocadoraId);
+      const quantidadeRetroativa = Math.ceil(diffDias / intervalosDias);
       
-      const pagamento = {
-        id: crypto.randomUUID(),
-        locadoraId: finalLocadoraId,
-        motoristaId,
-        aluguelId,
-        tipo: 'aluguel',
-        descricao: `Pagamento ${recorrencia} ${i + 1}/${quantidadePagamentos}`,
-        valorTotal: valorPagamento.toFixed(2),
-        valorPago: '0.00',
-        valorRestante: valorPagamento.toFixed(2),
-        dataPagamento: format(dataPagamento, 'yyyy-MM-dd'),
-        status: 'em_aberto',
-        observacoes: `Pagamento criado automaticamente - recorrência ${recorrencia}`,
-        valorJuros: '0.00',
-        valorMulta: '0.00'
-      };
-      
-      console.log(`[DEBUG] Profile para pagamento:`, { 
-        profileId: profile?.id, 
-        profileLocadoraId: profile?.locadoraId,
-        pagamentoLocadoraId: pagamento.locadoraId 
+      console.log('[RETROATIVO] Cálculo:', {
+        diasPassados: diffDias,
+        intervaloDias: intervalosDias,
+        quantidadeRetroativa
       });
       
-      console.log(`[PAYMENT] Criando pagamento ${i + 1}:`, pagamento);
-      pagamentos.push(pagamento);
-    }
-
-    // Cria todos os pagamentos no banco
-    let pagamentosCriados = 0;
-    for (const pagamento of pagamentos) {
-      try {
-        const response = await fetch('/api/pagamentos', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(pagamento),
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`[PAYMENT ERROR] Erro ao criar pagamento ${pagamento.id}:`, errorText);
-        } else {
-          const resultado = await response.json();
-          console.log(`[PAYMENT SUCCESS] Pagamento criado:`, resultado);
-          pagamentosCriados++;
+      // Criar pagamentos retroativos
+      for (let i = 0; i < quantidadeRetroativa; i++) {
+        const dataVencimento = new Date(dataPrimeiro);
+        
+        switch (recorrencia) {
+          case 'semanal':
+            dataVencimento.setDate(dataPrimeiro.getDate() + (i * 7));
+            break;
+          case 'quinzenal':
+            dataVencimento.setDate(dataPrimeiro.getDate() + (i * 15));
+            break;
+          case 'mensal':
+            dataVencimento.setMonth(dataPrimeiro.getMonth() + i);
+            break;
         }
-      } catch (error) {
-        console.error(`[PAYMENT CATCH] Erro ao processar pagamento ${pagamento.id}:`, error);
+        
+        // Só cria se a data de vencimento for anterior ou igual a hoje
+        if (dataVencimento <= hoje) {
+          const statusPagamento = marcarAnterioresComoPago ? 'pago_total' : 'em_aberto';
+          
+          const pagamento = {
+            id: crypto.randomUUID(),
+            aluguelId,
+            motoristaId,
+            locadoraId: profile.locadoraId,
+            dataVencimento: format(dataVencimento, 'yyyy-MM-dd'),
+            valor: valorPagamento,
+            status: statusPagamento as const,
+            observacoes: marcarAnterioresComoPago 
+              ? `Pagamento retroativo ${i + 1} - Marcado automaticamente como pago`
+              : `Pagamento retroativo ${i + 1} - ${recorrencia}`,
+            codigoPagamento: `PAG-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+          };
+
+          console.log('[RETROATIVO CRIADO]', {
+            numero: i + 1,
+            data: format(dataVencimento, 'dd/MM/yyyy'),
+            status: statusPagamento,
+            valor: pagamento.valor
+          });
+          
+          const response = await fetch('/api/pagamentos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(pagamento)
+          });
+
+          if (response.ok) {
+            pagamentosCriados++;
+            pagamentosRetroativos++;
+            console.log(`✓ Pagamento retroativo ${i + 1} criado:`, format(dataVencimento, 'dd/MM/yyyy'));
+          } else {
+            console.error(`✗ Erro ao criar pagamento retroativo ${i + 1}:`, await response.text());
+          }
+        }
       }
     }
-
-    console.log(`[PAYMENTS RESULT] ${pagamentosCriados}/${pagamentos.length} pagamentos recorrentes criados com sucesso`);
-    return pagamentosCriados;
     
+    // SEMPRE CRIAR PRÓXIMO PAGAMENTO (como "em_aberto")
+    const proximaData = new Date(dataPrimeiro);
+    
+    if (dataPrimeiro < hoje) {
+      // Se há pagamentos retroativos, calcular a próxima data baseada no último pagamento
+      const ultimoPagamentoIndex = pagamentosRetroativos;
+      
+      switch (recorrencia) {
+        case 'semanal':
+          proximaData.setDate(dataPrimeiro.getDate() + (ultimoPagamentoIndex * 7));
+          break;
+        case 'quinzenal':
+          proximaData.setDate(dataPrimeiro.getDate() + (ultimoPagamentoIndex * 15));
+          break;
+        case 'mensal':
+          proximaData.setMonth(dataPrimeiro.getMonth() + ultimoPagamentoIndex);
+          break;
+      }
+    }
+    
+    // Criar próximo pagamento sempre como "em_aberto"
+    const proximoPagamento = {
+      id: crypto.randomUUID(),
+      aluguelId,
+      motoristaId,
+      locadoraId: profile.locadoraId,
+      dataVencimento: format(proximaData, 'yyyy-MM-dd'),
+      valor: valorPagamento,
+      status: 'em_aberto' as const,
+      observacoes: `Próximo pagamento - ${recorrencia}`,
+      codigoPagamento: `PAG-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+    };
+
+    console.log('[PRÓXIMO PAGAMENTO CRIADO]', {
+      data: format(proximaData, 'dd/MM/yyyy'),
+      valor: proximoPagamento.valor,
+      status: 'em_aberto'
+    });
+    
+    const responseProximo = await fetch('/api/pagamentos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(proximoPagamento)
+    });
+
+    if (responseProximo.ok) {
+      pagamentosCriados++;
+      console.log(`✓ Próximo pagamento criado:`, format(proximaData, 'dd/MM/yyyy'));
+    } else {
+      console.error(`✗ Erro ao criar próximo pagamento:`, await responseProximo.text());
+    }
+
+    console.log(`[RESULTADO FINAL] ${pagamentosCriados} pagamentos criados (${pagamentosRetroativos} retroativos + 1 próximo)`);
+    
+    return {
+      totalCriados: pagamentosCriados,
+      retroativos: pagamentosRetroativos,
+      statusRetroativos: marcarAnterioresComoPago ? 'pago_total' : 'em_aberto'
+    };
+
   } catch (error) {
-    console.error('Erro ao criar pagamentos recorrentes:', error);
-    return 0;
+    console.error('[ERRO] Falha na criação de pagamentos recorrentes:', error);
+    return { totalCriados: 0, retroativos: 0, statusRetroativos: 'em_aberto' };
   }
 };
 
@@ -782,54 +805,21 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           data.tempoMinimoContrato,
           data.dataInicio,  // Passa a data de início do contrato
           data.tipoPagamento,  // Tipo: ilimitado ou limitado
-          data.quantidadePagamentos  // Quantidade específica (se limitado)
+          data.quantidadePagamentos,  // Quantidade específica (se limitado)
+          data.marcarPagamentosAnteriores  // Marcar pagamentos anteriores como pagos
         );
         
-        console.log('[DEBUG PAGAMENTOS] Quantidade criada:', quantidadePagamentos);
+        console.log('[DEBUG PAGAMENTOS] Resultado:', quantidadePagamentos);
         
-        // Se checkbox "Pagamentos Anteriores" estiver marcado, marcar pagamentos anteriores como pagos
-        if (data.marcarPagamentosAnteriores && quantidadePagamentos > 0) {
-          console.log('[DEBUG PAGAMENTOS ANTERIORES] Iniciando marcação de pagamentos anteriores como pagos...');
-          try {
-            const response = await fetch('/api/pagamentos/marcar-anteriores-pagos', {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                motoristaId: data.motoristaId,
-                dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
-                recorrencia: data.recorrencia
-              }),
-            });
+        // Exibir notificação baseada no resultado
+        if (quantidadePagamentos.totalCriados > 0) {
+          const mensagem = quantidadePagamentos.retroativos > 0 
+            ? `${quantidadePagamentos.totalCriados} pagamentos criados (${quantidadePagamentos.retroativos} retroativos${quantidadePagamentos.statusRetroativos === 'pago_total' ? ' marcados como pagos' : ''} + 1 próximo)`
+            : `${quantidadePagamentos.totalCriados} pagamento${quantidadePagamentos.totalCriados > 1 ? 's' : ''} ${data.recorrencia}${quantidadePagamentos.totalCriados > 1 ? 's' : ''} criado${quantidadePagamentos.totalCriados > 1 ? 's' : ''} automaticamente`;
             
-            if (response.ok) {
-              const resultado = await response.json();
-              console.log('[DEBUG PAGAMENTOS ANTERIORES] Resultado:', resultado);
-              toast({
-                title: "Pagamentos Recorrentes Criados e Atualizados",
-                description: `${quantidadePagamentos} pagamentos criados. ${resultado.pagamentosAtualizados} pagamentos anteriores marcados como "pago total".`,
-              });
-            } else {
-              console.error('[DEBUG PAGAMENTOS ANTERIORES] Erro na marcação:', response.statusText);
-              toast({
-                title: "Pagamentos Recorrentes Criados",
-                description: `${quantidadePagamentos} pagamentos ${data.recorrencia}s foram criados automaticamente. Erro ao marcar pagamentos anteriores.`,
-                variant: "destructive",
-              });
-            }
-          } catch (error) {
-            console.error('[DEBUG PAGAMENTOS ANTERIORES] Erro na requisição:', error);
-            toast({
-              title: "Pagamentos Recorrentes Criados",
-              description: `${quantidadePagamentos} pagamentos ${data.recorrencia}s foram criados automaticamente. Erro ao marcar pagamentos anteriores.`,
-              variant: "destructive",
-            });
-          }
-        } else if (quantidadePagamentos > 0) {
           toast({
             title: "Pagamentos Recorrentes Criados",
-            description: `${quantidadePagamentos} pagamentos ${data.recorrencia}s foram criados automaticamente com status "Em Aberto".`,
+            description: mensagem,
           });
         } else {
           console.log('[DEBUG PAGAMENTOS] Nenhum pagamento foi criado');
