@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Modal de Visualização de Contratos Ultra-Compacto - CONCLUÍDO ✅
+- ✅ **LAYOUT COMPACTO IMPLEMENTADO** - Todas as informações organizadas em um único card com 3 colunas
+- ✅ **VALOR TOTAL REMOVIDO** - Eliminado campo "Valor" que mostrava valor total do contrato
+- ✅ **VALOR SEMANAL DESTACADO** - Exibe valor semanal em verde para fácil identificação
+- ✅ **VALOR CAUÇÃO DESTACADO** - Mostra valor da caução em azul separadamente
+- ✅ **DADOS INTEGRADOS** - Cliente (nome + CPF), Veículo (marca/modelo + placa) e Valores (semanal + caução) na mesma visualização
+- ✅ **IMPRESSÃO/PDF ATUALIZADOS** - Funções de impressão e geração de PDF também corrigidas com novos valores
+- ✅ **INTERFACE OTIMIZADA** - Melhor aproveitamento de espaço com informações organizadas logicamente
+
 ### 2025-07-22: Sistema de 4 Status de Contratos Totalmente Implementado - CONCLUÍDO ✅
 - ✅ **STATUS INICIAL CORRIGIDO** - Novos contratos iniciams como "em_aberto" ao invés de "ativo"
 - ✅ **MODAL DE CANCELAMENTO IMPLEMENTADO** - Sistema completo com campo obrigatório de motivo
