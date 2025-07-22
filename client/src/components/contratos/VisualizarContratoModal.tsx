@@ -346,7 +346,7 @@ export function VisualizarContratoModal({
               <p className="font-medium">{contrato.cliente}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Valor Total</p>
+              <p className="text-sm text-muted-foreground">Valor Total do Contrato</p>
               <p className="font-medium">R$ {Number(contrato.valor).toFixed(2)}</p>
             </div>
             <div>
