@@ -22,6 +22,7 @@ import { NovoPagamentoModal } from '@/components/pagamentos/NovoPagamentoModal';
 import { EditarPagamentoModal } from '@/components/pagamentos/EditarPagamentoModal';
 import { DetalhesPagamentoModal } from '@/components/pagamentos/DetalhesPagamentoModal';
 import { ExcluirPagamentoModal } from '@/components/pagamentos/ExcluirPagamentoModal';
+import { formatDate } from '@/lib/utils';
 import type { Pagamento } from '@shared/schema';
 
 export default function Pagamentos() {
@@ -100,9 +101,7 @@ export default function Pagamentos() {
     }).format(numValue);
   };
 
-  const formatDate = (date: string | Date) => {
-    return new Date(date).toLocaleDateString('pt-BR');
-  };
+
 
   // Filtrar e ordenar pagamentos
   const pagamentosFiltrados = useMemo(() => {
