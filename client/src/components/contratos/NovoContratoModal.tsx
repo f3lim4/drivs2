@@ -426,6 +426,8 @@ export function NovoContratoModal({
           const now = new Date();
           
           const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
+            const isJeane = motorista.id === "161.059.678-10";
+            
             // Verifica CNH válida
             const temVencimento = !!motorista.vencimentoCnh;
             let cnhValida = false;
@@ -440,6 +442,22 @@ export function NovoContratoModal({
             );
             
             const disponivel = temVencimento && cnhValida && !temAluguelAtivo;
+            
+            if (isJeane) {
+              console.log("🔍 TESTE JEANE:", {
+                id: motorista.id,
+                nome: motorista.nome,
+                vencimentoCnh: motorista.vencimentoCnh,
+                temVencimento,
+                cnhValida,
+                vencimentoDate: temVencimento ? new Date(motorista.vencimentoCnh) : null,
+                agora: now,
+                temAluguelAtivo,
+                totalAlugueis: alugueisAtivos.length,
+                disponivel,
+                PASSA_FILTRO: disponivel
+              });
+            }
             
             return disponivel;
           }).map((motorista: any) => ({
@@ -954,40 +972,40 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                   )}
                 />
 
-                {/* SELEÇÃO DE MOTORISTA */}
+                {/* SELEÇÃO DE MOTORISTA - TESTE DROPDOWN SIMPLES */}
                 <FormField
                   control={form.control}
                   name="motoristaId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Motorista Disponível *</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecionar motorista" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {motoristas.length > 0 ? (
-                            motoristas.map((motorista) => (
-                              <SelectItem key={motorista.id} value={motorista.id}>
-                                <div className="flex flex-col">
-                                  <span className="font-medium">
-                                    {motorista.nome}
-                                  </span>
-                                  <span className="text-sm text-muted-foreground">
-                                    CPF: {motorista.id}
-                                  </span>
-                                </div>
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="none" disabled>
-                              Nenhum motorista com CNH válida
-                            </SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Motorista Disponível * ({motoristas.length} encontrados)</FormLabel>
+                      
+                      {/* Lista visual dos motoristas para debug */}
+                      <div className="text-xs bg-blue-50 p-2 rounded border">
+                        <strong>MOTORISTAS CARREGADOS:</strong><br/>
+                        {motoristas.map((m, i) => (
+                          <div key={m.id} className={`text-xs ${m.id === "161.059.678-10" ? "bg-yellow-200 font-bold" : ""}`}>
+                            {i + 1}. {m.nome} (CPF: {m.id})
+                          </div>
+                        ))}
+                        {motoristas.length === 0 && <div className="text-red-500">❌ Nenhum motorista carregado</div>}
+                      </div>
+                      
+                      {/* Dropdown HTML nativo para teste */}
+                      <FormControl>
+                        <select 
+                          value={field.value || ""} 
+                          onChange={(e) => field.onChange(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          <option value="">Selecionar motorista</option>
+                          {motoristas.map((motorista) => (
+                            <option key={motorista.id} value={motorista.id}>
+                              {motorista.nome} - CPF: {motorista.id}
+                            </option>
+                          ))}
+                        </select>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
