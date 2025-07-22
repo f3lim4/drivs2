@@ -629,10 +629,10 @@ export default function Contratos() {
                         </TableCell>
                         <TableCell>
                           <Badge 
-                            variant={contrato.tipo === 'aluguel_ativo' ? 'default' : 'outline'} 
-                            className={contrato.tipo === 'aluguel_ativo' ? 'bg-blue-500 text-white' : 'capitalize'}
+                            variant={contrato.tipo === 'Ativo' ? 'default' : 'outline'} 
+                            className={contrato.tipo === 'Ativo' ? 'bg-blue-500 text-white' : 'capitalize'}
                           >
-                            {contrato.tipo === 'aluguel_ativo' ? 'Aluguel Ativo' : contrato.tipo}
+                            {contrato.tipo === 'Ativo' ? 'Ativo' : contrato.tipo}
                           </Badge>
                         </TableCell>
 
