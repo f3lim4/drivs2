@@ -371,24 +371,14 @@ export default function Contratos() {
   const contratosFinalizados = contratos.filter(c => c.status === 'finalizado').length;
   const contratosCancelados = contratos.filter(c => c.status === 'cancelado').length;
   
-  // CÁLCULO EXATO: Usa nova função que conta apenas semanas completas
+  // SOMA DOS VALORES MENSAIS DOS CONTRATOS
   const valorTotal = contratos.reduce((sum, c) => {
-    if (c.valorSemanal && c.dataInicio && c.tempoContrato) {
-      try {
-        // Usa função calcularContratoExato para valor total correto
-        const calculoExato = calcularContratoExato(
-          new Date(c.dataInicio),
-          parseInt(c.tempoContrato.toString()),
-          parseFloat(c.valorSemanal)
-        );
-        return sum + calculoExato.valorTotal;
-      } catch (error) {
-        console.warn('Erro ao calcular contrato exato:', error);
-        // Fallback para contratos com problemas
-        return sum + (parseFloat(c.valor) || 0);
-      }
+    if (c.valorSemanal) {
+      // Converte valor semanal para mensal: valorSemanal * 4.35 (baseado em 30.44 dias/mês ÷ 7 dias/semana)
+      const valorMensalContrato = parseFloat(c.valorSemanal) * 4.35;
+      return sum + valorMensalContrato;
     }
-    // Fallback para contratos sem valorSemanal
+    // Fallback para contratos antigos sem valorSemanal
     return sum + (parseFloat(c.valor) || 0);
   }, 0);
 
@@ -463,7 +453,7 @@ export default function Contratos() {
                 <p className="text-xs font-medium text-purple-700">VALOR TOTAL</p>
                 <p className="text-xl font-bold text-purple-800">{formatCurrency(valorTotal)}</p>
                 <p className="text-xs text-purple-600">
-                  Soma dos contratos
+                  Valor mensal total
                 </p>
               </div>
               <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center ml-auto">
