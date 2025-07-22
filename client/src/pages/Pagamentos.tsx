@@ -349,7 +349,7 @@ export default function Pagamentos() {
                 <TableHead>Tipo</TableHead>
                 <TableHead>Valor</TableHead>
                 <TableHead>Vencimento</TableHead>
-                <TableHead width="120">Ações</TableHead>
+                <TableHead className="w-[120px]">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -362,11 +362,11 @@ export default function Pagamentos() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {pagamento.veiculoPlaca ? (
+                    {(pagamento as any).veiculoPlaca ? (
                       <div>
-                        <div className="font-medium text-sm">{pagamento.veiculoPlaca}</div>
+                        <div className="font-medium text-sm">{(pagamento as any).veiculoPlaca}</div>
                         <div className="text-xs text-muted-foreground">
-                          {pagamento.veiculoMarca} {pagamento.veiculoModelo}
+                          {(pagamento as any).veiculoMarca} {(pagamento as any).veiculoModelo}
                         </div>
                       </div>
                     ) : (
@@ -379,6 +379,14 @@ export default function Pagamentos() {
                   <TableCell>
                     <div className="max-w-xs">
                       <div className="truncate">{pagamento.descricao || 'Sem descrição'}</div>
+                      {(pagamento as any).automatico && (
+                        <div className="text-xs text-blue-600 mt-1">
+                          <div className="inline-flex items-center gap-1">
+                            <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                            Automático
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>

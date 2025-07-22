@@ -259,6 +259,7 @@ export const pagamentos = pgTable("pagamentos", {
   aluguelId: text("aluguel_id"), // Opcional - apenas para pagamentos de aluguel
   tipo: text("tipo").notNull(), // 'aluguel', 'infrações', 'manutenção', 'danos', 'outros'
   descricao: text("descricao"), // Descrição adicional do pagamento
+  automatico: boolean("automatico").default(false), // Marca se o pagamento foi criado automaticamente pelo contrato
   valorTotal: decimal("valor_total", { precision: 10, scale: 2 }).notNull(),
   valorPago: decimal("valor_pago", { precision: 10, scale: 2 }).notNull(),
   valorRestante: decimal("valor_restante", { precision: 10, scale: 2 }).notNull(),

@@ -42,7 +42,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
   const [copiarValorTotal, setCopiarValorTotal] = useState(false);
   
   // Verificar se é um pagamento gerado automaticamente
-  const isPagamentoAutomatico = pagamento.observacoes?.includes('Pagamento criado automaticamente') || false;
+  const isPagamentoAutomatico = (pagamento as any).automatico === true || pagamento.observacoes?.includes('Pagamento criado automaticamente') || false;
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -104,9 +104,13 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
 
   const handleSubmit = (data: FormData) => {
     const updates: Partial<InsertPagamento> = {
-      motoristaId: data.motoristaId,
-      tipo: data.tipo,
-      descricao: data.descricao || undefined,
+      // Para pagamentos automáticos, não permitir alterar motorista, tipo e descrição
+      ...(isPagamentoAutomatico ? {} : {
+        motoristaId: data.motoristaId,
+        tipo: data.tipo,
+        descricao: data.descricao || undefined,
+      }),
+      // Sempre permitir alterar valores e datas
       valorTotal: data.valorTotal,
       valorPago: data.valorPago,
       valorJuros: data.valorJuros || '0.00',

@@ -226,6 +226,8 @@ const criarPagamentosRecorrentes = async (
             motoristaId,
             locadoraId: profile.locadoraId,
             tipo: 'aluguel', // ✅ CAMPO OBRIGATÓRIO
+            descricao: 'Aluguel Semanal', // ✅ DESCRIÇÃO PADRÃO PARA PAGAMENTOS AUTOMÁTICOS
+            automatico: true, // ✅ MARCA COMO PAGAMENTO AUTOMÁTICO
             dataPagamento: format(dataVencimento, 'yyyy-MM-dd'), // ✅ CAMPO CORRETO
             valorTotal: valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
             valorPago: marcarAnterioresComoPago ? valorPagamento.toString() : '0.00', // ✅ CAMPO OBRIGATÓRIO
@@ -288,6 +290,8 @@ const criarPagamentosRecorrentes = async (
       motoristaId,
       locadoraId: profile.locadoraId,
       tipo: 'aluguel', // ✅ CAMPO OBRIGATÓRIO
+      descricao: 'Aluguel Semanal', // ✅ DESCRIÇÃO PADRÃO PARA PAGAMENTOS AUTOMÁTICOS
+      automatico: true, // ✅ MARCA COMO PAGAMENTO AUTOMÁTICO
       dataPagamento: format(proximaData, 'yyyy-MM-dd'), // ✅ CAMPO CORRETO
       valorTotal: valorPagamento.toString(), // ✅ CAMPO OBRIGATÓRIO
       valorPago: '0.00', // ✅ CAMPO OBRIGATÓRIO - próximo pagamento sempre em aberto
