@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Sistema de Cálculo de Semanas Completas Implementado - CONCLUÍDO ✅
+- ✅ **CÁLCULO EXATO DE SEMANAS IMPLEMENTADO** - Nova função `calcularContratoExato()` conta apenas semanas completas
+- ✅ **REGRA SIMPLIFICADA** - Cobra apenas grupos de 7 dias completos, dias restantes não são cobrados
+- ✅ **FUNÇÃO ESPECÍFICA PARA ESPECIFICAÇÃO** - Cenário 26 meses/28-04-2025/R$550 = 113 semanas × R$550 = R$62.150
+- ✅ **LOGS DETALHADOS** - Sistema mostra cálculo passo-a-passo: período, dias totais, semanas completas
+- ✅ **INTEGRAÇÃO COMPLETA** - Modal de contratos usa nova função para cálculos precisos
+- ✅ **TESTE VALIDADO** - Arquivo test_calculo.js confirma: 791 dias = 113 semanas = R$ 62.150,00
+- ✅ **COMPATIBILIDADE MANTIDA** - Sistema continua funcionando com contratos existentes
+- ✅ **PARÂMETROS DINÂMICOS** - Função aceita data_inicio, duracao_meses e valor_semanal variáveis
+
 ### 2025-07-22: Correção Final do Modal de Criação de Contratos - Última Lacuna Fechada - CONCLUÍDO ✅
 - ✅ **MODAL DE CRIAÇÃO CORRIGIDO** - NovoContratoModal.tsx agora usa valorSemanal * 4.35 em TODOS os pontos
 - ✅ **ÚLTIMA LACUNA FECHADA** - Linhas 475 e 566 do modal ainda usavam fórmula antiga (* 4.0)

@@ -45,6 +45,7 @@ import { useContratos } from '../../hooks/useContratos';
 import { useTemplateContratos } from '../../hooks/useTemplateContratos';
 import { registrarAtividade } from '@/utils/activityLogger';
 import { useToast } from '@/hooks/use-toast';
+import { calcularContratoExato } from '@/utils/contratoCalculos';
 
 // Schema de validação
 const contratoSchema = z.object({
@@ -467,31 +468,23 @@ export function NovoContratoModal({
         throw new Error('Veículo ou motorista não encontrado');
       }
       
-      // CÁLCULO EXATO: Conta o número real de semanas no período do contrato
-      const dataInicioContrato = new Date(data.dataInicio);
-      const dataFimContrato = new Date(dataInicioContrato);
-      dataFimContrato.setMonth(dataFimContrato.getMonth() + data.tempoContrato);
+      // CÁLCULO EXATO: Usa nova função que conta apenas semanas completas
+      const calculoContrato = calcularContratoExato(
+        data.dataInicio,
+        data.tempoContrato,
+        data.valorSemanal
+      );
       
-      // Calcula dias totais no período
-      const totalDias = Math.ceil((dataFimContrato.getTime() - dataInicioContrato.getTime()) / (1000 * 60 * 60 * 24));
-      
-      // Calcula semanas exatas
-      const semanasCompletas = Math.floor(totalDias / 7);
-      const diasRestantes = totalDias % 7;
-      
-      // Se há 3+ dias restantes, conta como semana adicional
-      const totalSemanas = semanasCompletas + (diasRestantes >= 3 ? 1 : 0);
-      
-      // Valor total baseado no número exato de semanas
-      const valorTotalExato = totalSemanas * data.valorSemanal;
+      // Extrai valores calculados
+      const valorTotalExato = calculoContrato.valorTotal;
       const valorMensalCalculado = valorTotalExato / data.tempoContrato; // Para compatibilidade com o banco
       
-      console.log(`📊 CÁLCULO EXATO DO CONTRATO:
-• Período: ${dataInicioContrato.toLocaleDateString()} até ${dataFimContrato.toLocaleDateString()}
-• Total de dias: ${totalDias}
-• Semanas completas: ${semanasCompletas}
-• Dias restantes: ${diasRestantes}
-• Total de semanas para cobrança: ${totalSemanas}
+      console.log(`📊 CÁLCULO EXATO DO CONTRATO (NOVA FUNÇÃO):
+• Período: ${calculoContrato.dataInicio.toLocaleDateString()} até ${calculoContrato.dataFim.toLocaleDateString()}
+• Total de dias: ${calculoContrato.totalDias}
+• Semanas completas: ${calculoContrato.detalhes.semanasCompletas}
+• Dias restantes: ${calculoContrato.detalhes.diasRestantes} (não cobrados)
+• Total de semanas para cobrança: ${calculoContrato.totalSemanas}
 • Valor semanal: R$ ${data.valorSemanal.toFixed(2)}
 • Valor total exato: R$ ${valorTotalExato.toFixed(2)}
 • Valor mensal calculado: R$ ${valorMensalCalculado.toFixed(2)}`);
