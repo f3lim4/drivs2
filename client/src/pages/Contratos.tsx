@@ -337,11 +337,15 @@ export default function Contratos() {
           // Ordena por nome do cliente Z-A
           return b.cliente.localeCompare(a.cliente);
         case 'valor-maior':
-          // Ordena por valor decrescente (maior primeiro)
-          return (parseFloat(b.valor) || 0) - (parseFloat(a.valor) || 0);
+          // CORREÇÃO: Ordena por valor mensal corrigido (maior primeiro)
+          const valorBCorrigido = b.valorSemanal ? parseFloat(b.valorSemanal) * 4.35 : (parseFloat(b.valor) || 0);
+          const valorACorrigido = a.valorSemanal ? parseFloat(a.valorSemanal) * 4.35 : (parseFloat(a.valor) || 0);
+          return valorBCorrigido - valorACorrigido;
         case 'valor-menor':
-          // Ordena por valor crescente (menor primeiro)
-          return (parseFloat(a.valor) || 0) - (parseFloat(b.valor) || 0);
+          // CORREÇÃO: Ordena por valor mensal corrigido (menor primeiro)
+          const valorACorrigido2 = a.valorSemanal ? parseFloat(a.valorSemanal) * 4.35 : (parseFloat(a.valor) || 0);
+          const valorBCorrigido2 = b.valorSemanal ? parseFloat(b.valorSemanal) * 4.35 : (parseFloat(b.valor) || 0);
+          return valorACorrigido2 - valorBCorrigido2;
         case 'data-inicio':
           // Ordena por data de início mais recente
           return new Date(b.dataInicio || '').getTime() - new Date(a.dataInicio || '').getTime();
@@ -374,7 +378,17 @@ export default function Contratos() {
   const contratosAtivos = contratos.filter(c => c.status === 'ativo').length;
   const contratosFinalizados = contratos.filter(c => c.status === 'finalizado').length;
   const contratosCancelados = contratos.filter(c => c.status === 'cancelado').length;
-  const valorTotal = contratos.reduce((sum, c) => sum + (parseFloat(c.valor) || 0), 0);
+  
+  // CORREÇÃO: Calcula valor total usando fórmula corrigida
+  const valorTotal = contratos.reduce((sum, c) => {
+    if (c.valorSemanal) {
+      // Usa nova fórmula: valorSemanal * 4.35 para valor mensal correto
+      const valorMensalCorrigido = parseFloat(c.valorSemanal) * 4.35;
+      return sum + valorMensalCorrigido;
+    }
+    // Fallback para contratos sem valorSemanal
+    return sum + (parseFloat(c.valor) || 0);
+  }, 0);
 
   // Formatar currency
   const formatCurrency = (value: number) => {
@@ -623,7 +637,16 @@ export default function Contratos() {
                         </TableCell>
                         <TableCell>
                           <p className="font-medium">
-                            R$ {parseFloat(contrato.valorMensal || contrato.valor || '0').toFixed(2)}
+                            R$ {(() => {
+                              // CORREÇÃO: Calcula valor mensal corrigido baseado no valor semanal
+                              if (contrato.valorSemanal) {
+                                // Usa nova fórmula: valorSemanal * 4.35 (30.44 dias/mês ÷ 7 dias/semana)
+                                const valorMensalCorrigido = parseFloat(contrato.valorSemanal) * 4.35;
+                                return valorMensalCorrigido.toFixed(2);
+                              }
+                              // Fallback para contratos sem valorSemanal
+                              return parseFloat(contrato.valorMensal || contrato.valor || '0').toFixed(2);
+                            })()}
                           </p>
                           {contrato.valorSemanal && (
                             <p className="text-xs text-muted-foreground">
