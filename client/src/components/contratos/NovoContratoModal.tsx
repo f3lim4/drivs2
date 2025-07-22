@@ -345,8 +345,29 @@ export function NovoContratoModal({
         const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
+          console.log('MODAL DEBUG: Todos os veículos:', veiculosData.map((v: any) => ({ placa: v.placa, status: v.status, id: v.id })));
+          
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => veiculo.status === 'disponivel');
+          console.log('MODAL DEBUG: Veículos disponíveis após filtro:', veiculosDisponiveis.map((v: any) => ({ placa: v.placa, status: v.status, id: v.id })));
+          
+          // Verificação específica do EUQ8D22
+          const euq8d22 = veiculosData.find((v: any) => v.placa === 'EUQ8D22');
+          if (euq8d22) {
+            console.log('MODAL DEBUG: EUQ8D22 encontrado no veiculosData:', { 
+              placa: euq8d22.placa, 
+              status: euq8d22.status, 
+              id: euq8d22.id,
+              passaNoFiltro: euq8d22.status === 'disponivel'
+            });
+          } else {
+            console.log('MODAL DEBUG: EUQ8D22 NÃO encontrado no veiculosData');
+          }
+          
+          const euq8d22Disponivel = veiculosDisponiveis.find((v: any) => v.placa === 'EUQ8D22');
+          console.log('MODAL DEBUG: EUQ8D22 em veiculosDisponiveis?', euq8d22Disponivel ? 'SIM' : 'NÃO');
+          
           setVeiculos(veiculosDisponiveis);
+          console.log('MODAL DEBUG: Total de veículos no estado:', veiculosDisponiveis.length);
         }
 
         // Carrega aluguéis primeiro para filtrar motoristas
