@@ -1109,7 +1109,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
 
                 {form.watch('pagamentoRecorrente') && (
                   <div className="space-y-4 ml-6">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
                         name="dataPrimeiroPagamento"
@@ -1161,12 +1161,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                           </FormItem>
                         )}
                       />
-                    </div>
 
-                    {/* NOVA SEÇÃO: CONFIGURAÇÃO DE PAGAMENTOS */}
-                    <div className="space-y-4 border-t pt-4">
-                      <div className="text-sm font-medium text-gray-700">Configuração dos Pagamentos</div>
-                      
                       <FormField
                         control={form.control}
                         name="tipoPagamento"
@@ -1180,58 +1175,44 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="ilimitado">
-                                  <div className="flex flex-col">
-                                    <span className="font-medium">Ilimitado</span>
-                                    <span className="text-xs text-muted-foreground">
-                                      Continua cobrando enquanto o contrato estiver ativo
-                                    </span>
-                                  </div>
-                                </SelectItem>
-                                <SelectItem value="limitado">
-                                  <div className="flex flex-col">
-                                    <span className="font-medium">Limitado</span>
-                                    <span className="text-xs text-muted-foreground">
-                                      Cobra apenas um número específico de pagamentos
-                                    </span>
-                                  </div>
-                                </SelectItem>
+                                <SelectItem value="ilimitado">Ilimitado</SelectItem>
+                                <SelectItem value="limitado">Limitado</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-
-                      {form.watch('tipoPagamento') === 'limitado' && (
-                        <FormField
-                          control={form.control}
-                          name="quantidadePagamentos"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Quantidade de Pagamentos *</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder="Ex: 12"
-                                  min="1"
-                                  max="200"
-                                  value={field.value || ''}
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    field.onChange(value ? parseInt(value) : undefined);
-                                  }}
-                                />
-                              </FormControl>
-                              <p className="text-xs text-muted-foreground">
-                                Número total de pagamentos que serão cobrados
-                              </p>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
                     </div>
+
+                    {form.watch('tipoPagamento') === 'limitado' && (
+                      <FormField
+                        control={form.control}
+                        name="quantidadePagamentos"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Quantidade de Pagamentos *</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="Ex: 12"
+                                min="1"
+                                max="200"
+                                value={field.value || ''}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  field.onChange(value ? parseInt(value) : undefined);
+                                }}
+                              />
+                            </FormControl>
+                            <p className="text-xs text-muted-foreground">
+                              Número total de pagamentos que serão cobrados
+                            </p>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
                   </div>
                 )}
               </div>
