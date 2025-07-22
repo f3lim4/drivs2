@@ -135,6 +135,7 @@ export interface Contrato {
   // Campos adicionais para cálculos
   valorSemanal?: number;
   tempoContrato?: number;
+  caucao?: number;
   veiculoId?: string;
   motoristaNome?: string;
   motoristaCpf?: string;
