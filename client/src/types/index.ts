@@ -129,6 +129,18 @@ export interface Contrato {
   dataFim?: string;
   status: 'ativo' | 'finalizado' | 'cancelado';
   template?: string;
+  arquivoAssinado?: string; // Nome do arquivo de contrato assinado
+  dataAssinatura?: string; // Data de assinatura do contrato
+  
+  // Campos adicionais para cálculos
+  valorSemanal?: number;
+  tempoContrato?: number;
+  veiculoId?: string;
+  motoristaNome?: string;
+  motoristaCpf?: string;
+  veiculoPlaca?: string;
+  veiculoMarca?: string;
+  veiculoModelo?: string;
 }
 
 export interface DashboardStats {
