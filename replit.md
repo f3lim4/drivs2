@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Sistema de Pagamentos Automáticos Corrigido - Aluguéis Ativos Detectados - CONCLUÍDO ✅
+- ✅ **BUG CRÍTICO CORRIGIDO** - Sistema agora trabalha com aluguéis ativos ao invés de contratos
+- ✅ **DETECÇÃO AUTOMÁTICA** - 1 aluguel ativo detectado (Henrique Oliveira gomes)
+- ✅ **CÁLCULO CORRETO** - R$ 697,32 semanal baseado em R$ 3.033,33 mensal (÷ 4.35)
+- ✅ **PAGAMENTO CRIADO** - Primeiro pagamento automático gerado com sucesso
+- ✅ **LOGS DETALHADOS** - Monitoramento completo do processo de criação
+- ✅ **INTEGRAÇÃO ROTAS** - Parada automática quando aluguel finalizado/cancelado
+
 ### 2025-07-22: Sistema de Criação de Contratos Totalmente Corrigido - CONCLUÍDO ✅
 - ✅ **ERROS DE VALIDAÇÃO RESOLVIDOS** - Campos de pagamento agora incluem todos os campos obrigatórios
 - ✅ **SCHEMA SINCRONIZADO** - Database atualizado com campos corretos (dataPagamento, valorJuros, valorMulta)
