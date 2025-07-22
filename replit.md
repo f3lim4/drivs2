@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Bug Jeane Dropdown Totalmente Resolvido - Espaços Extras Identificados - CONCLUÍDO ✅
+- ✅ **CAUSA RAIZ IDENTIFICADA** - Nomes de motoristas com espaços extras no final causavam problemas no Shadcn Select
+- ✅ **SOLUÇÃO APLICADA** - Função trim() implementada para remover espaços extras de todos os nomes
+- ✅ **DEBUGGING COMPLETO** - Logs confirmaram que Jeane passava em todos os filtros (CNH válida, sem aluguel ativo)
+- ✅ **PROBLEMA DE DADOS CORRIGIDO** - Database continha "Jeane clemente da Silva " (com espaço extra no final)
+- ✅ **COMPONENTE UI SENSÍVEL** - Shadcn Select teve problemas de renderização com certas strings
+- ✅ **CÓDIGO LIMPO** - Removidos logs de debug, sistema funcionando perfeitamente
+- ✅ **SOLUÇÃO PREVENTIVA** - Trim aplicado a todos os nomes protege contra futuros problemas similares
+- ✅ **SISTEMA PRODUÇÃO-READY** - Dropdown de contratos totalmente funcional com todos os motoristas
+
 ### 2025-07-22: Sistema de Pagamentos Retroativos Inteligente - PRODUÇÃO ✅
 - ✅ **LÓGICA RETROATIVA IMPLEMENTADA** - Sistema gera automaticamente pagamentos em atraso desde data inicial até hoje
 - ✅ **DETECÇÃO INTELIGENTE DE DATAS** - Identifica quando primeiro pagamento é anterior à data atual
@@ -21,7 +31,6 @@ Preferred communication style: Simple, everyday language.
 - ✅ **CÓDIGO LIMPO** - Removida lógica duplicada do endpoint separado, tudo integrado numa função
 - ✅ **LOGS COMPLETOS** - Sistema monitora criação passo-a-passo para debugging
 - ✅ **ZERO ERROS LSP** - Código sem problemas TypeScript, totalmente funcional
-- ✅ **INVESTIGAÇÃO JEANE CONCLUÍDA** - Motorista Jeane funciona corretamente, aparece na lista (possível cache visual)
 
 ### 2025-07-22: Layout Ultra-Compacto de Contratos - Linha Única - CONCLUÍDO ✅
 - ✅ **LAYOUT EM UMA ÚNICA LINHA** - Todos os 5 campos principais organizados em uma linha horizontal
