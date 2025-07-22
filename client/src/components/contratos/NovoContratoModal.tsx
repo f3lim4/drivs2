@@ -227,7 +227,7 @@ const criarPagamentosRecorrentes = async (
             locadoraId: profile.locadoraId,
             dataVencimento: format(dataVencimento, 'yyyy-MM-dd'),
             valor: valorPagamento,
-            status: statusPagamento as const,
+            status: statusPagamento,
             observacoes: marcarAnterioresComoPago 
               ? `Pagamento retroativo ${i + 1} - Marcado automaticamente como pago`
               : `Pagamento retroativo ${i + 1} - ${recorrencia}`,
@@ -426,6 +426,9 @@ export function NovoContratoModal({
           const now = new Date();
           
           const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
+            // Debug especial para Jeane
+            const isJeane = motorista.nome.includes('Jeane');
+            
             // Verifica CNH válida
             const temVencimento = !!motorista.vencimentoCnh;
             let cnhValida = false;
@@ -441,11 +444,26 @@ export function NovoContratoModal({
             
             const disponivel = temVencimento && cnhValida && !temAluguelAtivo;
             
-
+            if (isJeane) {
+              console.log(`[DEBUG JEANE] ${motorista.nome}:`, {
+                id: motorista.id,
+                vencimentoCnh: motorista.vencimentoCnh,
+                temVencimento,
+                cnhValida,
+                dataAtual: now.toISOString(),
+                vencimentoFormatado: temVencimento ? new Date(motorista.vencimentoCnh).toISOString() : 'N/A',
+                temAluguelAtivo,
+                alugueisAtivos: alugueisAtivos.length,
+                disponivel
+              });
+            }
             
             return disponivel;
           });
           
+          console.log(`[FINAL DEBUG] ${motoristasDisponiveis.length} motoristas disponíveis:`, 
+            motoristasDisponiveis.map(m => ({ nome: m.nome, id: m.id }))
+          );
           
           setMotoristas(motoristasDisponiveis);
         }
@@ -669,7 +687,7 @@ profissão: Motorista de Aplicativo. As partes acima identificadas têm, entre s
 Automóvel que se regerá pelas cláusulas seguintes e pelas condições descritas no presente.
 
 1. CLÁUSULA PRIMEIRA – DO OBJETO, PRAZO E USO
-1.1. O LOCADOR declara ser o legítimo possuidor e/ou proprietário do veículo de modelo ${aluguel.veiculoModelo}, placa ${aluguel.veiculoPlaca}, Vistoriado com fotos e video no dia da retirada, e que resolveu dá-lo em locação ao LOCATÁRIO pelo prazo de ${data.tempoContrato} mês(es)
+1.1. O LOCADOR declara ser o legítimo possuidor e/ou proprietário do veículo de modelo ${aluguel.veiculoModelo}, placa ${aluguel.veiculoPlaca}, Vistoriado com fotos e video no dia da retirada, e que resolveu dá-lo em locação ao LOCATÁRIO pelo prazo de ${data.tempoMinimoContrato} mês(es)
 contados a partir da assinatura do presente contrato.
 
 1.2. Findo o prazo acima estipulado, o contrato poderá ser renovado automaticamente, desde que seja do desejo de
@@ -968,6 +986,10 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          {(() => {
+                            console.log('[RENDER DEBUG] Motoristas no render:', motoristas.map(m => ({ nome: m.nome, id: m.id })));
+                            return null;
+                          })()}
                           {motoristas.length > 0 ? (
                             motoristas.map((motorista) => (
                               <SelectItem key={motorista.id} value={motorista.id}>
