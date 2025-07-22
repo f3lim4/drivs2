@@ -24,6 +24,7 @@ import Login from "./pages/Login";
 import CadastroLocadora from "./pages/CadastroLocadora";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
+import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -61,7 +62,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro-locadora" element={<CadastroLocadora />} />
             <Route path="/landing" element={<Landing />} />
-            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={
             <AuthGuard>
               <DrivsLayout><Dashboard /></DrivsLayout>
