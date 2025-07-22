@@ -1269,6 +1269,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para marcar pagamentos anteriores como pagos
+  app.put("/api/pagamentos/marcar-anteriores-pagos", async (req, res) => {
+    try {
+      const { motoristaId, dataInicio, recorrencia } = req.body;
+      
+      if (!motoristaId || !dataInicio || !recorrencia) {
+        return res.status(400).json({ 
+          message: "motoristaId, dataInicio e recorrencia são obrigatórios" 
+        });
+      }
+
+      console.log('[DEBUG PAGAMENTOS ANTERIORES] Marcando pagamentos como pagos:', {
+        motoristaId,
+        dataInicio,
+        recorrencia
+      });
+
+      // Buscar todos os pagamentos do motorista
+      const todosPagamentos = await storage.getPagamentosByMotorista(motoristaId);
+      
+      // Filtrar apenas pagamentos em aberto
+      const pagamentosEmAberto = todosPagamentos.filter(p => p.status === 'em_aberto');
+      
+      console.log('[DEBUG PAGAMENTOS ANTERIORES] Pagamentos em aberto encontrados:', pagamentosEmAberto.length);
+
+      if (pagamentosEmAberto.length === 0) {
+        return res.json({ pagamentosAtualizados: 0, message: 'Nenhum pagamento em aberto encontrado' });
+      }
+
+      // Calcular data limite (penúltima semana até hoje)
+      const hoje = new Date();
+      const dataInicioDate = new Date(dataInicio);
+      
+      // Calcular intervalo da recorrência
+      let intervaloDias = 7; // padrão semanal
+      if (recorrencia === 'quinzenal') intervaloDias = 15;
+      if (recorrencia === 'mensal') intervaloDias = 30;
+      
+      // Data limite: penúltima semana (hoje - 1 intervalo)
+      const dataLimite = new Date(hoje);
+      dataLimite.setDate(dataLimite.getDate() - intervaloDias);
+      
+      console.log('[DEBUG PAGAMENTOS ANTERIORES] Data limite calculada:', {
+        hoje: hoje.toLocaleDateString(),
+        dataInicio: dataInicioDate.toLocaleDateString(),
+        dataLimite: dataLimite.toLocaleDateString(),
+        intervaloDias
+      });
+
+      // Filtrar pagamentos que devem ser marcados como pagos
+      const pagamentosParaMarcar = pagamentosEmAberto.filter(pagamento => {
+        const vencimentoPagamento = new Date(pagamento.vencimento);
+        return vencimentoPagamento >= dataInicioDate && vencimentoPagamento <= dataLimite;
+      });
+
+      console.log('[DEBUG PAGAMENTOS ANTERIORES] Pagamentos para marcar como pagos:', pagamentosParaMarcar.length);
+
+      // Marcar pagamentos como "pago total"
+      let pagamentosAtualizados = 0;
+      for (const pagamento of pagamentosParaMarcar) {
+        await storage.updatePagamento(pagamento.id, { 
+          status: 'pago',
+          observacoes: 'Marcado automaticamente como pago (pagamentos anteriores)' 
+        });
+        pagamentosAtualizados++;
+        
+        console.log('[DEBUG PAGAMENTOS ANTERIORES] Pagamento marcado como pago:', {
+          id: pagamento.id,
+          vencimento: pagamento.vencimento,
+          valor: pagamento.valor
+        });
+      }
+
+      res.json({ 
+        pagamentosAtualizados,
+        message: `${pagamentosAtualizados} pagamentos marcados como "pago total"`
+      });
+
+    } catch (error) {
+      console.error('[ERROR] Erro ao marcar pagamentos anteriores como pagos:', error);
+      res.status(500).json({ message: "Erro interno do servidor", error: error.message });
+    }
+  });
+
   // Infrações routes
   app.get("/api/infracoes", async (req, res) => {
     try {
