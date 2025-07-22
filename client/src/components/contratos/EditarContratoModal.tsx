@@ -221,17 +221,26 @@ export function EditarContratoModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Editar Contrato</DialogTitle>
+          <DialogTitle className="flex items-center gap-3">
+            Editar Contrato
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-normal text-muted-foreground">Status atual:</span>
+              {contrato?.status === 'em_aberto' && <Badge variant="secondary" className="bg-gray-100 text-gray-800">Em Aberto</Badge>}
+              {contrato?.status === 'ativo' && <Badge variant="secondary" className="bg-green-100 text-green-800">Ativo</Badge>}
+              {contrato?.status === 'cancelado' && <Badge variant="secondary" className="bg-red-100 text-red-800">Cancelado</Badge>}
+              {contrato?.status === 'encerrado' && <Badge variant="secondary" className="bg-gray-100 text-gray-600">Encerrado</Badge>}
+            </div>
+          </DialogTitle>
           <DialogDescription>
-            Atualize as informações do contrato.
+            Atualize as informações do contrato e altere o status se necessário.
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             
-            {/* INFORMAÇÕES BÁSICAS */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* INFORMAÇÕES BÁSICAS E STATUS */}
+            <div className="grid grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="titulo"
@@ -259,51 +268,30 @@ export function EditarContratoModal({
                   </FormItem>
                 )}
               />
-            </div>
 
-            {/* STATUS DO CONTRATO */}
-            <div className="p-4 border rounded-lg bg-gray-50">
-              <h3 className="font-medium mb-3">Status do Contrato</h3>
-              <div className="grid grid-cols-2 gap-4 items-center">
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Alterar Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecionar status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="em_aberto">
-                            Em Aberto - Aguardando assinatura
-                          </SelectItem>
-                          <SelectItem value="ativo">
-                            Ativo - Contrato funcionando
-                          </SelectItem>
-                          <SelectItem value="cancelado">
-                            Cancelado - Cancelado manualmente
-                          </SelectItem>
-                          <SelectItem value="encerrado">
-                            Encerrado - Finalizado automaticamente
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div>
-                  <p className="text-sm font-medium mb-1">Status Atual:</p>
-                  {contrato?.status === 'em_aberto' && <Badge variant="secondary" className="bg-gray-100 text-gray-800">Em Aberto</Badge>}
-                  {contrato?.status === 'ativo' && <Badge variant="secondary" className="bg-green-100 text-green-800">Ativo</Badge>}
-                  {contrato?.status === 'cancelado' && <Badge variant="secondary" className="bg-red-100 text-red-800">Cancelado</Badge>}
-                  {contrato?.status === 'encerrado' && <Badge variant="secondary" className="bg-gray-100 text-gray-600">Encerrado</Badge>}
-                </div>
-              </div>
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="em_aberto">Em Aberto</SelectItem>
+                        <SelectItem value="ativo">Ativo</SelectItem>
+                        <SelectItem value="cancelado">Cancelado</SelectItem>
+                        <SelectItem value="encerrado">Encerrado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* CONTEÚDO DO CONTRATO */}
