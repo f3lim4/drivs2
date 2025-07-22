@@ -337,16 +337,7 @@ export default function Contratos() {
         case 'cliente-za':
           // Ordena por nome do cliente Z-A
           return b.cliente.localeCompare(a.cliente);
-        case 'valor-maior':
-          // CORREÇÃO: Ordena por valor mensal corrigido (maior primeiro)
-          const valorBCorrigido = b.valorSemanal ? parseFloat(b.valorSemanal) * 4.35 : (parseFloat(b.valor) || 0);
-          const valorACorrigido = a.valorSemanal ? parseFloat(a.valorSemanal) * 4.35 : (parseFloat(a.valor) || 0);
-          return valorBCorrigido - valorACorrigido;
-        case 'valor-menor':
-          // CORREÇÃO: Ordena por valor mensal corrigido (menor primeiro)
-          const valorACorrigido2 = a.valorSemanal ? parseFloat(a.valorSemanal) * 4.35 : (parseFloat(a.valor) || 0);
-          const valorBCorrigido2 = b.valorSemanal ? parseFloat(b.valorSemanal) * 4.35 : (parseFloat(b.valor) || 0);
-          return valorACorrigido2 - valorBCorrigido2;
+
         case 'data-inicio':
           // Ordena por data de início mais recente
           return new Date(b.dataInicio || '').getTime() - new Date(a.dataInicio || '').getTime();
@@ -596,8 +587,6 @@ export default function Contratos() {
                     <SelectItem value="mais-antigos">Mais Antigos Primeiro</SelectItem>
                     <SelectItem value="cliente-az">Cliente (A-Z)</SelectItem>
                     <SelectItem value="cliente-za">Cliente (Z-A)</SelectItem>
-                    <SelectItem value="valor-maior">Valor (Maior)</SelectItem>
-                    <SelectItem value="valor-menor">Valor (Menor)</SelectItem>
                     <SelectItem value="data-inicio">Data de Início</SelectItem>
                     <SelectItem value="data-fim">Data de Fim</SelectItem>
                   </SelectContent>
@@ -611,7 +600,6 @@ export default function Contratos() {
                       <TableHead>MOTORISTA/CLIENTE</TableHead>
                       <TableHead>VEÍCULO</TableHead>
                       <TableHead>TIPO</TableHead>
-                      <TableHead>VALOR</TableHead>
                       <TableHead>DATA INÍCIO</TableHead>
                       <TableHead>STATUS</TableHead>
                       <TableHead>AÇÕES</TableHead>
@@ -646,48 +634,7 @@ export default function Contratos() {
                             {contrato.tipo === 'aluguel_ativo' ? 'Aluguel Ativo' : contrato.tipo}
                           </Badge>
                         </TableCell>
-                        <TableCell>
-                          <p className="font-medium">
-                            R$ {(() => {
-                              // CÁLCULO EXATO: Usa nova função que conta apenas semanas completas
-                              if (contrato.valorSemanal && contrato.dataInicio && contrato.tempoContrato) {
-                                try {
-                                  const calculoExato = calcularContratoExato(
-                                    new Date(contrato.dataInicio),
-                                    parseInt(contrato.tempoContrato.toString()),
-                                    parseFloat(contrato.valorSemanal)
-                                  );
-                                  return calculoExato.valorTotal.toFixed(2);
-                                } catch (error) {
-                                  console.warn('Erro ao calcular contrato exato na exibição:', error);
-                                  // Fallback para contratos com problemas
-                                  return parseFloat(contrato.valor || '0').toFixed(2);
-                                }
-                              }
-                              // Fallback para contratos sem valorSemanal
-                              return parseFloat(contrato.valorMensal || contrato.valor || '0').toFixed(2);
-                            })()}
-                          </p>
-                          {contrato.valorSemanal && (
-                            <p className="text-xs text-muted-foreground">
-                              R$ {parseFloat(contrato.valorSemanal).toFixed(2)}/sem ({(() => {
-                                if (contrato.dataInicio && contrato.tempoContrato) {
-                                  try {
-                                    const calculoExato = calcularContratoExato(
-                                      new Date(contrato.dataInicio),
-                                      parseInt(contrato.tempoContrato.toString()),
-                                      parseFloat(contrato.valorSemanal)
-                                    );
-                                    return calculoExato.totalSemanas;
-                                  } catch (error) {
-                                    return '?';
-                                  }
-                                }
-                                return '?';
-                              })()} semanas)
-                            </p>
-                          )}
-                        </TableCell>
+
                         <TableCell>
                           <p>{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
                         </TableCell>

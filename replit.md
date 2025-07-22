@@ -10,6 +10,22 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-22: Interface de Contratos Otimizada - Coluna Valor Removida - CONCLUÍDO ✅
+- ✅ **COLUNA VALOR REMOVIDA** - Tabela de contratos não exibe mais a coluna "VALOR"
+- ✅ **LAYOUT SIMPLIFICADO** - Interface mais limpa sem informações redundantes de valor
+- ✅ **ORDENAÇÃO ATUALIZADA** - Removidas opções "Valor (Maior)" e "Valor (Menor)" do dropdown
+- ✅ **LÓGICA LIMPA** - Código de ordenação por valor removido da função sortContratos
+- ✅ **FUNCIONALIDADE PRESERVADA** - Valores ainda calculados para relatórios e estatísticas
+- ✅ **INTERFACE CONSISTENTE** - 6 colunas: Motorista/Cliente, Veículo, Tipo, Data Início, Status, Ações
+
+### 2025-07-22: Sistema de Configuração de Pagamentos com Layout 3-Colunas - CONCLUÍDO ✅
+- ✅ **LAYOUT 3-COLUNAS IMPLEMENTADO** - Data | Recorrência | Tipo de Pagamento na mesma linha
+- ✅ **TIPO DE PAGAMENTO ADICIONADO** - Opções "Ilimitado" vs "Limitado" para contratos
+- ✅ **CAMPO CONDICIONAL** - Quantidade de Pagamentos aparece apenas quando tipo "Limitado"
+- ✅ **VALORES PADRÃO CONFIGURADOS** - Tipo "ilimitado" selecionado por padrão
+- ✅ **VALIDAÇÃO INTELIGENTE** - Sistema valida quantidade apenas quando necessário
+- ✅ **INTERFACE COMPACTA** - Layout otimizado com campos organizados horizontalmente
+
 ### 2025-07-22: Sistema de Cálculo de Semanas Completas Implementado - CONCLUÍDO ✅
 - ✅ **CÁLCULO EXATO DE SEMANAS IMPLEMENTADO** - Nova função `calcularContratoExato()` conta apenas semanas completas
 - ✅ **REGRA SIMPLIFICADA** - Cobra apenas grupos de 7 dias completos, dias restantes não são cobrados
