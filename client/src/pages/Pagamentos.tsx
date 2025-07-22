@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus, Eye, Edit, Trash2, Calendar, DollarSign, User, AlertCircle, Search, Filter, CheckCircle, Clock, Calculator } from 'lucide-react';
+import { Plus, Eye, Edit, Trash2, Calendar, DollarSign, User, AlertCircle, Search, Filter, CheckCircle, Clock, Calculator, Car } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -357,6 +357,7 @@ export default function Pagamentos() {
             <TableHeader>
               <TableRow>
                 <TableHead>Motorista</TableHead>
+                <TableHead>Veículo</TableHead>
                 <TableHead>Descrição</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Valor</TableHead>
@@ -376,6 +377,25 @@ export default function Pagamentos() {
                       <div>
                         <div className="font-medium">{pagamento.motoristaNome || 'N/A'}</div>
                       </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      {pagamento.veiculoPlaca ? (
+                        <>
+                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                            <Car className="w-4 h-4 text-gray-600" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-sm">{pagamento.veiculoPlaca}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {pagamento.veiculoMarca} {pagamento.veiculoModelo}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-sm text-muted-foreground">-</div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
