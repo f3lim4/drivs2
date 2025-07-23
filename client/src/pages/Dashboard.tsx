@@ -112,39 +112,7 @@ export default function Dashboard() {
   const veiculosSeguro = veiculosRaw;
   const alugueisSeguro = alugueisRaw;
 
-  // DEBUG: Log dos dados carregados
-  console.log('Dashboard - Dados carregados:', {
-    locadoraId: profile?.locadoraId,
-    motoristas: motoristasSeguro.length,
-    veiculos: veiculosSeguro.length,
-    alugueis: alugueisRaw.length
-  });
 
-  // DEBUG ADICIONAL: Verificar se dados estão chegando
-  console.log('Dashboard - Dados detalhados:', {
-    motoristasRaw: motoristasRaw.length > 0 ? 'DADOS OK' : 'VAZIO',
-    veiculosRaw: veiculosRaw.length > 0 ? 'DADOS OK' : 'VAZIO', 
-    alugueisRaw: alugueisRaw.length > 0 ? 'DADOS OK' : 'VAZIO',
-    pagamentos: pagamentos.length > 0 ? 'DADOS OK' : 'VAZIO',
-    loading: loading
-  });
-
-  // DEBUG: Verificar cálculos específicos
-  console.log('Dashboard - Cálculos finais:', {
-    motoristasSeguroLength: motoristasSeguro.length,
-    veiculosSeguroLength: veiculosSeguro.length,
-    alugueisSeguroLength: alugueisSeguro.length
-  });
-
-  // Log apenas se houver problemas para debug
-  if (isLocadora && veiculosSeguro.length > 1) {
-    console.log('Dashboard - Verificando isolamento:', {
-      locadoraId: profile?.locadoraId,
-      veiculosTotal: veiculosSeguro.length,
-      primeiroVeiculo: veiculosSeguro[0]?.locadoraId,
-      segundoVeiculo: veiculosSeguro[1]?.locadoraId
-    });
-  }
 
   // Função para formatar valores monetários
   const formatCurrency = (value: number) => {
