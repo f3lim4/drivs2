@@ -662,7 +662,7 @@ export default function CadastroLocadora() {
 
         <div className="text-center mt-6">
           <p className="text-xs text-muted-foreground">
-            © 2024 DRIVS. Todos os direitos reservados.
+            © 2025 DRIVS. Todos os direitos reservados.
           </p>
         </div>
       </div>
