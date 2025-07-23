@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-23: Análise por Veículo - Correção Crítica Cálculo Despesas Mensais - CONCLUÍDO ✅
+- ✅ **BUG CRÍTICO CORRIGIDO** - Despesas mensais na análise por veículo agora incluem TODAS as fontes de custos
+- ✅ **MANUTENÇÕES INCLUÍDAS** - Sistema agora soma manutenções concluídas no período aos cálculos
+- ✅ **CÁLCULO COMPLETO IMPLEMENTADO** - Despesas mensais = despesas manuais + manutenções + despesas fixas
+- ✅ **DESPESAS ANUAIS CORRIGIDAS** - Incluídas manutenções anuais no cálculo de despesas totais anuais
+- ✅ **DATA CONCLUSÃO PRIORIZADA** - Manutenções consideradas pela data de conclusão quando disponível
+- ✅ **VALORES REAIS GARANTIDOS** - Sistema agora mostra custos reais completos por veículo
+- ✅ **INTEGRIDADE FINANCEIRA** - Análise por veículo com dados precisos para tomada de decisão
+
 ### 2025-07-23: Cards Financeiros com Estilo dos Contratos Implementado - CONCLUÍDO ✅
 - ✅ **ESTILO UNIFICADO APLICADO** - Cards financeiros agora usam mesmo estilo e tamanho dos cards de contratos
 - ✅ **ÍCONES PADRONIZADOS** - Ícones w-10 h-10 em círculos coloridos posicionados com ml-auto
