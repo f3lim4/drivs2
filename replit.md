@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-23: Campo "Próxima Manutenção (km)" Obrigatório + Relatório Financeiro Atualizado - CONCLUÍDO ✅
+- ✅ **CAMPO PRÓXIMA MANUTENÇÃO OBRIGATÓRIO** - Campo "Próxima Manutenção (km)" alterado para obrigatório com asterisco
+- ✅ **SCHEMA CORRIGIDO** - Removido `.optional()` para tornar campo obrigatório na validação
+- ✅ **VALORES PADRÃO CONFIGURADOS** - Default 0 definido em ambos os modais (criar e editar manutenção)
+- ✅ **RELATÓRIO FINANCEIRO ATUALIZADO** - Na aba "Análise por Veículo" alterado "Despesas Fixas" para "Despesas Mensais"
+- ✅ **TERMINOLOGIA PADRONIZADA** - Interface mais clara e consistente com conceito de despesas mensais
+- ✅ **VALIDAÇÃO FRONTEND CORRIGIDA** - Sistema agora exige preenchimento do campo próxima manutenção
+
 ### 2025-07-23: Background Futurista na Página de Cadastro com Container Branco - CONCLUÍDO ✅
 - ✅ **BACKGROUND UNIFICADO CADASTRO** - Página de cadastro agora usa mesmo gradiente futurista do login e homepage
 - ✅ **GRADIENTE APLICADO** - bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 na página de cadastro
