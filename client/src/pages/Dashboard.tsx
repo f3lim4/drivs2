@@ -109,6 +109,15 @@ export default function Dashboard() {
     alugueis: alugueisRaw.length
   });
 
+  // DEBUG ADICIONAL: Verificar se dados estão chegando
+  console.log('Dashboard - Dados detalhados:', {
+    motoristasRaw: motoristasRaw.length > 0 ? 'DADOS OK' : 'VAZIO',
+    veiculosRaw: veiculosRaw.length > 0 ? 'DADOS OK' : 'VAZIO', 
+    alugueisRaw: alugueisRaw.length > 0 ? 'DADOS OK' : 'VAZIO',
+    pagamentos: pagamentos.length > 0 ? 'DADOS OK' : 'VAZIO',
+    loading: loading
+  });
+
   // Usar dados diretamente dos hooks (já filtrados corretamente)
   const alugueisSeguro = alugueisRaw;
 
