@@ -129,6 +129,13 @@ export default function Dashboard() {
     loading: loading
   });
 
+  // DEBUG: Verificar cálculos específicos
+  console.log('Dashboard - Cálculos finais:', {
+    motoristasSeguroLength: motoristasSeguro.length,
+    veiculosSeguroLength: veiculosSeguro.length,
+    alugueisSeguroLength: alugueisSeguro.length
+  });
+
   // Log apenas se houver problemas para debug
   if (isLocadora && veiculosSeguro.length > 1) {
     console.log('Dashboard - Verificando isolamento:', {
