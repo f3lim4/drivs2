@@ -131,7 +131,7 @@ export default function Landing() {
           <Badge className="mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 text-black text-sm px-6 py-3 rounded-full font-bold border border-cyan-300 shadow-lg shadow-cyan-500/50">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
-              OFERTA LIMITADA - 30 DIAS GRÁTIS
+              OFERTA LIMITADA - 7 DIAS GRÁTIS
             </span>
           </Badge>
           
@@ -297,7 +297,7 @@ export default function Landing() {
               </h3>
               <div className="text-center mb-8">
                 <p className="text-6xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent animate-pulse">
-                  30 DIAS
+                  7 DIAS
                 </p>
                 <p className="text-2xl text-white">Completamente GRÁTIS</p>
               </div>
@@ -382,7 +382,7 @@ export default function Landing() {
             </h3>
             <ul className="text-xl space-y-4">
               {[
-                "30 dias GRÁTIS (sem cartão)",
+                "7 dias GRÁTIS (sem cartão)",
                 "Configuração completa em 24h", 
                 "Migração dos seus dados GRATUITA",
                 "Suporte brasileiro especializado",

@@ -25,7 +25,7 @@ export default function Seo() {
     resolver: zodResolver(insertSeoConfigSchema),
     defaultValues: seoConfig || {
       titulo: "🚗 DRIVS - Sistema que DOBRA Receita de Locadoras em 90 Dias! Teste Grátis",
-      descricao: "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 500+ locadoras já usam. 30 dias GRÁTIS!",
+      descricao: "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 500+ locadoras já usam. 7 dias GRÁTIS!",
       palavrasChave: "sistema locadora profissional, dobrar receita locadora, organizar locadora, automatizar locadora, aumentar lucro aluguel carros, gestão locadora completa",
       autor: "DRIVS Team",
       urlCanonica: "https://drivs.me",
@@ -155,7 +155,7 @@ export default function Seo() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">30 DIAS</div>
+                <div className="text-2xl font-bold text-green-600">7 DIAS</div>
                 <div className="text-sm text-green-700">Teste Grátis Total</div>
               </div>
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
@@ -171,7 +171,7 @@ export default function Seo() {
               ✅ Migração completa dos seus dados ✅ Treinamento da equipe ✅ Suporte 24/7 ✅ Sem contrato de fidelidade
             </p>
             <div className="text-lg font-bold text-green-800 dark:text-green-200">
-              Comece hoje e recupere o investimento em 30 dias ou menos!
+              Comece hoje e recupere o investimento em 7 dias ou menos!
             </div>
           </div>
         </CardContent>
@@ -194,13 +194,13 @@ export default function Seo() {
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
                 <h4 className="font-bold text-sm text-green-700 dark:text-green-300 mb-2">🚀 FOCO NO CRESCIMENTO:</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                  "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 500+ locadoras já usam. 30 dias GRÁTIS!"
+                  "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 500+ locadoras já usam. 7 dias GRÁTIS!"
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
                 <h4 className="font-bold text-sm text-purple-700 dark:text-purple-300 mb-2">💼 FOCO NA PROFISSIONALIZAÇÃO:</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                  "Transforme sua locadora em empresa profissional! Sistema automatiza contratos, organiza finanças e dobra receita em 90 dias. Teste 30 dias GRÁTIS!"
+                  "Transforme sua locadora em empresa profissional! Sistema automatiza contratos, organiza finanças e dobra receita em 90 dias. Teste 7 dias GRÁTIS!"
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
@@ -212,7 +212,7 @@ export default function Seo() {
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
                 <h4 className="font-bold text-sm text-orange-700 dark:text-orange-300 mb-2">📈 FOCO EM RESULTADOS:</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                  "Locadoras aumentam 60% da receita em 3 meses! Sistema elimina planilhas, gera contratos válidos e automatiza gestão completa. 30 dias GRÁTIS!"
+                  "Locadoras aumentam 60% da receita em 3 meses! Sistema elimina planilhas, gera contratos válidos e automatiza gestão completa. 7 dias GRÁTIS!"
                 </p>
               </div>
             </div>
