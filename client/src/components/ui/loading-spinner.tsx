@@ -13,12 +13,12 @@ export function LoadingSpinner({ className = '', size = 'md' }: LoadingSpinnerPr
     lg: 'w-12 h-12'
   };
 
-  // Array com os diferentes tipos de veículos
+  // Array com os diferentes tipos de veículos - TODOS AZUIS
   const vehicleTypes = [
     { icon: Car, color: 'text-blue-600' },
-    { icon: Bike, color: 'text-green-600' },
-    { icon: Truck, color: 'text-red-600' },
-    { icon: Bus, color: 'text-yellow-600' }
+    { icon: Bike, color: 'text-blue-600' },
+    { icon: Truck, color: 'text-blue-600' },
+    { icon: Bus, color: 'text-blue-600' }
   ];
 
   const [currentVehicleIndex, setCurrentVehicleIndex] = useState(0);
