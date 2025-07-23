@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-23: Alteração Completa do Período de Teste Gratuito - 30 para 7 Dias - CONCLUÍDO ✅
+- ✅ **TODAS AS PÁGINAS DE LANDING ATUALIZADAS** - Alterado período de teste gratuito de 30 para 7 dias
+- ✅ **LANDING.TSX CORRIGIDO** - "OFERTA LIMITADA - 7 DIAS GRÁTIS" e "7 DIAS Completamente GRÁTIS"
+- ✅ **HOME.TSX ATUALIZADO** - Todos os botões "30 Dias Grátis" alterados para "7 Dias Grátis"
+- ✅ **SEO.TSX MODIFICADO** - Meta descrições e conteúdo promocional com novo período de 7 dias
+- ✅ **CONSISTÊNCIA TOTAL** - Todas as 6 ocorrências alteradas mantendo mensagens persuasivas
+- ✅ **OFERTAS PROMOCIONAIS ALINHADAS** - "7 dias GRÁTIS (sem cartão)" em todas as seções
+- ✅ **MENSAGENS DE URGÊNCIA AJUSTADAS** - "recupere o investimento em 7 dias ou menos"
+- ✅ **SISTEMA DE MARKETING ATUALIZADO** - Nova estratégia de conversão com período mais curto
+- ✅ **INTERFACE CONSISTENTE** - Todas as páginas de entrada com mesmo período promocional
+
 ### 2025-07-23: Bug Crítico Financeiro - Estados de Loading Implementados - CONCLUÍDO ✅
 - ✅ **PROBLEMA IDENTIFICADO** - Cards financeiros mostravam valores iniciais/cache antes dos dados reais carregarem
 - ✅ **CAUSA RAIZ ENCONTRADA** - Falta de estados de loading adequados permitia exibição de valores temporários
