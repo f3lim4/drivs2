@@ -1154,9 +1154,9 @@ export default function RelatoriosFinanceiros() {
       {/* Cards de Resumo Financeiro - apenas para locadoras */}
       {!isAdmin && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center space-y-0.5">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-green-700">RECEITA TOTAL</p>
                 {isDataLoading ? (
@@ -1166,25 +1166,25 @@ export default function RelatoriosFinanceiros() {
                   </>
                 ) : (
                   <>
-                    <p className="text-lg font-bold text-green-800">
+                    <p className="text-xl font-bold text-green-800">
                       {formatCurrency(receitaTotal)}
                     </p>
                     <p className="text-xs text-green-600">
-                      {variacaoReceita > 0 ? '+' : ''}{variacaoReceita.toFixed(1)}% em relação ao mês anterior
+                      {variacaoReceita > 0 ? '+' : ''}{variacaoReceita.toFixed(1)}% vs mês anterior
                     </p>
                   </>
                 )}
               </div>
-              <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-green-700" />
+              <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center ml-auto">
+                <TrendingUp className="w-6 h-6 text-green-700" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center space-y-0.5">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-red-700">DESPESAS TOTAIS</p>
                 {isDataLoading ? (
@@ -1194,25 +1194,25 @@ export default function RelatoriosFinanceiros() {
                   </>
                 ) : (
                   <>
-                    <p className="text-lg font-bold text-red-800">
+                    <p className="text-xl font-bold text-red-800">
                       {formatCurrency(totalDespesas)}
                     </p>
                     <p className="text-xs text-red-600">
-                      {variacaoDespesas > 0 ? '+' : ''}{variacaoDespesas.toFixed(1)}% em relação ao mês anterior
+                      {variacaoDespesas > 0 ? '+' : ''}{variacaoDespesas.toFixed(1)}% vs mês anterior
                     </p>
                   </>
                 )}
               </div>
-              <div className="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center">
-                <TrendingDown className="w-4 h-4 text-red-700" />
+              <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center ml-auto">
+                <TrendingDown className="w-6 h-6 text-red-700" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center space-y-0.5">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-blue-700">LUCRO LÍQUIDO</p>
                 {isDataLoading ? (
@@ -1222,25 +1222,25 @@ export default function RelatoriosFinanceiros() {
                   </>
                 ) : (
                   <>
-                    <p className={`text-lg font-bold ${lucroLiquido >= 0 ? 'text-blue-800' : 'text-red-800'}`}>
+                    <p className={`text-xl font-bold ${lucroLiquido >= 0 ? 'text-blue-800' : 'text-red-800'}`}>
                       {formatCurrency(lucroLiquido)}
                     </p>
                     <p className="text-xs text-blue-600">
-                      {variacaoLucro > 0 ? '+' : ''}{variacaoLucro.toFixed(1)}% em relação ao mês anterior
+                      {variacaoLucro > 0 ? '+' : ''}{variacaoLucro.toFixed(1)}% vs mês anterior
                     </p>
                   </>
                 )}
               </div>
-              <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
-                <DollarSign className={`w-4 h-4 ${lucroLiquido >= 0 ? 'text-blue-700' : 'text-red-700'}`} />
+              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center ml-auto">
+                <DollarSign className={`w-6 h-6 ${lucroLiquido >= 0 ? 'text-blue-700' : 'text-red-700'}`} />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg h-32">
-          <CardContent className="p-6 h-full">
-            <div className="flex items-center justify-between">
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center space-y-0.5">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-purple-700">MARGEM DE LUCRO</p>
                 {isDataLoading ? (
@@ -1250,7 +1250,7 @@ export default function RelatoriosFinanceiros() {
                   </>
                 ) : (
                   <>
-                    <p className={`text-lg font-bold ${margemLucro >= 0 ? 'text-purple-800' : 'text-red-800'}`}>
+                    <p className={`text-xl font-bold ${margemLucro >= 0 ? 'text-purple-800' : 'text-red-800'}`}>
                       {margemLucro.toFixed(1)}%
                     </p>
                     <p className="text-xs text-purple-600">
@@ -1259,8 +1259,8 @@ export default function RelatoriosFinanceiros() {
                   </>
                 )}
               </div>
-              <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
-                <TrendingUp className={`w-4 h-4 ${margemLucro >= 0 ? 'text-purple-700' : 'text-red-700'}`} />
+              <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center ml-auto">
+                <TrendingUp className={`w-6 h-6 ${margemLucro >= 0 ? 'text-purple-700' : 'text-red-700'}`} />
               </div>
             </div>
           </CardContent>
