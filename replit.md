@@ -17,12 +17,14 @@ Preferred communication style: Simple, everyday language.
 - ✅ **LOADING MANUTENÇÕES COMPLETO** - Página Manutenções só exibe quando todos os dados necessários estão carregados
 - ✅ **LOADING INFRAÇÕES COMPLETO** - Página Infrações só exibe quando todos os dados necessários estão carregados
 - ✅ **LOADING VEÍCULOS COMPLETO** - Página Veículos só exibe quando todos os dados necessários estão carregados
+- ✅ **LOADING PAGAMENTOS COMPLETO** - Página Pagamentos só exibe quando todos os dados necessários estão carregados
 - ✅ **VERIFICAÇÃO MÚLTIPLAS FONTES** - Dashboard: 7 fontes (anúncios, motoristas, veículos, aluguéis, pagamentos, despesas, locadoras)
 - ✅ **VERIFICAÇÃO ESPECÍFICA MOTORISTAS** - Sistema verifica: motoristas principais + locadoras (admin) + aluguéis + veículos + pagamentos (4-5 fontes)
 - ✅ **VERIFICAÇÃO ESPECÍFICA CONTRATOS** - Sistema verifica: contratos + templates + motoristas + veículos + aluguéis (5 fontes)
 - ✅ **VERIFICAÇÃO ESPECÍFICA MANUTENÇÕES** - Sistema verifica: manutenções + locais + veículos + pagamentos (4 fontes)
 - ✅ **VERIFICAÇÃO ESPECÍFICA INFRAÇÕES** - Sistema verifica: infrações + locadoras + veículos + motoristas + pagamentos (5 fontes)
 - ✅ **VERIFICAÇÃO ESPECÍFICA VEÍCULOS** - Sistema verifica: veículos + aluguéis + motoristas + manutenções + despesas (5 fontes)
+- ✅ **VERIFICAÇÃO ESPECÍFICA PAGAMENTOS** - Sistema verifica: pagamentos + motoristas + veículos + aluguéis + contratos (5 fontes)
 - ✅ **CARD VALOR MENSAL ATUALIZADO** - Card "VALOR TOTAL" alterado para "VALOR MENSAL" mostrando R$ 21.641,25 diretamente
 - ✅ **INTERFACE ULTRA-LIMPA** - Eliminado valores de referência e textos explicativos desnecessários
 - ✅ **LOADING VISUAL MELHORADO** - Spinner azul com ícones de veículos e mensagens específicas por página

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Plus, Eye, Edit, Trash2, Calendar, DollarSign, User, AlertCircle, Search, Filter, CheckCircle, Clock, Calculator, Car } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,8 +28,24 @@ import type { Pagamento } from '@shared/schema';
 
 export default function Pagamentos() {
   const { profile } = useAuth();
-  const { pagamentos, isLoading, createPagamento, updatePagamento, deletePagamento } = usePagamentos();
-  const { motoristas } = useMotoristas();
+  const { pagamentos, isLoading: loadingPagamentos, createPagamento, updatePagamento, deletePagamento } = usePagamentos();
+  const { motoristas, loading: loadingMotoristas } = useMotoristas();
+
+  // Buscar dados adicionais necessários para o sistema completo
+  const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery({
+    queryKey: ['/api/veiculos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: alugueis = [], isLoading: loadingAlugueis } = useQuery({
+    queryKey: ['/api/alugueis', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: contratos = [], isLoading: loadingContratos } = useQuery({
+    queryKey: ['/api/contratos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
   
   const [showNovoPagamento, setShowNovoPagamento] = useState(false);
   const [showDetalhes, setShowDetalhes] = useState(false);
@@ -497,12 +514,18 @@ export default function Pagamentos() {
     }
   };
 
+  // Sistema de loading completo - verifica múltiplas fontes
+  const loading = loadingPagamentos || loadingMotoristas || loadingVeiculos || loadingAlugueis || loadingContratos;
 
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+      <div className="flex-1 space-y-6 p-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+          <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground text-center">
+            Carregando pagamentos...
+          </p>
+        </div>
       </div>
     );
   }
