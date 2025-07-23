@@ -1951,7 +1951,7 @@ export default function RelatoriosFinanceiros() {
                             <th className="text-left p-3 border-b">Veículo</th>
                             <th className="text-left p-3 border-b">Status</th>
                             <th className="text-left p-3 border-b">Receita Mensal</th>
-                            <th className="text-left p-3 border-b">Despesas Fixas</th>
+                            <th className="text-left p-3 border-b">Despesas Mensais</th>
                             <th className="text-left p-3 border-b">Lucro Líquido</th>
                             <th className="text-left p-3 border-b">Margem %</th>
                           </tr>
