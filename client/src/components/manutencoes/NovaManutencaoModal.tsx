@@ -13,7 +13,7 @@ import { useVeiculos } from '@/hooks/useVeiculos';
 import { useLocais } from '@/hooks/useLocais';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { insertManutencaoSchema } from '@shared/schema';
+import { insertManutencaoSchema, type Veiculo } from '@shared/schema';
 import { format } from 'date-fns';
 
 const formSchema = insertManutencaoSchema.omit({ id: true });
@@ -66,6 +66,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
       prioridade: 'normal',
       statusPagamento: 'em_aberto',
       formaPagamento: null,
+      proximaManutencaoKm: undefined,
     },
   });
 
@@ -131,7 +132,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                   <SelectValue placeholder="Selecione um veículo" />
                 </SelectTrigger>
                 <SelectContent>
-                  {veiculos.map((veiculo) => (
+                  {veiculos.map((veiculo: Veiculo) => (
                     <SelectItem key={veiculo.id} value={veiculo.id}>
                       {veiculo.modelo} - {veiculo.placa}
                     </SelectItem>

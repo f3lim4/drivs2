@@ -414,6 +414,8 @@ export const manutencoes = pgTable("manutencoes", {
 export const insertManutencaoSchema = createInsertSchema(manutencoes).omit({
   createdAt: true,
   updatedAt: true,
+}).extend({
+  proximaManutencaoKm: z.number().optional(),
 });
 
 // Locais table (oficinas/locais de manutenção)

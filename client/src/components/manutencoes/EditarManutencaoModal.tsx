@@ -11,7 +11,7 @@ import { useManutencoes } from '@/hooks/useManutencoes';
 import { useVeiculos } from '@/hooks/useVeiculos';
 import { useToast } from '@/hooks/use-toast';
 import { insertManutencaoSchema } from '@shared/schema';
-import type { Manutencao } from '@shared/schema';
+import type { Manutencao, Veiculo } from '@shared/schema';
 import { useEffect } from 'react';
 
 const formSchema = insertManutencaoSchema.omit({ id: true });
@@ -42,6 +42,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
       prioridade: 'normal',
       statusPagamento: 'em_aberto',
       formaPagamento: null,
+      proximaManutencaoKm: undefined,
     },
   });
 
@@ -67,6 +68,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
         formaPagamento: manutencao.formaPagamento || null,
         pecasSubstituidas: manutencao.pecasSubstituidas || '',
         proximaManutencao: manutencao.proximaManutencao || undefined,
+        proximaManutencaoKm: manutencao.proximaManutencaoKm || undefined,
       });
     }
   }, [manutencao, open, form]);
@@ -117,7 +119,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
                   <SelectValue placeholder="Selecione um veículo" />
                 </SelectTrigger>
                 <SelectContent>
-                  {veiculos.map((veiculo) => (
+                  {veiculos.map((veiculo: Veiculo) => (
                     <SelectItem key={veiculo.id} value={veiculo.id}>
                       {veiculo.modelo} - {veiculo.placa}
                     </SelectItem>
