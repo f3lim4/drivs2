@@ -207,13 +207,35 @@ export default function Pagamentos() {
 
   // Cálculos para diferentes visualizações do card interativo
   const calcularValorVisualizacao = () => {
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth(); // 0-11
+    
     switch (visualizacaoPagamento) {
       case 'mensal':
-        // Valor mensal (divide valor total por número de meses estimado)
-        return totalGeral / 12; // Estimativa simples - pode ser ajustada
+        // Valor mensal (pagamentos do mês atual)
+        return pagamentosFiltrados
+          .filter(p => {
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento.getFullYear() === anoAtual && 
+                   dataPagamento.getMonth() === mesAtual;
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
+      
       case 'semanal':
-        // Valor semanal (divide valor total por número de semanas no ano)
-        return totalGeral / 52; // 52 semanas por ano
+        // Valor semanal (pagamentos dos últimos 7 dias)
+        const seteDiasAtras = new Date();
+        seteDiasAtras.setDate(hoje.getDate() - 7);
+        
+        return pagamentosFiltrados
+          .filter(p => {
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento >= seteDiasAtras && dataPagamento <= hoje;
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
+      
       default:
         return totalGeral;
     }
@@ -231,13 +253,16 @@ export default function Pagamentos() {
   };
 
   const obterDescricaoVisualizacao = () => {
+    const hoje = new Date();
+    const mesNome = hoje.toLocaleDateString('pt-BR', { month: 'long' });
+    
     switch (visualizacaoPagamento) {
       case 'mensal':
-        return 'Clique para ver semanal';
+        return `Pagamentos de ${mesNome}`;
       case 'semanal':
-        return 'Clique para ver geral';
+        return 'Últimos 7 dias';
       default:
-        return 'Clique para ver mensal';
+        return 'Todos os pagamentos';
     }
   };
 
