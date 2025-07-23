@@ -809,6 +809,15 @@ export default function RelatoriosFinanceiros() {
           return total + (isNaN(valor) ? 0 : valor);
         }, 0);
       
+      // Incluir manutenções do período no cálculo das despesas mensais
+      const manutencoesMensais = manutencoes
+        .filter(m => m.veiculoId === veiculo.id && m.status === 'concluida' && 
+          isWithinInterval(new Date(m.dataConclusao || m.dataInicio), { start: monthStart, end: monthEnd }))
+        .reduce((total, manutencao) => {
+          const valorFinal = parseFloat(manutencao.valorFinal || manutencao.valorEstimado || '0');
+          return total + (isNaN(valorFinal) ? 0 : valorFinal);
+        }, 0);
+      
       const despesasManuaisAnuais = despesasVeiculo
         .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento')
         .reduce((total, despesa) => {
@@ -816,9 +825,17 @@ export default function RelatoriosFinanceiros() {
           return total + (isNaN(valor) ? 0 : valor);
         }, 0);
       
-      // Somar despesas manuais + fixas
-      const despesasMensais = despesasManuaisMensais + despesasFixasMensais;
-      const despesasAnuais = despesasManuaisAnuais + (despesasFixasMensais * 12);
+      // Incluir manutenções anuais
+      const manutencoesAnuais = manutencoes
+        .filter(m => m.veiculoId === veiculo.id && m.status === 'concluida')
+        .reduce((total, manutencao) => {
+          const valorFinal = parseFloat(manutencao.valorFinal || manutencao.valorEstimado || '0');
+          return total + (isNaN(valorFinal) ? 0 : valorFinal);
+        }, 0);
+      
+      // Somar despesas manuais + manutenções + fixas
+      const despesasMensais = despesasManuaisMensais + manutencoesMensais + despesasFixasMensais;
+      const despesasAnuais = despesasManuaisAnuais + manutencoesAnuais + (despesasFixasMensais * 12);
       
       const lucro = receitaMensal - despesasMensais;
       const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
