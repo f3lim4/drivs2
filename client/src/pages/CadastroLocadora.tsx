@@ -332,19 +332,17 @@ export default function CadastroLocadora() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
+            <img 
+              src={drivsLogo} 
+              alt="DRIVS" 
+              className="h-8 w-auto"
+            />
           </div>
         </div>
 
         {/* Formulário */}
         <Card className="shadow-xl border-0 bg-white">
           <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <img 
-                src={drivsLogo} 
-                alt="DRIVS" 
-                className="h-12 w-auto"
-              />
-            </div>
             <CardTitle className="text-2xl text-gray-900">Cadastro de Locadora</CardTitle>
             <CardDescription className="text-gray-600">
               Preencha seus dados para se cadastrar no sistema DRIVS
