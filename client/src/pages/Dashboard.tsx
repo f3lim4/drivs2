@@ -328,36 +328,31 @@ export default function Dashboard() {
     .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
     .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorMensal || '0'), 0);
 
-  // Calcular receita semanal esperada (baseada nos aluguéis ativos)
+  // CORRIGIDO: Calcular receita semanal esperada usando fórmula correta (4.35)
   const receitaSemanalEsperada = alugueisSeguro
     .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
     .reduce((total: number, aluguel: any) => {
       const valorMensal = parseFloat(aluguel.valorMensal || '0');
-      const valorSemanal = valorMensal / 4; // Divide por 4 semanas
+      const valorSemanal = valorMensal / 4.35; // Divide por 4.35 (fórmula correta)
       return total + valorSemanal;
     }, 0);
 
-  // Calcular receita semanal já recebida (pagamentos desta semana)
-  const inicioSemana = new Date(hoje);
-  inicioSemana.setDate(hoje.getDate() - hoje.getDay()); // Domingo da semana atual
-  inicioSemana.setHours(0, 0, 0, 0);
-  
-  const fimSemana = new Date(inicioSemana);
-  fimSemana.setDate(inicioSemana.getDate() + 6); // Sábado da semana atual
-  fimSemana.setHours(23, 59, 59, 999);
+  // CORRIGIDO: Calcular receita semanal recebida usando mesma lógica da página Pagamentos
+  // Últimos 7 dias (igual à função calcularValorVisualizacaoRecebido da página Pagamentos)
+  const seteDiasAtras = new Date();
+  seteDiasAtras.setDate(hoje.getDate() - 7);
 
   const receitaSemanalRecebida = pagamentos
     .filter((p: any) => {
-      const dataPagamento = new Date(p.data);
-      return dataPagamento >= inicioSemana && 
-             dataPagamento <= fimSemana &&
+      if (!p.dataPagamento) return false;
+      const dataPagamento = new Date(p.dataPagamento);
+      return dataPagamento >= seteDiasAtras && 
+             dataPagamento <= hoje &&
              p.status === 'pago';
     })
     .reduce((sum: number, p: any) => {
-      const valorBase = parseFloat(p.valor || '0');
-      const valorJuros = parseFloat(p.valorJuros || '0');
-      const valorMulta = parseFloat(p.valorMulta || '0');
-      return sum + valorBase + valorJuros + valorMulta;
+      const valorPago = parseFloat(p.valorPago || '0');
+      return sum + valorPago;
     }, 0);
 
   // Métricas importantes para admin de SaaS de locadoras
