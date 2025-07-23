@@ -833,6 +833,8 @@ export default function RelatoriosFinanceiros() {
           return total + (isNaN(valorFinal) ? 0 : valorFinal);
         }, 0);
       
+
+
       // Somar despesas manuais + manutenções + fixas
       const despesasMensais = despesasManuaisMensais + manutencoesMensais + despesasFixasMensais;
       const despesasAnuais = despesasManuaisAnuais + manutencoesAnuais + (despesasFixasMensais * 12);
