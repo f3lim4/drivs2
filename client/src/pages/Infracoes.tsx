@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Plus, Search, Filter, AlertTriangle, DollarSign, Calendar, Clock } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,8 +19,24 @@ import { EditarInfracaoModal } from '@/components/infracoes/EditarInfracaoModal'
 export default function Infracoes() {
   const { infracoes, isLoading, isDeleting, deleteInfracao } = useInfracoes();
   const { profile } = useAuth();
-  const { locadoras } = useLocadoras();
+  const { locadoras, isLoading: loadingLocadoras } = useLocadoras();
   const isAdmin = profile?.tipo === 'admin';
+
+  // Buscar dados adicionais necessários para o sistema completo
+  const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery({
+    queryKey: ['/api/veiculos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: motoristas = [], isLoading: loadingMotoristas } = useQuery({
+    queryKey: ['/api/motoristas', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
+    queryKey: ['/api/pagamentos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
@@ -147,12 +165,17 @@ export default function Infracoes() {
 
 
 
-  if (isLoading) {
+  // Sistema de loading completo - verifica múltiplas fontes
+  const loading = isLoading || loadingLocadoras || loadingVeiculos || loadingMotoristas || loadingPagamentos;
+
+  if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Carregando infrações...</p>
+      <div className="flex-1 space-y-6 p-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+          <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground text-center">
+            Carregando infrações...
+          </p>
         </div>
       </div>
     );
