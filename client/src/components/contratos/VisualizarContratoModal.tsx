@@ -79,11 +79,12 @@ export function VisualizarContratoModal({
   useEffect(() => {
     if (!contrato || !motoristas || !veiculos) return;
 
-    // Encontrar motorista pelo nome do cliente
-    const motoristaEncontrado = motoristas.find((m: Motorista) => 
-      m.nome.toLowerCase().includes(contrato.cliente.toLowerCase()) ||
-      contrato.cliente.toLowerCase().includes(m.nome.toLowerCase())
-    );
+    // Encontrar motorista pelo nome do cliente (com verificação de segurança)
+    const motoristaEncontrado = motoristas.find((m: Motorista) => {
+      if (!m.nome || !contrato.cliente) return false;
+      return m.nome.toLowerCase().includes(contrato.cliente.toLowerCase()) ||
+             contrato.cliente.toLowerCase().includes(m.nome.toLowerCase());
+    });
     setMotorista(motoristaEncontrado || null);
 
     // Encontrar veículo pelo ID (assumindo que existe campo veiculoId no contrato)
