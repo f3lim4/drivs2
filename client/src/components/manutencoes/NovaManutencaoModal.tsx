@@ -66,7 +66,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
       prioridade: 'normal',
       statusPagamento: 'em_aberto',
       formaPagamento: null,
-      proximaManutencaoKm: undefined,
+      proximaManutencaoKm: 0,
     },
   });
 
@@ -362,7 +362,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="proximaManutencaoKm">Próxima Manutenção (km) - Opcional</Label>
+                    <Label htmlFor="proximaManutencaoKm">Próxima Manutenção (km) *</Label>
                     <Input
                       id="proximaManutencaoKm"
                       type="number"

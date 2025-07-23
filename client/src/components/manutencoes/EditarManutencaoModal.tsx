@@ -42,7 +42,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
       prioridade: 'normal',
       statusPagamento: 'em_aberto',
       formaPagamento: null,
-      proximaManutencaoKm: undefined,
+      proximaManutencaoKm: 0,
     },
   });
 
@@ -68,7 +68,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
         formaPagamento: manutencao.formaPagamento || null,
         pecasSubstituidas: manutencao.pecasSubstituidas || '',
         proximaManutencao: manutencao.proximaManutencao || undefined,
-        proximaManutencaoKm: manutencao.proximaManutencaoKm || undefined,
+        proximaManutencaoKm: manutencao.proximaManutencaoKm || 0,
       });
     }
   }, [manutencao, open, form]);
