@@ -76,6 +76,11 @@ export default function Motoristas() {
     enabled: !!profile?.locadoraId && isLocadora,
   });
 
+  const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
+    queryKey: ['/api/pagamentos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
     if (!locadoraId) return 'Locadora';
@@ -276,7 +281,8 @@ export default function Motoristas() {
   // Sistema de loading completo - verifica múltiplas fontes
   const loading = isLoading || 
     (isAdmin && loadingLocadoras) || 
-    (isLocadora && (loadingAlugueis || loadingVeiculos));
+    (isLocadora && (loadingAlugueis || loadingVeiculos)) ||
+    loadingPagamentos;
 
   if (loading) {
     return (

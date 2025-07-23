@@ -17,7 +17,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **LOADING MANUTENÇÕES COMPLETO** - Página Manutenções só exibe quando todos os dados necessários estão carregados
 - ✅ **LOADING INFRAÇÕES COMPLETO** - Página Infrações só exibe quando todos os dados necessários estão carregados
 - ✅ **VERIFICAÇÃO MÚLTIPLAS FONTES** - Dashboard: 7 fontes (anúncios, motoristas, veículos, aluguéis, pagamentos, despesas, locadoras)
-- ✅ **VERIFICAÇÃO ESPECÍFICA MOTORISTAS** - Sistema verifica: motoristas principais + locadoras (admin) + aluguéis + veículos (locadora)
+- ✅ **VERIFICAÇÃO ESPECÍFICA MOTORISTAS** - Sistema verifica: motoristas principais + locadoras (admin) + aluguéis + veículos + pagamentos (4-5 fontes)
 - ✅ **VERIFICAÇÃO ESPECÍFICA CONTRATOS** - Sistema verifica: contratos + templates + motoristas + veículos + aluguéis (5 fontes)
 - ✅ **VERIFICAÇÃO ESPECÍFICA MANUTENÇÕES** - Sistema verifica: manutenções + locais + veículos + pagamentos (4 fontes)
 - ✅ **VERIFICAÇÃO ESPECÍFICA INFRAÇÕES** - Sistema verifica: infrações + locadoras + veículos + motoristas + pagamentos (5 fontes)
