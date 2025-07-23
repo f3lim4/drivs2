@@ -299,8 +299,27 @@ export default function CadastroLocadora() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <div className="container mx-auto max-w-4xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 p-4 overflow-hidden">
+      {/* Animated Background Elements - mesmo do login */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+            backgroundSize: '40px 40px'
+          }}></div>
+        </div>
+        
+        {/* Floating Orbs */}
+        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-cyan-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Animated Lines */}
+        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent animate-pulse"></div>
+        <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/30 to-transparent animate-pulse delay-700"></div>
+      </div>
+      
+      <div className="relative z-10 container mx-auto max-w-4xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -308,22 +327,22 @@ export default function CadastroLocadora() {
               variant="ghost" 
               size="icon"
               onClick={() => navigate('/login')}
-              className="h-10 w-10"
+              className="h-10 w-10 text-white hover:text-cyan-400 hover:bg-white/10"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2">
-              <Car className="w-8 h-8 text-primary" />
-              <h1 className="text-3xl font-bold text-foreground">DRIVS</h1>
+              <Car className="w-8 h-8 text-cyan-400" />
+              <h1 className="text-3xl font-bold text-white">DRIVS</h1>
             </div>
           </div>
         </div>
 
         {/* Formulário */}
-        <Card className="shadow-xl border-0 bg-card/50 backdrop-blur">
+        <Card className="shadow-xl border-0 bg-white/10 backdrop-blur-md border border-white/20">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Cadastro de Locadora</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl text-white">Cadastro de Locadora</CardTitle>
+            <CardDescription className="text-gray-200">
               Preencha seus dados para se cadastrar no sistema DRIVS
             </CardDescription>
           </CardHeader>
@@ -334,7 +353,7 @@ export default function CadastroLocadora() {
                 {/* Nome Fantasia, Razão Social e CNPJ na mesma linha */}
                 <div className="col-span-2 grid grid-cols-3 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="nome">Nome Fantasia *</Label>
+                    <Label htmlFor="nome" className="text-gray-200">Nome Fantasia *</Label>
                     <Input
                       id="nome"
                       value={formData.nome}
@@ -345,7 +364,7 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="razaoSocial">Razão Social *</Label>
+                    <Label htmlFor="razaoSocial" className="text-gray-200">Razão Social *</Label>
                     <Input
                       id="razaoSocial"
                       value={formData.razaoSocial}
@@ -356,7 +375,7 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cnpj">CNPJ *</Label>
+                    <Label htmlFor="cnpj" className="text-gray-200">CNPJ *</Label>
                     <Input
                       id="cnpj"
                       value={formData.cnpj}
@@ -370,7 +389,7 @@ export default function CadastroLocadora() {
                 {/* Email, Telefone e Responsável na mesma linha */}
                 <div className="col-span-2 grid grid-cols-3 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email" className="text-gray-200">Email *</Label>
                     <Input
                       id="email"
                       type="email"
@@ -382,7 +401,7 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="telefone">Telefone *</Label>
+                    <Label htmlFor="telefone" className="text-gray-200">Telefone *</Label>
                     <Input
                       id="telefone"
                       value={formData.telefone}
@@ -393,7 +412,7 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="responsavel">Responsável *</Label>
+                    <Label htmlFor="responsavel" className="text-gray-200">Responsável *</Label>
                     <Input
                       id="responsavel"
                       value={formData.responsavel}
@@ -407,7 +426,7 @@ export default function CadastroLocadora() {
                 {/* CEP, Endereço, Número e Complemento na mesma linha */}
                 <div className="col-span-2 grid gap-2" style={{gridTemplateColumns: '1fr 2fr 0.8fr 1fr'}}>
                   <div className="space-y-2">
-                    <Label htmlFor="cep">CEP *</Label>
+                    <Label htmlFor="cep" className="text-gray-200">CEP *</Label>
                     <Input
                       id="cep"
                       value={formData.cep}
@@ -422,7 +441,7 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="endereco">Endereço *</Label>
+                    <Label htmlFor="endereco" className="text-gray-200">Endereço *</Label>
                     <Input
                       id="endereco"
                       value={formData.endereco}
@@ -433,7 +452,7 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="numero">Número *</Label>
+                    <Label htmlFor="numero" className="text-gray-200">Número *</Label>
                     <Input
                       id="numero"
                       value={formData.numero}
@@ -444,7 +463,7 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="complemento">Complemento</Label>
+                    <Label htmlFor="complemento" className="text-gray-200">Complemento</Label>
                     <Input
                       id="complemento"
                       value={formData.complemento}
@@ -457,7 +476,7 @@ export default function CadastroLocadora() {
                 {/* Bairro, Cidade e Estado na mesma linha */}
                 <div className="col-span-2 grid grid-cols-3 gap-3">
                   <div className="space-y-2">
-                    <Label htmlFor="bairro">Bairro *</Label>
+                    <Label htmlFor="bairro" className="text-gray-200">Bairro *</Label>
                     <Input
                       id="bairro"
                       value={formData.bairro}
@@ -468,7 +487,7 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cidade">Cidade *</Label>
+                    <Label htmlFor="cidade" className="text-gray-200">Cidade *</Label>
                     <Input
                       id="cidade"
                       value={formData.cidade}
@@ -479,7 +498,7 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="estado">Estado *</Label>
+                    <Label htmlFor="estado" className="text-gray-200">Estado *</Label>
                     <Select
                       value={formData.estado}
                       onValueChange={(value) => updateFormData('estado', value)}
@@ -527,7 +546,7 @@ export default function CadastroLocadora() {
               <div className="grid grid-cols-2 gap-6 pt-6 border-t">
                 {/* Coluna Logo */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center">
+                  <h3 className="text-lg font-medium flex items-center text-white">
                     <Image className="h-5 w-5 mr-2" />
                     Logo da Empresa (Opcional)
                   </h3>
@@ -547,10 +566,10 @@ export default function CadastroLocadora() {
                         )}
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-200">
                           {logoPreview ? 'Logo selecionado' : 'Nenhum logo selecionado'}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-400">
                           Formatos aceitos: JPG, PNG, SVG (máximo 5MB)
                         </p>
                       </div>
@@ -591,14 +610,14 @@ export default function CadastroLocadora() {
 
                 {/* Coluna Senhas */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center">
+                  <h3 className="text-lg font-medium flex items-center text-white">
                     <Lock className="h-5 w-5 mr-2" />
                     Credenciais de Acesso
                   </h3>
                   
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="senha">Senha *</Label>
+                      <Label htmlFor="senha" className="text-gray-200">Senha *</Label>
                       <Input
                         id="senha"
                         type="password"
@@ -611,7 +630,7 @@ export default function CadastroLocadora() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="confirmarSenha">Confirmar Senha *</Label>
+                      <Label htmlFor="confirmarSenha" className="text-gray-200">Confirmar Senha *</Label>
                       <Input
                         id="confirmarSenha"
                         type="password"
@@ -646,11 +665,11 @@ export default function CadastroLocadora() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-gray-200">
                 Já tem uma conta?{' '}
                 <Button 
                   variant="link" 
-                  className="px-0 text-primary hover:text-primary/80"
+                  className="px-0 text-cyan-400 hover:text-cyan-300"
                   onClick={() => navigate('/login')}
                 >
                   Fazer login
@@ -661,7 +680,7 @@ export default function CadastroLocadora() {
         </Card>
 
         <div className="text-center mt-6">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-gray-400">
             © 2025 DRIVS. Todos os direitos reservados.
           </p>
         </div>
