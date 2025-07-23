@@ -42,6 +42,10 @@ export const locadoras = pgTable("locadoras", {
   status: text("status").notNull().default("pendente"), // 'ativa', 'inativa', 'pendente'
   plano: text("plano").notNull().default("basico"), // 'basico', 'premium', 'enterprise'
   tiposVeiculos: text("tipos_veiculos").array().notNull().default(['carro']), // tipos de veículos que a locadora trabalha
+  // Controle de teste gratuito
+  testeGratuito: boolean("teste_gratuito").notNull().default(true), // Se está no período de teste
+  diasTesteGratuito: integer("dias_teste_gratuito").notNull().default(7), // Quantos dias de teste (7 por padrão)
+  dataVencimentoTeste: date("data_vencimento_teste"), // Data de vencimento do teste
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
