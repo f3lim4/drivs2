@@ -38,11 +38,15 @@ export default function RelatoriosFinanceiros() {
   const { profile, isAdmin } = useAuth();
   const { alugueis, isLoading: alugueisLoading } = useAlugueis();
   const { pagamentos, isLoading: pagamentosLoading } = usePagamentos();
-  const { infracoes } = useInfracoes();
+  const { infracoes, isLoading: infracoesLoading } = useInfracoes();
   const { despesas, isLoading: despesasLoading } = useDespesas();
   const { veiculos, isLoading: veiculosLoading } = useVeiculos();
-  const { motoristas } = useMotoristas();
-  const { manutencoes } = useManutencoes();
+  const { motoristas, isLoading: motoristasLoading } = useMotoristas();
+  const { manutencoes, isLoading: manutencoesLoading } = useManutencoes();
+
+  // ✅ VERIFICAR SE TODOS OS DADOS ESTÃO CARREGADOS
+  const isLoadingData = alugueisLoading || pagamentosLoading || infracoesLoading || 
+                        despesasLoading || veiculosLoading || motoristasLoading || manutencoesLoading;
   
   // Criar variável despesasComManutencoes usando dados do hook useDespesas
   const despesasComManutencoes = useMemo(() => {
@@ -1106,6 +1110,58 @@ export default function RelatoriosFinanceiros() {
   );
 
 
+
+  // ✅ EXIBIR LOADING ENQUANTO DADOS NÃO ESTÃO 100% CARREGADOS
+  if (isLoadingData) {
+    return (
+      <div className="space-y-6 p-6">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">Relatórios Financeiros</h1>
+          <p className="text-muted-foreground">Carregando dados financeiros...</p>
+        </div>
+        
+        {/* Seletor de mês com skeleton */}
+        <div className="flex justify-end items-center gap-4">
+          <div className="h-9 w-40 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-9 w-32 bg-gray-200 rounded animate-pulse"></div>
+        </div>
+        
+        {/* Cards com skeleton de loading */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Card key={i} className="h-32 animate-pulse">
+              <CardContent className="p-6 h-full">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-2 flex-1">
+                    <div className="h-3 bg-gray-200 rounded w-24"></div>
+                    <div className="h-6 bg-gray-300 rounded w-20"></div>
+                    <div className="h-3 bg-gray-100 rounded w-32"></div>
+                  </div>
+                  <div className="h-10 w-10 bg-gray-200 rounded"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        
+        {/* Abas com skeleton */}
+        <Card className="animate-pulse">
+          <CardHeader>
+            <div className="flex space-x-4 mb-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-8 bg-gray-200 rounded w-32"></div>
+              ))}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="h-12 bg-gray-100 rounded"></div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-6">
