@@ -176,16 +176,7 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-6 text-center space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Precisa de uma conta?{' '}
-                <Button 
-                  variant="link" 
-                  className="px-0 text-primary hover:text-primary/80"
-                >
-                  Entre em contato
-                </Button>
-              </p>
+            <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
                 É uma locadora?{' '}
                 <Button 
@@ -202,7 +193,7 @@ export default function Login() {
 
         <div className="text-center mt-6">
           <p className="text-xs text-white/60">
-            © 2024 DRIVS. Todos os direitos reservados.
+            © 2025 DRIVS. Todos os direitos reservados.
           </p>
         </div>
       </div>
