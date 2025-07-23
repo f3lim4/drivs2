@@ -60,9 +60,20 @@ export default function Motoristas() {
   const [sortBy, setSortBy] = useState<string>('nome-asc');
 
   // Buscar locadoras para exibir nome na coluna
-  const { data: locadoras = [] } = useQuery({
+  const { data: locadoras = [], isLoading: loadingLocadoras } = useQuery({
     queryKey: ['/api/locadoras'],
     enabled: isAdmin, // Só busca se for admin
+  });
+
+  // Buscar dados adicionais necessários para o sistema completo
+  const { data: alugueis = [], isLoading: loadingAlugueis } = useQuery({
+    queryKey: ['/api/alugueis', profile?.locadoraId],
+    enabled: !!profile?.locadoraId && isLocadora,
+  });
+
+  const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery({
+    queryKey: ['/api/veiculos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId && isLocadora,
   });
 
   // Função para encontrar o nome da locadora
@@ -262,10 +273,20 @@ export default function Motoristas() {
     }
   };
 
-  if (isLoading) {
+  // Sistema de loading completo - verifica múltiplas fontes
+  const loading = isLoading || 
+    (isAdmin && loadingLocadoras) || 
+    (isLocadora && (loadingAlugueis || loadingVeiculos));
+
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+      <div className="flex-1 space-y-6 p-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+          <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground text-center">
+            Carregando motoristas...
+          </p>
+        </div>
       </div>
     );
   }
