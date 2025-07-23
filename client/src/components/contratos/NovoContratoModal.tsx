@@ -911,10 +911,10 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Gerar Novo Contrato</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="w-[95vw] sm:max-w-[800px] max-w-[800px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+        <DialogHeader className="pb-3 sm:pb-6">
+          <DialogTitle className="text-lg sm:text-xl">Gerar Novo Contrato</DialogTitle>
+          <DialogDescription className="text-sm sm:text-base">
             Preencha as informações para gerar um contrato de locação.
           </DialogDescription>
         </DialogHeader>
@@ -925,10 +925,10 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           </div>
         ) : (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-6">
               
               {/* SELEÇÃO DE VEÍCULO, MOTORISTA E TEMPLATE */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 {/* SELEÇÃO DE VEÍCULO */}
                 <FormField
                   control={form.control}
@@ -1038,7 +1038,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
               </div>
 
               {/* TODOS OS CAMPOS EM UMA ÚNICA LINHA */}
-              <div className="grid grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 {/* DATA DE INÍCIO */}
                 <FormField
                   control={form.control}
@@ -1175,7 +1175,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
               </div>
 
               {/* SEÇÃO DE PAGAMENTO RECORRENTE */}
-              <div className="space-y-4 border-t pt-4">
+              <div className="space-y-3 sm:space-y-4 border-t pt-3 sm:pt-4">
                 <FormField
                   control={form.control}
                   name="pagamentoRecorrente"
@@ -1200,8 +1200,8 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 />
 
                 {form.watch('pagamentoRecorrente') && (
-                  <div className="space-y-4 ml-6">
-                    <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-3 sm:space-y-4 ml-3 sm:ml-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                       <FormField
                         control={form.control}
                         name="dataPrimeiroPagamento"
@@ -1314,7 +1314,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                     control={form.control}
                     name="marcarPagamentosAnteriores"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 ml-6 border-t pt-4">
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 ml-3 sm:ml-6 border-t pt-3 sm:pt-4">
                         <FormControl>
                           <Checkbox
                             checked={field.value}
@@ -1335,19 +1335,20 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                 )}
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="gap-2 sm:gap-3 pt-3 sm:pt-6 flex-col sm:flex-row">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => onOpenChange(false)}
                   disabled={createContrato.isPending}
+                  className="w-full sm:w-auto order-2 sm:order-1"
                 >
                   Cancelar
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={createContrato.isPending || contratoGerado || processandoRef.current}
-                  className={contratoGerado ? "bg-green-600 hover:bg-green-600" : ""}
+                  className={`w-full sm:w-auto order-1 sm:order-2 ${contratoGerado ? "bg-green-600 hover:bg-green-600" : ""}`}
                 >
                   {createContrato.isPending || processandoRef.current ? (
                     <>
