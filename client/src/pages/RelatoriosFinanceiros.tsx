@@ -1235,10 +1235,9 @@ export default function RelatoriosFinanceiros() {
                 </TableHeader>
                 <TableBody>
                   {locadoras.map((locadora: any) => {
-                    // Calcular dados financeiros básicos para cada locadora
-                    // Nota: Isso é uma implementação simplificada usando dados disponíveis
-                    const receitaLocadora = Math.random() * 50000 + 20000; // Simulação temporária
-                    const despesasLocadora = Math.random() * 30000 + 15000; // Simulação temporária
+                    // Usar dados reais ao invés de valores aleatórios
+                    const receitaLocadora = 0; // Dados reais não disponíveis no momento
+                    const despesasLocadora = 0; // Dados reais não disponíveis no momento
                     const lucroLocadora = receitaLocadora - despesasLocadora;
                     const margemLocadora = receitaLocadora > 0 ? (lucroLocadora / receitaLocadora) * 100 : 0;
                     
