@@ -14,6 +14,10 @@ import { DashboardStats, Alert, Motorista, Veiculo } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useAnunciosAtivos } from '@/hooks/useAnuncios';
+import { useMotoristas } from '@/hooks/useMotoristas';
+import { useVeiculos } from '@/hooks/useVeiculos';
+import { useAlugueis } from '@/hooks/useAlugueis';
+import { usePagamentos } from '@/hooks/usePagamentos';
 import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
 
 
@@ -88,97 +92,30 @@ export default function Dashboard() {
     gcTime: 0,
   });
   
-  // Construir URLs com filtro de locadora se necessário
-  const motoristasUrl = isLocadora && profile?.locadoraId 
-    ? `/api/motoristas?locadoraId=${profile.locadoraId}`
-    : '/api/motoristas';
-  
-  const veiculosUrl = isLocadora && profile?.locadoraId 
-    ? `/api/veiculos?locadoraId=${profile.locadoraId}`
-    : '/api/veiculos';
-  
-  const alugueisUrl = isLocadora && profile?.locadoraId 
-    ? `/api/alugueis?locadoraId=${profile.locadoraId}`
-    : '/api/alugueis';
-  
-  // Buscar dados dos motoristas
-  const { data: motoristasRaw = [], isLoading: loadingMotoristas } = useQuery<Motorista[]>({
-    queryKey: [motoristasUrl, profile?.locadoraId, isLocadora],
-    enabled: !!profile,
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    staleTime: 0,
-    gcTime: 0,
+  // Usar hooks especializados para buscar dados
+  const { data: motoristasRaw = [], isLoading: loadingMotoristas } = useMotoristas();
+  const { data: veiculosRaw = [], isLoading: loadingVeiculos } = useVeiculos();
+  const { data: alugueisRaw = [], isLoading: loadingAlugueis } = useAlugueis();
+
+  // Usar dados diretamente dos hooks (já filtrados corretamente)
+  const motoristasSeguro = motoristasRaw;
+  const veiculosSeguro = veiculosRaw;
+
+  // DEBUG: Log dos dados carregados
+  console.log('Dashboard - Dados carregados:', {
+    locadoraId: profile?.locadoraId,
+    motoristas: motoristasSeguro.length,
+    veiculos: veiculosSeguro.length,
+    alugueis: alugueisRaw.length
   });
 
-  // FILTRO DE SEGURANÇA: Garantir que locadora veja apenas seus motoristas  
-  const motoristas = isLocadora && profile?.locadoraId 
-    ? motoristasRaw.filter(m => m.locadoraId === profile.locadoraId)
-    : motoristasRaw;
-  
-  // PROTEÇÃO EXTRA: Se for locadora e tiver dados de outras locadoras, mostrar array vazio
-  const motoristasSeguro = isLocadora && profile?.locadoraId 
-    ? motoristas.every(m => m.locadoraId === profile.locadoraId) ? motoristas : []
-    : motoristas;
+  // Usar dados diretamente dos hooks (já filtrados corretamente)
+  const alugueisSeguro = alugueisRaw;
 
-  // Buscar dados dos veículos
-  const { data: veiculosRaw = [], isLoading: loadingVeiculos } = useQuery<Veiculo[]>({
-    queryKey: [veiculosUrl, profile?.locadoraId, isLocadora],
-    enabled: !!profile,
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    staleTime: 0,
-    gcTime: 0,
-  });
-
-  // FILTRO DE SEGURANÇA: Garantir que locadora veja apenas seus veículos
-  const veiculos = isLocadora && profile?.locadoraId 
-    ? veiculosRaw.filter(v => v.locadoraId === profile.locadoraId)
-    : veiculosRaw;
-  
-  // PROTEÇÃO EXTRA: Se for locadora e tiver dados de outras locadoras, mostrar array vazio
-  const veiculosSeguro = isLocadora && profile?.locadoraId 
-    ? veiculos.every(v => v.locadoraId === profile.locadoraId) ? veiculos : []
-    : veiculos;
-
-  // Buscar dados dos aluguéis
-  const { data: alugueisRaw = [], isLoading: loadingAlugueis } = useQuery({
-    queryKey: [alugueisUrl, profile?.locadoraId, isLocadora],
-    enabled: !!profile,
-    refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    staleTime: 0,
-    gcTime: 0,
-  });
-
-  // FILTRO DE SEGURANÇA: Garantir que locadora veja apenas seus aluguéis
-  const alugueis = isLocadora && profile?.locadoraId 
-    ? alugueisRaw.filter((a: any) => a.locadoraId === profile.locadoraId)
-    : alugueisRaw;
-  
-  // PROTEÇÃO EXTRA: Se for locadora e tiver dados de outras locadoras, mostrar array vazio
-  const alugueisSeguro = isLocadora && profile?.locadoraId 
-    ? alugueis.every((a: any) => a.locadoraId === profile.locadoraId) ? alugueis : []
-    : alugueis;
-
-  // Buscar dados financeiros para o gráfico
-  const pagamentosUrl = isLocadora && profile?.locadoraId 
-    ? `/api/pagamentos?locadoraId=${profile.locadoraId}`
-    : '/api/pagamentos';
-  
-  const despesasUrl = isLocadora && profile?.locadoraId 
-    ? `/api/despesas?locadoraId=${profile.locadoraId}`
-    : '/api/despesas';
-
-  const { data: pagamentos = [] } = useQuery({
-    queryKey: [pagamentosUrl, profile?.locadoraId],
-    enabled: !!profile && isLocadora,
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-  });
-
+  // Buscar dados financeiros usando hooks
+  const { data: pagamentos = [] } = usePagamentos();
   const { data: despesas = [] } = useQuery({
-    queryKey: [despesasUrl, profile?.locadoraId],
+    queryKey: ['/api/despesas', profile?.locadoraId],
     enabled: !!profile && isLocadora,
     refetchOnWindowFocus: false,
     staleTime: 0,
