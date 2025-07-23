@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Plus, Eye, Edit, Trash2, Wrench, Calendar, Clock, MapPin, Building2, Phone, Mail, Search, Filter, CheckCircle, AlertTriangle, BarChart3, DollarSign } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,8 +37,20 @@ import { formatDate } from '@/lib/utils';
 import type { Manutencao, Local } from '@shared/schema';
 
 export default function Manutencoes() {
+  const { profile } = useAuth();
   const { manutencoes, isLoading, deleteManutencao, isDeleting, updateManutencao } = useManutencoes();
   const { locais, isLoading: isLoadingLocais, deleteLocal } = useLocais();
+
+  // Buscar dados adicionais necessários para o sistema completo
+  const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery({
+    queryKey: ['/api/veiculos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
+    queryKey: ['/api/pagamentos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
@@ -185,10 +199,18 @@ export default function Manutencoes() {
     }).format(value);
   };
 
-  if (isLoading) {
+  // Sistema de loading completo - verifica múltiplas fontes
+  const loading = isLoading || isLoadingLocais || loadingVeiculos || loadingPagamentos;
+
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+      <div className="flex-1 space-y-6 p-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+          <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground text-center">
+            Carregando manutenções...
+          </p>
+        </div>
       </div>
     );
   }
