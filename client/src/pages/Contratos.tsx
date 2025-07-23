@@ -8,7 +8,9 @@ import { Plus, Upload, FileText, Download, Eye, Edit, Trash2, Filter, Search, X,
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useContratos } from '@/hooks/useContratos';
+import { useQuery } from '@tanstack/react-query';
 import { registrarAtividade } from '@/utils/activityLogger';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -41,6 +43,22 @@ export default function Contratos() {
   const { toast } = useToast();
   const { contratos, isLoading, createContrato, updateContrato, deleteContrato } = useContratos();
   const { templates, isLoading: isLoadingTemplates, deleteTemplate } = useTemplateContratos();
+  
+  // Buscar dados adicionais necessários para o sistema completo
+  const { data: motoristas = [], isLoading: loadingMotoristas } = useQuery({
+    queryKey: ['/api/motoristas', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery({
+    queryKey: ['/api/veiculos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: alugueis = [], isLoading: loadingAlugueis } = useQuery({
+    queryKey: ['/api/alugueis', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
   const [showNovoContratoModal, setShowNovoContratoModal] = useState(false);
   const [showVisualizarModal, setShowVisualizarModal] = useState(false);
   const [showEditarModal, setShowEditarModal] = useState(false);
@@ -77,7 +95,12 @@ export default function Contratos() {
 
   const handleContratoEditado = async (contratoAtualizado: Contrato) => {
     try {
-      await updateContrato.mutateAsync(contratoAtualizado);
+      // Garantir que o valor seja string para o backend
+      const contratoParaAtualizar = {
+        ...contratoAtualizado,
+        valor: contratoAtualizado.valor.toString(),
+      };
+      await updateContrato.mutateAsync(contratoParaAtualizar);
       toast({
         title: "Contrato Atualizado",
         description: `Contrato de ${contratoAtualizado.cliente} foi atualizado com sucesso!`,
@@ -409,6 +432,22 @@ export default function Contratos() {
         return <Badge variant="outline">{status}</Badge>;
     }
   };
+
+  // Sistema de loading completo - verifica múltiplas fontes
+  const loading = isLoading || isLoadingTemplates || loadingMotoristas || loadingVeiculos || loadingAlugueis;
+
+  if (loading) {
+    return (
+      <div className="flex-1 space-y-6 p-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+          <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground text-center">
+            Carregando contratos...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-6 p-6">
