@@ -47,6 +47,8 @@ export default function Pagamentos() {
   // Estados para alternar visualização dos cards de pagamentos
   const [visualizacaoPagamento, setVisualizacaoPagamento] = useState<'geral' | 'mensal' | 'semanal'>('geral');
   const [visualizacaoRecebido, setVisualizacaoRecebido] = useState<'geral' | 'mensal' | 'semanal'>('geral');
+  const [visualizacaoAberto, setVisualizacaoAberto] = useState<'geral' | 'mensal' | 'semanal'>('geral');
+  const [visualizacaoParcial, setVisualizacaoParcial] = useState<'geral' | 'mensal' | 'semanal'>('geral');
 
   // Função para alternar visualização do primeiro card
   const alternarVisualizacao = () => {
@@ -67,6 +69,38 @@ export default function Pagamentos() {
   // Função para alternar visualização do segundo card (recebidos)
   const alternarVisualizacaoRecebido = () => {
     setVisualizacaoRecebido(prev => {
+      switch (prev) {
+        case 'geral':
+          return 'mensal';
+        case 'mensal':
+          return 'semanal';
+        case 'semanal':
+          return 'geral';
+        default:
+          return 'geral';
+      }
+    });
+  };
+
+  // Função para alternar visualização do terceiro card (em aberto)
+  const alternarVisualizacaoAberto = () => {
+    setVisualizacaoAberto(prev => {
+      switch (prev) {
+        case 'geral':
+          return 'mensal';
+        case 'mensal':
+          return 'semanal';
+        case 'semanal':
+          return 'geral';
+        default:
+          return 'geral';
+      }
+    });
+  };
+
+  // Função para alternar visualização do quarto card (parciais)
+  const alternarVisualizacaoParcial = () => {
+    setVisualizacaoParcial(prev => {
       switch (prev) {
         case 'geral':
           return 'mensal';
@@ -343,6 +377,126 @@ export default function Pagamentos() {
     }
   };
 
+  // Funções para o card em aberto
+  const calcularValorVisualizacaoAberto = () => {
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth();
+    const pagamentosAberto = pagamentosFiltrados.filter(p => p.status === 'em_aberto');
+    
+    switch (visualizacaoAberto) {
+      case 'mensal':
+        return pagamentosAberto
+          .filter(p => {
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento.getFullYear() === anoAtual && 
+                   dataPagamento.getMonth() === mesAtual;
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
+      
+      case 'semanal':
+        const seteDiasAtras = new Date();
+        seteDiasAtras.setDate(hoje.getDate() - 7);
+        
+        return pagamentosAberto
+          .filter(p => {
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento >= seteDiasAtras && dataPagamento <= hoje;
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
+      
+      default:
+        return totalPendente;
+    }
+  };
+
+  const obterTituloVisualizacaoAberto = () => {
+    switch (visualizacaoAberto) {
+      case 'mensal':
+        return 'Em Aberto Mensal';
+      case 'semanal':
+        return 'Em Aberto Semanal';
+      default:
+        return 'Total em Aberto';
+    }
+  };
+
+  const obterDescricaoVisualizacaoAberto = () => {
+    const hoje = new Date();
+    const mesNome = hoje.toLocaleDateString('pt-BR', { month: 'long' });
+    
+    switch (visualizacaoAberto) {
+      case 'mensal':
+        return `Em aberto em ${mesNome}`;
+      case 'semanal':
+        return 'Em aberto últimos 7 dias';
+      default:
+        return 'Todos em aberto';
+    }
+  };
+
+  // Funções para o card de parciais
+  const calcularValorVisualizacaoParcial = () => {
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth();
+    const pagamentosParciais = pagamentosFiltrados.filter(p => p.status === 'parcial');
+    
+    switch (visualizacaoParcial) {
+      case 'mensal':
+        return pagamentosParciais
+          .filter(p => {
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento.getFullYear() === anoAtual && 
+                   dataPagamento.getMonth() === mesAtual;
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
+      
+      case 'semanal':
+        const seteDiasAtras = new Date();
+        seteDiasAtras.setDate(hoje.getDate() - 7);
+        
+        return pagamentosParciais
+          .filter(p => {
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento >= seteDiasAtras && dataPagamento <= hoje;
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
+      
+      default:
+        return totalParcial;
+    }
+  };
+
+  const obterTituloVisualizacaoParcial = () => {
+    switch (visualizacaoParcial) {
+      case 'mensal':
+        return 'Parciais Mensal';
+      case 'semanal':
+        return 'Parciais Semanal';
+      default:
+        return 'Total Parciais';
+    }
+  };
+
+  const obterDescricaoVisualizacaoParcial = () => {
+    const hoje = new Date();
+    const mesNome = hoje.toLocaleDateString('pt-BR', { month: 'long' });
+    
+    switch (visualizacaoParcial) {
+      case 'mensal':
+        return `Parciais em ${mesNome}`;
+      case 'semanal':
+        return 'Parciais últimos 7 dias';
+      default:
+        return 'Todos parciais';
+    }
+  };
+
 
 
   if (isLoading) {
@@ -393,13 +547,16 @@ export default function Pagamentos() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32">
+        <Card 
+          className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg h-32 cursor-pointer hover:shadow-xl transition-shadow"
+          onClick={alternarVisualizacaoAberto}
+        >
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-red-700">Total em Aberto</p>
-                <p className="text-xl font-bold text-red-800">{formatCurrency(totalPendente)}</p>
-                <p className="text-xs text-red-600">{pagamentosFiltrados.filter(p => p.status === 'em_aberto').length} pagamentos</p>
+                <p className="text-xs font-medium text-red-700">{obterTituloVisualizacaoAberto()}</p>
+                <p className="text-xl font-bold text-red-800">{formatCurrency(calcularValorVisualizacaoAberto())}</p>
+                <p className="text-xs text-red-600">{obterDescricaoVisualizacaoAberto()}</p>
               </div>
               <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-red-700" />
@@ -408,13 +565,16 @@ export default function Pagamentos() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg h-32">
+        <Card 
+          className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg h-32 cursor-pointer hover:shadow-xl transition-shadow"
+          onClick={alternarVisualizacaoParcial}
+        >
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-orange-700">Total Parciais</p>
-                <p className="text-xl font-bold text-orange-800">{formatCurrency(totalParcial)}</p>
-                <p className="text-xs text-orange-600">{pagamentosFiltrados.filter(p => p.status === 'parcial').length} pagamentos</p>
+                <p className="text-xs font-medium text-orange-700">{obterTituloVisualizacaoParcial()}</p>
+                <p className="text-xl font-bold text-orange-800">{formatCurrency(calcularValorVisualizacaoParcial())}</p>
+                <p className="text-xs text-orange-600">{obterDescricaoVisualizacaoParcial()}</p>
               </div>
               <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center">
                 <Clock className="w-5 h-5 text-orange-700" />
