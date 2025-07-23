@@ -93,13 +93,24 @@ export default function Dashboard() {
   });
   
   // Usar hooks especializados para buscar dados
-  const { data: motoristasRaw = [], isLoading: loadingMotoristas } = useMotoristas();
-  const { data: veiculosRaw = [], isLoading: loadingVeiculos } = useVeiculos();
-  const { data: alugueisRaw = [], isLoading: loadingAlugueis } = useAlugueis();
+  const { motoristas: motoristasRaw = [], isLoading: loadingMotoristas } = useMotoristas();
+  const { veiculos: veiculosRaw = [], loading: loadingVeiculos } = useVeiculos();
+  const { alugueis: alugueisRaw = [], isLoading: loadingAlugueis } = useAlugueis();
+  const { pagamentos = [] } = usePagamentos();
+  
+  const { data: despesas = [] } = useQuery({
+    queryKey: ['/api/despesas', profile?.locadoraId],
+    enabled: !!profile && isLocadora,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  });
+
+  const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis;
 
   // Usar dados diretamente dos hooks (já filtrados corretamente)
   const motoristasSeguro = motoristasRaw;
   const veiculosSeguro = veiculosRaw;
+  const alugueisSeguro = alugueisRaw;
 
   // DEBUG: Log dos dados carregados
   console.log('Dashboard - Dados carregados:', {
@@ -117,20 +128,6 @@ export default function Dashboard() {
     pagamentos: pagamentos.length > 0 ? 'DADOS OK' : 'VAZIO',
     loading: loading
   });
-
-  // Usar dados diretamente dos hooks (já filtrados corretamente)
-  const alugueisSeguro = alugueisRaw;
-
-  // Buscar dados financeiros usando hooks
-  const { data: pagamentos = [] } = usePagamentos();
-  const { data: despesas = [] } = useQuery({
-    queryKey: ['/api/despesas', profile?.locadoraId],
-    enabled: !!profile && isLocadora,
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-  });
-
-  const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis;
 
   // Log apenas se houver problemas para debug
   if (isLocadora && veiculosSeguro.length > 1) {
