@@ -1,32 +1,39 @@
 /**
- * Página Index - redireciona para o Login
- * Esta página redireciona usuários não autenticados para o login
+ * Página Index - exibe Landing Page para visitantes e Dashboard para usuários autenticados
  */
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import Landing from './Landing';
 
 const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        navigate('/dashboard', { replace: true });
-      } else {
-        navigate('/login', { replace: true });
-      }
+    if (!isLoading && isAuthenticated) {
+      navigate('/dashboard', { replace: true });
     }
   }, [navigate, isAuthenticated, isLoading]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <LoadingSpinner size="lg" />
-    </div>
-  );
+  // Se ainda está carregando, mostra spinner
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  // Se não está autenticado, mostra a Landing Page
+  if (!isAuthenticated) {
+    return <Landing />;
+  }
+
+  // Se chegou aqui, usuário está autenticado e será redirecionado
+  return null;
 };
 
 export default Index;

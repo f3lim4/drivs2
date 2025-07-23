@@ -20,6 +20,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **MENSAGENS DE URGÊNCIA AJUSTADAS** - "recupere o investimento em 7 dias ou menos"
 - ✅ **SISTEMA DE MARKETING ATUALIZADO** - Nova estratégia de conversão com período mais curto
 - ✅ **INTERFACE CONSISTENTE** - Todas as páginas de entrada com mesmo período promocional
+- ✅ **PÁGINA INICIAL CORRIGIDA** - Index.tsx agora mostra Landing para visitantes não autenticados
 
 ### 2025-07-23: Bug Crítico Financeiro - Estados de Loading Implementados - CONCLUÍDO ✅
 - ✅ **PROBLEMA IDENTIFICADO** - Cards financeiros mostravam valores iniciais/cache antes dos dados reais carregarem
