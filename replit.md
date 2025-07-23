@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-23: Bug Crítico Financeiro - Valores Aleatórios Corrigidos - CONCLUÍDO ✅
+- ✅ **PROBLEMA IDENTIFICADO** - Valores financeiros mudavam aleatoriamente a cada entrada/saída da página
+- ✅ **CAUSA RAIZ ENCONTRADA** - Math.random() nas linhas 1240-1241 de RelatoriosFinanceiros.tsx gerando valores simulados
+- ✅ **CORREÇÃO APLICADA** - Substituído valores aleatórios por dados reais (0 quando não disponíveis)
+- ✅ **CONSISTÊNCIA RESTAURADA** - Página financeira agora mostra valores estáveis e consistentes
+- ✅ **SISTEMA PRODUCTION-READY** - Relatórios financeiros baseados apenas em dados reais do banco
+- ✅ **INTEGRIDADE DE DADOS** - Eliminada fonte de confusão e dados incorretos para usuários
+
 ### 2025-07-23: Sistema de Notificações em Tempo Real Finalizado - CONCLUÍDO ✅
 - ✅ **SISTEMA TEMPO REAL IMPLEMENTADO** - Notificações atualizadas automaticamente a cada 30 segundos
 - ✅ **14 NOTIFICAÇÕES ATIVAS** - Sistema detectando: 1 CNH vencida, 1 CNH vencendo, 12 despesas significativas
