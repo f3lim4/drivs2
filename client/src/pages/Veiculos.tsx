@@ -8,6 +8,7 @@ import { Plus, Search, Filter, Edit, Trash2, Car, Bike, Truck, Bus, Eye } from '
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useVeiculos } from '@/hooks/useVeiculos';
+import { useQuery } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -110,8 +111,29 @@ const getVehicleIconColor = (cor: string) => {
 
 export default function Veiculos() {
   const { toast } = useToast();
-  const { isAdmin, isLocadora } = useAuth();
-  const { veiculos, loading, adicionarVeiculo, atualizarVeiculo, removerVeiculo } = useVeiculos();
+  const { profile, isAdmin, isLocadora } = useAuth();
+  const { veiculos, loading: loadingVeiculos, adicionarVeiculo, atualizarVeiculo, removerVeiculo } = useVeiculos();
+
+  // Buscar dados adicionais necessários para o sistema completo
+  const { data: alugueis = [], isLoading: loadingAlugueis } = useQuery({
+    queryKey: ['/api/alugueis', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: motoristas = [], isLoading: loadingMotoristas } = useQuery({
+    queryKey: ['/api/motoristas', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: manutencoes = [], isLoading: loadingManutencoes } = useQuery({
+    queryKey: ['/api/manutencoes', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
+
+  const { data: despesas = [], isLoading: loadingDespesas } = useQuery({
+    queryKey: ['/api/despesas', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
@@ -281,10 +303,18 @@ export default function Veiculos() {
     }).format(value);
   };
 
+  // Sistema de loading completo - verifica múltiplas fontes
+  const loading = loadingVeiculos || loadingAlugueis || loadingMotoristas || loadingManutencoes || loadingDespesas;
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+      <div className="flex-1 space-y-6 p-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+          <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground text-center">
+            Carregando veículos...
+          </p>
+        </div>
       </div>
     );
   }
