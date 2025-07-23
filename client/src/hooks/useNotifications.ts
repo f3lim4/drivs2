@@ -27,42 +27,66 @@ export function useNotifications() {
   const { data: motoristasRaw = [] } = useQuery({
     queryKey: [motoristasUrl],
     enabled: !!profile?.locadoraId,
+    refetchInterval: 30000, // Refetch a cada 30 segundos
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const { data: alugueisRaw = [] } = useQuery({
     queryKey: [alugueisUrl],
     enabled: !!profile?.locadoraId,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const { data: veiculosRaw = [] } = useQuery({
     queryKey: [veiculosUrl],
     enabled: !!profile?.locadoraId,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const { data: manutencoesRaw = [] } = useQuery({
     queryKey: [manutencoesUrl],
     enabled: !!profile?.locadoraId,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const { data: despesasRaw = [] } = useQuery({
     queryKey: [despesasUrl],
     enabled: !!profile?.locadoraId,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const { data: infracoesRaw = [] } = useQuery({
     queryKey: [infracoesUrl],
     enabled: !!profile?.locadoraId,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const { data: pagamentosRaw = [] } = useQuery({
     queryKey: [pagamentosUrl],
     enabled: !!profile?.locadoraId,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   // Buscar anúncios ativos
   const { data: anunciosRaw = [] } = useQuery({
     queryKey: ['/api/anuncios/ativos'],
     enabled: !!profile,
+    refetchInterval: 60000, // Anúncios podem ser atualizados menos frequentemente
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   // Filtrar dados com isolamento de segurança
@@ -77,35 +101,6 @@ export function useNotifications() {
   // Gerar notificações baseadas nos dados reais
   const notifications: Notification[] = [];
   const today = new Date();
-
-  // Log para debug - verificar dados carregados
-  console.log('Notificações - Dados carregados:', {
-    motoristas: motoristas.length,
-    alugueis: alugueis.length,
-    veiculos: veiculos.length,
-    manutencoes: manutencoes.length,
-    despesas: despesas.length,
-    infracoes: infracoes.length,
-    pagamentos: pagamentos.length,
-    anuncios: anunciosRaw.length,
-    locadoraId: profile?.locadoraId
-  });
-
-  // Log específico para anúncios
-  console.log('Notificações - Anúncios carregados:', anunciosRaw.map(a => ({
-    id: a.id,
-    tipo: a.tipo,
-    titulo: a.titulo,
-    conteudo: a.conteudo,
-    created_at: a.created_at
-  })));
-
-  // Log detalhado dos dados
-  console.log('Notificações - Detalhes dos dados:', {
-    motoristas: motoristas.map(m => ({ id: m.id, nome: m.nome, vencimentoCnh: m.vencimentoCnh })),
-    infracoes: infracoes.map(i => ({ id: i.id, status: i.status, dataVencimento: i.dataVencimento, situacao: i.situacao })),
-    pagamentos: pagamentos.map(p => ({ id: p.id, status: p.status, valor: p.valor, motoristaNome: p.motoristaNome }))
-  });
 
   if (motoristas.length > 0) {
     motoristas.forEach((motorista: any) => {
@@ -184,28 +179,6 @@ export function useNotifications() {
 
   // Notificações de manutenções
   if (manutencoes.length > 0) {
-    console.log('Notificações - Verificando manutenções:', manutencoes.map(m => ({
-      id: m.id,
-      status: m.status,
-      statusPagamento: m.statusPagamento,
-      valor: m.valor,
-      tipoManutencao: m.tipoManutencao,
-      dataAgendada: m.dataAgendada,
-      dataInicio: m.dataInicio,
-      dataFinalizacao: m.dataFinalizacao,
-      proximaManutencao: m.proximaManutencao,
-      proximaManutencaoKm: m.proximaManutencaoKm,
-      veiculoId: m.veiculoId
-    })));
-
-    console.log('Notificações - Veículos disponíveis:', veiculos.map(v => ({
-      id: v.id,
-      placa: v.placa,
-      marca: v.marca,
-      modelo: v.modelo,
-      quilometragem: v.quilometragem
-    })));
-    
     manutencoes.forEach((manutencao: any) => {
       if (manutencao.status === 'agendada') {
         const dataAgendada = manutencao.dataAgendada || manutencao.dataInicio || new Date();
@@ -463,13 +436,6 @@ export function useNotifications() {
   });
 
   const unreadCount = sortedNotifications.filter(n => !n.isRead).length;
-
-  // Log final das notificações geradas
-  console.log('Notificações - Geradas:', {
-    total: sortedNotifications.length,
-    unread: unreadCount,
-    tipos: sortedNotifications.map(n => ({ id: n.id, type: n.type, title: n.title }))
-  });
 
   return {
     notifications: sortedNotifications,
