@@ -1956,7 +1956,7 @@ export default function RelatoriosFinanceiros() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {veiculos.length === 0 ? (
+                {analiseVeiculos.length === 0 ? (
                   <p className="text-gray-500 text-center py-8">
                     Nenhum veículo encontrado.
                   </p>
@@ -1976,19 +1976,9 @@ export default function RelatoriosFinanceiros() {
                           </tr>
                         </thead>
                         <tbody>
-                          {veiculos.slice((currentPageVeiculos - 1) * itemsPerPageVeiculos, currentPageVeiculos * itemsPerPageVeiculos).map((veiculo) => {
-                            // Buscar aluguel ativo para este veículo
-                            const aluguelAtivo = filteredData.alugueisAtivos.find(a => a.veiculoId === veiculo.id);
-                            const receitaMensal = aluguelAtivo ? Number(aluguelAtivo.valorMensal || 0) : 0;
-                            
-                            // Calcular despesas fixas do veículo
-                            const despesasFixasVeiculo = 
-                              (veiculo.ipva ? Number(veiculo.ipva) / 12 : 0) +
-                              (veiculo.valorSeguroMensal ? Number(veiculo.valorSeguroMensal) : 0) +
-                              (veiculo.valorRastreadorMensal ? Number(veiculo.valorRastreadorMensal) : 0);
-                            
-                            const lucroLiquido = receitaMensal - despesasFixasVeiculo;
-                            const margemLucro = receitaMensal > 0 ? (lucroLiquido / receitaMensal) * 100 : 0;
+                          {analiseVeiculos.slice((currentPageVeiculos - 1) * itemsPerPageVeiculos, currentPageVeiculos * itemsPerPageVeiculos).map((analiseItem) => {
+                            const veiculo = veiculos.find(v => v.placa === analiseItem.veiculo);
+                            if (!veiculo) return null;
                             
                             return (
                               <tr key={veiculo.id} className="border-b hover:bg-gray-50">
@@ -2010,27 +2000,29 @@ export default function RelatoriosFinanceiros() {
                                 </td>
                                 <td className="p-3">
                                   <span className={`px-2 py-1 rounded-full text-xs ${
-                                    veiculo.status === 'alugado' 
+                                    analiseItem.status === 'Lucrativo' 
                                       ? 'bg-green-100 text-green-700' 
-                                      : 'bg-gray-100 text-gray-700'
+                                      : analiseItem.status === 'Parado'
+                                      ? 'bg-gray-100 text-gray-700'
+                                      : 'bg-red-100 text-red-700'
                                   }`}>
-                                    {veiculo.status === 'alugado' ? 'Alugado' : 'Disponível'}
+                                    {analiseItem.status}
                                   </span>
                                 </td>
                                 <td className="p-3 font-semibold text-green-600">
-                                  {formatCurrency(receitaMensal)}
+                                  {formatCurrency(analiseItem.receitaMensal)}
                                 </td>
                                 <td className="p-3 font-semibold text-red-600">
-                                  {formatCurrency(despesasFixasVeiculo)}
+                                  {formatCurrency(analiseItem.despesasMensais)}
                                 </td>
                                 <td className="p-3 font-semibold">
-                                  <span className={lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}>
-                                    {formatCurrency(lucroLiquido)}
+                                  <span className={analiseItem.lucro >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                    {formatCurrency(analiseItem.lucro)}
                                   </span>
                                 </td>
                                 <td className="p-3 font-semibold">
-                                  <span className={margemLucro >= 0 ? 'text-green-600' : 'text-red-600'}>
-                                    {margemLucro.toFixed(1)}%
+                                  <span className={analiseItem.margem >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                    {analiseItem.margem.toFixed(1)}%
                                   </span>
                                 </td>
                               </tr>
@@ -2064,8 +2056,8 @@ export default function RelatoriosFinanceiros() {
                         
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-gray-700">
-                            Página {currentPageVeiculos} de {Math.ceil(veiculos.length / itemsPerPageVeiculos)} 
-                            ({veiculos.length} itens)
+                            Página {currentPageVeiculos} de {Math.ceil(analiseVeiculos.length / itemsPerPageVeiculos)} 
+                            ({analiseVeiculos.length} itens)
                           </span>
                           <div className="flex gap-1">
                             <Button
