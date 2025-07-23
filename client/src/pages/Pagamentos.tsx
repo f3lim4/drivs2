@@ -44,12 +44,29 @@ export default function Pagamentos() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   
-  // Estado para alternar visualização do card de pagamentos
+  // Estados para alternar visualização dos cards de pagamentos
   const [visualizacaoPagamento, setVisualizacaoPagamento] = useState<'geral' | 'mensal' | 'semanal'>('geral');
+  const [visualizacaoRecebido, setVisualizacaoRecebido] = useState<'geral' | 'mensal' | 'semanal'>('geral');
 
-  // Função para alternar visualização
+  // Função para alternar visualização do primeiro card
   const alternarVisualizacao = () => {
     setVisualizacaoPagamento(prev => {
+      switch (prev) {
+        case 'geral':
+          return 'mensal';
+        case 'mensal':
+          return 'semanal';
+        case 'semanal':
+          return 'geral';
+        default:
+          return 'geral';
+      }
+    });
+  };
+
+  // Função para alternar visualização do segundo card (recebidos)
+  const alternarVisualizacaoRecebido = () => {
+    setVisualizacaoRecebido(prev => {
       switch (prev) {
         case 'geral':
           return 'mensal';
@@ -266,6 +283,66 @@ export default function Pagamentos() {
     }
   };
 
+  // Funções para o card de recebidos
+  const calcularValorVisualizacaoRecebido = () => {
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth();
+    const pagamentosPagos = pagamentosFiltrados.filter(p => p.status === 'pago');
+    
+    switch (visualizacaoRecebido) {
+      case 'mensal':
+        return pagamentosPagos
+          .filter(p => {
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento.getFullYear() === anoAtual && 
+                   dataPagamento.getMonth() === mesAtual;
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
+      
+      case 'semanal':
+        const seteDiasAtras = new Date();
+        seteDiasAtras.setDate(hoje.getDate() - 7);
+        
+        return pagamentosPagos
+          .filter(p => {
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento >= seteDiasAtras && dataPagamento <= hoje;
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
+      
+      default:
+        return totalRecebido;
+    }
+  };
+
+  const obterTituloVisualizacaoRecebido = () => {
+    switch (visualizacaoRecebido) {
+      case 'mensal':
+        return 'Recebido Mensal';
+      case 'semanal':
+        return 'Recebido Semanal';
+      default:
+        return 'Total Recebido';
+    }
+  };
+
+  const obterDescricaoVisualizacaoRecebido = () => {
+    const hoje = new Date();
+    const mesNome = hoje.toLocaleDateString('pt-BR', { month: 'long' });
+    
+    switch (visualizacaoRecebido) {
+      case 'mensal':
+        return `Recebidos em ${mesNome}`;
+      case 'semanal':
+        return 'Recebidos últimos 7 dias';
+      default:
+        return 'Todos recebidos';
+    }
+  };
+
 
 
   if (isLoading) {
@@ -298,13 +375,16 @@ export default function Pagamentos() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32">
+        <Card 
+          className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg h-32 cursor-pointer hover:shadow-xl transition-shadow"
+          onClick={alternarVisualizacaoRecebido}
+        >
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-green-700">Total Recebido</p>
-                <p className="text-xl font-bold text-green-800">{formatCurrency(totalRecebido)}</p>
-                <p className="text-xs text-green-600">{pagamentosFiltrados.filter(p => p.status === 'pago').length} pagamentos</p>
+                <p className="text-xs font-medium text-green-700">{obterTituloVisualizacaoRecebido()}</p>
+                <p className="text-xl font-bold text-green-800">{formatCurrency(calcularValorVisualizacaoRecebido())}</p>
+                <p className="text-xs text-green-600">{obterDescricaoVisualizacaoRecebido()}</p>
               </div>
               <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-green-700" />
