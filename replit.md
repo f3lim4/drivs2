@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-23: Correção Crítica dos Cálculos Dashboard - Sincronização com Página Pagamentos - CONCLUÍDO ✅
+- ✅ **BUG CRÍTICO CORRIGIDO** - Dashboard "TOTAL RECEBIDO ESSA SEMANA" agora usa mesma lógica da página Pagamentos
+- ✅ **CÁLCULO SEMANAL CORRIGIDO** - Alterado de semana atual (domingo-sábado) para últimos 7 dias
+- ✅ **CAMPO CORRETO APLICADO** - Usando dataPagamento ao invés de data para filtrar pagamentos
+- ✅ **VALOR CORRETO APLICADO** - Usando valorPago ao invés de valor + juros + multas
+- ✅ **FÓRMULA ESPERADA CORRIGIDA** - Valor semanal esperado usando 4.35 ao invés de 4.0
+- ✅ **CONSISTÊNCIA TOTAL** - Dashboard agora mostra exatamente os mesmos valores que a página Pagamentos
+- ✅ **DADOS SINCRONIZADOS** - Eliminada divergência entre páginas do sistema
+- ✅ **LÓGICA UNIFICADA** - Sistema usa filtro de 7 dias atrás até hoje para cálculos semanais
+
 ### 2025-07-23: Sistema de Teste Gratuito 7 Dias Completamente Implementado - CONCLUÍDO ✅
 - ✅ **TODAS AS PÁGINAS DE LANDING ATUALIZADAS** - Alterado período de teste gratuito de 30 para 7 dias
 - ✅ **LANDING.TSX CORRIGIDO** - "OFERTA LIMITADA - 7 DIAS GRÁTIS" e "7 DIAS Completamente GRÁTIS"
