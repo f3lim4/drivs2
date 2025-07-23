@@ -1,12 +1,12 @@
 /**
- * Página Index - exibe Landing Page para visitantes e Dashboard para usuários autenticados
+ * Página Index - exibe Home Page para visitantes e Dashboard para usuários autenticados
  */
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import Landing from './Landing';
+import Home from './Home';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -27,9 +27,9 @@ const Index = () => {
     );
   }
 
-  // Se não está autenticado, mostra a Landing Page
+  // Se não está autenticado, mostra a página Home
   if (!isAuthenticated) {
-    return <Landing />;
+    return <Home />;
   }
 
   // Se chegou aqui, usuário está autenticado e será redirecionado
