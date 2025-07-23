@@ -96,16 +96,17 @@ export default function Dashboard() {
   const { motoristas: motoristasRaw = [], isLoading: loadingMotoristas } = useMotoristas();
   const { veiculos: veiculosRaw = [], loading: loadingVeiculos } = useVeiculos();
   const { alugueis: alugueisRaw = [], isLoading: loadingAlugueis } = useAlugueis();
-  const { pagamentos = [] } = usePagamentos();
+  const { pagamentos = [], isLoading: loadingPagamentos } = usePagamentos();
   
-  const { data: despesas = [] } = useQuery({
+  const { data: despesas = [], isLoading: loadingDespesas } = useQuery({
     queryKey: ['/api/despesas', profile?.locadoraId],
     enabled: !!profile && isLocadora,
     refetchOnWindowFocus: false,
     staleTime: 0,
   });
 
-  const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis;
+  // SISTEMA DE LOADING COMPLETO - Dashboard só carrega quando TODOS os dados estão prontos
+  const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis || loadingPagamentos || loadingDespesas || loadingAnuncios || loadingLocadoras;
 
   // Usar dados diretamente dos hooks (já filtrados corretamente)
   const motoristasSeguro = motoristasRaw;
@@ -442,8 +443,11 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex-1 space-y-6 p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
           <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground text-center">
+            Carregando dashboard...
+          </p>
         </div>
       </div>
     );
