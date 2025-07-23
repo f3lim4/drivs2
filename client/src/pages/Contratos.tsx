@@ -489,15 +489,15 @@ export default function Contratos() {
           </CardContent>
         </Card>
 
-        {/* Valor Total */}
+        {/* Valor Mensal */}
         <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center space-y-0.5">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-purple-700">VALOR TOTAL</p>
-                <p className="text-lg font-bold text-purple-800">{formatCurrency(valorTotalGeral)}</p>
+                <p className="text-xs font-medium text-purple-700">VALOR MENSAL</p>
+                <p className="text-xl font-bold text-purple-800">{formatCurrency(valorTotalMensal)}</p>
                 <p className="text-xs text-purple-600">
-                  Mensal: {formatCurrency(valorTotalMensal)}
+                  Receita mensal dos contratos
                 </p>
               </div>
               <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center ml-auto">
