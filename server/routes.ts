@@ -288,7 +288,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/locadoras", async (req, res) => {
     try {
-      const result = insertLocadoraSchema.safeParse(req.body);
+      // Calcular data de vencimento do teste (7 dias a partir de hoje)
+      const dataVencimentoTeste = new Date();
+      dataVencimentoTeste.setDate(dataVencimentoTeste.getDate() + 7);
+      
+      // Adicionar campos de teste gratuito aos dados recebidos
+      const dadosComTeste = {
+        ...req.body,
+        testeGratuito: true,
+        diasTesteGratuito: 7,
+        dataVencimentoTeste: dataVencimentoTeste.toISOString().split('T')[0] // Formato YYYY-MM-DD
+      };
+      
+      const result = insertLocadoraSchema.safeParse(dadosComTeste);
       if (!result.success) {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
@@ -301,6 +313,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         console.error("Error updating profile with locadora_id:", error);
       }
+      
+      console.log(`[CADASTRO] Locadora ${locadora.nome} criada com teste gratuito de 7 dias até ${dataVencimentoTeste.toLocaleDateString('pt-BR')}`);
       
       res.json(locadora);
     } catch (error) {
