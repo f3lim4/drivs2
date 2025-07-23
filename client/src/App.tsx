@@ -22,6 +22,7 @@ import Seo from "./pages/Seo";
 import Perfil from "./pages/Perfil";
 import Login from "./pages/Login";
 import CadastroLocadora from "./pages/CadastroLocadora";
+import TermosUso from "./pages/TermosUso";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Index from "./pages/Index";
@@ -61,6 +62,7 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro-locadora" element={<CadastroLocadora />} />
+            <Route path="/termos-uso" element={<TermosUso />} />
             <Route path="/landing" element={<Landing />} />
             <Route path="/home" element={<Home />} />
             <Route path="/" element={<Index />} />

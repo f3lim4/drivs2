@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-23: Termos de Uso no Cadastro da Locadora - CONCLUÍDO ✅
+- ✅ **PÁGINA TERMOS CRIADA** - Nova página TermosUso.tsx com design futurista consistente 
+- ✅ **CHECKBOX OBRIGATÓRIO** - Campo "Li e aceito os Termos de Uso" obrigatório no cadastro
+- ✅ **BOTÃO LINK FUNCIONAL** - Botão "Termos de Uso" abre página em nova aba
+- ✅ **ROTA CONFIGURADA** - Rota /termos-uso adicionada ao App.tsx
+- ✅ **CONTEÚDO COMPLETO** - 12 seções abrangendo todos aspectos legais importantes
+- ✅ **VISUAL CONSISTENTE** - Mesmo background futurista das outras páginas de autenticação
+- ✅ **TERMOS ESPECÍFICOS** - Conteúdo personalizado para locadoras de veículos
+- ✅ **LGPD COMPLIANCE** - Seção específica sobre proteção de dados
+- ✅ **PERÍODO TESTE** - Menção ao período de 7 dias gratuitos
+- ✅ **INFORMAÇÕES CONTATO** - Dados para suporte e contato incluídos
+
 ### 2025-07-23: Campo "Próxima Manutenção (km)" Obrigatório + Relatório Financeiro Atualizado - CONCLUÍDO ✅
 - ✅ **CAMPO PRÓXIMA MANUTENÇÃO OBRIGATÓRIO** - Campo "Próxima Manutenção (km)" alterado para obrigatório com asterisco
 - ✅ **SCHEMA CORRIGIDO** - Removido `.optional()` para tornar campo obrigatório na validação
