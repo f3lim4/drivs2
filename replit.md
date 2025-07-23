@@ -23,7 +23,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **CARD INTERATIVO IMPLEMENTADO** - Primeiro card da página de pagamentos agora é clicável
 - ✅ **TRÊS ESTADOS DE VISUALIZAÇÃO** - Alterna entre Total Geral → Total Mensal → Total Semanal → repete ciclo
 - ✅ **FEEDBACK VISUAL CLARO** - Cursor pointer, hover effect e transições suaves
-- ✅ **CÁLCULOS AUTOMÁTICOS** - Mensal (total/12) e Semanal (total/52) calculados automaticamente
+- ✅ **CÁLCULOS CORRETOS** - Mensal (pagamentos do mês atual) e Semanal (últimos 7 dias) baseados em datas reais
 - ✅ **DESCRIÇÕES ORIENTATIVAS** - Card mostra "Clique para ver próxima visualização"
 - ✅ **ESTADO PERSISTENTE** - Sistema mantém visualização atual até próximo clique
 - ✅ **INTEGRAÇÃO COMPLETA** - Funciona perfeitamente com filtros e dados da página
