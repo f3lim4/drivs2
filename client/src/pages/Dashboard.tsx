@@ -454,7 +454,7 @@ export default function Dashboard() {
     });
   }
 
-  if (veiculosDisponivel === 0 && veiculos.length > 0) {
+  if (veiculosDisponivel === 0 && veiculosSeguro.length > 0) {
     alertas.push({
       id: 'sem-veiculos',
       titulo: 'Sem Veículos Disponíveis',
