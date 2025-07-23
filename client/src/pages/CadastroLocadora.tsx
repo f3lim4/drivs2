@@ -332,10 +332,6 @@ export default function CadastroLocadora() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div className="flex items-center gap-2">
-              <Car className="w-8 h-8 text-cyan-400" />
-              <h1 className="text-3xl font-bold text-white">DRIVS</h1>
-            </div>
           </div>
         </div>
 
