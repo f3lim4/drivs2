@@ -101,7 +101,12 @@ export default function Login() {
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <img src={drivsLogo} alt="DRIVS Logo" className="h-16" />
+            <img 
+              src={drivsLogo} 
+              alt="DRIVS Logo" 
+              className="h-16 cursor-pointer hover:opacity-80 transition-opacity" 
+              onClick={() => navigate('/')}
+            />
           </div>
           <p className="text-white/80">Sistema de Gestão de Locação</p>
         </div>
