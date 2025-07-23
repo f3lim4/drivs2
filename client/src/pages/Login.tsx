@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import drivsLogo from "@/assets/drivs-logo.png";
-import networkBackground from "@/assets/network-background.jpg";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -79,17 +78,25 @@ export default function Login() {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4 relative bg-blue-900"
-      style={{
-        backgroundImage: `url(${networkBackground})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      {/* Overlay sutil para melhor contraste */}
-      <div className="absolute inset-0 bg-black/10"></div>
+    <div className="min-h-screen flex items-center justify-center p-4 relative bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 overflow-hidden">
+      {/* Animated Background Elements - mesmo da homepage */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+            backgroundSize: '40px 40px'
+          }}></div>
+        </div>
+        
+        {/* Floating Orbs */}
+        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-500/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-cyan-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Animated Lines */}
+        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400/40 to-transparent animate-pulse"></div>
+        <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/30 to-transparent animate-pulse delay-700"></div>
+      </div>
       
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
