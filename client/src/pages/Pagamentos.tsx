@@ -43,6 +43,25 @@ export default function Pagamentos() {
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Estado para alternar visualização do card de pagamentos
+  const [visualizacaoPagamento, setVisualizacaoPagamento] = useState<'geral' | 'mensal' | 'semanal'>('geral');
+
+  // Função para alternar visualização
+  const alternarVisualizacao = () => {
+    setVisualizacaoPagamento(prev => {
+      switch (prev) {
+        case 'geral':
+          return 'mensal';
+        case 'mensal':
+          return 'semanal';
+        case 'semanal':
+          return 'geral';
+        default:
+          return 'geral';
+      }
+    });
+  };
 
   const handleVerDetalhes = (pagamento: Pagamento) => {
     setPagamentoSelecionado(pagamento);
@@ -186,6 +205,42 @@ export default function Pagamentos() {
   const totalGeral = pagamentosFiltrados
     .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
 
+  // Cálculos para diferentes visualizações do card interativo
+  const calcularValorVisualizacao = () => {
+    switch (visualizacaoPagamento) {
+      case 'mensal':
+        // Valor mensal (divide valor total por número de meses estimado)
+        return totalGeral / 12; // Estimativa simples - pode ser ajustada
+      case 'semanal':
+        // Valor semanal (divide valor total por número de semanas no ano)
+        return totalGeral / 52; // 52 semanas por ano
+      default:
+        return totalGeral;
+    }
+  };
+
+  const obterTituloVisualizacao = () => {
+    switch (visualizacaoPagamento) {
+      case 'mensal':
+        return 'Total Mensal';
+      case 'semanal':
+        return 'Total Semanal';
+      default:
+        return 'Total Geral';
+    }
+  };
+
+  const obterDescricaoVisualizacao = () => {
+    switch (visualizacaoPagamento) {
+      case 'mensal':
+        return 'Clique para ver semanal';
+      case 'semanal':
+        return 'Clique para ver geral';
+      default:
+        return 'Clique para ver mensal';
+    }
+  };
+
 
 
   if (isLoading) {
@@ -200,13 +255,16 @@ export default function Pagamentos() {
     <div className="flex-1 space-y-6 p-6">
       {/* Cards de estatísticas com visual futurista - igual página veículos */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
+        <Card 
+          className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32 cursor-pointer hover:shadow-xl transition-shadow"
+          onClick={alternarVisualizacao}
+        >
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-blue-700">Total Geral</p>
-                <p className="text-xl font-bold text-blue-800">{formatCurrency(totalGeral)}</p>
-                <p className="text-xs text-blue-600">{pagamentosFiltrados.length} pagamentos</p>
+                <p className="text-xs font-medium text-blue-700">{obterTituloVisualizacao()}</p>
+                <p className="text-xl font-bold text-blue-800">{formatCurrency(calcularValorVisualizacao())}</p>
+                <p className="text-xs text-blue-600">{obterDescricaoVisualizacao()}</p>
               </div>
               <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
                 <Calculator className="w-5 h-5 text-blue-700" />

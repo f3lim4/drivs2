@@ -19,13 +19,14 @@ Preferred communication style: Simple, everyday language.
 - ✅ **CONTRATOS RENOVÁVEIS** - Formatação aplicada especificamente para contratos sem data final
 - ✅ **CONSISTÊNCIA MANTIDA** - Mesmo padrão aplicado em ambos os modais
 
-### 2025-07-22: Card "VALOR TOTAL" com Dupla Visualização - Geral + Mensal - CONCLUÍDO ✅
-- ✅ **VALOR PRINCIPAL GERAL** - Card exibe valor total geral de todos os contratos no valor principal
-- ✅ **VALOR MENSAL NA DESCRIÇÃO** - Mostra "Mensal: R$ X" calculado com valorSemanal * 4.35
-- ✅ **DUPLA INFORMAÇÃO** - Usuário vê tanto total geral quanto receita mensal no mesmo card
-- ✅ **CÁLCULOS SEPARADOS** - valorTotalGeral e valorTotalMensal calculados independentemente
-- ✅ **FÓRMULA CORRIGIDA MANTIDA** - 4.35 baseado em 30.44 dias/mês ÷ 7 dias/semana
-- ✅ **VISÃO FINANCEIRA COMPLETA** - Card oferece perspectiva tanto de valor total quanto mensal
+### 2025-07-22: Card Interativo de Pagamentos com Tripla Visualização - CONCLUÍDO ✅
+- ✅ **CARD INTERATIVO IMPLEMENTADO** - Primeiro card da página de pagamentos agora é clicável
+- ✅ **TRÊS ESTADOS DE VISUALIZAÇÃO** - Alterna entre Total Geral → Total Mensal → Total Semanal → repete ciclo
+- ✅ **FEEDBACK VISUAL CLARO** - Cursor pointer, hover effect e transições suaves
+- ✅ **CÁLCULOS AUTOMÁTICOS** - Mensal (total/12) e Semanal (total/52) calculados automaticamente
+- ✅ **DESCRIÇÕES ORIENTATIVAS** - Card mostra "Clique para ver próxima visualização"
+- ✅ **ESTADO PERSISTENTE** - Sistema mantém visualização atual até próximo clique
+- ✅ **INTEGRAÇÃO COMPLETA** - Funciona perfeitamente com filtros e dados da página
 
 ### 2025-07-22: Contratos Renováveis Totalmente Implementados - Interface Final Corrigida - CONCLUÍDO ✅
 - ✅ **SEÇÃO "PRÓXIMA AVALIAÇÃO" REMOVIDA** - Eliminada data calculada incorretamente (05/11/2025)
