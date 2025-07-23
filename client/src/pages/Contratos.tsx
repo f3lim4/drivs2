@@ -372,13 +372,18 @@ export default function Contratos() {
   const contratosCancelados = contratos.filter(c => c.status === 'cancelado').length;
   
   // SOMA DOS VALORES MENSAIS DOS CONTRATOS
-  const valorTotal = contratos.reduce((sum, c) => {
+  const valorTotalMensal = contratos.reduce((sum, c) => {
     if (c.valorSemanal) {
       // Converte valor semanal para mensal: valorSemanal * 4.35 (baseado em 30.44 dias/mês ÷ 7 dias/semana)
       const valorMensalContrato = parseFloat(c.valorSemanal) * 4.35;
       return sum + valorMensalContrato;
     }
     // Fallback para contratos antigos sem valorSemanal
+    return sum + (parseFloat(c.valor) || 0);
+  }, 0);
+
+  // SOMA DOS VALORES TOTAIS DOS CONTRATOS (valor completo dos contratos)
+  const valorTotalGeral = contratos.reduce((sum, c) => {
     return sum + (parseFloat(c.valor) || 0);
   }, 0);
 
@@ -451,9 +456,9 @@ export default function Contratos() {
             <div className="flex items-center space-y-0.5">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-purple-700">VALOR TOTAL</p>
-                <p className="text-xl font-bold text-purple-800">{formatCurrency(valorTotal)}</p>
+                <p className="text-lg font-bold text-purple-800">{formatCurrency(valorTotalGeral)}</p>
                 <p className="text-xs text-purple-600">
-                  Valor mensal total
+                  Mensal: {formatCurrency(valorTotalMensal)}
                 </p>
               </div>
               <div className="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center ml-auto">
