@@ -36,11 +36,11 @@ import { Pagination } from '@/components/ui/pagination';
 
 export default function RelatoriosFinanceiros() {
   const { profile, isAdmin } = useAuth();
-  const { alugueis } = useAlugueis();
-  const { pagamentos } = usePagamentos();
+  const { alugueis, isLoading: alugueisLoading } = useAlugueis();
+  const { pagamentos, isLoading: pagamentosLoading } = usePagamentos();
   const { infracoes } = useInfracoes();
-  const { despesas } = useDespesas();
-  const { veiculos } = useVeiculos();
+  const { despesas, isLoading: despesasLoading } = useDespesas();
+  const { veiculos, isLoading: veiculosLoading } = useVeiculos();
   const { motoristas } = useMotoristas();
   const { manutencoes } = useManutencoes();
   
@@ -878,6 +878,9 @@ export default function RelatoriosFinanceiros() {
     return despesasAnterior.reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
   }, [despesas, mesAnteriorStart, mesAnteriorEnd]);
 
+  // Verificar se dados estão carregando
+  const isDataLoading = alugueisLoading || pagamentosLoading || despesasLoading || veiculosLoading;
+
   const variacaoReceita = receitaMesAnterior > 0 ? ((receitaTotal - receitaMesAnterior) / receitaMesAnterior) * 100 : 0;
   const variacaoDespesas = despesasMesAnterior > 0 ? ((totalDespesas - despesasMesAnterior) / despesasMesAnterior) * 100 : 0;
   const variacaoLucro = (receitaMesAnterior - despesasMesAnterior) > 0 ? ((lucroLiquido - (receitaMesAnterior - despesasMesAnterior)) / (receitaMesAnterior - despesasMesAnterior)) * 100 : 0;
@@ -1139,12 +1142,21 @@ export default function RelatoriosFinanceiros() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-green-700">RECEITA TOTAL</p>
-                <p className="text-lg font-bold text-green-800">
-                  {formatCurrency(receitaTotal)}
-                </p>
-                <p className="text-xs text-green-600">
-                  {variacaoReceita > 0 ? '+' : ''}{variacaoReceita.toFixed(1)}% em relação ao mês anterior
-                </p>
+                {isDataLoading ? (
+                  <>
+                    <div className="h-6 w-20 bg-green-200 rounded animate-pulse"></div>
+                    <div className="h-3 w-32 bg-green-100 rounded animate-pulse"></div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-lg font-bold text-green-800">
+                      {formatCurrency(receitaTotal)}
+                    </p>
+                    <p className="text-xs text-green-600">
+                      {variacaoReceita > 0 ? '+' : ''}{variacaoReceita.toFixed(1)}% em relação ao mês anterior
+                    </p>
+                  </>
+                )}
               </div>
               <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 text-green-700" />
@@ -1158,12 +1170,21 @@ export default function RelatoriosFinanceiros() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-red-700">DESPESAS TOTAIS</p>
-                <p className="text-lg font-bold text-red-800">
-                  {formatCurrency(totalDespesas)}
-                </p>
-                <p className="text-xs text-red-600">
-                  {variacaoDespesas > 0 ? '+' : ''}{variacaoDespesas.toFixed(1)}% em relação ao mês anterior
-                </p>
+                {isDataLoading ? (
+                  <>
+                    <div className="h-6 w-20 bg-red-200 rounded animate-pulse"></div>
+                    <div className="h-3 w-32 bg-red-100 rounded animate-pulse"></div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-lg font-bold text-red-800">
+                      {formatCurrency(totalDespesas)}
+                    </p>
+                    <p className="text-xs text-red-600">
+                      {variacaoDespesas > 0 ? '+' : ''}{variacaoDespesas.toFixed(1)}% em relação ao mês anterior
+                    </p>
+                  </>
+                )}
               </div>
               <div className="w-8 h-8 bg-red-200 rounded-full flex items-center justify-center">
                 <TrendingDown className="w-4 h-4 text-red-700" />
@@ -1177,12 +1198,21 @@ export default function RelatoriosFinanceiros() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-blue-700">LUCRO LÍQUIDO</p>
-                <p className={`text-lg font-bold ${lucroLiquido >= 0 ? 'text-blue-800' : 'text-red-800'}`}>
-                  {formatCurrency(lucroLiquido)}
-                </p>
-                <p className="text-xs text-blue-600">
-                  {variacaoLucro > 0 ? '+' : ''}{variacaoLucro.toFixed(1)}% em relação ao mês anterior
-                </p>
+                {isDataLoading ? (
+                  <>
+                    <div className="h-6 w-20 bg-blue-200 rounded animate-pulse"></div>
+                    <div className="h-3 w-32 bg-blue-100 rounded animate-pulse"></div>
+                  </>
+                ) : (
+                  <>
+                    <p className={`text-lg font-bold ${lucroLiquido >= 0 ? 'text-blue-800' : 'text-red-800'}`}>
+                      {formatCurrency(lucroLiquido)}
+                    </p>
+                    <p className="text-xs text-blue-600">
+                      {variacaoLucro > 0 ? '+' : ''}{variacaoLucro.toFixed(1)}% em relação ao mês anterior
+                    </p>
+                  </>
+                )}
               </div>
               <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center">
                 <DollarSign className={`w-4 h-4 ${lucroLiquido >= 0 ? 'text-blue-700' : 'text-red-700'}`} />
@@ -1196,12 +1226,21 @@ export default function RelatoriosFinanceiros() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <p className="text-xs font-medium text-purple-700">MARGEM DE LUCRO</p>
-                <p className={`text-lg font-bold ${margemLucro >= 0 ? 'text-purple-800' : 'text-red-800'}`}>
-                  {margemLucro.toFixed(1)}%
-                </p>
-                <p className="text-xs text-purple-600">
-                  Meta: 30%
-                </p>
+                {isDataLoading ? (
+                  <>
+                    <div className="h-6 w-16 bg-purple-200 rounded animate-pulse"></div>
+                    <div className="h-3 w-20 bg-purple-100 rounded animate-pulse"></div>
+                  </>
+                ) : (
+                  <>
+                    <p className={`text-lg font-bold ${margemLucro >= 0 ? 'text-purple-800' : 'text-red-800'}`}>
+                      {margemLucro.toFixed(1)}%
+                    </p>
+                    <p className="text-xs text-purple-600">
+                      Meta: 30%
+                    </p>
+                  </>
+                )}
               </div>
               <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center">
                 <TrendingUp className={`w-4 h-4 ${margemLucro >= 0 ? 'text-purple-700' : 'text-red-700'}`} />
