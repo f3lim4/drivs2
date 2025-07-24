@@ -909,11 +909,17 @@ export default function RelatoriosFinanceiros() {
   const variacaoDespesas = despesasMesAnterior > 0 ? ((totalDespesas - despesasMesAnterior) / despesasMesAnterior) * 100 : 0;
   const variacaoLucro = (receitaMesAnterior - despesasMesAnterior) > 0 ? ((lucroLiquido - (receitaMesAnterior - despesasMesAnterior)) / (receitaMesAnterior - despesasMesAnterior)) * 100 : 0;
 
-  // Função para gerar dados detalhados do veículo
+  // Função para gerar dados detalhados do veículo com histórico completo
   const gerarDadosDetalhados = (veiculo: any) => {
     const aluguelVeiculo = alugueis.find(a => a.veiculoId === veiculo.id && a.status === 'ativo');
     const motorista = aluguelVeiculo ? motoristas.find(m => m.id === aluguelVeiculo.motoristaId) : null;
     const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
+    
+    // Histórico completo do veículo
+    const historicoAlugueis = alugueis.filter(a => a.veiculoId === veiculo.id);
+    const historicoManutencoes = manutencoes?.filter(m => m.veiculoId === veiculo.id) || [];
+    const historicoPagamentos = pagamentos?.filter(p => p.veiculoId === veiculo.id) || [];
+    const historicoInfracoes = infracoes?.filter(i => i.veiculoId === veiculo.id) || [];
     
     // Calcular despesas fixas puras do veículo (sem manutenções)
     let despesasFixasMensais = 0;
@@ -1114,7 +1120,14 @@ export default function RelatoriosFinanceiros() {
       },
       motorista,
       despesasDetalhadas,
-      evolucaoMensal
+      evolucaoMensal,
+      historico: {
+        alugueis: historicoAlugueis,
+        manutencoes: historicoManutencoes,
+        pagamentos: historicoPagamentos,
+        infracoes: historicoInfracoes,
+        despesas: despesasVeiculo
+      }
     };
   };
 
