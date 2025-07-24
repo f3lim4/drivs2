@@ -283,6 +283,39 @@ export function DetalhesVeiculoAnaliseModal({
                   </div>
                 )}
 
+                {/* Despesas */}
+                {dadosVeiculo?.despesasDetalhadas && dadosVeiculo.despesasDetalhadas.length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-sm text-gray-700 mb-2 flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Despesas ({dadosVeiculo.despesasDetalhadas.length})
+                    </h4>
+                    <div className="space-y-2">
+                      {dadosVeiculo.despesasDetalhadas.slice(0, 3).map((despesa: any, idx: number) => (
+                        <div key={idx} className="flex justify-between items-center text-sm bg-gray-50 p-2 rounded">
+                          <div>
+                            <div className="font-medium">{despesa.categoria || despesa.tipo || 'Despesa'}</div>
+                            <div className="text-gray-500">
+                              {despesa.descricao || formatDate(despesa.data)}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium text-red-600">
+                              {formatCurrency(parseFloat(despesa.valor || '0'))}
+                            </div>
+                            <div className="text-xs text-gray-500">{despesa.fonte || 'manual'}</div>
+                          </div>
+                        </div>
+                      ))}
+                      {dadosVeiculo.despesasDetalhadas.length > 3 && (
+                        <div className="text-xs text-gray-500 text-center">
+                          +{dadosVeiculo.despesasDetalhadas.length - 3} mais
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Pagamentos */}
                 {historicoData?.pagamentos && historicoData.pagamentos.length > 0 && (
                   <div>
