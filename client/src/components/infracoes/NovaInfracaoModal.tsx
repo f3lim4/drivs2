@@ -188,6 +188,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       const taxaAdminValor = (valorOriginal * taxaAdminPercent) / 100;
       
       const infracaoData = {
+        id: crypto.randomUUID(),
         ...data,
         locadoraId: profile?.locadoraId || '',
         valorOriginal: valorOriginal.toFixed(2),
@@ -212,6 +213,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       if (criarPagamento && novaInfracao) {
         try {
           const pagamentoData = {
+            id: crypto.randomUUID(),
             locadoraId: profile?.locadoraId || '',
             motoristaId: data.motoristaId,
             aluguelId: data.aluguelId === 'sem-aluguel' ? null : data.aluguelId,
@@ -336,7 +338,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                             </FormControl>
                             <SelectContent>
                               {motoristas.length > 0 ? (
-                                motoristas.map((motorista) => (
+                                motoristas.map((motorista: any) => (
                                   <SelectItem key={motorista.id} value={motorista.id}>
                                     {motorista.nome} - {motorista.id}
                                   </SelectItem>
@@ -367,7 +369,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                             </FormControl>
                             <SelectContent>
                               {veiculos.length > 0 ? (
-                                veiculos.map((veiculo) => (
+                                veiculos.map((veiculo: any) => (
                                   <SelectItem key={veiculo.id} value={veiculo.id}>
                                     {veiculo.modelo} - {veiculo.placa}
                                   </SelectItem>
@@ -391,7 +393,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   control={form.control}
                   name="aluguelId"
                   render={({ field }) => (
-                    <input type="hidden" {...field} />
+                    <input type="hidden" {...field} value={field.value || ''} />
                   )}
                 />
               </div>
@@ -677,7 +679,8 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   <FormControl>
                     <Textarea 
                       placeholder="" 
-                      {...field} 
+                      {...field}
+                      value={field.value || ''}
                       rows={3}
                       className="resize-none"
                     />
