@@ -12,10 +12,11 @@ import { useInfracoes } from '@/hooks/useInfracoes';
 import { useMotoristas } from '@/hooks/useMotoristas';
 import { useVeiculos } from '@/hooks/useVeiculos';
 import { useAlugueis } from '@/hooks/useAlugueis';
+import { usePagamentos } from '@/hooks/usePagamentos';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { insertInfracaoSchema } from '@shared/schema';
-import { Calendar, AlertTriangle } from 'lucide-react';
+import { Calendar, AlertTriangle, CreditCard } from 'lucide-react';
 
 const formSchema = insertInfracaoSchema.extend({
   numeroAuto: z.string().min(1, 'Número do auto é obrigatório'),
@@ -45,6 +46,7 @@ interface NovaInfracaoModalProps {
 
 export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   const { createInfracao, isCreating } = useInfracoes();
+  const { createPagamento } = usePagamentos();
   const { motoristas } = useMotoristas();
   const { veiculos } = useVeiculos();
   const { alugueis } = useAlugueis();
@@ -84,6 +86,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
   // Estados para controlar o modo de seleção
   const [selecaoManual, setSelecaoManual] = React.useState(false);
   const [aluguelSelecionado, setAluguelSelecionado] = React.useState<string>('');
+  const [criarPagamento, setCriarPagamento] = React.useState(false);
 
   // Filtrar motoristas com aluguéis ativos
   const motoristasComAluguel = React.useMemo(() => {
@@ -153,6 +156,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
       // Reset estados locais
       setSelecaoManual(false);
       setAluguelSelecionado('');
+      setCriarPagamento(false);
     }
   }, [open, motoristas, veiculos, alugueis, form, profile?.locadoraId]);
 
@@ -202,12 +206,48 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         responsavel: 'motorista',
       };
 
-      await createInfracao(infracaoData);
+      const novaInfracao = await createInfracao(infracaoData);
       
-      toast({
-        title: "Infração criada com sucesso!",
-        description: "A infração foi registrada no sistema.",
-      });
+      // Se checkbox marcado, criar pagamento automaticamente
+      if (criarPagamento && novaInfracao) {
+        try {
+          const pagamentoData = {
+            locadoraId: profile?.locadoraId || '',
+            motoristaId: data.motoristaId,
+            aluguelId: data.aluguelId === 'sem-aluguel' ? null : data.aluguelId,
+            tipo: 'infracao',
+            descricao: `Infração de trânsito - ${data.numeroAuto}`,
+            automatico: false,
+            valorTotal: data.valorFinal,
+            valorPago: '0.00',
+            valorRestante: data.valorFinal,
+            valorJuros: '0.00',
+            valorMulta: '0.00',
+            dataPagamento: data.dataVencimento,
+            status: 'em_aberto',
+            observacoes: `Pagamento criado automaticamente para infração: ${data.numeroAuto}`,
+          };
+          
+          await createPagamento(pagamentoData);
+          
+          toast({
+            title: "Infração e pagamento criados!",
+            description: "A infração foi registrada e o pagamento foi criado automaticamente.",
+          });
+        } catch (error) {
+          console.error('Erro ao criar pagamento:', error);
+          toast({
+            title: "Infração criada, erro no pagamento",
+            description: "A infração foi criada mas houve erro ao criar o pagamento automático.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Infração criada com sucesso!",
+          description: "A infração foi registrada no sistema.",
+        });
+      }
       
       form.reset();
       onClose();
@@ -648,6 +688,26 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                 </FormItem>
               )}
             />
+
+            {/* Checkbox para criar pagamento automaticamente */}
+            <div className="flex items-center space-x-3 p-4 border rounded-lg bg-blue-50">
+              <CreditCard className="h-5 w-5 text-blue-600" />
+              <div className="flex items-center space-x-2 flex-1">
+                <input
+                  type="checkbox"
+                  id="criarPagamento"
+                  checked={criarPagamento}
+                  onChange={(e) => setCriarPagamento(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="criarPagamento" className="text-sm font-medium text-gray-900">
+                  Criar pagamento automaticamente
+                </label>
+              </div>
+              <span className="text-xs text-gray-600">
+                Status: Em Aberto
+              </span>
+            </div>
 
             {/* Botões */}
             <div className="flex justify-end space-x-2">
