@@ -943,7 +943,22 @@ export default function RelatoriosFinanceiros() {
       .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
       .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
     
-    const despesasMensais = despesasManuais + despesasFixasMensais;
+    // Incluir manutenções no período
+    const manutencoesVeiculo = manutencoes?.filter(m => {
+      if (m.veiculoId !== veiculo.id) return false;
+      
+      const dataManutencao = m.dataConclusao ? new Date(m.dataConclusao) : new Date(m.dataAgendamento);
+      const valor = m.valorFinal || m.valorOrcamento;
+      
+      return valor && parseFloat(valor) > 0 && isWithinInterval(dataManutencao, { start: monthStart, end: monthEnd });
+    }) || [];
+    
+    const manutencoesMensais = manutencoesVeiculo.reduce((total, manutencao) => {
+      const valorFinal = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
+      return total + (isNaN(valorFinal) ? 0 : valorFinal);
+    }, 0);
+    
+    const despesasMensais = despesasManuais + manutencoesMensais + despesasFixasMensais;
     const lucro = receitaMensal - despesasMensais;
     const margem = receitaMensal > 0 ? (lucro / receitaMensal) * 100 : 0;
     
@@ -999,9 +1014,17 @@ export default function RelatoriosFinanceiros() {
       });
     }
     
-    // Despesas manuais
+    // Manutenções
+    if (manutencoesMensais > 0) {
+      despesasDetalhadas.push({
+        categoria: 'Manutenção',
+        valor: manutencoesMensais,
+        percentual: despesasMensais > 0 ? (manutencoesMensais / despesasMensais) * 100 : 0
+      });
+    }
+    
+    // Despesas manuais (excluindo manutenção que já foi incluída acima)
     const categoriasManuais = [
-      { key: 'manutencao', nome: 'Manutenção' },
       { key: 'licenciamento', nome: 'Licenciamento' },
       { key: 'multa', nome: 'Multas' },
       { key: 'lavagem', nome: 'Lavagem' },
