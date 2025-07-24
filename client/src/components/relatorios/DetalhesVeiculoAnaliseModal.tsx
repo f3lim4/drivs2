@@ -1,10 +1,8 @@
+import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Car, TrendingUp, TrendingDown, DollarSign, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
-import { format } from "date-fns";
-import { pt } from "date-fns/locale";
+import { CheckCircle, AlertTriangle, XCircle, Car, User, DollarSign, Calendar, Wrench, FileText, Clock } from "lucide-react";
 
 interface DetalhesVeiculoAnaliseModalProps {
   isOpen: boolean;
@@ -19,31 +17,11 @@ interface DetalhesVeiculoAnaliseModalProps {
 export function DetalhesVeiculoAnaliseModal({
   isOpen,
   onClose,
-  dadosVeiculo,
-  selectedMonth,
-  veiculo,
-  analise,
-  historico
+  dadosVeiculo
 }: DetalhesVeiculoAnaliseModalProps) {
-  // Debug: verificar dados recebidos
-  console.log('DEBUG Modal - dadosVeiculo:', dadosVeiculo);
-  console.log('DEBUG Modal - veiculo prop:', veiculo);
-  console.log('DEBUG Modal - analise prop:', analise);
-  console.log('DEBUG Modal - historico prop:', historico);
+  if (!dadosVeiculo) return null;
   
-  // Suportar ambos os formatos (novo e antigo)
-  const veiculoData = veiculo || dadosVeiculo?.veiculo;
-  const analiseData = analise || dadosVeiculo?.analiseFinanceira;
-  const historicoData = historico || dadosVeiculo?.historico;
-  
-  console.log('DEBUG Modal - veiculoData final:', veiculoData);
-  console.log('DEBUG Modal - analiseData final:', analiseData);
-  console.log('DEBUG Modal - historicoData final:', historicoData);
-  
-  if (!veiculoData || !analiseData) {
-    console.log('DEBUG Modal - Retornando null, dados insuficientes');
-    return null;
-  }
+  const { veiculo: veiculoData, analiseFinanceira: analiseData, historico: historicoData, motorista } = dadosVeiculo;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -52,14 +30,25 @@ export function DetalhesVeiculoAnaliseModal({
     }).format(value);
   };
 
-  // Análise de lucratividade
-  const receitaMensal = parseFloat(analiseData?.receitaMensal || analiseData?.receita_mensal || '0');
-  const despesaMensal = parseFloat(analiseData?.despesasMensais || analiseData?.despesas_mensais || '0');
-  const lucroMensal = receitaMensal - despesaMensal;
-  const margemLucro = receitaMensal > 0 ? (lucroMensal / receitaMensal) * 100 : 0;
+  const formatDate = (date: string | Date) => {
+    if (!date) return 'N/A';
+    try {
+      const validDate = new Date(date);
+      if (isNaN(validDate.getTime())) return 'N/A';
+      return validDate.toLocaleDateString('pt-BR');
+    } catch {
+      return 'N/A';
+    }
+  };
+
+  // Análise de lucratividade usando dados originais
+  const receitaMensal = parseFloat(analiseData?.receitaMensal || '0');
+  const despesaMensal = parseFloat(analiseData?.despesasMensais || '0');
+  const lucroMensal = parseFloat(analiseData?.lucro || '0');
+  const margemLucro = parseFloat(analiseData?.margem || '0');
   
   const isLucrativo = lucroMensal > 0;
-  const deveManterOperacao = margemLucro > 10; // Margem mínima de 10%
+  const deveManterOperacao = margemLucro > 10;
 
   // Recomendação
   const getRecomendacao = () => {
@@ -108,145 +97,224 @@ export function DetalhesVeiculoAnaliseModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="pb-4">
-          <DialogTitle className="flex items-center gap-3 text-xl">
-            <Car className="h-6 w-6 text-blue-600" />
-            Análise de Lucratividade - {veiculoData.placa}
-            <span className="text-sm font-normal text-gray-600">
-              {veiculoData.marca} {veiculoData.modelo}
-            </span>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Car className="h-5 w-5 text-blue-600" />
+            Análise do Veículo {veiculoData?.placa}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Status de Lucratividade */}
-          <Card className={`${recomendacao.bgColor} border-l-4 border-l-${recomendacao.color.replace('text-', '')}`}>
-            <CardHeader className="pb-3">
-              <CardTitle className={`flex items-center gap-2 ${recomendacao.color}`}>
-                <IconeRecomendacao className="h-5 w-5" />
-                {recomendacao.titulo}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-700 mb-4">{recomendacao.descricao}</p>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">{formatCurrency(receitaMensal)}</p>
-                  <p className="text-sm text-gray-600">Receita Mensal</p>
+          {/* Card de Recomendação Principal */}
+          <Card className={`${recomendacao.bgColor} border-2`}>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <IconeRecomendacao className={`h-8 w-8 ${recomendacao.color}`} />
+                <div className="flex-1">
+                  <h3 className={`font-bold text-lg ${recomendacao.color}`}>
+                    {recomendacao.titulo}
+                  </h3>
+                  <p className="text-gray-600 mt-1">{recomendacao.descricao}</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-red-600">{formatCurrency(despesaMensal)}</p>
-                  <p className="text-sm text-gray-600">Despesas Mensais</p>
-                </div>
-                <div className="text-center">
-                  <p className={`text-2xl font-bold ${lucroMensal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <div className="text-right">
+                  <div className={`text-2xl font-bold ${isLucrativo ? 'text-green-600' : 'text-red-600'}`}>
                     {formatCurrency(lucroMensal)}
-                  </p>
-                  <p className="text-sm text-gray-600">Lucro Mensal</p>
-                  <Badge className={`mt-1 ${margemLucro >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {margemLucro.toFixed(1)}% margem
-                  </Badge>
+                  </div>
+                  <div className="text-sm text-gray-500">Lucro Mensal</div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Histórico Simplificado */}
+          {/* Informações do Veículo e Análise Financeira */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Informações do Veículo */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Car className="h-4 w-4" />
+                  Informações do Veículo
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">Placa:</span>
+                    <div className="font-medium">{veiculoData?.placa}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Modelo:</span>
+                    <div className="font-medium">{veiculoData?.marca} {veiculoData?.modelo}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Ano:</span>
+                    <div className="font-medium">{veiculoData?.ano}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Status:</span>
+                    <Badge variant={analiseData?.status === 'Lucrativo' ? 'default' : 'secondary'}>
+                      {analiseData?.status}
+                    </Badge>
+                  </div>
+                </div>
+                {motorista && (
+                  <div className="pt-2 border-t">
+                    <div className="flex items-center gap-2 text-sm">
+                      <User className="h-4 w-4 text-gray-500" />
+                      <span className="text-gray-500">Motorista:</span>
+                    </div>
+                    <div className="font-medium">{motorista.nome}</div>
+                    <div className="text-sm text-gray-500">{motorista.contato}</div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Análise Financeira */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Análise Financeira
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">Receita Mensal:</span>
+                    <div className="font-medium text-green-600">{formatCurrency(receitaMensal)}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Despesas Mensais:</span>
+                    <div className="font-medium text-red-600">{formatCurrency(despesaMensal)}</div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Lucro Mensal:</span>
+                    <div className={`font-bold ${isLucrativo ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrency(lucroMensal)}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Margem de Lucro:</span>
+                    <div className={`font-bold ${isLucrativo ? 'text-green-600' : 'text-red-600'}`}>
+                      {margemLucro.toFixed(1)}%
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Histórico do Veículo */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Histórico do Veículo</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Histórico do Veículo
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {/* Aluguéis */}
                 {historicoData?.alugueis && historicoData.alugueis.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-sm text-gray-700 mb-2">Aluguéis ({historicoData.alugueis.length})</h4>
+                    <h4 className="font-medium text-sm text-gray-700 mb-2 flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Aluguéis ({historicoData.alugueis.length})
+                    </h4>
                     <div className="space-y-2">
-                      {historicoData.alugueis.slice(0, 3).map((aluguel: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
-                          <span>{aluguel.motoristaNome || 'N/A'}</span>
-                          <span>
-                            {aluguel.dataInicio && !isNaN(new Date(aluguel.dataInicio).getTime()) 
-                              ? format(new Date(aluguel.dataInicio), 'dd/MM/yyyy', { locale: pt }) 
-                              : 'Data inválida'} - {formatCurrency(parseFloat(aluguel.valorMensal || '0'))}
-                          </span>
-                          <Badge className={aluguel.status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-                            {aluguel.status}
-                          </Badge>
+                      {historicoData.alugueis.slice(0, 3).map((aluguel: any, idx: number) => (
+                        <div key={idx} className="flex justify-between items-center text-sm bg-gray-50 p-2 rounded">
+                          <div>
+                            <div className="font-medium">{aluguel.motoristaNome}</div>
+                            <div className="text-gray-500">
+                              {formatDate(aluguel.dataInicio)} - {formatDate(aluguel.dataFim)}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium text-green-600">
+                              {formatCurrency(parseFloat(aluguel.valorMensal || '0'))}
+                            </div>
+                            <div className="text-xs text-gray-500">mensal</div>
+                          </div>
                         </div>
                       ))}
                       {historicoData.alugueis.length > 3 && (
-                        <p className="text-xs text-gray-500 text-center">
-                          Mostrando 3 de {historicoData.alugueis.length} aluguéis
-                        </p>
+                        <div className="text-xs text-gray-500 text-center">
+                          +{historicoData.alugueis.length - 3} mais
+                        </div>
                       )}
                     </div>
                   </div>
                 )}
-
-                <Separator />
 
                 {/* Manutenções */}
                 {historicoData?.manutencoes && historicoData.manutencoes.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-sm text-gray-700 mb-2">Manutenções ({historicoData.manutencoes.length})</h4>
+                    <h4 className="font-medium text-sm text-gray-700 mb-2 flex items-center gap-2">
+                      <Wrench className="h-4 w-4" />
+                      Manutenções ({historicoData.manutencoes.length})
+                    </h4>
                     <div className="space-y-2">
-                      {historicoData.manutencoes.slice(0, 3).map((manutencao: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
-                          <span>{manutencao.tipo} - {manutencao.descricao}</span>
-                          <span>
-                            {manutencao.dataAgendamento && !isNaN(new Date(manutencao.dataAgendamento).getTime())
-                              ? format(new Date(manutencao.dataAgendamento), 'dd/MM/yyyy', { locale: pt })
-                              : 'Data inválida'} - {formatCurrency(parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0'))}
-                          </span>
-                          <Badge className={manutencao.status === 'concluida' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                            {manutencao.status}
-                          </Badge>
+                      {historicoData.manutencoes.slice(0, 3).map((manutencao: any, idx: number) => (
+                        <div key={idx} className="flex justify-between items-center text-sm bg-gray-50 p-2 rounded">
+                          <div>
+                            <div className="font-medium">{manutencao.tipo || 'Manutenção'}</div>
+                            <div className="text-gray-500">
+                              {formatDate(manutencao.dataAgendamento)}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium text-red-600">
+                              {formatCurrency(parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0'))}
+                            </div>
+                            <Badge variant={manutencao.status === 'concluida' ? 'default' : 'secondary'} className="text-xs">
+                              {manutencao.status}
+                            </Badge>
+                          </div>
                         </div>
                       ))}
                       {historicoData.manutencoes.length > 3 && (
-                        <p className="text-xs text-gray-500 text-center">
-                          Mostrando 3 de {historicoData.manutencoes.length} manutenções
-                        </p>
+                        <div className="text-xs text-gray-500 text-center">
+                          +{historicoData.manutencoes.length - 3} mais
+                        </div>
                       )}
                     </div>
                   </div>
                 )}
 
-                <Separator />
-
-                {/* Despesas */}
-                {historicoData?.despesas && historicoData.despesas.length > 0 && (
+                {/* Pagamentos */}
+                {historicoData?.pagamentos && historicoData.pagamentos.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-sm text-gray-700 mb-2">Despesas ({historicoData.despesas.length})</h4>
+                    <h4 className="font-medium text-sm text-gray-700 mb-2 flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      Pagamentos Recentes ({historicoData.pagamentos.length})
+                    </h4>
                     <div className="space-y-2">
-                      {historicoData.despesas.slice(0, 3).map((despesa: any, index: number) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
-                          <span>{despesa.categoria} - {despesa.descricao}</span>
-                          <span>
-                            {despesa.data && !isNaN(new Date(despesa.data).getTime())
-                              ? format(new Date(despesa.data), 'dd/MM/yyyy', { locale: pt })
-                              : 'Data inválida'} - {formatCurrency(parseFloat(despesa.valor || '0'))}
-                          </span>
-                          <span className="text-xs text-gray-500">{despesa.formaPagamento}</span>
+                      {historicoData.pagamentos.slice(0, 3).map((pagamento: any, idx: number) => (
+                        <div key={idx} className="flex justify-between items-center text-sm bg-gray-50 p-2 rounded">
+                          <div>
+                            <div className="font-medium">{pagamento.descricao || 'Pagamento'}</div>
+                            <div className="text-gray-500">
+                              {formatDate(pagamento.dataPagamento || pagamento.dataVencimento)}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-medium text-green-600">
+                              {formatCurrency(parseFloat(pagamento.valorTotal || '0'))}
+                            </div>
+                            <Badge variant={pagamento.status === 'pago' ? 'default' : 'secondary'} className="text-xs">
+                              {pagamento.status}
+                            </Badge>
+                          </div>
                         </div>
                       ))}
-                      {historicoData.despesas.length > 3 && (
-                        <p className="text-xs text-gray-500 text-center">
-                          Mostrando 3 de {historicoData.despesas.length} despesas
-                        </p>
+                      {historicoData.pagamentos.length > 3 && (
+                        <div className="text-xs text-gray-500 text-center">
+                          +{historicoData.pagamentos.length - 3} mais
+                        </div>
                       )}
                     </div>
-                  </div>
-                )}
-
-                {/* Se não houver histórico */}
-                {(!historicoData?.alugueis?.length && !historicoData?.manutencoes?.length && !historicoData?.despesas?.length) && (
-                  <div className="text-center py-8 text-gray-500">
-                    <Car className="h-12 w-12 mx-auto mb-2 text-gray-300" />
-                    <p>Nenhum histórico encontrado para este veículo</p>
                   </div>
                 )}
               </div>
