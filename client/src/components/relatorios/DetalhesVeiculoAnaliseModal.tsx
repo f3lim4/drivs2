@@ -1,7 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Car, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Car, DollarSign, TrendingUp, TrendingDown, Calendar, Wrench, Receipt, AlertTriangle, User, Fuel } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
@@ -21,7 +22,7 @@ export function DetalhesVeiculoAnaliseModal({
 }: DetalhesVeiculoAnaliseModalProps) {
   if (!dadosVeiculo) return null;
 
-  const { veiculo, analiseFinanceira, motorista, despesasDetalhadas, evolucaoMensal } = dadosVeiculo;
+  const { veiculo, analiseFinanceira, motorista, despesasDetalhadas, evolucaoMensal, historico } = dadosVeiculo;
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -75,8 +76,18 @@ export function DetalhesVeiculoAnaliseModal({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Informações do Veículo */}
+        <Tabs defaultValue="resumo" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="resumo">Resumo</TabsTrigger>
+            <TabsTrigger value="alugueis">Aluguéis</TabsTrigger>
+            <TabsTrigger value="manutencoes">Manutenções</TabsTrigger>
+            <TabsTrigger value="pagamentos">Pagamentos</TabsTrigger>
+            <TabsTrigger value="despesas">Despesas</TabsTrigger>
+            <TabsTrigger value="infracoes">Infrações</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="resumo" className="space-y-6">
+            {/* Informações do Veículo */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -230,7 +241,286 @@ export function DetalhesVeiculoAnaliseModal({
               </CardContent>
             </Card>
           )}
-        </div>
+          </TabsContent>
+
+          {/* Aba Histórico de Aluguéis */}
+          <TabsContent value="alugueis" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Histórico de Aluguéis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {historico?.alugueis && historico.alugueis.length > 0 ? (
+                  <div className="space-y-3">
+                    {historico.alugueis.map((aluguel: any, index: number) => (
+                      <div key={index} className="p-4 border rounded-lg">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Status</p>
+                            <Badge className={aluguel.status === 'ativo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                              {aluguel.status}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Período</p>
+                            <p className="font-medium text-sm">
+                              {format(new Date(aluguel.dataInicio), 'dd/MM/yyyy', { locale: pt })} - {format(new Date(aluguel.dataFim), 'dd/MM/yyyy', { locale: pt })}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Valor Mensal</p>
+                            <p className="font-bold text-green-600">{formatCurrency(parseFloat(aluguel.valorMensal || '0'))}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Motorista</p>
+                            <p className="font-medium text-sm">{aluguel.motoristaNome || 'N/A'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    Nenhum aluguel registrado para este veículo.
+                  </div>
+                )}
+              </CardContent>  
+            </Card>
+          </TabsContent>
+
+          {/* Aba Histórico de Manutenções */}
+          <TabsContent value="manutencoes" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Wrench className="h-5 w-5" />
+                  Histórico de Manutenções
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {historico?.manutencoes && historico.manutencoes.length > 0 ? (
+                  <div className="space-y-3">
+                    {historico.manutencoes.map((manutencao: any, index: number) => (
+                      <div key={index} className="p-4 border rounded-lg">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Status</p>
+                            <Badge className={manutencao.status === 'concluida' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                              {manutencao.status}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Tipo</p>
+                            <p className="font-medium text-sm">{manutencao.tipo}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Descrição</p>
+                            <p className="font-medium text-sm">{manutencao.descricao}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Valor</p>
+                            <p className="font-bold text-red-600">
+                              {formatCurrency(parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0'))}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Data Agendamento</p>
+                            <p className="font-medium text-sm">
+                              {format(new Date(manutencao.dataAgendamento), 'dd/MM/yyyy', { locale: pt })}
+                            </p>
+                          </div>
+                          {manutencao.dataConclusao && (
+                            <div>
+                              <p className="text-sm text-gray-600">Data Conclusão</p>
+                              <p className="font-medium text-sm">
+                                {format(new Date(manutencao.dataConclusao), 'dd/MM/yyyy', { locale: pt })}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    Nenhuma manutenção registrada para este veículo.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Aba Histórico de Pagamentos */}
+          <TabsContent value="pagamentos" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Receipt className="h-5 w-5" />
+                  Histórico de Pagamentos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {historico?.pagamentos && historico.pagamentos.length > 0 ? (
+                  <div className="space-y-3">
+                    {historico.pagamentos.slice(0, 10).map((pagamento: any, index: number) => (
+                      <div key={index} className="p-4 border rounded-lg">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Status</p>
+                            <Badge className={pagamento.status === 'pago' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                              {pagamento.status}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Data Vencimento</p>
+                            <p className="font-medium text-sm">
+                              {format(new Date(pagamento.data), 'dd/MM/yyyy', { locale: pt })}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Valor</p>
+                            <p className="font-bold text-blue-600">{formatCurrency(parseFloat(pagamento.valor || '0'))}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Tipo</p>
+                            <p className="font-medium text-sm capitalize">{pagamento.tipo}</p>
+                          </div>
+                        </div>
+                        {pagamento.observacoes && (
+                          <div className="mt-2 pt-2 border-t">
+                            <p className="text-sm text-gray-600">Observações</p>
+                            <p className="text-sm">{pagamento.observacoes}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {historico.pagamentos.length > 10 && (
+                      <div className="text-center py-2 text-sm text-gray-500">
+                        Mostrando os 10 pagamentos mais recentes de {historico.pagamentos.length} no total.
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    Nenhum pagamento registrado para este veículo.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Aba Histórico de Despesas */}
+          <TabsContent value="despesas" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Fuel className="h-5 w-5" />
+                  Histórico de Despesas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {historico?.despesas && historico.despesas.length > 0 ? (
+                  <div className="space-y-3">
+                    {historico.despesas.map((despesa: any, index: number) => (
+                      <div key={index} className="p-4 border rounded-lg">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Categoria</p>
+                            <div className="flex items-center gap-2">
+                              <div className={`w-3 h-3 rounded-full ${getCategoriaColor(despesa.categoria)}`} />
+                              <p className="font-medium text-sm capitalize">{despesa.categoria}</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Data</p>
+                            <p className="font-medium text-sm">
+                              {format(new Date(despesa.data), 'dd/MM/yyyy', { locale: pt })}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Valor</p>
+                            <p className="font-bold text-red-600">{formatCurrency(parseFloat(despesa.valor || '0'))}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Forma de Pagamento</p>
+                            <p className="font-medium text-sm">{despesa.formaPagamento}</p>
+                          </div>
+                        </div>
+                        {despesa.descricao && (
+                          <div className="mt-2 pt-2 border-t">
+                            <p className="text-sm text-gray-600">Descrição</p>
+                            <p className="text-sm">{despesa.descricao}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    Nenhuma despesa registrada para este veículo.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Aba Histórico de Infrações */}
+          <TabsContent value="infracoes" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Histórico de Infrações
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {historico?.infracoes && historico.infracoes.length > 0 ? (
+                  <div className="space-y-3">
+                    {historico.infracoes.map((infracao: any, index: number) => (
+                      <div key={index} className="p-4 border rounded-lg">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <p className="text-sm text-gray-600">Status</p>
+                            <Badge className={infracao.status === 'pago' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                              {infracao.status}
+                            </Badge>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Data da Infração</p>
+                            <p className="font-medium text-sm">
+                              {format(new Date(infracao.dataInfracao), 'dd/MM/yyyy', { locale: pt })}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Valor</p>
+                            <p className="font-bold text-red-600">{formatCurrency(parseFloat(infracao.valor || '0'))}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Responsável</p>
+                            <p className="font-medium text-sm">{infracao.responsavel}</p>
+                          </div>
+                        </div>
+                        {infracao.descricao && (
+                          <div className="mt-2 pt-2 border-t">
+                            <p className="text-sm text-gray-600">Descrição</p>
+                            <p className="text-sm">{infracao.descricao}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    Nenhuma infração registrada para este veículo.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
