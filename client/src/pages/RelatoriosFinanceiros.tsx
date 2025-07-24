@@ -348,7 +348,16 @@ export default function RelatoriosFinanceiros() {
     const result = {
       alugueisAtivos: filteredData.alugueisAtivos,
       pagamentosRealizados: filteredData.pagamentosRealizados,
-      infracoesPeriodo: filteredData.infracoesPeriodo,
+      infracoesPeriodo: filteredData.infracoesPeriodo.filter(infracao => {
+        const matchesSearch = !searchTerm ||
+          infracao.numeroAuto?.toLowerCase().includes(searchLower) ||
+          infracao.tipoInfracao?.toLowerCase().includes(searchLower) ||
+          veiculos.find(v => v.id === infracao.veiculoId)?.placa?.toLowerCase().includes(searchLower);
+          
+        const matchesType = filterType === 'todos' || filterType === 'infracao';
+        
+        return matchesSearch && matchesType;
+      }),
       despesasPeriodo: filteredData.despesasPeriodo.filter(despesa => {
         const matchesSearch = !searchTerm || 
           despesa.descricao?.toLowerCase().includes(searchLower) ||
