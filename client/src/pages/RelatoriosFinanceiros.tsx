@@ -1023,24 +1023,41 @@ export default function RelatoriosFinanceiros() {
       });
     }
     
-    // Despesas manuais (excluindo manutenção que já foi incluída acima)
-    const categoriasManuais = [
-      { key: 'licenciamento', nome: 'Licenciamento' },
-      { key: 'multa', nome: 'Multas' },
-      { key: 'lavagem', nome: 'Lavagem' },
-      { key: 'outros', nome: 'Outros' }
-    ];
-    
-    categoriasManuais.forEach(categoria => {
-      const valor = despesasVeiculo
-        .filter(d => d.categoria === categoria.key && d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
-        .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
-      
-      if (valor > 0) {
+    // Despesas manuais (excluindo financiamento e manutenção que já foram incluídas acima)
+    const despesasManuaisAgrupadas = despesasVeiculo
+      .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && d.categoria !== 'manutencao' && 
+                   isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+      .reduce((grupos, despesa) => {
+        const categoria = despesa.categoria || 'outros';
+        if (!grupos[categoria]) {
+          grupos[categoria] = { total: 0, nome: '' };
+        }
+        grupos[categoria].total += parseFloat(despesa.valor || '0');
+        
+        // Mapear nome amigável da categoria
+        const nomesCategoria = {
+          'emprestimo': 'Empréstimo',
+          'combustivel': 'Combustível', 
+          'licenciamento': 'Licenciamento',
+          'multa': 'Multas',
+          'lavagem': 'Lavagem',
+          'pneu': 'Pneus',
+          'seguro': 'Seguro',
+          'ipva': 'IPVA',
+          'outros': 'Outros'
+        };
+        
+        grupos[categoria].nome = nomesCategoria[categoria] || categoria.charAt(0).toUpperCase() + categoria.slice(1);
+        return grupos;
+      }, {});
+
+    // Adicionar cada categoria de despesa manual ao detalhamento
+    Object.values(despesasManuaisAgrupadas).forEach(categoria => {
+      if (categoria.total > 0) {
         despesasDetalhadas.push({
           categoria: categoria.nome,
-          valor,
-          percentual: despesasMensais > 0 ? (valor / despesasMensais) * 100 : 0
+          valor: categoria.total,
+          percentual: despesasMensais > 0 ? (categoria.total / despesasMensais) * 100 : 0
         });
       }
     });
