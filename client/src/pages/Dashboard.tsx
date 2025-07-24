@@ -167,7 +167,7 @@ export default function Dashboard() {
 
       const mesInfo = meses[mes - 1];
       
-      // Calcular receita do mês (pagamentos recebidos)
+      // Calcular entradas do mês (pagamentos recebidos)
       const receitaMes = pagamentos
         .filter((p: any) => {
           const dataPagamento = new Date(p.data);
@@ -177,7 +177,7 @@ export default function Dashboard() {
         })
         .reduce((total: number, p: any) => total + parseFloat(p.valor || '0'), 0);
 
-      // Calcular despesas do mês (despesas pagas)
+      // Calcular saídas do mês (despesas pagas)
       const despesasMes = despesas
         .filter((d: any) => {
           const dataDespesa = new Date(d.data);
@@ -187,7 +187,7 @@ export default function Dashboard() {
         })
         .reduce((total: number, d: any) => total + parseFloat(d.valor || '0'), 0);
 
-      // Calcular despesas fixas mensais (IPVA, seguro, rastreador)
+      // Calcular saídas fixas mensais (IPVA, seguro, rastreador)
       const despesasFixasMes = veiculosSeguro.reduce((total: number, veiculo: any) => {
         let totalVeiculo = 0;
         
@@ -211,8 +211,8 @@ export default function Dashboard() {
 
       dadosFinanceiros.push({
         mes: mesInfo.nome,
-        receita: Math.round(receitaMes),
-        despesas: Math.round(despesasMes + despesasFixasMes),
+        entradas: Math.round(receitaMes),
+        saidas: Math.round(despesasMes + despesasFixasMes),
         lucro: Math.round(receitaMes - (despesasMes + despesasFixasMes))
       });
     }
@@ -518,12 +518,12 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Receita Semanal - Card Futurista */}
+        {/* Entradas Semanais - Card Futurista */}
         <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-yellow-700">TOTAL RECEBIDO ESSA SEMANA</p>
+                <p className="text-xs font-medium text-yellow-700">ENTRADAS DESSA SEMANA</p>
                 <p className="text-lg font-bold text-yellow-800">
                   {formatCurrency(receitaSemanalRecebida)}
                 </p>
@@ -699,7 +699,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="p-4 bg-white rounded-lg border border-slate-200">
-                  <p className="text-sm font-medium text-slate-600">Receita Total</p>
+                  <p className="text-sm font-medium text-slate-600">Entradas Totais</p>
                   <p className="text-2xl font-bold text-slate-800">
                     {formatCurrency(
                       alugueisRaw.reduce((acc: number, aluguel: any) => acc + parseFloat(aluguel.valorTotal || '0'), 0)
