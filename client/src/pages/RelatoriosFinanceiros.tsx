@@ -1533,8 +1533,22 @@ export default function RelatoriosFinanceiros() {
                   {Object.entries(despesasPorCategoria)
                     .sort(([,a], [,b]) => b - a) // Ordenar por valor decrescente
                     .map(([categoria, valor]) => {
-                      const nomeCategoria = categoria.charAt(0).toUpperCase() + categoria.slice(1);
+                      const nomesCategoria: { [key: string]: string } = {
+                        'emprestimo': 'Empréstimo',
+                        'manutencao': 'Manutenção',
+                        'infracao': 'Infrações',
+                        'combustivel': 'Combustível',
+                        'ipva': 'IPVA',
+                        'seguro': 'Seguro',
+                        'rastreador': 'Rastreador',
+                        'financiamento': 'Financiamento',
+                        'licenciamento': 'Licenciamento',
+                        'lavagem': 'Lavagem',
+                        'outros': 'Outros'
+                      };
+                      const nomeCategoria = nomesCategoria[categoria] || categoria.charAt(0).toUpperCase() + categoria.slice(1);
                       const corBg = categoria === 'emprestimo' ? 'bg-purple-50' :
+                                   categoria === 'infracao' ? 'bg-red-50' :
                                    categoria === 'lavagem' ? 'bg-blue-50' :
                                    categoria === 'ipva' ? 'bg-yellow-50' :
                                    categoria === 'seguro' ? 'bg-green-50' :
@@ -1545,6 +1559,7 @@ export default function RelatoriosFinanceiros() {
                                    categoria === 'despachante' ? 'bg-teal-50' :
                                    'bg-gray-50';
                       const corTexto = categoria === 'emprestimo' ? 'text-purple-800' :
+                                      categoria === 'infracao' ? 'text-red-800' :
                                       categoria === 'lavagem' ? 'text-blue-800' :
                                       categoria === 'ipva' ? 'text-yellow-800' :
                                       categoria === 'seguro' ? 'text-green-800' :
@@ -1555,6 +1570,7 @@ export default function RelatoriosFinanceiros() {
                                       categoria === 'despachante' ? 'text-teal-800' :
                                       'text-gray-800';
                       const corValor = categoria === 'emprestimo' ? 'text-purple-600' :
+                                      categoria === 'infracao' ? 'text-red-600' :
                                       categoria === 'lavagem' ? 'text-blue-600' :
                                       categoria === 'ipva' ? 'text-yellow-600' :
                                       categoria === 'seguro' ? 'text-green-600' :
