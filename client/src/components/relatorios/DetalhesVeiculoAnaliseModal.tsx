@@ -267,7 +267,11 @@ export function DetalhesVeiculoAnaliseModal({
                           <div>
                             <p className="text-sm text-gray-600">Período</p>
                             <p className="font-medium text-sm">
-                              {format(new Date(aluguel.dataInicio), 'dd/MM/yyyy', { locale: pt })} - {format(new Date(aluguel.dataFim), 'dd/MM/yyyy', { locale: pt })}
+                              {aluguel.dataInicio && !isNaN(new Date(aluguel.dataInicio).getTime()) 
+                                ? format(new Date(aluguel.dataInicio), 'dd/MM/yyyy', { locale: pt }) 
+                                : 'Data inválida'} - {aluguel.dataFim && !isNaN(new Date(aluguel.dataFim).getTime()) 
+                                ? format(new Date(aluguel.dataFim), 'dd/MM/yyyy', { locale: pt }) 
+                                : 'Data inválida'}
                             </p>
                           </div>
                           <div>
@@ -329,10 +333,12 @@ export function DetalhesVeiculoAnaliseModal({
                           <div>
                             <p className="text-sm text-gray-600">Data Agendamento</p>
                             <p className="font-medium text-sm">
-                              {format(new Date(manutencao.dataAgendamento), 'dd/MM/yyyy', { locale: pt })}
+                              {manutencao.dataAgendamento && !isNaN(new Date(manutencao.dataAgendamento).getTime())
+                                ? format(new Date(manutencao.dataAgendamento), 'dd/MM/yyyy', { locale: pt })
+                                : 'Data inválida'}
                             </p>
                           </div>
-                          {manutencao.dataConclusao && (
+                          {manutencao.dataConclusao && !isNaN(new Date(manutencao.dataConclusao).getTime()) && (
                             <div>
                               <p className="text-sm text-gray-600">Data Conclusão</p>
                               <p className="font-medium text-sm">
@@ -377,7 +383,9 @@ export function DetalhesVeiculoAnaliseModal({
                           <div>
                             <p className="text-sm text-gray-600">Data Vencimento</p>
                             <p className="font-medium text-sm">
-                              {format(new Date(pagamento.data), 'dd/MM/yyyy', { locale: pt })}
+                              {pagamento.data && !isNaN(new Date(pagamento.data).getTime())
+                                ? format(new Date(pagamento.data), 'dd/MM/yyyy', { locale: pt })
+                                : 'Data inválida'}
                             </p>
                           </div>
                           <div>
@@ -437,7 +445,9 @@ export function DetalhesVeiculoAnaliseModal({
                           <div>
                             <p className="text-sm text-gray-600">Data</p>
                             <p className="font-medium text-sm">
-                              {format(new Date(despesa.data), 'dd/MM/yyyy', { locale: pt })}
+                              {despesa.data && !isNaN(new Date(despesa.data).getTime())
+                                ? format(new Date(despesa.data), 'dd/MM/yyyy', { locale: pt })
+                                : 'Data inválida'}
                             </p>
                           </div>
                           <div>
@@ -491,7 +501,9 @@ export function DetalhesVeiculoAnaliseModal({
                           <div>
                             <p className="text-sm text-gray-600">Data da Infração</p>
                             <p className="font-medium text-sm">
-                              {format(new Date(infracao.dataInfracao), 'dd/MM/yyyy', { locale: pt })}
+                              {infracao.dataInfracao && !isNaN(new Date(infracao.dataInfracao).getTime())
+                                ? format(new Date(infracao.dataInfracao), 'dd/MM/yyyy', { locale: pt })
+                                : 'Data inválida'}
                             </p>
                           </div>
                           <div>
