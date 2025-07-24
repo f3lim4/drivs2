@@ -378,20 +378,21 @@ export default function RelatoriosFinanceiros() {
 
   // Dados do histórico ordenados e paginados
   const historicoOrdenado = useMemo(() => {
-    // Combinar despesas e manutenções
+    // Combinar saídas (despesas/manutenções) e entradas (infrações pagas)
     const itensCombinados = [
-      // Filtrar despesas para remover as convertidas de manutenções (evitar duplicatas)
+      // SAÍDAS - Filtrar despesas para remover as convertidas de manutenções (evitar duplicatas)
       ...filteredDataBySearch.despesasPeriodo
         .filter(despesa => !despesa.id.startsWith('manutencao_'))
         .map(despesa => ({
           ...despesa,
-          tipo: 'despesa',
+          tipo: 'saida',
           data: despesa.data,
           valor: parseFloat(despesa.valor || '0'),
           categoria: despesa.categoria,
           descricao: despesa.descricao,
           veiculoId: despesa.veiculoId
         })),
+      // SAÍDAS - Manutenções
       ...filteredDataBySearch.manutencoes.map(manutencao => {
         // Para manutenções concluídas, usar data de conclusão; caso contrário, data de início
         const dataManutencao = manutencao.status === 'concluida' && manutencao.dataConclusao 
@@ -400,14 +401,27 @@ export default function RelatoriosFinanceiros() {
         
         return {
           ...manutencao,
-          tipo: 'manutencao',
+          tipo: 'saida',
           data: dataManutencao,
           valor: parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0'),
           categoria: 'manutencao',
           descricao: manutencao.descricao,
           veiculoId: manutencao.veiculoId
         };
-      })
+      }),
+      // ENTRADAS - Infrações pagas
+      ...filteredDataBySearch.infracoesPeriodo
+        .filter(infracao => infracao.status === 'pago' && infracao.valorFinal)
+        .map(infracao => ({
+          ...infracao,
+          id: `infracao_${infracao.id}`,
+          tipo: 'entrada',
+          data: infracao.dataPagamento || infracao.dataInfracao,
+          valor: parseFloat(infracao.valorFinal || '0'),
+          categoria: 'infracao',
+          descricao: `Pagamento de Infração - ${infracao.tipoInfracao} - ${infracao.numeroAuto}`,
+          veiculoId: infracao.veiculoId
+        }))
     ];
 
     // Aplicar ordenação
@@ -946,7 +960,21 @@ export default function RelatoriosFinanceiros() {
       despesasFixasMensais += parseFloat(veiculo.valorFinanciamento);
     }
     
-    const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
+    // Receita do aluguel
+    const receitaAluguel = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
+    
+    // Adicionar infrações pagas como entradas (receita)
+    const infracoesVeiculo = infracoes.filter(infracao => 
+      infracao.veiculoId === veiculo.id && 
+      infracao.status === 'pago' &&
+      infracao.valorFinal &&
+      isWithinInterval(new Date(infracao.dataPagamento || infracao.dataInfracao), { start: monthStart, end: monthEnd })
+    );
+    
+    const receitaInfracoes = infracoesVeiculo
+      .reduce((total, infracao) => total + parseFloat(infracao.valorFinal || '0'), 0);
+    
+    const receitaMensal = receitaAluguel + receitaInfracoes;
     const despesasManuais = despesasVeiculo
       .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && d.categoria !== 'manutencao' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
       .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
@@ -1839,7 +1867,7 @@ export default function RelatoriosFinanceiros() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Histórico de Despesas dos Veículos</CardTitle>
+                <CardTitle>Histórico de Entradas e Saídas dos Veículos</CardTitle>
                 <CardDescription>
                   Histórico filtrado baseado na busca realizada - dados reais
                 </CardDescription>
@@ -1895,7 +1923,7 @@ export default function RelatoriosFinanceiros() {
                                 <td className="p-3 capitalize">{item.categoria}</td>
                                 <td className="p-3">{item.descricao}</td>
                                 <td className={`p-3 font-semibold ${
-                                  item.tipo === 'despesa' ? 'text-red-600' : 'text-orange-600'
+                                  item.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'
                                 }`}>
                                   {formatCurrency(item.valor)}
                                 </td>
@@ -1911,16 +1939,16 @@ export default function RelatoriosFinanceiros() {
                                 </td>
                                 <td className="p-3">
                                   <span className={`px-2 py-1 rounded-full text-xs ${
-                                    item.tipo === 'despesa' 
-                                      ? 'bg-red-100 text-red-700' 
-                                      : 'bg-orange-100 text-orange-700'
+                                    item.tipo === 'entrada' 
+                                      ? 'bg-green-100 text-green-700' 
+                                      : 'bg-red-100 text-red-700'
                                   }`}>
-                                    {item.tipo === 'despesa' ? 'Despesa' : 'Manutenção'}
+                                    {item.tipo === 'entrada' ? 'Entrada' : item.categoria === 'manutencao' ? 'Saída - Manutenção' : 'Saída'}
                                   </span>
                                 </td>
                                 <td className="p-3">
-                                  {/* Despesas manuais (IDs normais) podem ser excluídas */}
-                                  {!item.id.startsWith('manutencao_') && !item.id.startsWith('financiamento_') && item.tipo === 'despesa' && (
+                                  {/* Saídas manuais (IDs normais) podem ser excluídas, infrações não podem */}
+                                  {!item.id.startsWith('manutencao_') && !item.id.startsWith('financiamento_') && !item.id.startsWith('infracao_') && item.tipo === 'saida' && (
                                     <Button
                                       variant="ghost"
                                       size="sm"
@@ -1930,8 +1958,8 @@ export default function RelatoriosFinanceiros() {
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
                                   )}
-                                  {/* Despesas automáticas (manutenção, financiamento) não podem ser excluídas */}
-                                  {(item.id.startsWith('manutencao_') || item.id.startsWith('financiamento_')) && (
+                                  {/* Saídas automáticas (manutenção, financiamento) e entradas (infrações) não podem ser excluídas */}
+                                  {(item.id.startsWith('manutencao_') || item.id.startsWith('financiamento_') || item.id.startsWith('infracao_')) && (
                                     <span className="text-gray-400 text-xs">-</span>
                                   )}
                                 </td>
