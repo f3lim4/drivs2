@@ -2290,7 +2290,10 @@ export default function RelatoriosFinanceiros() {
           isOpen={!!veiculoDetalhes}
           onClose={() => setVeiculoDetalhes(null)}
           veiculo={veiculoDetalhes.veiculo}
-          analise={veiculoDetalhes.analiseFinanceira}
+          analise={{
+            receita_mensal: veiculoDetalhes.analiseFinanceira.receitaMensal,
+            despesas_mensais: veiculoDetalhes.analiseFinanceira.despesasMensais
+          }}
           historico={veiculoDetalhes.historico}
         />
       )}
