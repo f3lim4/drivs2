@@ -205,101 +205,108 @@ export function DetalhesVeiculoAnaliseModal({
             </CardContent>
           </Card>
 
-          {/* Histórico do Veículo */}
+          {/* Histórico Detalhado do Veículo */}
           <Card>
             <CardHeader>
-              <CardTitle>Histórico do Veículo</CardTitle>
+              <CardTitle>Histórico Detalhado do Veículo</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {/* Aluguéis Recentes */}
-                <div>
-                  <h4 className="font-medium text-sm text-gray-700 mb-2 flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Aluguéis Recentes (3 mais recentes)
-                  </h4>
-                  <div className="space-y-2">
-                    {dadosVeiculo?.historico?.alugueis?.slice(0, 3).map((aluguel: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
+              <div className="space-y-2">
+                {(() => {
+                  // Criar array unificado de eventos
+                  const eventos: any[] = [];
+                  
+                  // Adicionar aluguéis como receitas
+                  if (dadosVeiculo?.historico?.alugueis) {
+                    dadosVeiculo.historico.alugueis.forEach((aluguel: any) => {
+                      eventos.push({
+                        tipo: 'receita',
+                        data: aluguel.dataInicio,
+                        descricao: `Aluguel - ${aluguel.motoristaNome}`,
+                        categoria: 'Aluguel',
+                        valor: aluguel.valorMensal || 0,
+                        status: aluguel.status,
+                        icone: <Calendar className="w-4 h-4 text-green-600" />,
+                        cor: 'text-green-600'
+                      });
+                    });
+                  }
+                  
+                  // Adicionar manutenções como despesas
+                  if (dadosVeiculo?.historico?.manutencoes) {
+                    dadosVeiculo.historico.manutencoes.forEach((manutencao: any) => {
+                      eventos.push({
+                        tipo: 'despesa',
+                        data: manutencao.dataConclusao || manutencao.data,
+                        descricao: manutencao.descricao,
+                        categoria: 'Manutenção',
+                        valor: parseFloat(manutencao.valorFinal || manutencao.valorEstimado || '0'),
+                        status: manutencao.status,
+                        icone: <Wrench className="w-4 h-4 text-red-600" />,
+                        cor: 'text-red-600'
+                      });
+                    });
+                  }
+                  
+                  // Adicionar despesas manuais
+                  if (dadosVeiculo?.historico?.despesas) {
+                    dadosVeiculo.historico.despesas.forEach((despesa: any) => {
+                      eventos.push({
+                        tipo: 'despesa',
+                        data: despesa.data,
+                        descricao: despesa.descricao,
+                        categoria: despesa.categoria,
+                        valor: parseFloat(despesa.valor || '0'),
+                        status: 'concluida',
+                        icone: <Receipt className="w-4 h-4 text-orange-600" />,
+                        cor: 'text-orange-600'
+                      });
+                    });
+                  }
+                  
+                  // Ordenar por data (mais recente primeiro)
+                  const eventosOrdenados = eventos
+                    .filter(evento => evento.data && evento.data !== 'Invalid Date')
+                    .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
+                    .slice(0, 10); // Mostrar últimos 10 eventos
+                  
+                  if (eventosOrdenados.length === 0) {
+                    return (
+                      <div className="text-center text-gray-500 py-8">
+                        Nenhum histórico encontrado para este veículo
+                      </div>
+                    );
+                  }
+                  
+                  return eventosOrdenados.map((evento, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                      <div className="flex items-center gap-3">
+                        {evento.icone}
                         <div>
-                          <span className="font-medium">{aluguel.motoristaNome}</span>
-                          <span className="text-gray-500 ml-2">
-                            {formatDate(aluguel.dataInicio)} - {aluguel.dataFim ? formatDate(aluguel.dataFim) : 'Em andamento'}
-                          </span>
+                          <div className="font-medium text-sm">{evento.descricao}</div>
+                          <div className="text-xs text-gray-500">
+                            {formatDate(evento.data)} • {evento.categoria}
+                          </div>
                         </div>
-                        <Badge variant="outline" className={aluguel.status === 'ativo' ? 'text-green-600' : 'text-gray-600'}>
-                          {aluguel.status}
+                      </div>
+                      <div className="text-right">
+                        <div className={`font-bold text-sm ${evento.tipo === 'receita' ? 'text-green-600' : 'text-red-600'}`}>
+                          {evento.tipo === 'receita' ? '+' : '-'}{formatCurrency(evento.valor)}
+                        </div>
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs ${
+                            evento.status === 'ativo' || evento.status === 'concluida' ? 'text-green-600' :
+                            evento.status === 'pendente' || evento.status === 'agendada' ? 'text-yellow-600' :
+                            'text-gray-600'
+                          }`}
+                        >
+                          {evento.status}
                         </Badge>
                       </div>
-                    )) || (
-                      <div className="text-center text-gray-500 py-4">
-                        Nenhum aluguel encontrado
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Manutenções Recentes */}
-                <div>
-                  <h4 className="font-medium text-sm text-gray-700 mb-2 flex items-center gap-2">
-                    <Wrench className="w-4 h-4" />
-                    Manutenções Recentes (3 mais recentes)
-                  </h4>
-                  <div className="space-y-2">
-                    {dadosVeiculo?.historico?.manutencoes?.slice(0, 3).map((manutencao: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
-                        <div>
-                          <span className="font-medium">{manutencao.descricao}</span>
-                          <span className="text-gray-500 ml-2">
-                            {manutencao.dataConclusao ? formatDate(manutencao.dataConclusao) : formatDate(manutencao.data)}
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <Badge variant="outline" className={manutencao.status === 'concluida' ? 'text-green-600' : 'text-yellow-600'}>
-                            {manutencao.status}
-                          </Badge>
-                          {manutencao.valorFinal && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {formatCurrency(parseFloat(manutencao.valorFinal))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )) || (
-                      <div className="text-center text-gray-500 py-4">
-                        Nenhuma manutenção encontrada
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Despesas Recentes */}
-                <div>
-                  <h4 className="font-medium text-sm text-gray-700 mb-2 flex items-center gap-2">
-                    <Receipt className="w-4 h-4" />
-                    Despesas Recentes (3 mais recentes)
-                  </h4>
-                  <div className="space-y-2">
-                    {dadosVeiculo?.historico?.despesas?.slice(0, 3).map((despesa: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
-                        <div>
-                          <span className="font-medium">{despesa.descricao}</span>
-                          <span className="text-gray-500 ml-2">
-                            {formatDate(despesa.data)}
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-medium">{formatCurrency(parseFloat(despesa.valor))}</div>
-                          <div className="text-xs text-gray-500">{despesa.categoria}</div>
-                        </div>
-                      </div>
-                    )) || (
-                      <div className="text-center text-gray-500 py-4">
-                        Nenhuma despesa encontrada
-                      </div>
-                    )}
-                  </div>
-                </div>
+                    </div>
+                  ));
+                })()}
               </div>
             </CardContent>
           </Card>
