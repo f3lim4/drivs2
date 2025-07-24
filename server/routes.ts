@@ -1404,8 +1404,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { locadoraId, motoristaId } = req.query;
       
+      console.log("[DEBUG INFRACOES] Parâmetros recebidos:", { locadoraId, motoristaId });
+      
       if (motoristaId) {
+        console.log("[DEBUG INFRACOES] Buscando infrações por motorista:", motoristaId);
         const infracoes = await storage.getInfracoesByMotorista(motoristaId as string);
+        console.log("[DEBUG INFRACOES] Infrações encontradas para motorista:", infracoes.length);
         res.json(infracoes);
       } else if (locadoraId) {
         const infracoes = await storage.getInfracoesByLocadora(locadoraId as string);
