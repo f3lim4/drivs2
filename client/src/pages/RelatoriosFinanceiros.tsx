@@ -22,6 +22,7 @@ import { useAlugueis } from '@/hooks/useAlugueis';
 import { usePagamentos } from '@/hooks/usePagamentos';
 import { useInfracoes } from '@/hooks/useInfracoes';
 import { useDespesas } from '@/hooks/useDespesas';
+import { useReceitas } from '@/hooks/useReceitas';
 import { useVeiculos } from '@/hooks/useVeiculos';
 import { useMotoristas } from '@/hooks/useMotoristas';
 import { useManutencoes } from '@/hooks/useManutencoes';
@@ -41,13 +42,14 @@ export default function RelatoriosFinanceiros() {
   const { pagamentos, isLoading: pagamentosLoading } = usePagamentos();
   const { infracoes, isLoading: infracoesLoading } = useInfracoes();
   const { despesas, isLoading: despesasLoading } = useDespesas();
+  const { receitas, isLoading: receitasLoading } = useReceitas(profile?.locadoraId);
   const { veiculos, isLoading: veiculosLoading } = useVeiculos();
   const { motoristas, isLoading: motoristasLoading } = useMotoristas();
   const { manutencoes, isLoading: manutencoesLoading } = useManutencoes();
 
   // ✅ VERIFICAR SE TODOS OS DADOS ESTÃO CARREGADOS
   const isLoadingData = alugueisLoading || pagamentosLoading || infracoesLoading || 
-                        despesasLoading || veiculosLoading || motoristasLoading || manutencoesLoading;
+                        despesasLoading || receitasLoading || veiculosLoading || motoristasLoading || manutencoesLoading;
   
   // Criar variável despesasComManutencoes usando dados do hook useDespesas
   const despesasComManutencoes = useMemo(() => {
@@ -1230,7 +1232,7 @@ export default function RelatoriosFinanceiros() {
           <CardContent className="p-6">
             <div className="flex items-center space-y-0.5">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-green-700">RECEITA TOTAL</p>
+                <p className="text-xs font-medium text-green-700">ENTRADAS TOTAIS</p>
                 {isDataLoading ? (
                   <>
                     <div className="h-6 w-20 bg-green-200 rounded animate-pulse"></div>
@@ -1258,7 +1260,7 @@ export default function RelatoriosFinanceiros() {
           <CardContent className="p-6">
             <div className="flex items-center space-y-0.5">
               <div className="space-y-0.5">
-                <p className="text-xs font-medium text-red-700">DESPESAS TOTAIS</p>
+                <p className="text-xs font-medium text-red-700">SAÍDAS TOTAIS</p>
                 {isDataLoading ? (
                   <>
                     <div className="h-6 w-20 bg-red-200 rounded animate-pulse"></div>
@@ -1443,8 +1445,8 @@ export default function RelatoriosFinanceiros() {
       {/* Tabs de Análise */}
       <Tabs defaultValue="despesas" className="space-y-2">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="despesas">Despesas</TabsTrigger>
-          <TabsTrigger value="despesas-fixas">Despesas Fixas</TabsTrigger>
+          <TabsTrigger value="despesas">Saídas</TabsTrigger>
+          <TabsTrigger value="despesas-fixas">Saídas Fixas</TabsTrigger>
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
           <TabsTrigger value="motoristas">Análise por Motorista</TabsTrigger>
           <TabsTrigger value="historico">Histórico</TabsTrigger>
@@ -1459,10 +1461,10 @@ export default function RelatoriosFinanceiros() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  Receitas por Tipo
+                  Entradas por Tipo
                 </CardTitle>
                 <CardDescription>
-                  Detalhamento das receitas do mês
+                  Detalhamento das entradas do mês
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1506,8 +1508,8 @@ export default function RelatoriosFinanceiros() {
 
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-2 border-gray-200">
                     <div>
-                      <p className="font-bold text-gray-800">TOTAL RECEITAS</p>
-                      <p className="text-sm text-gray-600">Soma de todas as receitas</p>
+                      <p className="font-bold text-gray-800">TOTAL ENTRADAS</p>
+                      <p className="text-sm text-gray-600">Soma de todas as entradas</p>
                     </div>
                     <p className="text-xl font-bold text-green-600">
                       {formatCurrency(receitaTotal)}
@@ -1522,10 +1524,10 @@ export default function RelatoriosFinanceiros() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingDown className="h-5 w-5" />
-                  Despesas por Categoria
+                  Saídas por Categoria
                 </CardTitle>
                 <CardDescription>
-                  Valor de cada categoria de despesa
+                  Valor de cada categoria de saída
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -2002,7 +2004,7 @@ export default function RelatoriosFinanceiros() {
               <div>
                 <CardTitle>Análise por Veículo</CardTitle>
                 <CardDescription>
-                  Relatório detalhado de receitas e despesas por veículo
+                  Relatório detalhado de entradas e saídas por veículo
                 </CardDescription>
               </div>
               <div className="flex items-center gap-4">
@@ -2013,10 +2015,10 @@ export default function RelatoriosFinanceiros() {
                   <SelectContent>
                     <SelectItem value="mais-lucrativos">Mais Lucrativos</SelectItem>
                     <SelectItem value="menos-lucrativos">Menos Lucrativos</SelectItem>
-                    <SelectItem value="maior-receita">Maior Receita</SelectItem>
-                    <SelectItem value="menor-receita">Menor Receita</SelectItem>
-                    <SelectItem value="maior-despesa">Maior Despesa</SelectItem>
-                    <SelectItem value="menor-despesa">Menor Despesa</SelectItem>
+                    <SelectItem value="maior-receita">Maiores Entradas</SelectItem>
+                    <SelectItem value="menor-receita">Menores Entradas</SelectItem>
+                    <SelectItem value="maior-despesa">Maiores Saídas</SelectItem>
+                    <SelectItem value="menor-despesa">Menores Saídas</SelectItem>
                     <SelectItem value="placa-az">Placa (A-Z)</SelectItem>
                     <SelectItem value="placa-za">Placa (Z-A)</SelectItem>
                   </SelectContent>
