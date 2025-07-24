@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Car, TrendingUp, TrendingDown, DollarSign, Calendar, Wrench, Receipt } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface DetalhesVeiculoAnaliseModalProps {
   isOpen: boolean;
@@ -20,6 +21,19 @@ export function DetalhesVeiculoAnaliseModal({
   onClose,
   dadosVeiculo
 }: DetalhesVeiculoAnaliseModalProps) {
+  const queryClient = useQueryClient();
+  
+  // Forçar atualização dos dados quando o modal abre
+  useEffect(() => {
+    if (isOpen) {
+      console.log('Modal aberto, forçando atualização dos dados...');
+      queryClient.invalidateQueries({ queryKey: ['manutencoes'] });
+      queryClient.invalidateQueries({ queryKey: ['despesas'] });
+      queryClient.refetchQueries({ queryKey: ['manutencoes'] });
+      queryClient.refetchQueries({ queryKey: ['despesas'] });
+    }
+  }, [isOpen, queryClient]);
+  
   if (!dadosVeiculo) return null;
   
   const { veiculo: veiculoData, analiseFinanceira: analiseData } = dadosVeiculo;
