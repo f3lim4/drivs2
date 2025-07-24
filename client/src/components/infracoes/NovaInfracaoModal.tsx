@@ -422,38 +422,35 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Dados da Infração */}
-              <div className="space-y-3">
+            {/* Número do Auto e Código da Infração na mesma linha */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="numeroAuto"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">Número do Auto</FormLabel>
+                    <FormControl>
+                      <Input className="h-9" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <FormField
-                  control={form.control}
-                  name="numeroAuto"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">Número do Auto</FormLabel>
-                      <FormControl>
-                        <Input className="h-9" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="codigoInfracao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">Código da Infração</FormLabel>
-                      <FormControl>
-                        <Input className="h-9" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="codigoInfracao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">Código da Infração</FormLabel>
+                    <FormControl>
+                      <Input className="h-9" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Descrição da Infração */}
