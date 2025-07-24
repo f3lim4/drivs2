@@ -14,15 +14,26 @@ export function useManutencoes() {
         params.append('locadoraId', profile.locadoraId);
       }
       
-      const response = await fetch(`/api/manutencoes?${params}`);
+      const response = await fetch(`/api/manutencoes?${params}`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch manutencoes');
       }
-      return response.json() as Promise<Manutencao[]>;
+      const data = await response.json() as Manutencao[];
+      console.log('Manutenções carregadas do servidor:', data.length, 'registros');
+      return data;
     },
     enabled: !!profile?.locadoraId,
     staleTime: 0, // Sem cache para debug
     gcTime: 0, // Sem cache para debug
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchInterval: 30000 // Refetch a cada 30 segundos para garantir dados atuais
   });
 
   const createMutation = useMutation({
@@ -108,10 +119,35 @@ export function useManutencoes() {
       });
       
       if (!response.ok) throw new Error('Failed to delete manutencao');
+      
+      // Log da atividade
+      try {
+        const { registrarAtividade } = await import('@/utils/activityLogger');
+        await registrarAtividade(
+          profile?.locadoraId || '',
+          profile?.email || 'usuario@drivs.me',
+          'excluir',
+          'manutencao',
+          id,
+          `Manutenção excluída`
+        );
+      } catch (error) {
+        console.error('Erro ao registrar atividade:', error);
+      }
+      
       return response.json();
     },
     onSuccess: () => {
+      // Invalidar TODOS os caches relacionados
       queryClient.invalidateQueries({ queryKey: ['manutencoes'] });
+      queryClient.invalidateQueries({ queryKey: ['despesas'] }); // Despesas incluem manutenções
+      queryClient.invalidateQueries({ queryKey: ['veiculos'] }); // Dados dos veículos podem incluir manutenções
+      
+      // Force refetch para garantir dados atualizados
+      queryClient.refetchQueries({ queryKey: ['manutencoes'] });
+      queryClient.refetchQueries({ queryKey: ['despesas'] });
+      
+      console.log('Manutenção excluída, cache invalidado e dados atualizados');
     },
   });
 
