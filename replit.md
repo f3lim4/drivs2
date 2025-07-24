@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-24: Modal de Análise por Veículo Expandido com Histórico Completo - CONCLUÍDO ✅
+- ✅ **SISTEMA DE ABAS IMPLEMENTADO** - Modal expandido com 6 seções organizadas (Resumo, Aluguéis, Manutenções, Pagamentos, Despesas, Infrações)
+- ✅ **HISTÓRICO COMPLETO DE ALUGUÉIS** - Mostra todos os aluguéis do veículo com status, período, valor mensal e motorista
+- ✅ **HISTÓRICO COMPLETO DE MANUTENÇÕES** - Registro completo com status, tipo, descrição, valores e datas de agendamento/conclusão
+- ✅ **HISTÓRICO DE PAGAMENTOS LIMITADO** - Mostra os 10 pagamentos mais recentes com status, data, valor e tipo
+- ✅ **HISTÓRICO DE DESPESAS DETALHADO** - Todas as despesas manuais por categoria com data, valor e forma de pagamento
+- ✅ **HISTÓRICO DE INFRAÇÕES COMPLETO** - Registro de infrações com status, data, valor e responsável
+- ✅ **VALIDAÇÃO DE DATAS CRÍTICA** - Correção do erro "Invalid time value" com validação de datas antes da formatação
+- ✅ **INTERFACE PROFISSIONAL** - Badges coloridos, informações organizadas em grid e dados reais do banco
+- ✅ **DADOS REAIS EXIBIDOS** - Sistema usa dados autênticos do PostgreSQL sem mock ou placeholders
+- ✅ **NAVEGAÇÃO INTUITIVA** - Clique em qualquer veículo na tabela de análise abre histórico completo
+
 ### 2025-07-24: Sistema de Despesas Manuais Completo - Duplicação de Manutenções Eliminada - CONCLUÍDO ✅
 - ✅ **BUG CRÍTICO RESOLVIDO** - Eliminada duplicação de manutenções (contadas como despesas manuais + manutenções)
 - ✅ **FILTRO DE CATEGORIAS IMPLEMENTADO** - Excluída categoria "manutencao" das despesas manuais para evitar duplicação
