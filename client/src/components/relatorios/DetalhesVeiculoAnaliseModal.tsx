@@ -35,13 +35,24 @@ export function DetalhesVeiculoAnaliseModal({
   const lucroLiquido = receitaMensal - despesasMensais;
   const margemLucro = receitaMensal > 0 ? (lucroLiquido / receitaMensal) * 100 : 0;
 
-  // Categorias de despesas com dados reais do sistema
-  const despesasDetalhadas = [
-    { categoria: 'IPVA', valor: 113.33, percentual: (113.33 / despesasMensais) * 100 },
-    { categoria: 'Seguro', valor: 180.00, percentual: (180.00 / despesasMensais) * 100 },
-    { categoria: 'Rastreador', valor: 10.00, percentual: (10.00 / despesasMensais) * 100 },
-    { categoria: 'Manutenção', valor: 1000.00, percentual: (1000.00 / despesasMensais) * 100 },
-  ].filter(item => item.valor > 0);
+  // Usar despesas reais do veículo
+  const despesasDetalhadas = dadosVeiculo?.despesasDetalhadas || [];
+  
+  // Agrupar despesas por categoria e somar valores
+  const despesasAgrupadas = despesasDetalhadas.reduce((acc: any, despesa: any) => {
+    const categoria = despesa.categoria || despesa.tipo || 'Outras';
+    if (!acc[categoria]) {
+      acc[categoria] = { categoria, valor: 0, percentual: 0 };
+    }
+    acc[categoria].valor += parseFloat(despesa.valor || '0');
+    return acc;
+  }, {});
+
+  // Calcular percentuais
+  const despesasParaExibir = Object.values(despesasAgrupadas).map((despesa: any) => ({
+    ...despesa,
+    percentual: despesasMensais > 0 ? (despesa.valor / despesasMensais) * 100 : 0
+  })).sort((a: any, b: any) => b.valor - a.valor);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -55,42 +66,42 @@ export function DetalhesVeiculoAnaliseModal({
 
         <div className="space-y-6">
           {/* Cards de Resumo Financeiro */}
-          <div className="grid grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-sm text-green-600 mb-1">📈</div>
-                <div className="text-sm text-gray-600">Receita Mensal</div>
-                <div className="text-lg font-bold text-green-600">
+          <div className="grid grid-cols-4 gap-3">
+            <Card className="bg-gradient-to-br from-green-50 to-green-100">
+              <CardContent className="p-3 text-center">
+                <div className="text-2xl mb-1">📈</div>
+                <div className="text-xs text-gray-600 mb-1">Receita Mensal</div>
+                <div className="text-xl font-bold text-green-600">
                   {formatCurrency(receitaMensal)}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-sm text-red-600 mb-1">📉</div>
-                <div className="text-sm text-gray-600">Despesas Mensais</div>
-                <div className="text-lg font-bold text-red-600">
+            <Card className="bg-gradient-to-br from-red-50 to-red-100">
+              <CardContent className="p-3 text-center">
+                <div className="text-2xl mb-1">📉</div>
+                <div className="text-xs text-gray-600 mb-1">Despesas Mensais</div>
+                <div className="text-xl font-bold text-red-600">
                   {formatCurrency(despesasMensais)}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-sm text-blue-600 mb-1">💰</div>
-                <div className="text-sm text-gray-600">Lucro Líquido</div>
-                <div className={`text-lg font-bold ${lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <Card className={`bg-gradient-to-br ${lucroLiquido >= 0 ? 'from-blue-50 to-blue-100' : 'from-red-50 to-red-100'}`}>
+              <CardContent className="p-3 text-center">
+                <div className="text-2xl mb-1">💰</div>
+                <div className="text-xs text-gray-600 mb-1">Lucro Líquido</div>
+                <div className={`text-xl font-bold ${lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {lucroLiquido >= 0 ? '' : '-'}{formatCurrency(Math.abs(lucroLiquido))}
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-sm text-purple-600 mb-1">%</div>
-                <div className="text-sm text-gray-600">Margem de Lucro</div>
-                <div className={`text-lg font-bold ${margemLucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <Card className={`bg-gradient-to-br ${margemLucro >= 0 ? 'from-purple-50 to-purple-100' : 'from-red-50 to-red-100'}`}>
+              <CardContent className="p-3 text-center">
+                <div className="text-2xl mb-1">%</div>
+                <div className="text-xs text-gray-600 mb-1">Margem de Lucro</div>
+                <div className={`text-xl font-bold ${margemLucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {margemLucro.toFixed(1)}%
                 </div>
               </CardContent>
@@ -103,24 +114,30 @@ export function DetalhesVeiculoAnaliseModal({
               <CardTitle>Detalhamento de Despesas Mensais</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {despesasDetalhadas.map((despesa, index) => (
-                  <div key={index} className="flex items-center justify-between py-2">
-                    <div className="flex items-center gap-3">
+              <div className="space-y-2">
+                {despesasParaExibir.length > 0 ? despesasParaExibir.map((despesa: any, index: number) => (
+                  <div key={index} className="flex items-center justify-between py-1.5 border-b border-gray-100 last:border-b-0">
+                    <div className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${
-                        despesa.categoria === 'IPVA' ? 'bg-orange-500' :
-                        despesa.categoria === 'Seguro' ? 'bg-blue-500' :
-                        despesa.categoria === 'Rastreador' ? 'bg-green-500' :
-                        'bg-red-500'
+                        despesa.categoria === 'IPVA' || despesa.categoria === 'ipva' ? 'bg-orange-500' :
+                        despesa.categoria === 'Seguro' || despesa.categoria === 'seguro' ? 'bg-blue-500' :
+                        despesa.categoria === 'Rastreador' || despesa.categoria === 'rastreador' ? 'bg-green-500' :
+                        despesa.categoria === 'Manutenção' || despesa.categoria === 'manutencao' ? 'bg-red-500' :
+                        despesa.categoria === 'Financiamento' || despesa.categoria === 'financiamento' || despesa.categoria === 'emprestimo' ? 'bg-purple-500' :
+                        'bg-gray-500'
                       }`}></div>
-                      <span className="font-medium">{despesa.categoria}</span>
+                      <span className="font-medium text-sm">{despesa.categoria}</span>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold">{formatCurrency(despesa.valor)}</div>
+                      <div className="font-bold text-sm">{formatCurrency(despesa.valor)}</div>
                       <div className="text-xs text-gray-500">({despesa.percentual.toFixed(1)}%)</div>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center text-gray-500 py-4">
+                    Nenhuma despesa encontrada para este veículo
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
