@@ -9,19 +9,28 @@ import { pt } from "date-fns/locale";
 interface DetalhesVeiculoAnaliseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  veiculo: any;
-  analise: any;
-  historico: any;
+  dadosVeiculo?: any;
+  selectedMonth?: any;
+  veiculo?: any;
+  analise?: any;
+  historico?: any;
 }
 
 export function DetalhesVeiculoAnaliseModal({
   isOpen,
   onClose,
+  dadosVeiculo,
+  selectedMonth,
   veiculo,
   analise,
   historico
 }: DetalhesVeiculoAnaliseModalProps) {
-  if (!veiculo || !analise) return null;
+  // Suportar ambos os formatos (novo e antigo)
+  const veiculoData = veiculo || dadosVeiculo?.veiculo;
+  const analiseData = analise || dadosVeiculo?.analiseFinanceira;
+  const historicoData = historico || dadosVeiculo?.historico;
+  
+  if (!veiculoData || !analiseData) return null;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -31,8 +40,8 @@ export function DetalhesVeiculoAnaliseModal({
   };
 
   // Análise de lucratividade
-  const receitaMensal = parseFloat(analise.receita_mensal || '0');
-  const despesaMensal = parseFloat(analise.despesas_mensais || '0');
+  const receitaMensal = parseFloat(analiseData?.receitaMensal || analiseData?.receita_mensal || '0');
+  const despesaMensal = parseFloat(analiseData?.despesasMensais || analiseData?.despesas_mensais || '0');
   const lucroMensal = receitaMensal - despesaMensal;
   const margemLucro = receitaMensal > 0 ? (lucroMensal / receitaMensal) * 100 : 0;
   
@@ -89,9 +98,9 @@ export function DetalhesVeiculoAnaliseModal({
         <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center gap-3 text-xl">
             <Car className="h-6 w-6 text-blue-600" />
-            Análise de Lucratividade - {veiculo.placa}
+            Análise de Lucratividade - {veiculoData.placa}
             <span className="text-sm font-normal text-gray-600">
-              {veiculo.marca} {veiculo.modelo}
+              {veiculoData.marca} {veiculoData.modelo}
             </span>
           </DialogTitle>
         </DialogHeader>
@@ -138,11 +147,11 @@ export function DetalhesVeiculoAnaliseModal({
             <CardContent>
               <div className="space-y-4">
                 {/* Aluguéis */}
-                {historico?.alugueis && historico.alugueis.length > 0 && (
+                {historicoData?.alugueis && historicoData.alugueis.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-sm text-gray-700 mb-2">Aluguéis ({historico.alugueis.length})</h4>
+                    <h4 className="font-medium text-sm text-gray-700 mb-2">Aluguéis ({historicoData.alugueis.length})</h4>
                     <div className="space-y-2">
-                      {historico.alugueis.slice(0, 3).map((aluguel: any, index: number) => (
+                      {historicoData.alugueis.slice(0, 3).map((aluguel: any, index: number) => (
                         <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
                           <span>{aluguel.motoristaNome || 'N/A'}</span>
                           <span>
@@ -155,9 +164,9 @@ export function DetalhesVeiculoAnaliseModal({
                           </Badge>
                         </div>
                       ))}
-                      {historico.alugueis.length > 3 && (
+                      {historicoData.alugueis.length > 3 && (
                         <p className="text-xs text-gray-500 text-center">
-                          Mostrando 3 de {historico.alugueis.length} aluguéis
+                          Mostrando 3 de {historicoData.alugueis.length} aluguéis
                         </p>
                       )}
                     </div>
@@ -167,11 +176,11 @@ export function DetalhesVeiculoAnaliseModal({
                 <Separator />
 
                 {/* Manutenções */}
-                {historico?.manutencoes && historico.manutencoes.length > 0 && (
+                {historicoData?.manutencoes && historicoData.manutencoes.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-sm text-gray-700 mb-2">Manutenções ({historico.manutencoes.length})</h4>
+                    <h4 className="font-medium text-sm text-gray-700 mb-2">Manutenções ({historicoData.manutencoes.length})</h4>
                     <div className="space-y-2">
-                      {historico.manutencoes.slice(0, 3).map((manutencao: any, index: number) => (
+                      {historicoData.manutencoes.slice(0, 3).map((manutencao: any, index: number) => (
                         <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
                           <span>{manutencao.tipo} - {manutencao.descricao}</span>
                           <span>
@@ -184,9 +193,9 @@ export function DetalhesVeiculoAnaliseModal({
                           </Badge>
                         </div>
                       ))}
-                      {historico.manutencoes.length > 3 && (
+                      {historicoData.manutencoes.length > 3 && (
                         <p className="text-xs text-gray-500 text-center">
-                          Mostrando 3 de {historico.manutencoes.length} manutenções
+                          Mostrando 3 de {historicoData.manutencoes.length} manutenções
                         </p>
                       )}
                     </div>
@@ -196,11 +205,11 @@ export function DetalhesVeiculoAnaliseModal({
                 <Separator />
 
                 {/* Despesas */}
-                {historico?.despesas && historico.despesas.length > 0 && (
+                {historicoData?.despesas && historicoData.despesas.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-sm text-gray-700 mb-2">Despesas ({historico.despesas.length})</h4>
+                    <h4 className="font-medium text-sm text-gray-700 mb-2">Despesas ({historicoData.despesas.length})</h4>
                     <div className="space-y-2">
-                      {historico.despesas.slice(0, 3).map((despesa: any, index: number) => (
+                      {historicoData.despesas.slice(0, 3).map((despesa: any, index: number) => (
                         <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
                           <span>{despesa.categoria} - {despesa.descricao}</span>
                           <span>
@@ -211,9 +220,9 @@ export function DetalhesVeiculoAnaliseModal({
                           <span className="text-xs text-gray-500">{despesa.formaPagamento}</span>
                         </div>
                       ))}
-                      {historico.despesas.length > 3 && (
+                      {historicoData.despesas.length > 3 && (
                         <p className="text-xs text-gray-500 text-center">
-                          Mostrando 3 de {historico.despesas.length} despesas
+                          Mostrando 3 de {historicoData.despesas.length} despesas
                         </p>
                       )}
                     </div>
@@ -221,7 +230,7 @@ export function DetalhesVeiculoAnaliseModal({
                 )}
 
                 {/* Se não houver histórico */}
-                {(!historico?.alugueis?.length && !historico?.manutencoes?.length && !historico?.despesas?.length) && (
+                {(!historicoData?.alugueis?.length && !historicoData?.manutencoes?.length && !historicoData?.despesas?.length) && (
                   <div className="text-center py-8 text-gray-500">
                     <Car className="h-12 w-12 mx-auto mb-2 text-gray-300" />
                     <p>Nenhum histórico encontrado para este veículo</p>
