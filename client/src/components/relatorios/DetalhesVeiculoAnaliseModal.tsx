@@ -25,12 +25,25 @@ export function DetalhesVeiculoAnaliseModal({
   analise,
   historico
 }: DetalhesVeiculoAnaliseModalProps) {
+  // Debug: verificar dados recebidos
+  console.log('DEBUG Modal - dadosVeiculo:', dadosVeiculo);
+  console.log('DEBUG Modal - veiculo prop:', veiculo);
+  console.log('DEBUG Modal - analise prop:', analise);
+  console.log('DEBUG Modal - historico prop:', historico);
+  
   // Suportar ambos os formatos (novo e antigo)
   const veiculoData = veiculo || dadosVeiculo?.veiculo;
   const analiseData = analise || dadosVeiculo?.analiseFinanceira;
   const historicoData = historico || dadosVeiculo?.historico;
   
-  if (!veiculoData || !analiseData) return null;
+  console.log('DEBUG Modal - veiculoData final:', veiculoData);
+  console.log('DEBUG Modal - analiseData final:', analiseData);
+  console.log('DEBUG Modal - historicoData final:', historicoData);
+  
+  if (!veiculoData || !analiseData) {
+    console.log('DEBUG Modal - Retornando null, dados insuficientes');
+    return null;
+  }
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
