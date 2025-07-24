@@ -52,6 +52,31 @@ export function useDespesas() {
           };
         });
       
+      // Buscar infrações pagas para incluir como despesas
+      const infracoesResponse = await fetch(`/api/infracoes?locadoraId=${locadoraId}`);
+      if (!infracoesResponse.ok) throw new Error('Failed to fetch infracoes');
+      const infracoes = await infracoesResponse.json();
+      
+      // Converter infrações pagas em despesas
+      const despesasInfracoes = infracoes
+        .filter((infracao: any) => infracao.status === 'pago' && infracao.valorFinal)
+        .map((infracao: any) => ({
+          id: `infracao_${infracao.id}`,
+          locadoraId: infracao.locadoraId,
+          veiculoId: infracao.veiculoId,
+          veiculoModelo: infracao.veiculoModelo || 'N/A',
+          veiculoPlaca: infracao.veiculoPlaca || 'N/A',
+          categoria: 'infracao',
+          descricao: `Infração - ${infracao.tipoInfracao} - ${infracao.numeroAuto}`,
+          valor: infracao.valorFinal,
+          data: infracao.dataPagamento || infracao.dataInfracao,
+          tipo: 'despesa',
+          fonte: 'infracao',
+          infracaoId: infracao.id,
+          createdAt: infracao.createdAt,
+          updatedAt: infracao.updatedAt,
+        }));
+
       // Buscar veículos para incluir despesas de financiamento
       const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
       if (!veiculosResponse.ok) throw new Error('Failed to fetch veiculos');
@@ -81,13 +106,14 @@ export function useDespesas() {
           };
         });
       
-      const todasDespesas = [...despesasManuais, ...despesasManutencao, ...despesasFinanciamento];
+      const todasDespesas = [...despesasManuais, ...despesasManutencao, ...despesasInfracoes, ...despesasFinanciamento];
       
       console.log('Despesas - Verificando isolamento:', {
         locadoraId,
         despesasTotal: todasDespesas.length,
         despesasManuais: despesasManuais.length,
         despesasManutencao: despesasManutencao.length,
+        despesasInfracoes: despesasInfracoes.length,
         despesasFinanciamento: despesasFinanciamento.length,
         primeiraDespesa: todasDespesas[0]?.locadoraId
       });
