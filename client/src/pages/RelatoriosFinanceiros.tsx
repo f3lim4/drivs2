@@ -2289,12 +2289,8 @@ export default function RelatoriosFinanceiros() {
         <DetalhesVeiculoAnaliseModal
           isOpen={!!veiculoDetalhes}
           onClose={() => setVeiculoDetalhes(null)}
-          veiculo={veiculoDetalhes.veiculo}
-          analise={{
-            receita_mensal: veiculoDetalhes.analiseFinanceira.receitaMensal,
-            despesas_mensais: veiculoDetalhes.analiseFinanceira.despesasMensais
-          }}
-          historico={veiculoDetalhes.historico}
+          dadosVeiculo={veiculoDetalhes}
+          selectedMonth={selectedMonth}
         />
       )}
 
