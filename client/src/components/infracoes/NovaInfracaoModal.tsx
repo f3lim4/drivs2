@@ -277,11 +277,10 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Dados do Motorista e Veículo */}
+            {/* Motorista e Tipo da Infração na mesma linha */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Seleção de Motorista com Aluguel Ativo */}
               <div className="space-y-2">
-                
-                {/* Seleção de Motorista com Aluguel Ativo */}
                 {!selecaoManual && (
                   <div className="space-y-2">
                     <FormLabel className="text-sm">Motorista com Aluguel Ativo</FormLabel>
@@ -387,31 +386,6 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   </div>
                 )}
 
-                {/* Campo de Tipo da Infração */}
-                <FormField
-                  control={form.control}
-                  name="tipoInfracao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">Tipo da Infração</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-9">
-                            <SelectValue placeholder="Selecione o tipo" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="leve">Leve (3 pontos)</SelectItem>
-                          <SelectItem value="media">Média (4 pontos)</SelectItem>
-                          <SelectItem value="grave">Grave (5 pontos)</SelectItem>
-                          <SelectItem value="gravissima">Gravíssima (7 pontos)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 {/* Campo oculto para aluguelId */}
                 <FormField
                   control={form.control}
@@ -422,6 +396,33 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                 />
               </div>
 
+              {/* Campo de Tipo da Infração */}
+              <FormField
+                control={form.control}
+                name="tipoInfracao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm">Tipo da Infração</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Selecione o tipo" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="leve">Leve (3 pontos)</SelectItem>
+                        <SelectItem value="media">Média (4 pontos)</SelectItem>
+                        <SelectItem value="grave">Grave (5 pontos)</SelectItem>
+                        <SelectItem value="gravissima">Gravíssima (7 pontos)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Dados da Infração */}
               <div className="space-y-3">
 
