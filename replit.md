@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-24: Layout Modal de Infrações Ultra-Compacto - Campos Agrupados na Mesma Linha - CONCLUÍDO ✅
+- ✅ **MOTORISTA E TIPO DE INFRAÇÃO NA MESMA LINHA** - Layout reorganizado para usar grid 2 colunas (md:grid-cols-2)
+- ✅ **NÚMERO DO AUTO E CÓDIGO DA INFRAÇÃO NA MESMA LINHA** - Campos agrupados horizontalmente para interface mais compacta
+- ✅ **CHECKBOX PAGAMENTO AUTOMÁTICO IMPLEMENTADO** - Sistema cria pagamento em aberto automaticamente quando checkbox marcado
+- ✅ **INTERFACE RESPONSIVA** - Layout se adapta automaticamente a diferentes tamanhos de tela
+- ✅ **FUNCIONALIDADE PRESERVADA** - Mantidas todas as funcionalidades anteriores (seleção automática/manual, validações)
+- ✅ **DESIGN LIMPO** - Interface mais organizizada e intuitiva com melhor aproveitamento do espaço
+- ✅ **INTEGRAÇÃO PAGAMENTOS** - Pagamento criado com mesmo valor, data de vencimento e vinculado ao motorista/aluguel
+- ✅ **FEEDBACK DIFERENCIADO** - Toast mostra quando infração e pagamento são criados juntos
+
 ### 2025-07-24: Modal de Análise por Veículo Simplificado com Foco em Lucratividade - CONCLUÍDO ✅
 - ✅ **ANÁLISE DE LUCRATIVIDADE IMPLEMENTADA** - Modal foca em mostrar se veículo é lucrativo e deve ser mantido em operação
 - ✅ **RECOMENDAÇÕES INTELIGENTES** - Sistema analisa margem de lucro e dá recomendações (Excelente/Satisfatória/Atenção/Prejuízo)
