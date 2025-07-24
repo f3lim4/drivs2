@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### 2025-07-24: Tabela Análise por Veículo - Bug Crítico Corrigido - Despesas Mensais Completas - CONCLUÍDO ✅
+- ✅ **BUG CRÍTICO RESOLVIDO** - Tabela "Análise por Veículo" agora usa analiseVeiculos ao invés de cálculo simplificado
+- ✅ **CÁLCULO COMPLETO IMPLEMENTADO** - Coluna "Despesas Mensais" inclui despesas manuais + manutenções + despesas fixas
+- ✅ **CONSISTÊNCIA TOTAL ALCANÇADA** - Tabela reflete exatamente os mesmos valores do modal de detalhes
+- ✅ **VALOR CORRETO EXIBIDO** - Veículo GDD7A13 agora mostra R$ 3.636,66 ao invés de valor simplificado
+- ✅ **PRECISÃO FINANCEIRA GARANTIDA** - Sistema garante integridade dos dados financeiros em todas as visualizações
+- ✅ **FONTE DE DADOS UNIFICADA** - Eliminada divergência entre tabela e modal, ambos usam analiseVeiculos
+- ✅ **PAGINAÇÃO CORRIGIDA** - Sistema de paginação atualizado para trabalhar com dados corretos
+- ✅ **INTERFACE PADRONIZADA** - Status dos veículos agora baseado em dados reais (Lucrativo/Parado/Prejuízo)
+
 ### 2025-07-23: Análise por Veículo - Correção Crítica Cálculo Despesas Mensais - CONCLUÍDO ✅
 - ✅ **BUG CRÍTICO CORRIGIDO** - Despesas mensais na análise por veículo agora incluem TODAS as fontes de custos
 - ✅ **MANUTENÇÕES INCLUÍDAS** - Sistema agora soma manutenções concluídas no período aos cálculos
