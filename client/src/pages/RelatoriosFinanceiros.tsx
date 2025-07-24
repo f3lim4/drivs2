@@ -803,7 +803,7 @@ export default function RelatoriosFinanceiros() {
         .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0);
       
       const despesasManuaisMensais = despesasVeiculo
-        .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+        .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && d.categoria !== 'manutencao' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
         .reduce((total, despesa) => {
           const valor = parseFloat(despesa.valor || '0');
           return total + (isNaN(valor) ? 0 : valor);
@@ -814,12 +814,12 @@ export default function RelatoriosFinanceiros() {
         .filter(m => m.veiculoId === veiculo.id && m.status === 'concluida' && 
           isWithinInterval(new Date(m.dataConclusao || m.dataInicio), { start: monthStart, end: monthEnd }))
         .reduce((total, manutencao) => {
-          const valorFinal = parseFloat(manutencao.valorFinal || manutencao.valorEstimado || '0');
+          const valorFinal = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
           return total + (isNaN(valorFinal) ? 0 : valorFinal);
         }, 0);
       
       const despesasManuaisAnuais = despesasVeiculo
-        .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento')
+        .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && d.categoria !== 'manutencao')
         .reduce((total, despesa) => {
           const valor = parseFloat(despesa.valor || '0');
           return total + (isNaN(valor) ? 0 : valor);
@@ -829,7 +829,7 @@ export default function RelatoriosFinanceiros() {
       const manutencoesAnuais = manutencoes
         .filter(m => m.veiculoId === veiculo.id && m.status === 'concluida')
         .reduce((total, manutencao) => {
-          const valorFinal = parseFloat(manutencao.valorFinal || manutencao.valorEstimado || '0');
+          const valorFinal = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
           return total + (isNaN(valorFinal) ? 0 : valorFinal);
         }, 0);
       
@@ -940,7 +940,7 @@ export default function RelatoriosFinanceiros() {
     
     const receitaMensal = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
     const despesasManuais = despesasVeiculo
-      .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+      .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && d.categoria !== 'manutencao' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
       .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
     
     // Incluir manutenções no período
