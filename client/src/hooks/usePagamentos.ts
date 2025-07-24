@@ -14,7 +14,6 @@ export function usePagamentos() {
       if (!locadoraId) return [];
       
       const response = await fetch(`/api/pagamentos?locadoraId=${locadoraId}`, {
-        // FORÇA CACHE BUST
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
@@ -35,9 +34,13 @@ export function usePagamentos() {
       return data as Pagamento[];
     },
     enabled: !!locadoraId,
-    // FORÇA REFETCH SEMPRE
-    staleTime: 0,
-    gcTime: 0,
+    // OTIMIZADO: Cache de 5 segundos para melhor performance
+    staleTime: 5 * 1000,
+    gcTime: 10 * 1000,
+    // ATUALIZAÇÃO AUTOMÁTICA: Refetch a cada 10 segundos para dados sempre atuais
+    refetchInterval: 10 * 1000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: 'always',
   });
 
   const createMutation = useMutation({
@@ -68,8 +71,16 @@ export function usePagamentos() {
       
       return novoPagamento;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
+    onSuccess: (novoPagamento) => {
+      // ATUALIZAÇÃO OTIMISTA: Adiciona o novo pagamento na lista imediatamente
+      queryClient.setQueryData(['/api/pagamentos', locadoraId], (oldData: Pagamento[] | undefined) => {
+        return oldData ? [novoPagamento, ...oldData] : [novoPagamento];
+      });
+      
+      // INVALIDAÇÃO AGRESSIVA: Força refetch de todos os dados relacionados
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/relatorios'] });
     },
   });
 
@@ -101,8 +112,16 @@ export function usePagamentos() {
       
       return pagamentoAtualizado;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
+    onSuccess: (pagamentoAtualizado) => {
+      // ATUALIZAÇÃO OTIMISTA: Atualiza o pagamento na lista imediatamente
+      queryClient.setQueryData(['/api/pagamentos', locadoraId], (oldData: Pagamento[] | undefined) => {
+        return oldData?.map(p => p.id === pagamentoAtualizado.id ? pagamentoAtualizado : p) || [];
+      });
+      
+      // INVALIDAÇÃO AGRESSIVA: Força refetch de todos os dados relacionados
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/relatorios'] });
     },
   });
 
@@ -132,10 +151,18 @@ export function usePagamentos() {
         console.error('Erro ao registrar atividade:', error);
       }
       
-      return response.json();
+      return { id, deleted: true };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
+    onSuccess: (_, deletedId) => {
+      // ATUALIZAÇÃO OTIMISTA: Remove o pagamento da lista imediatamente
+      queryClient.setQueryData(['/api/pagamentos', locadoraId], (oldData: Pagamento[] | undefined) => {
+        return oldData?.filter(p => p.id !== deletedId) || [];
+      });
+      
+      // INVALIDAÇÃO AGRESSIVA: Força refetch de todos os dados relacionados
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/relatorios'] });
     },
   });
 
