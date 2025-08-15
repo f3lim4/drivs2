@@ -5,8 +5,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import Home from './Home';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -15,25 +13,32 @@ const Index = () => {
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       navigate('/dashboard', { replace: true });
+    } else if (!isLoading && !isAuthenticated) {
+      navigate('/login', { replace: true });
     }
   }, [navigate, isAuthenticated, isLoading]);
 
-  // Se ainda está carregando, mostra spinner
+  // Se ainda está carregando, mostra loading simples
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingSpinner size="lg" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando...</p>
+        </div>
       </div>
     );
   }
 
-  // Se não está autenticado, mostra a página Home
-  if (!isAuthenticated) {
-    return <Home />;
-  }
-
-  // Se chegou aqui, usuário está autenticado e será redirecionado
-  return null;
+  // Fallback enquanto redireciona
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Redirecionando...</p>
+      </div>
+    </div>
+  );
 };
 
 export default Index;
