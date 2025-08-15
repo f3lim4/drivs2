@@ -6,6 +6,17 @@ DRIVS é um sistema completo para gerenciamento de locadoras de veículos, desen
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Migration
+### 2025-08-15: Migration from Replit Agent to Standard Environment - CONCLUÍDO ✅
+- ✅ **DATABASE MIGRATION COMPLETE** - Successfully migrated from Supabase to PostgreSQL with Drizzle ORM
+- ✅ **SCHEMA PUSHED** - All tables created and functioning (profiles, locadoras, veiculos, motoristas, contratos, etc.)
+- ✅ **AUTHENTICATION FIXED** - Admin user created with proper credentials (drivs@drivs.com.br / secret)
+- ✅ **API ENDPOINTS WORKING** - All server routes functional for CRUD operations
+- ✅ **REAL-TIME SYSTEMS ACTIVE** - Contract checking and payment automation running
+- ✅ **SUPABASE CODE REMOVED** - Clean migration with no legacy dependencies
+- ✅ **FRONTEND CONNECTED** - React interface properly communicating with Express backend
+- ✅ **DATABASE CONNECTION VERIFIED** - PostgreSQL fully operational and responding
+
 ## System Architecture
 DRIVS é construído com uma arquitetura full-stack que garante escalabilidade, segurança e uma experiência de usuário fluida.
 
