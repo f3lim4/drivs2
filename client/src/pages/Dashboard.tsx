@@ -178,7 +178,7 @@ export default function Dashboard() {
         .reduce((total: number, p: any) => total + parseFloat(p.valor || '0'), 0);
 
       // Calcular saídas do mês (despesas pagas)
-      const despesasMes = despesas
+      const despesasMes = (despesas as any[])
         .filter((d: any) => {
           const dataDespesa = new Date(d.data);
           return dataDespesa.getMonth() + 1 === mes && 
@@ -298,26 +298,26 @@ export default function Dashboard() {
 
   // Estatísticas de motoristas
   const totalMotoristas = motoristasSeguro.length;
-  const motoristasAtivos = motoristasSeguro.filter(m => m.status === 'ativo').length;
+  const motoristasAtivos = motoristasSeguro.filter((m: any) => m.status === 'ativo').length;
   
   // CNH vencendo nos próximos 30 dias
-  const cnhVencendo = motoristasSeguro.filter(m => {
+  const cnhVencendo = motoristasSeguro.filter((m: any) => {
     const vencimento = new Date(m.vencimentoCnh);
     return vencimento >= hoje && vencimento <= proximoMes;
   }).length;
 
   // CNH já vencida
-  const cnhVencida = motoristasSeguro.filter(m => {
+  const cnhVencida = motoristasSeguro.filter((m: any) => {
     const vencimento = new Date(m.vencimentoCnh);
     return vencimento < hoje;
   }).length;
 
   // Estatísticas de veículos
   const totalVeiculos = veiculosSeguro.length;
-  const veiculosDisponivel = veiculosSeguro.filter(v => v.status === 'disponivel').length;
-  const veiculosAlugado = veiculosSeguro.filter(v => v.status === 'alugado').length;
-  const veiculosManutencao = veiculosSeguro.filter(v => v.status === 'manutencao').length;
-  const veiculosParado = veiculosSeguro.filter(v => v.status === 'parado').length;
+  const veiculosDisponivel = veiculosSeguro.filter((v: any) => v.status === 'disponivel').length;
+  const veiculosAlugado = veiculosSeguro.filter((v: any) => v.status === 'alugado').length;
+  const veiculosManutencao = veiculosSeguro.filter((v: any) => v.status === 'manutencao').length;
+  const veiculosParado = veiculosSeguro.filter((v: any) => v.status === 'parado').length;
 
   // Estatísticas de aluguéis
   const totalAlugueis = alugueisSeguro.length;
@@ -362,7 +362,7 @@ export default function Dashboard() {
   const totalVeiculosGlobal = veiculosSeguro.length;
   const totalMotoristasGlobal = motoristasSeguro.length;
   const totalAlugueisGlobal = alugueisSeguro.length;
-  const receitaTotalGlobal = alugueisSeguro.reduce((sum, a) => sum + (a.valores?.mensal || 0), 0);
+  const receitaTotalGlobal = alugueisSeguro.reduce((sum: number, a: any) => sum + parseFloat(a.valorMensal || '0'), 0);
 
   // Dados para gráficos de gestão de SaaS de locadoras
   const crescimentoLocadorasData = [
@@ -409,7 +409,9 @@ export default function Dashboard() {
       id: 'cnh-vencida',
       titulo: 'CNH Vencida',
       descricao: `${cnhVencida} motorista${cnhVencida > 1 ? 's' : ''} com CNH vencida`,
-      tipo: 'danger'
+      tipo: 'danger' as const,
+      data: new Date().toISOString(),
+      lida: false
     });
   }
 
@@ -418,7 +420,9 @@ export default function Dashboard() {
       id: 'cnh-vencendo',
       titulo: 'CNH Vencendo',
       descricao: `${cnhVencendo} motorista${cnhVencendo > 1 ? 's' : ''} com CNH vencendo este mês`,
-      tipo: 'warning'
+      tipo: 'warning' as const,
+      data: new Date().toISOString(),
+      lida: false
     });
   }
 
@@ -427,7 +431,9 @@ export default function Dashboard() {
       id: 'veiculos-manutencao',
       titulo: 'Veículos em Manutenção',
       descricao: `${veiculosManutencao} veículo${veiculosManutencao > 1 ? 's' : ''} em manutenção`,
-      tipo: 'warning'
+      tipo: 'warning' as const,
+      data: new Date().toISOString(),
+      lida: false
     });
   }
 
@@ -436,7 +442,9 @@ export default function Dashboard() {
       id: 'sem-veiculos',
       titulo: 'Sem Veículos Disponíveis',
       descricao: 'Todos os veículos estão alugados ou em manutenção',
-      tipo: 'warning'
+      tipo: 'warning' as const,
+      data: new Date().toISOString(),
+      lida: false
     });
   }
 
@@ -565,16 +573,14 @@ export default function Dashboard() {
                         {anuncio.conteudo}
                       </p>
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        {formatDate(anuncio.dataFim) && (
+                        {anuncio.dataExpiracao && (
                           <span>
-                            Válido até: {formatDate(anuncio.dataFim)}
+                            Válido até: {new Date(anuncio.dataExpiracao).toLocaleDateString('pt-BR')}
                           </span>
                         )}
-                        {formatDate(anuncio.dataInicio) && (
-                          <span>
-                            Publicado: {formatDate(anuncio.dataInicio)}
-                          </span>
-                        )}
+                        <span>
+                          Publicado: {new Date(anuncio.createdAt).toLocaleDateString('pt-BR')}
+                        </span>
                       </div>
                     </div>
                   </div>
