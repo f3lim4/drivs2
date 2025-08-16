@@ -528,7 +528,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error extracting vehicle data:", error);
       res.status(500).json({ 
         message: "Erro ao extrair dados do documento",
-        error: error.message 
+        error: (error as Error).message 
       });
     }
   });
@@ -703,10 +703,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateVeiculo(veiculoId, { status: 'alugado' });
       
       // AUTO-REGISTRO DE TAXA ADMINISTRATIVA: Se houver taxa administrativa, registrar como receita
-      if (result.data.taxaAdmin && parseFloat(result.data.taxaAdmin) > 0) {
+      if (result.data.taxaAdministrativa && parseFloat(result.data.taxaAdministrativa) > 0) {
         console.log('[AUTO-RECEITA] Registrando taxa administrativa:', {
           aluguelId: aluguel.id,
-          taxaAdmin: result.data.taxaAdmin,
+          taxaAdministrativa: result.data.taxaAdministrativa,
           motoristaId: result.data.motoristaId
         });
         
@@ -717,8 +717,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           aluguelId: aluguel.id,
           tipo: 'taxa administrativa',
           descricao: `Taxa administrativa - Aluguel veículo ${veiculo.placa}`,
-          valorTotal: result.data.taxaAdmin,
-          valorPago: result.data.taxaAdmin,
+          valorTotal: result.data.taxaAdministrativa,
+          valorPago: result.data.taxaAdministrativa,
           valorRestante: "0.00",
           valorJuros: "0.00",
           valorMulta: "0.00",
@@ -798,7 +798,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Aluguel deleted successfully" });
     } catch (error) {
       console.error("[DELETE ALUGUEL] Error deleting aluguel:", error);
-      res.status(500).json({ message: "Internal server error", error: error.message });
+      res.status(500).json({ message: "Internal server error", error: (error as Error).message });
     }
   });
 
@@ -937,7 +937,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Ativar contrato
       const contratoAtivado = await storage.updateContrato(req.params.id, {
-        ...contrato,
         status: 'ativo',
         dataAssinatura: new Date()
       });
@@ -991,7 +990,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const alugueis = await storage.getAlugueisByLocadora(contrato.locadoraId);
         const aluguelRelacionado = alugueis.find(a => 
           a.motoristaNome === contrato.cliente || 
-          (contrato.titulo && contrato.titulo.includes(a.veiculoPlaca))
+          (contrato.titulo && contrato.titulo?.includes(a.veiculoPlaca || ''))
         );
         
         if (aluguelRelacionado) {
@@ -1177,7 +1176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("POST /api/template-contratos - Body:", req.body);
       
       // Validar usando o schema Zod
-      const validatedData = insertTemplateContratoSchema.omit({ id: true, createdAt: true }).parse(req.body);
+      const validatedData = insertTemplateContratoSchema.omit({ id: true }).parse(req.body);
       
       console.log("Dados validados:", validatedData);
       const template = await storage.createTemplateContrato(validatedData);
@@ -1188,14 +1187,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error creating template contrato:", error);
       
       // Se é erro de validação Zod
-      if (error.name === 'ZodError') {
+      if ((error as any).name === 'ZodError') {
         return res.status(400).json({ 
           message: "Dados inválidos", 
-          errors: error.errors 
+          errors: (error as any).errors 
         });
       }
       
-      res.status(500).json({ message: "Internal server error", error: error.message });
+      res.status(500).json({ message: "Internal server error", error: (error as Error).message });
     }
   });
 
@@ -1297,7 +1296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(pagamento);
     } catch (error) {
       console.error("[PAGAMENTO API ERROR] Erro ao criar pagamento:", error);
-      res.status(500).json({ message: "Internal server error", error: error.message });
+      res.status(500).json({ message: "Internal server error", error: (error as Error).message });
     }
   });
 
@@ -1373,7 +1372,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Filtrar pagamentos que devem ser marcados como pagos
       const pagamentosParaMarcar = pagamentosEmAberto.filter(pagamento => {
-        const vencimentoPagamento = new Date(pagamento.vencimento);
+        const vencimentoPagamento = new Date(pagamento.dataPagamento || pagamento.createdAt);
         return vencimentoPagamento >= dataInicioDate && vencimentoPagamento <= dataLimite;
       });
 
@@ -1390,8 +1389,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log('[DEBUG PAGAMENTOS ANTERIORES] Pagamento marcado como pago:', {
           id: pagamento.id,
-          vencimento: pagamento.vencimento,
-          valor: pagamento.valor
+          dataPagamento: pagamento.dataPagamento,
+          valorTotal: pagamento.valorTotal
         });
       }
 
@@ -1402,7 +1401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     } catch (error) {
       console.error('[ERROR] Erro ao marcar pagamentos anteriores como pagos:', error);
-      res.status(500).json({ message: "Erro interno do servidor", error: error.message });
+      res.status(500).json({ message: "Erro interno do servidor", error: (error as Error).message });
     }
   });
 
@@ -1446,7 +1445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/infracoes", async (req, res) => {
     try {
-      const validatedData = insertInfracaoSchema.omit({ id: true }).parse(req.body);
+      const validatedData = insertInfracaoSchema.parse(req.body);
       const infracao = await storage.createInfracao(validatedData);
       res.json(infracao);
     } catch (error) {
@@ -1531,7 +1530,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const possibleDuplicate = existingDespesas.find(despesa => {
         const sameVehicle = despesa.veiculoId === validatedData.veiculoId;
         const sameCategory = despesa.categoria === validatedData.categoria;
-        const sameValue = parseFloat(despesa.valor) === parseFloat(validatedData.valor);
+        const sameValue = parseFloat(despesa.valor) === parseFloat(validatedData.valor.toString());
         const sameDate = despesa.data === validatedData.data;
         const sameDescription = despesa.descricao?.trim().toLowerCase() === validatedData.descricao?.trim().toLowerCase();
         
@@ -1549,8 +1548,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(despesa);
     } catch (error) {
       console.error("Error creating despesa:", error);
-      if (error.name === 'ZodError') {
-        return res.status(400).json({ message: "Validation error", details: error.issues });
+      if ((error as any).name === 'ZodError') {
+        return res.status(400).json({ message: "Validation error", details: (error as any).issues });
       }
       res.status(500).json({ message: "Internal server error" });
     }
