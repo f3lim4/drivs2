@@ -146,8 +146,8 @@ export function DrivsSidebar() {
 
   // Filtrar itens baseado no tipo de usuário e aplicar ícone dinâmico
   const filteredNavigationItems = navigationItems.filter(item => {
-    console.log(`[SIDEBAR DEBUG] Item: ${item.title}, adminOnly: ${item.adminOnly}, isAdmin: ${isAdmin}, profile.type: ${profile?.type}`);
     if (item.adminOnly) {
+      console.log(`[FILTER] Item ${item.title} - adminOnly: true, isAdmin: ${isAdmin}, será exibido: ${isAdmin}`);
       return isAdmin;
     }
     if (item.locadoraOnly) {
@@ -213,23 +213,26 @@ export function DrivsSidebar() {
         <SidebarGroup>
           <SidebarGroupContent className="px-3">
             <SidebarMenu>
-              {filteredNavigationItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      className={getLinkClasses(item.url)}
-                      title={item.description}
-                      onClick={handleLinkClick}
-                    >
-                      <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                        <item.icon className="w-full h-full" />
-                      </div>
-                      <span className="font-medium">{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {filteredNavigationItems.map((item) => {
+                console.log(`[RENDER] Renderizando item: ${item.title}`);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        className={getLinkClasses(item.url)}
+                        title={item.description}
+                        onClick={handleLinkClick}
+                      >
+                        <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                          <item.icon className="w-full h-full" />
+                        </div>
+                        <span className="font-medium">{item.title}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
