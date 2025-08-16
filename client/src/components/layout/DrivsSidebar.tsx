@@ -146,6 +146,7 @@ export function DrivsSidebar() {
 
   // Filtrar itens baseado no tipo de usuário e aplicar ícone dinâmico
   const filteredNavigationItems = navigationItems.filter(item => {
+    console.log(`[SIDEBAR DEBUG] Item: ${item.title}, adminOnly: ${item.adminOnly}, isAdmin: ${isAdmin}, profile.type: ${profile?.type}`);
     if (item.adminOnly) {
       return isAdmin;
     }
