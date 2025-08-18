@@ -88,11 +88,7 @@ export function EditarContratoModal({
   const onSubmit = async (data: ContratoFormData) => {
     if (!contrato) return;
 
-    console.log('[EDITAR CONTRATO] Iniciando edição:', { 
-      contratoId: contrato.id, 
-      dadosOriginais: { titulo: contrato.titulo, cliente: contrato.cliente, status: contrato.status, template: contrato.template },
-      dadosNovos: data 
-    });
+
 
     setLoading(true);
     
@@ -116,11 +112,8 @@ export function EditarContratoModal({
         contratoData.template = data.template;
       }
 
-      console.log('[EDITAR CONTRATO] Dados que serão enviados:', contratoData);
-
       // Verificar se há mudanças para enviar
       if (Object.keys(contratoData).length === 0) {
-        console.log('[EDITAR CONTRATO] Nenhuma alteração detectada');
         toast({
           title: "Sem Alterações",
           description: "Nenhuma alteração foi detectada no contrato.",
@@ -140,12 +133,10 @@ export function EditarContratoModal({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('[EDITAR CONTRATO] Erro da API:', { status: response.status, errorData });
         throw new Error(errorData.message || `Erro ao atualizar contrato (${response.status})`);
       }
 
       const contratoAtualizado = await response.json();
-      console.log('[EDITAR CONTRATO] Contrato atualizado com sucesso:', contratoAtualizado);
       
       // Log da atividade
       try {
@@ -157,26 +148,21 @@ export function EditarContratoModal({
           contrato.id,
           `Contrato editado: ${data.cliente} - ${contrato.tipo}`
         );
-        console.log('[EDITAR CONTRATO] Atividade registrada com sucesso');
       } catch (activityError) {
-        console.warn('[EDITAR CONTRATO] Erro ao registrar atividade:', activityError);
         // Não bloquear o fluxo principal por erro na atividade
+        console.warn('Erro ao registrar atividade:', activityError);
       }
       
       onContratoEditado(contratoAtualizado);
-      console.log('[EDITAR CONTRATO] Callback onContratoEditado chamado');
-      
       onOpenChange(false);
-      console.log('[EDITAR CONTRATO] Modal fechado');
       
       toast({
         title: "Contrato Editado",
         description: `Contrato de ${data.cliente} foi atualizado com sucesso.`,
       });
-      console.log('[EDITAR CONTRATO] Toast exibido');
       
     } catch (error) {
-      console.error('[EDITAR CONTRATO] Erro ao editar contrato:', error);
+      console.error('Erro ao editar contrato:', error);
       toast({
         title: "Erro",
         description: error instanceof Error ? error.message : "Não foi possível editar o contrato. Tente novamente.",
@@ -184,7 +170,6 @@ export function EditarContratoModal({
       });
     } finally {
       setLoading(false);
-      console.log('[EDITAR CONTRATO] Loading finalizado');
     }
   };
 
