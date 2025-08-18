@@ -536,53 +536,7 @@ export function NovoVeiculoModal({
               </div>
             </div>
 
-            {/* DOCUMENTAÇÃO */}
-            <div className="space-y-4">
-              
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="renavam"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>RENAVAM *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="000000000" 
-                          {...field}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/\D/g, '');
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
-                <FormField
-                  control={form.control}
-                  name="chassi"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Chassi *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="9BWZZZ377VT004251" 
-                          {...field}
-                          onChange={(e) => {
-                            const value = e.target.value.toUpperCase();
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
 
             {/* CARACTERÍSTICAS TÉCNICAS */}
             <div className="space-y-4">
