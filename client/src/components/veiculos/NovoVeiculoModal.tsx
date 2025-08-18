@@ -3,13 +3,14 @@
  * Formulário completo com validação
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { marcasVeiculos, getModelosPorMarca, ModeloVeiculo } from '@shared/veiculos-data';
 import { Button } from '@/components/ui/button';
 // Imports de ícones removidos (não mais necessários)
 import {
@@ -106,6 +107,7 @@ export function NovoVeiculoModal({
   onVeiculoAdicionado 
 }: NovoVeiculoModalProps) {
   const [loading, setLoading] = useState(false);
+  const [modelosDisponiveis, setModelosDisponiveis] = useState<ModeloVeiculo[]>([]);
   const { profile } = useAuth();
   const { toast } = useToast();
 
@@ -142,6 +144,19 @@ export function NovoVeiculoModal({
       valorLimiteKm: '' as any,
     },
   });
+
+  // Atualizar modelos quando a marca mudar
+  const marcaSelecionada = form.watch('marca');
+  useEffect(() => {
+    if (marcaSelecionada) {
+      const modelos = getModelosPorMarca(marcaSelecionada);
+      setModelosDisponiveis(modelos);
+      // Limpar o modelo selecionado quando trocar de marca
+      form.setValue('modelo', '');
+    } else {
+      setModelosDisponiveis([]);
+    }
+  }, [marcaSelecionada, form]);
 
   const onSubmit = async (data: VeiculoFormData) => {
     setLoading(true);
@@ -189,8 +204,8 @@ export function NovoVeiculoModal({
         chassi: data.chassi.toUpperCase(),
         combustivel: data.combustivel,
         quilometragem: data.quilometragem,
-        valorSemanal: data.valorSemanal.toString(),
-        caucao: data.caucao.toString(),
+        valorSemanal: data.valorSemanal?.toString() || '0',
+        caucao: data.caucao?.toString() || '0',
         taxaAdministrativa: data.taxaAdministrativa?.toString(),
         limiteQuilometragem: data.limiteQuilometragem,
         valorLimiteKm: data.valorLimiteKm,
@@ -296,9 +311,20 @@ export function NovoVeiculoModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Marca *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Toyota, Honda, etc." {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a marca" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {marcasVeiculos.map((marca) => (
+                            <SelectItem key={marca.nome} value={marca.nome}>
+                              {marca.nome}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -310,9 +336,21 @@ export function NovoVeiculoModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Modelo *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Corolla, Civic, etc." {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={!marcaSelecionada}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={!marcaSelecionada ? "Selecione uma marca primeiro" : "Selecione o modelo"} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {modelosDisponiveis.map((modelo) => (
+                            <SelectItem key={modelo.nome} value={modelo.nome}>
+                              {modelo.nome} 
+                              <span className="text-xs text-gray-500 ml-2">({modelo.categoria})</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
