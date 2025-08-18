@@ -90,6 +90,11 @@ function validarIdade(dataNascimento: string): boolean {
   const hoje = new Date();
   const nascimento = new Date(dataNascimento);
   
+  // Verificar se a data é válida
+  if (isNaN(nascimento.getTime())) {
+    return false;
+  }
+  
   let idade = hoje.getFullYear() - nascimento.getFullYear();
   const mes = hoje.getMonth() - nascimento.getMonth();
   
@@ -97,14 +102,24 @@ function validarIdade(dataNascimento: string): boolean {
     idade--;
   }
   
-  return idade >= 18 && idade <= 80;
+  return idade >= 18 && idade <= 90;
 }
 
 function validarCNHVencimento(dataVencimento: string): boolean {
   const hoje = new Date();
   const vencimento = new Date(dataVencimento);
   
-  return vencimento > hoje;
+  // Verificar se a data é válida
+  if (isNaN(vencimento.getTime())) {
+    return false;
+  }
+  
+  // CNH não pode estar vencida (data deve ser futura)
+  // Considera apenas a data, não o horário
+  const hojeData = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+  const vencimentoData = new Date(vencimento.getFullYear(), vencimento.getMonth(), vencimento.getDate());
+  
+  return vencimentoData >= hojeData;
 }
 
 // Schema de validação baseado no schema do banco
@@ -115,7 +130,7 @@ const motoristaSchema = z.object({
     .refine(validarCPF, 'CPF inválido'),
   rg: z.string().min(7, 'RG deve ter pelo menos 7 dígitos'),
   dataNascimento: z.string().min(1, 'Data de nascimento é obrigatória')
-    .refine(validarIdade, 'Idade deve estar entre 18 e 80 anos'),
+    .refine(validarIdade, 'Idade deve estar entre 18 e 90 anos'),
   
   // Contato
   telefone: z.string().min(10, 'Telefone deve ter pelo menos 10 dígitos'),
@@ -410,7 +425,7 @@ export function NovoMotoristaModal({
       
     } catch (error) {
       console.error('Erro ao cadastrar motorista:', error);
-      alert('Erro ao cadastrar motorista: ' + (error.message || 'Erro desconhecido'));
+      alert('Erro ao cadastrar motorista: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
     } finally {
       setLoading(false);
     }
