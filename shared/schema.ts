@@ -55,6 +55,7 @@ export const veiculos = pgTable("veiculos", {
   id: text("id").primaryKey(), // RENAVAM será usado como ID
   locadoraId: text("locadora_id").notNull(), // Referência ao CNPJ da locadora
   // Informações Básicas
+  tipoVeiculo: text("tipo_veiculo").notNull(),
   placa: text("placa").notNull().unique(),
   marca: text("marca").notNull(),
   modelo: text("modelo").notNull(),

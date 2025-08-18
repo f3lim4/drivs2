@@ -10,7 +10,7 @@ import * as z from 'zod';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { marcasVeiculos, getModelosPorMarca, ModeloVeiculo } from '@shared/veiculos-data';
+import { tiposVeiculos, getTiposVeiculos, getMarcasPorTipo, getModelosPorMarca, ModeloVeiculo, MarcaVeiculo } from '@shared/veiculos-data';
 import { Button } from '@/components/ui/button';
 // Imports de ícones removidos (não mais necessários)
 import {
@@ -44,6 +44,7 @@ import { registrarAtividade } from '@/utils/activityLogger';
 // Schema de validação
 const veiculoSchema = z.object({
   // Informações Básicas
+  tipoVeiculo: z.string().min(1, 'Tipo de veículo é obrigatório'),
   placa: z.string().min(7, 'Placa deve ter pelo menos 7 caracteres'),
   marca: z.string().min(1, 'Marca é obrigatória'),
   modelo: z.string().min(1, 'Modelo é obrigatório'),
@@ -107,6 +108,7 @@ export function NovoVeiculoModal({
   onVeiculoAdicionado 
 }: NovoVeiculoModalProps) {
   const [loading, setLoading] = useState(false);
+  const [marcasDisponiveis, setMarcasDisponiveis] = useState<MarcaVeiculo[]>([]);
   const [modelosDisponiveis, setModelosDisponiveis] = useState<ModeloVeiculo[]>([]);
   const { profile } = useAuth();
   const { toast } = useToast();
@@ -114,6 +116,7 @@ export function NovoVeiculoModal({
   const form = useForm<VeiculoFormData>({
     resolver: zodResolver(veiculoSchema),
     defaultValues: {
+      tipoVeiculo: '',
       placa: '',
       marca: '',
       modelo: '',
@@ -145,18 +148,34 @@ export function NovoVeiculoModal({
     },
   });
 
+  // Atualizar marcas quando o tipo mudar
+  const tipoSelecionado = form.watch('tipoVeiculo');
+  useEffect(() => {
+    if (tipoSelecionado) {
+      const marcas = getMarcasPorTipo(tipoSelecionado);
+      setMarcasDisponiveis(marcas);
+      // Limpar marca e modelo quando trocar de tipo
+      form.setValue('marca', '');
+      form.setValue('modelo', '');
+      setModelosDisponiveis([]);
+    } else {
+      setMarcasDisponiveis([]);
+      setModelosDisponiveis([]);
+    }
+  }, [tipoSelecionado, form]);
+
   // Atualizar modelos quando a marca mudar
   const marcaSelecionada = form.watch('marca');
   useEffect(() => {
-    if (marcaSelecionada) {
-      const modelos = getModelosPorMarca(marcaSelecionada);
+    if (marcaSelecionada && tipoSelecionado) {
+      const modelos = getModelosPorMarca(marcaSelecionada, tipoSelecionado);
       setModelosDisponiveis(modelos);
       // Limpar o modelo selecionado quando trocar de marca
       form.setValue('modelo', '');
     } else {
       setModelosDisponiveis([]);
     }
-  }, [marcaSelecionada, form]);
+  }, [marcaSelecionada, tipoSelecionado, form]);
 
   const onSubmit = async (data: VeiculoFormData) => {
     setLoading(true);
@@ -194,6 +213,7 @@ export function NovoVeiculoModal({
       const veiculoData = {
         id: data.renavam, // RENAVAM como ID
         locadoraId: profile.locadoraId,
+        tipoVeiculo: data.tipoVeiculo,
         placa: data.placa.toUpperCase(),
         marca: data.marca,
         modelo: data.modelo,
@@ -283,7 +303,32 @@ export function NovoVeiculoModal({
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-4 gap-4">
+                <FormField
+                  control={form.control}
+                  name="tipoVeiculo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Veículo *</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o tipo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {getTiposVeiculos().map((tipo) => (
+                            <SelectItem key={tipo} value={tipo}>
+                              {tipo}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="placa"
@@ -311,14 +356,14 @@ export function NovoVeiculoModal({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Marca *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={!tipoSelecionado}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione a marca" />
+                            <SelectValue placeholder={!tipoSelecionado ? "Selecione o tipo primeiro" : "Selecione a marca"} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {marcasVeiculos.map((marca) => (
+                          {marcasDisponiveis.map((marca) => (
                             <SelectItem key={marca.nome} value={marca.nome}>
                               {marca.nome}
                             </SelectItem>

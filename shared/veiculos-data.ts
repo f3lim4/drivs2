@@ -1,11 +1,11 @@
 /**
  * Dados de marcas e modelos de veículos
- * Organizados por marca com seus respectivos modelos
+ * Organizados por tipo de veículo, depois por marca e modelos
  */
 
 export interface ModeloVeiculo {
   nome: string;
-  categoria: 'Hatch' | 'Sedan' | 'SUV' | 'Pickup' | 'Van' | 'Coupe' | 'Conversível' | 'Utilitário';
+  categoria: 'Hatch' | 'Sedan' | 'SUV' | 'Pickup' | 'Van' | 'Coupe' | 'Conversível' | 'Utilitário' | 'Motocicleta' | 'Scooter' | 'Caminhão' | 'Micro-ônibus';
 }
 
 export interface MarcaVeiculo {
@@ -13,7 +13,15 @@ export interface MarcaVeiculo {
   modelos: ModeloVeiculo[];
 }
 
-export const marcasVeiculos: MarcaVeiculo[] = [
+export interface TipoVeiculo {
+  tipo: 'Carro' | 'Moto' | 'Caminhão' | 'Utilitário';
+  marcas: MarcaVeiculo[];
+}
+
+export const tiposVeiculos: TipoVeiculo[] = [
+  {
+    tipo: 'Carro',
+    marcas: [
   {
     nome: "Chevrolet",
     modelos: [
@@ -465,29 +473,234 @@ export const marcasVeiculos: MarcaVeiculo[] = [
       { nome: "Poer", categoria: "Pickup" }
     ]
   }
+    ]
+  },
+  {
+    tipo: 'Moto',
+    marcas: [
+      {
+        nome: "Honda",
+        modelos: [
+          { nome: "CG 160", categoria: "Motocicleta" },
+          { nome: "CB 600F Hornet", categoria: "Motocicleta" },
+          { nome: "CBR 600RR", categoria: "Motocicleta" },
+          { nome: "PCX 150", categoria: "Scooter" },
+          { nome: "SH 150i", categoria: "Scooter" },
+          { nome: "Bros 160", categoria: "Motocicleta" },
+          { nome: "XRE 300", categoria: "Motocicleta" }
+        ]
+      },
+      {
+        nome: "Yamaha",
+        modelos: [
+          { nome: "Factor 150", categoria: "Motocicleta" },
+          { nome: "MT-03", categoria: "Motocicleta" },
+          { nome: "MT-07", categoria: "Motocicleta" },
+          { nome: "R3", categoria: "Motocicleta" },
+          { nome: "Neo 125", categoria: "Scooter" },
+          { nome: "NMAX 160", categoria: "Scooter" },
+          { nome: "Lander 250", categoria: "Motocicleta" }
+        ]
+      },
+      {
+        nome: "Suzuki",
+        modelos: [
+          { nome: "GSX-S1000", categoria: "Motocicleta" },
+          { nome: "V-Strom 650", categoria: "Motocicleta" },
+          { nome: "Burgman 400", categoria: "Scooter" },
+          { nome: "Yes 125", categoria: "Motocicleta" },
+          { nome: "Intruder 150", categoria: "Motocicleta" }
+        ]
+      },
+      {
+        nome: "Kawasaki",
+        modelos: [
+          { nome: "Ninja 300", categoria: "Motocicleta" },
+          { nome: "Z300", categoria: "Motocicleta" },
+          { nome: "Versys 300", categoria: "Motocicleta" },
+          { nome: "Ninja ZX-10R", categoria: "Motocicleta" }
+        ]
+      },
+      {
+        nome: "BMW",
+        modelos: [
+          { nome: "G 310 GS", categoria: "Motocicleta" },
+          { nome: "F 750 GS", categoria: "Motocicleta" },
+          { nome: "R 1250 GS", categoria: "Motocicleta" },
+          { nome: "C 400 X", categoria: "Scooter" }
+        ]
+      }
+    ]
+  },
+  {
+    tipo: 'Caminhão',
+    marcas: [
+      {
+        nome: "Mercedes-Benz",
+        modelos: [
+          { nome: "Accelo 815", categoria: "Caminhão" },
+          { nome: "Atego 1719", categoria: "Caminhão" },
+          { nome: "Axor 2544", categoria: "Caminhão" },
+          { nome: "Actros 2651", categoria: "Caminhão" }
+        ]
+      },
+      {
+        nome: "Volvo",
+        modelos: [
+          { nome: "VM 270", categoria: "Caminhão" },
+          { nome: "FH 460", categoria: "Caminhão" },
+          { nome: "FMX 500", categoria: "Caminhão" }
+        ]
+      },
+      {
+        nome: "Scania",
+        modelos: [
+          { nome: "R 450", categoria: "Caminhão" },
+          { nome: "G 420", categoria: "Caminhão" },
+          { nome: "P 320", categoria: "Caminhão" }
+        ]
+      },
+      {
+        nome: "Iveco",
+        modelos: [
+          { nome: "Daily 35S14", categoria: "Caminhão" },
+          { nome: "Tector 170E22", categoria: "Caminhão" },
+          { nome: "Stralis 480", categoria: "Caminhão" }
+        ]
+      },
+      {
+        nome: "Ford",
+        modelos: [
+          { nome: "Cargo 816", categoria: "Caminhão" },
+          { nome: "Cargo 1719", categoria: "Caminhão" },
+          { nome: "Cargo 2422", categoria: "Caminhão" }
+        ]
+      }
+    ]
+  },
+  {
+    tipo: 'Utilitário',
+    marcas: [
+      {
+        nome: "Fiat",
+        modelos: [
+          { nome: "Fiorino", categoria: "Van" },
+          { nome: "Ducato", categoria: "Van" },
+          { nome: "Doblo Cargo", categoria: "Van" }
+        ]
+      },
+      {
+        nome: "Renault",
+        modelos: [
+          { nome: "Kangoo", categoria: "Van" },
+          { nome: "Master", categoria: "Van" },
+          { nome: "Traffic", categoria: "Van" }
+        ]
+      },
+      {
+        nome: "Peugeot",
+        modelos: [
+          { nome: "Partner", categoria: "Van" },
+          { nome: "Boxer", categoria: "Van" }
+        ]
+      },
+      {
+        nome: "Citroën",
+        modelos: [
+          { nome: "Berlingo", categoria: "Van" },
+          { nome: "Jumper", categoria: "Van" }
+        ]
+      },
+      {
+        nome: "Mercedes-Benz",
+        modelos: [
+          { nome: "Sprinter", categoria: "Van" },
+          { nome: "Vito", categoria: "Van" }
+        ]
+      },
+      {
+        nome: "Iveco",
+        modelos: [
+          { nome: "Daily Van", categoria: "Van" },
+          { nome: "Daily Chassi", categoria: "Van" }
+        ]
+      },
+      {
+        nome: "Volkswagen",
+        modelos: [
+          { nome: "Delivery", categoria: "Van" },
+          { nome: "Crafter", categoria: "Van" }
+        ]
+      },
+      {
+        nome: "Hyundai",
+        modelos: [
+          { nome: "HR", categoria: "Van" },
+          { nome: "H100", categoria: "Van" }
+        ]
+      }
+    ]
+  }
 ];
 
-// Função para obter modelos de uma marca específica
-export const getModelosPorMarca = (marcaNome: string): ModeloVeiculo[] => {
-  const marca = marcasVeiculos.find(m => m.nome.toLowerCase() === marcaNome.toLowerCase());
-  return marca ? marca.modelos : [];
+// Função para obter tipos de veículos
+export const getTiposVeiculos = (): string[] => {
+  return tiposVeiculos.map(tipo => tipo.tipo);
 };
 
-// Função para obter todas as marcas
+// Função para obter marcas de um tipo específico
+export const getMarcasPorTipo = (tipoNome: string): MarcaVeiculo[] => {
+  const tipo = tiposVeiculos.find(t => t.tipo.toLowerCase() === tipoNome.toLowerCase());
+  return tipo ? tipo.marcas : [];
+};
+
+// Função para obter modelos de uma marca específica
+export const getModelosPorMarca = (marcaNome: string, tipoNome?: string): ModeloVeiculo[] => {
+  if (tipoNome) {
+    const tipo = tiposVeiculos.find(t => t.tipo.toLowerCase() === tipoNome.toLowerCase());
+    if (tipo) {
+      const marca = tipo.marcas.find(m => m.nome.toLowerCase() === marcaNome.toLowerCase());
+      return marca ? marca.modelos : [];
+    }
+  }
+  
+  // Busca em todos os tipos se não especificado
+  for (const tipo of tiposVeiculos) {
+    const marca = tipo.marcas.find(m => m.nome.toLowerCase() === marcaNome.toLowerCase());
+    if (marca) {
+      return marca.modelos;
+    }
+  }
+  
+  return [];
+};
+
+// Função para obter todas as marcas (de todos os tipos)
 export const getMarcas = (): string[] => {
-  return marcasVeiculos.map(marca => marca.nome);
+  const todasMarcas: string[] = [];
+  tiposVeiculos.forEach(tipo => {
+    tipo.marcas.forEach(marca => {
+      if (!todasMarcas.includes(marca.nome)) {
+        todasMarcas.push(marca.nome);
+      }
+    });
+  });
+  return todasMarcas.sort();
 };
 
 // Função para buscar modelos por termo
-export const buscarModelos = (termo: string): { marca: string; modelo: ModeloVeiculo }[] => {
-  const resultados: { marca: string; modelo: ModeloVeiculo }[] = [];
+export const buscarModelos = (termo: string): { tipo: string; marca: string; modelo: ModeloVeiculo }[] => {
+  const resultados: { tipo: string; marca: string; modelo: ModeloVeiculo }[] = [];
   
-  marcasVeiculos.forEach(marca => {
-    marca.modelos.forEach(modelo => {
-      if (modelo.nome.toLowerCase().includes(termo.toLowerCase()) ||
-          marca.nome.toLowerCase().includes(termo.toLowerCase())) {
-        resultados.push({ marca: marca.nome, modelo });
-      }
+  tiposVeiculos.forEach(tipo => {
+    tipo.marcas.forEach(marca => {
+      marca.modelos.forEach(modelo => {
+        if (modelo.nome.toLowerCase().includes(termo.toLowerCase()) ||
+            marca.nome.toLowerCase().includes(termo.toLowerCase()) ||
+            tipo.tipo.toLowerCase().includes(termo.toLowerCase())) {
+          resultados.push({ tipo: tipo.tipo, marca: marca.nome, modelo });
+        }
+      });
     });
   });
   
