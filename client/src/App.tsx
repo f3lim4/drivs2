@@ -52,6 +52,15 @@ const queryClient = new QueryClient({
   },
 });
 
+// Capturar erros não tratados para evitar crashes do sistema
+if (typeof window !== 'undefined') {
+  window.addEventListener('unhandledrejection', (event) => {
+    console.warn('Capturado unhandledrejection:', event.reason);
+    // Prevenir que o erro apareça no console do usuário
+    event.preventDefault();
+  });
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <VehicleTypesProvider>
