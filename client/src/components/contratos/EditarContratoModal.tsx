@@ -88,6 +88,12 @@ export function EditarContratoModal({
   const onSubmit = async (data: ContratoFormData) => {
     if (!contrato) return;
 
+    console.log('[EDITAR CONTRATO] Iniciando edição:', { 
+      contratoId: contrato.id, 
+      dadosOriginais: { titulo: contrato.titulo, cliente: contrato.cliente, status: contrato.status, template: contrato.template },
+      dadosNovos: data 
+    });
+
     setLoading(true);
     
     try {
@@ -108,6 +114,19 @@ export function EditarContratoModal({
       
       if (data.template !== contrato.template) {
         contratoData.template = data.template;
+      }
+
+      console.log('[EDITAR CONTRATO] Dados que serão enviados:', contratoData);
+
+      // Verificar se há mudanças para enviar
+      if (Object.keys(contratoData).length === 0) {
+        console.log('[EDITAR CONTRATO] Nenhuma alteração detectada');
+        toast({
+          title: "Sem Alterações",
+          description: "Nenhuma alteração foi detectada no contrato.",
+        });
+        setLoading(false);
+        return;
       }
 
       // Chama API para atualizar contrato
