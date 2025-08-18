@@ -56,6 +56,7 @@ const contratoSchema = z.object({
   }),
   dataFim: z.date().optional(), // Data final opcional - se não preenchida, contrato é renovável
   tempoMinimoContrato: z.string().optional(),
+  prazoMinimo: z.string().optional(),
   valorSemanal: z.number().min(0.01, 'Valor semanal deve ser maior que 0'),
   caucao: z.number().min(0, 'Caução deve ser maior ou igual a 0'),
   templateId: z.string().optional(),
@@ -369,6 +370,7 @@ export function NovoContratoModal({
       dataInicio: getAmanha(),
       dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
       tempoMinimoContrato: '',
+      prazoMinimo: '',
       valorSemanal: 0,
       caucao: 0,
       templateId: 'default',
@@ -648,103 +650,118 @@ export function NovoContratoModal({
       
       // Se não encontrou template personalizado ou selecionou padrão, usar template padrão
       if (!templateContent) {
-        templateContent = `CONTRATO DE LOCAÇÃO DE VEÍCULO
+        templateContent = `INSTRUMENTO PARTICULAR DE CONTRATO DE LOCAÇÃO DE VEÍCULO
 
-LOCADOR: ${locadorInfo.nome}, Ramo de atividade: Locação de Veículos, portador do CNPJ: ${locadorInfo.cnpj}, cuja
-sede se encontra na ${locadorInfo.endereco}. 
+LOCADOR: ${locadorInfo.nome}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº ${locadorInfo.cnpj}, com sede em ${locadorInfo.endereco}.
+Telefone: ${aluguel.motoristaId} E-mail: contato@drivs.me.
 
-LOCATÁRIO: ${aluguel.motoristaNome}, Telefone: ${aluguel.motoristaId}
-profissão: Motorista de Aplicativo. As partes acima identificadas têm, entre si, justo e acertado o presente Contrato de Locação de
-Automóvel que se regerá pelas cláusulas seguintes e pelas condições descritas no presente.
+LOCATÁRIO: ${aluguel.motoristaNome}, profissão: Motorista de Aplicativo, portador do CPF nº ${aluguel.motoristaId}, RG nº _________________ e CNH nº _________________ (validade _________), 
+residente em _________________________________________________________________________________________________________________, telefone ________________________.
 
-1. CLÁUSULA PRIMEIRA – DO OBJETO, PRAZO E USO
-1.1. O LOCADOR declara ser o legítimo possuidor e/ou proprietário do veículo de modelo ${aluguel.veiculoModelo}, placa ${aluguel.veiculoPlaca}, Vistoriado com fotos e video no dia da retirada, e que resolveu dá-lo em locação ao LOCATÁRIO${data.tempoMinimoContrato && data.tempoMinimoContrato.trim() ? ` pelo prazo de ${data.tempoMinimoContrato}` : ''}
-contados a partir da assinatura do presente contrato.
+As partes celebram o presente Contrato de Locação de Veículo, que se regerá pelas seguintes cláusulas e condições:
 
-1.2. Findo o prazo acima estipulado, o contrato poderá ser renovado automaticamente, desde que seja do desejo de
-ambas as partes, ou o veículo deverá ser devolvido ao LOCADOR nas mesmas condições em que estava quando foi
-recebido, ou seja, em perfeitas condições de uso, respondendo o LOCATÁRIO pelos danos ou prejuízos causados e pela
-devolução do veículo após o término do contrato.
-1.2.1. Caso o LOCATÁRIO não pague o aluguel na data estipulada, após 02 dias de vencido, além dos juros e multa por
-atraso, o veículo será recolhido, e as diárias serão cobradas normalmente, mesmo sem a utilização dele. O veículo só
-será liberado ao LOCATÁRIO novamente após a quitação dos débitos pendentes.
-1.3. Caso o LOCATÁRIO não restituir o automóvel na data estipulada, deverá pagar, enquanto detiver em seu poder, o
-valor da locação que o LOCADOR arbitrar, e responderá pelo dano que o automóvel venha a sofrer, mesmo se
-proveniente de caso fortuito.
-1.4. Uso Exclusivo e Restrições de Localidade
-O veículo locado será destinado exclusivamente ao uso nas plataformas de transporte de passageiros, como UBER, 99,
-CABIFY e outros aplicativos similares, somente dentro do estado de São Paulo. É expressamente proibida a utilização
-do veículo fora do estado de São Paulo, bem como o empréstimo, sublocação ou qualquer transferência de posse a
-terceiros. O descumprimento desta cláusula resultará em multa de 02 semanais do veículo, além da remoção imediata
-do veículo.
-Adicionalmente, a empresa arcará com os custos de guincho em um raio de até 100 km da nossa base. Caso o veículo
-necessite de remoção em uma distância superior, o custo adicional do guincho e as horas necessárias até a chegada do
-veículo à mecânica serão cobrados do motorista responsável.
-1.5. O bem locado apenas poderá ser dirigido pelo LOCATÁRIO. Havendo qualquer tipo de problema no veículo ou
-alteração no endereço do LOCATÁRIO, o mesmo deverá comunicar imediatamente ao LOCADOR.
+CLÁUSULA PRIMEIRA – RELAÇÃO JURÍDICA
 
-2. CLÁUSULA SEGUNDA – DO VALOR
-2.1. O LOCATÁRIO pagará ao LOCADOR, a título de locação, o valor semanal de R$ ${parseFloat(String(data.valorSemanal)).toFixed(2)}.
-2.2. O pagamento será feito toda segunda-feira, via depósito em conta do LOCADOR, e o atraso no pagamento do acordo
-da cláusula acima enseja multa de 10% (dez por cento) e juros de 2% (dois por cento) ao dia.
+1.1. O presente contrato não configura vínculo empregatício entre as partes, nos termos do artigo 593 do Código Civil, tratando-se exclusivamente de locação de bem móvel.
+1.2. O LOCADOR limita-se a disponibilizar o veículo, enquanto o LOCATÁRIO é responsável por sua atividade de transporte de passageiros.
 
-3. CLÁUSULA TERCEIRA – DAS OBRIGAÇÕES
-3.1. No caso de o veículo ficar parado em oficina, se por desgaste natural nas manutenções, o carro que ultrapassar 08
-horas parado terá os dias/horas abonados do aluguel semanal. Se a paralisação for por má utilização do condutor, os
-dias/períodos parados serão cobrados normalmente do aluguel.
-3.2. É de inteira responsabilidade do LOCATÁRIO os débitos sobre infrações de trânsito (multas), e que seus pontos
-sejam repassados/transmitidos de imediato, mais o pagamento de 20% sobre o valor da multa. Caso não transfira em
-até 10 dias, o LOCADOR poderá solicitar o carro, e o LOCATÁRIO pagará o valor dobrado da multa.
-3.3. O veículo alugado possui seguro contra roubo, furto, colisões e perda total (PT). Em caso de sinistro, o seguro será
-acionado, e o motorista será responsável pelo pagamento dos dias em que o veículo permanecer fora de circulação até
-que volte a estar disponível para uso, além de arcar com 10% do valor do carro, correspondente à franquia. Caso a
-seguradora rejeite a cobertura por qualquer motivo, o motorista deverá pagar o valor integral do veículo conforme a
-tabela FIPE vigente na data do sinistro.
+CLÁUSULA SEGUNDA – FINALIDADE
 
-4. CLÁUSULA QUARTA - Vistorias
-Fica determinado entre as partes que o LOCATÁRIO tem direito a duas vistorias mensais no veículo, cujo dia fica a
-combinar entre ambas as partes.
+2.1. O veículo será utilizado para transporte de passageiros e entregas por meio de aplicativos, como Uber, 99, Mercado Livre, InDrive e outros similares, dentro da Grande São Paulo.
+2.2. O LOCATÁRIO é o único responsável por eventuais ganhos, taxas e tributações associadas à sua atividade, conforme estabelece o artigo 421 do Código Civil.
 
-5. CLÁUSULA QUINTA - Verificações do LOCADOR
-É de total responsabilidade do LOCADOR a verificação diária da água do radiador e do óleo. Em caso de falta, deverá
-avisar ao LOCATÁRIO, e em hipótese alguma deve andar com o veículo fervendo ou sem óleo, caso o motorista ande com veículo nessas condições ele será responsável pelos danos.
+CLÁUSULA TERCEIRA – RESPONSABILIDADES DAS PARTES
 
-6. CLÁUSULA SEXTA– DA RESCISÃO / CAUÇÃO
-6.1. A rescisão, antes do vencimento contratual, por iniciativa de qualquer das partes, deverá ser precedida de
-notificação expressa com antecedência mínima de 1 mês. Caso não haja essa notificação, haverá multa por quebra do
-contrato no valor de 02 semanais do veículo.
-6.2. A caução no valor de R$ ${parseFloat(String(data.caucao)).toFixed(2)} será devolvida no término do contrato, após o prazo de 30 dias úteis, desde que não haja nenhuma avaria
-ou infração pendente.
-6.3. O descumprimento de qualquer uma das cláusulas por parte dos contratantes ensejará a rescisão deste
-instrumento e o devido pagamento de multa pela parte inadimplente, no valor correspondente a 02 semanas de
-locação.
+3.1. O LOCADOR se compromete a:
+• Manter o veículo regularizado perante os órgãos competentes;
+• Assegurar que o veículo esteja segurado contra sinistros, nos termos do art. 566 do Código Civil;
+• Entregar o veículo em boas condições mecânicas e adequado ao uso;
+• Prestar assistência mecânica em falhas oriundas de desgaste natural do veículo;
+• Fornecer guincho para até 80 km da base. Caso seja necessária remoção em distância maior, os custos adicionais serão pagos pelo LOCATÁRIO;
+• Comunicar ao LOCATÁRIO qualquer alteração relevante no contrato ou nas condições do veículo.
 
-7. CLÁUSULA SÉTIMA - Limite de Quilometragem Mensal
-Fica estipulado o limite mensal de quilometragem de ${dadosVeiculo?.valorLimiteKm ? `${dadosVeiculo.valorLimiteKm * 4} km` : 'ILIMITADO'} para o veículo alugado. Caso o condutor exceda esse
-limite, será cobrado o valor de R$ 0,50 (cinquenta centavos) por quilômetro excedido.
+3.2. O LOCATÁRIO se compromete a:
+• Utilizar o veículo respeitando o Código de Trânsito Brasileiro (Lei nº 9.503/97);
+• Não conduzir sob efeito de álcool, substâncias entorpecentes ou quaisquer outras que comprometam sua capacidade, nem transportar tais substâncias no veículo;
+• Não transportar drogas, substâncias ilícitas, armas, contrabando ou mercadorias sem nota fiscal, sob pena de rescisão imediata, recolhimento do veículo e responsabilização civil e criminal;
+• Não vender, doar, emprestar, sublocar, comercializar ou negociar o veículo objeto deste contrato, por qualquer meio;
+• Apresentar semanalmente o veículo para inspeção junto ao LOCADOR e enviar fotos e vídeo semanalmente utilizando aplicativo de vistoria indicado pela empresa;
+• Responsabilizar-se integralmente por multas, infrações de trânsito e penalidades decorrentes do uso do veículo;
+• Abastecer com combustível de qualidade e seguir as recomendações do fabricante quanto à manutenção;
+• Verificar diariamente água do radiador e óleo, comunicando imediatamente qualquer problema ao LOCADOR;
+• Devolver o veículo ao final do contrato no mesmo estado de conservação em que o recebeu, salvo desgaste natural;
+• Comunicar imediatamente ao LOCADOR acidentes, avarias, roubo, furto ou qualquer ocorrência envolvendo o veículo.
 
-8. CLÁUSULA OITAVA - Responsabilidade por Batidas e Reparos
-Em caso de colisão, batida simples ou qualquer tipo de acidente envolvendo o veículo locado, o motorista é obrigado
-a comunicar a empresa imediatamente após o ocorrido.
-Todos os custos relacionados aos reparos serão de total responsabilidade do motorista, incluindo as diárias em que o
-veículo estiver parado para conserto. Durante o período de reparo, o valor das diárias será cobrado até que o veículo
-esteja em plenas condições de uso.
-Além disso, a empresa se reserva o direito de não devolver o veículo ao motorista caso considere necessário, seja por
-motivos de má utilização, recorrência de acidentes ou qualquer outra razão que comprometa a segurança do veículo
-ou a operação.
+CLÁUSULA QUARTA – OBJETO
 
-9. CLÁUSULA NONA – DAS DISPOSIÇÕES GERAIS
-As partes contratantes
-elegem o foro de Embu das Artes para dirimir qualquer ação oriunda deste contrato. E, por estarem justas e
-contratadas, assinam o presente instrumento em Embu das Artes - SP, ${format(data.dataInicio, 'dd/MM/yyyy')}.
+4.1. O objeto do presente contrato é a locação do veículo ${aluguel.veiculoMarca} ${aluguel.veiculoModelo}, ano ${dadosVeiculo?.ano || 'N/I'}, cor ${dadosVeiculo?.cor || 'N/I'}, placa ${aluguel.veiculoPlaca}, RENAVAM ${dadosVeiculo?.renavam || 'N/I'}, CHASSI ${dadosVeiculo?.chassi || 'N/I'}, entregue ao LOCATÁRIO Vistoriado com fotos e video${data.tempoMinimoContrato && data.tempoMinimoContrato.trim() ? `, pelo prazo de ${data.tempoMinimoContrato}` : ''}${data.prazoMinimo && data.prazoMinimo.trim() ? `, prazo mínimo: ${data.prazoMinimo}` : ''} a partir da assinatura.
+4.2. O contrato poderá ser renovado automaticamente caso ambas as partes concordem. Caso contrário, o veículo deverá ser devolvido nas mesmas condições em que foi recebido.
+4.3. O LOCATÁRIO reconhece que recebeu o veículo em bom estado e se compromete a devolvê-lo nas mesmas condições, salvo desgaste natural.
 
+CLÁUSULA QUINTA – DEPÓSITO CAUÇÃO
 
+5.1. O LOCATÁRIO pagará, no ato da retirada, R$ ${parseFloat(String(data.caucao)).toFixed(2)} (${data.caucao ? 'valor por extenso' : ''}) a título de caução.
+5.2. A caução será devolvida ao final do contrato no mesmo valor, desde que não haja pendências financeiras, avarias ou multas, considerando o desconto da taxa administrativa de R$100,00 referente aos custos operacionais da empresa.
+5.3. A devolução será realizada em até 30 (trinta) dias úteis após a entrega do veículo.
+5.4. A caução poderá ser retida total ou parcialmente em caso de:
+• Pendências financeiras;
+• Avarias no veículo;
+• Multas de trânsito não transferidas;
+• Descumprimento de cláusulas contratuais.
 
-            __________________                          __________________
-            ${aluguel.motoristaNome}                          ${locadorInfo.responsavel}
-                LOCATÁRIO                                    LOCADORA
+CLÁUSULA SEXTA – ALUGUEL E PAGAMENTO
 
-Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
+6.1. O LOCATÁRIO pagará ao LOCADOR o valor de R$ ${parseFloat(String(data.valorSemanal)).toFixed(2)} por semana, via depósito bancário, sempre às segundas-feiras.
+6.2. Caso o pagamento não seja efetuado na segunda-feira, poderá ser realizado na terça-feira até 23h59 com multa de 10%.
+6.3. Após 00h00 de terça-feira, o veículo será bloqueado. Para desbloqueio, o LOCATÁRIO deverá pagar: (i) o valor em atraso; (ii) a multa de 10%; e (iii) taxa de R$50,00 pelo serviço de desbloqueio.
+6.4. Caso o pagamento não seja regularizado até quarta-feira, o veículo será recolhido, e o LOCATÁRIO deverá pagar multa correspondente a duas semanas de locação, além dos custos adicionais decorrentes de avarias e remoção.
+
+CLÁUSULA SÉTIMA – DEVOLUÇÃO VOLUNTÁRIA
+
+7.1. Caso o LOCATÁRIO perceba que não conseguirá manter os pagamentos, deverá comunicar imediatamente o LOCADOR e devolver voluntariamente o veículo no mesmo local da retirada.
+7.2. Caso o veículo não seja devolvido nesse local e seja necessária busca/remoção, será cobrada taxa fixa de R$200,00 + R$10,00 por quilômetro rodado.
+7.3. A não devolução voluntária será considerada descumprimento contratual.
+
+CLÁUSULA OITAVA – VISTORIAS
+
+8.1. O LOCATÁRIO tem direito a duas vistorias mensais.
+8.2. Se o veículo permanecer em oficina por mais de 10 (dez) horas devido a desgaste natural, o aluguel será abatido proporcionalmente.
+8.3. Se a paralisação decorrer de mau uso, o aluguel continuará sendo cobrado.
+
+CLÁUSULA NONA – PENALIDADES
+
+9.1. O LOCATÁRIO é responsável por todas as multas e infrações de trânsito, acrescidas de taxa administrativa de 20%. Caso não haja transferência dos pontos em até 10 (dez) dias, o LOCADOR poderá solicitar a devolução do veículo e cobrar o valor da multa em dobro.
+9.2. O veículo possui seguro contra roubo, furto, colisão e perda total (PT).
+• Em caso de sinistro coberto, o LOCATÁRIO arcará apenas com os dias de indisponibilidade;
+• Caso a seguradora recuse a cobertura, o LOCATÁRIO será responsável por todos os custos de reparo, além dos dias parados;
+• Em caso de perda total, o LOCATÁRIO arcará com o valor integral do veículo conforme tabela FIPE;
+• Danos não cobertos pelo seguro serão de responsabilidade do LOCATÁRIO.
+9.3. O LOCADOR poderá recolher definitivamente o veículo em caso de má utilização, reincidência de acidentes ou comprometimento da segurança.
+9.4. O limite de quilometragem mensal é de ${dadosVeiculo?.limiteQuilometragem || '8000'} km. O excedente será cobrado a R$0,50 por km.
+
+CLÁUSULA DÉCIMA – RESCISÃO
+
+10.1. A rescisão antecipada requer notificação prévia de 30 dias. Caso não ocorra, o LOCATÁRIO pagará multa de R$1.200,00.
+10.2. O descumprimento de qualquer cláusula resultará na rescisão do contrato e multa equivalente a duas semanas de locação.
+
+CLÁUSULA DÉCIMA PRIMEIRA – DISPOSIÇÕES FINAIS
+
+11.1. As partes elegem o foro de Embu das Artes/SP.
+11.2. O presente contrato constitui título executivo extrajudicial (art. 784, III, CPC).
+
+Taboão da Serra/SP, ${format(data.dataInicio, 'dd/MM/yyyy')}.
+
+Assinaturas:
+
+${aluguel.motoristaNome}
+(LOCATÁRIO)
+
+${locadorInfo.nome}
+(LOCADORA)
+
+(Testemunha 1 – Nome / RG / CPF)
+
+(Testemunha 2 – Nome / RG / CPF)`;
       }
 
       // Cria novo contrato
@@ -814,7 +831,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           data.dataPrimeiroPagamento,
           data.recorrencia,
           data.valorSemanal,
-          data.tempoMinimoContrato,
+          data.tempoMinimoContrato || '',
           data.dataInicio,  // Passa a data de início do contrato
           data.tipoPagamento,  // Tipo: ilimitado ou limitado
           data.quantidadePagamentos,  // Quantidade específica (se limitado)
@@ -870,6 +887,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           dataInicio: getAmanha(),
           dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
           tempoMinimoContrato: '',
+          prazoMinimo: '',
           valorSemanal: 0,
           caucao: 0,
           templateId: 'default',
@@ -1132,6 +1150,28 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                       </FormControl>
                       <p className="text-xs text-muted-foreground mt-1">
                         Campo opcional. Digite livremente (ex: 1 mês, 6 meses, 1 ano)
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* PRAZO MÍNIMO */}
+                <FormField
+                  control={form.control}
+                  name="prazoMinimo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-base font-semibold">Prazo Mínimo</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="text"
+                          placeholder="ex: 30 dias, 3 meses, sem prazo"
+                          {...field}
+                        />
+                      </FormControl>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Campo opcional. Digite livremente (ex: 30 dias, 3 meses, sem prazo)
                       </p>
                       <FormMessage />
                     </FormItem>
