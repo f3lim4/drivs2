@@ -55,7 +55,7 @@ const contratoSchema = z.object({
     required_error: 'Data de início é obrigatória',
   }),
   dataFim: z.date().optional(), // Data final opcional - se não preenchida, contrato é renovável
-  tempoMinimoContrato: z.string().min(1, 'Tempo mínimo de contrato é obrigatório'),
+  tempoMinimoContrato: z.string().optional(),
   valorSemanal: z.number().min(0.01, 'Valor semanal deve ser maior que 0'),
   caucao: z.number().min(0, 'Caução deve ser maior ou igual a 0'),
   templateId: z.string().optional(),
@@ -368,7 +368,7 @@ export function NovoContratoModal({
       veiculoId: '',
       dataInicio: getAmanha(),
       dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
-      tempoMinimoContrato: '1 mês',
+      tempoMinimoContrato: '',
       valorSemanal: 0,
       caucao: 0,
       templateId: 'default',
@@ -511,11 +511,13 @@ export function NovoContratoModal({
         throw new Error('Veículo ou motorista não encontrado');
       }
       
-      // Para cálculos, assume 1 mês como padrão se não conseguir extrair número
+      // Para cálculos, assume 1 mês como padrão se campo vazio ou não conseguir extrair número
       let mesesParaCalculo = 1;
-      const numeroExtraido = data.tempoMinimoContrato.match(/\d+/);
-      if (numeroExtraido) {
-        mesesParaCalculo = parseInt(numeroExtraido[0]);
+      if (data.tempoMinimoContrato && data.tempoMinimoContrato.trim()) {
+        const numeroExtraido = data.tempoMinimoContrato.match(/\d+/);
+        if (numeroExtraido) {
+          mesesParaCalculo = parseInt(numeroExtraido[0]);
+        }
       }
       
       // CÁLCULO EXATO: Usa nova função que conta apenas semanas completas
@@ -656,7 +658,7 @@ profissão: Motorista de Aplicativo. As partes acima identificadas têm, entre s
 Automóvel que se regerá pelas cláusulas seguintes e pelas condições descritas no presente.
 
 1. CLÁUSULA PRIMEIRA – DO OBJETO, PRAZO E USO
-1.1. O LOCADOR declara ser o legítimo possuidor e/ou proprietário do veículo de modelo ${aluguel.veiculoModelo}, placa ${aluguel.veiculoPlaca}, Vistoriado com fotos e video no dia da retirada, e que resolveu dá-lo em locação ao LOCATÁRIO pelo prazo de ${data.tempoMinimoContrato}
+1.1. O LOCADOR declara ser o legítimo possuidor e/ou proprietário do veículo de modelo ${aluguel.veiculoModelo}, placa ${aluguel.veiculoPlaca}, Vistoriado com fotos e video no dia da retirada, e que resolveu dá-lo em locação ao LOCATÁRIO${data.tempoMinimoContrato && data.tempoMinimoContrato.trim() ? ` pelo prazo de ${data.tempoMinimoContrato}` : ''}
 contados a partir da assinatura do presente contrato.
 
 1.2. Findo o prazo acima estipulado, o contrato poderá ser renovado automaticamente, desde que seja do desejo de
@@ -867,7 +869,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           veiculoId: '',
           dataInicio: getAmanha(),
           dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
-          tempoMinimoContrato: '1 mês',
+          tempoMinimoContrato: '',
           valorSemanal: 0,
           caucao: 0,
           templateId: 'default',
@@ -1120,7 +1122,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                   name="tempoMinimoContrato"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-base font-semibold">Tempo Mínimo *</FormLabel>
+                      <FormLabel className="text-base font-semibold">Tempo Mínimo</FormLabel>
                       <FormControl>
                         <Input 
                           type="text"
@@ -1129,7 +1131,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                         />
                       </FormControl>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Digite livremente o tempo mínimo (ex: 1 mês, 6 meses, 1 ano)
+                        Campo opcional. Digite livremente (ex: 1 mês, 6 meses, 1 ano)
                       </p>
                       <FormMessage />
                     </FormItem>
