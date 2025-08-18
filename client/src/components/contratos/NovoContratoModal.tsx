@@ -55,7 +55,7 @@ const contratoSchema = z.object({
     required_error: 'Data de início é obrigatória',
   }),
   dataFim: z.date().optional(), // Data final opcional - se não preenchida, contrato é renovável
-  tempoMinimoContrato: z.number().min(1, 'Tempo mínimo de contrato deve ser maior que 0'),
+  tempoMinimoContrato: z.string().min(1, 'Tempo mínimo de contrato é obrigatório'),
   valorSemanal: z.number().min(0.01, 'Valor semanal deve ser maior que 0'),
   caucao: z.number().min(0, 'Caução deve ser maior ou igual a 0'),
   templateId: z.string().optional(),
@@ -130,7 +130,7 @@ const criarPagamentosRecorrentes = async (
   dataPrimeiroPagamento: Date,
   recorrencia: 'semanal' | 'quinzenal' | 'mensal',
   valorSemanal: number,
-  tempoMinimoContrato: number,
+  tempoMinimoContrato: string,
   dataInicioContrato: Date,
   tipoPagamento: 'ilimitado' | 'limitado' = 'ilimitado',
   quantidadePagamentos?: number,
@@ -368,7 +368,7 @@ export function NovoContratoModal({
       veiculoId: '',
       dataInicio: getAmanha(),
       dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
-      tempoMinimoContrato: 1,
+      tempoMinimoContrato: '1 mês',
       valorSemanal: 0,
       caucao: 0,
       templateId: 'default',
@@ -511,16 +511,23 @@ export function NovoContratoModal({
         throw new Error('Veículo ou motorista não encontrado');
       }
       
+      // Para cálculos, assume 1 mês como padrão se não conseguir extrair número
+      let mesesParaCalculo = 1;
+      const numeroExtraido = data.tempoMinimoContrato.match(/\d+/);
+      if (numeroExtraido) {
+        mesesParaCalculo = parseInt(numeroExtraido[0]);
+      }
+      
       // CÁLCULO EXATO: Usa nova função que conta apenas semanas completas
       const calculoContrato = calcularContratoExato(
         data.dataInicio,
-        data.tempoMinimoContrato,
+        mesesParaCalculo,
         data.valorSemanal
       );
       
       // Extrai valores calculados
       const valorTotalExato = calculoContrato.valorTotal;
-      const valorMensalCalculado = valorTotalExato / data.tempoMinimoContrato; // Para compatibilidade com o banco
+      const valorMensalCalculado = valorTotalExato / mesesParaCalculo; // Para compatibilidade com o banco
       
       console.log(`📊 CÁLCULO EXATO DO CONTRATO (NOVA FUNÇÃO):
 • Período: ${calculoContrato.dataInicio.toLocaleDateString()} até ${calculoContrato.dataFim.toLocaleDateString()}
@@ -542,7 +549,7 @@ export function NovoContratoModal({
       } else {
         // Se não tiver data final, usa tempo mínimo para calcular
         dataFimAluguel = new Date(data.dataInicio);
-        dataFimAluguel.setMonth(dataFimAluguel.getMonth() + data.tempoMinimoContrato);
+        dataFimAluguel.setMonth(dataFimAluguel.getMonth() + mesesParaCalculo);
       }
       
       // Prepara dados do aluguel (mas NÃO cria ainda)
@@ -555,7 +562,7 @@ export function NovoContratoModal({
         veiculoId: data.veiculoId,
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: format(dataFimAluguel, 'yyyy-MM-dd'),
-        tempoContrato: data.tempoMinimoContrato,
+        tempoContrato: mesesParaCalculo,
         valorMensal: valorMensalAluguel.toFixed(2),
         valorTotal: valorTotalAluguel.toFixed(2),
         caucao: data.caucao.toFixed(2),
@@ -649,7 +656,7 @@ profissão: Motorista de Aplicativo. As partes acima identificadas têm, entre s
 Automóvel que se regerá pelas cláusulas seguintes e pelas condições descritas no presente.
 
 1. CLÁUSULA PRIMEIRA – DO OBJETO, PRAZO E USO
-1.1. O LOCADOR declara ser o legítimo possuidor e/ou proprietário do veículo de modelo ${aluguel.veiculoModelo}, placa ${aluguel.veiculoPlaca}, Vistoriado com fotos e video no dia da retirada, e que resolveu dá-lo em locação ao LOCATÁRIO pelo prazo de ${data.tempoMinimoContrato} mês(es)
+1.1. O LOCADOR declara ser o legítimo possuidor e/ou proprietário do veículo de modelo ${aluguel.veiculoModelo}, placa ${aluguel.veiculoPlaca}, Vistoriado com fotos e video no dia da retirada, e que resolveu dá-lo em locação ao LOCATÁRIO pelo prazo de ${data.tempoMinimoContrato}
 contados a partir da assinatura do presente contrato.
 
 1.2. Findo o prazo acima estipulado, o contrato poderá ser renovado automaticamente, desde que seja do desejo de
@@ -860,7 +867,7 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
           veiculoId: '',
           dataInicio: getAmanha(),
           dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
-          tempoMinimoContrato: 1,
+          tempoMinimoContrato: '1 mês',
           valorSemanal: 0,
           caucao: 0,
           templateId: 'default',
@@ -1116,15 +1123,14 @@ Contrato gerado em ${format(new Date(), "dd/MM/yyyy 'às' HH:mm")}`;
                       <FormLabel className="text-base font-semibold">Tempo Mínimo *</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
-                          min="1"
+                          type="text"
+                          placeholder="ex: 1 mês, 6 meses, 1 ano"
                           {...field}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            field.onChange(value === '' ? '' : parseInt(value) || 0);
-                          }}
                         />
                       </FormControl>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Digite livremente o tempo mínimo (ex: 1 mês, 6 meses, 1 ano)
+                      </p>
                       <FormMessage />
                     </FormItem>
                   )}
