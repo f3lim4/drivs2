@@ -699,7 +699,7 @@ CLÁUSULA QUARTA – OBJETO
 
 CLÁUSULA QUINTA – DEPÓSITO CAUÇÃO
 
-5.1. O LOCATÁRIO pagará, no ato da retirada, R$ ${parseFloat(String(data.caucao)).toFixed(2)} (${data.caucao ? 'valor por extenso' : ''}) a título de caução.
+5.1. O LOCATÁRIO pagará, no ato da retirada, R$ ${parseFloat(String(data.caucao)).toFixed(2)} a título de caução.
 5.2. A caução será devolvida ao final do contrato no mesmo valor, desde que não haja pendências financeiras, avarias ou multas, considerando o desconto da taxa administrativa de R$100,00 referente aos custos operacionais da empresa.
 5.3. A devolução será realizada em até 30 (trinta) dias úteis após a entrega do veículo.
 5.4. A caução poderá ser retida total ou parcialmente em caso de:
