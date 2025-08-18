@@ -140,39 +140,51 @@ export function EditarContratoModal({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Erro da API:', errorData);
-        throw new Error(errorData.message || 'Erro ao atualizar contrato');
+        console.error('[EDITAR CONTRATO] Erro da API:', { status: response.status, errorData });
+        throw new Error(errorData.message || `Erro ao atualizar contrato (${response.status})`);
       }
 
       const contratoAtualizado = await response.json();
+      console.log('[EDITAR CONTRATO] Contrato atualizado com sucesso:', contratoAtualizado);
       
       // Log da atividade
-      await registrarAtividade(
-        profile?.locadoraId || '',
-        profile?.email || 'usuario@drivs.me',
-        'editar',
-        'contrato',
-        contrato.id,
-        `Contrato editado: ${data.cliente} - ${contrato.tipo}`
-      );
+      try {
+        await registrarAtividade(
+          profile?.locadoraId || '',
+          profile?.email || 'usuario@drivs.me',
+          'editar',
+          'contrato',
+          contrato.id,
+          `Contrato editado: ${data.cliente} - ${contrato.tipo}`
+        );
+        console.log('[EDITAR CONTRATO] Atividade registrada com sucesso');
+      } catch (activityError) {
+        console.warn('[EDITAR CONTRATO] Erro ao registrar atividade:', activityError);
+        // Não bloquear o fluxo principal por erro na atividade
+      }
       
       onContratoEditado(contratoAtualizado);
+      console.log('[EDITAR CONTRATO] Callback onContratoEditado chamado');
+      
       onOpenChange(false);
+      console.log('[EDITAR CONTRATO] Modal fechado');
       
       toast({
         title: "Contrato Editado",
         description: `Contrato de ${data.cliente} foi atualizado com sucesso.`,
       });
+      console.log('[EDITAR CONTRATO] Toast exibido');
       
     } catch (error) {
-      console.error('Erro ao editar contrato:', error);
+      console.error('[EDITAR CONTRATO] Erro ao editar contrato:', error);
       toast({
         title: "Erro",
-        description: "Não foi possível editar o contrato. Tente novamente.",
+        description: error instanceof Error ? error.message : "Não foi possível editar o contrato. Tente novamente.",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
+      console.log('[EDITAR CONTRATO] Loading finalizado');
     }
   };
 

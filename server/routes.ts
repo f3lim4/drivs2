@@ -952,13 +952,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/contratos/:id", async (req, res) => {
     try {
+      console.log(`[UPDATE CONTRATO] Recebendo requisição para: ${req.params.id}`, { body: req.body });
+      
       // Validate the request body usando schema flexível para updates
       const result = updateContratoSchema.safeParse(req.body);
       if (!result.success) {
+        console.log('[UPDATE CONTRATO] Erro de validação:', result.error.errors);
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
+      console.log('[UPDATE CONTRATO] Dados validados:', result.data);
       const contrato = await storage.updateContrato(req.params.id, result.data);
+      console.log('[UPDATE CONTRATO] Contrato atualizado:', contrato);
       
       // Se status mudou para encerrado ou cancelado, parar pagamentos automáticos
       if (result.data.status && (result.data.status === 'encerrado' || result.data.status === 'cancelado')) {
@@ -975,10 +980,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      console.log('[UPDATE CONTRATO] Enviando resposta:', contrato);
       res.json(contrato);
     } catch (error) {
-      console.error("Error updating contrato:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("[UPDATE CONTRATO] Error updating contrato:", error);
+      res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 
