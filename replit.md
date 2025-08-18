@@ -17,6 +17,13 @@ Preferred communication style: Simple, everyday language.
 - ✅ **FRONTEND CONNECTED** - React interface properly communicating with Express backend
 - ✅ **DATABASE CONNECTION VERIFIED** - PostgreSQL fully operational and responding
 
+### 2025-08-18: Contract System Fixes - CONCLUÍDO ✅
+- ✅ **CONTRACT UPDATE API FIXED** - Created flexible updateContratoSchema for partial updates
+- ✅ **FRONTEND MODAL OPTIMIZED** - EditarContratoModal now sends only changed fields
+- ✅ **ERROR HANDLING IMPROVED** - Better API error messages and debugging
+- ✅ **STATUS TRANSITIONS WORKING** - All contract statuses (ativo, cancelado, encerrado) function correctly
+- ✅ **DUPLICATE REQUESTS ELIMINATED** - Fixed issue causing multiple API calls
+
 ## System Architecture
 DRIVS é construído com uma arquitetura full-stack que garante escalabilidade, segurança e uma experiência de usuário fluida.
 
