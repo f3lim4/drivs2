@@ -42,30 +42,6 @@ import { registrarAtividade } from '@/utils/activityLogger';
 import { Veiculo } from '@/types';
 import { CheckCircle, AlertTriangle, Wrench, BarChart3 } from 'lucide-react';
 
-// Função auxiliar para formatar moeda
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  }).format(value);
-};
-
-// Função para obter badge de status
-const getStatusBadge = (status: string) => {
-  switch (status) {
-    case 'disponivel':
-      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Disponível</Badge>;
-    case 'alugado':
-      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Alugado</Badge>;
-    case 'manutencao':
-      return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Manutenção</Badge>;
-    case 'indisponivel':
-      return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Indisponível</Badge>;
-    default:
-      return <Badge variant="outline">Indefinido</Badge>;
-  }
-};
-
 // Função para obter ícone baseado na categoria do veículo
 const getVehicleIconByCategory = (categoria: string) => {
   switch (categoria?.toLowerCase()) {
@@ -89,24 +65,6 @@ const getVehicleIconByCategory = (categoria: string) => {
     default:
       return Car;
   }
-};
-
-// Função para obter cor do ícone do veículo baseado na cor do veículo
-const getVehicleIconColor = (cor: string) => {
-  const colorMap: { [key: string]: string } = {
-    'branco': 'bg-gray-100 text-gray-600',
-    'preto': 'bg-gray-800 text-gray-100',
-    'prata': 'bg-gray-300 text-gray-700',
-    'cinza': 'bg-gray-500 text-gray-100',
-    'azul': 'bg-blue-500 text-blue-100',
-    'vermelho': 'bg-red-500 text-red-100',
-    'verde': 'bg-green-500 text-green-100',
-    'bege': 'bg-yellow-200 text-yellow-800',
-    'amarelo': 'bg-yellow-400 text-yellow-900',
-    'marrom': 'bg-amber-700 text-amber-100'
-  };
-  
-  return colorMap[cor?.toLowerCase()] || 'bg-primary text-primary-foreground';
 };
 
 export default function Veiculos() {
@@ -219,7 +177,7 @@ export default function Veiculos() {
   };
 
   const handleVeiculoAdicionado = (novoVeiculo: Veiculo) => {
-    adicionarVeiculo(novoVeiculo);
+    adicionarVeiculo?.(novoVeiculo);
   };
 
   const handleEditarVeiculo = (veiculo: Veiculo) => {
@@ -228,7 +186,7 @@ export default function Veiculos() {
   };
 
   const handleVeiculoEditado = (veiculoAtualizado: Veiculo) => {
-    atualizarVeiculo(veiculoAtualizado);
+    atualizarVeiculo?.(veiculoAtualizado);
     toast({
       title: "Veículo Atualizado",
       description: `${veiculoAtualizado.marca} ${veiculoAtualizado.modelo} foi atualizado com sucesso!`,
@@ -252,8 +210,8 @@ export default function Veiculos() {
       
       // Log da atividade
       await registrarAtividade(
-        profile.locadoraId,
-        profile.email || 'usuario@drivs.me',
+        profile?.locadoraId || '',
+        profile?.email || 'usuario@drivs.me',
         'excluir',
         'veiculo',
         veiculo.id,
@@ -261,7 +219,7 @@ export default function Veiculos() {
       );
       
       // Remove do estado local após sucesso na API
-      removerVeiculo(veiculo.id);
+      removerVeiculo?.(veiculo.id);
       
       toast({
         title: "Veículo Excluído",
@@ -295,12 +253,38 @@ export default function Veiculos() {
     }
   };
 
+  // Função para obter a cor do ícone baseada na cor do veículo
+  const getVehicleIconColor = (cor: string) => {
+    switch (cor?.toLowerCase()) {
+      case 'branco':
+        return 'bg-gray-100 text-gray-700';
+      case 'prata':
+      case 'cinza':
+        return 'bg-gray-200 text-gray-800';
+      case 'preto':
+        return 'bg-gray-900 text-white';
+      case 'azul':
+        return 'bg-blue-100 text-blue-700';
+      case 'vermelho':
+        return 'bg-red-100 text-red-700';
+      case 'verde':
+        return 'bg-green-100 text-green-700';
+      case 'amarelo':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'marrom':
+        return 'bg-amber-100 text-amber-700';
+      default:
+        return 'bg-slate-100 text-slate-700';
+    }
+  };
+
   // Formata valor monetário
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | string) => {
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(value);
+    }).format(numValue || 0);
   };
 
   // Sistema de loading completo - verifica múltiplas fontes
