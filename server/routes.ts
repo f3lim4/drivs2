@@ -966,11 +966,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // O sistema automático irá detectar na próxima verificação que o contrato não está mais ativo
       }
       
-      // Se arquivo foi enviado/aprovado, mudar status para "ativo"
-      if (result.data.arquivoAssinado && (!contrato.status || contrato.status === 'em_aberto')) {
+      // Se arquivo foi enviado/aprovado, mudar status para "ativo" (apenas se não estiver sendo mudado para outro status)
+      if (result.data.arquivoAssinado && !result.data.status && (!contrato.status || contrato.status === 'em_aberto')) {
         console.log(`[CONTRATO] Upload detectado - mudando status de '${contrato.status}' para 'ativo'`);
-        result.data.status = 'ativo';
-        result.data.dataAssinatura = new Date();
+        await storage.updateContrato(req.params.id, {
+          status: 'ativo',
+          dataAssinatura: new Date()
+        });
       }
       
       res.json(contrato);
