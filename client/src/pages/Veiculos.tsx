@@ -72,6 +72,14 @@ export default function Veiculos() {
   const { profile, isAdmin, isLocadora } = useAuth();
   const { veiculos, loading: loadingVeiculos, adicionarVeiculo, atualizarVeiculo, removerVeiculo } = useVeiculos();
 
+  // Debug: Log do tipo de usuário
+  console.log('DEBUG Veiculos - Profile:', { 
+    type: profile?.type, 
+    isAdmin, 
+    isLocadora, 
+    locadoraId: profile?.locadoraId 
+  });
+
   // Buscar dados adicionais necessários para o sistema completo
   const { data: alugueis = [], isLoading: loadingAlugueis } = useQuery({
     queryKey: ['/api/alugueis', profile?.locadoraId],
@@ -106,7 +114,7 @@ export default function Veiculos() {
 
   // Filtra e ordena veículos baseado na busca, filtros e ordenação
   const filteredVeiculos = veiculos
-    .filter(veiculo => {
+    .filter((veiculo: Veiculo) => {
       const matchesSearch = veiculo.modelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            veiculo.marca.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            veiculo.placa.toLowerCase().includes(searchTerm.toLowerCase());
@@ -115,7 +123,7 @@ export default function Veiculos() {
       
       return matchesSearch && matchesStatus;
     })
-    .sort((a, b) => {
+    .sort((a: Veiculo, b: Veiculo) => {
       switch (sortOrder) {
         case 'mais-novos':
           // Ordena por data de cadastro decrescente (mais novos primeiro)
@@ -166,9 +174,9 @@ export default function Veiculos() {
   // Calcula estatísticas
   const stats = {
     total: veiculos.length,
-    disponiveis: veiculos.filter(v => v.status === 'disponivel').length,
-    alugados: veiculos.filter(v => v.status === 'alugado').length,
-    manutencao: veiculos.filter(v => v.status === 'manutencao').length,
+    disponiveis: veiculos.filter((v: Veiculo) => v.status === 'disponivel').length,
+    alugados: veiculos.filter((v: Veiculo) => v.status === 'alugado').length,
+    manutencao: veiculos.filter((v: Veiculo) => v.status === 'manutencao').length,
   };
 
   // Funções dos botões
@@ -450,7 +458,7 @@ export default function Veiculos() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedVeiculos.map((veiculo) => (
+              {paginatedVeiculos.map((veiculo: Veiculo) => (
                 <TableRow key={veiculo.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">

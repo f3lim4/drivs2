@@ -107,16 +107,16 @@ export function useVeiculos() {
     locadoraNome: v.locadoraNome,
   });
 
-  // Adicionar veículo
-  const adicionarVeiculo = () => {
+  // Adicionar veículo - apenas invalida cache para recarregar dados
+  const adicionarVeiculo = (_novoVeiculo?: Veiculo) => {
     queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
   };
 
-  const atualizarVeiculo = () => {
+  const atualizarVeiculo = (_veiculoAtualizado?: Veiculo) => {
     queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
   };
 
-  const removerVeiculo = () => {
+  const removerVeiculo = (_veiculoId?: string) => {
     queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
   };
 
