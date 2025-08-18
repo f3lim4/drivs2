@@ -91,18 +91,24 @@ export function EditarContratoModal({
     setLoading(true);
     
     try {
-      // Prepara dados para API
-      const contratoData = {
-        tipo: contrato.tipo,
-        titulo: data.titulo,
-        cliente: data.cliente,
-        valor: contrato.valor, // Mantém valor existente
-        dataInicio: typeof contrato.dataInicio === 'string' ? contrato.dataInicio : contrato.dataInicio,
-        dataFim: typeof contrato.dataFim === 'string' ? contrato.dataFim : contrato.dataFim,
-        status: data.status || contrato.status,
-        template: data.template,
-        locadoraId: (contrato as any).locadoraId
-      };
+      // Prepara dados para API - apenas campos alterados
+      const contratoData: any = {};
+      
+      if (data.titulo !== contrato.titulo) {
+        contratoData.titulo = data.titulo;
+      }
+      
+      if (data.cliente !== contrato.cliente) {
+        contratoData.cliente = data.cliente;
+      }
+      
+      if (data.status && data.status !== contrato.status) {
+        contratoData.status = data.status;
+      }
+      
+      if (data.template !== contrato.template) {
+        contratoData.template = data.template;
+      }
 
       // Chama API para atualizar contrato
       const response = await fetch(`/api/contratos/${contrato.id}`, {
@@ -114,7 +120,9 @@ export function EditarContratoModal({
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao atualizar contrato');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Erro da API:', errorData);
+        throw new Error(errorData.message || 'Erro ao atualizar contrato');
       }
 
       const contratoAtualizado = await response.json();
@@ -155,18 +163,10 @@ export function EditarContratoModal({
     setDesativando(true);
     
     try {
-      // Prepara dados para cancelar contrato
+      // Prepara dados para cancelar contrato - apenas campos necessários
       const contratoData = {
-        tipo: contrato.tipo,
-        titulo: contrato.titulo,
-        cliente: contrato.cliente,
-        valor: contrato.valor,
-        dataInicio: typeof contrato.dataInicio === 'string' ? contrato.dataInicio : contrato.dataInicio,
-        dataFim: typeof contrato.dataFim === 'string' ? contrato.dataFim : contrato.dataFim,
         status: 'cancelado', // Mudança principal: cancelar contrato
         motivoCancelamento: motivoCancelamento.trim(), // Motivo obrigatório
-        template: contrato.template,
-        locadoraId: (contrato as any).locadoraId
       };
 
       // Chama API para desativar contrato
