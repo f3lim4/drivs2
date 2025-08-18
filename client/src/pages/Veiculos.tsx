@@ -72,13 +72,7 @@ export default function Veiculos() {
   const { profile, isAdmin, isLocadora } = useAuth();
   const { veiculos, loading: loadingVeiculos, adicionarVeiculo, atualizarVeiculo, removerVeiculo } = useVeiculos();
 
-  // Debug: Log do tipo de usuário
-  console.log('DEBUG Veiculos - Profile:', { 
-    type: profile?.type, 
-    isAdmin, 
-    isLocadora, 
-    locadoraId: profile?.locadoraId 
-  });
+
 
   // Buscar dados adicionais necessários para o sistema completo
   const { data: alugueis = [], isLoading: loadingAlugueis } = useQuery({
