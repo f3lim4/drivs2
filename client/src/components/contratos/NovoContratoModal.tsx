@@ -349,16 +349,15 @@ export function NovoContratoModal({
     console.log('Templates no modal:', templates);
   }, [templates]);
 
-  // Função para obter a data de amanhã sem problemas de timezone
-  const getAmanha = () => {
+  // Função para obter a data de hoje sem problemas de timezone
+  const getHoje = () => {
     const hoje = new Date();
     const ano = hoje.getFullYear();
     const mes = hoje.getMonth();
     const dia = hoje.getDate();
     
-    // Cria nova data local para amanhã
-    const amanha = new Date(ano, mes, dia + 1);
-    return amanha;
+    // Cria nova data local para hoje
+    return new Date(ano, mes, dia);
   };
 
   const form = useForm<ContratoFormData>({
@@ -366,14 +365,14 @@ export function NovoContratoModal({
     defaultValues: {
       motoristaId: '',
       veiculoId: '',
-      dataInicio: getAmanha(),
+      dataInicio: getHoje(),
       dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
       prazoMinimo: '',
       valorSemanal: 0,
       caucao: 0,
       templateId: 'default',
       pagamentoRecorrente: true, // ✅ HABILITADO POR PADRÃO
-      dataPrimeiroPagamento: getAmanha(), // ✅ DATA PADRÃO
+      dataPrimeiroPagamento: getHoje(), // ✅ DATA PADRÃO
       recorrencia: 'semanal', // ✅ RECORRÊNCIA PADRÃO
       tipoPagamento: 'ilimitado', // ✅ TIPO PADRÃO
       quantidadePagamentos: undefined, // ✅ QUANTIDADE OPCIONAL
@@ -611,12 +610,14 @@ export function NovoContratoModal({
         nome: dadosLocadora.nome,
         cnpj: dadosLocadora.cnpj,
         endereco: `${dadosLocadora.endereco}, ${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}`,
-        responsavel: dadosLocadora.responsavel
+        responsavel: dadosLocadora.responsavel,
+        telefone: dadosLocadora.telefone
       } : {
         nome: "DRIVS LOCADORA DE VEÍCULOS LTDA",
         cnpj: "12.345.678/0001-90",
         endereco: "Rua das Empresas, 123 - Centro, Embu das Artes/SP",
-        responsavel: "Responsável da Locadora"
+        responsavel: "Responsável da Locadora",
+        telefone: "(11) 9999-9999"
       };
 
       // Calcula data final apenas se fornecida, caso contrário deixa como contrato renovável
@@ -651,10 +652,10 @@ export function NovoContratoModal({
         templateContent = `INSTRUMENTO PARTICULAR DE CONTRATO DE LOCAÇÃO DE VEÍCULO
 
 LOCADOR: ${locadorInfo.nome}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº ${locadorInfo.cnpj}, com sede em ${locadorInfo.endereco}.
-Telefone: ${aluguel.motoristaId} E-mail: contato@drivs.me.
+Telefone: ${locadorInfo.telefone || motorista.telefone} E-mail: contato@drivs.me.
 
-LOCATÁRIO: ${aluguel.motoristaNome}, profissão: Motorista de Aplicativo, portador do CPF nº ${aluguel.motoristaId}, RG nº _________________ e CNH nº _________________ (validade _________), 
-residente em _________________________________________________________________________________________________________________, telefone ________________________.
+LOCATÁRIO: ${motorista.nome}, profissão: Motorista de Aplicativo, portador do CPF nº ${motorista.cpf}, RG nº ${motorista.rg} e CNH nº ${motorista.cnh} (validade ${motorista.vencimentoCnh ? new Date(motorista.vencimentoCnh).toLocaleDateString('pt-BR') : '_________'}), 
+residente em ${motorista.rua}, ${motorista.numero}${motorista.complemento ? ', ' + motorista.complemento : ''} - ${motorista.bairro}, ${motorista.cidade}/${motorista.estado} - CEP: ${motorista.cep}, telefone ${motorista.telefone}.
 
 As partes celebram o presente Contrato de Locação de Veículo, que se regerá pelas seguintes cláusulas e condições:
 
@@ -882,14 +883,14 @@ ${locadorInfo.nome}
         form.reset({
           motoristaId: '',
           veiculoId: '',
-          dataInicio: getAmanha(),
+          dataInicio: getHoje(),
           dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
           prazoMinimo: '',
           valorSemanal: 0,
           caucao: 0,
           templateId: 'default',
           pagamentoRecorrente: true, // ✅ HABILITADO POR PADRÃO
-          dataPrimeiroPagamento: getAmanha(), // ✅ DATA PADRÃO
+          dataPrimeiroPagamento: getHoje(), // ✅ DATA PADRÃO
           recorrencia: 'semanal', // ✅ RECORRÊNCIA PADRÃO
           tipoPagamento: 'ilimitado', // ✅ TIPO PADRÃO
           quantidadePagamentos: undefined, // ✅ QUANTIDADE OPCIONAL
