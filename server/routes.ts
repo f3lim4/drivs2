@@ -13,6 +13,17 @@ import OpenAI from "openai";
 import { PDFDocument } from "pdf-lib";
 import crypto from "crypto";
 
+// Declaração de tipos para sessão
+declare module 'express-session' {
+  interface SessionData {
+    user?: {
+      id: number;
+      email: string;
+      nome: string;
+    };
+  }
+}
+
 // Função para converter data brasileira (dd/MM/yyyy) para formato ISO
 const convertBrazilianDate = (dateStr: string): string => {
   if (dateStr.includes('/')) {
@@ -124,6 +135,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para verificar senha do usuário atual
+  app.post("/api/auth/verify-password", async (req, res) => {
+    try {
+      const { password } = req.body;
+      
+      if (!req.session?.user?.email) {
+        return res.status(401).json({ message: "Usuário não autenticado" });
+      }
+      
+      if (!password) {
+        return res.status(400).json({ message: "Senha é obrigatória" });
+      }
+      
+      // Buscar perfil pelo email da sessão
+      const profile = await storage.getProfileByEmail(req.session.user.email);
+      if (!profile) {
+        return res.status(404).json({ message: "Perfil não encontrado" });
+      }
+      
+      // Buscar usuário pelo UUID do perfil
+      const user = await storage.getUserByUUID(profile.userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      // Verificar senha
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid) {
+        return res.status(400).json({ message: "Senha incorreta" });
+      }
+      
+      res.json({ message: "Senha verificada com sucesso" });
+    } catch (error) {
+      console.error("Error verifying password:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -151,6 +200,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!isValidPassword) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
+      
+      // Store user info in session
+      req.session.user = {
+        id: user.id,
+        email: profile.email,
+        nome: profile.nome
+      };
       
       console.log("Login successful for:", email);
       res.json({ 
