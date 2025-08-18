@@ -303,7 +303,8 @@ export function NovoVeiculoModal({
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-4 gap-4">
+              {/* Primeira linha: Tipo, Marca, Modelo */}
+              <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="tipoVeiculo"
@@ -324,27 +325,6 @@ export function NovoVeiculoModal({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="placa"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Placa *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="ABC-1234" 
-                          {...field}
-                          onChange={(e) => {
-                            const value = e.target.value.toUpperCase();
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -396,6 +376,72 @@ export function NovoVeiculoModal({
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Segunda linha: Placa, RENAVAM, Chassi */}
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="placa"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Placa *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="ABC-1234" 
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value.toUpperCase();
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="renavam"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>RENAVAM *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="12345678901" 
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '');
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="chassi"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Chassi *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="9BWZZZ377VT004251" 
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value.toUpperCase();
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
