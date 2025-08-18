@@ -254,6 +254,40 @@ export const insertContratoSchema = createInsertSchema(contratos).omit({
   tempoContrato: z.number().optional(),
 });
 
+// Schema mais flexível para atualizações (todos campos opcionais)
+export const updateContratoSchema = z.object({
+  locadoraId: z.string().optional(),
+  veiculoId: z.string().optional(),
+  tipo: z.string().optional(),
+  titulo: z.string().optional(),
+  cliente: z.string().optional(),
+  valor: z.union([z.string(), z.number()]).optional().transform((val) => {
+    if (val === undefined) return undefined;
+    if (typeof val === 'number') {
+      return val.toString();
+    }
+    return val;
+  }),
+  valorSemanal: z.union([z.string(), z.number()]).optional().transform((val) => {
+    if (val === undefined) return undefined;
+    if (typeof val === 'number') {
+      return val.toString();
+    }
+    return val;
+  }),
+  tempoContrato: z.number().optional(),
+  dataInicio: z.union([z.string(), z.date()]).optional(),
+  dataFim: z.union([z.string(), z.date()]).optional(),
+  prazoMinimo: z.string().optional(),
+  caucao: z.union([z.string(), z.number()]).optional(),
+  limiteKm: z.union([z.string(), z.number()]).optional(),
+  status: z.string().optional(),
+  motivoCancelamento: z.string().optional(),
+  template: z.string().optional(),
+  arquivoAssinado: z.string().optional(),
+  dataAssinatura: z.union([z.string(), z.date()]).optional(),
+});
+
 export const insertTemplateContratoSchema = createInsertSchema(templateContratos).omit({
   id: true,
   createdAt: true,
