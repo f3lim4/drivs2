@@ -178,6 +178,8 @@ export function NovoVeiculoModal({
   }, [marcaSelecionada, tipoSelecionado, form]);
 
   const onSubmit = async (data: VeiculoFormData) => {
+    console.log('🚗 DEBUG - Submit iniciado:', data);
+    console.log('🚗 DEBUG - Form errors:', form.formState.errors);
     setLoading(true);
     
     try {
@@ -996,6 +998,11 @@ export function NovoVeiculoModal({
                 type="submit" 
                 disabled={loading}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={() => {
+                  console.log('🚗 DEBUG - Botão clicado!');
+                  console.log('🚗 DEBUG - Form valid?', form.formState.isValid);
+                  console.log('🚗 DEBUG - Form errors:', form.formState.errors);
+                }}
               >
                 {loading ? 'Cadastrando...' : 'Cadastrar Veículo'}
               </Button>
