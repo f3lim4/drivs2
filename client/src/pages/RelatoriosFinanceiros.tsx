@@ -1264,7 +1264,7 @@ export default function RelatoriosFinanceiros() {
 
       {/* Cards de Resumo Financeiro - apenas para locadoras */}
       {!isAdmin && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center space-y-0.5">
@@ -1492,7 +1492,7 @@ export default function RelatoriosFinanceiros() {
         <TabsContent value="despesas" className="space-y-2">
           {/* Cards pequenos de resumo removidos conforme solicitado */}
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {/* Receitas por Tipo */}
             <Card>
               <CardHeader>
@@ -1648,29 +1648,72 @@ export default function RelatoriosFinanceiros() {
 
 
           {/* Resumo das despesas */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-            <div className="bg-red-50 p-4 rounded-lg">
-              <h4 className="font-medium text-red-700 mb-2">Total Despesas Fixas</h4>
-              <p className="text-2xl font-bold text-red-800">
-                {formatCurrency(totalDespesasFixasPuras)}
-              </p>
-              <p className="text-sm text-red-600">Mensais</p>
-            </div>
-            <div className="bg-orange-50 p-4 rounded-lg">
-              <h4 className="font-medium text-orange-700 mb-2">Manutenções</h4>
-              <p className="text-2xl font-bold text-orange-800">
-                {formatCurrency(filteredData.manutencoes.reduce((total, m) => 
-                  total + (parseFloat(m.valorFinal || m.valorOrcamento || '0') || 0), 0))}
-              </p>
-              <p className="text-sm text-orange-600">Período</p>
-            </div>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-700 mb-2">Despesas Manuais</h4>
-              <p className="text-2xl font-bold text-blue-800">
-                {formatCurrency(despesasManuaisValor)}
-              </p>
-              <p className="text-sm text-blue-600">Período</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center space-y-0.5">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-red-700">DESPESAS FIXAS</p>
+                    <p className="text-xl font-bold text-red-800">
+                      {formatCurrency(totalDespesasFixasPuras)}
+                    </p>
+                    <p className="text-xs text-red-600">Mensais</p>
+                  </div>
+                  <div className="w-10 h-10 bg-red-200 rounded-full flex items-center justify-center ml-auto">
+                    <Calendar className="w-6 h-6 text-red-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center space-y-0.5">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-orange-700">MANUTENÇÕES</p>
+                    <p className="text-xl font-bold text-orange-800">
+                      {formatCurrency(filteredData.manutencoes.reduce((total, m) => 
+                        total + (parseFloat(m.valorFinal || m.valorOrcamento || '0') || 0), 0))}
+                    </p>
+                    <p className="text-xs text-orange-600">Período</p>
+                  </div>
+                  <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center ml-auto">
+                    <Car className="w-6 h-6 text-orange-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center space-y-0.5">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-blue-700">DESPESAS MANUAIS</p>
+                    <p className="text-xl font-bold text-blue-800">
+                      {formatCurrency(despesasManuaisValor)}
+                    </p>
+                    <p className="text-xs text-blue-600">Período</p>
+                  </div>
+                  <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center ml-auto">
+                    <FileText className="w-6 h-6 text-blue-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center space-y-0.5">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-medium text-green-700">ECONOMIA</p>
+                    <p className="text-xl font-bold text-green-800">
+                      {formatCurrency(Math.max(0, receitaTotal - totalDespesas))}
+                    </p>
+                    <p className="text-xs text-green-600">Economia Total</p>
+                  </div>
+                  <div className="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center ml-auto">
+                    <TrendingUp className="w-6 h-6 text-green-700" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
 
