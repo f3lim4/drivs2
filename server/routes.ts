@@ -205,7 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.user = {
         id: user.id,
         email: profile.email,
-        nome: profile.nome
+        nome: profile.name
       };
       
       console.log("Login successful for:", email);
