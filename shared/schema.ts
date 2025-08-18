@@ -178,7 +178,9 @@ export const contratos = pgTable("contratos", {
   dataInicio: date("data_inicio").notNull(),
   dataFim: date("data_fim"), // Data final opcional para contratos renováveis
   tempoMinimoContrato: text("tempo_minimo_contrato"), // Tempo mínimo (texto livre)
+  prazoMinimo: text("prazo_minimo"), // Prazo mínimo (texto livre) - campo adicional
   caucao: decimal("caucao", { precision: 10, scale: 2 }), // Caução do contrato
+  limiteKm: text("limite_km"), // Limite de quilometragem (ex: "8000 km/mês")
   // Status com 4 estados: em_aberto, ativo, cancelado, encerrado
   status: text("status").notNull().default("em_aberto"), // 'em_aberto', 'ativo', 'cancelado', 'encerrado'
   motivoCancelamento: text("motivo_cancelamento"), // Motivo quando cancelado

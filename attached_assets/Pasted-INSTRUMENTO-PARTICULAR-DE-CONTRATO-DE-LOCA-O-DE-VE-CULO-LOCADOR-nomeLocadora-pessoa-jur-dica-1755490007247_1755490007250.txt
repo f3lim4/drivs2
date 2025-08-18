@@ -1,0 +1,113 @@
+INSTRUMENTO PARTICULAR DE CONTRATO DE LOCAÇÃO DE VEÍCULO
+
+LOCADOR: {{nomeLocadora}}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº {{cnpjLocadora}}, com sede em {{enderecoLocadora}}.
+Responsável: {{responsavelLocadora}}
+Telefone: {{telefoneLocadora}}
+E-mail: {{emailLocadora}}
+
+LOCATÁRIO: {{nomeMotorista}}, profissão: Motorista de Aplicativo, portador do CPF nº {{cpfMotorista}}, RG nº {{rgMotorista}} e CNH nº {{cnhMotorista}} (validade {{vencimentoCnh}}), residente em {{enderecoMotorista}}, telefone {{telefoneMotorista}}, e-mail {{emailMotorista}}.
+
+As partes celebram o presente Contrato de Locação de Veículo, que se regerá pelas seguintes cláusulas e condições:
+
+CLÁUSULA PRIMEIRA – RELAÇÃO JURÍDICA
+
+1.1. O presente contrato não configura vínculo empregatício entre as partes, nos termos do artigo 593 do Código Civil, tratando-se exclusivamente de locação de bem móvel.
+1.2. O LOCADOR limita-se a disponibilizar o veículo, enquanto o LOCATÁRIO é responsável por sua atividade de transporte de passageiros.
+
+CLÁUSULA SEGUNDA – FINALIDADE
+
+2.1. O veículo será utilizado para transporte de passageiros e entregas por meio de aplicativos, como Uber, 99, Mercado Livre, InDrive e outros similares, dentro da Grande São Paulo.
+2.2. O LOCATÁRIO é o único responsável por eventuais ganhos, taxas e tributações associadas à sua atividade, conforme estabelece o artigo 421 do Código Civil.
+
+CLÁUSULA TERCEIRA – RESPONSABILIDADES DAS PARTES
+
+3.1. O LOCADOR se compromete a:
+• Manter o veículo regularizado perante os órgãos competentes;
+• Assegurar que o veículo esteja segurado contra sinistros, nos termos do art. 566 do Código Civil;
+• Entregar o veículo em boas condições mecânicas e adequado ao uso;
+• Prestar assistência mecânica em falhas oriundas de desgaste natural do veículo;
+• Fornecer guincho para até 80 km da base. Caso seja necessária remoção em distância maior, os custos adicionais serão pagos pelo LOCATÁRIO;
+• Comunicar ao LOCATÁRIO qualquer alteração relevante no contrato ou nas condições do veículo.
+
+3.2. O LOCATÁRIO se compromete a:
+• Utilizar o veículo respeitando o Código de Trânsito Brasileiro (Lei nº 9.503/97);
+• Não conduzir sob efeito de álcool, substâncias entorpecentes ou quaisquer outras que comprometam sua capacidade, nem transportar tais substâncias no veículo;
+• Não transportar drogas, substâncias ilícitas, armas, contrabando ou mercadorias sem nota fiscal, sob pena de rescisão imediata, recolhimento do veículo e responsabilização civil e criminal;
+• Não vender, doar, emprestar, sublocar, comercializar ou negociar o veículo objeto deste contrato, por qualquer meio;
+• Apresentar semanalmente o veículo para inspeção junto ao LOCADOR e enviar fotos e vídeo semanalmente utilizando aplicativo de vistoria indicado pela empresa;
+• Responsabilizar-se integralmente por multas, infrações de trânsito e penalidades decorrentes do uso do veículo;
+• Abastecer com combustível de qualidade e seguir as recomendações do fabricante quanto à manutenção;
+• Verificar diariamente água do radiador e óleo, comunicando imediatamente qualquer problema ao LOCADOR;
+• Devolver o veículo ao final do contrato no mesmo estado de conservação em que o recebeu, salvo desgaste natural;
+• Comunicar imediatamente ao LOCADOR acidentes, avarias, roubo, furto ou qualquer ocorrência envolvendo o veículo.
+
+CLÁUSULA QUARTA – OBJETO
+
+4.1. O objeto do presente contrato é a locação do veículo {{marcaVeiculo}} {{modeloVeiculo}}, ano {{anoVeiculo}}, cor {{corVeiculo}}, placa {{placaVeiculo}}, entregue ao LOCATÁRIO em perfeitas condições de uso, pelo prazo de 3 (três) meses a partir da assinatura.
+4.2. O contrato poderá ser renovado automaticamente caso ambas as partes concordem. Caso contrário, o veículo deverá ser devolvido nas mesmas condições em que foi recebido.
+4.3. O LOCATÁRIO reconhece que recebeu o veículo em bom estado e se compromete a devolvê-lo nas mesmas condições, salvo desgaste natural.
+
+CLÁUSULA QUINTA – DEPÓSITO CAUÇÃO
+
+5.1. O LOCATÁRIO pagará, no ato da retirada, {{caucao}} (valor da caução) a título de caução.
+5.2. A caução será devolvida ao final do contrato no mesmo valor, desde que não haja pendências financeiras, avarias ou multas, considerando o desconto da taxa administrativa de R$100,00 referente aos custos operacionais da empresa.
+5.3. A devolução será realizada em até 30 (trinta) dias úteis após a entrega do veículo.
+5.4. A caução poderá ser retida total ou parcialmente em caso de:
+• Pendências financeiras;
+• Avarias no veículo;
+• Multas de trânsito não transferidas;
+• Descumprimento de cláusulas contratuais.
+
+CLÁUSULA SEXTA – ALUGUEL E PAGAMENTO
+
+6.1. O LOCATÁRIO pagará ao LOCADOR o valor de {{valorSemanal}} por semana, via depósito bancário, sempre às segundas-feiras.
+6.2. Caso o pagamento não seja efetuado na segunda-feira, poderá ser realizado na terça-feira até 23h59 com multa de 10%.
+6.3. Após 00h00 de terça-feira, o veículo será bloqueado. Para desbloqueio, o LOCATÁRIO deverá pagar: (i) o valor em atraso; (ii) a multa de 10%; e (iii) taxa de R$50,00 pelo serviço de desbloqueio.
+6.4. Caso o pagamento não seja regularizado até quarta-feira, o veículo será recolhido, e o LOCATÁRIO deverá pagar multa correspondente a duas semanas de locação, além dos custos adicionais decorrentes de avarias e remoção.
+
+CLÁUSULA SÉTIMA – DEVOLUÇÃO VOLUNTÁRIA
+
+7.1. Caso o LOCATÁRIO perceba que não conseguirá manter os pagamentos, deverá comunicar imediatamente o LOCADOR e devolver voluntariamente o veículo no mesmo local da retirada.
+7.2. Caso o veículo não seja devolvido nesse local e seja necessária busca/remoção, será cobrada taxa fixa de R$200,00 + R$10,00 por quilômetro rodado.
+7.3. A não devolução voluntária será considerada descumprimento contratual.
+
+CLÁUSULA OITAVA – VISTORIAS
+
+8.1. O LOCATÁRIO tem direito a duas vistorias mensais.
+8.2. Se o veículo permanecer em oficina por mais de 10 (dez) horas devido a desgaste natural, o aluguel será abatido proporcionalmente.
+8.3. Se a paralisação decorrer de mau uso, o aluguel continuará sendo cobrado.
+
+CLÁUSULA NONA – PENALIDADES
+
+9.1. O LOCATÁRIO é responsável por todas as multas e infrações de trânsito, acrescidas de taxa administrativa de 20%. Caso não haja transferência dos pontos em até 10 (dez) dias, o LOCADOR poderá solicitar a devolução do veículo e cobrar o valor da multa em dobro.
+9.2. O veículo possui seguro contra roubo, furto, colisão e perda total (PT).
+• Em caso de sinistro coberto, o LOCATÁRIO arcará apenas com os dias de indisponibilidade;
+• Caso a seguradora recuse a cobertura, o LOCATÁRIO será responsável por todos os custos de reparo, além dos dias parados;
+• Em caso de perda total, o LOCATÁRIO arcará com o valor integral do veículo conforme tabela FIPE;
+• Danos não cobertos pelo seguro serão de responsabilidade do LOCATÁRIO.
+9.3. O LOCADOR poderá recolher definitivamente o veículo em caso de má utilização, reincidência de acidentes ou comprometimento da segurança.
+9.4. O limite de quilometragem mensal é de {{limiteKm}}. O excedente será cobrado a R$0,50 por km.
+
+CLÁUSULA DÉCIMA – RESCISÃO
+
+10.1. A rescisão antecipada requer notificação prévia de 30 dias. Caso não ocorra, o LOCATÁRIO pagará multa de R$1.200,00.
+10.2. O descumprimento de qualquer cláusula resultará na rescisão do contrato e multa equivalente a duas semanas de locação.
+
+CLÁUSULA DÉCIMA PRIMEIRA – DISPOSIÇÕES FINAIS
+
+11.1. As partes elegem o foro de Embu das Artes/SP.
+11.2. O presente contrato constitui título executivo extrajudicial (art. 784, III, CPC).
+
+Taboão da Serra/SP, {{dataAtual}}.
+
+Assinaturas:
+
+{{nomeMotorista}}
+(LOCATÁRIO)
+
+{{nomeLocadora}}
+(LOCADORA)
+
+(Testemunha 1 – Nome / RG / CPF)
+
+(Testemunha 2 – Nome / RG / CPF)
