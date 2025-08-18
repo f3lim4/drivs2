@@ -23,6 +23,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ **ERROR HANDLING IMPROVED** - Better API error messages and debugging
 - ✅ **STATUS TRANSITIONS WORKING** - All contract statuses (ativo, cancelado, encerrado) function correctly
 - ✅ **DUPLICATE REQUESTS ELIMINATED** - Fixed issue causing multiple API calls
+- ✅ **VALIDATION SCHEMA FIXED** - Updated schema to properly handle null values and optional fields
+- ✅ **CONTRACT EDITING FULLY FUNCTIONAL** - Contract status changes now work without errors
 
 ## System Architecture
 DRIVS é construído com uma arquitetura full-stack que garante escalabilidade, segurança e uma experiência de usuário fluida.
