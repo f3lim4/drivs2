@@ -275,17 +275,17 @@ export const updateContratoSchema = z.object({
     }
     return val;
   }),
-  tempoContrato: z.number().optional(),
+  tempoContrato: z.union([z.number(), z.null()]).optional(),
   dataInicio: z.union([z.string(), z.date()]).optional(),
-  dataFim: z.union([z.string(), z.date()]).optional(),
-  prazoMinimo: z.string().optional(),
+  dataFim: z.union([z.string(), z.date(), z.null()]).optional(),
+  prazoMinimo: z.union([z.string(), z.null()]).optional(),
   caucao: z.union([z.string(), z.number()]).optional(),
-  limiteKm: z.union([z.string(), z.number()]).optional(),
-  status: z.string().optional(),
-  motivoCancelamento: z.string().optional(),
+  limiteKm: z.union([z.string(), z.number(), z.null()]).optional(),
+  status: z.enum(['em_aberto', 'ativo', 'cancelado', 'encerrado']).optional(),
+  motivoCancelamento: z.union([z.string(), z.null()]).optional(),
   template: z.string().optional(),
-  arquivoAssinado: z.string().optional(),
-  dataAssinatura: z.union([z.string(), z.date()]).optional(),
+  arquivoAssinado: z.union([z.string(), z.null()]).optional(),
+  dataAssinatura: z.union([z.string(), z.date(), z.null()]).optional(),
 });
 
 export const insertTemplateContratoSchema = createInsertSchema(templateContratos).omit({
