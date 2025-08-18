@@ -55,7 +55,6 @@ const contratoSchema = z.object({
     required_error: 'Data de início é obrigatória',
   }),
   dataFim: z.date().optional(), // Data final opcional - se não preenchida, contrato é renovável
-  tempoMinimoContrato: z.string().optional(),
   prazoMinimo: z.string().optional(),
   valorSemanal: z.number().min(0.01, 'Valor semanal deve ser maior que 0'),
   caucao: z.number().min(0, 'Caução deve ser maior ou igual a 0'),
@@ -369,7 +368,6 @@ export function NovoContratoModal({
       veiculoId: '',
       dataInicio: getAmanha(),
       dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
-      tempoMinimoContrato: '',
       prazoMinimo: '',
       valorSemanal: 0,
       caucao: 0,
@@ -513,10 +511,10 @@ export function NovoContratoModal({
         throw new Error('Veículo ou motorista não encontrado');
       }
       
-      // Para cálculos, assume 1 mês como padrão se campo vazio ou não conseguir extrair número
+      // Para cálculos, assume 1 mês como padrão
       let mesesParaCalculo = 1;
-      if (data.tempoMinimoContrato && data.tempoMinimoContrato.trim()) {
-        const numeroExtraido = data.tempoMinimoContrato.match(/\d+/);
+      if (data.prazoMinimo && data.prazoMinimo.trim()) {
+        const numeroExtraido = data.prazoMinimo.match(/\d+/);
         if (numeroExtraido) {
           mesesParaCalculo = parseInt(numeroExtraido[0]);
         }
@@ -694,7 +692,7 @@ CLÁUSULA TERCEIRA – RESPONSABILIDADES DAS PARTES
 
 CLÁUSULA QUARTA – OBJETO
 
-4.1. O objeto do presente contrato é a locação do veículo ${aluguel.veiculoMarca} ${aluguel.veiculoModelo}, ano ${dadosVeiculo?.ano || 'N/I'}, cor ${dadosVeiculo?.cor || 'N/I'}, placa ${aluguel.veiculoPlaca}, RENAVAM ${dadosVeiculo?.renavam || 'N/I'}, CHASSI ${dadosVeiculo?.chassi || 'N/I'}, entregue ao LOCATÁRIO Vistoriado com fotos e video${data.tempoMinimoContrato && data.tempoMinimoContrato.trim() ? `, pelo prazo de ${data.tempoMinimoContrato}` : ''}${data.prazoMinimo && data.prazoMinimo.trim() ? `, prazo mínimo: ${data.prazoMinimo}` : ''} a partir da assinatura.
+4.1. O objeto do presente contrato é a locação do veículo ${veiculo.marca} ${veiculo.modelo}, ano ${dadosVeiculo?.ano || 'N/I'}, cor ${dadosVeiculo?.cor || 'N/I'}, placa ${aluguel.veiculoPlaca}, RENAVAM ${dadosVeiculo?.renavam || 'N/I'}, CHASSI ${dadosVeiculo?.chassi || 'N/I'}, entregue ao LOCATÁRIO Vistoriado com fotos e video${data.prazoMinimo && data.prazoMinimo.trim() ? `, prazo mínimo: ${data.prazoMinimo}` : ''} a partir da assinatura.
 4.2. O contrato poderá ser renovado automaticamente caso ambas as partes concordem. Caso contrário, o veículo deverá ser devolvido nas mesmas condições em que foi recebido.
 4.3. O LOCATÁRIO reconhece que recebeu o veículo em bom estado e se compromete a devolvê-lo nas mesmas condições, salvo desgaste natural.
 
@@ -773,7 +771,7 @@ ${locadorInfo.nome}
         valor: valorTotal.toFixed(2), // Enviar como string
         valorSemanal: data.valorSemanal.toFixed(2), // ✅ INCLUIR VALOR SEMANAL
         caucao: data.caucao.toFixed(2), // ✅ INCLUIR CAUÇÃO
-        tempoMinimoContrato: data.tempoMinimoContrato, // ✅ INCLUIR TEMPO MÍNIMO
+        prazoMinimo: data.prazoMinimo, // ✅ INCLUIR PRAZO MÍNIMO
         dataInicio: format(data.dataInicio, 'yyyy-MM-dd'),
         dataFim: dataFimContrato ? format(dataFimContrato, 'yyyy-MM-dd') : null, // ✅ NULL para contratos renováveis
         status: 'em_aberto' as const, // Inicia sempre como em_aberto
@@ -831,7 +829,7 @@ ${locadorInfo.nome}
           data.dataPrimeiroPagamento,
           data.recorrencia,
           data.valorSemanal,
-          data.tempoMinimoContrato || '',
+          data.prazoMinimo || '',
           data.dataInicio,  // Passa a data de início do contrato
           data.tipoPagamento,  // Tipo: ilimitado ou limitado
           data.quantidadePagamentos,  // Quantidade específica (se limitado)
@@ -886,7 +884,6 @@ ${locadorInfo.nome}
           veiculoId: '',
           dataInicio: getAmanha(),
           dataFim: undefined, // ✅ DATA FINAL OPCIONAL PARA CONTRATOS RENOVÁVEIS
-          tempoMinimoContrato: '',
           prazoMinimo: '',
           valorSemanal: 0,
           caucao: 0,
@@ -1129,28 +1126,6 @@ ${locadorInfo.nome}
                           Deixe vazio para contrato renovável
                         </p>
                       </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* TEMPO MÍNIMO DE CONTRATO */}
-                <FormField
-                  control={form.control}
-                  name="tempoMinimoContrato"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-base font-semibold">Tempo Mínimo</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="text"
-                          placeholder="ex: 1 mês, 6 meses, 1 ano"
-                          {...field}
-                        />
-                      </FormControl>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Campo opcional. Digite livremente (ex: 1 mês, 6 meses, 1 ano)
-                      </p>
                       <FormMessage />
                     </FormItem>
                   )}
