@@ -151,9 +151,6 @@ const motoristaSchema = z.object({
   cidade: z.string().min(1, 'Cidade é obrigatória'),
   estado: z.string().min(1, 'Estado é obrigatório'),
   cep: z.string().min(8, 'CEP deve ter 8 dígitos'),
-  
-  // Status
-  status: z.enum(['ativo', 'inativo', 'vencido']),
 });
 
 type MotoristaFormData = z.infer<typeof motoristaSchema>;
@@ -221,7 +218,6 @@ export function NovoMotoristaModal({
       cidade: '',
       estado: '',
       cep: '',
-      status: 'ativo',
     },
   });
 
@@ -345,7 +341,7 @@ export function NovoMotoristaModal({
         cidade: data.cidade,
         estado: data.estado,
         cep: data.cep,
-        status: data.status,
+        status: 'ativo', // Sempre definir como ativo
       };
 
       // Usar hook do React Query para criar motorista
@@ -1021,29 +1017,7 @@ export function NovoMotoristaModal({
 
             {/* STATUS */}
             <div className="space-y-4">
-              
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="ativo">Ativo</SelectItem>
-                        <SelectItem value="inativo">Inativo</SelectItem>
-                        <SelectItem value="vencido">CNH Vencida</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Status será sempre "ativo" por padrão */}
             </div>
 
             <DialogFooter>
