@@ -77,7 +77,7 @@ export function VisualizarContratoModal({
 
   // Encontrar motorista e veículo específicos baseados no contrato
   useEffect(() => {
-    if (!contrato || !motoristas || !veiculos) return;
+    if (!contrato || !motoristas || !veiculos || !Array.isArray(motoristas) || !Array.isArray(veiculos)) return;
 
     // Encontrar motorista pelo nome do cliente (com verificação de segurança)
     const motoristaEncontrado = motoristas.find((m: Motorista) => {
@@ -482,7 +482,7 @@ export function VisualizarContratoModal({
                 {!contrato.dataFim && (
                   <div>
                     <p className="text-sm font-medium text-gray-600">Tempo Mínimo</p>
-                    <p className="font-semibold">{contrato.tempoMinimoContrato || 1} mês{(contrato.tempoMinimoContrato || 1) > 1 ? 'es' : ''}</p>
+                    <p className="font-semibold">{contrato.tempoContrato || 1} mês{(contrato.tempoContrato || 1) > 1 ? 'es' : ''}</p>
                   </div>
                 )}
               </div>
@@ -497,7 +497,7 @@ export function VisualizarContratoModal({
             <CardContent>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <pre className="whitespace-pre-wrap text-sm font-mono">
-                  {contrato.template}
+                  {contrato.template || 'Template não especificado'}
                 </pre>
               </div>
             </CardContent>

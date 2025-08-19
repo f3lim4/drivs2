@@ -140,7 +140,7 @@ export function NovoAluguelModal({
             
             // FILTRO DE SEGURANÇA: Verificar se todos os motoristas pertencem à locadora
             if (isLocadora && profile?.locadoraId) {
-              const todosMotoristasCorretos = motoristasData.every(m => m.locadoraId === profile.locadoraId);
+              const todosMotoristasCorretos = motoristasData.every((m: any) => m.locadoraId === profile.locadoraId);
               if (!todosMotoristasCorretos) {
                 console.error('SECURITY ALERT: Motoristas de outras locadoras detectados');
                 setMotoristas([]);
@@ -174,7 +174,7 @@ export function NovoAluguelModal({
             
             // FILTRO DE SEGURANÇA: Verificar se todos os veículos pertencem à locadora
             if (isLocadora && profile?.locadoraId) {
-              const todosVeiculosCorretos = veiculosData.every(v => v.locadoraId === profile.locadoraId);
+              const todosVeiculosCorretos = veiculosData.every((v: any) => v.locadoraId === profile.locadoraId);
               if (!todosVeiculosCorretos) {
                 console.error('SECURITY ALERT: Veículos de outras locadoras detectados');
                 setVeiculos([]);
@@ -231,8 +231,8 @@ export function NovoAluguelModal({
 
       // Calcula valores (converte string para número)
       const valorSemanalNum = typeof veiculo.valorSemanal === 'string' ? 
-        parseFloat(veiculo.valorSemanal.replace(',', '.')) : 
-        veiculo.valorSemanal;
+        parseFloat(veiculo.valorSemanal.toString().replace(',', '.')) : 
+        parseFloat(veiculo.valorSemanal.toString());
       // CORREÇÃO: Usa fórmula corrigida baseada em dias reais do mês
       const valorMensal = valorSemanalNum * 4.35; // 30.44 dias/mês ÷ 7 dias/semana = 4.35
       const valorTotal = valorMensal * data.tempoContrato;
@@ -249,8 +249,8 @@ export function NovoAluguelModal({
         valorMensal: valorMensal.toString(),
         valorTotal: valorTotal.toString(),
         caucao: (typeof veiculo.caucao === 'string' ? 
-          parseFloat(veiculo.caucao.replace(',', '.')) : 
-          veiculo.caucao).toString(),
+          parseFloat(veiculo.caucao.toString().replace(',', '.')) : 
+          parseFloat(veiculo.caucao.toString())).toString(),
         taxaAdministrativa: '0',
         status: 'ativo',
       };
@@ -449,8 +449,8 @@ export function NovoAluguelModal({
                                 </span>
                                 <span className="text-sm text-muted-foreground">
                                   R$ {typeof veiculo.valorSemanal === 'string' ? 
-                                    parseFloat(veiculo.valorSemanal.replace(',', '.')).toFixed(2) : 
-                                    parseFloat(veiculo.valorSemanal).toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
+                                    parseFloat(veiculo.valorSemanal.toString().replace(',', '.')).toFixed(2) : 
+                                    parseFloat(veiculo.valorSemanal.toString()).toFixed(2)}/semana • {veiculo.cor} • {veiculo.ano}
                                 </span>
                               </div>
                             </SelectItem>

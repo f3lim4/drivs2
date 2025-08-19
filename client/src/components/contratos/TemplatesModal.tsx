@@ -77,7 +77,7 @@ export function TemplatesModal({ isOpen, onClose }: TemplatesModalProps) {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {templates.map((template) => (
+                      {templates.map((template: any) => (
                         <TableRow key={template.id}>
                           <TableCell className="font-medium">{template.nome}</TableCell>
                           <TableCell>{new Date(template.createdAt).toLocaleDateString('pt-BR')}</TableCell>
@@ -170,7 +170,7 @@ export function TemplatesModal({ isOpen, onClose }: TemplatesModalProps) {
         open={showUploadTemplateModal}
         onOpenChange={setShowUploadTemplateModal}
         onTemplateUploaded={() => {
-          refetch(); // Recarregar templates após upload
+          // Template carregado com sucesso
         }}
       />
     </>
