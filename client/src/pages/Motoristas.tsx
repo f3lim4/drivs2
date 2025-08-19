@@ -261,13 +261,20 @@ export default function Motoristas() {
 
   // Retorna badge de status com cor apropriada
   const getStatusBadge = (motorista: Motorista) => {
-    // Prioridade: Negativado > CNH vencida > CNH vencendo > Ativo
+    // Para a coluna do motorista: mostra se foi negativado ou status básico
     if (motorista.negativado) {
       return <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">
         Negativado
       </Badge>;
     }
     
+    return <Badge variant={motorista.status === 'ativo' ? 'default' : 'outline'} className="text-xs">
+      {motorista.status === 'ativo' ? 'Ativo' : 'Inativo'}
+    </Badge>;
+  };
+
+  const getCnhStatusBadge = (motorista: Motorista) => {
+    // Para a coluna CNH: mostra apenas o status da CNH
     const statusCnh = getStatusFromVencimento(motorista.vencimentoCnh);
     
     switch (statusCnh) {
@@ -284,7 +291,7 @@ export default function Motoristas() {
           CNH Vencida
         </Badge>;
       default:
-        return <Badge variant="outline">{motorista.status}</Badge>;
+        return <Badge variant="outline">Status desconhecido</Badge>;
     }
   };
 
@@ -524,7 +531,7 @@ export default function Motoristas() {
                   <TableCell>
                     <div className="space-y-1">
                       <p className="text-sm">{motorista.vencimentoCnh}</p>
-                      {getStatusBadge(motorista)}
+                      {getCnhStatusBadge(motorista)}
                     </div>
                   </TableCell>
                   {isLocadora && (
