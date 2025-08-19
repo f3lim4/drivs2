@@ -152,8 +152,7 @@ const motoristaSchema = z.object({
   estado: z.string().min(1, 'Estado é obrigatório'),
   cep: z.string().min(8, 'CEP deve ter 8 dígitos'),
   
-  // Status
-  status: z.enum(['ativo', 'inativo', 'vencido']),
+
 });
 
 type MotoristaFormData = z.infer<typeof motoristaSchema>;
@@ -226,7 +225,6 @@ export function EditarMotoristaModal({
       cidade: '',
       estado: '',
       cep: '',
-      status: 'ativo',
     },
   });
 
@@ -346,7 +344,6 @@ export function EditarMotoristaModal({
         cidade: motorista.cidade,
         estado: motorista.estado,
         cep: motorista.cep,
-        status: motorista.status,
       });
       
       // Limpar imagens quando mudar motorista
@@ -447,7 +444,8 @@ export function EditarMotoristaModal({
       // Preparar dados para API
       const motoristaData = {
         ...data,
-        locadoraId: profile.id,
+        locadoraId: profile.locadoraId || profile.id,
+        status: motorista.status, // Manter status original
         email: data.email || undefined,
       };
       
@@ -1155,41 +1153,21 @@ export function EditarMotoristaModal({
 
             {/* STATUS */}
             <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status do Motorista *</FormLabel>
-                    <div className="space-y-3">
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="w-48">
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="ativo">Ativo</SelectItem>
-                          <SelectItem value="inativo">Inativo</SelectItem>
-                          <SelectItem value="vencido">CNH Vencida</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      
-                      {/* BOTÃO NEGATIVAR */}
-                      <div className="flex justify-end">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setMostrarNegativacao(!mostrarNegativacao)}
-                          className="text-red-600 border-red-300 hover:bg-red-50 text-xs"
-                        >
-                          Negativar Motorista
-                        </Button>
-                      </div>
+              {/* BOTÃO NEGATIVAR */}
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setMostrarNegativacao(!mostrarNegativacao)}
+                  className="text-red-600 border-red-300 hover:bg-red-50 text-xs"
+                >
+                  Negativar Motorista
+                </Button>
+              </div>
 
-                      {/* SEÇÃO NEGATIVAR MOTORISTA */}
-                      {mostrarNegativacao && (
+              {/* SEÇÃO NEGATIVAR MOTORISTA */}
+              {mostrarNegativacao && (
                         <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-3">
                           <div className="flex items-center gap-2">
                             <div className="w-2 h-2 bg-red-500 rounded-full"></div>
@@ -1239,11 +1217,6 @@ export function EditarMotoristaModal({
                           </div>
                         </div>
                       )}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             <DialogFooter>
