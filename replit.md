@@ -32,6 +32,13 @@ Preferred communication style: Simple, everyday language.
 - ✅ **DATABASE VERIFICATION CONFIRMED** - Negativation data correctly stored and retrieved from PostgreSQL
 - ✅ **DRIVER SEARCH WORKING** - CPF search across locadoras now shows negativation as "problema" instead of "limpo"
 
+### 2025-08-19: Driver Edit Modal Status Field Removal - CONCLUÍDO ✅
+- ✅ **STATUS FIELD REMOVED** - Status dropdown completely removed from EditarMotoristaModal
+- ✅ **SCHEMA UPDATED** - Validation schema no longer includes status field
+- ✅ **NEGATIVATION PRESERVED** - "Negativar Motorista" button maintained and functional
+- ✅ **STATUS PRESERVATION** - Driver status preserved during normal edits, only changed via negativation
+- ✅ **TYPE SAFETY FIXED** - TypeScript interface updated with all required motorista fields
+
 ## System Architecture
 DRIVS é construído com uma arquitetura full-stack que garante escalabilidade, segurança e uma experiência de usuário fluida.
 
