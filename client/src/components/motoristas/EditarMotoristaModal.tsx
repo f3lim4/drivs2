@@ -171,6 +171,8 @@ export function EditarMotoristaModal({
   onMotoristaEditado 
 }: EditarMotoristaModalProps) {
   const [loading, setLoading] = useState(false);
+  const [mostrarNegativacao, setMostrarNegativacao] = useState(false);
+  const [motivoNegativacao, setMotivoNegativacao] = useState('');
   const [imagens, setImagens] = useState<{
     fotoPerfil: File | null;
     cnhImagem: File | null;
@@ -364,6 +366,72 @@ export function EditarMotoristaModal({
       });
     }
   }, [motorista, open, form]);
+
+  const negativarMotorista = async () => {
+    if (!motorista || !profile || !motivoNegativacao.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, descreva o motivo da negativação",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const negativacaoData = {
+        negativado: true,
+        motivoNegativacao: motivoNegativacao,
+        dataNegativacao: new Date().toISOString(),
+        status: 'inativo' // Garantir que o motorista fique inativo
+      };
+      
+      const response = await fetch(`/api/motoristas/${motorista.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(negativacaoData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao negativar motorista');
+      }
+
+      const motoristaAtualizado = await response.json();
+
+      // Log da atividade
+      await registrarAtividade(
+        profile.locadoraId || profile.id,
+        profile.email || 'usuario@drivs.me',
+        'negativar',
+        'motorista',
+        motorista.id,
+        `Motorista negativado: ${motoristaAtualizado.nome} (CPF: ${motoristaAtualizado.cpf}) - Motivo: ${motivoNegativacao}`
+      );
+
+      toast({
+        title: "Motorista negativado!",
+        description: `${motoristaAtualizado.nome} foi negativado com sucesso.`,
+      });
+
+      onMotoristaEditado(motoristaAtualizado);
+      setMostrarNegativacao(false);
+      setMotivoNegativacao('');
+      onOpenChange(false);
+      
+    } catch (error) {
+      console.error('Error negativing motorista:', error);
+      toast({
+        title: "Erro ao negativar motorista",
+        description: "Tente novamente mais tarde",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const onSubmit = async (data: MotoristaFormData) => {
     if (!motorista || !profile) return;
@@ -1088,7 +1156,14 @@ export function EditarMotoristaModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status do Motorista *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={(value) => {
+                      field.onChange(value);
+                      if (value === 'inativo') {
+                        setMostrarNegativacao(true);
+                      } else {
+                        setMostrarNegativacao(false);
+                      }
+                    }} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-48">
                           <SelectValue />
@@ -1104,6 +1179,43 @@ export function EditarMotoristaModal({
                   </FormItem>
                 )}
               />
+
+              {/* BOTÃO NEGATIVAR MOTORISTA */}
+              {mostrarNegativacao && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <h3 className="text-sm font-semibold text-red-700">Negativar Motorista</h3>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Label htmlFor="motivo-negativacao" className="text-sm">
+                      Descreva o motivo da negativação *
+                    </Label>
+                    <textarea
+                      id="motivo-negativacao"
+                      value={motivoNegativacao}
+                      onChange={(e) => setMotivoNegativacao(e.target.value)}
+                      placeholder="Ex: Inadimplência, problemas com documentação, histórico de infrações..."
+                      className="w-full p-2 border border-red-300 rounded-md text-sm resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      rows={3}
+                    />
+                    
+                    <Button
+                      type="button"
+                      onClick={negativarMotorista}
+                      disabled={loading || !motivoNegativacao.trim()}
+                      className="w-full bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      {loading ? "Processando..." : "Confirmar Negativação"}
+                    </Button>
+                    
+                    <p className="text-xs text-red-600">
+                      ⚠️ Ação irreversível: O motorista será marcado como negativado no sistema
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <DialogFooter>
