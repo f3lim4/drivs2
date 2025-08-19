@@ -127,6 +127,10 @@ export const motoristas = pgTable("motoristas", {
   // Status
   status: text("status").notNull().default("ativo"), // 'ativo', 'inativo', 'vencido'
   avatar: text("avatar"),
+  // Negativação
+  negativado: boolean("negativado").notNull().default(false),
+  motivoNegativacao: text("motivo_negativacao"),
+  dataNegativacao: timestamp("data_negativacao"),
   // Imagens do motorista (até 6 imagens)
   imagem1: text("imagem1"),
   imagem2: text("imagem2"),
