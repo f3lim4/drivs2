@@ -36,6 +36,7 @@ import { NovoMotoristaModal } from '@/components/motoristas/NovoMotoristaModal';
 import { EditarMotoristaModal } from '@/components/motoristas/EditarMotoristaModal';
 import { ExcluirMotoristaDialog } from '@/components/motoristas/ExcluirMotoristaDialog';
 import { VisualizarMotoristaModal } from '@/components/motoristas/VisualizarMotoristaModal';
+import { PesquisarCpfModal } from '@/components/motoristas/PesquisarCpfModal';
 import { registrarAtividade } from '@/utils/activityLogger';
 
 
@@ -53,6 +54,7 @@ export default function Motoristas() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [pesquisarCpfModalOpen, setPesquisarCpfModalOpen] = useState(false);
 
   const [selectedMotorista, setSelectedMotorista] = useState<Motorista | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -393,13 +395,23 @@ export default function Motoristas() {
               </Select>
 
               {isLocadora && (
-                <Button 
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  onClick={handleNovoMotorista}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Novo Motorista
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setPesquisarCpfModalOpen(true)}
+                    title="Pesquisar histórico de motorista por CPF"
+                  >
+                    <Search className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={handleNovoMotorista}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Novo Motorista
+                  </Button>
+                </div>
               )}
             </div>
           </div>
@@ -603,6 +615,11 @@ export default function Motoristas() {
             onConfirmarExclusao={handleConfirmarExclusao}
           />
 
+          {/* Modal de Pesquisar CPF */}
+          <PesquisarCpfModal
+            open={pesquisarCpfModalOpen}
+            onOpenChange={setPesquisarCpfModalOpen}
+          />
 
         </>
       )}
