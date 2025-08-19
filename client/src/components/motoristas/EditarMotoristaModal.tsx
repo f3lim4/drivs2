@@ -1156,88 +1156,89 @@ export function EditarMotoristaModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status do Motorista *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="w-48">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="ativo">Ativo</SelectItem>
-                        <SelectItem value="inativo">Inativo</SelectItem>
-                        <SelectItem value="vencido">CNH Vencida</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="space-y-3">
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-48">
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="ativo">Ativo</SelectItem>
+                          <SelectItem value="inativo">Inativo</SelectItem>
+                          <SelectItem value="vencido">CNH Vencida</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      {/* BOTÃO NEGATIVAR */}
+                      <div className="flex justify-end">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setMostrarNegativacao(!mostrarNegativacao)}
+                          className="text-red-600 border-red-300 hover:bg-red-50 text-xs"
+                        >
+                          Negativar Motorista
+                        </Button>
+                      </div>
+
+                      {/* SEÇÃO NEGATIVAR MOTORISTA */}
+                      {mostrarNegativacao && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <h3 className="text-sm font-semibold text-red-700">Negativar Motorista</h3>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <Label htmlFor="motivo-negativacao" className="text-sm">
+                              Descreva o motivo da negativação *
+                            </Label>
+                            <textarea
+                              id="motivo-negativacao"
+                              value={motivoNegativacao}
+                              onChange={(e) => setMotivoNegativacao(e.target.value)}
+                              placeholder="Ex: Inadimplência, problemas com documentação, histórico de infrações..."
+                              className="w-full p-2 border border-red-300 rounded-md text-sm resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                              rows={3}
+                            />
+                            
+                            <div className="flex gap-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setMostrarNegativacao(false);
+                                  setMotivoNegativacao('');
+                                }}
+                                className="flex-1"
+                              >
+                                Cancelar
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={negativarMotorista}
+                                disabled={loading || !motivoNegativacao.trim()}
+                                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                              >
+                                {loading ? "Processando..." : "Confirmar"}
+                              </Button>
+                            </div>
+                            
+                            <p className="text-xs text-red-600">
+                              ⚠️ Ação irreversível: O motorista será marcado como negativado no sistema
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {/* AÇÕES ESPECIAIS */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-gray-700">Ações Especiais</h3>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setMostrarNegativacao(!mostrarNegativacao)}
-                    className="text-red-600 border-red-300 hover:bg-red-50"
-                  >
-                    Negativar Motorista
-                  </Button>
-                </div>
-
-                {/* SEÇÃO NEGATIVAR MOTORISTA */}
-                {mostrarNegativacao && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                      <h3 className="text-sm font-semibold text-red-700">Negativar Motorista</h3>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <Label htmlFor="motivo-negativacao" className="text-sm">
-                        Descreva o motivo da negativação *
-                      </Label>
-                      <textarea
-                        id="motivo-negativacao"
-                        value={motivoNegativacao}
-                        onChange={(e) => setMotivoNegativacao(e.target.value)}
-                        placeholder="Ex: Inadimplência, problemas com documentação, histórico de infrações..."
-                        className="w-full p-2 border border-red-300 rounded-md text-sm resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        rows={3}
-                      />
-                      
-                      <div className="flex gap-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => {
-                            setMostrarNegativacao(false);
-                            setMotivoNegativacao('');
-                          }}
-                          className="flex-1"
-                        >
-                          Cancelar
-                        </Button>
-                        <Button
-                          type="button"
-                          onClick={negativarMotorista}
-                          disabled={loading || !motivoNegativacao.trim()}
-                          className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          {loading ? "Processando..." : "Confirmar Negativação"}
-                        </Button>
-                      </div>
-                      
-                      <p className="text-xs text-red-600">
-                        ⚠️ Ação irreversível: O motorista será marcado como negativado no sistema
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
 
             <DialogFooter>
