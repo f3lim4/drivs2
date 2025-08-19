@@ -15,7 +15,8 @@ export function useMotoristas() {
   const { 
     data: motoristas = [], 
     isLoading, 
-    error 
+    error,
+    refetch
   } = useQuery({
     queryKey: ['motoristas', locadoraId],
     queryFn: async () => {
@@ -133,6 +134,7 @@ export function useMotoristas() {
     motoristas,
     isLoading,
     error,
+    refetch,
     createMotorista,
     updateMotorista,
     deleteMotorista,
