@@ -47,7 +47,7 @@ import { addDays, isAfter, isBefore, parseISO } from 'date-fns';
 export default function Motoristas() {
   const { toast } = useToast();
   const { isAdmin, isLocadora, profile } = useAuth();
-  const { motoristas, isLoading, deleteMotorista } = useMotoristas();
+  const { motoristas, isLoading, deleteMotorista, refetch } = useMotoristas();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [modalOpen, setModalOpen] = useState(false);
@@ -203,7 +203,8 @@ export default function Motoristas() {
       title: "Motorista Atualizado",
       description: `${motoristaAtualizado.nome} foi atualizado com sucesso!`,
     });
-    // A atualização da lista é feita automaticamente pelo hook
+    // Forçar atualização dos dados para refletir mudanças imediatamente
+    refetch();
   };
 
   const handleExcluirMotorista = (motorista: Motorista) => {
@@ -488,7 +489,7 @@ export default function Motoristas() {
                       <div>
                         <p className="font-medium">{motorista.nome}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          {motorista.negativado === true ? (
+                          {motorista.negativado ? (
                             <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 text-xs font-medium">
                               ❌ Negativado
                             </Badge>
