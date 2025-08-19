@@ -488,13 +488,13 @@ export default function Motoristas() {
                       <div>
                         <p className="font-medium">{motorista.nome}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          {motorista.negativado ? (
-                            <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 text-xs">
-                              Negativado
+                          {motorista.negativado === true ? (
+                            <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 text-xs font-medium">
+                              ❌ Negativado
                             </Badge>
                           ) : (
                             <Badge variant={motorista.status === 'ativo' ? 'default' : 'outline'} className="text-xs">
-                              {motorista.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                              {motorista.status === 'ativo' ? '✅ Ativo' : '⚠️ Inativo'}
                             </Badge>
                           )}
                         </div>
