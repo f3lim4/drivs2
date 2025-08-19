@@ -684,6 +684,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Pesquisar histórico de motorista por CPF em todas as locadoras
+  app.get("/api/motoristas/pesquisar-historico/:cpf", async (req, res) => {
+    try {
+      const cpf = req.params.cpf;
+      
+      // Buscar motorista em todas as locadoras
+      const todosMotoristas = await storage.getAllMotoristas();
+      const motoristasEncontrados = todosMotoristas.filter(m => m.cpf.replace(/\D/g, '') === cpf);
+      
+      if (motoristasEncontrados.length === 0) {
+        return res.status(404).json({ message: "Motorista não encontrado em nenhuma locadora" });
+      }
+      
+      // Para cada motorista encontrado, buscar problemas históricos
+      const historico: {
+        motorista: {
+          nome: string;
+          cpf: string;
+          telefone: string;
+        };
+        locadoras: Array<{
+          nome: string;
+          cnpj: string;
+          problemas: Array<{
+            tipo: string;
+            descricao: string;
+            valor?: number;
+            data: string;
+          }>;
+        }>;
+      } = {
+        motorista: {
+          nome: motoristasEncontrados[0].nome,
+          cpf: motoristasEncontrados[0].cpf,
+          telefone: motoristasEncontrados[0].telefone
+        },
+        locadoras: []
+      };
+      
+      // Buscar todas as locadoras para obter nomes
+      const todasLocadoras = await storage.getAllLocadoras();
+      
+      for (const motorista of motoristasEncontrados) {
+        const locadora = todasLocadoras.find(l => l.id === motorista.locadoraId);
+        if (!locadora) continue;
+        
+        const problemas: Array<{
+          tipo: string;
+          descricao: string;
+          valor?: number;
+          data: string;
+        }> = [];
+        
+        // Buscar problemas de pagamentos em atraso/inadimplência
+        const pagamentos = await storage.getPagamentosByMotorista(motorista.id);
+        const pagamentosProblema = pagamentos.filter(p => 
+          p.status === 'em_aberto' || 
+          p.status === 'em_atraso' || 
+          (p.observacoes && p.observacoes.toLowerCase().includes('inadimpl'))
+        );
+        
+        pagamentosProblema.forEach(p => {
+          problemas.push({
+            tipo: 'inadimplencia',
+            descricao: `Pagamento em atraso: ${p.descricao || 'Valor pendente'}`,
+            valor: parseFloat(p.valorRestante || p.valorTotal || '0'),
+            data: p.dataPagamento || new Date().toISOString()
+          });
+        });
+        
+        // Buscar contratos cancelados por problemas
+        const contratos = await storage.getAllContratos();
+        const contratosCancelados = contratos.filter(c => 
+          c.locadoraId === motorista.locadoraId &&
+          c.cliente === motorista.nome &&
+          c.status === 'cancelado'
+        );
+        
+        contratosCancelados.forEach(c => {
+          problemas.push({
+            tipo: 'cancelamento',
+            descricao: `Contrato cancelado: ${c.titulo || 'Contrato de locação'}`,
+            data: c.updatedAt?.toISOString() || new Date().toISOString()
+          });
+        });
+        
+        // Buscar infrações/multas
+        const infracoes = await storage.getAllInfracoes();
+        const infracoesMotorista = infracoes.filter(i => 
+          i.locadoraId === motorista.locadoraId &&
+          i.motoristaId === motorista.id
+        );
+        
+        infracoesMotorista.forEach(i => {
+          problemas.push({
+            tipo: 'infracao',
+            descricao: `Infração: ${i.tipoInfracao} - ${i.observacoes || 'Infração registrada'}`,
+            valor: parseFloat(i.valor || '0'),
+            data: i.dataInfracao || new Date().toISOString()
+          });
+        });
+        
+        historico.locadoras.push({
+          nome: locadora.nome,
+          cnpj: locadora.cnpj,
+          problemas: problemas
+        });
+      }
+      
+      res.json(historico);
+      
+    } catch (error) {
+      console.error("Error searching motorista history:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Aluguéis routes
   app.get("/api/alugueis", async (req, res) => {
     try {
