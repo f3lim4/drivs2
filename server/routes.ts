@@ -794,6 +794,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         });
         
+        // Verificar se motorista foi negativado
+        if (motorista.negativado && motorista.motivoNegativacao) {
+          problemas.push({
+            tipo: 'negativacao',
+            descricao: `Motorista negativado: ${motorista.motivoNegativacao}`,
+            data: motorista.dataNegativacao?.toISOString() || new Date().toISOString()
+          });
+        }
+        
         historico.locadoras.push({
           nome: locadora.nome,
           cnpj: locadora.cnpj,
