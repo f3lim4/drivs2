@@ -260,6 +260,13 @@ export default function Motoristas() {
 
   // Retorna badge de status com cor apropriada
   const getStatusBadge = (motorista: Motorista) => {
+    // Prioridade: Negativado > CNH vencida > CNH vencendo > Ativo
+    if (motorista.negativado) {
+      return <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200">
+        Negativado
+      </Badge>;
+    }
+    
     const statusCnh = getStatusFromVencimento(motorista.vencimentoCnh);
     
     switch (statusCnh) {
@@ -480,9 +487,17 @@ export default function Motoristas() {
                       </div>
                       <div>
                         <p className="font-medium">{motorista.nome}</p>
-                        {motorista.localizacao && (
-                          <p className="text-sm text-muted-foreground">{motorista.localizacao}</p>
-                        )}
+                        <div className="flex items-center gap-2 mt-1">
+                          {motorista.negativado ? (
+                            <Badge variant="destructive" className="bg-red-100 text-red-800 border-red-200 text-xs">
+                              Negativado
+                            </Badge>
+                          ) : (
+                            <Badge variant={motorista.status === 'ativo' ? 'default' : 'outline'} className="text-xs">
+                              {motorista.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </TableCell>
