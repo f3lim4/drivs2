@@ -445,8 +445,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateMotorista(id: string, updates: Partial<InsertMotorista>): Promise<Motorista> {
+    // Processar campos de data corretamente
+    const processedUpdates = { ...updates };
+    
+    // Se dataNegativacao estiver sendo enviada como string, converter para Date
+    if (processedUpdates.dataNegativacao && typeof processedUpdates.dataNegativacao === 'string') {
+      processedUpdates.dataNegativacao = new Date(processedUpdates.dataNegativacao);
+    }
+    
     const result = await db.update(motoristas)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({ ...processedUpdates, updatedAt: new Date() })
       .where(eq(motoristas.id, id))
       .returning();
     return result[0];

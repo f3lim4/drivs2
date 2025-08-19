@@ -666,7 +666,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/motoristas/:id", async (req, res) => {
     try {
-      const motorista = await storage.updateMotorista(req.params.id, req.body);
+      // Processar campos de data se existirem
+      const updates = { ...req.body };
+      
+      // Se dataNegativacao for uma string, converter para Date
+      if (updates.dataNegativacao && typeof updates.dataNegativacao === 'string') {
+        updates.dataNegativacao = new Date(updates.dataNegativacao);
+      }
+      
+      const motorista = await storage.updateMotorista(req.params.id, updates);
       res.json(motorista);
     } catch (error) {
       console.error("Error updating motorista:", error);

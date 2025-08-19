@@ -383,7 +383,7 @@ export function EditarMotoristaModal({
       const negativacaoData = {
         negativado: true,
         motivoNegativacao: motivoNegativacao,
-        dataNegativacao: new Date().toISOString(),
+        dataNegativacao: new Date(),
         status: 'inativo' // Garantir que o motorista fique inativo
       };
       
