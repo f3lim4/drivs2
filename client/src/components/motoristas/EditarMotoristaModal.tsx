@@ -37,6 +37,7 @@ import { Motorista } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { registrarAtividade } from '@/utils/activityLogger';
+import { useQueryClient } from '@tanstack/react-query';
 import { Image, Upload, X, FileText, Eye } from 'lucide-react';
 
 // Funções de validação
@@ -170,6 +171,9 @@ export function EditarMotoristaModal({
   motorista,
   onMotoristaEditado 
 }: EditarMotoristaModalProps) {
+  const { profile } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [mostrarNegativacao, setMostrarNegativacao] = useState(false);
   const [motivoNegativacao, setMotivoNegativacao] = useState('');
@@ -203,8 +207,6 @@ export function EditarMotoristaModal({
     fotoExtra: null,
     fotoExtra2: null,
   });
-  const { profile } = useAuth();
-  const { toast } = useToast();
 
   const form = useForm<MotoristaFormData>({
     resolver: zodResolver(motoristaSchema),
@@ -416,6 +418,9 @@ export function EditarMotoristaModal({
         description: `${motoristaAtualizado.nome} foi negativado com sucesso.`,
       });
 
+      // Invalidar cache do React Query para forçar atualização
+      queryClient.invalidateQueries({ queryKey: ['/api/motoristas'] });
+      
       onMotoristaEditado(motoristaAtualizado);
       setMostrarNegativacao(false);
       setMotivoNegativacao('');
