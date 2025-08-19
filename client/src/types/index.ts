@@ -5,6 +5,7 @@
 
 export interface Motorista {
   id: string;
+  locadoraId: string;
   // Informações Pessoais
   nome: string;
   cpf: string;
@@ -21,12 +22,24 @@ export interface Motorista {
   rua: string;
   numero: string;
   bairro: string;
+  complemento?: string;
   cidade: string;
   estado: string;
   cep: string;
   // Status e outros
   status: 'ativo' | 'inativo' | 'vencido';
   avatar?: string;
+  // Negativação
+  negativado?: boolean;
+  motivoNegativacao?: string;
+  dataNegativacao?: string;
+  // Imagens
+  imagem1?: string;
+  imagem2?: string;
+  imagem3?: string;
+  imagem4?: string;
+  imagem5?: string;
+  imagem6?: string;
   // Campos legados para compatibilidade
   contato?: string;
   localizacao?: string;

@@ -86,7 +86,7 @@ export default function Motoristas() {
   // Função para encontrar o nome da locadora
   const getLocadoraName = (locadoraId: string) => {
     if (!locadoraId) return 'Locadora';
-    const locadora = locadoras.find((loc: any) => loc.id === locadoraId);
+    const locadora = (locadoras as any[]).find((loc: any) => loc.id === locadoraId);
     return locadora ? locadora.nome : locadoraId;
   };
 
