@@ -26,6 +26,12 @@ Preferred communication style: Simple, everyday language.
 - ✅ **VALIDATION SCHEMA FIXED** - Updated schema to properly handle null values and optional fields
 - ✅ **CONTRACT EDITING FULLY FUNCTIONAL** - Contract status changes now work without errors
 
+### 2025-08-19: Driver History API Fix - CONCLUÍDO ✅
+- ✅ **DRIVER NEGATIVATION HISTORY FIXED** - API pesquisar-historico now includes negativation records as problems
+- ✅ **CACHE INVALIDATION CORRECTED** - React Query cache properly updates after driver status changes
+- ✅ **DATABASE VERIFICATION CONFIRMED** - Negativation data correctly stored and retrieved from PostgreSQL
+- ✅ **DRIVER SEARCH WORKING** - CPF search across locadoras now shows negativation as "problema" instead of "limpo"
+
 ## System Architecture
 DRIVS é construído com uma arquitetura full-stack que garante escalabilidade, segurança e uma experiência de usuário fluida.
 
