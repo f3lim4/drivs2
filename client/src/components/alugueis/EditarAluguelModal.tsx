@@ -169,7 +169,7 @@ export function EditarAluguelModal({
 
       // Calcula valores
       // CORREÇÃO: Usa fórmula corrigida baseada em dias reais do mês
-      const valorMensal = veiculo.valorSemanal ? parseFloat(veiculo.valorSemanal) * 4.35 : 0; // 30.44 dias/mês ÷ 7 dias/semana = 4.35
+      const valorMensal = veiculo.valorSemanal ? parseFloat(veiculo.valorSemanal.toString()) * 4.35 : 0; // 30.44 dias/mês ÷ 7 dias/semana = 4.35
       const valorTotal = valorMensal * data.tempoContrato;
 
       // Prepara dados para atualização no banco
@@ -185,7 +185,7 @@ export function EditarAluguelModal({
         tempoContrato: data.tempoContrato,
         valorMensal: valorMensal.toString(),
         valorTotal: valorTotal.toString(),
-        caucao: veiculo.caucao || '0',
+        caucao: (typeof veiculo.caucao === 'number' ? veiculo.caucao.toString() : veiculo.caucao) || '0',
         taxaAdministrativa: data.taxaAdministrativa?.toString() || '0',
         status: data.status,
       };
@@ -220,10 +220,9 @@ export function EditarAluguelModal({
                 dias: data.tempoContrato,
               },
               valores: {
-                mensal: valorMensal,
                 diario: valorMensal / 30,
                 total: valorTotal,
-                caucao: veiculo.caucao ? parseFloat(veiculo.caucao) : 0,
+                caucao: veiculo.caucao ? parseFloat(veiculo.caucao.toString()) : 0,
                 taxaAdmin: data.taxaAdministrativa || 0,
               },
               status: data.status,
@@ -332,7 +331,7 @@ export function EditarAluguelModal({
                                 {veiculo.marca} {veiculo.modelo} - {veiculo.placa}
                               </span>
                               <span className="text-sm text-muted-foreground">
-                                R$ {veiculo.valorSemanal ? parseFloat(veiculo.valorSemanal).toFixed(2) : '0.00'}/semana • {veiculo.cor} • {veiculo.ano}
+                                R$ {veiculo.valorSemanal ? parseFloat(veiculo.valorSemanal.toString()).toFixed(2) : '0.00'}/semana • {veiculo.cor} • {veiculo.ano}
                               </span>
                             </div>
                           </SelectItem>
