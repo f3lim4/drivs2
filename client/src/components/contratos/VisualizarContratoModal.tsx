@@ -248,36 +248,6 @@ export function VisualizarContratoModal({
         yPosition += 6;
       }
       
-      // Título
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('CONTRATO DE LOCAÇÃO DE VEÍCULO', pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += 10;
-      
-      // Informações do contrato
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      
-      pdf.text(`Cliente: ${contrato.cliente}`, margin, yPosition);
-      yPosition += 6;
-      
-      pdf.text(`Valor Semanal: R$ ${Number(contrato.valorSemanal || 0).toFixed(2)}`, margin, yPosition);
-      yPosition += 6;
-      
-      pdf.text(`Valor Caução: R$ ${Number(contrato.caucao || 0).toFixed(2)}`, margin, yPosition);
-      yPosition += 6;
-      
-      pdf.text(`Data de Início: ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}`, margin, yPosition);
-      yPosition += 6;
-      
-      if (contrato.dataFim) {
-        pdf.text(`Data de Término: ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}`, margin, yPosition);
-        yPosition += 6;
-      } else {
-        pdf.text(`Tipo: Contrato Renovável`, margin, yPosition);
-        yPosition += 6;
-      }
-      
       yPosition += 4;
       
       // Conteúdo do contrato
