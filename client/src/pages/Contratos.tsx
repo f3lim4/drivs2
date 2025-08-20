@@ -99,8 +99,9 @@ export default function Contratos() {
       const contratoParaAtualizar = {
         ...contratoAtualizado,
         valor: contratoAtualizado.valor.toString(),
+        valorSemanal: contratoAtualizado.valorSemanal?.toString() || null,
       };
-      await updateContrato.mutateAsync(contratoParaAtualizar);
+      await updateContrato.mutateAsync(contratoParaAtualizar as any);
       toast({
         title: "Contrato Atualizado",
         description: `Contrato de ${contratoAtualizado.cliente} foi atualizado com sucesso!`,

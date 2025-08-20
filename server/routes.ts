@@ -789,7 +789,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           problemas.push({
             tipo: 'infracao',
             descricao: `Infração: ${i.tipoInfracao} - ${i.observacoes || 'Infração registrada'}`,
-            valor: parseFloat(i.valor || '0'),
+            valor: parseFloat((i as any).valor || '0'),
             data: i.dataInfracao || new Date().toISOString()
           });
         });
@@ -1128,7 +1128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Ativar contrato
       const contratoAtivado = await storage.updateContrato(req.params.id, {
         status: 'ativo',
-        dataAssinatura: new Date()
+        dataAssinatura: new Date().toISOString()
       });
       
       console.log(`[CONTRACT-ACTIVATE] Contrato ${req.params.id} ativado com sucesso`);
@@ -1161,7 +1161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`[CONTRATO] Upload detectado - mudando status de '${contrato.status}' para 'ativo'`);
         await storage.updateContrato(req.params.id, {
           status: 'ativo',
-          dataAssinatura: new Date()
+          dataAssinatura: new Date().toISOString()
         });
       }
       
@@ -1371,7 +1371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertTemplateContratoSchema.omit({ id: true }).parse(req.body);
       
       console.log("Dados validados:", validatedData);
-      const template = await storage.createTemplateContrato(validatedData);
+      const template = await storage.createTemplateContrato(validatedData as any);
       console.log("Template criado com sucesso:", template);
       
       res.json(template);
