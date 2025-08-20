@@ -143,12 +143,7 @@ export function VisualizarContratoModal({
                 font-size: 16px;
                 margin-bottom: 20px;
               }
-              .contract-info {
-                margin-bottom: 20px;
-                border: 1px solid #ddd;
-                padding: 10px;
-                background-color: #f9f9f9;
-              }
+
               .contract-content {
                 white-space: pre-line;
                 text-align: justify;
@@ -177,14 +172,7 @@ export function VisualizarContratoModal({
           </head>
           <body>
             ${cabecalhoEmpresa}
-            <h1>CONTRATO DE LOCAÇÃO DE VEÍCULO</h1>
-            <div class="contract-info">
-              <p><strong>Cliente:</strong> ${contrato.cliente}</p>
-              <p><strong>Valor Semanal:</strong> R$ ${Number(contrato.valorSemanal || 0).toFixed(2)}</p>
-              <p><strong>Valor Caução:</strong> R$ ${Number(contrato.caucao || 0).toFixed(2)}</p>
-              <p><strong>Data de Início:</strong> ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
-              ${contrato.dataFim ? `<p><strong>Data de Término:</strong> ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}</p>` : `<p><strong>Tipo:</strong> Contrato Renovável</p>`}
-            </div>
+
             <div class="contract-content">${contrato.template}</div>
             <div class="signatures">
               <div class="signature-field">
