@@ -649,9 +649,7 @@ export function NovoContratoModal({
       
       // Se não encontrou template personalizado ou selecionou padrão, usar template padrão
       if (!templateContent) {
-        templateContent = `INSTRUMENTO PARTICULAR DE CONTRATO DE LOCAÇÃO DE VEÍCULO
-
-LOCADOR: ${locadorInfo.nome}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº ${locadorInfo.cnpj}, com sede em ${locadorInfo.endereco}.
+        templateContent = `LOCADOR: ${locadorInfo.nome}, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº ${locadorInfo.cnpj}, com sede em ${locadorInfo.endereco}.
 Telefone: ${locadorInfo.telefone || motorista.telefone} E-mail: contato@drivs.me.
 
 LOCATÁRIO: ${motorista.nome}, profissão: Motorista de Aplicativo, portador do CPF nº ${motorista.cpf}, RG nº ${motorista.rg} e CNH nº ${motorista.cnh} (validade ${motorista.vencimentoCnh ? new Date(motorista.vencimentoCnh).toLocaleDateString('pt-BR') : '_________'}), 
