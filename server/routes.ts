@@ -1986,7 +1986,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload de documentos de motoristas com campos específicos
-  app.post("/api/motoristas/upload-imagens", upload.fields([
+  app.post("/api/motoristas/:id/upload-imagens", upload.fields([
     { name: 'fotoPerfil', maxCount: 1 },
     { name: 'cnhImagem', maxCount: 1 },
     { name: 'fotoComCnh', maxCount: 1 },
@@ -1995,12 +1995,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     { name: 'fotoExtra2', maxCount: 1 }
   ]), async (req, res) => {
     try {
-      const { motoristaId } = req.body;
+      const motoristaId = req.params.id;
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      
-      if (!motoristaId) {
-        return res.status(400).json({ message: "ID do motorista é obrigatório" });
-      }
       
       if (!files || Object.keys(files).length === 0) {
         return res.status(400).json({ message: "Nenhum documento foi enviado" });
