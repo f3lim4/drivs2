@@ -30,6 +30,7 @@ export const locadoras = pgTable("locadoras", {
   cnpj: text("cnpj").notNull().unique(),
   email: text("email").notNull().unique(),
   telefone: text("telefone").notNull().unique(),
+  senhaAdmin: text("senha_admin"), // Senha de administrador da locadora para operações críticas
   endereco: text("endereco").notNull(),
   numero: text("numero").notNull(),
   complemento: text("complemento"),
