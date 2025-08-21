@@ -306,6 +306,7 @@ export class DatabaseStorage implements IStorage {
       .select({
         id: veiculos.id,
         locadoraId: veiculos.locadoraId,
+        tipoVeiculo: veiculos.tipoVeiculo,
         placa: veiculos.placa,
         marca: veiculos.marca,
         modelo: veiculos.modelo,
@@ -355,6 +356,7 @@ export class DatabaseStorage implements IStorage {
       .select({
         id: veiculos.id,
         locadoraId: veiculos.locadoraId,
+        tipoVeiculo: veiculos.tipoVeiculo,
         placa: veiculos.placa,
         marca: veiculos.marca,
         modelo: veiculos.modelo,
@@ -1868,6 +1870,7 @@ export class MemStorage implements IStorage {
       id,
       status: locadora.status || "pendente",
       plano: locadora.plano || "basico",
+      senhaAdmin: locadora.senhaAdmin || null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
