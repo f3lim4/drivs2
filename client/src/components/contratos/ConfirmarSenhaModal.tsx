@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertTriangle, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ConfirmarSenhaModalProps {
   open: boolean;
@@ -24,6 +25,7 @@ export function ConfirmarSenhaModal({
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const { toast } = useToast();
+  const { profile } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +46,10 @@ export function ConfirmarSenhaModal({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password: senha }),
+        body: JSON.stringify({ 
+          password: senha,
+          email: profile?.email || 'drivs@drivs.com.br'
+        }),
       });
 
       if (!response.ok) {
