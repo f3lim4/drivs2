@@ -1782,6 +1782,7 @@ export class MemStorage implements IStorage {
     this.alugueisMap = new Map();
     this.contratosMap = new Map();
     this.infracoesMap = new Map();
+    this.despesasMap = new Map();
     this.currentId = 1;
   }
 
@@ -2154,10 +2155,6 @@ export class MemStorage implements IStorage {
     return [];
   }
 
-  async createAtividade(atividade: InsertAtividade): Promise<Atividade> {
-    throw new Error('Atividades não implementadas no MemStorage');
-  }
-
   // Métodos não implementados no MemStorage
   async getAllTemplateContratos(): Promise<TemplateContrato[]> {
     return [];
@@ -2287,16 +2284,8 @@ export class MemStorage implements IStorage {
     throw new Error('Anúncios não implementados no MemStorage');
   }
 
-  async getAtividadesByLocadora(locadoraId: string): Promise<Atividade[]> {
-    return [];
-  }
-
   async getAtividadesByLocadoraEUsuario(locadoraId: string, usuario?: string): Promise<Atividade[]> {
     return [];
-  }
-
-  async createAtividade(atividade: InsertAtividade): Promise<Atividade> {
-    throw new Error('Atividades não implementadas no MemStorage');
   }
 
   // SEO operations (apenas admin)
