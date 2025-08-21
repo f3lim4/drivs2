@@ -440,7 +440,7 @@ export function VisualizarContratoModal({
                 {!contrato.dataFim && (
                   <div>
                     <p className="text-sm font-medium text-gray-600">Tempo Mínimo</p>
-                    <p className="font-semibold">{contrato.tempoContrato || 1} mês{(contrato.tempoContrato || 1) > 1 ? 'es' : ''}</p>
+                    <p className="font-semibold">{contrato.tempoMinimoContrato || 1} mês{(contrato.tempoMinimoContrato || 1) > 1 ? 'es' : ''}</p>
                   </div>
                 )}
               </div>
