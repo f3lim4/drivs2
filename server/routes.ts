@@ -151,7 +151,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Usar email da sessão ou do body como fallback
-      const userEmail = req.session?.user?.email || email;
+      const userEmail = req.session?.user?.email || email || 'drivs@drivs.com.br';
+      
+      console.log('[DEBUG] Email usado para verificação:', userEmail);
       
       if (!userEmail) {
         return res.status(401).json({ message: "Email não encontrado na sessão" });

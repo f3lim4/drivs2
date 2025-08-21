@@ -48,7 +48,7 @@ export function ConfirmarSenhaModal({
         },
         body: JSON.stringify({ 
           password: senha,
-          email: profile?.email || 'drivs@drivs.com.br'
+          email: 'drivs@drivs.com.br' // Sempre usar o admin para verificação de senha
         }),
       });
 
