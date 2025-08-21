@@ -221,34 +221,7 @@ export function VisualizarContratoModal({
       
       let yPosition = margin;
       
-      // Cabeçalho com dados da empresa
-      if (dadosLocadora) {
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(dadosLocadora.nome, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 6;
-        
-        pdf.setFontSize(9);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(`CNPJ: ${dadosLocadora.cnpj}`, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 4;
-        
-        pdf.text(`${dadosLocadora.endereco}`, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 4;
-        
-        pdf.text(`${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}`, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 4;
-        
-        pdf.text(`Tel: ${dadosLocadora.telefone} | Email: ${dadosLocadora.email}`, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 8;
-        
-        // Linha separadora
-        pdf.setLineWidth(0.5);
-        pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-        yPosition += 6;
-      }
-      
-      yPosition += 4;
+      // Começar direto com o conteúdo do contrato (sem cabeçalho duplicado)
       
       // Conteúdo do contrato
       const lines = contrato.template.split('\n');
