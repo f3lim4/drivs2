@@ -246,6 +246,11 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async getLocadoraById(id: string): Promise<Locadora | undefined> {
+    const result = await db.select().from(locadoras).where(eq(locadoras.id, id));
+    return result[0];
+  }
+
   async createProfile(profile: InsertProfile): Promise<Profile> {
     const result = await db.insert(profiles).values(profile).returning();
     return result[0];

@@ -47,8 +47,7 @@ export function ConfirmarSenhaModal({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          password: senha,
-          email: 'drivs@drivs.com.br' // Sempre usar o admin para verificação de senha
+          password: senha
         }),
       });
 

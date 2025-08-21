@@ -150,37 +150,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Senha é obrigatória" });
       }
       
-      // Usar email da sessão ou do body como fallback
-      const userEmail = req.session?.user?.email || email || 'drivs@drivs.com.br';
+      // Buscar a locadora do usuário atual através da sessão ou profile
+      let locadoraId = req.session?.user?.locadoraId;
       
-      console.log('[DEBUG] Email usado para verificação:', userEmail);
-      
-      if (!userEmail) {
-        return res.status(401).json({ message: "Email não encontrado na sessão" });
+      if (!locadoraId && req.session?.user?.email) {
+        // Buscar o locadoraId pelo email do perfil
+        const userProfile = await storage.getProfileByEmail(req.session.user.email);
+        locadoraId = userProfile?.locadoraId;
       }
       
-      // Buscar perfil pelo email
-      const profile = await storage.getProfileByEmail(userEmail);
-      if (!profile) {
-        console.log('[DEBUG] Perfil não encontrado para email:', userEmail);
-        return res.status(404).json({ message: "Perfil não encontrado" });
+      console.log('[DEBUG] Verificação de senha - locadoraId:', locadoraId);
+      
+      if (!locadoraId) {
+        return res.status(401).json({ message: "Locadora não identificada" });
       }
-      
-      // Buscar usuário pelo UUID do perfil
-      const user = await storage.getUserByUUID(profile.userId);
-      if (!user) {
-        console.log('[DEBUG] Usuário não encontrado para UUID:', profile.userId);
-        return res.status(404).json({ message: "Usuário não encontrado" });
+
+      // Buscar dados da locadora para verificar senha
+      const locadora = await storage.getLocadoraById(locadoraId);
+      if (!locadora) {
+        return res.status(404).json({ message: "Locadora não encontrada" });
       }
+
+      // Verificar se a locadora tem senha definida
+      if (!locadora.senhaAdmin) {
+        return res.status(500).json({ message: "Senha de administrador não configurada para esta locadora" });
+      }
+
+      const senhaValida = await bcrypt.compare(password, locadora.senhaAdmin);
       
-      // Verificar senha
-      const isValid = await bcrypt.compare(password, user.password);
-      console.log('[DEBUG] Senha válida:', isValid);
+      console.log('[DEBUG] Senha válida:', senhaValida);
       
-      if (!isValid) {
+      if (!senhaValida) {
         return res.status(400).json({ message: "Senha incorreta" });
       }
-      
+
       res.json({ message: "Senha verificada com sucesso" });
     } catch (error) {
       console.error("Error verifying password:", error);
