@@ -518,7 +518,11 @@ export type Aluguel = typeof alugueis.$inferSelect & {
 };
 
 export type InsertContrato = z.infer<typeof insertContratoSchema>;
-export type Contrato = typeof contratos.$inferSelect;
+export type Contrato = typeof contratos.$inferSelect & {
+  veiculoPlaca?: string | null;
+  veiculoMarca?: string | null;
+  veiculoModelo?: string | null;
+};
 
 export type InsertTemplateContrato = z.infer<typeof insertTemplateContratoSchema>;
 export type TemplateContrato = typeof templateContratos.$inferSelect;
