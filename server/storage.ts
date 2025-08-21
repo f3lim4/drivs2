@@ -573,40 +573,54 @@ export class DatabaseStorage implements IStorage {
 
   async getContratosByLocadora(locadoraId: string): Promise<Contrato[]> {
     try {
-      // Buscar contratos com join para incluir informações do veículo
-      const result = await db.select({
-        // Dados do contrato
-        id: contratos.id,
-        locadoraId: contratos.locadoraId,
-        veiculoId: contratos.veiculoId,
-        tipo: contratos.tipo,
-        titulo: contratos.titulo,
-        cliente: contratos.cliente,
-        valor: contratos.valor,
-        valorSemanal: contratos.valorSemanal,
-        caucao: contratos.caucao,
-        tempoMinimoContrato: contratos.tempoMinimoContrato, // ✅ INCLUIR TEMPO MÍNIMO
-        dataInicio: contratos.dataInicio,
-        dataFim: contratos.dataFim,
-        status: contratos.status,
-        template: contratos.template,
-        arquivoAssinado: contratos.arquivoAssinado,
-        dataAssinatura: contratos.dataAssinatura,
-        createdAt: contratos.createdAt,
-        updatedAt: contratos.updatedAt,
-        // Dados do veículo (quando veiculo_id existe)
-        veiculoPlaca: veiculos.placa,
-        veiculoMarca: veiculos.marca,
-        veiculoModelo: veiculos.modelo,
-      })
-      .from(contratos)
-      .leftJoin(veiculos, eq(contratos.veiculoId, veiculos.id))
-      .where(eq(contratos.locadoraId, locadoraId));
+      // Buscar contratos simples primeiro
+      const result = await db.select().from(contratos).where(eq(contratos.locadoraId, locadoraId));
       
-      return result;
+      // Para cada contrato, buscar dados do veículo separadamente
+      const contratosComVeiculo = await Promise.all(
+        result.map(async (contrato) => {
+          if (contrato.veiculoId) {
+            try {
+              const veiculo = await db.select({
+                placa: veiculos.placa,
+                marca: veiculos.marca,
+                modelo: veiculos.modelo,
+              })
+              .from(veiculos)
+              .where(eq(veiculos.id, contrato.veiculoId))
+              .limit(1);
+              
+              const veiculoData = veiculo[0];
+              return {
+                ...contrato,
+                veiculoPlaca: veiculoData?.placa || null,
+                veiculoMarca: veiculoData?.marca || null,
+                veiculoModelo: veiculoData?.modelo || null,
+              };
+            } catch (error) {
+              console.error('Error fetching vehicle for contract:', contrato.id, error);
+              return {
+                ...contrato,
+                veiculoPlaca: null,
+                veiculoMarca: null,
+                veiculoModelo: null,
+              };
+            }
+          }
+          
+          return {
+            ...contrato,
+            veiculoPlaca: null,
+            veiculoMarca: null,
+            veiculoModelo: null,
+          };
+        })
+      );
+      
+      return contratosComVeiculo;
     } catch (error) {
       console.error('Error in getContratosByLocadora:', error);
-      // Fallback para query simples se o join falhar
+      // Fallback para query simples se tudo falhar
       return await db.select().from(contratos).where(eq(contratos.locadoraId, locadoraId));
     }
   }
