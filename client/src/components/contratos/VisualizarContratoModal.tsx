@@ -116,15 +116,7 @@ export function VisualizarContratoModal({
     
     const printWindow = window.open('', '_blank');
     if (printWindow) {
-      const cabecalhoEmpresa = dadosLocadora ? `
-        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">
-          <h2 style="margin: 0; font-size: 18px; font-weight: bold;">${dadosLocadora.nome}</h2>
-          <p style="margin: 2px 0; font-size: 10px;">CNPJ: ${dadosLocadora.cnpj}</p>
-          <p style="margin: 2px 0; font-size: 10px;">${dadosLocadora.endereco}</p>
-          <p style="margin: 2px 0; font-size: 10px;">${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}</p>
-          <p style="margin: 2px 0; font-size: 10px;">Tel: ${dadosLocadora.telefone} | Email: ${dadosLocadora.email}</p>
-        </div>
-      ` : '';
+      // Removido cabeçalho duplicado - informações já estão no template
       
       printWindow.document.write(`
         <html>
@@ -171,7 +163,7 @@ export function VisualizarContratoModal({
             </style>
           </head>
           <body>
-            ${cabecalhoEmpresa}
+            
 
             <div class="contract-content">${contrato.template}</div>
             <div class="signatures">
