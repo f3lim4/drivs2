@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertTriangle, Eye, EyeOff } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
 
 interface ConfirmarSenhaModalProps {
   open: boolean;
@@ -22,63 +22,40 @@ export function ConfirmarSenhaModal({
   contratoNome,
   loading = false
 }: ConfirmarSenhaModalProps) {
-  const [senha, setSenha] = useState("");
-  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [textoConfirmacao, setTextoConfirmacao] = useState("");
+  const [confirmouExclusao, setConfirmouExclusao] = useState(false);
   const { toast } = useToast();
-  const { profile } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!senha.trim()) {
+    if (textoConfirmacao.toLowerCase() !== "excluir") {
       toast({
-        title: "Senha Obrigatória",
-        description: "Digite sua senha para confirmar a exclusão.",
+        title: "Confirmação Incorreta",
+        description: "Digite 'excluir' para confirmar a exclusão.",
         variant: "destructive",
       });
       return;
     }
 
-    try {
-      // Verificar senha através da API
-      const response = await fetch('/api/auth/verify-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          password: senha
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        toast({
-          title: "Senha Incorreta",
-          description: errorData.message || "A senha digitada está incorreta.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Senha correta, executar exclusão
-      onConfirm();
-      setSenha("");
-      setMostrarSenha(false);
-      
-    } catch (error) {
-      console.error('Erro ao verificar senha:', error);
+    if (!confirmouExclusao) {
       toast({
-        title: "Erro de Autenticação",
-        description: "Não foi possível verificar a senha. Tente novamente.",
+        title: "Confirmação Obrigatória",
+        description: "Marque a caixa para confirmar que tem certeza da exclusão.",
         variant: "destructive",
       });
+      return;
     }
+
+    // Executar exclusão diretamente
+    onConfirm();
+    setTextoConfirmacao("");
+    setConfirmouExclusao(false);
   };
 
   const handleCancel = () => {
-    setSenha("");
-    setMostrarSenha(false);
+    setTextoConfirmacao("");
+    setConfirmouExclusao(false);
     onOpenChange(false);
   };
 
@@ -113,35 +90,33 @@ export function ConfirmarSenhaModal({
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="senha" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Digite sua senha para confirmar:
+              <Label htmlFor="confirmacao" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Digite "excluir" para confirmar:
               </Label>
-              <div className="relative">
-                <Input
-                  id="senha"
-                  type={mostrarSenha ? "text" : "password"}
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  placeholder="Sua senha"
-                  className="pr-10"
-                  disabled={loading}
-                  autoComplete="current-password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setMostrarSenha(!mostrarSenha)}
-                  disabled={loading}
-                >
-                  {mostrarSenha ? (
-                    <EyeOff className="h-4 w-4 text-gray-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-500" />
-                  )}
-                </Button>
-              </div>
+              <Input
+                id="confirmacao"
+                type="text"
+                value={textoConfirmacao}
+                onChange={(e) => setTextoConfirmacao(e.target.value)}
+                placeholder="Digite: excluir"
+                disabled={loading}
+                autoComplete="off"
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="confirmar"
+                checked={confirmouExclusao}
+                onCheckedChange={(checked) => setConfirmouExclusao(!!checked)}
+                disabled={loading}
+              />
+              <Label
+                htmlFor="confirmar"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
+              >
+                Tenho certeza que quero excluir este contrato
+              </Label>
             </div>
 
             <DialogFooter className="flex gap-2 pt-4">
@@ -157,7 +132,7 @@ export function ConfirmarSenhaModal({
               <Button
                 type="submit"
                 variant="destructive"
-                disabled={loading || !senha.trim()}
+                disabled={loading || textoConfirmacao.toLowerCase() !== "excluir" || !confirmouExclusao}
                 className="flex-1"
               >
                 {loading ? "Excluindo..." : "Confirmar Exclusão"}
