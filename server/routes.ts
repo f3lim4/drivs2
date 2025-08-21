@@ -138,30 +138,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint para verificar senha do usuário atual
   app.post("/api/auth/verify-password", async (req, res) => {
     try {
-      const { password } = req.body;
+      const { password, email } = req.body;
       
-      if (!req.session?.user?.email) {
-        return res.status(401).json({ message: "Usuário não autenticado" });
-      }
+      console.log('[DEBUG] Verificação de senha - Dados recebidos:', { 
+        hasPassword: !!password, 
+        email, 
+        sessionUser: req.session?.user 
+      });
       
       if (!password) {
         return res.status(400).json({ message: "Senha é obrigatória" });
       }
       
-      // Buscar perfil pelo email da sessão
-      const profile = await storage.getProfileByEmail(req.session.user.email);
+      // Usar email da sessão ou do body como fallback
+      const userEmail = req.session?.user?.email || email;
+      
+      if (!userEmail) {
+        return res.status(401).json({ message: "Email não encontrado na sessão" });
+      }
+      
+      // Buscar perfil pelo email
+      const profile = await storage.getProfileByEmail(userEmail);
       if (!profile) {
+        console.log('[DEBUG] Perfil não encontrado para email:', userEmail);
         return res.status(404).json({ message: "Perfil não encontrado" });
       }
       
       // Buscar usuário pelo UUID do perfil
       const user = await storage.getUserByUUID(profile.userId);
       if (!user) {
+        console.log('[DEBUG] Usuário não encontrado para UUID:', profile.userId);
         return res.status(404).json({ message: "Usuário não encontrado" });
       }
       
       // Verificar senha
       const isValid = await bcrypt.compare(password, user.password);
+      console.log('[DEBUG] Senha válida:', isValid);
+      
       if (!isValid) {
         return res.status(400).json({ message: "Senha incorreta" });
       }
