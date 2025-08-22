@@ -54,6 +54,13 @@ Preferred communication style: Simple, everyday language.
 - ✅ **UNIFIED FIELD** - Single "Nome da Empresa" field used for both name and razão social
 - ✅ **ADAPTIVE LABELS** - Dynamic labels and placeholders that change based on document type
 
+### 2025-08-22: Marketing Statistics Update - CONCLUÍDO ✅
+- ✅ **TRIAL PERIOD UPDATED** - Changed from "7 dias grátis" to "1 mês grátis" across all pages
+- ✅ **STATISTICS ADJUSTED** - Updated "500+ locadoras" to "50+ locadoras" for realistic numbers
+- ✅ **VEHICLE COUNT UPDATED** - Changed "25K+ veículos" to "1K+ veículos gerenciados"
+- ✅ **SEO PAGES UPDATED** - All marketing descriptions now reflect accurate statistics
+- ✅ **CONSISTENT MESSAGING** - All public pages now show unified 1-month free trial offer
+
 ## System Architecture
 DRIVS é construído com uma arquitetura full-stack que garante escalabilidade, segurança e uma experiência de usuário fluida.
 

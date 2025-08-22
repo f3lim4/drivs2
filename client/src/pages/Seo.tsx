@@ -25,7 +25,7 @@ export default function Seo() {
     resolver: zodResolver(insertSeoConfigSchema),
     defaultValues: seoConfig || {
       titulo: "🚗 DRIVS - Sistema que DOBRA Receita de Locadoras em 90 Dias! Teste Grátis",
-      descricao: "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 500+ locadoras já usam. 1 mês GRÁTIS!",
+      descricao: "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 50+ locadoras já usam. 1 mês GRÁTIS!",
       palavrasChave: "sistema locadora profissional, dobrar receita locadora, organizar locadora, automatizar locadora, aumentar lucro aluguel carros, gestão locadora completa",
       autor: "DRIVS Team",
       urlCanonica: "https://drivs.me",
@@ -194,7 +194,7 @@ export default function Seo() {
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
                 <h4 className="font-bold text-sm text-green-700 dark:text-green-300 mb-2">🚀 FOCO NO CRESCIMENTO:</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                  "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 500+ locadoras já usam. 1 mês GRÁTIS!"
+                  "Sistema COMPLETO que organiza sua locadora, DOBRA receita, elimina inadimplência e automatiza contratos profissionais. 50+ locadoras já usam. 1 mês GRÁTIS!"
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
@@ -206,7 +206,7 @@ export default function Seo() {
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
                 <h4 className="font-bold text-sm text-blue-700 dark:text-blue-300 mb-2">⚡ FOCO NA ORGANIZAÇÃO:</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 italic">
-                  "Organize sua locadora com sistema completo! Contratos automáticos, controle financeiro total e zero inadimplência. 500+ empresas confiam. Teste 1 mês grátis!"
+                  "Organize sua locadora com sistema completo! Contratos automáticos, controle financeiro total e zero inadimplência. 50+ empresas confiam. Teste 1 mês grátis!"
                 </p>
               </div>
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
