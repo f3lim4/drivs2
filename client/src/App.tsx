@@ -73,6 +73,7 @@ const App = () => (
             <Route path="/cadastro-locadora" element={<CadastroLocadora />} />
             <Route path="/termos-uso" element={<TermosUso />} />
             <Route path="/landing" element={<Landing />} />
+            <Route path="/site" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={
