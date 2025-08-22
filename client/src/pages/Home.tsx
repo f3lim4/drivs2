@@ -437,7 +437,7 @@ export default function Home() {
                   <div className="relative p-6 rounded-2xl border border-blue-400/20 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-blue-400/40 transition-all duration-500 hover:scale-105">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-2xl"></div>
                     <div className="relative">
-                      <div className="text-5xl font-bold bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent mb-2 group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-500">500+</div>
+                      <div className="text-5xl font-bold bg-gradient-to-r from-blue-300 to-cyan-300 bg-clip-text text-transparent mb-2 group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-500">50+</div>
                       <div className="text-lg font-semibold mb-1 text-blue-100">Locadoras Ativas</div>
                       <div className="text-sm text-blue-300/80">Empresas que confiam no DRIVS</div>
                     </div>
@@ -449,7 +449,7 @@ export default function Home() {
                   <div className="relative p-6 rounded-2xl border border-emerald-400/20 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:border-emerald-400/40 transition-all duration-500 hover:scale-105">
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-2xl"></div>
                     <div className="relative">
-                      <div className="text-5xl font-bold bg-gradient-to-r from-emerald-300 to-green-300 bg-clip-text text-transparent mb-2 group-hover:from-emerald-200 group-hover:to-green-200 transition-all duration-500">25K+</div>
+                      <div className="text-5xl font-bold bg-gradient-to-r from-emerald-300 to-green-300 bg-clip-text text-transparent mb-2 group-hover:from-emerald-200 group-hover:to-green-200 transition-all duration-500">1K+</div>
                       <div className="text-lg font-semibold mb-1 text-emerald-100">Veículos Gerenciados</div>
                       <div className="text-sm text-emerald-300/80">Frota total na plataforma</div>
                     </div>
