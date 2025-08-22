@@ -42,7 +42,6 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     nome: '',
-    razaoSocial: '',
     cnpj: '',
     email: '',
     telefone: '',
@@ -76,7 +75,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
         body: JSON.stringify({
           id: limparDocumento(formData.cnpj), // Usar documento limpo como ID
           nome: formData.nome,
-          razaoSocial: formData.razaoSocial,
+          razaoSocial: formData.nome, // Usar nome como razão social também
           cnpj: limparDocumento(formData.cnpj), // Salvar documento limpo
           email: formData.email,
           telefone: formData.telefone,
@@ -102,7 +101,6 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
       // Reset form
       setFormData({
         nome: '',
-        razaoSocial: '',
         cnpj: '',
         email: '',
         telefone: '',
@@ -143,7 +141,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nome">Nome Fantasia *</Label>
+              <Label htmlFor="nome">Nome da Locadora *</Label>
               <Input
                 id="nome"
                 value={formData.nome}
@@ -159,17 +157,6 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                 id="responsavel"
                 value={formData.responsavel}
                 onChange={(e) => updateFormData('responsavel', e.target.value)}
-                placeholder=""
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="razaoSocial">Razão Social *</Label>
-              <Input
-                id="razaoSocial"
-                value={formData.razaoSocial}
-                onChange={(e) => updateFormData('razaoSocial', e.target.value)}
                 placeholder=""
                 required
               />
