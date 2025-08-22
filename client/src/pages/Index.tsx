@@ -14,7 +14,7 @@ const Index = () => {
     if (!isLoading && isAuthenticated) {
       navigate('/dashboard', { replace: true });
     } else if (!isLoading && !isAuthenticated) {
-      navigate('/login', { replace: true });
+      navigate('/site', { replace: true });
     }
   }, [navigate, isAuthenticated, isLoading]);
 
