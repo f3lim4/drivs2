@@ -255,36 +255,7 @@ export default function Contratos() {
         }
       }
       
-      // Rodapé com assinaturas
-      if (yPosition > pageHeight - 60) {
-        pdf.addPage();
-        yPosition = margin;
-      }
-      
-      yPosition = pageHeight - 40;
-      
-      // Linha separadora
-      pdf.setLineWidth(0.5);
-      pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-      yPosition += 10;
-      
-      // Campos de assinatura
-      pdf.setFontSize(9);
-      pdf.text('_________________________________', margin, yPosition);
-      pdf.text('_________________________________', pageWidth - margin - 60, yPosition);
-      yPosition += 4;
-      
-      pdf.text('Assinatura do Locador', margin, yPosition);
-      pdf.text('Assinatura do Locatário', pageWidth - margin - 60, yPosition);
-      yPosition += 6;
-      
-      if (dadosLocadora) {
-        pdf.text(dadosLocadora.responsavel, margin, yPosition);
-        pdf.text(contrato.cliente, pageWidth - margin - 60, yPosition);
-      } else {
-        pdf.text('Responsável da Locadora', margin, yPosition);
-        pdf.text(contrato.cliente, pageWidth - margin - 60, yPosition);
-      }
+      // Sem rodapé de assinaturas
       
       // Salva o PDF
       const fileName = `Contrato_${contrato.cliente.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;

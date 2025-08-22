@@ -206,49 +206,7 @@ export function VisualizarContratoModal({
         }
       }
       
-      // Rodapé com assinaturas
-      if (yPosition > pageHeight - 60) {
-        pdf.addPage();
-        yPosition = margin;
-      }
-      
-      yPosition = pageHeight - 40;
-      
-      // Linha separadora
-      pdf.setLineWidth(0.5);
-      pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-      yPosition += 10;
-      
-      // Campos de assinatura
-      pdf.setFontSize(9);
-      pdf.text('_________________________________', margin, yPosition);
-      pdf.text('_________________________________', pageWidth - margin - 60, yPosition);
-      yPosition += 4;
-      
-      pdf.text('Assinatura do Locador', margin, yPosition);
-      pdf.text('Assinatura do Locatário', pageWidth - margin - 60, yPosition);
-      yPosition += 6;
-      
-      // Nome do responsável da locadora (buscando dados reais)
-      const locadoraId = contrato.locadoraId;
-      let nomeResponsavel = 'Responsável da Locadora';
-      
-      try {
-        if (locadoraId) {
-          const response = await fetch(`/api/locadoras/${locadoraId}`);
-          if (response.ok) {
-            const dadosLocadora = await response.json();
-            if (dadosLocadora.responsavel) {
-              nomeResponsavel = dadosLocadora.responsavel;
-            }
-          }
-        }
-      } catch (error) {
-        console.log('Erro ao buscar dados da locadora para assinatura:', error);
-      }
-      
-      pdf.text(nomeResponsavel, margin, yPosition);
-      pdf.text(contrato.cliente, pageWidth - margin - 60, yPosition);
+      // Sem rodapé de assinaturas
       
       // Salva o PDF
       const fileName = `Contrato_${contrato.cliente.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
