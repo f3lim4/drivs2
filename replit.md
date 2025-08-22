@@ -46,6 +46,14 @@ Preferred communication style: Simple, everyday language.
 - ✅ **RUNTIME ERRORS FIXED** - Eliminated TypeScript compilation errors causing system crashes
 - ✅ **SYSTEM STABILITY** - Application runs without red error screens or runtime crashes
 
+### 2025-08-22: CPF/CNPJ Auto-Detection & Form Simplification - CONCLUÍDO ✅
+- ✅ **AUTO-DETECTION SYSTEM** - System automatically identifies CPF (11 digits) vs CNPJ (14 digits)
+- ✅ **DYNAMIC FORMATTING** - CPF formatted as 000.000.000-00, CNPJ as 00.000.000/0000-00
+- ✅ **REAL-TIME VALIDATION** - Automatic document validation with proper error messages
+- ✅ **FORM SIMPLIFICATION** - Removed "Nome Fantasia" and "Razão Social" fields
+- ✅ **UNIFIED FIELD** - Single "Nome da Empresa" field used for both name and razão social
+- ✅ **ADAPTIVE LABELS** - Dynamic labels and placeholders that change based on document type
+
 ## System Architecture
 DRIVS é construído com uma arquitetura full-stack que garante escalabilidade, segurança e uma experiência de usuário fluida.
 
