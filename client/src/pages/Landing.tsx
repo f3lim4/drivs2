@@ -131,7 +131,7 @@ export default function Landing() {
           <Badge className="mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 text-black text-sm px-6 py-3 rounded-full font-bold border border-cyan-300 shadow-lg shadow-cyan-500/50">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
-              OFERTA LIMITADA - 7 DIAS GRÁTIS
+              OFERTA LIMITADA - 1 MÊS GRÁTIS
             </span>
           </Badge>
           
