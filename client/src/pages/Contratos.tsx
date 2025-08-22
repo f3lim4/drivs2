@@ -218,56 +218,9 @@ export default function Contratos() {
       
       let yPosition = margin;
       
-      // Cabeçalho com dados da empresa
-      if (dadosLocadora) {
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(dadosLocadora.nome, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 6;
-        
-        pdf.setFontSize(9);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(`CNPJ: ${dadosLocadora.cnpj}`, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 4;
-        
-        pdf.text(`${dadosLocadora.endereco}`, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 4;
-        
-        pdf.text(`${dadosLocadora.cidade}/${dadosLocadora.estado} - CEP: ${dadosLocadora.cep}`, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 4;
-        
-        pdf.text(`Tel: ${dadosLocadora.telefone} | Email: ${dadosLocadora.email}`, pageWidth / 2, yPosition, { align: 'center' });
-        yPosition += 8;
-        
-        // Linha separadora
-        pdf.setLineWidth(0.5);
-        pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-        yPosition += 6;
-      }
+      // Não adicionar cabeçalho da empresa - apenas o template limpo
       
-      // Título
-      pdf.setFontSize(16);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('CONTRATO DE LOCAÇÃO DE VEÍCULO', pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += 10;
-      
-      // Informações do contrato
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      
-      pdf.text(`Cliente: ${contrato.cliente}`, margin, yPosition);
-      yPosition += 6;
-      
-      pdf.text(`Valor: R$ ${Number(contrato.valor).toFixed(2)}`, margin, yPosition);
-      yPosition += 6;
-      
-      pdf.text(`Data de Início: ${new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}`, margin, yPosition);
-      yPosition += 6;
-      
-      if (contrato.dataFim) {
-        pdf.text(`Data de Término: ${new Date(contrato.dataFim).toLocaleDateString('pt-BR')}`, margin, yPosition);
-        yPosition += 6;
-      }
+      // Não adicionar título nem informações duplicadas - apenas o template
       
       yPosition += 4;
       
