@@ -280,8 +280,11 @@ export default function Contratos() {
       
       if (dadosLocadora) {
         pdf.text(dadosLocadora.responsavel, margin, yPosition);
+        pdf.text(contrato.cliente, pageWidth - margin - 60, yPosition);
+      } else {
+        pdf.text('Responsável da Locadora', margin, yPosition);
+        pdf.text(contrato.cliente, pageWidth - margin - 60, yPosition);
       }
-      pdf.text(contrato.cliente, pageWidth - margin - 60, yPosition);
       
       // Salva o PDF
       const fileName = `Contrato_${contrato.cliente.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
