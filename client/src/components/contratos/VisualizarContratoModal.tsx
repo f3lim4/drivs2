@@ -100,19 +100,8 @@ export function VisualizarContratoModal({
     }
   };
   
-    const handleImprimir = async () => {
+      const handleImprimir = async () => {
     if (!contrato) return;
-    
-    // Buscar dados da locadora
-    const locadoraId = profile?.locadoraId;
-    
-    let dadosLocadora = null;
-    if (locadoraId) {
-      const response = await fetch(`/api/locadoras/${locadoraId}`);
-      if (response.ok) {
-        dadosLocadora = await response.json();
-      }
-    }
     
     const printWindow = window.open('', '_blank');
     if (printWindow) {
@@ -156,18 +145,6 @@ export function VisualizarContratoModal({
           </head>
           <body>
             <div class="contract-content">${contrato.template}</div>
-            <div class="signatures">
-              <div class="signature-field">
-                <div class="signature-line"></div>
-                <p>Assinatura do Locador</p>
-                <p>${dadosLocadora ? dadosLocadora.responsavel : ''}</p>
-              </div>
-              <div class="signature-field">
-                <div class="signature-line"></div>
-                <p>Assinatura do Locatário</p>
-                <p>${contrato.cliente}</p>
-              </div>
-            </div>
           </body>
         </html>
       `);
@@ -176,21 +153,10 @@ export function VisualizarContratoModal({
     }
   };
 
-  const handleBaixarPDF = async () => {
+    const handleBaixarPDF = async () => {
     if (!contrato) return;
     
     try {
-      // Buscar dados da locadora
-      const locadoraId = profile?.locadoraId;
-      
-      let dadosLocadora = null;
-      if (locadoraId) {
-        const response = await fetch(`/api/locadoras/${locadoraId}`);
-        if (response.ok) {
-          dadosLocadora = await response.json();
-        }
-      }
-      
       // Cria um novo documento PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
       
@@ -203,9 +169,7 @@ export function VisualizarContratoModal({
       
       let yPosition = margin;
       
-      // Começar direto com o conteúdo do contrato (sem cabeçalho duplicado)
-      
-      // Conteúdo do contrato
+      // Conteúdo SOMENTE do template - SEM cabeçalho adicional
       const lines = contrato.template.split('\n');
       
       for (const line of lines) {
@@ -233,34 +197,6 @@ export function VisualizarContratoModal({
           yPosition += lineHeight;
         }
       }
-      
-      // Rodapé com assinaturas
-      if (yPosition > pageHeight - 60) {
-        pdf.addPage();
-        yPosition = margin;
-      }
-      
-      yPosition = pageHeight - 40;
-      
-      // Linha separadora
-      pdf.setLineWidth(0.5);
-      pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-      yPosition += 10;
-      
-      // Campos de assinatura
-      pdf.setFontSize(9);
-      pdf.text('_________________________________', margin, yPosition);
-      pdf.text('_________________________________', pageWidth - margin - 60, yPosition);
-      yPosition += 4;
-      
-      pdf.text('Assinatura do Locador', margin, yPosition);
-      pdf.text('Assinatura do Locatário', pageWidth - margin - 60, yPosition);
-      yPosition += 6;
-      
-      if (dadosLocadora) {
-        pdf.text(dadosLocadora.responsavel, margin, yPosition);
-      }
-      pdf.text(contrato.cliente, pageWidth - margin - 60, yPosition);
       
       // Salva o PDF
       const fileName = `Contrato_${contrato.cliente.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
