@@ -29,7 +29,7 @@ export default function Landing() {
     if (!email) {
       toast({
         title: "Email necessário",
-        description: "Digite seu email para começar o teste grátis.",
+        description: "Digite seu email para começar o teste grátis de 1 mês.",
         variant: "destructive"
       });
       return;
@@ -382,7 +382,7 @@ export default function Landing() {
             </h3>
             <ul className="text-xl space-y-4">
               {[
-                "7 dias GRÁTIS (sem cartão)",
+                "1 mês GRÁTIS (sem cartão)",
                 "Configuração completa em 24h", 
                 "Migração dos seus dados GRATUITA",
                 "Suporte brasileiro especializado",
