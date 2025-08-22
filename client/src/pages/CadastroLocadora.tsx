@@ -14,6 +14,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { 
+  formatarDocumento, 
+  validarDocumento, 
+  getLabelDocumento, 
+  getPlaceholderDocumento,
+  limparDocumento 
+} from '@/utils/documentValidation';
 
 export default function CadastroLocadora() {
   const navigate = useNavigate();
@@ -26,7 +33,7 @@ export default function CadastroLocadora() {
   const [formData, setFormData] = useState({
     nome: '',
     razaoSocial: '',
-    cnpj: '',
+    cnpj: '', // Este campo agora aceita CPF ou CNPJ
     email: '',
     senha: '',
     confirmarSenha: '',
@@ -187,6 +194,17 @@ export default function CadastroLocadora() {
       setIsLoading(false);
       return;
     }
+
+    // Validar documento (CPF ou CNPJ)
+    if (!validarDocumento(formData.cnpj)) {
+      toast({
+        title: "Erro na validação",
+        description: "Digite um CPF ou CNPJ válido.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
     
     try {
       // 1. Criar usuário de autenticação
@@ -220,10 +238,10 @@ export default function CadastroLocadora() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: formData.cnpj,
+          id: limparDocumento(formData.cnpj), // Usar documento limpo como ID
           nome: formData.nome,
           razaoSocial: formData.razaoSocial,
-          cnpj: formData.cnpj,
+          cnpj: limparDocumento(formData.cnpj), // Salvar documento limpo
           email: formData.email,
           telefone: formData.telefone,
           endereco: formData.endereco,
@@ -377,12 +395,12 @@ export default function CadastroLocadora() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cnpj" >CNPJ *</Label>
+                    <Label htmlFor="cnpj">{getLabelDocumento(formData.cnpj)} *</Label>
                     <Input
                       id="cnpj"
-                      value={formData.cnpj}
+                      value={formatarDocumento(formData.cnpj)}
                       onChange={(e) => updateFormData('cnpj', e.target.value)}
-                      placeholder=""
+                      placeholder={getPlaceholderDocumento(formData.cnpj)}
                       required
                     />
                   </div>

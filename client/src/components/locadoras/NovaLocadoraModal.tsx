@@ -23,6 +23,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  formatarDocumento, 
+  validarDocumento, 
+  getLabelDocumento, 
+  getPlaceholderDocumento,
+  limparDocumento 
+} from '@/utils/documentValidation';
 
 
 interface NovaLocadoraModalProps {
@@ -50,6 +57,16 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validar documento (CPF ou CNPJ)
+    if (!validarDocumento(formData.cnpj)) {
+      toast({
+        title: "Erro na validação",
+        description: "Digite um CPF ou CNPJ válido.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       const response = await fetch('/api/locadoras', {
         method: 'POST',
@@ -57,10 +74,10 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: formData.cnpj, // Usar CNPJ como ID
+          id: limparDocumento(formData.cnpj), // Usar documento limpo como ID
           nome: formData.nome,
           razaoSocial: formData.razaoSocial,
-          cnpj: formData.cnpj,
+          cnpj: limparDocumento(formData.cnpj), // Salvar documento limpo
           email: formData.email,
           telefone: formData.telefone,
           endereco: formData.endereco,
@@ -159,12 +176,12 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="cnpj">CNPJ *</Label>
+              <Label htmlFor="cnpj">{getLabelDocumento(formData.cnpj)} *</Label>
               <Input
                 id="cnpj"
-                value={formData.cnpj}
+                value={formatarDocumento(formData.cnpj)}
                 onChange={(e) => updateFormData('cnpj', e.target.value)}
-                placeholder=""
+                placeholder={getPlaceholderDocumento(formData.cnpj)}
                 required
               />
             </div>
