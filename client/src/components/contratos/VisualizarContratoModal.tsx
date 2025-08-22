@@ -100,7 +100,7 @@ export function VisualizarContratoModal({
     }
   };
   
-  const handleImprimir = async () => {
+    const handleImprimir = async () => {
     if (!contrato) return;
     
     // Buscar dados da locadora
@@ -116,8 +116,6 @@ export function VisualizarContratoModal({
     
     const printWindow = window.open('', '_blank');
     if (printWindow) {
-      // Removido cabeçalho duplicado - informações já estão no template
-      
       printWindow.document.write(`
         <html>
           <head>
@@ -130,12 +128,6 @@ export function VisualizarContratoModal({
                 margin: 20px;
                 color: #000;
               }
-              h1 {
-                text-align: center;
-                font-size: 16px;
-                margin-bottom: 20px;
-              }
-
               .contract-content {
                 white-space: pre-line;
                 text-align: justify;
@@ -163,8 +155,6 @@ export function VisualizarContratoModal({
             </style>
           </head>
           <body>
-            
-
             <div class="contract-content">${contrato.template}</div>
             <div class="signatures">
               <div class="signature-field">
