@@ -748,17 +748,22 @@ CLÁUSULA DÉCIMA PRIMEIRA – DISPOSIÇÕES FINAIS
 
 Taboão da Serra/SP, ${format(data.dataInicio, 'dd/MM/yyyy')}.
 
+
+
+
 Assinaturas:
 
-${aluguel.motoristaNome}
-(LOCATÁRIO)
 
-${locadorInfo.nome}
-(LOCADORA)
 
-(Testemunha 1 – Nome / RG / CPF)
+____________________________________        ____________________________________
+${aluguel.motoristaNome}                    ${locadorInfo.nome}
+(LOCATÁRIO)                                 (LOCADORA)
 
-(Testemunha 2 – Nome / RG / CPF)`;
+
+
+
+____________________________________        ____________________________________
+(Testemunha 1 – Nome / RG / CPF)           (Testemunha 2 – Nome / RG / CPF)`;
       }
 
       // Cria novo contrato
