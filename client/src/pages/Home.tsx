@@ -605,12 +605,13 @@ export default function Home() {
                 <ul className="space-y-4 mb-8">
                   {[
                     "Até 5 veículos na frota",
-                    "Cadastro completo de motoristas",
-                    "Geração automática de contratos",
-                    "Pagamentos automáticos semanais",
-                    "Alertas de CNH vencida",
-                    "Relatórios financeiros básicos",
-                    "Suporte por email"
+                    "Gestão completa de motoristas",
+                    "Contratos automáticos profissionais",
+                    "Pagamentos automáticos",
+                    "Controle de infrações e multas",
+                    "Relatórios financeiros completos",
+                    "Gestão de manutenções",
+                    "Upload de documentos"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
@@ -661,12 +662,12 @@ export default function Home() {
                   {[
                     "Até 20 veículos na frota",
                     "Gestão completa de motoristas",
-                    "Contratos profissionais automáticos",
-                    "Pagamentos automáticos (semanal/mensal)",
+                    "Contratos automáticos profissionais",
+                    "Pagamentos automáticos",
                     "Controle de infrações e multas",
-                    "Relatórios financeiros detalhados",
-                    "Alertas de manutenção",
-                    "Dashboard executivo"
+                    "Relatórios financeiros completos",
+                    "Gestão de manutenções",
+                    "Upload de documentos"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-cyan-400 mr-3 flex-shrink-0" />
@@ -705,13 +706,13 @@ export default function Home() {
                 <ul className="space-y-4 mb-8">
                   {[
                     "Até 50 veículos na frota",
-                    "Upload de documentos (CNH, fotos)",
-                    "Templates personalizados de contratos",
-                    "Gestão avançada de manutenções",
-                    "Controle de despesas detalhado",
-                    "Análise de lucratividade por veículo",
-                    "Sistema de negativação de motoristas",
-                    "Integração com API ViaCEP"
+                    "Gestão completa de motoristas",
+                    "Contratos automáticos profissionais",
+                    "Pagamentos automáticos",
+                    "Controle de infrações e multas",
+                    "Relatórios financeiros completos",
+                    "Gestão de manutenções",
+                    "Upload de documentos"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
@@ -750,13 +751,13 @@ export default function Home() {
                 <ul className="space-y-4 mb-8">
                   {[
                     "Veículos ilimitados",
-                    "Multi-locadoras (admin)",
-                    "Anúncios do sistema",
-                    "Configuração SEO avançada",
-                    "Logs de atividades detalhados",
-                    "Analytics e métricas completas",
-                    "Suporte 24/7 dedicado",
-                    "Treinamento personalizado"
+                    "Gestão completa de motoristas",
+                    "Contratos automáticos profissionais",
+                    "Pagamentos automáticos",
+                    "Controle de infrações e multas",
+                    "Relatórios financeiros completos",
+                    "Gestão de manutenções",
+                    "Suporte 24/7 e treinamento"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
