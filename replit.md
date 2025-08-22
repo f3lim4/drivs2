@@ -63,11 +63,11 @@ Preferred communication style: Simple, everyday language.
 
 ### 2025-08-22: Pricing Plans Section Added - CONCLUÍDO ✅
 - ✅ **4 PRICING TIERS CREATED** - Básico (R$49/5 carros), Profissional (R$99/20 carros), Avançado (R$200/50 carros), Master (R$500/ilimitados)
-- ✅ **FEATURE PARITY** - All plans include full system access (motoristas, contratos, pagamentos, infrações, manutenções, relatórios)
+- ✅ **FEATURE PARITY** - All plans include full system access with real financial controls showing actual profits/losses
 - ✅ **VEHICLE LIMITS ONLY** - Plans differ only by vehicle quantity limits, all other features included in every plan
 - ✅ **MASTER PLAN PREMIUM** - Only Master includes 24/7 support and personalized training as differentiators
-- ✅ **ADMIN FEATURES REMOVED** - Multi-locadoras, system announcements, and SEO config removed from Master plan
-- ✅ **RESPONSIVE DESIGN** - 4-column grid layout with professional styling and animations
+- ✅ **REAL FINANCIAL CONTROLS** - All plans include "Controle financeiro com lucros/perdas reais" instead of generic reports
+- ✅ **TERMINOLOGY UPDATED** - "Pagamentos automáticos" changed to "Controle de pagamentos" across all plans
 - ✅ **30-DAY GUARANTEE** - Money-back guarantee displayed prominently
 
 ## System Architecture

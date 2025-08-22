@@ -607,10 +607,10 @@ export default function Home() {
                     "Até 5 veículos na frota",
                     "Gestão completa de motoristas",
                     "Contratos automáticos profissionais",
-                    "Pagamentos automáticos",
+                    "Controle de pagamentos",
                     "Controle de infrações e multas",
-                    "Relatórios financeiros completos",
-                    "Gestão de manutenções",
+                    "Controle financeiro com lucros/perdas reais",
+                    "Controle de manutenções",
                     "Upload de documentos"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
@@ -663,10 +663,10 @@ export default function Home() {
                     "Até 20 veículos na frota",
                     "Gestão completa de motoristas",
                     "Contratos automáticos profissionais",
-                    "Pagamentos automáticos",
+                    "Controle de pagamentos",
                     "Controle de infrações e multas",
-                    "Relatórios financeiros completos",
-                    "Gestão de manutenções",
+                    "Controle financeiro com lucros/perdas reais",
+                    "Controle de manutenções",
                     "Upload de documentos"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
@@ -708,10 +708,10 @@ export default function Home() {
                     "Até 50 veículos na frota",
                     "Gestão completa de motoristas",
                     "Contratos automáticos profissionais",
-                    "Pagamentos automáticos",
+                    "Controle de pagamentos",
                     "Controle de infrações e multas",
-                    "Relatórios financeiros completos",
-                    "Gestão de manutenções",
+                    "Controle financeiro com lucros/perdas reais",
+                    "Controle de manutenções",
                     "Upload de documentos"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
@@ -753,11 +753,11 @@ export default function Home() {
                     "Veículos ilimitados",
                     "Gestão completa de motoristas",
                     "Contratos automáticos profissionais",
-                    "Pagamentos automáticos",
+                    "Controle de pagamentos",
                     "Controle de infrações e multas",
-                    "Relatórios financeiros completos",
-                    "Gestão de manutenções",
-                    "Suporte 24/7 e treinamento"
+                    "Controle financeiro com lucros/perdas reais",
+                    "Controle de manutenções",
+                    "Suporte 24/7 e treinamento personalizado"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
