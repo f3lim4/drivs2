@@ -169,7 +169,15 @@ export function VisualizarContratoModal({
       
       let yPosition = margin;
       
-      // Conteúdo SOMENTE do template - SEM cabeçalho adicional
+      // Título do contrato
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('CONTRATO DE LOCAÇÃO DE VEÍCULO', pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 15;
+      
+      // Conteúdo do template com fonte menor
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
       const lines = contrato.template.split('\n');
       
       for (const line of lines) {
