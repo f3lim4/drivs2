@@ -103,9 +103,9 @@ const navigationItems = [
   },
   {
     title: 'Planos',
-    url: '/planos',
+    url: '/admin/planos',
     icon: Crown,
-    description: 'Gerenciar planos do SaaS',
+    description: 'Gerenciar planos do sistema',
     adminOnly: true  // Só admins podem ver este item
   },
   {
