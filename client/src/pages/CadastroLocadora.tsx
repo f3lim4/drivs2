@@ -372,7 +372,7 @@ export default function CadastroLocadora() {
                 {/* Nome e CNPJ na mesma linha */}
                 <div className="col-span-2 grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="nome" >Nome da Locadora *</Label>
+                    <Label htmlFor="nome" >Nome da Empresa *</Label>
                     <Input
                       id="nome"
                       value={formData.nome}

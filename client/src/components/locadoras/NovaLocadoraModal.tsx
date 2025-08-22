@@ -141,7 +141,7 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="nome">Nome da Locadora *</Label>
+              <Label htmlFor="nome">Nome da Empresa *</Label>
               <Input
                 id="nome"
                 value={formData.nome}
