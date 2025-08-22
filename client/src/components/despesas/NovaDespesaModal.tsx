@@ -319,7 +319,7 @@ export function NovaDespesaModal() {
                     </FormControl>
                   </PopoverTrigger>
                   <PopoverContent className="w-[400px] p-0">
-                    <div className="p-4 space-y-3 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    <div className="p-4 space-y-3 max-h-96 overflow-y-auto scrollbar-thin">
                       {/* Campo de busca */}
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
