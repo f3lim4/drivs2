@@ -30,8 +30,8 @@ export function VehicleTypesProvider({ children }: { children: React.ReactNode }
 
   // Atualizar estado quando dados da locadora carregarem
   useEffect(() => {
-    if (locadoraData?.tiposVeiculos) {
-      setSelectedTypes(locadoraData.tiposVeiculos);
+    if (locadoraData && 'tiposVeiculos' in locadoraData && Array.isArray(locadoraData.tiposVeiculos)) {
+      setSelectedTypes(locadoraData.tiposVeiculos as VehicleType[]);
     }
   }, [locadoraData]);
 
@@ -116,7 +116,15 @@ export function VehicleTypesProvider({ children }: { children: React.ReactNode }
 export function useVehicleTypes() {
   const context = useContext(VehicleTypesContext);
   if (context === undefined) {
-    throw new Error('useVehicleTypes deve ser usado dentro de VehicleTypesProvider');
+    // Retornar valores padrão ao invés de lançar erro para evitar crashes
+    console.warn('useVehicleTypes usado fora do VehicleTypesProvider, usando valores padrão');
+    return {
+      vehicleTypes: ['carro'] as VehicleType[],
+      selectedTypes: ['carro'] as VehicleType[],
+      setSelectedTypes: () => {},
+      updateVehicleTypes: async () => {},
+      isLoading: false
+    };
   }
   return context;
 }
