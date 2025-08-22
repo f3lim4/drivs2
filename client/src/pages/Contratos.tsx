@@ -218,13 +218,15 @@ export default function Contratos() {
       
       let yPosition = margin;
       
-      // Não adicionar cabeçalho da empresa - apenas o template limpo
+      // Título do contrato
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('CONTRATO DE LOCAÇÃO DE VEÍCULO', pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 15;
       
-      // Não adicionar título nem informações duplicadas - apenas o template
-      
-      yPosition += 4;
-      
-      // Conteúdo do contrato
+      // Conteúdo do contrato com fonte menor
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
       const lines = (contrato.template || '').split('\n');
       
       for (const line of lines) {
