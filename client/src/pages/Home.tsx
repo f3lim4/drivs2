@@ -604,12 +604,12 @@ export default function Home() {
 
                 <ul className="space-y-4 mb-8">
                   {[
-                    "Gestão de até 5 veículos",
-                    "Cadastro de motoristas",
-                    "Contratos automáticos",
-                    "Relatórios completos",
-                    "Sistema anti-inadimplência",
-                    "Alertas automáticos",
+                    "Até 5 veículos na frota",
+                    "Cadastro completo de motoristas",
+                    "Geração automática de contratos",
+                    "Pagamentos automáticos semanais",
+                    "Alertas de CNH vencida",
+                    "Relatórios financeiros básicos",
                     "Suporte por email"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
@@ -659,12 +659,14 @@ export default function Home() {
 
                 <ul className="space-y-4 mb-8">
                   {[
-                    "Gestão de até 20 veículos",
-                    "Contratos automáticos",
-                    "Sistema anti-inadimplência",
-                    "Relatórios completos",
-                    "Alertas automáticos",
-                    "Suporte por email"
+                    "Até 20 veículos na frota",
+                    "Gestão completa de motoristas",
+                    "Contratos profissionais automáticos",
+                    "Pagamentos automáticos (semanal/mensal)",
+                    "Controle de infrações e multas",
+                    "Relatórios financeiros detalhados",
+                    "Alertas de manutenção",
+                    "Dashboard executivo"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-cyan-400 mr-3 flex-shrink-0" />
@@ -702,12 +704,14 @@ export default function Home() {
 
                 <ul className="space-y-4 mb-8">
                   {[
-                    "Gestão de até 50 veículos",
-                    "Contratos automáticos",
-                    "Sistema anti-inadimplência",
-                    "Relatórios completos",
-                    "Alertas automáticos",
-                    "Suporte por email"
+                    "Até 50 veículos na frota",
+                    "Upload de documentos (CNH, fotos)",
+                    "Templates personalizados de contratos",
+                    "Gestão avançada de manutenções",
+                    "Controle de despesas detalhado",
+                    "Análise de lucratividade por veículo",
+                    "Sistema de negativação de motoristas",
+                    "Integração com API ViaCEP"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
@@ -746,11 +750,12 @@ export default function Home() {
                 <ul className="space-y-4 mb-8">
                   {[
                     "Veículos ilimitados",
-                    "Contratos automáticos",
-                    "Sistema anti-inadimplência",
-                    "Relatórios completos",
-                    "Alertas automáticos",
-                    "Suporte 24/7",
+                    "Multi-locadoras (admin)",
+                    "Anúncios do sistema",
+                    "Configuração SEO avançada",
+                    "Logs de atividades detalhados",
+                    "Analytics e métricas completas",
+                    "Suporte 24/7 dedicado",
                     "Treinamento personalizado"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
