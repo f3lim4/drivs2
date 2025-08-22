@@ -68,7 +68,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **MASTER PLAN PREMIUM** - Only Master includes 24/7 support and personalized training as differentiators
 - ✅ **REAL FINANCIAL CONTROLS** - All plans include "Controle financeiro com lucros/perdas reais" instead of generic reports
 - ✅ **TERMINOLOGY UPDATED** - "Pagamentos automáticos" changed to "Controle de pagamentos" across all plans
-- ✅ **30-DAY GUARANTEE** - Money-back guarantee displayed prominently
+- ✅ **GUARANTEE REMOVED** - Money-back guarantee section removed per user request
 
 ## System Architecture
 DRIVS é construído com uma arquitetura full-stack que garante escalabilidade, segurança e uma experiência de usuário fluida.

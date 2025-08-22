@@ -776,15 +776,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Garantia */}
-          <div className="text-center mt-16">
-            <div className="inline-flex items-center bg-white/10 backdrop-blur-lg rounded-2xl px-8 py-4 border border-white/20">
-              <Shield className="h-6 w-6 text-green-400 mr-3" />
-              <span className="text-lg font-medium">
-                <span className="text-green-400 font-bold">Garantia de 30 dias</span> - Se não dobrar sua receita, devolvemos 100% do valor
-              </span>
-            </div>
-          </div>
+
         </div>
       </section>
 
