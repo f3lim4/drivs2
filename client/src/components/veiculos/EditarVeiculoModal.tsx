@@ -554,7 +554,7 @@ export function EditarVeiculoModal({
                   name="taxaAdministrativa"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Taxa Administrativa (R$)</FormLabel>
+                      <FormLabel>Taxa Administrativa (R$) - Opcional</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -597,7 +597,7 @@ export function EditarVeiculoModal({
                   name="valorSeguroMensal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor do Seguro Mensal (R$)</FormLabel>
+                      <FormLabel>Valor do Seguro Mensal (R$) - Opcional</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -698,7 +698,7 @@ export function EditarVeiculoModal({
                   name="valorRastreadorMensal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor Mensal do Rastreador (R$)</FormLabel>
+                      <FormLabel>Valor Mensal do Rastreador (R$) - Opcional</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
