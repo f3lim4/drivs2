@@ -682,7 +682,7 @@ export function NovoVeiculoModal({
                   name="taxaAdministrativa"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Taxa Administrativa (R$)</FormLabel>
+                      <FormLabel>Taxa Administrativa (R$) - Opcional</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -725,7 +725,7 @@ export function NovoVeiculoModal({
                   name="valorSeguroMensal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor Mensal (R$)</FormLabel>
+                      <FormLabel>Valor Mensal (R$) - Opcional</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -827,7 +827,7 @@ export function NovoVeiculoModal({
                   name="valorRastreadorMensal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor Mensal do Rastreador (R$)</FormLabel>
+                      <FormLabel>Valor Mensal do Rastreador (R$) - Opcional</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
