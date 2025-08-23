@@ -48,7 +48,11 @@ const veiculoSchema = z.object({
   placa: z.string().min(7, 'Placa deve ter pelo menos 7 caracteres'),
   marca: z.string().min(1, 'Marca é obrigatória'),
   modelo: z.string().min(1, 'Modelo é obrigatório'),
-  ano: z.number().min(1900, 'Ano inválido').max(2030, 'Ano inválido'),
+  ano: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseInt(val);
+    return val;
+  }, z.number().min(1900, 'Ano inválido').max(2030, 'Ano inválido')),
   cor: z.string().min(1, 'Cor é obrigatória'),
   categoria: z.string().min(1, 'Categoria é obrigatória'),
   
@@ -58,10 +62,26 @@ const veiculoSchema = z.object({
   
   // Características Técnicas
   combustivel: z.string().min(1, 'Tipo de combustível é obrigatório'),
-  quilometragem: z.number().min(0, 'Quilometragem deve ser positiva').optional(),
-  valorSemanal: z.number().min(0, 'Valor deve ser positivo').optional(),
-  caucao: z.number().min(0, 'Caução deve ser positiva').optional(),
-  taxaAdministrativa: z.union([z.number().min(0), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
+  quilometragem: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().min(0, 'Quilometragem deve ser positiva').optional()),
+  valorSemanal: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().min(0, 'Valor deve ser positivo').optional()),
+  caucao: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().min(0, 'Caução deve ser positiva').optional()),
+  taxaAdministrativa: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().min(0).optional()),
   limiteQuilometragem: z.string().min(1, 'Limite de quilometragem é obrigatório'),
   
 
@@ -70,28 +90,56 @@ const veiculoSchema = z.object({
   seguradora: z.string().optional(),
   numeroApolice: z.string().optional(),
   vigenciaSeguro: z.string().optional(),
-  valorSeguroMensal: z.union([z.number().min(0), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
+  valorSeguroMensal: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().min(0).optional()),
   
   // Valor do Veículo e IPVA
-  valorVeiculo: z.number().min(0).optional(),
-  ipva: z.number().min(0).optional(),
+  valorVeiculo: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().min(0).optional()),
+  ipva: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().min(0).optional()),
   
   // Rastreador
   rastreador: z.string().optional(),
-  valorRastreadorMensal: z.union([z.number().min(0), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
+  valorRastreadorMensal: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().min(0).optional()),
   
   // Data de Compra
   dataCompra: z.string().optional(),
   
   // Financiamento
   financiado: z.boolean().default(false),
-  valorFinanciamento: z.union([z.number().min(0), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
-  quantidadeParcelas: z.union([z.number().min(1), z.string().transform((val) => val === '' ? undefined : parseInt(val))]).optional(),
+  valorFinanciamento: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().min(0).optional()),
+  quantidadeParcelas: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseInt(val);
+    return val;
+  }, z.number().min(1).optional()),
   
   // Status será sempre "disponível" no cadastro
   
   // Campo condicional para limite específico
-  valorLimiteKm: z.number().optional(),
+  valorLimiteKm: z.preprocess((val) => {
+    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string') return parseFloat(val);
+    return val;
+  }, z.number().optional()),
 });
 
 type VeiculoFormData = z.infer<typeof veiculoSchema>;
@@ -120,31 +168,31 @@ export function NovoVeiculoModal({
       placa: '',
       marca: '',
       modelo: '',
-      ano: '' as any,
+      ano: undefined,
       cor: '',
       categoria: '',
       renavam: '',
       chassi: '',
       combustivel: '',
-      quilometragem: '' as any,
-      valorSemanal: '' as any,
-      caucao: '' as any,
+      quilometragem: undefined,
+      valorSemanal: undefined,
+      caucao: undefined,
       taxaAdministrativa: '',
       limiteQuilometragem: '',
       seguradora: '',
       numeroApolice: '',
       vigenciaSeguro: '',
       valorSeguroMensal: '',
-      valorVeiculo: '' as any,
-      ipva: '' as any,
+      valorVeiculo: undefined,
+      ipva: undefined,
       rastreador: '',
       valorRastreadorMensal: '',
       dataCompra: '',
       financiado: false,
-      valorFinanciamento: undefined,
-      quantidadeParcelas: undefined,
+      valorFinanciamento: '',
+      quantidadeParcelas: '',
       // Status será definido automaticamente como "disponível"
-      valorLimiteKm: '' as any,
+      valorLimiteKm: undefined,
     },
   });
 
