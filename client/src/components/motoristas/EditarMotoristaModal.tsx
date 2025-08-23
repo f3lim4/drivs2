@@ -557,7 +557,7 @@ export function EditarMotoristaModal({
                 )}
               />
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -611,7 +611,7 @@ export function EditarMotoristaModal({
 
             {/* CONTATO */}
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="telefone"
@@ -651,7 +651,7 @@ export function EditarMotoristaModal({
 
             {/* CNH */}
             <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="cnh"
@@ -746,8 +746,8 @@ export function EditarMotoristaModal({
                 )}
               />
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2">
                   <FormField
                     control={form.control}
                     name="rua"
@@ -778,7 +778,7 @@ export function EditarMotoristaModal({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="bairro"
@@ -808,7 +808,7 @@ export function EditarMotoristaModal({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="cidade"
