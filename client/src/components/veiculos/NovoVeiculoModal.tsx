@@ -722,36 +722,6 @@ export function NovoVeiculoModal({
 
                 <FormField
                   control={form.control}
-                  name="numeroApolice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Número da Apólice</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Número da apólice" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="vigenciaSeguro"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vigência</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="valorSeguroMensal"
                   render={({ field }) => (
                     <FormItem>

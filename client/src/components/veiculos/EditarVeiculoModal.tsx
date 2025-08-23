@@ -161,8 +161,7 @@ export function EditarVeiculoModal({
         taxaAdministrativa: Number(veiculo.taxaAdministrativa) || undefined,
         limiteQuilometragem: veiculo.limiteQuilometragem,
         seguradora: veiculo.seguradora || '',
-        numeroApolice: veiculo.numeroApolice || '',
-        vigenciaSeguro: veiculo.vigenciaSeguro || '',
+
         valorSeguroMensal: Number(veiculo.valorSeguroMensal) || undefined,
         valorVeiculo: Number(veiculo.valorVeiculo) || undefined,
         ipva: Number(veiculo.ipva) || undefined,
@@ -585,42 +584,6 @@ export function EditarVeiculoModal({
                       <FormControl>
                         <Input 
                           placeholder="Allianz, Porto Seguro, etc."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="numeroApolice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Número da Apólice</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Número da apólice"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="vigenciaSeguro"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vigência do Seguro</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="date"
                           {...field}
                         />
                       </FormControl>
