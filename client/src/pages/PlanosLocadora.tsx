@@ -193,17 +193,17 @@ export default function PlanosLocadora() {
         // Invalidar cache para atualizar dados
         queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
         queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
-      } else if (data.sessionUrl) {
-        // Pagamento real - redirecionar para checkout do Stripe
+      } else if (data.clientSecret) {
+        // Pagamento real - mostrar sucesso por enquanto
         toast({
-          title: "Redirecionando para o pagamento...",
-          description: "Aguarde enquanto abrimos o checkout seguro do Stripe.",
+          title: "✅ Assinatura Stripe criada!",
+          description: `Plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome} configurado. Client Secret: ${data.clientSecret.substring(0, 20)}...`,
+          duration: 8000,
         });
         
-        // Redirecionar diretamente para a URL do checkout
-        setTimeout(() => {
-          window.location.href = data.sessionUrl;
-        }, 1000);
+        // Invalidar cache para atualizar dados
+        queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
       }
       
     } catch (error) {
