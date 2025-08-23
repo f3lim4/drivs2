@@ -2366,30 +2366,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Criar nova assinatura
-      const subscription = await stripe.subscriptions.create({
+      // Criar Checkout Session para pagamento da assinatura
+      const session = await stripe.checkout.sessions.create({
         customer: customerId,
-        items: [{ price: priceId }],
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent'],
+        payment_method_types: ['card'],
+        line_items: [{
+          price: priceId,
+          quantity: 1,
+        }],
+        mode: 'subscription',
+        success_url: `${req.get('origin')}/planos?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.get('origin')}/planos?canceled=true`,
         metadata: {
           locadoraId: locadora.id,
           plano: plano
         }
       });
 
-      // Atualizar locadora com dados da nova assinatura
+      // Atualizar locadora temporariamente (será confirmado via webhook)
       await storage.updateLocadora(locadora.id, {
-        stripeSubscriptionId: subscription.id,
+        stripeCustomerId: customerId,
         stripePriceId: priceId,
-        plano: plano
       });
-
-      const paymentIntent = subscription.latest_invoice?.payment_intent;
       
       res.json({
-        subscriptionId: subscription.id,
-        clientSecret: paymentIntent?.client_secret,
+        sessionId: session.id,
+        sessionUrl: session.url,
         customerId: customerId,
         simulation: false
       });
