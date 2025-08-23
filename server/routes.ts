@@ -45,10 +45,10 @@ if (process.env.STRIPE_SECRET_KEY) {
 
 // Mapeamento dos planos para Price IDs do Stripe
 const PLANOS_STRIPE = {
-  basico: process.env.STRIPE_PRICE_BASICO || 'price_1234_basico',
-  profissional: process.env.STRIPE_PRICE_PROFISSIONAL || 'price_1234_profissional', 
-  avancado: process.env.STRIPE_PRICE_AVANCADO || 'price_1234_avancado',
-  master: process.env.STRIPE_PRICE_MASTER || 'price_1234_master'
+  basico: process.env.STRIPE_PRICE_BASICO || 'price_1RzH3XA24pm0ZMwJDzeMMDKD',
+  profissional: process.env.STRIPE_PRICE_PROFISSIONAL || 'price_1RzH4PA24pm0ZMwJ9L1rF33H', 
+  avancado: process.env.STRIPE_PRICE_AVANCADO || 'price_1RzH4mA24pm0ZMwJWFKaSdz1',
+  master: process.env.STRIPE_PRICE_MASTER || 'price_1RzH52A24pm0ZMwJxexrjhoQ'
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -2310,6 +2310,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // VERIFICAR SE OS PRICE IDs REAIS EXISTEM
       // Se o Price ID for um placeholder (price_1234_*), usar simulação
       const isSimulation = priceId.startsWith('price_1234_');
+      
+      console.log(`[STRIPE DEBUG] Price ID: ${priceId}, isSimulation: ${isSimulation}`);
       
       if (isSimulation) {
         // SIMULAÇÃO - até os Price IDs reais serem criados

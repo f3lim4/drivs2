@@ -69,6 +69,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **SECURITY** - Proper validation, error handling, and isolation by locadoraId
 - ✅ **AUTOMATION** - Webhooks configured for automatic payment confirmation and status updates
 - ✅ **CREDENTIALS CONFIGURED** - STRIPE_SECRET_KEY and VITE_STRIPE_PUBLIC_KEY properly set
+- ✅ **REAL PRICE IDS CONFIGURED** - Live Stripe Price IDs replaced simulation mode (price_1RzH3XA24pm0ZMwJDzeMMDKD, etc.)
 
 ### 2025-08-22: Pricing Plans Section Added - CONCLUÍDO ✅
 - ✅ **4 PRICING TIERS CREATED** - Básico (R$49/5 carros), Profissional (R$99/20 carros), Avançado (R$200/50 carros), Master (R$500/ilimitados)
