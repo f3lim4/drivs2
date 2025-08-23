@@ -2307,29 +2307,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Plano inválido" });
       }
 
-      // SIMULAÇÃO TEMPORÁRIA - até os Price IDs serem criados no Stripe
-      // Por enquanto, apenas atualizar o plano da locadora diretamente
-      console.log(`[STRIPE SIMULATION] Mudança de plano solicitada: ${plano} para locadora ${locadora.nome}`);
+      // VERIFICAR SE OS PRICE IDs REAIS EXISTEM
+      // Se o Price ID for um placeholder (price_1234_*), usar simulação
+      const isSimulation = priceId.startsWith('price_1234_');
       
-      // Atualizar locadora com o novo plano
-      await storage.updateLocadora(locadora.id, {
-        plano: plano,
-        status: 'ativa' // Simular ativação
-      });
+      if (isSimulation) {
+        // SIMULAÇÃO - até os Price IDs reais serem criados
+        console.log(`[STRIPE SIMULATION] Mudança de plano solicitada: ${plano} para locadora ${locadora.nome}`);
+        
+        await storage.updateLocadora(locadora.id, {
+          plano: plano,
+          status: 'ativa'
+        });
 
-      // Simular resposta do Stripe
-      res.json({
-        subscriptionId: `sub_simulated_${Date.now()}`,
-        clientSecret: `pi_simulated_${Date.now()}_secret`,
-        customerId: `cus_simulated_${Date.now()}`,
-        simulation: true,
-        message: "Plano atualizado com sucesso (simulação)"
-      });
+        res.json({
+          subscriptionId: `sub_simulated_${Date.now()}`,
+          clientSecret: `pi_simulated_${Date.now()}_secret`,
+          customerId: `cus_simulated_${Date.now()}`,
+          simulation: true,
+          message: "Plano atualizado com sucesso (simulação - configure Price IDs reais)"
+        });
 
-      console.log(`[STRIPE SIMULATION] Plano ${plano} ativado para ${locadora.nome}`);
-
-      /* TODO: Substituir pela implementação real quando os Price IDs estiverem criados no Stripe
+        console.log(`[STRIPE SIMULATION] Plano ${plano} ativado para ${locadora.nome}`);
+        return;
+      }
       
+      // IMPLEMENTAÇÃO REAL COM STRIPE - quando Price IDs reais forem configurados
+
       let customerId = locadora.stripeCustomerId;
       
       // Criar cliente no Stripe se não existir
@@ -2384,10 +2388,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         subscriptionId: subscription.id,
         clientSecret: paymentIntent?.client_secret,
-        customerId: customerId
+        customerId: customerId,
+        simulation: false
       });
-      
-      */
 
     } catch (error) {
       console.error("Erro ao criar assinatura Stripe:", error);
