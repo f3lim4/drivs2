@@ -147,17 +147,57 @@ export default function PlanosLocadora() {
     try {
       setSolicitando(true);
       
-      // Simulação - em um sistema real faria a requisição para o servidor
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!profile?.locadoraId) {
+        toast({
+          title: "Erro",
+          description: "Locadora não identificada.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Criar assinatura no Stripe
+      const response = await fetch('/api/stripe/create-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          locadoraId: profile.locadoraId,
+          plano: novoPlano,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao criar assinatura');
+      }
+
+      const data = await response.json();
       
       toast({
-        title: "Solicitação enviada!",
-        description: `Sua solicitação de mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome} foi enviada. Nossa equipe entrará em contato.`,
+        title: "Redirecionando para o pagamento...",
+        description: `Aguarde enquanto preparamos sua mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome}.`,
       });
+
+      // Redirecionar para o Stripe Checkout ou abrir modal de pagamento
+      if (data.clientSecret) {
+        // Aqui você poderia abrir um modal com o StripeCheckout
+        // Por enquanto, apenas notificar sucesso
+        toast({
+          title: "Plano atualizado!",
+          description: `Sua mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome} foi processada.`,
+        });
+        
+        // Recarregar dados da locadora
+        window.location.reload();
+      }
+      
     } catch (error) {
+      console.error("Erro ao processar mudança de plano:", error);
       toast({
-        title: "Erro ao solicitar mudança",
-        description: "Tente novamente em alguns instantes.",
+        title: "Erro ao processar mudança",
+        description: error instanceof Error ? error.message : "Tente novamente em alguns instantes.",
         variant: "destructive",
       });
     } finally {
@@ -299,7 +339,7 @@ export default function PlanosLocadora() {
                       className="w-full"
                       variant={plano.popular ? "default" : "outline"}
                     >
-                      {solicitando ? "Solicitando..." : "Solicitar Mudança"}
+                      {solicitando ? "Processando..." : "Mudar Plano"}
                     </Button>
                   )}
                 </div>

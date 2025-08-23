@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
+import Stripe from "stripe";
 import { storage } from "./storage";
 import { testConnection, db } from "./db";
 import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, updateContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, insertTemplateContratoSchema, insertSeoConfigSchema, contratos } from "@shared/schema";
@@ -33,12 +34,32 @@ const convertBrazilianDate = (dateStr: string): string => {
   return dateStr;
 };
 
+// Inicializar Stripe
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-12-18',
+  });
+}
+
+// Mapeamento dos planos para Price IDs do Stripe
+const PLANOS_STRIPE = {
+  basico: process.env.STRIPE_PRICE_BASICO || 'price_1234_basico',
+  profissional: process.env.STRIPE_PRICE_PROFISSIONAL || 'price_1234_profissional', 
+  avancado: process.env.STRIPE_PRICE_AVANCADO || 'price_1234_avancado',
+  master: process.env.STRIPE_PRICE_MASTER || 'price_1234_master'
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Test database connection first
   console.log("Testing database connection...");
   const connectionOk = await testConnection();
   if (!connectionOk) {
     console.error("Database connection failed. Starting server without database functionality.");
+  }
+
+  if (!stripe) {
+    console.warn("Stripe não inicializado - funcionalidade de pagamentos desabilitada");
   }
 
   // Inicializar OpenAI (opcional)
@@ -2253,6 +2274,225 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching analytics:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ============================================================================
+  // ROTAS STRIPE - SISTEMA DE PAGAMENTOS DOS PLANOS
+  // ============================================================================
+
+  // Criar assinatura (mudança de plano)
+  app.post("/api/stripe/create-subscription", async (req, res) => {
+    if (!stripe) {
+      return res.status(503).json({ message: "Stripe não disponível" });
+    }
+
+    try {
+      const { locadoraId, plano } = req.body;
+      
+      if (!locadoraId || !plano) {
+        return res.status(400).json({ message: "locadoraId e plano são obrigatórios" });
+      }
+
+      // Buscar dados da locadora
+      const locadora = await storage.getLocadora(locadoraId);
+      if (!locadora) {
+        return res.status(404).json({ message: "Locadora não encontrada" });
+      }
+
+      // Verificar se o plano existe
+      const priceId = PLANOS_STRIPE[plano as keyof typeof PLANOS_STRIPE];
+      if (!priceId) {
+        return res.status(400).json({ message: "Plano inválido" });
+      }
+
+      let customerId = locadora.stripeCustomerId;
+      
+      // Criar cliente no Stripe se não existir
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: locadora.email,
+          name: locadora.nome,
+          metadata: {
+            locadoraId: locadora.id,
+            cnpj: locadora.id
+          }
+        });
+        
+        customerId = customer.id;
+        
+        // Atualizar locadora com Stripe Customer ID
+        await storage.updateLocadora(locadora.id, {
+          stripeCustomerId: customerId
+        });
+      }
+
+      // Cancelar assinatura existente se houver
+      if (locadora.stripeSubscriptionId) {
+        try {
+          await stripe.subscriptions.cancel(locadora.stripeSubscriptionId);
+        } catch (error) {
+          console.warn("Erro ao cancelar assinatura existente:", error);
+        }
+      }
+
+      // Criar nova assinatura
+      const subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{ price: priceId }],
+        payment_behavior: 'default_incomplete',
+        expand: ['latest_invoice.payment_intent'],
+        metadata: {
+          locadoraId: locadora.id,
+          plano: plano
+        }
+      });
+
+      // Atualizar locadora com dados da nova assinatura
+      await storage.updateLocadora(locadora.id, {
+        stripeSubscriptionId: subscription.id,
+        stripePriceId: priceId,
+        plano: plano
+      });
+
+      const paymentIntent = subscription.latest_invoice?.payment_intent;
+      
+      res.json({
+        subscriptionId: subscription.id,
+        clientSecret: paymentIntent?.client_secret,
+        customerId: customerId
+      });
+
+    } catch (error) {
+      console.error("Erro ao criar assinatura Stripe:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Webhook Stripe para confirmar pagamentos
+  app.post("/api/stripe/webhook", express.raw({type: 'application/json'}), async (req, res) => {
+    if (!stripe) {
+      return res.status(503).json({ message: "Stripe não disponível" });
+    }
+
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig as string, process.env.STRIPE_WEBHOOK_SECRET || '');
+    } catch (err) {
+      console.error('Webhook signature verification failed:', err);
+      return res.status(400).send(`Webhook Error`);
+    }
+
+    try {
+      // Processar eventos do Stripe
+      switch (event.type) {
+        case 'payment_intent.succeeded':
+          const paymentIntent = event.data.object;
+          console.log(`PaymentIntent ${paymentIntent.id} succeeded`);
+          break;
+
+        case 'invoice.payment_succeeded':
+          const invoice = event.data.object;
+          const subscriptionId = invoice.subscription;
+          
+          if (subscriptionId) {
+            // Atualizar status da locadora como ativa
+            const locadoras = await storage.getAllLocadoras();
+            const locadora = locadoras.find(l => l.stripeSubscriptionId === subscriptionId);
+            
+            if (locadora) {
+              await storage.updateLocadora(locadora.id, {
+                status: 'ativa'
+              });
+              console.log(`Pagamento confirmado para locadora ${locadora.nome}`);
+            }
+          }
+          break;
+
+        case 'invoice.payment_failed':
+          const failedInvoice = event.data.object;
+          const failedSubscriptionId = failedInvoice.subscription;
+          
+          if (failedSubscriptionId) {
+            // Suspender locadora por falta de pagamento
+            const locadoras = await storage.getAllLocadoras();
+            const locadora = locadoras.find(l => l.stripeSubscriptionId === failedSubscriptionId);
+            
+            if (locadora) {
+              await storage.updateLocadora(locadora.id, {
+                status: 'pendente' // Status de pagamento pendente
+              });
+              console.log(`Pagamento falhou para locadora ${locadora.nome}`);
+            }
+          }
+          break;
+
+        default:
+          console.log(`Unhandled event type ${event.type}`);
+      }
+
+      res.json({received: true});
+    } catch (error) {
+      console.error('Erro processando webhook:', error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Obter status da assinatura
+  app.get("/api/stripe/subscription/:locadoraId", async (req, res) => {
+    if (!stripe) {
+      return res.status(503).json({ message: "Stripe não disponível" });
+    }
+
+    try {
+      const { locadoraId } = req.params;
+      
+      const locadora = await storage.getLocadora(locadoraId);
+      if (!locadora || !locadora.stripeSubscriptionId) {
+        return res.status(404).json({ message: "Assinatura não encontrada" });
+      }
+
+      const subscription = await stripe.subscriptions.retrieve(locadora.stripeSubscriptionId);
+      
+      res.json({
+        status: subscription.status,
+        current_period_end: subscription.current_period_end,
+        current_period_start: subscription.current_period_start,
+        plano: locadora.plano
+      });
+
+    } catch (error) {
+      console.error("Erro ao buscar assinatura:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Portal do cliente Stripe (para gerenciar assinatura)
+  app.post("/api/stripe/customer-portal", async (req, res) => {
+    if (!stripe) {
+      return res.status(503).json({ message: "Stripe não disponível" });
+    }
+
+    try {
+      const { locadoraId } = req.body;
+      
+      const locadora = await storage.getLocadora(locadoraId);
+      if (!locadora || !locadora.stripeCustomerId) {
+        return res.status(404).json({ message: "Cliente Stripe não encontrado" });
+      }
+
+      const session = await stripe.billingPortal.sessions.create({
+        customer: locadora.stripeCustomerId,
+        return_url: `${req.headers.origin}/planos`,
+      });
+
+      res.json({ url: session.url });
+
+    } catch (error) {
+      console.error("Erro ao criar portal do cliente:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
 
