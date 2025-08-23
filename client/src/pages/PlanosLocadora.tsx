@@ -177,25 +177,23 @@ export default function PlanosLocadora() {
       const data = await response.json();
       
       toast({
-        title: "Redirecionando para o pagamento...",
-        description: `Aguarde enquanto preparamos sua mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome}.`,
+        title: "Processando mudança...",
+        description: `Aguarde enquanto processamos sua mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome}.`,
       });
 
       // Processar resposta do Stripe
       if (data.clientSecret || data.simulation) {
         toast({
-          title: "Plano atualizado!",
-          description: `Sua mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome} foi processada${data.simulation ? ' (simulação)' : ''}.`,
+          title: "✅ Plano atualizado com sucesso!",
+          description: `Você mudou para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome}. ${data.simulation ? 'Simulação ativada.' : 'Pagamento processado.'}`,
+          duration: 5000,
         });
         
         // Invalidar cache para atualizar dados
         queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
         queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
         
-        // Redirecionar após 2 segundos
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 2000);
+        // Não redirecionar automaticamente - deixar o usuário na página
       }
       
     } catch (error) {
