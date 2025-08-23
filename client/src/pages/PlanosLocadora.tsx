@@ -128,13 +128,19 @@ const planosInfo = {
 };
 
 export default function PlanosLocadora() {
-  const { locadora } = useAuth();
+  const { profile, isLocadora } = useAuth();
   const { toast } = useToast();
   const [solicitando, setSolicitando] = useState(false);
 
+  // Buscar dados da locadora se usuário é uma locadora
+  const { data: locadora, isLoading: isLoadingLocadora } = useQuery({
+    queryKey: ['/api/locadoras', profile?.locadoraId],
+    enabled: !!profile?.locadoraId && isLocadora,
+  });
+
   const { data: planoDetalhes, isLoading } = useQuery({
-    queryKey: ['/api/planos', locadora?.id],
-    enabled: !!locadora,
+    queryKey: ['/api/planos', profile?.locadoraId],
+    enabled: !!profile?.locadoraId,
   });
 
   const handleSolicitarMudanca = async (novoPlano: string) => {
@@ -159,7 +165,7 @@ export default function PlanosLocadora() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingLocadora) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <LoadingSpinner />
@@ -167,20 +173,10 @@ export default function PlanosLocadora() {
     );
   }
 
-  if (!locadora) {
-    return (
-      <div className="flex-1 space-y-6 p-6">
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Acesso Negado</h2>
-            <p className="text-gray-600">Você precisa estar logado como locadora para ver esta página.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Sempre mostrar a página de planos, mesmo sem locadora específica
+  // O sistema deve permitir visualizar os planos disponíveis
 
-  const planoAtual = locadora?.plano || 'basico';
+  const planoAtual = locadora?.plano || 'profissional'; // Padrão profissional se não definido
 
   return (
     <div className="flex-1 space-y-6 p-6">
