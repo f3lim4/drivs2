@@ -56,11 +56,13 @@ export function VisualizarLocadoraModal({ open, onOpenChange, locadora }: Visual
   const getPlanoBadge = (plano: string) => {
     switch (plano) {
       case 'basico':
-        return <Badge variant="outline">Básico</Badge>;
-      case 'premium':
-        return <Badge variant="default" className="bg-blue-100 text-blue-800">Premium</Badge>;
-      case 'enterprise':
-        return <Badge variant="default" className="bg-purple-100 text-purple-800">Enterprise</Badge>;
+        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Básico</Badge>;
+      case 'profissional':
+        return <Badge variant="default" className="bg-cyan-100 text-cyan-800 border-cyan-200">Profissional</Badge>;
+      case 'avancado':
+        return <Badge variant="default" className="bg-green-100 text-green-800 border-green-200">Avançado</Badge>;
+      case 'master':
+        return <Badge variant="default" className="bg-purple-100 text-purple-800 border-purple-200">Master</Badge>;
       default:
         return <Badge variant="outline">{plano}</Badge>;
     }

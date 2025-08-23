@@ -180,9 +180,10 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                   <SelectValue placeholder="Selecione o plano" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="basico">Básico</SelectItem>
-                  <SelectItem value="premium">Premium</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
+                  <SelectItem value="basico">Básico - R$ 49/mês</SelectItem>
+                  <SelectItem value="profissional">Profissional - R$ 99/mês</SelectItem>
+                  <SelectItem value="avancado">Avançado - R$ 200/mês</SelectItem>
+                  <SelectItem value="master">Master - R$ 500/mês</SelectItem>
                 </SelectContent>
               </Select>
             </div>
