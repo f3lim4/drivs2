@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Check, Crown, Star, Zap, Car, TrendingUp, HeadphonesIcon, Rocket } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface PlanoFeature {
   nome: string;
@@ -130,6 +130,7 @@ const planosInfo = {
 export default function PlanosLocadora() {
   const { profile, isLocadora } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [solicitando, setSolicitando] = useState(false);
 
   // Buscar dados da locadora se usuário é uma locadora
@@ -180,17 +181,21 @@ export default function PlanosLocadora() {
         description: `Aguarde enquanto preparamos sua mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome}.`,
       });
 
-      // Redirecionar para o Stripe Checkout ou abrir modal de pagamento
-      if (data.clientSecret) {
-        // Aqui você poderia abrir um modal com o StripeCheckout
-        // Por enquanto, apenas notificar sucesso
+      // Processar resposta do Stripe
+      if (data.clientSecret || data.simulation) {
         toast({
           title: "Plano atualizado!",
-          description: `Sua mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome} foi processada.`,
+          description: `Sua mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome} foi processada${data.simulation ? ' (simulação)' : ''}.`,
         });
         
-        // Recarregar dados da locadora
-        window.location.reload();
+        // Invalidar cache para atualizar dados
+        queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
+        
+        // Redirecionar após 2 segundos
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 2000);
       }
       
     } catch (error) {
