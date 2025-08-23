@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import StripeCheckout from "@/components/stripe/StripeCheckout";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -99,13 +100,16 @@ const planosInfo = {
   basico: {
     nome: "Básico",
     preco: 49.00,
+    valor: 49.00,
     icone: Car,
     cor: "bg-blue-500",
-    descricao: "Para locadoras iniciantes com até 5 veículos"
+    descricao: "Para locadoras iniciantes com até 5 veículos",
+    popular: false
   },
   profissional: {
     nome: "Profissional",
     preco: 99.00,
+    valor: 99.00,
     icone: Rocket,
     cor: "bg-cyan-500",
     descricao: "Para locadoras em crescimento com até 20 veículos",
@@ -114,16 +118,20 @@ const planosInfo = {
   avancado: {
     nome: "Avançado",
     preco: 200.00,
+    valor: 200.00,
     icone: Zap,
     cor: "bg-green-500",
-    descricao: "Para frotas médias com até 50 veículos"
+    descricao: "Para frotas médias com até 50 veículos",
+    popular: false
   },
   master: {
     nome: "Master",
     preco: 500.00,
+    valor: 500.00,
     icone: Crown,
     cor: "bg-purple-500",
-    descricao: "Para grandes frotas com veículos ilimitados e suporte 24/7"
+    descricao: "Para grandes frotas com veículos ilimitados e suporte 24/7",
+    popular: false
   }
 };
 
@@ -132,6 +140,12 @@ export default function PlanosLocadora() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [solicitando, setSolicitando] = useState(false);
+  const [checkoutData, setCheckoutData] = useState<{
+    clientSecret: string;
+    subscriptionId: string;
+    planoNome: string;
+    valor: number;
+  } | null>(null);
 
   // Buscar dados da locadora se usuário é uma locadora
   const { data: locadora, isLoading: isLoadingLocadora } = useQuery({
@@ -194,16 +208,13 @@ export default function PlanosLocadora() {
         queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
         queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
       } else if (data.clientSecret) {
-        // Pagamento real - mostrar sucesso por enquanto
-        toast({
-          title: "✅ Assinatura Stripe criada!",
-          description: `Plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome} configurado. Client Secret: ${data.clientSecret.substring(0, 20)}...`,
-          duration: 8000,
+        // Pagamento real - abrir checkout do Stripe
+        setCheckoutData({
+          clientSecret: data.clientSecret,
+          subscriptionId: data.subscriptionId,
+          planoNome: planosInfo[novoPlano as keyof typeof planosInfo].nome,
+          valor: planosInfo[novoPlano as keyof typeof planosInfo].valor
         });
-        
-        // Invalidar cache para atualizar dados
-        queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
-        queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
       }
       
     } catch (error) {
@@ -421,6 +432,29 @@ export default function PlanosLocadora() {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Checkout do Stripe */}
+      {checkoutData && (
+        <StripeCheckout
+          clientSecret={checkoutData.clientSecret}
+          subscriptionId={checkoutData.subscriptionId}
+          planoNome={checkoutData.planoNome}
+          valor={checkoutData.valor}
+          onSuccess={() => {
+            setCheckoutData(null);
+            toast({
+              title: "Pagamento realizado!",
+              description: `Plano ${checkoutData.planoNome} ativado com sucesso.`,
+            });
+            // Invalidar cache para atualizar dados
+            queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
+          }}
+          onCancel={() => {
+            setCheckoutData(null);
+          }}
+        />
+      )}
     </div>
   );
 }
