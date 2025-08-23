@@ -18,6 +18,7 @@ import RelatoriosFinanceiros from "./pages/RelatoriosFinanceiros";
 import Manutencoes from "./pages/Manutencoes";
 import AnunciosAdmin from "./pages/AnunciosAdmin";
 import Planos from "./pages/Planos";
+import PlanosLocadora from "./pages/PlanosLocadora";
 import PlanosAdmin from "./pages/PlanosAdmin";
 import Seo from "./pages/Seo";
 import Perfil from "./pages/Perfil";
@@ -130,7 +131,7 @@ const App = () => (
           } />
           <Route path="/planos" element={
             <AuthGuard>
-              <DrivsLayout><Planos /></DrivsLayout>
+              <DrivsLayout><PlanosLocadora /></DrivsLayout>
             </AuthGuard>
           } />
           <Route path="/seo" element={
