@@ -61,7 +61,7 @@ const veiculoSchema = z.object({
   quilometragem: z.number().min(0, 'Quilometragem deve ser positiva').optional(),
   valorSemanal: z.number().min(0, 'Valor deve ser positivo').optional(),
   caucao: z.number().min(0, 'Caução deve ser positiva').optional(),
-  taxaAdministrativa: z.number().min(0).optional(),
+  taxaAdministrativa: z.union([z.number().min(0), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
   limiteQuilometragem: z.string().min(1, 'Limite de quilometragem é obrigatório'),
   
 
@@ -70,7 +70,7 @@ const veiculoSchema = z.object({
   seguradora: z.string().optional(),
   numeroApolice: z.string().optional(),
   vigenciaSeguro: z.string().optional(),
-  valorSeguroMensal: z.number().min(0).optional(),
+  valorSeguroMensal: z.union([z.number().min(0), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
   
   // Valor do Veículo e IPVA
   valorVeiculo: z.number().min(0).optional(),
@@ -78,7 +78,7 @@ const veiculoSchema = z.object({
   
   // Rastreador
   rastreador: z.string().optional(),
-  valorRastreadorMensal: z.number().min(0).optional(),
+  valorRastreadorMensal: z.union([z.number().min(0), z.string().transform((val) => val === '' ? undefined : parseFloat(val))]).optional(),
   
   // Data de Compra
   dataCompra: z.string().optional(),
@@ -129,16 +129,16 @@ export function NovoVeiculoModal({
       quilometragem: '' as any,
       valorSemanal: '' as any,
       caucao: '' as any,
-      taxaAdministrativa: undefined,
+      taxaAdministrativa: '',
       limiteQuilometragem: '',
       seguradora: '',
       numeroApolice: '',
       vigenciaSeguro: '',
-      valorSeguroMensal: '' as any,
+      valorSeguroMensal: '',
       valorVeiculo: '' as any,
       ipva: '' as any,
       rastreador: '',
-      valorRastreadorMensal: '' as any,
+      valorRastreadorMensal: '',
       dataCompra: '',
       financiado: false,
       valorFinanciamento: undefined,
