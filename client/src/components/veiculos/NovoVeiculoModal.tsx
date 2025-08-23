@@ -129,7 +129,7 @@ export function NovoVeiculoModal({
       quilometragem: '' as any,
       valorSemanal: '' as any,
       caucao: '' as any,
-      taxaAdministrativa: '' as any,
+      taxaAdministrativa: undefined,
       limiteQuilometragem: '',
       seguradora: '',
       numeroApolice: '',
