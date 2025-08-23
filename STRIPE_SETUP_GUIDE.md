@@ -22,7 +22,17 @@ Para cada plano, você precisa criar um produto com preço:
 5. **Price**: `R$ 49.00` (BRL - Real Brasileiro)
 6. **Billing period**: `Monthly`
 7. Clique "**Save product**"
-8. **Copie o Price ID** (começa com `price_...`) - você vai precisar dele!
+
+**⚠️ IMPORTANTE - Como encontrar o PRICE ID (não Product ID):**
+- Após criar o produto, você verá uma lista com o produto criado
+- Clique no produto para abrir os detalhes
+- Na seção "Pricing", você verá o **Price ID** (começa com `price_...`)
+- **NÃO confundir** com Product ID (que começa com `prod_...`)
+- O que você precisa é o **PRICE ID**!
+
+**Exemplo:**
+- ❌ Product ID: `prod_Abc123` (NÃO usar)
+- ✅ **Price ID**: `price_1OaWcJKlTiQx8aM9vE3b8sK2` (USAR ESTE!)
 
 #### **Plano Profissional - R$ 99/mês**
 1. Clique em "**Add product**"
@@ -98,6 +108,33 @@ Depois de substituir os Price IDs reais:
 3. **Ative webhooks** no Stripe para atualização automática de status
 4. **Configure domínio** nas configurações do Stripe para produção
 
+## 🔍 Passo a Passo Visual - Onde Encontrar Price ID
+
+**No Dashboard do Stripe:**
+
+1. **Vá para**: https://dashboard.stripe.com/products
+2. **Crie o produto** (como descrito acima)
+3. **Clique no produto criado** (na lista de produtos)
+4. **Procure pela seção "Pricing"**
+5. **Copie o ID que começa com `price_`** (não o que começa com `prod_`)
+
+**Exemplo do que você verá:**
+```
+Product Details:
+ID: prod_Abc123 ← NÃO é este
+
+Pricing:
+Price ID: price_1OaWcJKlTiQx8aM9vE3b8sK2 ← É ESTE que você precisa!
+Amount: R$49.00
+```
+
+## 🚨 Diferença Importante
+
+- **Product ID** (`prod_...`) = Identifica o produto
+- **Price ID** (`price_...`) = Identifica o preço/plano específico 
+
+**Para o DRIVS funcionar, você precisa dos 4 PRICE IDs!**
+
 ## 📞 Precisa de Ajuda?
 
-Se tiver dificuldade para encontrar os Price IDs ou configurar produtos no Stripe, me avise! Posso ajudar a localizar exatamente onde estão no dashboard.
+Se ainda não conseguir encontrar os Price IDs, me mande um print da tela do Stripe que posso te ajudar a localizar exatamente onde estão!
