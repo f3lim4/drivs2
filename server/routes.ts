@@ -38,8 +38,9 @@ const convertBrazilianDate = (dateStr: string): string => {
 let stripe: Stripe | null = null;
 if (process.env.STRIPE_SECRET_KEY) {
   stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2024-12-18',
+    apiVersion: '2024-06-20',
   });
+  console.log("Stripe inicializado com sucesso");
 }
 
 // Mapeamento dos planos para Price IDs do Stripe
@@ -2306,6 +2307,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Plano inválido" });
       }
 
+      // SIMULAÇÃO TEMPORÁRIA - até os Price IDs serem criados no Stripe
+      // Por enquanto, apenas atualizar o plano da locadora diretamente
+      console.log(`[STRIPE SIMULATION] Mudança de plano solicitada: ${plano} para locadora ${locadora.nome}`);
+      
+      // Atualizar locadora com o novo plano
+      await storage.updateLocadora(locadora.id, {
+        plano: plano,
+        status: 'ativa' // Simular ativação
+      });
+
+      // Simular resposta do Stripe
+      res.json({
+        subscriptionId: `sub_simulated_${Date.now()}`,
+        clientSecret: `pi_simulated_${Date.now()}_secret`,
+        customerId: `cus_simulated_${Date.now()}`,
+        simulation: true,
+        message: "Plano atualizado com sucesso (simulação)"
+      });
+
+      console.log(`[STRIPE SIMULATION] Plano ${plano} ativado para ${locadora.nome}`);
+
+      /* TODO: Substituir pela implementação real quando os Price IDs estiverem criados no Stripe
+      
       let customerId = locadora.stripeCustomerId;
       
       // Criar cliente no Stripe se não existir
@@ -2362,6 +2386,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         clientSecret: paymentIntent?.client_secret,
         customerId: customerId
       });
+      
+      */
 
     } catch (error) {
       console.error("Erro ao criar assinatura Stripe:", error);
