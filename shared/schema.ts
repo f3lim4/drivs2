@@ -41,7 +41,11 @@ export const locadoras = pgTable("locadoras", {
   responsavel: text("responsavel").notNull(),
   logo: text("logo"), // URL ou base64 do logo da locadora
   status: text("status").notNull().default("pendente"), // 'ativa', 'inativa', 'pendente'
-  plano: text("plano").notNull().default("basico"), // 'basico', 'premium', 'enterprise'
+  plano: text("plano").notNull().default("profissional"), // 'basico', 'profissional', 'avancado', 'master'
+  // Campos Stripe
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripePriceId: text("stripe_price_id"),
   tiposVeiculos: text("tipos_veiculos").array().notNull().default(['carro']), // tipos de veículos que a locadora trabalha
   // Controle de teste gratuito
   testeGratuito: boolean("teste_gratuito").notNull().default(true), // Se está no período de teste
