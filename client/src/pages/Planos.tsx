@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Check, Crown, Star, Zap, Users, Car, FileText, TrendingUp, Shield, HeadphonesIcon } from 'lucide-react';
+import { Check, Crown, Star, Zap, Users, Car, FileText, TrendingUp, Shield, HeadphonesIcon, Rocket } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
 interface PlanoFeature {
@@ -99,25 +99,32 @@ const planosFeatures: PlanoFeature[] = [
 const planosInfo = {
   basico: {
     nome: "Básico",
-    preco: 99.90,
+    preco: 49.00,
     icone: Car,
     cor: "bg-blue-500",
-    descricao: "Perfeito para pequenas locadoras começando no mercado"
+    descricao: "Para locadoras iniciantes com até 5 veículos"
   },
-  premium: {
-    nome: "Premium",
-    preco: 199.90,
+  profissional: {
+    nome: "Profissional",
+    preco: 99.00,
     icone: Star,
-    cor: "bg-purple-500",
-    descricao: "Para locadoras em crescimento que precisam de mais recursos",
+    cor: "bg-cyan-500",
+    descricao: "Para locadoras em crescimento com até 20 veículos",
     popular: true
   },
-  enterprise: {
-    nome: "Enterprise",
-    preco: 399.90,
+  avancado: {
+    nome: "Avançado",
+    preco: 200.00,
+    icone: Zap,
+    cor: "bg-green-500",
+    descricao: "Para frotas médias com até 50 veículos"
+  },
+  master: {
+    nome: "Master",
+    preco: 500.00,
     icone: Crown,
-    cor: "bg-yellow-500",
-    descricao: "Solução completa para grandes locadoras e redes"
+    cor: "bg-purple-500",
+    descricao: "Para grandes frotas com veículos ilimitados e suporte 24/7"
   }
 };
 

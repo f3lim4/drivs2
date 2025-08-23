@@ -170,18 +170,18 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="free">Free - Gratuito</SelectItem>
-                  <SelectItem value="basico">Básico - R$ 99/mês</SelectItem>
-                  <SelectItem value="premium">Premium - R$ 199/mês</SelectItem>
-                  <SelectItem value="enterprise">Enterprise - R$ 399/mês</SelectItem>
+                  <SelectItem value="basico">Básico - R$ 49/mês</SelectItem>
+                  <SelectItem value="profissional">Profissional - R$ 99/mês</SelectItem>
+                  <SelectItem value="avancado">Avançado - R$ 200/mês</SelectItem>
+                  <SelectItem value="master">Master - R$ 500/mês</SelectItem>
                 </SelectContent>
               </Select>
               {formData.plano && (
                 <div className="text-sm text-slate-600 mt-1">
-                  {formData.plano === 'free' && 'Até 2 veículos, 10 motoristas - Gratuito'}
-                  {formData.plano === 'basico' && 'Até 20 veículos, 50 motoristas - R$ 99/mês'}
-                  {formData.plano === 'premium' && 'Até 100 veículos, 200 motoristas - R$ 199/mês'}
-                  {formData.plano === 'enterprise' && 'Veículos ilimitados, motoristas ilimitados - R$ 399/mês'}
+                  {formData.plano === 'basico' && 'Até 5 veículos na frota - R$ 49/mês'}
+                  {formData.plano === 'profissional' && 'Até 20 veículos na frota - R$ 99/mês'}
+                  {formData.plano === 'avancado' && 'Até 50 veículos na frota - R$ 200/mês'}
+                  {formData.plano === 'master' && 'Veículos ilimitados + Suporte 24/7 - R$ 500/mês'}
                 </div>
               )}
             </div>
