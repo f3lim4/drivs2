@@ -689,8 +689,16 @@ export function NovoVeiculoModal({
                           step="0.01"
                           placeholder="" 
                           {...field}
-                          value={field.value || ''}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                          value={field.value === undefined ? '' : field.value}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || value === null) {
+                              field.onChange(undefined);
+                            } else {
+                              const numValue = parseFloat(value);
+                              field.onChange(isNaN(numValue) ? undefined : numValue);
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -732,8 +740,16 @@ export function NovoVeiculoModal({
                           step="0.01"
                           placeholder="" 
                           {...field}
-                          value={field.value || ''}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                          value={field.value === undefined ? '' : field.value}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || value === null) {
+                              field.onChange(undefined);
+                            } else {
+                              const numValue = parseFloat(value);
+                              field.onChange(isNaN(numValue) ? undefined : numValue);
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -834,8 +850,16 @@ export function NovoVeiculoModal({
                           step="0.01"
                           placeholder=""
                           {...field}
-                          value={field.value || ''}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                          value={field.value === undefined ? '' : field.value}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || value === null) {
+                              field.onChange(undefined);
+                            } else {
+                              const numValue = parseFloat(value);
+                              field.onChange(isNaN(numValue) ? undefined : numValue);
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />

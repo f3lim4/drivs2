@@ -61,6 +61,13 @@ Preferred communication style: Simple, everyday language.
 - ✅ **SEO PAGES UPDATED** - All marketing descriptions now reflect accurate statistics
 - ✅ **CONSISTENT MESSAGING** - All public pages now show unified 1-month free trial offer
 
+### 2025-08-23: Vehicle Form Optional Fields Fix - CONCLUÍDO ✅
+- ✅ **OPTIONAL FIELD LABELS** - Added "- Opcional" suffix to Taxa Administrativa, Valor Seguro Mensal, Valor Rastreador Mensal
+- ✅ **PROPER FIELD HANDLING** - Fixed undefined/empty value handling for truly optional numeric fields
+- ✅ **VALIDATION CORRECTED** - Optional fields now properly accept empty values without validation errors
+- ✅ **DEFAULT VALUES FIXED** - Changed default values from empty strings to undefined for proper optional behavior
+- ✅ **USER EXPERIENCE** - Form now clearly indicates which fields are optional and allows skipping them
+
 ### 2025-08-23: Complete Stripe Payment System Implementation - CONCLUÍDO ✅
 - ✅ **STRIPE INTEGRATION** - Full Stripe API integration with proper version (2024-06-20)
 - ✅ **BACKEND ROUTES** - Complete payment routes: create-subscription, webhooks, customer-portal
