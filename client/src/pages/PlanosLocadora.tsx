@@ -108,54 +108,7 @@ const planosFeatures: PlanoFeature[] = [
   }
 ];
 
-const planosInfo = {
-  start: {
-    nome: "Start",
-    preco: 50.00,
-    valor: 50.00,
-    icone: Car,
-    cor: "bg-blue-500",
-    descricao: "Para locadoras iniciantes com até 5 veículos",
-    popular: false
-  },
-  pro: {
-    nome: "Pro",
-    preco: 99.00,
-    valor: 99.00,
-    icone: Rocket,
-    cor: "bg-cyan-500",
-    descricao: "Para locadoras em crescimento com até 20 veículos",
-    popular: true
-  },
-  elite: {
-    nome: "Elite",
-    preco: 250.00,
-    valor: 250.00,
-    icone: Zap,
-    cor: "bg-green-500",
-    descricao: "Para frotas médias com até 50 veículos",
-    popular: false
-  },
-  prime: {
-    nome: "Prime",
-    preco: 500.00,
-    valor: 500.00,
-    icone: Crown,
-    cor: "bg-purple-500",
-    descricao: "Para grandes frotas com até 100 veículos",
-    popular: false
-  },
-  infinity: {
-    nome: "Infinity",
-    preco: 0.00,
-    valor: 0.00,
-    icone: Star,
-    cor: "bg-gradient-to-r from-purple-600 to-pink-600",
-    descricao: "Veículos ilimitados - Preço a consultar",
-    popular: false,
-    consultar: true
-  }
-};
+
 
 export default function PlanosLocadora() {
   const { profile, isLocadora } = useAuth();
@@ -169,15 +122,28 @@ export default function PlanosLocadora() {
     valor: number;
   } | null>(null);
 
+  // Cache dos planos estáticos (carregamento instantâneo)
+  const planosEstaticos = {
+    start: { nome: "Start", preco: 50.00, valor: 50.00, icone: Car, cor: "bg-blue-500", descricao: "Para locadoras iniciantes com até 5 veículos", popular: false },
+    pro: { nome: "Pro", preco: 99.00, valor: 99.00, icone: Rocket, cor: "bg-cyan-500", descricao: "Para locadoras em crescimento com até 20 veículos", popular: true },
+    elite: { nome: "Elite", preco: 250.00, valor: 250.00, icone: Zap, cor: "bg-green-500", descricao: "Para frotas médias com até 50 veículos", popular: false },
+    prime: { nome: "Prime", preco: 500.00, valor: 500.00, icone: Crown, cor: "bg-purple-500", descricao: "Para grandes frotas com até 100 veículos", popular: false },
+    infinity: { nome: "Infinity", preco: 0.00, valor: 0.00, icone: Star, cor: "bg-gradient-to-r from-purple-600 to-pink-600", descricao: "Veículos ilimitados - Preço a consultar", popular: false, consultar: true }
+  };
+
   // Buscar dados da locadora se usuário é uma locadora
   const { data: locadora, isLoading: isLoadingLocadora } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId],
     enabled: !!profile?.locadoraId && isLocadora,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    cacheTime: 10 * 60 * 1000, // 10 minutos
   });
 
   const { data: planoDetalhes, isLoading } = useQuery({
     queryKey: ['/api/planos', profile?.locadoraId],
     enabled: !!profile?.locadoraId,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    cacheTime: 10 * 60 * 1000, // 10 minutos
   });
 
   const handleSolicitarMudanca = async (novoPlano: string) => {
@@ -214,7 +180,7 @@ export default function PlanosLocadora() {
       
       toast({
         title: "Processando mudança...",
-        description: `Aguarde enquanto processamos sua mudança para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome}.`,
+        description: `Aguarde enquanto processamos sua mudança para o plano ${planosEstaticos[novoPlano as keyof typeof planosEstaticos].nome}.`,
       });
 
       // Processar resposta do Stripe
@@ -222,7 +188,7 @@ export default function PlanosLocadora() {
         // Simulação - apenas mostrar sucesso
         toast({
           title: "✅ Plano atualizado com sucesso!",
-          description: `Você mudou para o plano ${planosInfo[novoPlano as keyof typeof planosInfo].nome}. Simulação ativada.`,
+          description: `Você mudou para o plano ${planosEstaticos[novoPlano as keyof typeof planosEstaticos].nome}. Simulação ativada.`,
           duration: 5000,
         });
         
@@ -234,8 +200,8 @@ export default function PlanosLocadora() {
         setCheckoutData({
           clientSecret: data.clientSecret,
           subscriptionId: data.subscriptionId,
-          planoNome: planosInfo[novoPlano as keyof typeof planosInfo].nome,
-          valor: planosInfo[novoPlano as keyof typeof planosInfo].valor
+          planoNome: planosEstaticos[novoPlano as keyof typeof planosEstaticos].nome,
+          valor: planosEstaticos[novoPlano as keyof typeof planosEstaticos].valor
         });
       }
       
@@ -253,8 +219,11 @@ export default function PlanosLocadora() {
 
   if (isLoading || isLoadingLocadora) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <LoadingSpinner />
+      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+        <div className="text-center space-y-4">
+          <LoadingSpinner />
+          <p className="text-muted-foreground">Carregando planos...</p>
+        </div>
       </div>
     );
   }
@@ -287,15 +256,15 @@ export default function PlanosLocadora() {
               </CardDescription>
             </div>
             <Badge variant="default" className="px-3 py-1">
-              {planosInfo[planoAtual as keyof typeof planosInfo]?.nome || 'Pro'}
+              {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
             </Badge>
           </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
-            <div className={`p-3 rounded-full ${planosInfo[planoAtual as keyof typeof planosInfo]?.cor || 'bg-blue-500'}`}>
+            <div className={`p-3 rounded-full ${planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500'}`}>
               {(() => {
-                const planoData = planosInfo[planoAtual as keyof typeof planosInfo];
+                const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
                 if (!planoData) return <Rocket className="h-6 w-6 text-white" />;
                 const IconComponent = planoData.icone;
                 return <IconComponent className="h-6 w-6 text-white" />;
@@ -303,15 +272,15 @@ export default function PlanosLocadora() {
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-lg">
-                Plano {planosInfo[planoAtual as keyof typeof planosInfo]?.nome || 'Pro'}
+                Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {planosInfo[planoAtual as keyof typeof planosInfo]?.descricao || 'Para locadoras em crescimento'}
+                {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento'}
               </p>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold">
-                R$ {(planosInfo[planoAtual as keyof typeof planosInfo]?.preco || 99).toFixed(2)}
+                R$ {(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}
               </p>
               <p className="text-sm text-muted-foreground">por mês</p>
             </div>
@@ -329,7 +298,7 @@ export default function PlanosLocadora() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
-          {Object.entries(planosInfo).map(([key, plano]) => {
+          {Object.entries(planosEstaticos).map(([key, plano]) => {
             const Icone = plano.icone;
             return (
               <Card key={key} className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500 relative' : ''}`}>
