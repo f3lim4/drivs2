@@ -43,12 +43,13 @@ if (process.env.STRIPE_SECRET_KEY) {
   console.log("Stripe inicializado com sucesso");
 }
 
-// Mapeamento dos planos para Price IDs do Stripe
+// Mapeamento dos planos para Price IDs do Stripe  
 const PLANOS_STRIPE = {
-  basico: process.env.STRIPE_PRICE_BASICO || 'price_1RzH3XA24pm0ZMwJDzeMMDKD',
-  profissional: process.env.STRIPE_PRICE_PROFISSIONAL || 'price_1RzH4PA24pm0ZMwJ9L1rF33H', 
-  avancado: process.env.STRIPE_PRICE_AVANCADO || 'price_1RzH4mA24pm0ZMwJWFKaSdz1',
-  master: process.env.STRIPE_PRICE_MASTER || 'price_1RzH52A24pm0ZMwJxexrjhoQ'
+  start: process.env.STRIPE_PRICE_START || 'price_1RzH3XA24pm0ZMwJDzeMMDKD',
+  pro: process.env.STRIPE_PRICE_PRO || 'price_1RzH4PA24pm0ZMwJ9L1rF33H', 
+  elite: process.env.STRIPE_PRICE_ELITE || 'price_1RzH4mA24pm0ZMwJWFKaSdz1',
+  prime: process.env.STRIPE_PRICE_PRIME || 'price_1RzH52A24pm0ZMwJxexrjhoQ',
+  // Infinity não tem Stripe - é preço a consultar
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -2317,6 +2318,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verificar se o plano existe
+      // Plano Infinity não tem Stripe - é tratado separadamente
+      if (plano === 'infinity') {
+        return res.status(400).json({ 
+          message: "O plano Infinity requer consulta personalizada. Entre em contato conosco.",
+          isInfinityPlan: true
+        });
+      }
+
       const priceId = PLANOS_STRIPE[plano as keyof typeof PLANOS_STRIPE];
       if (!priceId) {
         return res.status(400).json({ message: "Plano inválido" });
