@@ -36,7 +36,7 @@ import { Veiculo } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { registrarAtividade } from '@/utils/activityLogger';
-import { ObjectUploader } from '@/components/ObjectUploader';
+
 import { Upload, FileText, Download } from 'lucide-react';
 
 // Schema de validação (mesmo do NovoVeiculoModal)
@@ -901,38 +901,74 @@ export function EditarVeiculoModal({
                 Documentos do Veículo
               </h3>
               
-              {/* Upload de novos documentos */}
-              <div className="flex items-center gap-4">
-                <ObjectUploader
-                  maxNumberOfFiles={5}
-                  maxFileSize={10485760}
-                  onGetUploadParameters={async () => {
-                    const response = await fetch('/api/objects/upload', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                    });
-                    const data = await response.json();
-                    return {
-                      method: 'PUT' as const,
-                      url: data.uploadURL,
-                    };
-                  }}
-                  onComplete={(result) => {
-                    if (result.successful && result.successful.length > 0) {
-                      const uploadURL = result.successful[0].uploadURL;
-                      handleDocumentUpload(uploadURL);
-                    }
-                  }}
-                  buttonClassName="flex items-center gap-2"
-                >
-                  <Upload className="w-4 h-4" />
-                  Adicionar Documento
-                </ObjectUploader>
-                <span className="text-sm text-muted-foreground">
-                  PDF, imagens até 10MB
-                </span>
+              {/* Upload de documentos - sistema simples */}
+              <div className="flex items-center justify-between border rounded-lg p-3 bg-gray-50">
+                <span className="text-sm text-muted-foreground">Adicionar documentos:</span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    id="documento-upload-edit"
+                    multiple
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    style={{ display: 'none' }}
+                    onChange={async (e) => {
+                      const files = e.target.files;
+                      if (!files || files.length === 0) return;
+
+                      for (const file of Array.from(files)) {
+                        try {
+                          // Obter URL de upload
+                          const response = await fetch('/api/objects/upload', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                          });
+                          const data = await response.json();
+
+                          // Upload do arquivo
+                          const uploadResponse = await fetch(data.uploadURL, {
+                            method: 'PUT',
+                            body: file,
+                            headers: {
+                              'Content-Type': file.type,
+                            },
+                          });
+
+                          if (uploadResponse.ok) {
+                            await handleDocumentUpload(data.uploadURL);
+                            toast({
+                              title: "Documento adicionado",
+                              description: `${file.name} carregado com sucesso.`,
+                            });
+                          }
+                        } catch (error) {
+                          console.error('Erro no upload:', error);
+                          toast({
+                            title: "Erro no upload",
+                            description: `Falha ao carregar ${file.name}`,
+                            variant: "destructive",
+                          });
+                        }
+                      }
+                      // Limpar input
+                      e.target.value = '';
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById('documento-upload-edit')?.click()}
+                    className="text-xs"
+                  >
+                    <Upload className="w-3 h-3 mr-1" />
+                    Adicionar
+                  </Button>
+                  <span className="text-xs text-muted-foreground">
+                    PDF, imagens até 10MB
+                  </span>
+                </div>
               </div>
 
               {/* Lista de documentos existentes */}
