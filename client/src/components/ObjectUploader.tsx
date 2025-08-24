@@ -111,34 +111,40 @@ export function ObjectUploader({
     <div>
       <Button 
         onClick={() => {
-          console.log('[OBJECT_UPLOADER] Botão clicado, abrindo modal...');
+          console.log('[OBJECT_UPLOADER] Botão clicado, estado atual:', showModal);
           setShowModal(true);
+          console.log('[OBJECT_UPLOADER] Estado após setShowModal(true):', true);
         }} 
         className={buttonClassName}
       >
         {children}
       </Button>
 
-      <DashboardModal
-        uppy={uppy}
-        open={showModal}
-        onRequestClose={() => setShowModal(false)}
-        proudlyDisplayPoweredByUppy={false}
-        note=""
-        showRemoveButtonAfterComplete={true}
-        showProgressDetails={false}
-        hideUploadButton={false}
-        hideRetryButton={false}
-        hidePauseResumeButton={false}
-        hideCancelButton={false}
-        hideProgressAfterFinish={false}
-        disableStatusBar={false}
-        disableInformer={false}
-        disableThumbnailGenerator={false}
-        theme="light"
-        width={500}
-        height={400}
-      />
+      {showModal && (
+        <DashboardModal
+          uppy={uppy}
+          open={showModal}
+          onRequestClose={() => {
+            console.log('[OBJECT_UPLOADER] Modal fechado');
+            setShowModal(false);
+          }}
+          proudlyDisplayPoweredByUppy={false}
+          note=""
+          showRemoveButtonAfterComplete={true}
+          showProgressDetails={false}
+          hideUploadButton={false}
+          hideRetryButton={false}
+          hidePauseResumeButton={false}
+          hideCancelButton={false}
+          hideProgressAfterFinish={false}
+          disableStatusBar={false}
+          disableInformer={false}
+          disableThumbnailGenerator={false}
+          theme="light"
+          width={500}
+          height={400}
+        />
+      )}
       
       {/* CSS global para esconder textos de drop */}
       {showModal && (
