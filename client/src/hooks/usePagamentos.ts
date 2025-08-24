@@ -128,14 +128,27 @@ export function usePagamentos() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
+      console.log(`[FRONTEND] Tentando excluir pagamento: ${id}`);
+      
       // Buscar dados do pagamento antes de excluir para o log
       const pagamentoPrevio = query.data?.find(p => p.id === id);
+      console.log(`[FRONTEND] Pagamento encontrado para exclusão:`, pagamentoPrevio);
       
       const response = await fetch(`/api/pagamentos/${id}`, {
         method: 'DELETE',
       });
       
-      if (!response.ok) throw new Error('Failed to delete pagamento');
+      console.log(`[FRONTEND] Response status: ${response.status}`);
+      console.log(`[FRONTEND] Response ok: ${response.ok}`);
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error(`[FRONTEND] Erro na exclusão:`, errorData);
+        throw new Error(`Failed to delete pagamento: ${response.status} - ${errorData}`);
+      }
+      
+      const result = await response.json();
+      console.log(`[FRONTEND] Resultado da exclusão:`, result);
       
       // Log da atividade
       try {
