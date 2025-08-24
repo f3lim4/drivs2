@@ -740,7 +740,7 @@ export class DatabaseStorage implements IStorage {
             ...pagamento,
             data: pagamento.dataPagamento, // Mapear campo data corretamente
             valor: pagamento.valorPago, // Mapear campo valor corretamente
-            motoristaNome: motorista[0]?.nome || '',
+            motoristaNome: motorista[0]?.nome || 'Motorista Excluído',
             motoristaContato: motorista[0]?.telefone || '',
             // Adicionar dados do veículo
             ...veiculoData
@@ -764,7 +764,7 @@ export class DatabaseStorage implements IStorage {
       
       return result.map(pagamento => ({
         ...pagamento,
-        motoristaNome: motorista[0]?.nome || '',
+        motoristaNome: motorista[0]?.nome || 'Motorista Excluído',
         motoristaContato: motorista[0]?.telefone || ''
       }));
     } catch (error) {
@@ -788,7 +788,7 @@ export class DatabaseStorage implements IStorage {
       
       return {
         ...pagamento,
-        motoristaNome: motorista[0]?.nome || '',
+        motoristaNome: motorista[0]?.nome || 'Motorista Excluído',
         motoristaContato: motorista[0]?.telefone || ''
       };
     } catch (error) {
