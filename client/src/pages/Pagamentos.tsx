@@ -29,7 +29,7 @@ import type { Pagamento } from '@shared/schema';
 export default function Pagamentos() {
   const { profile } = useAuth();
   const { pagamentos, isLoading: loadingPagamentos, createPagamento, updatePagamento, deletePagamento } = usePagamentos();
-  const { motoristas, loading: loadingMotoristas } = useMotoristas();
+  const { motoristas, isLoading: loadingMotoristas } = useMotoristas();
 
   // Buscar dados adicionais necessários para o sistema completo
   const { data: veiculos = [], isLoading: loadingVeiculos } = useQuery({
@@ -703,7 +703,7 @@ export default function Pagamentos() {
                 <TableRow key={pagamento.id}>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{pagamento.motoristaNome || 'N/A'}</div>
+                      <div className="font-medium">{(pagamento as any).motoristaNome || pagamento.motoristaNome || 'N/A'}</div>
                       <div className="text-xs text-muted-foreground">{pagamento.motoristaId || 'CPF não informado'}</div>
                     </div>
                   </TableCell>

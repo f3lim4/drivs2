@@ -28,7 +28,8 @@ export function usePagamentos() {
         pagamentosTotal: data.length,
         primeiroPagamento: data[0]?.locadoraId,
         url: `/api/pagamentos?locadoraId=${locadoraId}`,
-        responseData: data
+        primeiroNomeMotorista: data[0]?.motoristaNome,
+        responseData: data.slice(0, 1).map(p => ({ id: p.id, motoristaNome: p.motoristaNome, motoristaId: p.motoristaId }))
       });
       
       return data as Pagamento[];
