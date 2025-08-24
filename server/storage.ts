@@ -632,6 +632,16 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async getContratosByMotorista(motoristaId: string): Promise<Contrato[]> {
+    try {
+      const result = await db.select().from(contratos).where(eq(contratos.motoristaId, motoristaId));
+      return result;
+    } catch (error) {
+      console.error('Error getting contratos by motorista:', error);
+      return [];
+    }
+  }
+
   async getContrato(id: string): Promise<Contrato | undefined> {
     const result = await db.select().from(contratos).where(eq(contratos.id, id));
     return result[0];
