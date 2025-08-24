@@ -14,7 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Car, Fuel, Calendar, DollarSign, Shield, Gauge } from 'lucide-react';
+import { Car, Fuel, Calendar, DollarSign, Shield, Gauge, Eye } from 'lucide-react';
 import { Veiculo } from '@/types';
 
 interface VisualizarVeiculoModalProps {
@@ -108,10 +108,20 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
                   {veiculo.combustivel || 'Flex'}
                 </p>
               </div>
+              
+              
+              {/* Campo Visualizar sempre exibido quando presente */}
               {(veiculo as any).visualizar && (
-                <div className="col-span-2">
-                  <p className="text-sm font-medium text-muted-foreground">Observações Visuais</p>
-                  <p className="text-sm">{(veiculo as any).visualizar}</p>
+                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Eye className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Observações Visuais do Veículo</p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 p-3 rounded border border-blue-100 dark:border-blue-700">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                      {(veiculo as any).visualizar}
+                    </p>
+                  </div>
                 </div>
               )}
             </CardContent>
