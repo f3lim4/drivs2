@@ -736,19 +736,25 @@ export class DatabaseStorage implements IStorage {
             }
           }
           
+          // Se motorista foi excluído, pular este pagamento
+          if (!motorista[0]) {
+            return null;
+          }
+          
           return {
             ...pagamento,
             data: pagamento.dataPagamento, // Mapear campo data corretamente
             valor: pagamento.valorPago, // Mapear campo valor corretamente
-            motoristaNome: motorista[0]?.nome || 'Motorista Excluído',
-            motoristaContato: motorista[0]?.telefone || '',
+            motoristaNome: motorista[0].nome,
+            motoristaContato: motorista[0].telefone || '',
             // Adicionar dados do veículo
             ...veiculoData
           };
         })
       );
       
-      return pagamentosEnriquecidos;
+      // Filtrar pagamentos nulos (motoristas excluídos)
+      return pagamentosEnriquecidos.filter(p => p !== null);
     } catch (error) {
       console.error('Error in getPagamentosByLocadora:', error);
       return [];
