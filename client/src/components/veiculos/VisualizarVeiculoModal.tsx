@@ -215,8 +215,6 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
           {/* Documentos do Veículo - Compacto */}
           {(() => {
             const documentos = veiculo.documentos;
-            console.log('[DEBUG] Documentos do veículo:', documentos);
-            console.log('[DEBUG] Veículo completo:', veiculo);
             
             return (
               <Card className="border-gray-200">
@@ -243,10 +241,7 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
                           key={index}
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            console.log('[DEBUG] Abrindo documento:', doc);
-                            window.open(doc, '_blank');
-                          }}
+                          onClick={() => window.open(doc, '_blank')}
                           className="h-8 text-xs gap-1"
                         >
                           <FileText className="w-3 h-3" />
