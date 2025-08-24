@@ -703,7 +703,7 @@ export default function Pagamentos() {
                 <TableRow key={pagamento.id}>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{(pagamento as any).motoristaNome || pagamento.motoristaNome || 'N/A'}</div>
+                      <div className="font-medium">{(pagamento as any).motoristaNome || pagamento.motoristaNome || 'Nome não disponível'}</div>
                       <div className="text-xs text-muted-foreground">{pagamento.motoristaId || 'CPF não informado'}</div>
                     </div>
                   </TableCell>
