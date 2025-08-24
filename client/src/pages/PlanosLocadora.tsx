@@ -17,97 +17,108 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface PlanoFeature {
   nome: string;
-  basico: boolean | string;
-  profissional: boolean | string;
-  avancado: boolean | string;
-  master: boolean | string;
+  start: boolean | string;
+  pro: boolean | string;
+  elite: boolean | string;
+  prime: boolean | string;
+  infinity: boolean | string;
 }
 
 const planosFeatures: PlanoFeature[] = [
   {
     nome: "Veículos na frota",
-    basico: "Até 5",
-    profissional: "Até 20", 
-    avancado: "Até 50",
-    master: "Ilimitados"
+    start: "Até 5",
+    pro: "Até 20", 
+    elite: "Até 50",
+    prime: "Até 100",
+    infinity: "Ilimitados"
   },
   {
     nome: "Gestão completa de motoristas",
-    basico: true,
-    profissional: true,
-    avancado: true,
-    master: true
+    start: true,
+    pro: true,
+    elite: true,
+    prime: true,
+    infinity: true
   },
   {
     nome: "Contratos automáticos profissionais",
-    basico: true,
-    profissional: true,
-    avancado: true,
-    master: true
+    start: true,
+    pro: true,
+    elite: true,
+    prime: true,
+    infinity: true
   },
   {
     nome: "Controle de pagamentos",
-    basico: true,
-    profissional: true,
-    avancado: true,
-    master: true
+    start: true,
+    pro: true,
+    elite: true,
+    prime: true,
+    infinity: true
   },
   {
     nome: "Controle de infrações e multas",
-    basico: true,
-    profissional: true,
-    avancado: true,
-    master: true
+    start: true,
+    pro: true,
+    elite: true,
+    prime: true,
+    infinity: true
   },
   {
     nome: "Controle financeiro com lucros/perdas reais",
-    basico: true,
-    profissional: true,
-    avancado: true,
-    master: true
+    start: true,
+    pro: true,
+    elite: true,
+    prime: true,
+    infinity: true
   },
   {
     nome: "Controle de manutenções",
-    basico: true,
-    profissional: true,
-    avancado: true,
-    master: true
+    start: true,
+    pro: true,
+    elite: true,
+    prime: true,
+    infinity: true
   },
   {
     nome: "Upload de documentos",
-    basico: true,
-    profissional: true,
-    avancado: true,
-    master: true
+    start: true,
+    pro: true,
+    elite: true,
+    prime: true,
+    infinity: true
   },
   {
     nome: "Suporte técnico",
-    basico: "Email",
-    profissional: "Email",
-    avancado: "Email",
-    master: "24/7 + Telefone"
+    start: "Email",
+    pro: "Email",
+    elite: "Email",
+    prime: "Email + Telefone",
+    infinity: "24/7 + Telefone"
   },
   {
     nome: "Treinamento",
-    basico: "Documentação",
-    profissional: "Documentação",
-    avancado: "Documentação",
-    master: "Personalizado"
+    start: "Documentação",
+    pro: "Documentação",
+    elite: "Documentação",
+    prime: "Personalizado",
+    infinity: "Personalizado VIP"
   }
 ];
 
 const planosInfo = {
-  basico: {
-    nome: "Básico",
-    preco: 49.00,
-    valor: 49.00,
+  start: {
+    nome: "Start",
+    preco: 50.00,
+    valor: 50.00,
     icone: Car,
     cor: "bg-blue-500",
     descricao: "Para locadoras iniciantes com até 5 veículos",
     popular: false
   },
-  profissional: {
-    nome: "Profissional",
+  pro: {
+    nome: "Pro",
     preco: 99.00,
     valor: 99.00,
     icone: Rocket,
@@ -115,23 +126,33 @@ const planosInfo = {
     descricao: "Para locadoras em crescimento com até 20 veículos",
     popular: true
   },
-  avancado: {
-    nome: "Avançado",
-    preco: 200.00,
-    valor: 200.00,
+  elite: {
+    nome: "Elite",
+    preco: 250.00,
+    valor: 250.00,
     icone: Zap,
     cor: "bg-green-500",
     descricao: "Para frotas médias com até 50 veículos",
     popular: false
   },
-  master: {
-    nome: "Master",
+  prime: {
+    nome: "Prime",
     preco: 500.00,
     valor: 500.00,
     icone: Crown,
     cor: "bg-purple-500",
-    descricao: "Para grandes frotas com veículos ilimitados e suporte 24/7",
+    descricao: "Para grandes frotas com até 100 veículos",
     popular: false
+  },
+  infinity: {
+    nome: "Infinity",
+    preco: 0.00,
+    valor: 0.00,
+    icone: Star,
+    cor: "bg-gradient-to-r from-purple-600 to-pink-600",
+    descricao: "Veículos ilimitados - Preço a consultar",
+    popular: false,
+    consultar: true
   }
 };
 
@@ -332,7 +353,7 @@ export default function PlanosLocadora() {
                   )}
                   <h3 className="font-semibold">{plano.nome}</h3>
                   <p className="text-sm text-muted-foreground">
-                    R$ {plano.preco.toFixed(2)}/mês
+                    {(plano as any).consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
                   </p>
                 </div>
                 <Separator />
@@ -355,6 +376,14 @@ export default function PlanosLocadora() {
                   {planoAtual === key ? (
                     <Button disabled className="w-full">
                       Plano Atual
+                    </Button>
+                  ) : (plano as any).consultar ? (
+                    <Button
+                      onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
+                      className="w-full"
+                      variant="outline"
+                    >
+                      Solicitar Orçamento
                     </Button>
                   ) : (
                     <Button
@@ -408,19 +437,19 @@ export default function PlanosLocadora() {
               </ul>
             </div>
             <div className="space-y-4">
-              <h4 className="font-semibold">Diferenciais do Plano Master:</h4>
+              <h4 className="font-semibold">Diferenciais dos Planos Premium:</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
                   <Crown className="h-4 w-4 text-purple-500" />
-                  Suporte técnico 24/7
+                  Prime: Suporte por telefone + 100 veículos
                 </li>
                 <li className="flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-purple-500" />
-                  Treinamento personalizado
+                  <Star className="h-4 w-4 text-pink-500" />
+                  Infinity: Veículos ilimitados + Suporte VIP 24/7
                 </li>
                 <li className="flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-purple-500" />
-                  Veículos ilimitados
+                  <Star className="h-4 w-4 text-pink-500" />
+                  Infinity: Treinamento personalizado exclusivo
                 </li>
               </ul>
             </div>
