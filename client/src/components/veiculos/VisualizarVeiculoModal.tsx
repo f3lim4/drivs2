@@ -212,63 +212,50 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
             </Card>
           )}
 
-          {/* Documentos do Veículo - Debug melhorado */}
+          {/* Documentos do Veículo - Compacto */}
           {(() => {
             const documentos = (veiculo as any).documentos;
-            console.log('Documentos do veículo:', documentos);
+            console.log('[DEBUG] Documentos do veículo:', documentos);
+            console.log('[DEBUG] Veículo completo:', veiculo);
             
-            if (!documentos || documentos.length === 0) {
-              return (
-                <Card className="border-gray-200">
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
-                      Documentos do Veículo
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">Nenhum documento cadastrado</p>
-                  </CardContent>
-                </Card>
-              );
-            }
-
             return (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    Documentos do Veículo ({documentos.length})
+              <Card className="border-gray-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Documentos
+                    </div>
+                    {documentos && documentos.length > 0 && (
+                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                        {documentos.length}
+                      </span>
+                    )}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid gap-2">
-                    {documentos.map((doc: string, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-blue-500" />
-                          <div>
-                            <span className="text-sm font-medium">Documento {index + 1}</span>
-                            <p className="text-xs text-muted-foreground">
-                              {doc.includes('.pdf') ? 'PDF' : 'Imagem'}
-                            </p>
-                          </div>
-                        </div>
+                <CardContent className="pt-0">
+                  {!documentos || documentos.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Nenhum documento</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {documentos.map((doc: string, index: number) => (
                         <Button
+                          key={index}
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            console.log('Abrindo documento:', doc);
+                            console.log('[DEBUG] Abrindo documento:', doc);
                             window.open(doc, '_blank');
                           }}
-                          className="flex items-center gap-1"
+                          className="h-8 text-xs gap-1"
                         >
+                          <FileText className="w-3 h-3" />
+                          Doc {index + 1}
                           <Download className="w-3 h-3" />
-                          Baixar
                         </Button>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );

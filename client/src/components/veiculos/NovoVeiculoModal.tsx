@@ -318,8 +318,10 @@ export function NovoVeiculoModal({
 
       // Processar documentos após criação do veículo
       if (data.documentos && data.documentos.length > 0) {
+        console.log('[UPLOAD] Processando', data.documentos.length, 'documentos...');
         for (const docURL of data.documentos) {
           try {
+            console.log('[UPLOAD] Salvando documento:', docURL);
             const docResponse = await fetch(`/api/veiculos/${novoVeiculo.id}/documentos`, {
               method: 'PUT',
               headers: {
@@ -328,11 +330,14 @@ export function NovoVeiculoModal({
               body: JSON.stringify({ documentURL: docURL }),
             });
             
-            if (!docResponse.ok) {
-              console.error('Erro ao salvar documento:', docURL);
+            if (docResponse.ok) {
+              const result = await docResponse.json();
+              console.log('[UPLOAD] Documento salvo com sucesso:', result);
+            } else {
+              console.error('[UPLOAD] Erro ao salvar documento:', docURL, await docResponse.text());
             }
           } catch (error) {
-            console.error('Erro ao processar documento:', error);
+            console.error('[UPLOAD] Erro ao processar documento:', error);
           }
         }
       }
@@ -1076,14 +1081,15 @@ export function NovoVeiculoModal({
               )}
             </div>
 
-            {/* Upload de documentos - linha discreta */}
-            <div className="flex items-center justify-between border rounded-lg p-3 bg-gray-50">
-              <span className="text-sm text-muted-foreground">Documentos (opcional):</span>
-              <div className="flex items-center gap-2">
+            {/* Upload de documentos - compacto */}
+            <div className="flex items-center gap-3 p-2 border rounded bg-gray-50/50">
+              <span className="text-xs text-muted-foreground min-w-fit">Documentos:</span>
+              <div className="flex items-center gap-2 flex-1">
                 <ObjectUploader
-                  maxNumberOfFiles={5}
-                  maxFileSize={10485760} // 10MB
+                  maxNumberOfFiles={3}
+                  maxFileSize={5242880} // 5MB
                   onGetUploadParameters={async () => {
+                    console.log('[UPLOAD] Solicitando URL de upload...');
                     const response = await fetch('/api/objects/upload', {
                       method: 'POST',
                       headers: {
@@ -1091,30 +1097,35 @@ export function NovoVeiculoModal({
                       },
                     });
                     const data = await response.json();
+                    console.log('[UPLOAD] URL obtida:', data.uploadURL);
                     return {
                       method: 'PUT' as const,
                       url: data.uploadURL,
                     };
                   }}
                   onComplete={(result) => {
+                    console.log('[UPLOAD] Upload completo:', result);
                     if (result.successful && result.successful.length > 0) {
                       const documentos = form.getValues('documentos') || [];
-                      const novosDocumentos = result.successful.map(file => file.uploadURL);
+                      const novosDocumentos = result.successful.map(file => {
+                        console.log('[UPLOAD] Arquivo salvo:', file.uploadURL);
+                        return file.uploadURL;
+                      });
                       form.setValue('documentos', [...documentos, ...novosDocumentos]);
                       
                       toast({
-                        title: "Documentos adicionados",
-                        description: `${result.successful.length} arquivo(s) carregado(s) com sucesso.`,
+                        title: "Sucesso",
+                        description: `${result.successful.length} documento(s) adicionado(s)`,
                       });
                     }
                   }}
-                  buttonClassName="text-xs h-8"
+                  buttonClassName="text-xs h-7 px-2"
                 >
                   <Upload className="w-3 h-3 mr-1" />
                   Adicionar
                 </ObjectUploader>
                 {form.watch('documentos') && form.watch('documentos').length > 0 && (
-                  <span className="text-xs text-green-600">
+                  <span className="text-xs text-green-600 font-medium">
                     {form.watch('documentos').length} arquivo(s)
                   </span>
                 )}
