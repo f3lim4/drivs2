@@ -67,12 +67,17 @@ export function ObjectUploader({
       meta: {},
       locale: {
         strings: {
-          // Remover textos de drop
-          dropPasteFiles: '',
-          dropPasteFolders: '',
-          dropPasteBoth: '',
-          dropHereOr: '',
+          // Remover completamente textos de drop
+          dropPasteFiles: ' ',
+          dropPasteFolders: ' ',
+          dropPasteBoth: ' ', 
+          dropHereOr: ' ',
+          dropHint: ' ',
           browse: 'Selecionar arquivos',
+          // Remover textos da área de drop
+          addingMoreFiles: ' ',
+          addMore: 'Adicionar mais',
+          // Configurar outros textos
           uploadXFiles: {
             0: 'Carregar %{smart_count} arquivo',
             1: 'Carregar %{smart_count} arquivos'
@@ -81,8 +86,6 @@ export function ObjectUploader({
             0: 'Carregar +%{smart_count} arquivo', 
             1: 'Carregar +%{smart_count} arquivos'
           },
-          // Outros textos em português
-          addMore: 'Adicionar mais',
           removeFile: 'Remover arquivo',
           editFile: 'Editar arquivo',
           done: 'Concluído',
@@ -130,6 +133,28 @@ export function ObjectUploader({
         width={500}
         height={400}
       />
+      
+      {/* CSS global para esconder textos de drop */}
+      {showModal && (
+        <style>{`
+          .uppy-Dashboard-dropFilesHereHint,
+          .uppy-Dashboard-AddFiles-title,
+          .uppy-Dashboard-note,
+          .uppy-Dashboard-AddFiles-info {
+            display: none !important;
+          }
+          .uppy-size--md .uppy-Dashboard-AddFiles {
+            padding-top: 20px !important;
+          }
+          .uppy-Dashboard-browse {
+            margin-top: 0 !important;
+            background: #007bff !important;
+            color: white !important;
+            padding: 8px 16px !important;
+            border-radius: 6px !important;
+          }
+        `}</style>
+      )}
     </div>
   );
 }
