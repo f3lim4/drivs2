@@ -1309,6 +1309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updates = {
         arquivoAssinado: uniqueFileName,
         dataAssinatura: new Date(),
+        status: 'ativo' as const, // Mudar status para ativo automaticamente
       };
       
       // Atualizar contrato diretamente no banco
