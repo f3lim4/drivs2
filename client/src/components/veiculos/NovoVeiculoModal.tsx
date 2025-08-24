@@ -145,6 +145,9 @@ const veiculoSchema = z.object({
   
   // Campo para melhor visualização do veículo
   visualizar: z.string().optional(),
+  
+  // Documentos do veículo (URLs temporárias antes de salvar)
+  documentos: z.array(z.string()).optional(),
 });
 
 type VeiculoFormData = z.infer<typeof veiculoSchema>;
@@ -199,6 +202,7 @@ export function NovoVeiculoModal({
       // Status será definido automaticamente como "disponível"
       valorLimiteKm: undefined,
       visualizar: '',
+      documentos: [],
     },
   });
 
@@ -292,6 +296,8 @@ export function NovoVeiculoModal({
         rastreador: data.rastreador,
         valorRastreadorMensal: data.valorRastreadorMensal?.toString(),
         visualizar: data.visualizar || null,
+        // Processar documentos carregados
+        documentos: data.documentos || [],
         status: 'disponivel', // Sempre "disponível" no cadastro
       };
 
@@ -309,6 +315,27 @@ export function NovoVeiculoModal({
       }
 
       const novoVeiculo = await response.json();
+
+      // Processar documentos após criação do veículo
+      if (data.documentos && data.documentos.length > 0) {
+        for (const docURL of data.documentos) {
+          try {
+            const docResponse = await fetch(`/api/veiculos/${novoVeiculo.id}/documentos`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ documentURL: docURL }),
+            });
+            
+            if (!docResponse.ok) {
+              console.error('Erro ao salvar documento:', docURL);
+            }
+          } catch (error) {
+            console.error('Erro ao processar documento:', error);
+          }
+        }
+      }
 
       // Log da atividade
       await registrarAtividade(
@@ -1044,6 +1071,84 @@ export function NovoVeiculoModal({
                         }) : 'R$ 0,00';
                       })()}
                     </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* DOCUMENTOS DO VEÍCULO */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Documentos do Veículo
+              </h3>
+              
+              {/* Upload de documentos */}
+              <div className="flex items-center gap-4">
+                <ObjectUploader
+                  maxNumberOfFiles={5}
+                  maxFileSize={10485760}
+                  onGetUploadParameters={async () => {
+                    const response = await fetch('/api/objects/upload', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                    });
+                    const data = await response.json();
+                    return {
+                      method: 'PUT' as const,
+                      url: data.uploadURL,
+                    };
+                  }}
+                  onComplete={(result) => {
+                    if (result.successful && result.successful.length > 0) {
+                      const uploadURL = result.successful[0].uploadURL;
+                      // Salvar o URL do documento na lista temporária
+                      const documentos = form.getValues('documentos') || [];
+                      form.setValue('documentos', [...documentos, uploadURL]);
+                      toast({
+                        title: "Documento adicionado",
+                        description: "O documento foi carregado com sucesso.",
+                      });
+                    }
+                  }}
+                  buttonClassName="flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  Adicionar Documento
+                </ObjectUploader>
+                <span className="text-sm text-muted-foreground">
+                  PDF, imagens até 10MB cada
+                </span>
+              </div>
+
+              {/* Lista de documentos carregados */}
+              {form.watch('documentos') && form.watch('documentos').length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-medium">Documentos Carregados:</h4>
+                  <div className="grid gap-2">
+                    {form.watch('documentos').map((doc: string, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-green-50">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-green-600" />
+                          <span className="text-sm text-green-800">Documento {index + 1} - Pronto para salvar</span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const documentos = form.getValues('documentos') || [];
+                            const novosDocumentos = documentos.filter((_: string, i: number) => i !== index);
+                            form.setValue('documentos', novosDocumentos);
+                          }}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          Remover
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
