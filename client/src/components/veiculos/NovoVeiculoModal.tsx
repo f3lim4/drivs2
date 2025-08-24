@@ -212,9 +212,10 @@ export function NovoVeiculoModal({
     if (tipoSelecionado) {
       const marcas = getMarcasPorTipo(tipoSelecionado);
       setMarcasDisponiveis(marcas);
-      // Limpar marca e modelo quando trocar de tipo
+      // Limpar marca, modelo e categoria quando trocar de tipo
       form.setValue('marca', '');
       form.setValue('modelo', '');
+      form.setValue('categoria', '');
       setModelosDisponiveis([]);
     } else {
       setMarcasDisponiveis([]);
@@ -234,6 +235,43 @@ export function NovoVeiculoModal({
       setModelosDisponiveis([]);
     }
   }, [marcaSelecionada, tipoSelecionado, form]);
+
+  // Função para obter categorias baseadas no tipo de veículo
+  const getCategoriasDisponiveis = (tipoVeiculo: string) => {
+    switch (tipoVeiculo) {
+      case 'Carro':
+        return [
+          { value: 'hatch', label: 'Hatch' },
+          { value: 'sedan', label: 'Sedan' },
+          { value: 'suv', label: 'SUV' },
+          { value: 'pickup', label: 'Pickup' },
+          { value: 'van', label: 'Van' },
+          { value: 'conversivel', label: 'Conversível' }
+        ];
+      case 'Moto':
+        return [
+          { value: 'moto', label: 'Motocicleta' },
+          { value: 'scooter', label: 'Scooter' }
+        ];
+      case 'Caminhão':
+        return [
+          { value: 'caminhao', label: 'Caminhão' },
+          { value: 'caminhao-leve', label: 'Caminhão Leve' },
+          { value: 'caminhao-medio', label: 'Caminhão Médio' },
+          { value: 'caminhao-pesado', label: 'Caminhão Pesado' }
+        ];
+      case 'Utilitário':
+        return [
+          { value: 'utilitario', label: 'Utilitário' },
+          { value: 'van', label: 'Van' },
+          { value: 'pickup', label: 'Pickup' }
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const categoriasDisponiveis = tipoSelecionado ? getCategoriasDisponiveis(tipoSelecionado) : [];
 
   const onSubmit = async (data: VeiculoFormData) => {
     setLoading(true);
@@ -597,22 +635,22 @@ export function NovoVeiculoModal({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Categoria *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select 
+                          onValueChange={field.onChange} 
+                          value={field.value}
+                          disabled={!tipoSelecionado}
+                        >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecionar" />
+                              <SelectValue placeholder={!tipoSelecionado ? "Selecione o tipo primeiro" : "Selecionar categoria"} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="hatch">Hatch</SelectItem>
-                            <SelectItem value="sedan">Sedan</SelectItem>
-                            <SelectItem value="suv">SUV</SelectItem>
-                            <SelectItem value="pickup">Pickup</SelectItem>
-                            <SelectItem value="van">Van</SelectItem>
-                            <SelectItem value="conversivel">Conversível</SelectItem>
-                            <SelectItem value="moto">Moto</SelectItem>
-                            <SelectItem value="utilitario">Utilitário</SelectItem>
-                            <SelectItem value="caminhao">Caminhão</SelectItem>
+                            {categoriasDisponiveis.map((categoria) => (
+                              <SelectItem key={categoria.value} value={categoria.value}>
+                                {categoria.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />

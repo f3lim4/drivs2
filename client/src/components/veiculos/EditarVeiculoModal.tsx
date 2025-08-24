@@ -181,6 +181,58 @@ export function EditarVeiculoModal({
     }
   }, [veiculo, open, form]);
 
+  // Função para obter categorias baseadas no tipo de veículo
+  const getCategoriasDisponiveis = () => {
+    if (!veiculo) return [];
+    
+    // Inferir tipo baseado na categoria atual do veículo
+    const categoria = veiculo.categoria?.toLowerCase();
+    
+    if (['hatch', 'sedan', 'suv', 'pickup', 'van', 'conversivel'].includes(categoria)) {
+      return [
+        { value: 'hatch', label: 'Hatch' },
+        { value: 'sedan', label: 'Sedan' },
+        { value: 'suv', label: 'SUV' },
+        { value: 'pickup', label: 'Pickup' },
+        { value: 'van', label: 'Van' },
+        { value: 'conversivel', label: 'Conversível' }
+      ];
+    } else if (['moto', 'scooter', 'motocicleta'].includes(categoria)) {
+      return [
+        { value: 'moto', label: 'Motocicleta' },
+        { value: 'scooter', label: 'Scooter' }
+      ];
+    } else if (categoria?.includes('caminhao') || categoria === 'caminhão') {
+      return [
+        { value: 'caminhao', label: 'Caminhão' },
+        { value: 'caminhao-leve', label: 'Caminhão Leve' },
+        { value: 'caminhao-medio', label: 'Caminhão Médio' },
+        { value: 'caminhao-pesado', label: 'Caminhão Pesado' }
+      ];
+    } else if (['utilitario', 'utilitário'].includes(categoria)) {
+      return [
+        { value: 'utilitario', label: 'Utilitário' },
+        { value: 'van', label: 'Van' },
+        { value: 'pickup', label: 'Pickup' }
+      ];
+    }
+    
+    // Fallback: mostrar todas as categorias
+    return [
+      { value: 'hatch', label: 'Hatch' },
+      { value: 'sedan', label: 'Sedan' },
+      { value: 'suv', label: 'SUV' },
+      { value: 'pickup', label: 'Pickup' },
+      { value: 'van', label: 'Van' },
+      { value: 'conversivel', label: 'Conversível' },
+      { value: 'moto', label: 'Motocicleta' },
+      { value: 'utilitario', label: 'Utilitário' },
+      { value: 'caminhao', label: 'Caminhão' }
+    ];
+  };
+
+  const categoriasDisponiveis = getCategoriasDisponiveis();
+
   // Função para lidar com upload de documentos
   const handleDocumentUpload = async (uploadURL: string) => {
     if (!veiculo) return;
@@ -429,19 +481,15 @@ export function EditarVeiculoModal({
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Hatch" />
+                              <SelectValue placeholder="Selecionar categoria" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="hatch">Hatch</SelectItem>
-                            <SelectItem value="sedan">Sedan</SelectItem>
-                            <SelectItem value="suv">SUV</SelectItem>
-                            <SelectItem value="pickup">Pickup</SelectItem>
-                            <SelectItem value="van">Van</SelectItem>
-                            <SelectItem value="conversivel">Conversível</SelectItem>
-                            <SelectItem value="moto">Moto</SelectItem>
-                            <SelectItem value="utilitario">Utilitário</SelectItem>
-                            <SelectItem value="caminhao">Caminhão</SelectItem>
+                            {categoriasDisponiveis.map((categoria) => (
+                              <SelectItem key={categoria.value} value={categoria.value}>
+                                {categoria.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
