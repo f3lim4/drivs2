@@ -65,10 +65,10 @@ const veiculoSchema = z.object({
   // Características Técnicas
   combustivel: z.string().min(1, 'Tipo de combustível é obrigatório'),
   quilometragem: z.preprocess((val) => {
-    if (typeof val === 'string' && val === '') return 0;
+    if (typeof val === 'string' && val === '') return undefined;
     if (typeof val === 'string') return parseFloat(val);
     return val;
-  }, z.number().min(0, 'Quilometragem deve ser positiva')),
+  }, z.number().min(0, 'Quilometragem é obrigatória')),
   valorSemanal: z.preprocess((val) => {
     if (typeof val === 'string' && val === '') return undefined;
     if (typeof val === 'string') return parseFloat(val);
@@ -182,7 +182,7 @@ export function NovoVeiculoModal({
       renavam: '',
       chassi: '',
       combustivel: '',
-      quilometragem: 0,
+      quilometragem: undefined,
       valorSemanal: undefined,
       caucao: undefined,
       taxaAdministrativa: '',
