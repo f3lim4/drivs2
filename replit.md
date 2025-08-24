@@ -25,7 +25,7 @@ DRIVS is built with a full-stack architecture prioritizing scalability, security
 
 ### Core System Features
 - **Driver Management**: Registration, validation (CPF, CNH, age), and document management with specific uploads. Dynamic profile photos and icons.
-- **Vehicle Management**: Detailed registration (plate, make, model, year, color, category), automatic status (available/rented), automatic calculation of fixed expenses (IPVA, insurance, tracker, financing). Dynamic icon colors based on vehicle color.
+- **Vehicle Management**: Detailed registration (plate, make, model, year, color, category), automatic status (available/rented), automatic calculation of fixed expenses (IPVA, insurance, tracker, financing). Dynamic icon colors based on vehicle color. Complete document management system with upload/download capabilities for vehicle documents stored in cloud object storage.
 - **Rental and Contract Management**:
     - Contract creation with available drivers and vehicles.
     - Automatic recurring payments (weekly, bi-weekly, monthly) with retroactive logic.

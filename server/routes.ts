@@ -474,12 +474,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (locadoraId) {
         const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
         
-        // Debug: Verificar documentos dos veículos
-        veiculos.forEach(v => {
-          if (v.documentos && v.documentos.length > 0) {
-            console.log(`[DEBUG VEICULOS] Veículo ${v.id} tem ${v.documentos.length} documentos:`, v.documentos);
-          }
-        });
+
         
         // SECURITY: Validar que todos os veículos pertencem à locadora solicitada
         const todosVeiculosCorretos = veiculos.every(v => v.locadoraId === locadoraId);
