@@ -212,38 +212,67 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
             </Card>
           )}
 
-          {/* Documentos do Veículo */}
-          {(veiculo as any).documentos && (veiculo as any).documentos.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Documentos do Veículo
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-2">
-                  {(veiculo as any).documentos.map((doc: string, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm">Documento {index + 1}</span>
+          {/* Documentos do Veículo - Debug melhorado */}
+          {(() => {
+            const documentos = (veiculo as any).documentos;
+            console.log('Documentos do veículo:', documentos);
+            
+            if (!documentos || documentos.length === 0) {
+              return (
+                <Card className="border-gray-200">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Documentos do Veículo
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">Nenhum documento cadastrado</p>
+                  </CardContent>
+                </Card>
+              );
+            }
+
+            return (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Documentos do Veículo ({documentos.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-2">
+                    {documentos.map((doc: string, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          <div>
+                            <span className="text-sm font-medium">Documento {index + 1}</span>
+                            <p className="text-xs text-muted-foreground">
+                              {doc.includes('.pdf') ? 'PDF' : 'Imagem'}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            console.log('Abrindo documento:', doc);
+                            window.open(doc, '_blank');
+                          }}
+                          className="flex items-center gap-1"
+                        >
+                          <Download className="w-3 h-3" />
+                          Baixar
+                        </Button>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(doc, '_blank')}
-                        className="flex items-center gap-1"
-                      >
-                        <Download className="w-3 h-3" />
-                        Baixar
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
         </div>
 
         <DialogFooter>
