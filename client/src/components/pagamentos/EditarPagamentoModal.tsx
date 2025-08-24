@@ -15,7 +15,7 @@ import type { Pagamento, Motorista, InsertPagamento } from '@shared/schema';
 
 const formSchema = z.object({
   motoristaId: z.string().min(1, 'Selecione um motorista'),
-  tipo: z.enum(['aluguel', 'infrações', 'manutenção', 'danos', 'outros']),
+  tipo: z.enum(['aluguel', 'infrações', 'infracao', 'manutenção', 'danos', 'outros']),
   descricao: z.string().optional(),
   valorTotal: z.string().min(1, 'Valor total é obrigatório'),
   valorPago: z.string().min(1, 'Valor pago é obrigatório'),
@@ -48,7 +48,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
     resolver: zodResolver(formSchema),
     defaultValues: {
       motoristaId: pagamento.motoristaId,
-      tipo: pagamento.tipo as any,
+      tipo: pagamento.tipo === 'infracao' ? 'infrações' : pagamento.tipo as any,
       descricao: pagamento.descricao || '',
       valorTotal: pagamento.valorTotal.toString(),
       valorPago: pagamento.valorPago.toString(),
@@ -67,7 +67,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
       
       form.reset({
         motoristaId: pagamento.motoristaId,
-        tipo: pagamento.tipo as any,
+        tipo: pagamento.tipo === 'infracao' ? 'infrações' : pagamento.tipo as any,
         descricao: pagamento.descricao || '',
         valorTotal: pagamento.valorTotal.toString(),
         valorPago: pagamento.valorPago.toString(),
@@ -107,7 +107,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
       // Para pagamentos automáticos, não permitir alterar motorista, tipo e descrição
       ...(isPagamentoAutomatico ? {} : {
         motoristaId: data.motoristaId,
-        tipo: data.tipo,
+        tipo: data.tipo === 'infrações' ? 'infracao' : data.tipo,
         descricao: data.descricao || undefined,
       }),
       // Sempre permitir alterar valores e datas
@@ -224,6 +224,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                       <SelectContent>
                         <SelectItem value="aluguel">Aluguel Semanal</SelectItem>
                         <SelectItem value="infrações">Infrações</SelectItem>
+                        <SelectItem value="infracao">Infração</SelectItem>
                         <SelectItem value="manutenção">Manutenção</SelectItem>
                         <SelectItem value="danos">Danos</SelectItem>
                         <SelectItem value="outros">Outros</SelectItem>
