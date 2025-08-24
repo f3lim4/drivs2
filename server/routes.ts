@@ -2709,6 +2709,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Endpoint para processar documentos após upload
   app.put("/api/veiculos/:id/documentos", async (req, res) => {
+    console.log(`[DOCUMENTO] Recebido para veículo ${req.params.id}:`, req.body);
+    
     if (!req.body.documentURL) {
       return res.status(400).json({ error: "documentURL é obrigatório" });
     }
@@ -2718,26 +2720,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const objectPath = objectStorageService.normalizeObjectEntityPath(
         req.body.documentURL,
       );
+      console.log(`[DOCUMENTO] URL normalizada: ${req.body.documentURL} -> ${objectPath}`);
 
       // Buscar veículo atual para preservar documentos existentes
       const veiculo = await storage.getVeiculo(req.params.id);
       if (!veiculo) {
+        console.log(`[DOCUMENTO] Veículo ${req.params.id} não encontrado`);
         return res.status(404).json({ error: "Veículo não encontrado" });
       }
 
       // Adicionar novo documento ao array existente
       const documentosAtuais = veiculo.documentos || [];
       const novosDocumentos = [...documentosAtuais, objectPath];
+      
+      console.log(`[DOCUMENTO] Documentos atuais: ${documentosAtuais.length}, novos: ${novosDocumentos.length}`);
 
       // Atualizar veículo com nova lista de documentos
       await storage.updateVeiculo(req.params.id, { documentos: novosDocumentos });
+      
+      console.log(`[DOCUMENTO] Documento salvo com sucesso. Total: ${novosDocumentos.length}`);
 
       res.status(200).json({
         objectPath: objectPath,
-        totalDocumentos: novosDocumentos.length
+        totalDocumentos: novosDocumentos.length,
+        documentos: novosDocumentos
       });
     } catch (error) {
-      console.error("Error setting documento:", error);
+      console.error("[DOCUMENTO] Error setting documento:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
