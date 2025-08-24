@@ -26,6 +26,7 @@ export const tiposVeiculos: TipoVeiculo[] = [
     nome: "Chevrolet",
     modelos: [
       { nome: "Onix", categoria: "Hatch" },
+      { nome: "Onix Plus", categoria: "Sedan" },
       { nome: "Prisma", categoria: "Sedan" },
       { nome: "Cruze", categoria: "Sedan" },
       { nome: "Tracker", categoria: "SUV" },
@@ -34,7 +35,12 @@ export const tiposVeiculos: TipoVeiculo[] = [
       { nome: "Spin", categoria: "Van" },
       { nome: "Cobalt", categoria: "Sedan" },
       { nome: "Celta", categoria: "Hatch" },
-      { nome: "Corsa", categoria: "Hatch" }
+      { nome: "Corsa", categoria: "Hatch" },
+      { nome: "Joy", categoria: "Hatch" },
+      { nome: "Montana", categoria: "Pickup" },
+      { nome: "Blazer", categoria: "SUV" },
+      { nome: "Trailblazer", categoria: "SUV" },
+      { nome: "Captiva", categoria: "SUV" }
     ]
   },
   {
@@ -49,7 +55,15 @@ export const tiposVeiculos: TipoVeiculo[] = [
       { nome: "Amarok", categoria: "Pickup" },
       { nome: "Fox", categoria: "Hatch" },
       { nome: "Voyage", categoria: "Sedan" },
-      { nome: "Up!", categoria: "Hatch" }
+      { nome: "Up!", categoria: "Hatch" },
+      { nome: "SpaceFox", categoria: "Van" },
+      { nome: "Saveiro", categoria: "Pickup" },
+      { nome: "Crossfox", categoria: "Hatch" },
+      { nome: "Golf", categoria: "Hatch" },
+      { nome: "Passat", categoria: "Sedan" },
+      { nome: "Touareg", categoria: "SUV" },
+      { nome: "Kombi", categoria: "Van" },
+      { nome: "Fusca", categoria: "Hatch" }
     ]
   },
   {
@@ -78,7 +92,16 @@ export const tiposVeiculos: TipoVeiculo[] = [
       { nome: "Fastback", categoria: "SUV" },
       { nome: "Strada", categoria: "Pickup" },
       { nome: "Doblo", categoria: "Van" },
-      { nome: "Palio", categoria: "Hatch" }
+      { nome: "Palio", categoria: "Hatch" },
+      { nome: "Siena", categoria: "Sedan" },
+      { nome: "Grand Siena", categoria: "Sedan" },
+      { nome: "Linea", categoria: "Sedan" },
+      { nome: "Punto", categoria: "Hatch" },
+      { nome: "Bravo", categoria: "Hatch" },
+      { nome: "Idea", categoria: "Van" },
+      { nome: "Weekend", categoria: "Van" },
+      { nome: "Ducato", categoria: "Van" },
+      { nome: "Fiorino", categoria: "Van" }
     ]
   },
   {
@@ -471,6 +494,117 @@ export const tiposVeiculos: TipoVeiculo[] = [
       { nome: "Haval H6", categoria: "SUV" },
       { nome: "Ora 03", categoria: "Hatch" },
       { nome: "Poer", categoria: "Pickup" }
+    ]
+  },
+  {
+    nome: "Troller",
+    modelos: [
+      { nome: "T4", categoria: "SUV" },
+      { nome: "Pantanal", categoria: "SUV" }
+    ]
+  },
+  {
+    nome: "Agrale",
+    modelos: [
+      { nome: "Marrua", categoria: "SUV" },
+      { nome: "Marruá AM 200", categoria: "SUV" }
+    ]
+  },
+  {
+    nome: "Geely",
+    modelos: [
+      { nome: "Emgrand X7", categoria: "SUV" },
+      { nome: "GC9", categoria: "Sedan" },
+      { nome: "Coolray", categoria: "SUV" }
+    ]
+  },
+  {
+    nome: "Hafei",
+    modelos: [
+      { nome: "Towner Jr", categoria: "Utilitário" },
+      { nome: "Lobo", categoria: "Pickup" }
+    ]
+  },
+  {
+    nome: "Effa",
+    modelos: [
+      { nome: "JMC N601", categoria: "Pickup" },
+      { nome: "Start", categoria: "Utilitário" },
+      { nome: "Van", categoria: "Van" }
+    ]
+  },
+  {
+    nome: "Shineray",
+    modelos: [
+      { nome: "T30", categoria: "Pickup" },
+      { nome: "T22", categoria: "Pickup" }
+    ]
+  },
+  {
+    nome: "Mahindra",
+    modelos: [
+      { nome: "Pik Up", categoria: "Pickup" },
+      { nome: "Scorpio", categoria: "SUV" },
+      { nome: "XUV500", categoria: "SUV" }
+    ]
+  },
+  {
+    nome: "Ssangyong",
+    modelos: [
+      { nome: "Actyon", categoria: "SUV" },
+      { nome: "Kyron", categoria: "SUV" },
+      { nome: "Rexton", categoria: "SUV" }
+    ]
+  },
+  {
+    nome: "RAM",
+    modelos: [
+      { nome: "1500", categoria: "Pickup" },
+      { nome: "2500", categoria: "Pickup" },
+      { nome: "700", categoria: "Pickup" }
+    ]
+  },
+  {
+    nome: "Isuzu",
+    modelos: [
+      { nome: "D-Max", categoria: "Pickup" },
+      { nome: "MU-X", categoria: "SUV" }
+    ]
+  },
+  {
+    nome: "Foton",
+    modelos: [
+      { nome: "Tunland", categoria: "Pickup" },
+      { nome: "Sauvana", categoria: "SUV" }
+    ]
+  },
+  {
+    nome: "BAIC",
+    modelos: [
+      { nome: "BJ40", categoria: "SUV" },
+      { nome: "X25", categoria: "SUV" },
+      { nome: "X35", categoria: "SUV" }
+    ]
+  },
+  {
+    nome: "Dongfeng",
+    modelos: [
+      { nome: "Rich", categoria: "Pickup" },
+      { nome: "S30", categoria: "Sedan" }
+    ]
+  },
+  {
+    nome: "Jinbei",
+    modelos: [
+      { nome: "Topic", categoria: "Van" },
+      { nome: "Grace", categoria: "Van" }
+    ]
+  },
+  {
+    nome: "DFSK",
+    modelos: [
+      { nome: "Glory 580", categoria: "SUV" },
+      { nome: "Fengon 500", categoria: "SUV" }
     ]
   }
     ]
