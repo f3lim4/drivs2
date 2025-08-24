@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import Uppy from "@uppy/core";
 import { DashboardModal } from "@uppy/react";
-// Estilo básico para upload de arquivos
 import AwsS3 from "@uppy/aws-s3";
 import type { UploadResult } from "@uppy/core";
 import { Button } from "@/components/ui/button";
@@ -65,6 +64,36 @@ export function ObjectUploader({
         maxFileSize,
       },
       autoProceed: false,
+      meta: {},
+      locale: {
+        strings: {
+          // Textos customizados
+          dropPasteFiles: 'Clique em "Selecionar arquivos" para adicionar',
+          dropPasteFolders: 'Clique em "Selecionar arquivos" para adicionar',
+          dropPasteBoth: 'Clique em "Selecionar arquivos" para adicionar',
+          dropHereOr: '',
+          browse: 'Selecionar arquivos',
+          uploadXFiles: {
+            0: 'Carregar %{smart_count} arquivo',
+            1: 'Carregar %{smart_count} arquivos'
+          },
+          uploadXNewFiles: {
+            0: 'Carregar +%{smart_count} arquivo', 
+            1: 'Carregar +%{smart_count} arquivos'
+          },
+          // Outros textos em português
+          addMore: 'Adicionar mais',
+          removeFile: 'Remover arquivo',
+          editFile: 'Editar arquivo',
+          done: 'Concluído',
+          cancel: 'Cancelar',
+          uploadComplete: 'Upload concluído',
+          uploadPaused: 'Upload pausado',
+          resumeUpload: 'Retomar upload',
+          pauseUpload: 'Pausar upload',
+          retryUpload: 'Tentar novamente',
+        }
+      }
     })
       .use(AwsS3, {
         shouldUseMultipart: false,
@@ -86,6 +115,20 @@ export function ObjectUploader({
         open={showModal}
         onRequestClose={() => setShowModal(false)}
         proudlyDisplayPoweredByUppy={false}
+        note=""
+        showRemoveButtonAfterComplete={true}
+        showProgressDetails={false}
+        hideUploadButton={false}
+        hideRetryButton={false}
+        hidePauseResumeButton={false}
+        hideCancelButton={false}
+        hideProgressAfterFinish={false}
+        disableStatusBar={false}
+        disableInformer={false}
+        disableThumbnailGenerator={false}
+        theme="light"
+        width={500}
+        height={400}
       />
     </div>
   );
