@@ -36,6 +36,8 @@ import { Veiculo } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { registrarAtividade } from '@/utils/activityLogger';
+import { ObjectUploader } from '@/components/ObjectUploader';
+import { Upload, FileText, Download } from 'lucide-react';
 
 // Schema de validação (mesmo do NovoVeiculoModal)
 const veiculoSchema = z.object({
@@ -178,6 +180,39 @@ export function EditarVeiculoModal({
       });
     }
   }, [veiculo, open, form]);
+
+  // Função para lidar com upload de documentos
+  const handleDocumentUpload = async (uploadURL: string) => {
+    if (!veiculo) return;
+    
+    try {
+      const response = await fetch(`/api/veiculos/${veiculo.id}/documentos`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ documentURL: uploadURL }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Documento adicionado",
+          description: "O documento foi salvo com sucesso.",
+        });
+        // Forçar recarregamento da página ou dos dados do veículo
+        window.location.reload();
+      } else {
+        throw new Error('Erro ao salvar documento');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer upload do documento:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar o documento. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const onSubmit = async (data: VeiculoFormData) => {
     if (!veiculo) return;
@@ -857,6 +892,75 @@ export function EditarVeiculoModal({
                   <li>• <strong>Alugado:</strong> quando há aluguel ativo</li>
                 </ul>
               </div>
+            </div>
+
+            {/* DOCUMENTOS DO VEÍCULO */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Documentos do Veículo
+              </h3>
+              
+              {/* Upload de novos documentos */}
+              <div className="flex items-center gap-4">
+                <ObjectUploader
+                  maxNumberOfFiles={5}
+                  maxFileSize={10485760}
+                  onGetUploadParameters={async () => {
+                    const response = await fetch('/api/objects/upload', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                    });
+                    const data = await response.json();
+                    return {
+                      method: 'PUT' as const,
+                      url: data.uploadURL,
+                    };
+                  }}
+                  onComplete={(result) => {
+                    if (result.successful && result.successful.length > 0) {
+                      const uploadURL = result.successful[0].uploadURL;
+                      handleDocumentUpload(uploadURL);
+                    }
+                  }}
+                  buttonClassName="flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  Adicionar Documento
+                </ObjectUploader>
+                <span className="text-sm text-muted-foreground">
+                  PDF, imagens até 10MB
+                </span>
+              </div>
+
+              {/* Lista de documentos existentes */}
+              {veiculo?.documentos && veiculo.documentos.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-medium">Documentos Salvos:</h4>
+                  <div className="grid gap-2">
+                    {veiculo.documentos.map((doc, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm">Documento {index + 1}</span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(doc, '_blank')}
+                          className="flex items-center gap-1"
+                        >
+                          <Download className="w-3 h-3" />
+                          Baixar
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <DialogFooter>

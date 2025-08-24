@@ -14,7 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Car, Fuel, Calendar, DollarSign, Shield, Gauge, Eye } from 'lucide-react';
+import { Car, Fuel, Calendar, DollarSign, Shield, Gauge, Eye, FileText, Download } from 'lucide-react';
 import { Veiculo } from '@/types';
 
 interface VisualizarVeiculoModalProps {
@@ -195,6 +195,55 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
               </div>
             </CardContent>
           </Card>
+          {/* Observações Visuais - Destaque especial */}
+          {(veiculo as any).visualizar && (
+            <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                  <Eye className="w-5 h-5" />
+                  Observações Visuais
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-blue-800 dark:text-blue-200 font-medium">
+                  {(veiculo as any).visualizar}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Documentos do Veículo */}
+          {(veiculo as any).documentos && (veiculo as any).documentos.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Documentos do Veículo
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-2">
+                  {(veiculo as any).documentos.map((doc: string, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-blue-500" />
+                        <span className="text-sm">Documento {index + 1}</span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(doc, '_blank')}
+                        className="flex items-center gap-1"
+                      >
+                        <Download className="w-3 h-3" />
+                        Baixar
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         <DialogFooter>

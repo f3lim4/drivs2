@@ -40,6 +40,8 @@ import {
 import { Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
 import { registrarAtividade } from '@/utils/activityLogger';
+import { ObjectUploader } from '@/components/ObjectUploader';
+import { Upload, FileText } from 'lucide-react';
 
 // Schema de validação
 const veiculoSchema = z.object({

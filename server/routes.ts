@@ -13,6 +13,10 @@ import multer from "multer";
 import OpenAI from "openai";
 import { PDFDocument } from "pdf-lib";
 import crypto from "crypto";
+import {
+  ObjectStorageService,
+  ObjectNotFoundError,
+} from "./objectStorage";
 
 // Declaração de tipos para sessão
 declare module 'express-session' {
@@ -2675,6 +2679,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao criar portal do cliente:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Rotas para Object Storage
+  // Endpoint para servir objetos privados  
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(
+        req.path,
+      );
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error checking object access:", error);
+      if (error instanceof ObjectNotFoundError) {
+        return res.sendStatus(404);
+      }
+      return res.sendStatus(500);
+    }
+  });
+
+  // Endpoint para obter URL de upload
+  app.post("/api/objects/upload", async (req, res) => {
+    const objectStorageService = new ObjectStorageService();
+    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+    res.json({ uploadURL });
+  });
+
+  // Endpoint para processar documentos após upload
+  app.put("/api/veiculos/:id/documentos", async (req, res) => {
+    if (!req.body.documentURL) {
+      return res.status(400).json({ error: "documentURL é obrigatório" });
+    }
+
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = objectStorageService.normalizeObjectEntityPath(
+        req.body.documentURL,
+      );
+
+      // Buscar veículo atual para preservar documentos existentes
+      const veiculo = await storage.getVeiculo(req.params.id);
+      if (!veiculo) {
+        return res.status(404).json({ error: "Veículo não encontrado" });
+      }
+
+      // Adicionar novo documento ao array existente
+      const documentosAtuais = veiculo.documentos || [];
+      const novosDocumentos = [...documentosAtuais, objectPath];
+
+      // Atualizar veículo com nova lista de documentos
+      await storage.updateVeiculo(req.params.id, { documentos: novosDocumentos });
+
+      res.status(200).json({
+        objectPath: objectPath,
+        totalDocumentos: novosDocumentos.length
+      });
+    } catch (error) {
+      console.error("Error setting documento:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
