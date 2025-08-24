@@ -139,6 +139,7 @@ export function EditarVeiculoModal({
       quantidadeParcelas: undefined,
       // Status será controlado automaticamente
       valorLimiteKm: undefined,
+      visualizar: '',
     },
   });
 
@@ -173,6 +174,7 @@ export function EditarVeiculoModal({
         quantidadeParcelas: veiculo.quantidadeParcelas || undefined,
         // Status não será editável
         valorLimiteKm: veiculo.valorLimiteKm,
+        visualizar: (veiculo as any).visualizar || '',
       });
     }
   }, [veiculo, open, form]);
@@ -212,6 +214,7 @@ export function EditarVeiculoModal({
         financiado: data.financiado,
         valorFinanciamento: data.valorFinanciamento?.toString(),
         quantidadeParcelas: data.quantidadeParcelas,
+        visualizar: data.visualizar || null,
         // Status não será enviado na edição
       };
 
@@ -412,6 +415,25 @@ export function EditarVeiculoModal({
                   />
                 </div>
               </div>
+
+              {/* Campo Visualizar Veículo */}
+              <FormField
+                control={form.control}
+                name="visualizar"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Visualizar Veículo</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Observações visuais do veículo (ex: arranhões, detalhes, etc.)" 
+                        {...field}
+                        data-testid="input-visualizar-veiculo"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* CARACTERÍSTICAS TÉCNICAS */}

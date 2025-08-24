@@ -2,6 +2,7 @@
  * Dialog de confirmação para exclusão de veículos
  */
 
+import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +13,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Veiculo } from '@/types';
 
 interface ExcluirVeiculoDialogProps {
@@ -27,17 +30,27 @@ export function ExcluirVeiculoDialog({
   veiculo,
   onConfirmarExclusao
 }: ExcluirVeiculoDialogProps) {
+  const [confirmationText, setConfirmationText] = useState('');
+  
   const handleConfirmar = () => {
-    if (veiculo) {
+    if (veiculo && confirmationText.toLowerCase() === 'excluir') {
       onConfirmarExclusao(veiculo);
       onOpenChange(false);
+      setConfirmationText(''); // Limpar o campo após confirmação
     }
+  };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      setConfirmationText(''); // Limpar o campo ao fechar
+    }
+    onOpenChange(isOpen);
   };
 
   if (!veiculo) return null;
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
@@ -49,11 +62,28 @@ export function ExcluirVeiculoDialog({
             <strong>Atenção:</strong> Certifique-se de que este veículo não possui contratos ativos antes de excluí-lo.
           </AlertDialogDescription>
         </AlertDialogHeader>
+        
+        <div className="space-y-2">
+          <Label htmlFor="confirmation">
+            Para confirmar, digite <strong>"excluir"</strong> abaixo:
+          </Label>
+          <Input
+            id="confirmation"
+            value={confirmationText}
+            onChange={(e) => setConfirmationText(e.target.value)}
+            placeholder="Digite 'excluir' para confirmar"
+            className="w-full"
+            data-testid="input-confirm-delete"
+          />
+        </div>
+        
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
           <AlertDialogAction 
             onClick={handleConfirmar}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            disabled={confirmationText.toLowerCase() !== 'excluir'}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            data-testid="button-confirm-delete"
           >
             Excluir Veículo
           </AlertDialogAction>

@@ -100,6 +100,8 @@ export const veiculos = pgTable("veiculos", {
   quantidadeParcelas: integer("quantidade_parcelas"),
   // Status
   status: text("status").notNull().default("disponivel"), // 'disponivel', 'alugado' (controlado automaticamente)
+  // Campo para melhor visualização do veículo
+  visualizar: text("visualizar"), // Campo adicional para identificação visual/observações
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
