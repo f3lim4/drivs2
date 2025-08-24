@@ -40,7 +40,6 @@ import {
 import { Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
 import { registrarAtividade } from '@/utils/activityLogger';
-import { ObjectUploader } from '@/components/ObjectUploader';
 import { Upload, FileText } from 'lucide-react';
 
 // Schema de validação
@@ -1080,38 +1079,67 @@ export function NovoVeiculoModal({
             <div className="flex items-center justify-between border rounded-lg p-3 bg-gray-50">
               <span className="text-sm text-muted-foreground">Documentos (opcional):</span>
               <div className="flex items-center gap-2">
-                <ObjectUploader
-                  maxNumberOfFiles={5}
-                  maxFileSize={10485760}
-                  onGetUploadParameters={async () => {
-                    const response = await fetch('/api/objects/upload', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                    });
-                    const data = await response.json();
-                    return {
-                      method: 'PUT' as const,
-                      url: data.uploadURL,
-                    };
-                  }}
-                  onComplete={(result) => {
-                    if (result.successful && result.successful.length > 0) {
-                      const uploadURL = result.successful[0].uploadURL;
-                      const documentos = form.getValues('documentos') || [];
-                      form.setValue('documentos', [...documentos, uploadURL]);
-                      toast({
-                        title: "Documento adicionado",
-                        description: "Documento carregado com sucesso.",
-                      });
+                <input
+                  type="file"
+                  id="documento-upload"
+                  multiple
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const files = e.target.files;
+                    if (!files || files.length === 0) return;
+
+                    for (const file of Array.from(files)) {
+                      try {
+                        // Obter URL de upload
+                        const response = await fetch('/api/objects/upload', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                        });
+                        const data = await response.json();
+
+                        // Upload do arquivo
+                        const uploadResponse = await fetch(data.uploadURL, {
+                          method: 'PUT',
+                          body: file,
+                          headers: {
+                            'Content-Type': file.type,
+                          },
+                        });
+
+                        if (uploadResponse.ok) {
+                          const documentos = form.getValues('documentos') || [];
+                          form.setValue('documentos', [...documentos, data.uploadURL]);
+                          toast({
+                            title: "Documento adicionado",
+                            description: `${file.name} carregado com sucesso.`,
+                          });
+                        }
+                      } catch (error) {
+                        console.error('Erro no upload:', error);
+                        toast({
+                          title: "Erro no upload",
+                          description: `Falha ao carregar ${file.name}`,
+                          variant: "destructive",
+                        });
+                      }
                     }
+                    // Limpar input
+                    e.target.value = '';
                   }}
-                  buttonClassName="text-xs"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById('documento-upload')?.click()}
+                  className="text-xs"
                 >
-                  <Upload className="w-3 h-3" />
+                  <Upload className="w-3 h-3 mr-1" />
                   Adicionar
-                </ObjectUploader>
+                </Button>
                 {form.watch('documentos') && form.watch('documentos').length > 0 && (
                   <span className="text-xs text-green-600">
                     {form.watch('documentos').length} arquivo(s)
