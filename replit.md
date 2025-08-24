@@ -1,169 +1,76 @@
 # DRIVS - Sistema de Locadora de Veículos
 
 ## Overview
-DRIVS é um sistema completo para gerenciamento de locadoras de veículos, desenvolvido com uma arquitetura full-stack moderna. Ele permite gerenciar motoristas, veículos, aluguéis, contratos, infrações e manutenções, oferecendo uma interface intuitiva e funcionalidades avançadas. O sistema visa eliminar a inadimplência, otimizar a gestão da frota e aumentar a receita de locadoras, especialmente as de pequeno e médio porte, substituindo planilhas manuais por um controle automatizado e preciso.
+DRIVS is a comprehensive vehicle rental management system designed to eliminate defaults, optimize fleet management, and increase revenue for rental companies, especially small to medium-sized ones. It automates the management of drivers, vehicles, rentals, contracts, infractions, and maintenance, replacing manual spreadsheets with a precise, automated control system. The system offers an intuitive interface and advanced functionalities, aiming to be a complete solution for vehicle rental businesses.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
-## Recent Migration
-### 2025-08-15: Migration from Replit Agent to Standard Environment - CONCLUÍDO ✅
-- ✅ **DATABASE MIGRATION COMPLETE** - Successfully migrated from Supabase to PostgreSQL with Drizzle ORM
-- ✅ **SCHEMA PUSHED** - All tables created and functioning (profiles, locadoras, veiculos, motoristas, contratos, etc.)
-- ✅ **AUTHENTICATION FIXED** - Admin user created with proper credentials (drivs@drivs.com.br / secret)
-- ✅ **API ENDPOINTS WORKING** - All server routes functional for CRUD operations
-- ✅ **REAL-TIME SYSTEMS ACTIVE** - Contract checking and payment automation running
-- ✅ **SUPABASE CODE REMOVED** - Clean migration with no legacy dependencies
-- ✅ **FRONTEND CONNECTED** - React interface properly communicating with Express backend
-- ✅ **DATABASE CONNECTION VERIFIED** - PostgreSQL fully operational and responding
-
-### 2025-08-18: Contract System Fixes - CONCLUÍDO ✅
-- ✅ **CONTRACT UPDATE API FIXED** - Created flexible updateContratoSchema for partial updates
-- ✅ **FRONTEND MODAL OPTIMIZED** - EditarContratoModal now sends only changed fields
-- ✅ **ERROR HANDLING IMPROVED** - Better API error messages and debugging
-- ✅ **STATUS TRANSITIONS WORKING** - All contract statuses (ativo, cancelado, encerrado) function correctly
-- ✅ **DUPLICATE REQUESTS ELIMINATED** - Fixed issue causing multiple API calls
-- ✅ **VALIDATION SCHEMA FIXED** - Updated schema to properly handle null values and optional fields
-- ✅ **CONTRACT EDITING FULLY FUNCTIONAL** - Contract status changes now work without errors
-
-### 2025-08-19: Driver History API Fix - CONCLUÍDO ✅
-- ✅ **DRIVER NEGATIVATION HISTORY FIXED** - API pesquisar-historico now includes negativation records as problems
-- ✅ **CACHE INVALIDATION CORRECTED** - React Query cache properly updates after driver status changes
-- ✅ **DATABASE VERIFICATION CONFIRMED** - Negativation data correctly stored and retrieved from PostgreSQL
-- ✅ **DRIVER SEARCH WORKING** - CPF search across locadoras now shows negativation as "problema" instead of "limpo"
-
-### 2025-08-19: Driver Edit Modal Status Field Removal - CONCLUÍDO ✅
-- ✅ **STATUS FIELD REMOVED** - Status dropdown completely removed from EditarMotoristaModal
-- ✅ **SCHEMA UPDATED** - Validation schema no longer includes status field
-- ✅ **NEGATIVATION PRESERVED** - "Negativar Motorista" button maintained and functional
-- ✅ **STATUS PRESERVATION** - Driver status preserved during normal edits, only changed via negativation
-- ✅ **TYPE SAFETY FIXED** - TypeScript interface updated with all required motorista fields
-
-### 2025-08-22: PDF Contract Generation Fix - CONCLUÍDO ✅
-- ✅ **DUPLICATE HEADER ELIMINATED** - Removed all duplicate company information from PDF generation
-- ✅ **CLEAN PDF OUTPUT** - Contract PDFs now show only template content without redundant fields
-- ✅ **CONTRACT DELETION SIMPLIFIED** - Replaced password verification with "excluir" text + checkbox confirmation
-- ✅ **RUNTIME ERRORS FIXED** - Eliminated TypeScript compilation errors causing system crashes
-- ✅ **SYSTEM STABILITY** - Application runs without red error screens or runtime crashes
-
-### 2025-08-22: CPF/CNPJ Auto-Detection & Form Simplification - CONCLUÍDO ✅
-- ✅ **AUTO-DETECTION SYSTEM** - System automatically identifies CPF (11 digits) vs CNPJ (14 digits)
-- ✅ **DYNAMIC FORMATTING** - CPF formatted as 000.000.000-00, CNPJ as 00.000.000/0000-00
-- ✅ **REAL-TIME VALIDATION** - Automatic document validation with proper error messages
-- ✅ **FORM SIMPLIFICATION** - Removed "Nome Fantasia" and "Razão Social" fields
-- ✅ **UNIFIED FIELD** - Single "Nome da Empresa" field used for both name and razão social
-- ✅ **ADAPTIVE LABELS** - Dynamic labels and placeholders that change based on document type
-
-### 2025-08-22: Marketing Statistics Update - CONCLUÍDO ✅
-- ✅ **TRIAL PERIOD UPDATED** - Changed from "7 dias grátis" to "1 mês grátis" across all pages
-- ✅ **STATISTICS ADJUSTED** - Updated "500+ locadoras" to "50+ locadoras" for realistic numbers
-- ✅ **VEHICLE COUNT UPDATED** - Changed "25K+ veículos" to "1K+ veículos gerenciados"
-- ✅ **SEO PAGES UPDATED** - All marketing descriptions now reflect accurate statistics
-- ✅ **CONSISTENT MESSAGING** - All public pages now show unified 1-month free trial offer
-
-### 2025-08-23: Vehicle Form Optional Fields Fix - CONCLUÍDO ✅
-- ✅ **OPTIONAL FIELD LABELS** - Added "- Opcional" suffix to Taxa Administrativa, Valor Seguro Mensal, Valor Rastreador Mensal
-- ✅ **PROPER FIELD HANDLING** - Fixed undefined/empty value handling for truly optional numeric fields
-- ✅ **VALIDATION CORRECTED** - Optional fields now properly accept empty values without validation errors
-- ✅ **DEFAULT VALUES FIXED** - Changed default values from empty strings to undefined for proper optional behavior
-- ✅ **USER EXPERIENCE** - Form now clearly indicates which fields are optional and allows skipping them
-
-### 2025-08-23: Responsive Layout Implementation - CONCLUÍDO ✅
-- ✅ **MOBILE-FIRST DESIGN** - Implemented responsive grid layout using grid-cols-1 md:grid-cols-X pattern
-- ✅ **VEHICLE FORM RESPONSIVE** - All sections now display single column on mobile, multi-column on PC/tablet
-- ✅ **DRIVER FORM RESPONSIVE** - Complete responsive layout for both new and edit driver modals
-- ✅ **COLUMN SPAN CORRECTIONS** - Updated col-span-2 to md:col-span-2 for proper mobile behavior
-- ✅ **CONSISTENT BREAKPOINTS** - Used md: breakpoint consistently across all form layouts
-- ✅ **USER EXPERIENCE** - Forms now perfectly readable and usable on all device sizes
-
-### 2025-08-23: Complete Stripe Payment System Implementation - CONCLUÍDO ✅
-- ✅ **STRIPE INTEGRATION** - Full Stripe API integration with proper version (2024-06-20)
-- ✅ **BACKEND ROUTES** - Complete payment routes: create-subscription, webhooks, customer-portal
-- ✅ **DATABASE SCHEMA** - Added Stripe fields (customerId, subscriptionId, priceId) to locadoras table
-- ✅ **FRONTEND INTEGRATION** - PlanosLocadora page connected to Stripe API endpoints
-- ✅ **SECURITY** - Proper validation, error handling, and isolation by locadoraId
-- ✅ **AUTOMATION** - Webhooks configured for automatic payment confirmation and status updates
-- ✅ **CREDENTIALS CONFIGURED** - STRIPE_SECRET_KEY and VITE_STRIPE_PUBLIC_KEY properly set
-- ✅ **REAL PRICE IDS CONFIGURED** - Live Stripe Price IDs replaced simulation mode (price_1RzH3XA24pm0ZMwJDzeMMDKD, etc.)
-
-### 2025-08-24: Complete 5-Tier Pricing Structure Implementation - CONCLUÍDO ✅
-- ✅ **5 PRICING TIERS CREATED** - Start (R$50/5 carros), Pro (R$99/20 carros), Elite (R$250/50 carros), Prime (R$500/100 carros), Infinity (ilimitados/consultar)
-- ✅ **INFINITY PLAN SPECIAL** - Unlimited vehicles with custom pricing requiring consultation via WhatsApp
-- ✅ **STRIPE INTEGRATION UPDATED** - Backend updated to handle new plan structure with proper Price ID mappings
-- ✅ **FEATURE DIFFERENTIATION** - Premium plans (Prime/Infinity) include enhanced support and personalized training
-- ✅ **UI COMPONENTS UPDATED** - All frontend components reflect new 5-tier structure with proper labeling
-- ✅ **CONSULTATION FLOW** - Infinity plan redirects to WhatsApp for custom pricing consultation
-- ✅ **BACKEND VALIDATION** - Server properly handles Infinity plan as non-Stripe consultation-only option
-
 ## System Architecture
-DRIVS é construído com uma arquitetura full-stack que garante escalabilidade, segurança e uma experiência de usuário fluida.
+DRIVS is built with a full-stack architecture prioritizing scalability, security, and a fluid user experience.
 
 ### Frontend Architecture
-- **Framework**: React 18 com TypeScript, utilizando Vite para desenvolvimento e bundling.
-- **UI/UX Decisions**:
-    - **Design System**: Tailwind CSS com um design system customizado, focado em um visual futurista com gradientes modernos.
-    - **Componentes**: Radix UI e shadcn/ui para componentes de interface, garantindo acessibilidade e consistência visual.
-    - **Padronização Visual**: Cards estatísticos, tabelas e modais seguem um padrão unificado com ícones padronizados, cores dinâmicas e espaçamento otimizado.
-    - **Layout Responsivo**: Otimizado para diferentes tamanhos de tela, incluindo cabeçalhos fixos e navegação adaptativa para mobile.
-    - **Identidade Visual**: Ícones temáticos de veículos, logos personalizados e animações de loading coesas com o tema automotivo DRIVS.
-- **State Management**: React Query (`@tanstack/react-query`) para gerenciamento de estado do servidor, incluindo caching e sincronização de dados.
-- **Routing**: React Router DOM para navegação.
-- **Forms**: React Hook Form com Zod para validação robusta de formulários.
+- **Framework**: React 18 with TypeScript, using Vite.
+- **UI/UX Decisions**: Tailwind CSS with a custom futuristic design system featuring modern gradients. Radix UI and shadcn/ui components ensure accessibility and visual consistency. Visual elements like statistical cards, tables, and modals follow a unified standard with standardized icons, dynamic colors, and optimized spacing. It features a responsive layout with fixed headers and adaptive mobile navigation. The visual identity includes thematic vehicle icons, custom logos, and cohesive automotive-themed loading animations.
+- **State Management**: React Query (`@tanstack/react-query`) for server state management, caching, and data synchronization.
+- **Routing**: React Router DOM.
+- **Forms**: React Hook Form with Zod for robust form validation.
 
 ### Backend Architecture
-- **Framework**: Express.js com TypeScript, rodando em Node.js.
-- **Database**: PostgreSQL (via Neon serverless) com Drizzle ORM para operações type-safe.
-- **Session Management**: `connect-pg-simple` para sessões persistentes baseadas em PostgreSQL.
-- **Microservices**: Sistema de notificações em tempo real, checagem de status de contratos, e sistema de pagamentos automáticos operam de forma integrada.
-- **Segurança**: Isolamento rigoroso de dados entre locadoras, com validações em múltiplas camadas (backend, frontend, cache) para prevenir vazamentos.
-- **Monitoramento**: Dashboard administrativo com métricas em tempo real sobre o status do sistema, desempenho e dados das locadoras.
+- **Framework**: Express.js with TypeScript, running on Node.js.
+- **Database**: PostgreSQL (via Neon serverless) with Drizzle ORM for type-safe operations.
+- **Session Management**: `connect-pg-simple` for persistent PostgreSQL-based sessions.
+- **System Design**: Real-time notification system, contract status checking, and automated payment system operate in an integrated manner. Strict data isolation between rental companies is enforced with multi-layer validations (backend, frontend, cache).
+- **Monitoring**: Administrative dashboard provides real-time metrics on system status, performance, and rental company data.
 
 ### Core System Features
-- **Gestão de Motoristas**: Cadastro, validação (CPF, CNH, idade) e gerenciamento de documentos com uploads específicos (foto de perfil, CNH, comprovante de endereço). Fotos de perfil dinâmicas e ícones.
-- **Gestão de Veículos**: Cadastro detalhado (placa, marca, modelo, ano, cor, categoria), status automático (disponível/alugado), cálculo automático de despesas fixas (IPVA, seguro, rastreador, financiamento). Cores de ícones dinâmicos baseadas na cor do veículo.
-- **Gestão de Aluguéis e Contratos**:
-    - Criação de contratos com motoristas e veículos disponíveis.
-    - Pagamentos recorrentes automáticos (semanal, quinzenal, mensal) com lógica retroativa.
-    - 4 status de contratos (em aberto, ativo, cancelado, encerrado) com transições automáticas.
-    - Geração de contratos profissionais em PDF com dados reais da locadora e cliente, e campos para assinatura.
-    - Sistema de upload de contratos assinados em PDF.
-    - Contratos renováveis e com tempo mínimo.
-- **Gestão Financeira e Relatórios**:
-    - Dashboard financeiro com receita total, despesas totais, lucro líquido e margem de lucro.
-    - Relatórios detalhados por veículo e motorista, incluindo lucratividade.
-    - Consolidação de despesas (fixas, manuais, manutenções) por categoria e forma de pagamento.
-    - Evolução mensal de receita e despesas.
-    - Sistema de loading completo com feedback visual.
-- **Manutenção de Frota**:
-    - Agendamento e registro de manutenções (preventiva, corretiva, revisão) com detalhes de oficina, valores e peças.
-    - Alertas automáticos por quilometragem e data próxima de manutenção.
-    - Integração de custos de manutenção nos relatórios financeiros.
-- **Gestão de Infrações**:
-    - Cadastro de infrações com seleção inteligente de motorista/veículo e cálculo de taxas administrativas.
-    - Notificações automáticas para multas com vencimento próximo.
-- **Sistema de Notificações**:
-    - Notificações em tempo real (atualização a cada 30 segundos) para CNHs vencidas/vencendo, multas pendentes, pagamentos em aberto, e anúncios críticos do sistema.
-    - Badge dinâmico no cabeçalho e dropdown de notificações com prioridade e cores.
-- **Sistema de Anúncios**: Exibição de anúncios críticos (warning, error) no dashboard das locadoras e no sistema de notificações, com cores e traduções por tipo.
-- **Testes e Validações**: Validações avançadas de dados (CPF, CNH, datas), e verificação de integridade para evitar dados inconsistentes.
-- **Paginação e Ordenação**: Implementadas em todas as tabelas e listas para melhor usabilidade e performance.
+- **Driver Management**: Registration, validation (CPF, CNH, age), and document management with specific uploads. Dynamic profile photos and icons.
+- **Vehicle Management**: Detailed registration (plate, make, model, year, color, category), automatic status (available/rented), automatic calculation of fixed expenses (IPVA, insurance, tracker, financing). Dynamic icon colors based on vehicle color.
+- **Rental and Contract Management**:
+    - Contract creation with available drivers and vehicles.
+    - Automatic recurring payments (weekly, bi-weekly, monthly) with retroactive logic.
+    - Four contract statuses (open, active, canceled, closed) with automatic transitions.
+    - Professional PDF contract generation with real rental company and client data, and signature fields.
+    - Upload system for signed PDF contracts.
+    - Renewable contracts with minimum term.
+- **Financial Management and Reporting**:
+    - Financial dashboard with total revenue, total expenses, net profit, and profit margin.
+    - Detailed reports by vehicle and driver, including profitability.
+    - Consolidation of expenses (fixed, manual, maintenance) by category and payment method.
+    - Monthly evolution of revenue and expenses.
+    - Comprehensive loading system with visual feedback.
+- **Fleet Maintenance**:
+    - Scheduling and registration of maintenance (preventive, corrective, revision) with details of workshop, values, and parts.
+    - Automatic alerts for mileage and upcoming maintenance dates.
+    - Integration of maintenance costs into financial reports.
+- **Infraction Management**:
+    - Registration of infractions with intelligent driver/vehicle selection and administrative fee calculation.
+    - Automatic notifications for upcoming fine due dates.
+- **Notification System**:
+    - Real-time notifications (updates every 30 seconds) for expired/expiring CNHs, pending fines, open payments, and critical system announcements.
+    - Dynamic header badge and notification dropdown with priority and colors.
+- **Announcement System**: Display of critical announcements (warning, error) on the rental company dashboard and in the notification system, with colors and translations by type.
+- **Testing and Validations**: Advanced data validations (CPF, CNH, dates), and integrity checks to prevent inconsistent data.
+- **Pagination and Sorting**: Implemented in all tables and lists for improved usability and performance.
+- **Automatic Trial System**: All new registrations receive a 30-day free Pro plan (20 vehicles). The system automatically assigns the trial and displays its status and remaining days.
 
 ## External Dependencies
 
 ### Frontend Dependencies
-- **UI Components**: Radix UI primitives e shadcn/ui.
+- **UI Components**: Radix UI primitives and shadcn/ui.
 - **Icons**: Lucide React.
-- **Date Handling**: `date-fns` para manipulação de datas.
-- **PDF Generation**: `jsPDF` para geração de documentos.
+- **Date Handling**: `date-fns`.
+- **PDF Generation**: `jsPDF`.
 
 ### Backend Dependencies
-- **Database Connection**: `@neondatabase/serverless` para conexão com PostgreSQL.
-- **ORM**: `drizzle-orm` para operações de banco de dados.
-- **Session Management**: `connect-pg-simple` para sessões persistentes.
-- **WebSockets**: `ws` para comunicação em tempo real.
-- **Autenticação**: `bcrypt` para hash de senhas.
-- **Validação**: `zod` para validação de esquemas de dados.
+- **Database Connection**: `@neondatabase/serverless`.
+- **ORM**: `drizzle-orm`.
+- **Session Management**: `connect-pg-simple`.
+- **WebSockets**: `ws`.
+- **Authentication**: `bcrypt`.
+- **Validation**: `zod`.
 
 ### Other Integrations
-- **API ViaCEP**: Para busca automática de endereço por CEP.
-- **Recharts**: Para visualização de dados em gráficos (onde aplicável).
+- **API ViaCEP**: For automatic address lookup by CEP.
+- **Recharts**: For data visualization in graphs.
+- **Stripe**: For payment processing, including subscription management, webhooks, and customer portal integration. Supports a 5-tier pricing structure.

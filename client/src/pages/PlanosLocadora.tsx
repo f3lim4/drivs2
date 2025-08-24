@@ -141,6 +141,7 @@ export default function PlanosLocadora() {
 
   const { data: planoDetalhes, isLoading } = useQuery({
     queryKey: ['/api/planos', profile?.locadoraId],
+    queryFn: () => fetch(`/api/planos${profile?.locadoraId ? `?locadoraId=${profile.locadoraId}` : ''}`).then(res => res.json()),
     enabled: !!profile?.locadoraId,
     staleTime: 5 * 60 * 1000, // 5 minutos
     cacheTime: 10 * 60 * 1000, // 10 minutos
@@ -241,6 +242,33 @@ export default function PlanosLocadora() {
           Gerencie o plano da sua locadora e descubra recursos adicionais
         </p>
       </div>
+
+      {/* Status do teste gratuito */}
+      {planoDetalhes?.testeGratuito && (
+        <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-500 rounded-full">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-green-800">
+                {planoDetalhes.testeGratuito.ativo ? 
+                  `Teste Gratuito Ativo - ${planoDetalhes.testeGratuito.diasRestantes} dias restantes` : 
+                  'Teste Gratuito Expirado'
+                }
+              </h3>
+              <p className="text-green-700 text-sm">
+                {planoDetalhes.testeGratuito.ativo ? 
+                  'Você está aproveitando seu teste gratuito do Plano Pro (20 veículos). Após o vencimento, escolha um plano para continuar.' :
+                  'Seu teste gratuito expirou. Escolha um plano para continuar usando o sistema.'
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Plano Atual */}
       <Card>
