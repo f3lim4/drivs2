@@ -136,7 +136,7 @@ export default function PlanosLocadora() {
     queryKey: ['/api/locadoras', profile?.locadoraId],
     enabled: !!profile?.locadoraId && isLocadora,
     staleTime: 5 * 60 * 1000, // 5 minutos
-    cacheTime: 10 * 60 * 1000, // 10 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos
   });
 
   const { data: planoDetalhes, isLoading } = useQuery({
@@ -144,7 +144,7 @@ export default function PlanosLocadora() {
     queryFn: () => fetch(`/api/planos${profile?.locadoraId ? `?locadoraId=${profile.locadoraId}` : ''}`).then(res => res.json()),
     enabled: !!profile?.locadoraId,
     staleTime: 5 * 60 * 1000, // 5 minutos
-    cacheTime: 10 * 60 * 1000, // 10 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos
   });
 
   const handleSolicitarMudanca = async (novoPlano: string) => {
@@ -232,7 +232,7 @@ export default function PlanosLocadora() {
   // Sempre mostrar a página de planos, mesmo sem locadora específica
   // O sistema deve permitir visualizar os planos disponíveis
 
-  const planoAtual = locadora?.plano || 'pro'; // Padrão pro se não definido
+  const planoAtual = (locadora as any)?.plano || 'pro'; // Padrão pro se não definido
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -261,8 +261,8 @@ export default function PlanosLocadora() {
               </h3>
               <p className="text-green-700 text-sm">
                 {planoDetalhes.testeGratuito.ativo ? 
-                  'Você está aproveitando seu teste gratuito do Plano Pro (20 veículos). Após o vencimento, escolha um plano para continuar.' :
-                  'Seu teste gratuito expirou. Escolha um plano para continuar usando o sistema.'
+                  `Você está aproveitando seu teste gratuito do Plano Pro (20 veículos). Vence em ${new Date(planoDetalhes.testeGratuito.dataVencimento).toLocaleDateString('pt-BR')}.` :
+                  `Seu teste gratuito expirou em ${new Date(planoDetalhes.testeGratuito.dataVencimento).toLocaleDateString('pt-BR')}. Escolha um plano para continuar.`
                 }
               </p>
             </div>

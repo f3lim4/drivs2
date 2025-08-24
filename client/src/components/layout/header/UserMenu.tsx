@@ -1,11 +1,12 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Crown } from 'lucide-react';
+import { User, Crown, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,14 @@ export function UserMenu() {
   const { data: locadora } = useQuery({
     queryKey: [`/api/locadoras/${profile?.locadoraId}`],
     enabled: !!profile?.locadoraId && profile?.type !== 'admin',
+  });
+
+  // Buscar informações do plano com status do teste gratuito
+  const { data: planoInfo } = useQuery({
+    queryKey: ['/api/planos', profile?.locadoraId],
+    queryFn: () => fetch(`/api/planos${profile?.locadoraId ? `?locadoraId=${profile.locadoraId}` : ''}`).then(res => res.json()),
+    enabled: !!profile?.locadoraId && profile?.type !== 'admin',
+    staleTime: 5 * 60 * 1000, // 5 minutos
   });
 
   const handleLogout = async () => {
@@ -68,9 +77,17 @@ export function UserMenu() {
               <p className="text-base font-semibold">
                 {profile?.type === 'admin' ? 'Administrador' : (locadora?.nome || 'Locadora')}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {profile?.type === 'admin' ? 'Sistema DRIVS' : (profile?.name || 'Usuário')}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {profile?.type === 'admin' ? 'Sistema DRIVS' : (profile?.name || 'Usuário')}
+                </p>
+                {profile?.type !== 'admin' && planoInfo?.testeGratuito?.ativo && (
+                  <Badge variant="secondary" className="text-xs">
+                    <Clock className="w-3 h-3 mr-1" />
+                    {planoInfo.testeGratuito.diasRestantes}d
+                  </Badge>
+                )}
+              </div>
             </div>
           </Button>
         </DropdownMenuTrigger>
@@ -91,7 +108,14 @@ export function UserMenu() {
               <div className="mr-2 h-4 w-4 flex items-center justify-center">
                 <Crown className="w-full h-full" />
               </div>
-              <span>Planos</span>
+              <div className="flex items-center justify-between flex-1">
+                <span>Planos</span>
+                {planoInfo?.testeGratuito?.ativo && (
+                  <Badge variant="outline" className="text-xs ml-2">
+                    Teste: {planoInfo.testeGratuito.diasRestantes} dias
+                  </Badge>
+                )}
+              </div>
             </DropdownMenuItem>
           )}
           
