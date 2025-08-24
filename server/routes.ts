@@ -1585,11 +1585,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[DELETE PAGAMENTO] Pagamento encontrado, locadora: ${pagamentoExistente.locadoraId}`);
       
       // Excluir o pagamento
-      await storage.deletePagamento(pagamentoId);
+      const deleted = await storage.deletePagamento(pagamentoId);
+      
+      if (!deleted) {
+        console.log(`[DELETE PAGAMENTO] Nenhum pagamento foi excluído (não encontrado): ${pagamentoId}`);
+        return res.status(404).json({ message: "Pagamento não foi encontrado para exclusão" });
+      }
       
       console.log(`[DELETE PAGAMENTO] Pagamento excluído com sucesso: ${pagamentoId}`);
       
-      res.json({ message: "Pagamento deleted successfully", id: pagamentoId });
+      res.json({ message: "Pagamento deleted successfully", id: pagamentoId, deleted: true });
     } catch (error) {
       console.error("Error deleting pagamento:", error);
       res.status(500).json({ message: "Internal server error", error: error.message });
