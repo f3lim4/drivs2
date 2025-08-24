@@ -2294,6 +2294,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Informações dos planos com status do teste gratuito
+  app.get("/api/planos", async (req, res) => {
+    try {
+      const locadoraId = req.query.locadoraId as string;
+      
+      // Planos disponíveis com informações específicas
+      const planosDisponiveis = {
+        start: {
+          id: "start",
+          nome: "Start",
+          preco: 50.00,
+          valor: 50.00,
+          descricao: "Para locadoras iniciantes com até 5 veículos",
+          popular: false,
+          stripePrice: "price_start_50_monthly"
+        },
+        pro: {
+          id: "pro",
+          nome: "Pro", 
+          preco: 99.00,
+          valor: 99.00,
+          descricao: "Para locadoras em crescimento com até 20 veículos",
+          popular: true,
+          stripePrice: "price_pro_99_monthly"
+        },
+        elite: {
+          id: "elite",
+          nome: "Elite",
+          preco: 250.00,
+          valor: 250.00,
+          descricao: "Para frotas médias com até 50 veículos", 
+          popular: false,
+          stripePrice: "price_elite_250_monthly"
+        },
+        prime: {
+          id: "prime",
+          nome: "Prime",
+          preco: 500.00,
+          valor: 500.00,
+          descricao: "Para grandes frotas com até 100 veículos",
+          popular: false,
+          stripePrice: "price_prime_500_monthly"
+        },
+        infinity: {
+          id: "infinity",
+          nome: "Infinity",
+          preco: 0,
+          valor: 0,
+          descricao: "Veículos ilimitados - Preço a consultar",
+          popular: false,
+          consultar: true
+        }
+      };
+
+      // Se tiver locadoraId, incluir informações do teste gratuito
+      if (locadoraId) {
+        try {
+          const locadora = await storage.getLocadora(locadoraId);
+          if (locadora) {
+            const diasRestantes = locadora.dataVencimentoTeste ? 
+              Math.max(0, Math.ceil((new Date(locadora.dataVencimentoTeste).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 0;
+            
+            const response = {
+              ...planosDisponiveis,
+              testeGratuito: {
+                ativo: locadora.testeGratuito && diasRestantes > 0,
+                diasRestantes: diasRestantes,
+                dataVencimento: locadora.dataVencimentoTeste
+              }
+            };
+            return res.json(response);
+          }
+        } catch (error) {
+          console.error('Erro ao buscar dados do teste gratuito:', error);
+        }
+      }
+
+      res.json(planosDisponiveis);
+    } catch (error) {
+      console.error("Error fetching planos:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Rota de teste para criar locadora com teste gratuito
+  app.post("/api/test-trial", async (req, res) => {
+    try {
+      const testLocadora = {
+        id: "99999999000199", // CNPJ fictício
+        nome: "Locadora Teste",
+        razaoSocial: "Locadora Teste Ltda",
+        cnpj: "99999999000199",
+        email: "teste@teste.com.br",
+        telefone: "(11) 99999-9999",
+        endereco: "Rua Teste, 123",
+        numero: "123",
+        bairro: "Centro",
+        cidade: "São Paulo",
+        estado: "SP",
+        cep: "01000-000",
+        responsavel: "Teste"
+      };
+
+      const locadoraCriada = await storage.createLocadora(testLocadora);
+      console.log("[TEST TRIAL] Locadora criada:", locadoraCriada);
+
+      res.json({
+        message: "Locadora de teste criada com sucesso",
+        locadora: locadoraCriada,
+        testeGratuito: {
+          ativo: locadoraCriada.testeGratuito,
+          diasRestantes: locadoraCriada.dataVencimentoTeste ? 
+            Math.ceil((new Date(locadoraCriada.dataVencimentoTeste).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 0,
+          dataVencimento: locadoraCriada.dataVencimentoTeste,
+          plano: locadoraCriada.plano
+        }
+      });
+
+    } catch (error) {
+      console.error("Error creating test locadora:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // ============================================================================
   // ROTAS STRIPE - SISTEMA DE PAGAMENTOS DOS PLANOS
   // ============================================================================

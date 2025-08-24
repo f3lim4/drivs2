@@ -41,7 +41,7 @@ export const locadoras = pgTable("locadoras", {
   responsavel: text("responsavel").notNull(),
   logo: text("logo"), // URL ou base64 do logo da locadora
   status: text("status").notNull().default("pendente"), // 'ativa', 'inativa', 'pendente'
-  plano: text("plano").notNull().default("profissional"), // 'basico', 'profissional', 'avancado', 'master'
+  plano: text("plano").notNull().default("pro"), // 'start', 'pro', 'elite', 'prime', 'infinity'
   // Campos Stripe
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
@@ -49,7 +49,7 @@ export const locadoras = pgTable("locadoras", {
   tiposVeiculos: text("tipos_veiculos").array().notNull().default(['carro']), // tipos de veículos que a locadora trabalha
   // Controle de teste gratuito
   testeGratuito: boolean("teste_gratuito").notNull().default(true), // Se está no período de teste
-  diasTesteGratuito: integer("dias_teste_gratuito").notNull().default(7), // Quantos dias de teste (7 por padrão)
+  diasTesteGratuito: integer("dias_teste_gratuito").notNull().default(30), // Quantos dias de teste (30 por padrão)
   dataVencimentoTeste: date("data_vencimento_teste"), // Data de vencimento do teste
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

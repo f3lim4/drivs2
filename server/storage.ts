@@ -275,11 +275,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLocadora(locadora: InsertLocadora): Promise<Locadora> {
+    // Calcular data de vencimento do teste (30 dias a partir de hoje)
+    const dataVencimentoTeste = new Date();
+    dataVencimentoTeste.setDate(dataVencimentoTeste.getDate() + 30);
+
     // Se o id não estiver definido, usar o CNPJ como ID
     const locadoraWithId = {
       ...locadora,
-      id: locadora.id || locadora.cnpj
+      id: locadora.id || locadora.cnpj,
+      plano: 'pro', // Sempre começar no plano Pro
+      testeGratuito: true,
+      diasTesteGratuito: 30,
+      dataVencimentoTeste: dataVencimentoTeste.toISOString().split('T')[0], // Formato YYYY-MM-DD
+      status: 'ativa' // Ativar automaticamente
     };
+    
     const result = await db.insert(locadoras).values(locadoraWithId).returning();
     return result[0];
   }
