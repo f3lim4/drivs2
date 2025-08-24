@@ -96,6 +96,9 @@ export function useVeiculos() {
     valorFinanciamento: v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : undefined,
     quantidadeParcelas: v.quantidadeParcelas,
     status: v.status as 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel',
+    // Documentos e visualização
+    documentos: v.documentos,
+    visualizar: v.visualizar,
     // Campos de compatibilidade
     valorDiario: parseFloat(v.valorSemanal) / 7,
     valorCaucao: parseFloat(v.caucao),
