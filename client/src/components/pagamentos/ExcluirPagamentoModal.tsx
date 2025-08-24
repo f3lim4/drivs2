@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { AlertTriangle, DollarSign, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { formatDate } from '@/lib/utils';
 import type { Pagamento } from '@shared/schema';
 
@@ -14,6 +18,9 @@ interface ExcluirPagamentoModalProps {
 }
 
 export function ExcluirPagamentoModal({ open, onClose, pagamento, onConfirm }: ExcluirPagamentoModalProps) {
+  const [confirmationText, setConfirmationText] = useState('');
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
   const formatCurrency = (value: number | string) => {
     const numValue = typeof value === 'string' ? parseFloat(value) : value;
     return new Intl.NumberFormat('pt-BR', {
@@ -57,12 +64,22 @@ export function ExcluirPagamentoModal({ open, onClose, pagamento, onConfirm }: E
   };
 
   const handleConfirm = () => {
-    onConfirm();
+    if (confirmationText.toLowerCase() === 'excluir' && isConfirmed) {
+      onConfirm();
+      onClose();
+      setConfirmationText('');
+      setIsConfirmed(false);
+    }
+  };
+
+  const handleClose = () => {
+    setConfirmationText('');
+    setIsConfirmed(false);
     onClose();
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-red-600">
@@ -119,13 +136,47 @@ export function ExcluirPagamentoModal({ open, onClose, pagamento, onConfirm }: E
               </div>
             </CardContent>
           </Card>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="confirmation">
+                Para confirmar, digite <strong>"excluir"</strong> abaixo:
+              </Label>
+              <Input
+                id="confirmation"
+                value={confirmationText}
+                onChange={(e) => setConfirmationText(e.target.value)}
+                placeholder="Digite 'excluir' para confirmar"
+                className="w-full"
+                data-testid="input-confirm-delete-payment"
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="final-confirmation"
+                checked={isConfirmed}
+                onCheckedChange={setIsConfirmed}
+                data-testid="checkbox-confirm-delete-payment"
+              />
+              <Label htmlFor="final-confirmation" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Tenho certeza que quero excluir este pagamento
+              </Label>
+            </div>
+          </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={handleClose}>
             Cancelar
           </Button>
-          <Button variant="destructive" onClick={handleConfirm}>
+          <Button 
+            variant="destructive" 
+            onClick={handleConfirm}
+            disabled={confirmationText.toLowerCase() !== 'excluir' || !isConfirmed}
+            className="disabled:opacity-50 disabled:cursor-not-allowed"
+            data-testid="button-confirm-delete-payment"
+          >
             Excluir Pagamento
           </Button>
         </DialogFooter>
