@@ -356,7 +356,7 @@ export default function PlanosLocadora() {
                   )}
                   <h3 className="font-semibold">{plano.nome}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {(plano as any).consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
+                    {plano.consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
                   </p>
                 </div>
                 <Separator />
@@ -380,7 +380,7 @@ export default function PlanosLocadora() {
                     <Button disabled className="w-full">
                       Plano Atual
                     </Button>
-                  ) : (plano as any).consultar ? (
+                  ) : plano.consultar ? (
                     <Button
                       onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
                       className="w-full"
@@ -495,6 +495,17 @@ export default function PlanosLocadora() {
 }
 
 // Componente de Carrossel para Mobile/Tablet
+interface PlanoInfo {
+  nome: string;
+  preco: number;
+  valor: number;
+  icone: any;
+  cor: string;
+  descricao: string;
+  popular: boolean;
+  consultar?: boolean;
+}
+
 function PlanoCarousel({ 
   planosInfo, 
   planosFeatures, 
@@ -502,7 +513,7 @@ function PlanoCarousel({
   handleSolicitarMudanca, 
   solicitando 
 }: {
-  planosInfo: any;
+  planosInfo: Record<string, PlanoInfo>;
   planosFeatures: PlanoFeature[];
   planoAtual: string | undefined;
   handleSolicitarMudanca: (plano: string) => void;
@@ -564,7 +575,7 @@ function PlanoCarousel({
                     </div>
                     <CardTitle className="text-xl">{plano.nome}</CardTitle>
                     <CardDescription className="text-sm">
-                      {(plano as any).consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
+                      {plano.consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
                     </CardDescription>
                     <p className="text-xs text-muted-foreground mt-1">{plano.descricao}</p>
                   </CardHeader>
@@ -601,7 +612,7 @@ function PlanoCarousel({
                         <Button disabled className="w-full">
                           Plano Atual
                         </Button>
-                      ) : (plano as any).consultar ? (
+                      ) : plano.consultar ? (
                         <Button
                           onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
                           className="w-full"
