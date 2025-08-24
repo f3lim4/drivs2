@@ -41,6 +41,7 @@ import { Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
 import { registrarAtividade } from '@/utils/activityLogger';
 import { Upload, FileText } from 'lucide-react';
+import { ObjectUploader } from '@/components/ObjectUploader';
 
 // Schema de validação
 const veiculoSchema = z.object({
@@ -64,20 +65,20 @@ const veiculoSchema = z.object({
   // Características Técnicas
   combustivel: z.string().min(1, 'Tipo de combustível é obrigatório'),
   quilometragem: z.preprocess((val) => {
-    if (typeof val === 'string' && val === '') return undefined;
+    if (typeof val === 'string' && val === '') return 0;
     if (typeof val === 'string') return parseFloat(val);
     return val;
-  }, z.number().min(0, 'Quilometragem deve ser positiva').optional()),
+  }, z.number().min(0, 'Quilometragem deve ser positiva')),
   valorSemanal: z.preprocess((val) => {
     if (typeof val === 'string' && val === '') return undefined;
     if (typeof val === 'string') return parseFloat(val);
     return val;
-  }, z.number().min(0, 'Valor deve ser positivo').optional()),
+  }, z.number().min(0.01, 'Valor semanal é obrigatório')),
   caucao: z.preprocess((val) => {
     if (typeof val === 'string' && val === '') return undefined;
     if (typeof val === 'string') return parseFloat(val);
     return val;
-  }, z.number().min(0, 'Caução deve ser positiva').optional()),
+  }, z.number().min(0.01, 'Caução é obrigatória')),
   taxaAdministrativa: z.preprocess((val) => {
     if (typeof val === 'string' && val === '') return undefined;
     if (typeof val === 'string') return parseFloat(val);
@@ -181,7 +182,7 @@ export function NovoVeiculoModal({
       renavam: '',
       chassi: '',
       combustivel: '',
-      quilometragem: undefined,
+      quilometragem: 0,
       valorSemanal: undefined,
       caucao: undefined,
       taxaAdministrativa: '',
@@ -1079,67 +1080,39 @@ export function NovoVeiculoModal({
             <div className="flex items-center justify-between border rounded-lg p-3 bg-gray-50">
               <span className="text-sm text-muted-foreground">Documentos (opcional):</span>
               <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  id="documento-upload"
-                  multiple
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  style={{ display: 'none' }}
-                  onChange={async (e) => {
-                    const files = e.target.files;
-                    if (!files || files.length === 0) return;
-
-                    for (const file of Array.from(files)) {
-                      try {
-                        // Obter URL de upload
-                        const response = await fetch('/api/objects/upload', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                        });
-                        const data = await response.json();
-
-                        // Upload do arquivo
-                        const uploadResponse = await fetch(data.uploadURL, {
-                          method: 'PUT',
-                          body: file,
-                          headers: {
-                            'Content-Type': file.type,
-                          },
-                        });
-
-                        if (uploadResponse.ok) {
-                          const documentos = form.getValues('documentos') || [];
-                          form.setValue('documentos', [...documentos, data.uploadURL]);
-                          toast({
-                            title: "Documento adicionado",
-                            description: `${file.name} carregado com sucesso.`,
-                          });
-                        }
-                      } catch (error) {
-                        console.error('Erro no upload:', error);
-                        toast({
-                          title: "Erro no upload",
-                          description: `Falha ao carregar ${file.name}`,
-                          variant: "destructive",
-                        });
-                      }
-                    }
-                    // Limpar input
-                    e.target.value = '';
+                <ObjectUploader
+                  maxNumberOfFiles={5}
+                  maxFileSize={10485760} // 10MB
+                  onGetUploadParameters={async () => {
+                    const response = await fetch('/api/objects/upload', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                    });
+                    const data = await response.json();
+                    return {
+                      method: 'PUT' as const,
+                      url: data.uploadURL,
+                    };
                   }}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => document.getElementById('documento-upload')?.click()}
-                  className="text-xs"
+                  onComplete={(result) => {
+                    if (result.successful && result.successful.length > 0) {
+                      const documentos = form.getValues('documentos') || [];
+                      const novosDocumentos = result.successful.map(file => file.uploadURL);
+                      form.setValue('documentos', [...documentos, ...novosDocumentos]);
+                      
+                      toast({
+                        title: "Documentos adicionados",
+                        description: `${result.successful.length} arquivo(s) carregado(s) com sucesso.`,
+                      });
+                    }
+                  }}
+                  buttonClassName="text-xs h-8"
                 >
                   <Upload className="w-3 h-3 mr-1" />
                   Adicionar
-                </Button>
+                </ObjectUploader>
                 {form.watch('documentos') && form.watch('documentos').length > 0 && (
                   <span className="text-xs text-green-600">
                     {form.watch('documentos').length} arquivo(s)
