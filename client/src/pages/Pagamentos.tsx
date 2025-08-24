@@ -703,7 +703,21 @@ export default function Pagamentos() {
                 <TableRow key={pagamento.id}>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{(pagamento as any).motoristaNome || pagamento.motoristaNome || 'Nome não disponível'}</div>
+                      <div className="font-medium">
+                        {console.log('Debug pagamento individual:', { 
+                          id: pagamento.id,
+                          motoristaNome: pagamento.motoristaNome,
+                          asAny: (pagamento as any).motoristaNome,
+                          motoristaId: pagamento.motoristaId,
+                          allKeys: Object.keys(pagamento),
+                          values: {
+                            motoristaNome: pagamento.motoristaNome,
+                            nome: (pagamento as any).nome,
+                            motoristaId: pagamento.motoristaId
+                          }
+                        })}
+                        {pagamento.motoristaNome || (pagamento as any).motoristaNome || pagamento.motoristaId || 'Nome não disponível'}
+                      </div>
                       <div className="text-xs text-muted-foreground">{pagamento.motoristaId || 'CPF não informado'}</div>
                     </div>
                   </TableCell>
