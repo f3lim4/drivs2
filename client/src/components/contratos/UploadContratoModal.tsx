@@ -105,7 +105,7 @@ export function UploadContratoModal({
         
         toast({
           title: "Upload realizado",
-          description: "Contrato assinado enviado com sucesso!",
+          description: "Contrato assinado enviado com sucesso! Status alterado para ATIVO.",
         });
       };
       
