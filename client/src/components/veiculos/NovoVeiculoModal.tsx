@@ -1081,49 +1081,84 @@ export function NovoVeiculoModal({
               )}
             </div>
 
-            {/* Upload de documentos - alinhado */}
+            {/* Upload de documentos - sistema direto */}
             <div className="flex items-center justify-between p-2 border rounded bg-gray-50/50">
               <span className="text-xs text-muted-foreground">Documentos:</span>
               <div className="flex items-center gap-2">
-                <ObjectUploader
-                  maxNumberOfFiles={3}
-                  maxFileSize={5242880} // 5MB
-                  onGetUploadParameters={async () => {
-                    console.log('[UPLOAD] Solicitando URL de upload...');
-                    const response = await fetch('/api/objects/upload', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                    });
-                    const data = await response.json();
-                    console.log('[UPLOAD] URL obtida:', data.uploadURL);
-                    return {
-                      method: 'PUT' as const,
-                      url: data.uploadURL,
-                    };
-                  }}
-                  onComplete={(result) => {
-                    console.log('[UPLOAD] Upload completo:', result);
-                    if (result.successful && result.successful.length > 0) {
-                      const documentos = form.getValues('documentos') || [];
-                      const novosDocumentos = result.successful.map(file => {
-                        console.log('[UPLOAD] Arquivo salvo:', file.uploadURL);
-                        return file.uploadURL;
-                      });
-                      form.setValue('documentos', [...documentos, ...novosDocumentos]);
-                      
-                      toast({
-                        title: "Sucesso",
-                        description: `${result.successful.length} documento(s) adicionado(s)`,
-                      });
+                <input
+                  type="file"
+                  id="documento-upload-novo"
+                  multiple
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const files = e.target.files;
+                    if (!files || files.length === 0) return;
+                    
+                    console.log('[UPLOAD DIRETO] Arquivos selecionados:', files.length);
+                    
+                    const documentos = form.getValues('documentos') || [];
+                    
+                    for (const file of Array.from(files)) {
+                      try {
+                        console.log('[UPLOAD DIRETO] Processando arquivo:', file.name);
+                        
+                        // Obter URL de upload
+                        const response = await fetch('/api/objects/upload', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                        });
+                        const data = await response.json();
+                        console.log('[UPLOAD DIRETO] URL obtida:', data.uploadURL);
+                        
+                        // Upload do arquivo
+                        const uploadResponse = await fetch(data.uploadURL, {
+                          method: 'PUT',
+                          body: file,
+                          headers: {
+                            'Content-Type': file.type,
+                          },
+                        });
+                        
+                        if (uploadResponse.ok) {
+                          documentos.push(data.uploadURL);
+                          console.log('[UPLOAD DIRETO] Arquivo carregado:', data.uploadURL);
+                          
+                          toast({
+                            title: "Documento adicionado",
+                            description: `${file.name} carregado com sucesso.`,
+                          });
+                        }
+                      } catch (error) {
+                        console.error('[UPLOAD DIRETO] Erro:', error);
+                        toast({
+                          title: "Erro no upload",
+                          description: `Falha ao carregar ${file.name}`,
+                          variant: "destructive",
+                        });
+                      }
                     }
+                    
+                    form.setValue('documentos', documentos);
+                    // Limpar input
+                    e.target.value = '';
                   }}
-                  buttonClassName="text-xs h-7 px-3 bg-blue-600 hover:bg-blue-700 text-white"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    console.log('[UPLOAD DIRETO] Abrindo seletor de arquivos...');
+                    document.getElementById('documento-upload-novo')?.click();
+                  }}
+                  className="text-xs h-7 px-3 bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                 >
                   <Upload className="w-3 h-3 mr-1" />
                   Adicionar
-                </ObjectUploader>
+                </Button>
                 {form.watch('documentos') && form.watch('documentos').length > 0 && (
                   <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
                     {form.watch('documentos').length} arquivo(s)
