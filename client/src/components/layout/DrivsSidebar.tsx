@@ -49,16 +49,16 @@ const navigationItems = [
     description: 'Visão geral do sistema'
   },
   {
-    title: 'Motoristas',
-    url: '/motoristas',
-    icon: Users,
-    description: 'Gestão de motoristas'
-  },
-  {
     title: 'Veículos',
     url: '/veiculos',
     icon: Car,
     description: 'Gestão de frota'
+  },
+  {
+    title: 'Motoristas',
+    url: '/motoristas',
+    icon: Users,
+    description: 'Gestão de motoristas'
   },
 
   {
