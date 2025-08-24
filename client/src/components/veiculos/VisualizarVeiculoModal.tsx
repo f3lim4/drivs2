@@ -214,7 +214,7 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
 
           {/* Documentos do Veículo - Compacto */}
           {(() => {
-            const documentos = (veiculo as any).documentos;
+            const documentos = veiculo.documentos;
             console.log('[DEBUG] Documentos do veículo:', documentos);
             console.log('[DEBUG] Veículo completo:', veiculo);
             
