@@ -319,96 +319,100 @@ export default function PlanosLocadora() {
         </CardContent>
       </Card>
 
-      {/* Comparação de Planos */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Comparação de Planos
-          </CardTitle>
-          <CardDescription>
-            Compare todos os planos disponíveis e suas funcionalidades
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* Carrossel de Planos - Responsivo */}
-          <div className="hidden lg:grid lg:grid-cols-5 gap-6">
-            {/* Versão Desktop - Grid Completo */}
-            {/* Coluna de Features */}
-            <div className="space-y-4">
-              <div className="h-16 flex items-center">
-                <h3 className="font-semibold">Funcionalidades</h3>
-              </div>
-              <Separator />
-              {planosFeatures.map((feature, index) => (
-                <div key={index} className="py-3 border-b last:border-b-0">
-                  <p className="text-sm font-medium">{feature.nome}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Colunas dos Planos */}
-            {Object.entries(planosInfo).map(([key, plano]) => (
-              <div key={key} className="space-y-4">
-                <div className="h-16 p-4 bg-muted rounded-lg flex flex-col items-center justify-center relative">
-                  {plano.popular && (
-                    <Badge className="absolute -top-2 bg-cyan-500 text-white">
-                      Mais Popular
-                    </Badge>
-                  )}
-                  <h3 className="font-semibold">{plano.nome}</h3>
-                  <p className="text-sm text-muted-foreground">
+      {/* Planos Disponíveis */}
+      <div className="space-y-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Planos Disponíveis</h2>
+          <p className="text-muted-foreground">
+            Escolha o plano ideal para sua locadora
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
+          {Object.entries(planosInfo).map(([key, plano]) => {
+            const Icone = plano.icone;
+            return (
+              <Card key={key} className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500 relative' : ''}`}>
+                {plano.popular && (
+                  <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-cyan-500 text-white z-10">
+                    Mais Popular
+                  </Badge>
+                )}
+                <CardHeader className="text-center">
+                  <div className={`w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center ${plano.cor}`}>
+                    <Icone className="h-6 w-6 text-white" />
+                  </div>
+                  <CardTitle className="text-xl">{plano.nome}</CardTitle>
+                  <CardDescription className="text-lg font-semibold">
                     {plano.consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
-                  </p>
-                </div>
-                <Separator />
-                {planosFeatures.map((feature, index) => (
-                  <div key={index} className="py-3 border-b last:border-b-0 text-center">
-                    {typeof feature[key as keyof PlanoFeature] === 'boolean' ? (
-                      feature[key as keyof PlanoFeature] ? (
-                        <Check className="h-5 w-5 text-green-500 mx-auto" />
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )
+                  </CardDescription>
+                  <p className="text-xs text-muted-foreground">{plano.descricao}</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Features do plano */}
+                  <div className="space-y-3">
+                    {planosFeatures.slice(0, 8).map((feature, index) => {
+                      const valor = feature[key as keyof PlanoFeature];
+                      return (
+                        <div key={index} className="flex items-start gap-2 text-sm">
+                          {typeof valor === 'boolean' ? (
+                            valor ? (
+                              <>
+                                <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                                <span>{feature.nome}</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5">—</span>
+                                <span className="text-muted-foreground">{feature.nome}</span>
+                              </>
+                            )
+                          ) : (
+                            <>
+                              <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <span className="font-medium">{feature.nome}:</span>
+                                <br />
+                                <span className="text-muted-foreground">{valor}</span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Botão de ação */}
+                  <div className="pt-4">
+                    {planoAtual === key ? (
+                      <Button disabled className="w-full">
+                        Plano Atual
+                      </Button>
+                    ) : plano.consultar ? (
+                      <Button
+                        onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
+                        className="w-full"
+                        variant="outline"
+                      >
+                        Solicitar Orçamento
+                      </Button>
                     ) : (
-                      <span className="text-sm">
-                        {feature[key as keyof PlanoFeature]}
-                      </span>
+                      <Button
+                        onClick={() => handleSolicitarMudanca(key)}
+                        disabled={solicitando}
+                        className="w-full"
+                        variant={plano.popular ? "default" : "outline"}
+                      >
+                        {solicitando ? "Processando..." : "Mudar Plano"}
+                      </Button>
                     )}
                   </div>
-                ))}
-                <div className="pt-4">
-                  {planoAtual === key ? (
-                    <Button disabled className="w-full">
-                      Plano Atual
-                    </Button>
-                  ) : plano.consultar ? (
-                    <Button
-                      onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
-                      className="w-full"
-                      variant="outline"
-                    >
-                      Solicitar Orçamento
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => handleSolicitarMudanca(key)}
-                      disabled={solicitando}
-                      className="w-full"
-                      variant={plano.popular ? "default" : "outline"}
-                    >
-                      {solicitando ? "Processando..." : "Mudar Plano"}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Carrossel Mobile/Tablet */}
-          <PlanoCarousel planosInfo={planosInfo} planosFeatures={planosFeatures} planoAtual={planoAtual} handleSolicitarMudanca={handleSolicitarMudanca} solicitando={solicitando} />
-        </CardContent>
-      </Card>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Suporte */}
       <Card>
