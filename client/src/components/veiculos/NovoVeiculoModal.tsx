@@ -1123,7 +1123,23 @@ export function NovoVeiculoModal({
                         });
                         
                         if (uploadResponse.ok) {
-                          documentos.push(data.uploadURL);
+                          // Notificar o backend sobre o documento carregado
+                          const notifyResponse = await fetch(`/api/veiculos/${form.getValues('renavam')}/documentos`, {
+                            method: 'PUT',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ documentURL: data.uploadURL }),
+                          });
+                          
+                          if (notifyResponse.ok) {
+                            const result = await notifyResponse.json();
+                            console.log('[UPLOAD DIRETO] Documento registrado no backend:', result);
+                            documentos.push(result.objectPath);
+                          } else {
+                            documentos.push(data.uploadURL);
+                          }
+                          
                           console.log('[UPLOAD DIRETO] Arquivo carregado:', data.uploadURL);
                           
                           toast({
