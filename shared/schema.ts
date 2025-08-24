@@ -538,6 +538,12 @@ export type Pagamento = typeof pagamentos.$inferSelect & {
   motoristaContato?: string;
   aluguelVeiculoModelo?: string;
   aluguelVeiculoPlaca?: string;
+  veiculoId?: string;
+  veiculoPlaca?: string;
+  veiculoMarca?: string;
+  veiculoModelo?: string;
+  data?: string; // Campo mapeado de dataPagamento
+  valor?: string; // Campo mapeado de valorPago
 };
 
 export type InsertInfracao = z.infer<typeof insertInfracaoSchema>;
