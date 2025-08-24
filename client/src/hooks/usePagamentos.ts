@@ -136,6 +136,10 @@ export function usePagamentos() {
       
       const response = await fetch(`/api/pagamentos/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        },
       });
       
       console.log(`[FRONTEND] Response status: ${response.status}`);
@@ -168,15 +172,37 @@ export function usePagamentos() {
       return { id, deleted: true };
     },
     onSuccess: (_, deletedId) => {
+      console.log(`[FRONTEND] Exclusão bem-sucedida, invalidando cache para ID: ${deletedId}`);
+      
       // ATUALIZAÇÃO OTIMISTA: Remove o pagamento da lista imediatamente
       queryClient.setQueryData(['/api/pagamentos', locadoraId], (oldData: Pagamento[] | undefined) => {
-        return oldData?.filter(p => p.id !== deletedId) || [];
+        const filtered = oldData?.filter(p => p.id !== deletedId) || [];
+        console.log(`[FRONTEND] Cache atualizado otimisticamente, ${oldData?.length || 0} -> ${filtered.length} pagamentos`);
+        return filtered;
       });
       
       // INVALIDAÇÃO AGRESSIVA: Força refetch de todos os dados relacionados
       queryClient.invalidateQueries({ queryKey: ['/api/pagamentos'] });
       queryClient.invalidateQueries({ queryKey: ['/api/dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['/api/relatorios'] });
+      
+      // FORÇAR REFETCH IMEDIATO para garantir sincronização
+      queryClient.refetchQueries({ 
+        queryKey: ['/api/pagamentos', locadoraId],
+        type: 'active' 
+      });
+      
+      // ADICIONAR DELAY PARA GARANTIR PROPAGAÇÃO NO DEPLOY
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['/api/pagamentos'] });
+        queryClient.refetchQueries({ queryKey: ['/api/pagamentos', locadoraId] });
+        console.log(`[FRONTEND] Refetch adicional após delay para sincronização de deploy`);
+      }, 500);
+      
+      console.log(`[FRONTEND] Todas as queries invalidadas e refetch forçado`);
+    },
+    onError: (error, deletedId) => {
+      console.error(`[FRONTEND] Erro na exclusão do pagamento ${deletedId}:`, error);
     },
   });
 
