@@ -81,6 +81,9 @@ export interface Veiculo {
   valorRastreadorMensal?: number;
   // Status
   status: 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel';
+  // Documentos
+  documentos?: string[];
+  visualizar?: boolean;
   // Campos legados para compatibilidade
   valorDiario?: number;
   valorCaucao?: number;
