@@ -1076,15 +1076,10 @@ export function NovoVeiculoModal({
               )}
             </div>
 
-            {/* DOCUMENTOS DO VEÍCULO */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                Documentos do Veículo
-              </h3>
-              
-              {/* Upload de documentos */}
-              <div className="flex items-center gap-4">
+            {/* Upload de documentos - linha discreta */}
+            <div className="flex items-center justify-between border rounded-lg p-3 bg-gray-50">
+              <span className="text-sm text-muted-foreground">Documentos (opcional):</span>
+              <div className="flex items-center gap-2">
                 <ObjectUploader
                   maxNumberOfFiles={5}
                   maxFileSize={10485760}
@@ -1104,54 +1099,25 @@ export function NovoVeiculoModal({
                   onComplete={(result) => {
                     if (result.successful && result.successful.length > 0) {
                       const uploadURL = result.successful[0].uploadURL;
-                      // Salvar o URL do documento na lista temporária
                       const documentos = form.getValues('documentos') || [];
                       form.setValue('documentos', [...documentos, uploadURL]);
                       toast({
                         title: "Documento adicionado",
-                        description: "O documento foi carregado com sucesso.",
+                        description: "Documento carregado com sucesso.",
                       });
                     }
                   }}
-                  buttonClassName="flex items-center gap-2"
+                  buttonClassName="text-xs"
                 >
-                  <Upload className="w-4 h-4" />
-                  Adicionar Documento
+                  <Upload className="w-3 h-3" />
+                  Adicionar
                 </ObjectUploader>
-                <span className="text-sm text-muted-foreground">
-                  PDF, imagens até 10MB cada
-                </span>
+                {form.watch('documentos') && form.watch('documentos').length > 0 && (
+                  <span className="text-xs text-green-600">
+                    {form.watch('documentos').length} arquivo(s)
+                  </span>
+                )}
               </div>
-
-              {/* Lista de documentos carregados */}
-              {form.watch('documentos') && form.watch('documentos').length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-medium">Documentos Carregados:</h4>
-                  <div className="grid gap-2">
-                    {form.watch('documentos').map((doc: string, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-green-50">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-green-600" />
-                          <span className="text-sm text-green-800">Documento {index + 1} - Pronto para salvar</span>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            const documentos = form.getValues('documentos') || [];
-                            const novosDocumentos = documentos.filter((_: string, i: number) => i !== index);
-                            form.setValue('documentos', novosDocumentos);
-                          }}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          Remover
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* STATUS: Veículos são cadastrados automaticamente como "disponível" */}
