@@ -262,7 +262,7 @@ export default function PlanosLocadora() {
   // Sempre mostrar a página de planos, mesmo sem locadora específica
   // O sistema deve permitir visualizar os planos disponíveis
 
-  const planoAtual = locadora?.plano || 'profissional'; // Padrão profissional se não definido
+  const planoAtual = locadora?.plano || 'pro'; // Padrão pro se não definido
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -287,29 +287,31 @@ export default function PlanosLocadora() {
               </CardDescription>
             </div>
             <Badge variant="default" className="px-3 py-1">
-              {planosInfo[planoAtual as keyof typeof planosInfo].nome}
+              {planosInfo[planoAtual as keyof typeof planosInfo]?.nome || 'Pro'}
             </Badge>
           </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
-            <div className={`p-3 rounded-full ${planosInfo[planoAtual as keyof typeof planosInfo].cor}`}>
+            <div className={`p-3 rounded-full ${planosInfo[planoAtual as keyof typeof planosInfo]?.cor || 'bg-blue-500'}`}>
               {(() => {
-                const IconComponent = planosInfo[planoAtual as keyof typeof planosInfo].icone;
+                const planoData = planosInfo[planoAtual as keyof typeof planosInfo];
+                if (!planoData) return <Rocket className="h-6 w-6 text-white" />;
+                const IconComponent = planoData.icone;
                 return <IconComponent className="h-6 w-6 text-white" />;
               })()}
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-lg">
-                Plano {planosInfo[planoAtual as keyof typeof planosInfo].nome}
+                Plano {planosInfo[planoAtual as keyof typeof planosInfo]?.nome || 'Pro'}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {planosInfo[planoAtual as keyof typeof planosInfo].descricao}
+                {planosInfo[planoAtual as keyof typeof planosInfo]?.descricao || 'Para locadoras em crescimento'}
               </p>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold">
-                R$ {planosInfo[planoAtual as keyof typeof planosInfo].preco.toFixed(2)}
+                R$ {(planosInfo[planoAtual as keyof typeof planosInfo]?.preco || 99).toFixed(2)}
               </p>
               <p className="text-sm text-muted-foreground">por mês</p>
             </div>
