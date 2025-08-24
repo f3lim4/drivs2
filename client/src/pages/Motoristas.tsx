@@ -212,7 +212,27 @@ export default function Motoristas() {
     setDeleteDialogOpen(true);
   };
 
-  const handleConfirmarExclusao = async (motorista: Motorista) => {
+  const handleConfirmarExclusao = async (motorista: Motorista, confirmationText: string, hasAgreed: boolean) => {
+    // Validar texto de confirmação
+    if (confirmationText.toLowerCase().trim() !== 'excluir') {
+      toast({
+        title: "Confirmação inválida",
+        description: "Digite 'excluir' para confirmar a exclusão.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Validar checkbox de concordância
+    if (!hasAgreed) {
+      toast({
+        title: "Confirmação necessária",
+        description: "Você deve concordar com a exclusão.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     try {
       await deleteMotorista.mutateAsync(motorista.id);
 
@@ -231,13 +251,17 @@ export default function Motoristas() {
         description: `${motorista.nome} foi excluído com sucesso.`,
         variant: "destructive",
       });
-    } catch (error) {
+      
+      return true;
+    } catch (error: any) {
       console.error('Erro ao excluir motorista:', error);
+      const errorMessage = error.message || "Não foi possível excluir o motorista. Tente novamente.";
       toast({
         title: "Erro ao excluir motorista",
-        description: "Não foi possível excluir o motorista. Tente novamente.",
+        description: errorMessage,
         variant: "destructive",
       });
+      return false;
     }
   };
 

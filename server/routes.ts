@@ -724,11 +724,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/motoristas/:id", async (req, res) => {
     try {
-      await storage.deleteMotorista(req.params.id);
-      res.json({ message: "Motorista deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting motorista:", error);
-      res.status(500).json({ message: "Internal server error" });
+      const { id } = req.params;
+      // Para agora, vamos permitir exclusão sem autenticação específica
+      // TODO: Implementar verificação de autenticação adequada
+
+      // Verificar se o motorista tem contratos ativos ou em aberto
+      const contratos = await storage.getContratosByMotorista(id);
+      const contratosAtivos = contratos.filter(c => c.status === 'ativo' || c.status === 'em_aberto');
+      
+      if (contratosAtivos.length > 0) {
+        return res.status(400).json({ 
+          message: `Não é possível excluir este motorista. Ele possui ${contratosAtivos.length} contrato(s) ativo(s) ou em aberto. Cancele ou encerre os contratos primeiro.`,
+          contratoStatus: contratosAtivos.map(c => ({ id: c.id, status: c.status }))
+        });
+      }
+
+      await storage.deleteMotorista(id);
+      res.json({ message: 'Motorista excluído com sucesso' });
+    } catch (error: any) {
+      console.error('Error deleting motorista:', error);
+      res.status(500).json({ message: error.message || 'Internal server error' });
     }
   });
 
