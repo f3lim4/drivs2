@@ -502,7 +502,16 @@ export default function Veiculos() {
                         <Button 
                           variant="ghost" 
                           size="icon"
+                          onClick={() => handleVisualizarVeiculo(veiculo)}
+                          title="Visualizar veículo"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
                           onClick={() => handleEditarVeiculo(veiculo)}
+                          title="Editar veículo"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -510,6 +519,7 @@ export default function Veiculos() {
                           variant="ghost" 
                           size="icon"
                           onClick={() => handleExcluirVeiculo(veiculo)}
+                          title="Excluir veículo"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
