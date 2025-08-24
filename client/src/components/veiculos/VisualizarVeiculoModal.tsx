@@ -108,6 +108,12 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
                   {veiculo.combustivel || 'Flex'}
                 </p>
               </div>
+              {(veiculo as any).visualizar && (
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-muted-foreground">Observações Visuais</p>
+                  <p className="text-sm">{(veiculo as any).visualizar}</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 

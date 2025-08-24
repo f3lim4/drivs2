@@ -140,6 +140,9 @@ const veiculoSchema = z.object({
     if (typeof val === 'string') return parseFloat(val);
     return val;
   }, z.number().optional()),
+  
+  // Campo para melhor visualização do veículo
+  visualizar: z.string().optional(),
 });
 
 type VeiculoFormData = z.infer<typeof veiculoSchema>;
@@ -193,6 +196,7 @@ export function NovoVeiculoModal({
       quantidadeParcelas: '',
       // Status será definido automaticamente como "disponível"
       valorLimiteKm: undefined,
+      visualizar: '',
     },
   });
 
@@ -285,6 +289,7 @@ export function NovoVeiculoModal({
         ipva: data.ipva?.toString(),
         rastreador: data.rastreador,
         valorRastreadorMensal: data.valorRastreadorMensal?.toString(),
+        visualizar: data.visualizar || null,
         status: 'disponivel', // Sempre "disponível" no cadastro
       };
 
@@ -582,6 +587,25 @@ export function NovoVeiculoModal({
                   />
                 </div>
               </div>
+
+              {/* Campo Visualizar Veículo */}
+              <FormField
+                control={form.control}
+                name="visualizar"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Visualizar Veículo</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Observações visuais do veículo (ex: arranhões, detalhes, etc.)" 
+                        {...field}
+                        data-testid="input-visualizar-veiculo"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
 
