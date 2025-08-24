@@ -1571,12 +1571,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.delete("/api/pagamentos/:id", async (req, res) => {
+    const pagamentoId = req.params.id;
+    console.log(`[DELETE PAGAMENTO] Tentando excluir pagamento: ${pagamentoId}`);
+    
     try {
-      await storage.deletePagamento(req.params.id);
-      res.json({ message: "Pagamento deleted successfully" });
+      // Verificar se o pagamento existe antes de excluir
+      const pagamentoExistente = await storage.getPagamento(pagamentoId);
+      if (!pagamentoExistente) {
+        console.log(`[DELETE PAGAMENTO] Pagamento não encontrado: ${pagamentoId}`);
+        return res.status(404).json({ message: "Pagamento não encontrado" });
+      }
+      
+      console.log(`[DELETE PAGAMENTO] Pagamento encontrado, locadora: ${pagamentoExistente.locadoraId}`);
+      
+      // Excluir o pagamento
+      await storage.deletePagamento(pagamentoId);
+      
+      console.log(`[DELETE PAGAMENTO] Pagamento excluído com sucesso: ${pagamentoId}`);
+      
+      res.json({ message: "Pagamento deleted successfully", id: pagamentoId });
     } catch (error) {
       console.error("Error deleting pagamento:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Internal server error", error: error.message });
     }
   });
 
