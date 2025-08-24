@@ -67,10 +67,10 @@ export function ObjectUploader({
       meta: {},
       locale: {
         strings: {
-          // Textos customizados
-          dropPasteFiles: 'Clique em "Selecionar arquivos" para adicionar',
-          dropPasteFolders: 'Clique em "Selecionar arquivos" para adicionar',
-          dropPasteBoth: 'Clique em "Selecionar arquivos" para adicionar',
+          // Remover textos de drop
+          dropPasteFiles: '',
+          dropPasteFolders: '',
+          dropPasteBoth: '',
           dropHereOr: '',
           browse: 'Selecionar arquivos',
           uploadXFiles: {
