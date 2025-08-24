@@ -583,38 +583,35 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6 max-w-8xl mx-auto">
-            {/* Plano Básico */}
-            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-blue-400/30 hover:border-blue-400/50 transition-all duration-500 hover:scale-105 group">
+          <div className="grid md:grid-cols-5 gap-4 max-w-9xl mx-auto">
+            {/* Plano Start */}
+            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-blue-400/30 hover:border-blue-400/50 transition-all duration-500 hover:scale-105 group">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-3xl"></div>
               <div className="relative z-10">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
-                    <Car className="h-8 w-8 text-white" />
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                    <Car className="h-6 w-6 text-white" />
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold text-center mb-2">Básico</h3>
-                <p className="text-blue-200 text-center mb-6">Para locadoras iniciantes</p>
+                <h3 className="text-xl font-bold text-center mb-2">Start</h3>
+                <p className="text-blue-200 text-center mb-4 text-sm">Para locadoras iniciantes</p>
                 
-                <div className="text-center mb-8">
-                  <div className="text-4xl font-bold mb-2">R$ 49<span className="text-lg font-normal">/mês</span></div>
-                  <div className="text-blue-300">Até 5 veículos</div>
+                <div className="text-center mb-6">
+                  <div className="text-3xl font-bold mb-2">R$ 50<span className="text-sm font-normal">/mês</span></div>
+                  <div className="text-blue-300 text-sm">Até 5 veículos</div>
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-2 mb-6 text-sm">
                   {[
                     "Até 5 veículos na frota",
-                    "Gestão completa de motoristas",
-                    "Contratos automáticos profissionais",
+                    "Gestão completa de motoristas", 
+                    "Contratos automáticos",
                     "Controle de pagamentos",
-                    "Controle de infrações e multas",
-                    "Controle financeiro com lucros/perdas reais",
-                    "Controle de manutenções",
-                    "Upload de documentos"
+                    "Controle financeiro real"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
-                      <CheckCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-blue-400 mr-2 flex-shrink-0" />
                       <span className="text-blue-100">{feature}</span>
                     </li>
                   ))}
@@ -622,55 +619,52 @@ export default function Home() {
 
                 <Button 
                   onClick={handleDemo}
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-3 rounded-xl transition-all duration-300 group-hover:shadow-2xl"
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 rounded-xl transition-all duration-300"
                 >
-                  Começar Teste Grátis
+                  Começar Teste
                 </Button>
               </div>
             </div>
 
-            {/* Plano Profissional - Mais Popular */}
-            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 border-2 border-cyan-400/50 hover:border-cyan-400/70 transition-all duration-500 hover:scale-105 group shadow-2xl">
+            {/* Plano Pro - Mais Popular */}
+            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-6 border-2 border-cyan-400/50 hover:border-cyan-400/70 transition-all duration-500 hover:scale-105 group shadow-2xl">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/15 to-purple-500/10 rounded-3xl"></div>
               
               {/* Badge "Mais Popular" */}
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-2 rounded-full border border-cyan-300">
-                  <span className="text-black font-bold text-sm flex items-center">
-                    <Crown className="h-4 w-4 mr-2" />
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <div className="bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-1 rounded-full border border-cyan-300">
+                  <span className="text-black font-bold text-xs flex items-center">
+                    <Crown className="h-3 w-3 mr-1" />
                     MAIS POPULAR
                   </span>
                 </div>
               </div>
               
-              <div className="relative z-10 mt-4">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                    <Rocket className="h-8 w-8 text-white" />
+              <div className="relative z-10 mt-2">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <Rocket className="h-6 w-6 text-white" />
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold text-center mb-2">Profissional</h3>
-                <p className="text-cyan-200 text-center mb-6">Para locadoras em crescimento</p>
+                <h3 className="text-xl font-bold text-center mb-2">Pro</h3>
+                <p className="text-cyan-200 text-center mb-4 text-sm">Para locadoras em crescimento</p>
                 
-                <div className="text-center mb-8">
-                  <div className="text-4xl font-bold mb-2">R$ 99<span className="text-lg font-normal">/mês</span></div>
-                  <div className="text-cyan-300">Até 20 veículos</div>
+                <div className="text-center mb-6">
+                  <div className="text-3xl font-bold mb-2">R$ 99<span className="text-sm font-normal">/mês</span></div>
+                  <div className="text-cyan-300 text-sm">Até 20 veículos</div>
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-2 mb-6 text-sm">
                   {[
                     "Até 20 veículos na frota",
                     "Gestão completa de motoristas",
-                    "Contratos automáticos profissionais",
-                    "Controle de pagamentos",
-                    "Controle de infrações e multas",
-                    "Controle financeiro com lucros/perdas reais",
-                    "Controle de manutenções",
-                    "Upload de documentos"
+                    "Contratos automáticos",
+                    "Controle de pagamentos", 
+                    "Controle financeiro real"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
-                      <CheckCircle className="h-5 w-5 text-cyan-400 mr-3 flex-shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-cyan-400 mr-2 flex-shrink-0" />
                       <span className="text-cyan-100">{feature}</span>
                     </li>
                   ))}
@@ -678,44 +672,41 @@ export default function Home() {
 
                 <Button 
                   onClick={handleDemo}
-                  className="w-full bg-gradient-to-r from-cyan-400 to-purple-600 hover:from-cyan-300 hover:to-purple-500 text-black font-bold py-3 rounded-xl transition-all duration-300 group-hover:shadow-2xl"
+                  className="w-full bg-gradient-to-r from-cyan-400 to-purple-600 hover:from-cyan-300 hover:to-purple-500 text-black font-bold py-2 rounded-xl transition-all duration-300"
                 >
-                  Começar Teste Grátis
+                  Começar Teste
                 </Button>
               </div>
             </div>
 
-            {/* Plano Avançado */}
-            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-green-400/30 hover:border-green-400/50 transition-all duration-500 hover:scale-105 group">
+            {/* Plano Elite */}
+            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-green-400/30 hover:border-green-400/50 transition-all duration-500 hover:scale-105 group">
               <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent rounded-3xl"></div>
               <div className="relative z-10">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center">
-                    <Zap className="h-8 w-8 text-white" />
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                    <Zap className="h-6 w-6 text-white" />
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold text-center mb-2">Avançado</h3>
-                <p className="text-green-200 text-center mb-6">Para frotas médias</p>
+                <h3 className="text-xl font-bold text-center mb-2">Elite</h3>
+                <p className="text-green-200 text-center mb-4 text-sm">Para frotas médias</p>
                 
-                <div className="text-center mb-8">
-                  <div className="text-4xl font-bold mb-2">R$ 200<span className="text-lg font-normal">/mês</span></div>
-                  <div className="text-green-300">Até 50 veículos</div>
+                <div className="text-center mb-6">
+                  <div className="text-3xl font-bold mb-2">R$ 250<span className="text-sm font-normal">/mês</span></div>
+                  <div className="text-green-300 text-sm">Até 50 veículos</div>
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-2 mb-6 text-sm">
                   {[
                     "Até 50 veículos na frota",
                     "Gestão completa de motoristas",
-                    "Contratos automáticos profissionais",
+                    "Contratos automáticos",
                     "Controle de pagamentos",
-                    "Controle de infrações e multas",
-                    "Controle financeiro com lucros/perdas reais",
-                    "Controle de manutenções",
-                    "Upload de documentos"
+                    "Controle financeiro real"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
-                      <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-green-400 mr-2 flex-shrink-0" />
                       <span className="text-green-100">{feature}</span>
                     </li>
                   ))}
@@ -723,44 +714,41 @@ export default function Home() {
 
                 <Button 
                   onClick={handleDemo}
-                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-xl transition-all duration-300 group-hover:shadow-2xl"
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-xl transition-all duration-300"
                 >
-                  Começar Teste Grátis
+                  Começar Teste
                 </Button>
               </div>
             </div>
 
-            {/* Plano Master */}
-            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-purple-400/30 hover:border-purple-400/50 transition-all duration-500 hover:scale-105 group">
+            {/* Plano Prime */}
+            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-purple-400/30 hover:border-purple-400/50 transition-all duration-500 hover:scale-105 group">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-3xl"></div>
               <div className="relative z-10">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                    <Crown className="h-8 w-8 text-white" />
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <Crown className="h-6 w-6 text-white" />
                   </div>
                 </div>
                 
-                <h3 className="text-2xl font-bold text-center mb-2">Master</h3>
-                <p className="text-purple-200 text-center mb-6">Para grandes frotas</p>
+                <h3 className="text-xl font-bold text-center mb-2">Prime</h3>
+                <p className="text-purple-200 text-center mb-4 text-sm">Para grandes frotas</p>
                 
-                <div className="text-center mb-8">
-                  <div className="text-4xl font-bold mb-2">R$ 500<span className="text-lg font-normal">/mês</span></div>
-                  <div className="text-purple-300">Veículos ilimitados</div>
+                <div className="text-center mb-6">
+                  <div className="text-3xl font-bold mb-2">R$ 500<span className="text-sm font-normal">/mês</span></div>
+                  <div className="text-purple-300 text-sm">Até 100 veículos</div>
                 </div>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-2 mb-6 text-sm">
                   {[
-                    "Veículos ilimitados",
+                    "Até 100 veículos na frota",
                     "Gestão completa de motoristas",
-                    "Contratos automáticos profissionais",
+                    "Contratos automáticos",
                     "Controle de pagamentos",
-                    "Controle de infrações e multas",
-                    "Controle financeiro com lucros/perdas reais",
-                    "Controle de manutenções",
-                    "Suporte 24/7 e treinamento personalizado"
+                    "Suporte telefônico"
                   ].map((feature, index) => (
                     <li key={index} className="flex items-center">
-                      <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-purple-400 mr-2 flex-shrink-0" />
                       <span className="text-purple-100">{feature}</span>
                     </li>
                   ))}
@@ -768,9 +756,52 @@ export default function Home() {
 
                 <Button 
                   onClick={handleDemo}
-                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-3 rounded-xl transition-all duration-300 group-hover:shadow-2xl"
+                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-2 rounded-xl transition-all duration-300"
                 >
-                  Começar Teste Grátis
+                  Começar Teste
+                </Button>
+              </div>
+            </div>
+
+            {/* Plano Infinity */}
+            <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-pink-400/30 hover:border-pink-400/50 transition-all duration-500 hover:scale-105 group">
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-3xl"></div>
+              <div className="relative z-10">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <Star className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+                
+                <h3 className="text-xl font-bold text-center mb-2">Infinity</h3>
+                <p className="text-pink-200 text-center mb-4 text-sm">Para empresas premium</p>
+                
+                <div className="text-center mb-6">
+                  <div className="text-2xl font-bold mb-2">Preço a</div>
+                  <div className="text-2xl font-bold mb-2">consultar</div>
+                  <div className="text-pink-300 text-sm">Veículos ilimitados</div>
+                </div>
+
+                <ul className="space-y-2 mb-6 text-sm">
+                  {[
+                    "Veículos ilimitados",
+                    "Gestão completa premium",
+                    "Contratos automáticos",
+                    "Suporte VIP 24/7",
+                    "Treinamento exclusivo"
+                  ].map((feature, index) => (
+                    <li key={index} className="flex items-center">
+                      <CheckCircle className="h-4 w-4 text-pink-400 mr-2 flex-shrink-0" />
+                      <span className="text-pink-100">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button 
+                  onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white py-2 rounded-xl transition-all duration-300"
+                >
+                  Solicitar Orçamento
                 </Button>
               </div>
             </div>
