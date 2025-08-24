@@ -901,9 +901,9 @@ export function EditarVeiculoModal({
                 Documentos do Veículo
               </h3>
               
-              {/* Upload de documentos - sistema simples */}
-              <div className="flex items-center justify-between border rounded-lg p-3 bg-gray-50">
-                <span className="text-sm text-muted-foreground">Adicionar documentos:</span>
+              {/* Upload de documentos - alinhado */}
+              <div className="flex items-center justify-between p-2 border rounded bg-gray-50/50">
+                <span className="text-xs text-muted-foreground">Documentos:</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="file"
@@ -960,14 +960,16 @@ export function EditarVeiculoModal({
                     variant="outline"
                     size="sm"
                     onClick={() => document.getElementById('documento-upload-edit')?.click()}
-                    className="text-xs"
+                    className="text-xs h-7 px-3 bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                   >
                     <Upload className="w-3 h-3 mr-1" />
                     Adicionar
                   </Button>
-                  <span className="text-xs text-muted-foreground">
-                    PDF, imagens até 10MB
-                  </span>
+                  {veiculo?.documentos && veiculo.documentos.length > 0 && (
+                    <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
+                      {veiculo.documentos.length} arquivo(s)
+                    </span>
+                  )}
                 </div>
               </div>
 
