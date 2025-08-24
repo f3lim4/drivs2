@@ -1081,10 +1081,10 @@ export function NovoVeiculoModal({
               )}
             </div>
 
-            {/* Upload de documentos - compacto */}
-            <div className="flex items-center gap-3 p-2 border rounded bg-gray-50/50">
-              <span className="text-xs text-muted-foreground min-w-fit">Documentos:</span>
-              <div className="flex items-center gap-2 flex-1">
+            {/* Upload de documentos - alinhado */}
+            <div className="flex items-center justify-between p-2 border rounded bg-gray-50/50">
+              <span className="text-xs text-muted-foreground">Documentos:</span>
+              <div className="flex items-center gap-2">
                 <ObjectUploader
                   maxNumberOfFiles={3}
                   maxFileSize={5242880} // 5MB
@@ -1119,13 +1119,13 @@ export function NovoVeiculoModal({
                       });
                     }
                   }}
-                  buttonClassName="text-xs h-7 px-2"
+                  buttonClassName="text-xs h-7 px-3 bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Upload className="w-3 h-3 mr-1" />
                   Adicionar
                 </ObjectUploader>
                 {form.watch('documentos') && form.watch('documentos').length > 0 && (
-                  <span className="text-xs text-green-600 font-medium">
+                  <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
                     {form.watch('documentos').length} arquivo(s)
                   </span>
                 )}
