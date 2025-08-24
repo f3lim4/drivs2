@@ -33,7 +33,7 @@ export function ExcluirVeiculoDialog({
   const [confirmationText, setConfirmationText] = useState('');
   
   const handleConfirmar = () => {
-    if (veiculo && confirmationText.toLowerCase() === 'excluir') {
+    if (veiculo && confirmationText.toLowerCase() === 'tenho certeza que quero excluir este contrato') {
       onConfirmarExclusao(veiculo);
       onOpenChange(false);
       setConfirmationText(''); // Limpar o campo após confirmação
@@ -65,13 +65,13 @@ export function ExcluirVeiculoDialog({
         
         <div className="space-y-2">
           <Label htmlFor="confirmation">
-            Para confirmar, digite <strong>"excluir"</strong> abaixo:
+            Para confirmar, digite <strong>"Tenho certeza que quero excluir este contrato"</strong> abaixo:
           </Label>
           <Input
             id="confirmation"
             value={confirmationText}
             onChange={(e) => setConfirmationText(e.target.value)}
-            placeholder="Digite 'excluir' para confirmar"
+            placeholder="Digite 'Tenho certeza que quero excluir este contrato' para confirmar"
             className="w-full"
             data-testid="input-confirm-delete"
           />
@@ -81,7 +81,7 @@ export function ExcluirVeiculoDialog({
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
           <AlertDialogAction 
             onClick={handleConfirmar}
-            disabled={confirmationText.toLowerCase() !== 'excluir'}
+            disabled={confirmationText.toLowerCase() !== 'tenho certeza que quero excluir este contrato'}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed"
             data-testid="button-confirm-delete"
           >
