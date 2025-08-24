@@ -12,8 +12,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Check, Crown, Star, Zap, Car, TrendingUp, HeadphonesIcon, Rocket } from 'lucide-react';
+import { Check, Crown, Star, Zap, Car, TrendingUp, HeadphonesIcon, Rocket, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import useEmblaCarousel from 'embla-carousel-react';
 
 interface PlanoFeature {
   nome: string;
@@ -328,7 +329,9 @@ export default function PlanosLocadora() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-5 gap-6">
+          {/* Carrossel de Planos - Responsivo */}
+          <div className="hidden lg:grid lg:grid-cols-5 gap-6">
+            {/* Versão Desktop - Grid Completo */}
             {/* Coluna de Features */}
             <div className="space-y-4">
               <div className="h-16 flex items-center">
@@ -399,6 +402,9 @@ export default function PlanosLocadora() {
               </div>
             ))}
           </div>
+          
+          {/* Carrossel Mobile/Tablet */}
+          <PlanoCarousel planosInfo={planosInfo} planosFeatures={planosFeatures} planoAtual={planoAtual} handleSolicitarMudanca={handleSolicitarMudanca} solicitando={solicitando} />
         </CardContent>
       </Card>
 
@@ -484,6 +490,153 @@ export default function PlanosLocadora() {
           }}
         />
       )}
+    </div>
+  );
+}
+
+// Componente de Carrossel para Mobile/Tablet
+function PlanoCarousel({ 
+  planosInfo, 
+  planosFeatures, 
+  planoAtual, 
+  handleSolicitarMudanca, 
+  solicitando 
+}: {
+  planosInfo: any;
+  planosFeatures: PlanoFeature[];
+  planoAtual: string | undefined;
+  handleSolicitarMudanca: (plano: string) => void;
+  solicitando: boolean;
+}) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    slidesToScroll: 1,
+    breakpoints: {
+      '(min-width: 768px)': { slidesToScroll: 2 },
+      '(min-width: 1024px)': { slidesToScroll: 3 }
+    }
+  });
+
+  const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
+  const scrollNext = () => emblaApi && emblaApi.scrollNext();
+
+  return (
+    <div className="lg:hidden">
+      {/* Controles do Carrossel */}
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">Planos Disponíveis</h3>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={scrollPrev}
+            className="h-8 w-8 p-0"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={scrollNext}
+            className="h-8 w-8 p-0"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Carrossel */}
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {Object.entries(planosInfo).map(([key, plano]) => {
+            const Icone = plano.icone;
+            return (
+              <div key={key} className="flex-[0_0_85%] sm:flex-[0_0_60%] md:flex-[0_0_45%] mr-4">
+                <Card className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500' : ''}`}>
+                  <CardHeader className="text-center relative">
+                    {plano.popular && (
+                      <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-cyan-500 text-white">
+                        Mais Popular
+                      </Badge>
+                    )}
+                    <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center ${plano.cor}`}>
+                      <Icone className="h-6 w-6 text-white" />
+                    </div>
+                    <CardTitle className="text-xl">{plano.nome}</CardTitle>
+                    <CardDescription className="text-sm">
+                      {(plano as any).consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
+                    </CardDescription>
+                    <p className="text-xs text-muted-foreground mt-1">{plano.descricao}</p>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Features do Plano */}
+                    <div className="space-y-2 mb-6">
+                      {planosFeatures.slice(0, 6).map((feature, index) => (
+                        <div key={index} className="flex items-center gap-2 text-sm">
+                          {typeof feature[key as keyof PlanoFeature] === 'boolean' ? (
+                            feature[key as keyof PlanoFeature] ? (
+                              <>
+                                <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                                <span>{feature.nome}</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="h-4 w-4 text-muted-foreground flex-shrink-0">—</span>
+                                <span className="text-muted-foreground">{feature.nome}</span>
+                              </>
+                            )
+                          ) : (
+                            <>
+                              <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                              <span>{feature.nome}: <strong>{feature[key as keyof PlanoFeature]}</strong></span>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Botão de Ação */}
+                    <div className="mt-auto">
+                      {planoAtual === key ? (
+                        <Button disabled className="w-full">
+                          Plano Atual
+                        </Button>
+                      ) : (plano as any).consultar ? (
+                        <Button
+                          onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
+                          className="w-full"
+                          variant="outline"
+                        >
+                          Solicitar Orçamento
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => handleSolicitarMudanca(key)}
+                          disabled={solicitando}
+                          className="w-full"
+                          variant={plano.popular ? "default" : "outline"}
+                        >
+                          {solicitando ? "Processando..." : "Mudar Plano"}
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Indicadores */}
+      <div className="flex justify-center gap-2 mt-4">
+        {Object.keys(planosInfo).map((_, index) => (
+          <div
+            key={index}
+            className="w-2 h-2 rounded-full bg-muted-foreground/30"
+          />
+        ))}
+      </div>
     </div>
   );
 }
