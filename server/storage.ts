@@ -881,7 +881,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deletePagamento(id: string): Promise<void> {
-    await db.delete(pagamentos).where(eq(pagamentos.id, id));
+    try {
+      console.log(`[STORAGE] Iniciando exclusão do pagamento: ${id}`);
+      
+      const result = await db.delete(pagamentos).where(eq(pagamentos.id, id));
+      
+      console.log(`[STORAGE] Pagamento excluído do banco, resultado:`, result);
+    } catch (error) {
+      console.error(`[STORAGE] Erro ao excluir pagamento ${id}:`, error);
+      throw error;
+    }
   }
 
   async getAluguelValorSemanal(aluguelId: string): Promise<number | undefined> {
