@@ -474,6 +474,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (locadoraId) {
         const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
         
+        // Debug: Verificar documentos dos veículos
+        veiculos.forEach(v => {
+          if (v.documentos && v.documentos.length > 0) {
+            console.log(`[DEBUG VEICULOS] Veículo ${v.id} tem ${v.documentos.length} documentos:`, v.documentos);
+          }
+        });
+        
         // SECURITY: Validar que todos os veículos pertencem à locadora solicitada
         const todosVeiculosCorretos = veiculos.every(v => v.locadoraId === locadoraId);
         if (!todosVeiculosCorretos) {
@@ -481,6 +488,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(403).json({ message: "Acesso negado: dados inconsistentes" });
         }
         
+        // Forçar headers sem cache para debug
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         res.json(veiculos);
       } else {
         const veiculos = await storage.getAllVeiculos();
