@@ -140,13 +140,13 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Valor Semanal</p>
                   <p className="text-sm font-medium text-green-600">
-                    {formatCurrency(veiculo.valorDiario)}/sem
+                    {formatCurrency(veiculo.valorSemanal)}/sem
                   </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Caução</p>
                   <p className="text-sm font-medium">
-                    {formatCurrency(veiculo.valorCaucao)}
+                    {formatCurrency(veiculo.caucao)}
                   </p>
                 </div>
               </div>
@@ -154,7 +154,7 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
                 <p className="text-sm font-medium text-muted-foreground">Limite de KM</p>
                 <p className="text-sm flex items-center gap-1">
                   <Gauge className="w-3 h-3" />
-                  {veiculo.kmLimite}
+                  {veiculo.limiteQuilometragem}
                 </p>
               </div>
             </CardContent>
