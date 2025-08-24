@@ -109,7 +109,13 @@ export function ObjectUploader({
 
   return (
     <div>
-      <Button onClick={() => setShowModal(true)} className={buttonClassName}>
+      <Button 
+        onClick={() => {
+          console.log('[OBJECT_UPLOADER] Botão clicado, abrindo modal...');
+          setShowModal(true);
+        }} 
+        className={buttonClassName}
+      >
         {children}
       </Button>
 
