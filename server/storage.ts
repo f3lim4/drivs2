@@ -736,25 +736,19 @@ export class DatabaseStorage implements IStorage {
             }
           }
           
-          // Se motorista foi excluído, pular este pagamento
-          if (!motorista[0]) {
-            return null;
-          }
-          
           return {
             ...pagamento,
             data: pagamento.dataPagamento, // Mapear campo data corretamente
             valor: pagamento.valorPago, // Mapear campo valor corretamente
-            motoristaNome: motorista[0].nome,
-            motoristaContato: motorista[0].telefone || '',
+            motoristaNome: motorista[0] ? motorista[0].nome : `${pagamento.motoristaId} - Excluído`,
+            motoristaContato: motorista[0]?.telefone || '',
             // Adicionar dados do veículo
             ...veiculoData
           };
         })
       );
       
-      // Filtrar pagamentos nulos (motoristas excluídos)
-      return pagamentosEnriquecidos.filter(p => p !== null);
+      return pagamentosEnriquecidos;
     } catch (error) {
       console.error('Error in getPagamentosByLocadora:', error);
       return [];
@@ -770,7 +764,7 @@ export class DatabaseStorage implements IStorage {
       
       return result.map(pagamento => ({
         ...pagamento,
-        motoristaNome: motorista[0]?.nome || 'Motorista Excluído',
+        motoristaNome: motorista[0] ? motorista[0].nome : `${pagamento.motoristaId} - Excluído`,
         motoristaContato: motorista[0]?.telefone || ''
       }));
     } catch (error) {
@@ -794,7 +788,7 @@ export class DatabaseStorage implements IStorage {
       
       return {
         ...pagamento,
-        motoristaNome: motorista[0]?.nome || 'Motorista Excluído',
+        motoristaNome: motorista[0] ? motorista[0].nome : `${pagamento.motoristaId} - Excluído`,
         motoristaContato: motorista[0]?.telefone || ''
       };
     } catch (error) {
