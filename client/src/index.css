@@ -266,3 +266,30 @@
     color: hsl(var(--sidebar-accent-foreground));
   }
 }
+
+/* Notificações toast mais compactas */
+[data-sonner-toast] {
+  padding: 6px 10px !important;
+  min-height: 36px !important;
+  height: auto !important;
+  margin: 2px 0 !important;
+}
+
+[data-sonner-toast] [data-title] {
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
+}
+
+[data-sonner-toast] [data-description] {
+  font-size: 12px !important;
+  line-height: 1.1 !important;
+  margin: 1px 0 0 0 !important;
+  opacity: 0.8;
+}
+
+/* Container do toaster com menos espaçamento */
+[data-sonner-toaster] {
+  gap: 4px !important;
+}
