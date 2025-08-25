@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
-import { User, Phone, Mail, Calendar, CreditCard, FileText, Image, Upload, X } from 'lucide-react';
+import { User, Phone, Mail, Calendar, CreditCard, FileText, Image, Upload, X, Download } from 'lucide-react';
 import { Motorista } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -341,10 +341,49 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                           e.currentTarget.style.display = 'none';
                         }}
                       />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded-lg flex items-center justify-center">
-                        <span className="text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                          Clique para ampliar
-                        </span>
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(imagemUrl, '_blank');
+                          }}
+                        >
+                          <Image className="w-3 h-3 mr-1" />
+                          Ver
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              const response = await fetch(imagemUrl);
+                              const blob = await response.blob();
+                              const url = window.URL.createObjectURL(blob);
+                              const link = document.createElement('a');
+                              link.href = url;
+                              link.download = `motorista-${motorista.nome}-imagem-${index + 1}.jpg`;
+                              document.body.appendChild(link);
+                              link.click();
+                              document.body.removeChild(link);
+                              window.URL.revokeObjectURL(url);
+                            } catch (error) {
+                              console.error('Erro ao baixar imagem:', error);
+                              toast({
+                                title: "Erro ao baixar",
+                                description: "Não foi possível baixar a imagem",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                        >
+                          <Download className="w-3 h-3 mr-1" />
+                          Baixar
+                        </Button>
                       </div>
                       {/* Botão de excluir (apenas para locadoras) */}
                       {isLocadora && (
