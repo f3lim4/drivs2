@@ -48,9 +48,28 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Car className="w-5 h-5" />
-            {veiculo.modelo} - {veiculo.placa}
+          <DialogTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Car className="w-5 h-5" />
+              {veiculo.modelo} - {veiculo.placa}
+            </div>
+            {/* Botão Download Documento no Topo */}
+            {(() => {
+              const documentos = veiculo.documentos;
+              const documentoAtual = documentos && documentos.length > 0 ? documentos[documentos.length - 1] : null;
+              
+              return documentoAtual ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(documentoAtual, '_blank')}
+                  className="gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Baixar Documento
+                </Button>
+              ) : null;
+            })()}
           </DialogTitle>
           <DialogDescription>
             Detalhes completos do veículo
@@ -212,48 +231,6 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
             </Card>
           )}
 
-          {/* Documentos do Veículo - Compacto */}
-          {(() => {
-            const documentos = veiculo.documentos;
-            // Mostrar apenas o último documento (sistema de documento único)
-            const documentoAtual = documentos && documentos.length > 0 ? [documentos[documentos.length - 1]] : [];
-            
-            return (
-              <Card className="border-gray-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
-                      Documentos
-                    </div>
-                    {documentoAtual.length > 0 && (
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                        1
-                      </span>
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  {documentoAtual.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">Nenhum documento</p>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(documentoAtual[0], '_blank')}
-                        className="h-8 text-xs gap-1"
-                      >
-                        <FileText className="w-3 h-3" />
-                        Documento
-                        <Download className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })()}
         </div>
 
         <DialogFooter>
