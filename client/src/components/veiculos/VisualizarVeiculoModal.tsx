@@ -25,6 +25,18 @@ interface VisualizarVeiculoModalProps {
 }
 
 export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: VisualizarVeiculoModalProps) {
+  // Buscar documentos da nova tabela
+  const { data: documentosVeiculo = [] } = useQuery({
+    queryKey: ['veiculos', veiculo?.id, 'documentos'],
+    queryFn: async () => {
+      if (!veiculo?.id) return [];
+      const response = await fetch(`/api/veiculos/${veiculo.id}/documentos`);
+      if (!response.ok) return [];
+      return await response.json();
+    },
+    enabled: !!veiculo?.id && open
+  });
+
   if (!veiculo) return null;
 
   const getStatusBadge = (status: string) => {
@@ -58,18 +70,7 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
               Detalhes completos do veículo
             </DialogDescription>
             {/* Botão Download Documento */}
-            {veiculo && (() => {
-              // eslint-disable-next-line react-hooks/rules-of-hooks
-              const { data: documentosVeiculo = [] } = useQuery({
-                queryKey: ['veiculos', veiculo.id, 'documentos'],
-                queryFn: async () => {
-                  const response = await fetch(`/api/veiculos/${veiculo.id}/documentos`);
-                  if (!response.ok) return [];
-                  return await response.json();
-                },
-                enabled: !!veiculo.id
-              });
-              
+            {(() => {
               const documentoAtual = documentosVeiculo.length > 0 ? documentosVeiculo[documentosVeiculo.length - 1] : null;
               
               return documentoAtual ? (
