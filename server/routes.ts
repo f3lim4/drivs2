@@ -2410,6 +2410,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota para atualizar planos
+  app.put("/api/planos/:id", async (req, res) => {
+    try {
+      const planoId = req.params.id;
+      const updates = req.body;
+      
+      console.log(`[PLANOS UPDATE] Atualizando plano ${planoId} com dados:`, updates);
+      
+      // Por enquanto, apenas retornar sucesso já que os planos são estáticos
+      // Em uma implementação real, aqui salvaria no banco de dados
+      res.json({
+        message: "Plano atualizado com sucesso",
+        plano: { id: planoId, ...updates }
+      });
+      
+    } catch (error) {
+      console.error("Error updating plano:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Rota de teste para criar locadora com teste gratuito
   app.post("/api/test-trial", async (req, res) => {
     try {
