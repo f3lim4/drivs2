@@ -153,6 +153,10 @@ export function EditarVeiculoModal({
   // Preenche o formulário quando o veículo é selecionado
   useEffect(() => {
     if (veiculo && open) {
+      // Limpar estado do upload ao abrir modal
+      setUploadedFileName(null);
+      setDocumentUploading(false);
+      
       form.reset({
         placa: veiculo.placa,
         marca: veiculo.marca,
