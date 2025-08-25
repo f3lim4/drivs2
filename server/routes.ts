@@ -4,8 +4,9 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { testConnection, db } from "./db";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, updateContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, insertTemplateContratoSchema, insertSeoConfigSchema, insertDashboardConfigSchema, contratos, dashboardConfig } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, updateContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, insertTemplateContratoSchema, insertSeoConfigSchema, insertDashboardConfigSchema, linksUteis, insertLinkUtilSchema, contratos, dashboardConfig } from "@shared/schema";
+import { eq, sql } from "drizzle-orm";
+import { z } from "zod";
 import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
@@ -2171,6 +2172,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(config[0]);
     } catch (error) {
       console.error('Erro ao buscar configuração do dashboard:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Links Úteis Routes - Dinâmicos para dashboard
+  app.get('/api/links-uteis', async (req, res) => {
+    try {
+      const links = await db.select().from(linksUteis).orderBy(linksUteis.ordem, linksUteis.id);
+      res.json(links);
+    } catch (error) {
+      console.error('Erro ao buscar links úteis:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  app.get('/api/links-uteis/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const link = await db.select().from(linksUteis).where(eq(linksUteis.id, id)).limit(1);
+      
+      if (link.length === 0) {
+        return res.status(404).json({ error: 'Link não encontrado' });
+      }
+      
+      res.json(link[0]);
+    } catch (error) {
+      console.error('Erro ao buscar link útil:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  app.post('/api/links-uteis', async (req, res) => {
+    try {
+      const data = insertLinkUtilSchema.parse(req.body);
+      
+      // Se não foi fornecida uma ordem, usar a próxima disponível
+      if (!data.ordem) {
+        const maxOrdem = await db.select({ max: sql`MAX(ordem)` }).from(linksUteis);
+        data.ordem = (maxOrdem[0]?.max || 0) + 1;
+      }
+      
+      const newLink = await db.insert(linksUteis).values(data).returning();
+      res.json(newLink[0]);
+    } catch (error) {
+      console.error('Erro ao criar link útil:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Dados inválidos', details: error.errors });
+      }
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  app.put('/api/links-uteis/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = insertLinkUtilSchema.partial().parse(req.body);
+      
+      const updatedLink = await db
+        .update(linksUteis)
+        .set({
+          ...data,
+          updatedAt: new Date()
+        })
+        .where(eq(linksUteis.id, id))
+        .returning();
+      
+      if (updatedLink.length === 0) {
+        return res.status(404).json({ error: 'Link não encontrado' });
+      }
+      
+      res.json(updatedLink[0]);
+    } catch (error) {
+      console.error('Erro ao atualizar link útil:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Dados inválidos', details: error.errors });
+      }
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  app.delete('/api/links-uteis/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      const deletedLink = await db
+        .delete(linksUteis)
+        .where(eq(linksUteis.id, id))
+        .returning();
+      
+      if (deletedLink.length === 0) {
+        return res.status(404).json({ error: 'Link não encontrado' });
+      }
+      
+      res.json({ message: 'Link removido com sucesso' });
+    } catch (error) {
+      console.error('Erro ao remover link útil:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });
