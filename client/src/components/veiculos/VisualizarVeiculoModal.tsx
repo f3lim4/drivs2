@@ -69,20 +69,49 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
             <DialogDescription>
               Detalhes completos do veículo
             </DialogDescription>
-            {/* Botão Download Documento */}
+            {/* Botões Documento */}
             {(() => {
               const documentoAtual = documentosVeiculo.length > 0 ? documentosVeiculo[documentosVeiculo.length - 1] : null;
               
               return documentoAtual ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.open(documentoAtual.url, '_blank')}
-                  className="gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  {documentoAtual.nomeOriginal || 'Baixar Documento'}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // Verificar se é PDF para visualizar inline, senão abre em nova aba
+                      const url = documentoAtual.url;
+                      if (documentoAtual.nomeOriginal?.toLowerCase().endsWith('.pdf')) {
+                        window.open(url, '_blank');
+                      } else {
+                        // Para imagens, abrir em nova aba para visualização
+                        window.open(url, '_blank');
+                      }
+                    }}
+                    className="gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Visualizar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // Forçar download criando um link temporário
+                      const link = document.createElement('a');
+                      link.href = documentoAtual.url;
+                      link.download = documentoAtual.nomeOriginal || 'documento';
+                      link.target = '_blank';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    className="gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Baixar
+                  </Button>
+                </div>
               ) : null;
             })()}
           </div>
