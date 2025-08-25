@@ -488,11 +488,11 @@ export default function Motoristas() {
             <TableHeader>
               <TableRow>
                 <TableHead>MOTORISTA</TableHead>
-                {showAllColumns && isAdmin && <TableHead>LOCADORA</TableHead>}
-                {showAllColumns && <TableHead>CPF</TableHead>}
-                {showAllColumns && <TableHead>CNH</TableHead>}
-                {showAllColumns && <TableHead>CONTATO</TableHead>}
-                {showAllColumns && <TableHead>VENCIMENTO CNH / STATUS</TableHead>}
+                {isAdmin && <TableHead>LOCADORA</TableHead>}
+                <TableHead>CPF</TableHead>
+                <TableHead>CNH</TableHead>
+                <TableHead>CONTATO</TableHead>
+                <TableHead>VENCIMENTO CNH / STATUS</TableHead>
                 <TableHead>AÇÕES</TableHead>
               </TableRow>
             </TableHeader>
@@ -529,47 +529,59 @@ export default function Motoristas() {
                       </div>
                     </div>
                   </TableCell>
-                  {showAllColumns && isAdmin && (
+                  {isAdmin && (
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
-                          <span className="text-blue-600 text-xs font-medium">
-                            {(getLocadoraName(motorista.locadoraId) || 'L').substring(0, 2).toUpperCase()}
-                          </span>
+                      {showAllColumns ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
+                            <span className="text-blue-600 text-xs font-medium">
+                              {(getLocadoraName(motorista.locadoraId) || 'L').substring(0, 2).toUpperCase()}
+                            </span>
+                          </div>
+                          <span className="text-sm">{getLocadoraName(motorista.locadoraId)}</span>
                         </div>
-                        <span className="text-sm">{getLocadoraName(motorista.locadoraId)}</span>
-                      </div>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
                     </TableCell>
                   )}
-                  {showAllColumns && (
-                    <TableCell>
+                  <TableCell>
+                    {showAllColumns ? (
                       <div>
                         <p>{motorista.cpf}</p>
                         <p className="text-sm text-muted-foreground">RG: {motorista.cpf.slice(0, 9)}</p>
                       </div>
-                    </TableCell>
-                  )}
-                  {showAllColumns && (
-                    <TableCell>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {showAllColumns ? (
                       <div>
                         <p>{motorista.cnh}</p>
                         <p className="text-sm text-muted-foreground">{motorista.categoria}</p>
                       </div>
-                    </TableCell>
-                  )}
-                  {showAllColumns && (
-                    <TableCell>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {showAllColumns ? (
                       <p>{motorista.telefone || motorista.contato}</p>
-                    </TableCell>
-                  )}
-                  {showAllColumns && (
-                    <TableCell>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {showAllColumns ? (
                       <div className="space-y-1">
                         <p className="text-sm">{motorista.vencimentoCnh}</p>
                         {getCnhStatusBadge(motorista)}
                       </div>
-                    </TableCell>
-                  )}
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
                   {isLocadora && (
                     <TableCell>
                       <div className="flex items-center gap-2">
