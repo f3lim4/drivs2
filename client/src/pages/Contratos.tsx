@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Plus, Upload, FileText, Download, Eye, Edit, Trash2, Filter, Search, X, TrendingUp, DollarSign, Calendar, Users, CheckCircle } from 'lucide-react';
+import { Plus, Upload, FileText, Download, Eye, EyeOff, Edit, Trash2, Filter, Search, X, TrendingUp, DollarSign, Calendar, Users, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useContratos } from '@/hooks/useContratos';
@@ -74,6 +74,7 @@ export default function Contratos() {
   const [sortOrder, setSortOrder] = useState<string>('mais-novos');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showAllColumns, setShowAllColumns] = useState(true);
 
   const handleContratoGerado = (novoContrato: Contrato) => {
     // O contrato já foi criado no modal, só precisamos mostrar o toast de sucesso
@@ -551,7 +552,22 @@ export default function Contratos() {
           ) : (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Contratos Gerados ({contratosFiltrados.length})</CardTitle>
+                <div className="flex items-center gap-3">
+                  <CardTitle>Contratos Gerados ({contratosFiltrados.length})</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowAllColumns(!showAllColumns)}
+                    title={showAllColumns ? "Esconder colunas extras" : "Mostrar todas as colunas"}
+                    data-testid="button-toggle-columns"
+                  >
+                    {showAllColumns ? (
+                      <Eye className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <EyeOff className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
                 
                 <div className="flex items-center gap-2">
                   {/* Ordenação */}
@@ -592,37 +608,53 @@ export default function Contratos() {
                           )}
                         </TableCell>
                         <TableCell>
-                          {contrato.veiculoPlaca ? (
-                            <div>
-                              <p className="font-medium">{contrato.veiculoPlaca}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {contrato.veiculoMarca} {contrato.veiculoModelo}
-                              </p>
-                            </div>
+                          {showAllColumns ? (
+                            contrato.veiculoPlaca ? (
+                              <div>
+                                <p className="font-medium">{contrato.veiculoPlaca}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {contrato.veiculoMarca} {contrato.veiculoModelo}
+                                </p>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">N/A</span>
+                            )
                           ) : (
-                            <span className="text-muted-foreground">N/A</span>
+                            <span className="text-muted-foreground">-</span>
                           )}
                         </TableCell>
                         <TableCell>
-                          <p>{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
-                        </TableCell>
-                        <TableCell>
-                          {getStatusBadge(contrato.status)}
-                        </TableCell>
-                        <TableCell>
-                          {contrato.arquivoAssinado ? (
-                            <Badge variant="secondary" className="bg-green-100 text-green-800">
-                              Enviado
-                            </Badge>
+                          {showAllColumns ? (
+                            <p>{new Date(contrato.dataInicio).toLocaleDateString('pt-BR')}</p>
                           ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleUploadContrato(contrato)}
-                              className="h-7 text-xs"
-                            >
-                              Enviar
-                            </Button>
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {showAllColumns ? (
+                            getStatusBadge(contrato.status)
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {showAllColumns ? (
+                            contrato.arquivoAssinado ? (
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                Enviado
+                              </Badge>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleUploadContrato(contrato)}
+                                className="h-7 text-xs"
+                              >
+                                Enviar
+                              </Button>
+                            )
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
                           )}
                         </TableCell>
                         <TableCell>
