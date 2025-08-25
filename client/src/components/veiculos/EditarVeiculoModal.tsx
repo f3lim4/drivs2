@@ -253,10 +253,10 @@ export function EditarVeiculoModal({
       if (response.ok) {
         const result = await response.json();
         
-        // Atualizar o veículo localmente com o novo documento
+        // Atualizar o veículo localmente com todos os documentos retornados do backend
         const veiculoAtualizado = {
           ...veiculo,
-          documentos: [result.objectPath]
+          documentos: result.documentos || [result.objectPath] // Usar array completo do backend
         };
         onVeiculoEditado(veiculoAtualizado);
         
