@@ -179,31 +179,31 @@ export class DatabaseStorage implements IStorage {
   // Função para sincronizar status dos veículos com aluguéis ativos
   private async syncVeiculosStatus(): Promise<void> {
     try {
-      // Atualizar veículos para 'disponivel' que não têm aluguel ativo
+      // Atualizar veículos para 'disponivel' que não têm contrato ativo
       await db.execute(sql`
         UPDATE veiculos 
         SET status = 'disponivel' 
         WHERE status = 'alugado' 
         AND id NOT IN (
           SELECT DISTINCT veiculo_id 
-          FROM alugueis 
+          FROM contratos 
           WHERE status = 'ativo'
         )
       `);
 
-      // Atualizar veículos para 'alugado' que têm aluguel ativo
+      // Atualizar veículos para 'alugado' que têm contrato ativo
       await db.execute(sql`
         UPDATE veiculos 
         SET status = 'alugado' 
         WHERE status = 'disponivel' 
         AND id IN (
           SELECT DISTINCT veiculo_id 
-          FROM alugueis 
+          FROM contratos 
           WHERE status = 'ativo'
         )
       `);
 
-      console.log('[STATUS SYNC] Status dos veículos sincronizado com aluguéis');
+      console.log('[STATUS SYNC] Status dos veículos sincronizado com contratos');
     } catch (error) {
       console.error('[STATUS SYNC] Erro ao sincronizar status:', error);
     }
