@@ -24,7 +24,7 @@ DRIVS is built with a full-stack architecture prioritizing scalability, security
 - **Monitoring**: Administrative dashboard provides real-time metrics on system status, performance, and rental company data.
 
 ### Core System Features
-- **Driver Management**: Registration, validation (CPF, CNH, age), and document management with specific uploads. Dynamic profile photos and icons.
+- **Driver Management**: Registration, validation (CPF, CNH, age), and document management with specific uploads. Dynamic profile photos and icons. **Image upload system fully functional** - supports upload during registration and editing, with proper display in visualization modal using API format conversion from `documentos` object to image arrays.
 - **Vehicle Management**: Detailed registration (plate, make, model, year, color, category), automatic status (available/rented), automatic calculation of fixed expenses (IPVA, insurance, tracker, financing). Dynamic icon colors based on vehicle color. Complete document management system with upload/download capabilities for vehicle documents stored in cloud object storage.
 - **Rental and Contract Management**:
     - Contract creation with available drivers and vehicles.
@@ -52,6 +52,7 @@ DRIVS is built with a full-stack architecture prioritizing scalability, security
 - **Announcement System**: Display of critical announcements (warning, error) on the rental company dashboard and in the notification system, with colors and translations by type.
 - **Testing and Validations**: Advanced data validations (CPF, CNH, dates), and integrity checks to prevent inconsistent data.
 - **Pagination and Sorting**: Implemented in all tables and lists for improved usability and performance.
+- **Column Visibility Controls**: Eye icon controls implemented across all main data tables (drivers, vehicles, contracts) allowing users to hide/show table content while keeping headers and main entity columns always visible.
 - **Automatic Trial System**: All new registrations receive a 30-day free Pro plan (20 vehicles). The system automatically assigns the trial and displays its status and remaining days.
 
 ## External Dependencies
