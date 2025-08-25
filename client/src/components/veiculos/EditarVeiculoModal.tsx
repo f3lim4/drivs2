@@ -39,6 +39,7 @@ import { useToast } from '@/hooks/use-toast';
 import { registrarAtividade } from '@/utils/activityLogger';
 
 import { Upload, FileText, Download } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 // Schema de validação (mesmo do NovoVeiculoModal)
 const veiculoSchema = z.object({
@@ -237,6 +238,18 @@ export function EditarVeiculoModal({
 
   const categoriasDisponiveis = getCategoriasDisponiveis();
 
+  // Buscar documentos da nova tabela
+  const { data: documentosVeiculo = [] } = useQuery({
+    queryKey: ['veiculos', veiculo?.id, 'documentos'],
+    queryFn: async () => {
+      if (!veiculo?.id) return [];
+      const response = await fetch(`/api/veiculos/${veiculo.id}/documentos`);
+      if (!response.ok) return [];
+      return await response.json();
+    },
+    enabled: !!veiculo?.id && open
+  });
+
   // Função para lidar com upload de documentos
   const handleDocumentUpload = async (uploadURL: string, nomeOriginal?: string) => {
     if (!veiculo) return;
@@ -267,6 +280,9 @@ export function EditarVeiculoModal({
         // Invalidar cache de veículos para atualizar a lista (usando query key correta)
         await queryClient.invalidateQueries({ queryKey: ['veiculos'] });
         await queryClient.invalidateQueries({ queryKey: ['veiculos', veiculo.locadoraId] });
+        
+        // Invalidar query dos documentos para recarregar
+        await queryClient.invalidateQueries({ queryKey: ['veiculos', veiculo.id, 'documentos'] });
         
         toast({
           title: "Documento salvo",
@@ -990,13 +1006,13 @@ export function EditarVeiculoModal({
                         </span>
                       </div>
                     </>
-                  ) : veiculo?.documentos && veiculo.documentos.length > 0 ? (
+                  ) : documentosVeiculo.length > 0 ? (
                     <>
                       <FileText className="w-4 h-4 text-green-600" />
                       <div className="flex flex-col">
                         <span className="text-xs text-green-600 font-medium">Documento salvo</span>
                         <span className="text-xs text-gray-500 truncate max-w-[200px]">
-                          documento_veiculo.pdf
+                          {documentosVeiculo[documentosVeiculo.length - 1]?.nomeOriginal || 'documento.pdf'}
                         </span>
                       </div>
                     </>
@@ -1006,15 +1022,15 @@ export function EditarVeiculoModal({
                 </div>
                 <div className="flex items-center gap-2">
                   {/* Botão para visualizar documento existente */}
-                  {veiculo?.documentos && veiculo.documentos.length > 0 && (
+                  {documentosVeiculo.length > 0 && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const documentoAtual = veiculo.documentos[veiculo.documentos.length - 1];
-                        if (documentoAtual) {
-                          window.open(documentoAtual, '_blank');
+                        const documentoAtual = documentosVeiculo[documentosVeiculo.length - 1];
+                        if (documentoAtual?.url) {
+                          window.open(documentoAtual.url, '_blank');
                         }
                       }}
                       className="text-xs h-7 px-3"
@@ -1082,7 +1098,7 @@ export function EditarVeiculoModal({
                     className="text-xs h-7 px-3 bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                   >
                     <Upload className="w-3 h-3 mr-1" />
-                    {veiculo?.documentos && veiculo.documentos.length > 0 ? 'Substituir' : 'Adicionar'}
+                    {documentosVeiculo.length > 0 ? 'Substituir' : 'Adicionar'}
                   </Button>
                 </div>
               </div>
