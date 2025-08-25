@@ -2757,11 +2757,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Veículo não encontrado" });
       }
 
-      // Adicionar novo documento ao array existente
+      // Substituir documento existente (sistema de documento único)
       const documentosAtuais = veiculo.documentos || [];
-      const novosDocumentos = [...documentosAtuais, objectPath];
+      const novosDocumentos = [objectPath]; // Apenas 1 documento permitido
       
-      console.log(`[DOCUMENTO] Documentos atuais: ${documentosAtuais.length}, novos: ${novosDocumentos.length}`);
+      console.log(`[DOCUMENTO] Substituindo documento - Atuais: ${documentosAtuais.length}, novo: ${novosDocumentos.length}`);
 
       // Atualizar veículo com nova lista de documentos
       await storage.updateVeiculo(req.params.id, { documentos: novosDocumentos });
