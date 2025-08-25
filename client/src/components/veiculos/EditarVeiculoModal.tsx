@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -109,6 +110,7 @@ export function EditarVeiculoModal({
   const [loading, setLoading] = useState(false);
   const { profile } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<VeiculoFormData>({
     resolver: zodResolver(veiculoSchema),
@@ -247,12 +249,22 @@ export function EditarVeiculoModal({
       });
 
       if (response.ok) {
+        const result = await response.json();
+        
+        // Atualizar o veículo localmente com o novo documento
+        const veiculoAtualizado = {
+          ...veiculo,
+          documentos: [result.objectPath]
+        };
+        onVeiculoEditado(veiculoAtualizado);
+        
+        // Invalidar cache de veículos para atualizar a lista
+        await queryClient.invalidateQueries({ queryKey: ['/api/veiculos'] });
+        
         toast({
-          title: "Documento adicionado",
+          title: "Documento salvo",
           description: "O documento foi salvo com sucesso.",
         });
-        // Forçar recarregamento da página ou dos dados do veículo
-        window.location.reload();
       } else {
         throw new Error('Erro ao salvar documento');
       }
