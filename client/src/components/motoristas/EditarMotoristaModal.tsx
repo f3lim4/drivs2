@@ -1089,17 +1089,129 @@ export function EditarMotoristaModal({
                           </Button>
                         </div>
                         {imagePreviews.cnhImagem ? (
-                          <img 
-                            src={imagePreviews.cnhImagem} 
-                            alt="Preview" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
+                          <div className="relative group">
+                            <img 
+                              src={imagePreviews.cnhImagem} 
+                              alt="Preview" 
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.open(imagePreviews.cnhImagem!, '_blank');
+                                }}
+                              >
+                                <Eye className="w-2 h-2 mr-1" />
+                                Ver
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  try {
+                                    const response = await fetch(imagePreviews.cnhImagem!);
+                                    const blob = await response.blob();
+                                    const url = window.URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = `motorista-${motorista.nome}-cnh.jpg`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    window.URL.revokeObjectURL(url);
+                                  } catch (error) {
+                                    console.error('Erro ao baixar imagem:', error);
+                                    toast({
+                                      title: "Erro ao baixar",
+                                      description: "Não foi possível baixar a imagem",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                              >
+                                <Download className="w-2 h-2 mr-1" />
+                                Baixar
+                              </Button>
+                            </div>
+                          </div>
                         ) : (
                           <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded">
                             <FileText className="h-4 w-4 text-gray-400" />
                             <span className="text-xs text-gray-600 ml-1">PDF</span>
                           </div>
                         )}
+                      </div>
+                    ) : imagePreviews.cnhImagem ? (
+                      <div className="space-y-2">
+                        <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.cnhImagem} 
+                            alt="CNH atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.cnhImagem!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                  const response = await fetch(imagePreviews.cnhImagem!);
+                                  const blob = await response.blob();
+                                  const url = window.URL.createObjectURL(blob);
+                                  const link = document.createElement('a');
+                                  link.href = url;
+                                  link.download = `motorista-${motorista.nome}-cnh.jpg`;
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                  window.URL.revokeObjectURL(url);
+                                } catch (error) {
+                                  console.error('Erro ao baixar imagem:', error);
+                                  toast({
+                                    title: "Erro ao baixar",
+                                    description: "Não foi possível baixar a imagem",
+                                    variant: "destructive",
+                                  });
+                                }
+                              }}
+                            >
+                              <Download className="w-2 h-2 mr-1" />
+                              Baixar
+                            </Button>
+                          </div>
+                        </div>
+                        <label
+                          htmlFor="cnh-imagem"
+                          className="cursor-pointer flex flex-col items-center justify-center py-1"
+                        >
+                          <Upload className="h-4 w-4 text-blue-500" />
+                          <span className="text-xs text-blue-600">Substituir</span>
+                        </label>
                       </div>
                     ) : (
                       <label
