@@ -2,7 +2,8 @@
  * Modal para cadastrar nova locadora
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,6 +41,29 @@ interface NovaLocadoraModalProps {
 
 export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocadoraModalProps) {
   const { toast } = useToast();
+  
+  // Buscar planos da API
+  const { data: planosFromServer } = useQuery({
+    queryKey: ['/api/planos'],
+    retry: false
+  });
+  
+  // Converter dados do servidor para array se necessário
+  const planos = React.useMemo(() => {
+    if (!planosFromServer) return [];
+    
+    // Se planosFromServer é um objeto com propriedades de planos, converter para array
+    if (typeof planosFromServer === 'object' && !Array.isArray(planosFromServer)) {
+      return Object.values(planosFromServer).filter(plano => plano && typeof plano === 'object');
+    }
+    
+    // Se já é um array, usar diretamente
+    if (Array.isArray(planosFromServer)) {
+      return planosFromServer;
+    }
+    
+    return [];
+  }, [planosFromServer]);
   const [formData, setFormData] = useState({
     nome: '',
     cnpj: '',
@@ -180,10 +204,11 @@ export function NovaLocadoraModal({ open, onOpenChange, onSuccess }: NovaLocador
                   <SelectValue placeholder="Selecione o plano" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="basico">Básico - R$ 49/mês</SelectItem>
-                  <SelectItem value="profissional">Profissional - R$ 99/mês</SelectItem>
-                  <SelectItem value="avancado">Avançado - R$ 200/mês</SelectItem>
-                  <SelectItem value="master">Master - R$ 500/mês</SelectItem>
+                  {planos.map((plano: any) => (
+                    <SelectItem key={plano.id} value={plano.id}>
+                      {plano.nome} - R$ {plano.preco}/mês
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
