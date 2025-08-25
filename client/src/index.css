@@ -316,3 +316,31 @@
 [data-sonner-toast]:hover {
   opacity: 1 !important;
 }
+
+/* Configurações específicas para mobile */
+@media (max-width: 768px) {
+  [data-sonner-toaster] {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    top: 20px !important;
+    bottom: auto !important;
+    width: 90vw !important;
+    max-width: 300px !important;
+    z-index: 9999 !important;
+  }
+  
+  [data-sonner-toast] {
+    min-height: 32px !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    max-width: 100% !important;
+    opacity: 0.85 !important;
+    margin: 2px 0 !important;
+  }
+  
+  [data-sonner-toast] [data-title] {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+}
