@@ -339,6 +339,13 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                         alt={`Imagem ${index + 1} do motorista`}
                         className="w-full h-32 object-cover rounded-lg border hover:shadow-md transition-shadow cursor-pointer"
                         onClick={() => window.open(imagemUrl, '_blank')}
+                        onError={(e) => {
+                          console.log('[VISUALIZAR] Erro ao carregar imagem:', imagemUrl);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                        onLoad={() => {
+                          console.log('[VISUALIZAR] Imagem carregada com sucesso:', imagemUrl);
+                        }}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded-lg flex items-center justify-center">
                         <span className="text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">
