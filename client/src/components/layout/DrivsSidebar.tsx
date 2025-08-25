@@ -248,33 +248,33 @@ export function DrivsSidebar() {
           </div>
           
           {/* Redes Sociais */}
-          <div className="flex flex-col space-y-2">
+          <div className="flex space-x-3 justify-center">
             <a 
               href="https://instagram.com/drivs.me" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-white/70 hover:text-pink-400 transition-colors duration-300 text-xs"
+              className="text-white/70 hover:text-pink-400 transition-colors duration-300"
+              title="Instagram @drivs.me"
             >
-              <FaInstagram className="w-3 h-3" />
-              <span>@drivs.me</span>
+              <FaInstagram className="w-4 h-4" />
             </a>
             <a 
               href="https://youtube.com/@drivs.me" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-white/70 hover:text-red-400 transition-colors duration-300 text-xs"
+              className="text-white/70 hover:text-red-400 transition-colors duration-300"
+              title="YouTube @drivs.me"
             >
-              <FaYoutube className="w-3 h-3" />
-              <span>@drivs.me</span>
+              <FaYoutube className="w-4 h-4" />
             </a>
             <a 
               href="https://linkedin.com/company/drivs.me" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-white/70 hover:text-blue-400 transition-colors duration-300 text-xs"
+              className="text-white/70 hover:text-blue-400 transition-colors duration-300"
+              title="LinkedIn @drivs.me"
             >
-              <FaLinkedin className="w-3 h-3" />
-              <span>@drivs.me</span>
+              <FaLinkedin className="w-4 h-4" />
             </a>
           </div>
         </div>
