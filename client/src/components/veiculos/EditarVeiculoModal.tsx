@@ -258,16 +258,22 @@ export function EditarVeiculoModal({
   const handleDocumentUpload = async (uploadURL: string, nomeOriginal?: string) => {
     if (!veiculo) return;
     
+    console.log(`[FRONTEND] handleDocumentUpload chamado para veículo ${veiculo.id} com arquivo: ${nomeOriginal}`);
+    
     try {
+      const requestData = { 
+        documentURL: uploadURL,
+        nomeOriginal: nomeOriginal || 'documento.pdf'
+      };
+      
+      console.log(`[FRONTEND] Fazendo PUT para /api/veiculos/${veiculo.id}/documentos com dados:`, requestData);
+      
       const response = await fetch(`/api/veiculos/${veiculo.id}/documentos`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          documentURL: uploadURL,
-          nomeOriginal: nomeOriginal || 'documento.pdf'
-        }),
+        body: JSON.stringify(requestData),
       });
 
       if (response.ok) {
