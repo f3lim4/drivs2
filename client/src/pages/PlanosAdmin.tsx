@@ -352,7 +352,7 @@ export default function PlanosAdmin() {
                             <Input
                               id={`preco-${plano.id}`}
                               type="number"
-                              defaultValue={plano.preco}
+                              value={plano.preco || 0}
                               className="mt-1"
                               onChange={(e) => handleInputChange(plano.id, 'preco', Number(e.target.value))}
                             />
@@ -363,7 +363,7 @@ export default function PlanosAdmin() {
                               id={`limite-${plano.id}`}
                               type="number"
                               placeholder="0 para ilimitados"
-                              defaultValue={plano.limiteVeiculos || 0}
+                              value={plano.limiteVeiculos || 0}
                               className="mt-1"
                               onChange={(e) => {
                                 const value = Number(e.target.value);
