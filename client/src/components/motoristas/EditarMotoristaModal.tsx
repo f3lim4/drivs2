@@ -988,9 +988,7 @@ export function EditarMotoristaModal({
                           </div>
                         )}
                       </div>
-                    ) : (
-                      <>
-                        {imagePreviews.fotoPerfil ? (
+                    ) : imagePreviews.fotoPerfil ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
                         <div className="relative group">
@@ -1054,16 +1052,14 @@ export function EditarMotoristaModal({
                           <span className="text-xs text-blue-600">Substituir</span>
                         </label>
                       </div>
-                        ) : (
-                          <label
-                            htmlFor="foto-perfil"
-                            className="cursor-pointer flex flex-col items-center justify-center py-1"
-                          >
-                            <Upload className="h-4 w-4 text-gray-400" />
-                            <span className="text-xs text-gray-600">Selecionar</span>
-                          </label>
-                        )}
-                      </>
+                    ) : (
+                      <label
+                        htmlFor="foto-perfil"
+                        className="cursor-pointer flex flex-col items-center justify-center py-1"
+                      >
+                        <Upload className="h-4 w-4 text-gray-400" />
+                        <span className="text-xs text-gray-600">Selecionar</span>
+                      </label>
                     )}
                   </div>
                 </div>
