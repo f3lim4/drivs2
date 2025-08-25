@@ -207,6 +207,12 @@ export default function PlanosAdmin() {
     }
   });
 
+  // Buscar estatísticas dos planos
+  const { data: planosStats } = useQuery({
+    queryKey: ['/api/planos/stats'],
+    enabled: !!isAdmin
+  });
+
   // Converter dados do servidor para array se necessário
   const planos = React.useMemo(() => {
     if (!planosFromServer) return planosData;
@@ -531,6 +537,59 @@ export default function PlanosAdmin() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Estatísticas dos Planos */}
+        {planosStats && (
+          <div className="mt-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>📊 Estatísticas dos Planos</CardTitle>
+                <p className="text-gray-600">Dados de uso e receita conectados ao Stripe</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-3xl font-bold text-blue-600">{planosStats.resumo?.totalLocadoras || 0}</div>
+                    <div className="text-sm text-gray-600">Total de Locadoras</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-3xl font-bold text-green-600">{planosStats.resumo?.locadorasAtivas || 0}</div>
+                    <div className="text-sm text-gray-600">Locadoras Ativas</div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <div className="text-3xl font-bold text-purple-600">R$ {planosStats.resumo?.receitaTotal || 0}</div>
+                    <div className="text-sm text-gray-600">Receita Mensal</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="font-medium text-gray-900">Distribuição por Plano:</h4>
+                  {Object.entries(planosStats.estatisticas || {}).map(([planoId, stats]: [string, any]) => (
+                    <div key={planoId} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border">
+                      <div className="flex-1">
+                        <div className="font-medium text-lg">{planoId.charAt(0).toUpperCase() + planoId.slice(1)}</div>
+                        <div className="text-sm text-gray-600">
+                          {stats.ativas} ativas de {stats.total} total ({stats.total > 0 ? Math.round((stats.ativas / stats.total) * 100) : 0}% conversão)
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold text-green-600 text-lg">R$ {stats.receita}</div>
+                        <div className="text-sm text-gray-600">receita mensal</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-blue-900">Taxa de Conversão Geral:</span>
+                    <span className="font-bold text-blue-600 text-lg">{planosStats.resumo?.conversao || 0}%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
   );
 }
