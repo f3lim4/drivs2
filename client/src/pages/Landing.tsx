@@ -434,7 +434,7 @@ export default function Landing() {
             <div>
               <h4 className="font-bold mb-4">Suporte</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>Central de Ajuda</li>
+                <li><a href="/suporte" className="hover:text-white transition-colors">Central de Ajuda</a></li>
                 <li>Contato</li>
                 <li>Treinamentos</li>
                 <li>Status do Sistema</li>
@@ -444,7 +444,7 @@ export default function Landing() {
               <h4 className="font-bold mb-4">Contato</h4>
               <ul className="space-y-2 text-gray-400">
                 <li>📧 contato@drivs.com.br</li>
-                <li>📱 (11) 9999-9999</li>
+                <li>📱 11977263156</li>
                 <li>🏢 São Paulo, SP</li>
               </ul>
             </div>

@@ -653,7 +653,7 @@ export function EditarMotoristaModal({
                       <FormLabel>Telefone *</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="(11) 99999-9999" 
+                          placeholder="11977263156" 
                           {...field}
                           onChange={(e) => {
                             const value = e.target.value.replace(/\D/g, '');

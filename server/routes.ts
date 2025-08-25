@@ -2419,7 +2419,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         razaoSocial: "Locadora Teste Ltda",
         cnpj: "99999999000199",
         email: "teste@teste.com.br",
-        telefone: "(11) 99999-9999",
+        telefone: "11977263156",
         endereco: "Rua Teste, 123",
         numero: "123",
         bairro: "Centro",

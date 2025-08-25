@@ -908,7 +908,7 @@ export default function Dashboard() {
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-green-600" />
-                  <span className="text-gray-700 font-medium">(11) 99999-9999</span>
+                  <span className="text-gray-700 font-medium">11977263156</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-blue-600" />
@@ -917,7 +917,7 @@ export default function Dashboard() {
                 <div className="flex items-center gap-2">
                   <ExternalLink className="w-4 h-4 text-blue-600" />
                   <a 
-                    href="https://drivs.com.br/suporte" 
+                    href="/suporte" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
