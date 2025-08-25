@@ -251,13 +251,27 @@ export default function PlanosAdmin() {
         return plano;
       }
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      // Atualizar dados locais imediatamente
+      setPlanosData(prev => prev.map(p => 
+        p.id === variables.id ? variables : p
+      ));
+      
       toast({
         title: "Plano atualizado",
         description: "As alterações foram salvas com sucesso.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
+      
+      // Limpar estado de edição
       setEditingPlano(null);
+      setEditingValues(prev => {
+        const newState = { ...prev };
+        delete newState[variables.id];
+        return newState;
+      });
+      
+      // Invalidar cache do servidor
+      queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
     },
     onError: (error: any) => {
       toast({
