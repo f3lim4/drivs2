@@ -102,9 +102,22 @@ export const veiculos = pgTable("veiculos", {
   status: text("status").notNull().default("disponivel"), // 'disponivel', 'alugado' (controlado automaticamente)
   // Campo para melhor visualização do veículo
   visualizar: text("visualizar"), // Campo adicional para identificação visual/observações
-  // Documentos do veículo
+  // Documentos do veículo (mantido por compatibilidade, mas será depreciado)
   documentos: text("documentos").array(), // Array de URLs dos documentos salvos
   // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Tabela de documentos de veículos
+export const documentosVeiculos = pgTable("documentos_veiculos", {
+  id: text("id").primaryKey(),
+  veiculoId: text("veiculo_id").notNull(), // ID do veículo
+  locadoraId: text("locadora_id").notNull(), // Para segurança adicional
+  nomeOriginal: text("nome_original").notNull(), // Nome original do arquivo
+  url: text("url").notNull(), // URL do documento no storage
+  tamanho: integer("tamanho"), // Tamanho em bytes
+  tipo: text("tipo"), // Tipo MIME do arquivo
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -525,6 +538,14 @@ export type Locadora = typeof locadoras.$inferSelect;
 
 export type InsertVeiculo = z.infer<typeof insertVeiculoSchema>;
 export type Veiculo = typeof veiculos.$inferSelect;
+
+export const insertDocumentoVeiculoSchema = createInsertSchema(documentosVeiculos).omit({
+  createdAt: true,
+  updatedAt: true
+});
+
+export type InsertDocumentoVeiculo = z.infer<typeof insertDocumentoVeiculoSchema>;
+export type DocumentoVeiculo = typeof documentosVeiculos.$inferSelect;
 
 export type InsertMotorista = z.infer<typeof insertMotoristaSchema>;
 export type Motorista = typeof motoristas.$inferSelect;
