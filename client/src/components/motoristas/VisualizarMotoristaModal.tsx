@@ -46,7 +46,10 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
         const response = await fetch(`/api/motoristas/${motorista.id}/imagens`);
         if (response.ok) {
           const data = await response.json();
-          setImagens(data.imagens || []);
+          // Converter documentos em array de URLs válidas
+          const imagensArray = Object.values(data.documentos || {})
+            .filter(url => url !== null) as string[];
+          setImagens(imagensArray);
         }
       } catch (error) {
         console.error('Erro ao carregar imagens:', error);
@@ -106,11 +109,14 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
       const formData = new FormData();
       formData.append('motoristaId', motorista.id);
 
-      validImages.forEach((file) => {
-        formData.append('imagens', file);
+      validImages.forEach((file, index) => {
+        // Usar nomes de campo específicos baseados no mapeamento do backend
+        const fieldNames = ['fotoPerfil', 'cnhImagem', 'fotoComCnh', 'comprovanteEndereco', 'fotoExtra', 'fotoExtra2'];
+        const fieldName = fieldNames[index] || 'fotoExtra2';
+        formData.append(fieldName, file);
       });
 
-      const response = await fetch('/api/motoristas/upload-imagens', {
+      const response = await fetch(`/api/motoristas/${motorista.id}/upload-imagens`, {
         method: 'POST',
         body: formData,
       });
@@ -128,7 +134,10 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
       const imagensResponse = await fetch(`/api/motoristas/${motorista.id}/imagens`);
       if (imagensResponse.ok) {
         const data = await imagensResponse.json();
-        setImagens(data.imagens || []);
+        // Converter documentos em array de URLs válidas
+        const imagensArray = Object.values(data.documentos || {})
+          .filter(url => url !== null) as string[];
+        setImagens(imagensArray);
       }
     } catch (error) {
       console.error('Erro no upload:', error);
@@ -164,7 +173,10 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
       const imagensResponse = await fetch(`/api/motoristas/${motorista.id}/imagens`);
       if (imagensResponse.ok) {
         const data = await imagensResponse.json();
-        setImagens(data.imagens || []);
+        // Converter documentos em array de URLs válidas
+        const imagensArray = Object.values(data.documentos || {})
+          .filter(url => url !== null) as string[];
+        setImagens(imagensArray);
       }
     } catch (error) {
       console.error('Erro ao excluir imagem:', error);
