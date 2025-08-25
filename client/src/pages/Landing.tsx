@@ -453,33 +453,33 @@ export default function Landing() {
               <h4 className="font-bold mb-4">Redes Sociais</h4>
               <div className="space-y-3">
                 <div className="text-sm text-gray-300 mb-3">DRIVS v1.0 - Sistema de Gestão</div>
-                <div className="flex flex-col space-y-3">
+                <div className="flex space-x-4">
                   <a 
                     href="https://instagram.com/drivs.me" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-3 text-gray-400 hover:text-pink-400 transition-colors duration-300"
+                    className="text-gray-400 hover:text-pink-400 transition-colors duration-300"
+                    title="Instagram @drivs.me"
                   >
                     <FaInstagram className="w-5 h-5" />
-                    <span>@drivs.me</span>
                   </a>
                   <a 
                     href="https://youtube.com/@drivs.me" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-3 text-gray-400 hover:text-red-500 transition-colors duration-300"
+                    className="text-gray-400 hover:text-red-500 transition-colors duration-300"
+                    title="YouTube @drivs.me"
                   >
                     <FaYoutube className="w-5 h-5" />
-                    <span>@drivs.me</span>
                   </a>
                   <a 
                     href="https://linkedin.com/company/drivs.me" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-3 text-gray-400 hover:text-blue-500 transition-colors duration-300"
+                    className="text-gray-400 hover:text-blue-500 transition-colors duration-300"
+                    title="LinkedIn @drivs.me"
                   >
                     <FaLinkedin className="w-5 h-5" />
-                    <span>@drivs.me</span>
                   </a>
                 </div>
               </div>
