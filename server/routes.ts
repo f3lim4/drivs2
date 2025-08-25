@@ -2809,7 +2809,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Endpoint para obter documentos de um veículo
+  // Endpoint para obter documentos de um veículo (NOVO SISTEMA)
+  app.get("/api/veiculos/:id/documentos/novo", async (req, res) => {
+    try {
+      const veiculo = await storage.getVeiculo(req.params.id);
+      if (!veiculo) {
+        return res.status(404).json({ error: "Veículo não encontrado" });
+      }
+
+      const documentos = await storage.getDocumentosVeiculo(req.params.id);
+      console.log(`[DOCUMENTO NOVO] Buscando documentos do veículo ${req.params.id}: ${documentos.length} documentos`);
+
+      res.status(200).json({
+        veiculoId: req.params.id,
+        totalDocumentos: documentos.length,
+        documentos: documentos.map(d => ({
+          id: d.id,
+          url: d.url,
+          nome: d.nomeOriginal,
+          tamanho: d.tamanho,
+          tipo: d.tipo,
+          createdAt: d.createdAt
+        }))
+      });
+    } catch (error) {
+      console.error("[DOCUMENTO NOVO] Error fetching documentos:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Endpoint para obter documentos de um veículo (SISTEMA ANTIGO)
   app.get("/api/veiculos/:id/documentos", async (req, res) => {
     try {
       const veiculo = await storage.getVeiculo(req.params.id);
@@ -2828,6 +2857,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("[DOCUMENTO] Error fetching documentos:", error);
       res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Endpoint para adicionar documento a um veículo (NOVO SISTEMA)
+  app.put('/api/veiculos/:id/documentos', async (req, res) => {
+    const veiculoId = req.params.id;
+    const { documentURL, nomeOriginal, tamanho, tipo } = req.body;
+    
+    console.log(`[DOCUMENTO NOVO] Recebido para veículo ${veiculoId}:`, { documentURL, nomeOriginal, tamanho, tipo });
+    
+    if (!documentURL || !nomeOriginal) {
+      return res.status(400).json({ error: 'URL do documento e nome original são obrigatórios' });
+    }
+
+    try {
+      // Buscar veículo para validar existência e obter locadoraId
+      const veiculo = await storage.getVeiculo(veiculoId);
+      if (!veiculo) {
+        return res.status(404).json({ error: 'Veículo não encontrado' });
+      }
+
+      // Normalizar URL para formato do banco
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = objectStorageService.normalizeObjectEntityPath(documentURL);
+      
+      console.log(`[DOCUMENTO NOVO] URL normalizada: ${documentURL} -> ${objectPath}`);
+      
+      // Criar documento na nova tabela
+      const novoDocumento = await storage.createDocumentoVeiculo({
+        id: crypto.randomUUID(),
+        veiculoId: veiculoId,
+        locadoraId: veiculo.locadoraId,
+        nomeOriginal: nomeOriginal,
+        url: objectPath,
+        tamanho: tamanho || null,
+        tipo: tipo || null
+      });
+
+      // Buscar todos os documentos do veículo
+      const documentos = await storage.getDocumentosVeiculo(veiculoId);
+
+      console.log(`[DOCUMENTO NOVO] Documento salvo com sucesso para veículo ${veiculoId}. Total: ${documentos.length}`);
+
+      res.json({
+        objectPath,
+        totalDocumentos: documentos.length,
+        documentos: documentos.map(d => ({ url: d.url, nome: d.nomeOriginal })),
+        message: 'Documento adicionado com sucesso'
+      });
+    } catch (error) {
+      console.error('Erro ao salvar documento:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });
 

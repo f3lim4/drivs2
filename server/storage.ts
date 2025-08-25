@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, pagamentosExcluidos,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, pagamentosExcluidos, documentosVeiculos,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -15,7 +15,8 @@ import {
   type Local, type InsertLocal,
   type Anuncio, type InsertAnuncio,
   type Atividade, type InsertAtividade,
-  type SeoConfig, type InsertSeoConfig
+  type SeoConfig, type InsertSeoConfig,
+  type DocumentoVeiculo, type InsertDocumentoVeiculo
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -69,6 +70,11 @@ export interface IStorage {
   createVeiculo(veiculo: InsertVeiculo): Promise<Veiculo>;
   updateVeiculo(id: string, updates: Partial<InsertVeiculo>): Promise<Veiculo>;
   deleteVeiculo(id: string): Promise<void>;
+  
+  // Documentos de veículos operations
+  createDocumentoVeiculo(documento: InsertDocumentoVeiculo): Promise<DocumentoVeiculo>;
+  getDocumentosVeiculo(veiculoId: string): Promise<DocumentoVeiculo[]>;
+  deleteDocumentoVeiculo(documentoId: string): Promise<void>;
   
   // Motorista operations
   getAllMotoristas(): Promise<Motorista[]>;
@@ -438,6 +444,23 @@ export class DatabaseStorage implements IStorage {
 
   async deleteVeiculo(id: string): Promise<void> {
     await db.delete(veiculos).where(eq(veiculos.id, id));
+  }
+
+  // Documentos de veículos operations
+  async createDocumentoVeiculo(documento: InsertDocumentoVeiculo): Promise<DocumentoVeiculo> {
+    const result = await db.insert(documentosVeiculos).values(documento).returning();
+    return result[0];
+  }
+
+  async getDocumentosVeiculo(veiculoId: string): Promise<DocumentoVeiculo[]> {
+    const result = await db.select().from(documentosVeiculos)
+      .where(eq(documentosVeiculos.veiculoId, veiculoId))
+      .orderBy(desc(documentosVeiculos.createdAt));
+    return result;
+  }
+
+  async deleteDocumentoVeiculo(documentoId: string): Promise<void> {
+    await db.delete(documentosVeiculos).where(eq(documentosVeiculos.id, documentoId));
   }
 
   // Motorista operations

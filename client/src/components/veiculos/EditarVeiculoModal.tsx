@@ -238,7 +238,7 @@ export function EditarVeiculoModal({
   const categoriasDisponiveis = getCategoriasDisponiveis();
 
   // Função para lidar com upload de documentos
-  const handleDocumentUpload = async (uploadURL: string) => {
+  const handleDocumentUpload = async (uploadURL: string, nomeOriginal?: string) => {
     if (!veiculo) return;
     
     try {
@@ -247,7 +247,10 @@ export function EditarVeiculoModal({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ documentURL: uploadURL }),
+        body: JSON.stringify({ 
+          documentURL: uploadURL,
+          nomeOriginal: nomeOriginal || 'documento.pdf'
+        }),
       });
 
       if (response.ok) {
@@ -256,7 +259,7 @@ export function EditarVeiculoModal({
         // Atualizar o veículo localmente com todos os documentos retornados do backend
         const veiculoAtualizado = {
           ...veiculo,
-          documentos: result.documentos || [result.objectPath] // Usar array completo do backend
+          documentos: result.documentos?.map((d: any) => d.url) || [result.objectPath] // Usar array completo do backend
         };
         
         onVeiculoEditado(veiculoAtualizado);
@@ -264,6 +267,12 @@ export function EditarVeiculoModal({
         // Invalidar cache de veículos para atualizar a lista (usando query key correta)
         await queryClient.invalidateQueries({ queryKey: ['veiculos'] });
         await queryClient.invalidateQueries({ queryKey: ['veiculos', veiculo.locadoraId] });
+        
+        toast({
+          title: "Documento salvo",
+          description: nomeOriginal || "documento.pdf",
+          variant: "default",
+        });
       } else {
         throw new Error('Erro ao salvar documento');
       }
