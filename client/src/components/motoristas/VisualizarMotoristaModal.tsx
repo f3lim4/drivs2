@@ -46,11 +46,9 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
         const response = await fetch(`/api/motoristas/${motorista.id}/imagens`);
         if (response.ok) {
           const data = await response.json();
-          console.log('[VISUALIZAR] Dados da API:', data);
           // Converter documentos em array de URLs válidas
           const imagensArray = Object.values(data.documentos || {})
             .filter(url => url !== null) as string[];
-          console.log('[VISUALIZAR] Array de imagens:', imagensArray);
           setImagens(imagensArray);
         }
       } catch (error) {
@@ -340,11 +338,7 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                         className="w-full h-32 object-cover rounded-lg border hover:shadow-md transition-shadow cursor-pointer"
                         onClick={() => window.open(imagemUrl, '_blank')}
                         onError={(e) => {
-                          console.log('[VISUALIZAR] Erro ao carregar imagem:', imagemUrl);
                           e.currentTarget.style.display = 'none';
-                        }}
-                        onLoad={() => {
-                          console.log('[VISUALIZAR] Imagem carregada com sucesso:', imagemUrl);
                         }}
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded-lg flex items-center justify-center">
