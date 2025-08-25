@@ -38,7 +38,7 @@ import { ExcluirMotoristaDialog } from '@/components/motoristas/ExcluirMotorista
 import { VisualizarMotoristaModal } from '@/components/motoristas/VisualizarMotoristaModal';
 import { PesquisarCpfModal } from '@/components/motoristas/PesquisarCpfModal';
 import { registrarAtividade } from '@/utils/activityLogger';
-
+import { MotoristaAvatar } from '@/components/motoristas/MotoristaAvatar';
 
 import { Motorista } from '@/types';
 import { Users, UserCheck, UserX, Clock, Activity } from 'lucide-react';
@@ -501,26 +501,11 @@ export default function Motoristas() {
                 <TableRow key={motorista.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center overflow-hidden">
-                        {motorista.imagem1 ? (
-                          <img 
-                            src={`/uploads/${motorista.imagem1}`} 
-                            alt={motorista.nome}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              // Se a imagem não carregar, mostra as iniciais
-                              e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling!.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <span 
-                          className="text-primary-foreground font-medium text-sm w-full h-full flex items-center justify-center"
-                          style={{ display: motorista.imagem1 ? 'none' : 'flex' }}
-                        >
-                          {motorista.nome.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
+                      <MotoristaAvatar 
+                        motoristaId={motorista.id}
+                        nome={motorista.nome}
+                        className="w-10 h-10"
+                      />
                       <div>
                         <p className="font-medium">{motorista.nome}</p>
                         <div className="flex items-center gap-2 mt-1">
