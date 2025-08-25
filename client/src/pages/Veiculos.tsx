@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, Car, Bike, Truck, Bus, Eye, EyeOff } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Car, Bike, Truck, Bus, Eye, EyeOff, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useVeiculos } from '@/hooks/useVeiculos';
@@ -463,6 +463,7 @@ export default function Veiculos() {
                 <TableHead>PLACA</TableHead>
                 {isAdmin && <TableHead>LOCADORA</TableHead>}
                 <TableHead>VALORES</TableHead>
+                <TableHead>DOCUMENTOS</TableHead>
                 <TableHead>STATUS</TableHead>
                 <TableHead>AÇÕES</TableHead>
               </TableRow>
@@ -520,6 +521,21 @@ export default function Veiculos() {
                     ) : (
                       <span className="text-muted-foreground">-</span>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {veiculo.documentos && veiculo.documentos.length > 0 ? (
+                        <>
+                          <FileText className="w-4 h-4 text-green-600" />
+                          <span className="text-xs text-green-600 font-medium">Salvo</span>
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="w-4 h-4 text-red-500" />
+                          <span className="text-xs text-red-500 font-medium">Pendente</span>
+                        </>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {showAllColumns ? (
