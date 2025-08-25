@@ -18,7 +18,8 @@ import {
   Save, 
   X,
   CheckCircle,
-  Building2
+  Building2,
+  Star
 } from 'lucide-react';
 // Função helper para requisições API
 const apiRequest = async (url: string, options: any = {}) => {
@@ -52,81 +53,85 @@ interface Plano {
 
 const defaultPlanos: Plano[] = [
   {
-    id: 'basico',
-    nome: 'Básico',
-    preco: 49,
+    id: 'start',
+    nome: 'Start',
+    preco: 50,
     limiteVeiculos: 5,
     descricao: 'Para locadoras iniciantes',
     recursos: [
       'Até 5 veículos na frota',
       'Gestão completa de motoristas',
-      'Contratos automáticos profissionais',
+      'Contratos automáticos',
       'Controle de pagamentos',
-      'Controle de infrações e multas',
-      'Controle financeiro com lucros/perdas reais',
-      'Controle de manutenções',
-      'Upload de documentos'
+      'Controle financeiro real'
     ],
     icone: 'Car',
     cor: 'blue'
   },
   {
-    id: 'profissional',
-    nome: 'Profissional',
+    id: 'pro',
+    nome: 'Pro',
     preco: 99,
     limiteVeiculos: 20,
     descricao: 'Para locadoras em crescimento',
     recursos: [
       'Até 20 veículos na frota',
       'Gestão completa de motoristas',
-      'Contratos automáticos profissionais',
+      'Contratos automáticos',
       'Controle de pagamentos',
-      'Controle de infrações e multas',
-      'Controle financeiro com lucros/perdas reais',
-      'Controle de manutenções',
-      'Upload de documentos'
+      'Controle financeiro real'
     ],
     icone: 'Rocket',
     cor: 'cyan',
     popular: true
   },
   {
-    id: 'avancado',
-    nome: 'Avançado',
-    preco: 200,
+    id: 'elite',
+    nome: 'Elite',
+    preco: 250,
     limiteVeiculos: 50,
     descricao: 'Para frotas médias',
     recursos: [
       'Até 50 veículos na frota',
       'Gestão completa de motoristas',
-      'Contratos automáticos profissionais',
+      'Contratos automáticos',
       'Controle de pagamentos',
-      'Controle de infrações e multas',
-      'Controle financeiro com lucros/perdas reais',
-      'Controle de manutenções',
-      'Upload de documentos'
+      'Controle financeiro real'
     ],
     icone: 'Zap',
     cor: 'green'
   },
   {
-    id: 'master',
-    nome: 'Master',
+    id: 'prime',
+    nome: 'Prime',
     preco: 500,
-    limiteVeiculos: null,
+    limiteVeiculos: 100,
     descricao: 'Para grandes frotas',
     recursos: [
-      'Veículos ilimitados',
+      'Até 100 veículos na frota',
       'Gestão completa de motoristas',
-      'Contratos automáticos profissionais',
+      'Contratos automáticos',
       'Controle de pagamentos',
-      'Controle de infrações e multas',
-      'Controle financeiro com lucros/perdas reais',
-      'Controle de manutenções',
-      'Suporte 24/7 e treinamento personalizado'
+      'Suporte telefônico'
     ],
     icone: 'Crown',
     cor: 'purple'
+  },
+  {
+    id: 'infinity',
+    nome: 'Infinity',
+    preco: 0,
+    limiteVeiculos: null,
+    descricao: 'Para empresas premium - Preço a consultar',
+    recursos: [
+      'Veículos ilimitados',
+      'Gestão completa premium',
+      'Contratos automáticos',
+      'Suporte VIP 24/7',
+      'Treinamento exclusivo'
+    ],
+    icone: 'Star',
+    cor: 'pink'
   }
 ];
 
@@ -136,6 +141,7 @@ const getIconComponent = (iconName: string) => {
     case 'Rocket': return Rocket;
     case 'Zap': return Zap;
     case 'Crown': return Crown;
+    case 'Star': return Star;
     default: return Building2;
   }
 };
@@ -173,6 +179,14 @@ const getColorClasses = (cor: string) => {
         iconBg: 'from-purple-500 to-purple-600',
         text: 'text-purple-600',
         check: 'text-purple-500'
+      };
+    case 'pink':
+      return {
+        border: 'border-pink-400/30 hover:border-pink-400/50',
+        bg: 'from-pink-500/10 to-purple-500/10',
+        iconBg: 'from-pink-500 to-purple-600',
+        text: 'text-pink-600',
+        check: 'text-pink-500'
       };
     default:
       return {

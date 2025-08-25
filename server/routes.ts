@@ -2331,113 +2331,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const locadoraId = req.query.locadoraId as string;
       
-      // Planos disponíveis com informações específicas
+      // Planos disponíveis com informações específicas (mesmos da página inicial)
       const planosDisponiveis = {
-        free: {
-          id: "free",
-          nome: "Free",
-          preco: 0,
-          valor: 0,
-          limiteVeiculos: 3,
-          descricao: "Para testes e locadoras muito pequenas",
-          popular: false,
-          stripePrice: null,
-          recursos: [
-            "Até 3 veículos",
-            "Gestão básica de motoristas",
-            "Contratos simples",
-            "Suporte por email"
-          ],
-          icone: "Car",
-          cor: "gray"
-        },
-        starter: {
-          id: "starter", 
-          nome: "Starter",
-          preco: 49,
-          valor: 49,
-          limiteVeiculos: 10,
+        start: {
+          id: "start",
+          nome: "Start",
+          preco: 50,
+          valor: 50,
+          limiteVeiculos: 5,
           descricao: "Para locadoras iniciantes",
           popular: false,
-          stripePrice: "price_starter_49_monthly",
+          stripePrice: "price_start_50_monthly",
           recursos: [
-            "Até 10 veículos",
+            "Até 5 veículos na frota",
             "Gestão completa de motoristas",
             "Contratos automáticos",
             "Controle de pagamentos",
-            "Suporte prioritário"
+            "Controle financeiro real"
           ],
-          icone: "CarFront",
+          icone: "Car",
           cor: "blue"
         },
-        professional: {
-          id: "professional",
-          nome: "Professional",
+        pro: {
+          id: "pro",
+          nome: "Pro",
           preco: 99,
           valor: 99,
-          limiteVeiculos: 25,
+          limiteVeiculos: 20,
           descricao: "Para locadoras em crescimento",
           popular: true,
-          stripePrice: "price_professional_99_monthly",
+          stripePrice: "price_pro_99_monthly",
           recursos: [
-            "Até 25 veículos",
+            "Até 20 veículos na frota",
             "Gestão completa de motoristas",
-            "Contratos automáticos profissionais",
-            "Controle de pagamentos avançado",
-            "Controle de infrações e multas",
-            "Relatórios financeiros",
-            "Suporte prioritário"
+            "Contratos automáticos",
+            "Controle de pagamentos",
+            "Controle financeiro real"
           ],
-          icone: "Truck",
+          icone: "Rocket",
+          cor: "cyan"
+        },
+        elite: {
+          id: "elite",
+          nome: "Elite",
+          preco: 250,
+          valor: 250,
+          limiteVeiculos: 50,
+          descricao: "Para frotas médias",
+          popular: false,
+          stripePrice: "price_elite_250_monthly",
+          recursos: [
+            "Até 50 veículos na frota",
+            "Gestão completa de motoristas",
+            "Contratos automáticos",
+            "Controle de pagamentos",
+            "Controle financeiro real"
+          ],
+          icone: "Zap",
           cor: "green"
         },
-        business: {
-          id: "business",
-          nome: "Business",
-          preco: 199,
-          valor: 199,
-          limiteVeiculos: 50,
-          descricao: "Para locadoras estabelecidas",
+        prime: {
+          id: "prime",
+          nome: "Prime",
+          preco: 500,
+          valor: 500,
+          limiteVeiculos: 100,
+          descricao: "Para grandes frotas",
           popular: false,
-          stripePrice: "price_business_199_monthly",
+          stripePrice: "price_prime_500_monthly",
           recursos: [
-            "Até 50 veículos",
+            "Até 100 veículos na frota",
             "Gestão completa de motoristas",
-            "Contratos automáticos profissionais",
-            "Controle de pagamentos e cobrança",
-            "Controle de infrações e multas",
-            "Controle financeiro com lucros/perdas",
-            "Controle de manutenções",
-            "API para integração",
-            "Suporte dedicado"
+            "Contratos automáticos",
+            "Controle de pagamentos",
+            "Suporte telefônico"
           ],
-          icone: "Bus",
+          icone: "Crown",
           cor: "purple"
         },
-        enterprise: {
-          id: "enterprise",
-          nome: "Enterprise",
-          preco: 399,
-          valor: 399,
+        infinity: {
+          id: "infinity",
+          nome: "Infinity",
+          preco: 0,
+          valor: 0,
           limiteVeiculos: null,
-          descricao: "Para grandes frotas - Veículos ilimitados",
+          descricao: "Para empresas premium",
           popular: false,
-          stripePrice: "price_enterprise_399_monthly",
+          consultar: true,
           recursos: [
             "Veículos ilimitados",
-            "Gestão completa de motoristas",
-            "Contratos automáticos profissionais",
-            "Sistema de cobrança avançado",
-            "Controle completo de infrações",
-            "Relatórios financeiros avançados",
-            "Controle de manutenções",
-            "API completa para integração",
-            "White label disponível",
-            "Suporte 24/7 dedicado",
-            "Treinamento personalizado"
+            "Gestão completa premium",
+            "Contratos automáticos",
+            "Suporte VIP 24/7",
+            "Treinamento exclusivo"
           ],
-          icone: "Building",
-          cor: "gold"
+          icone: "Star",
+          cor: "pink"
         }
       };
 
@@ -2478,22 +2467,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Contar locadoras por plano
       const estatisticas = {
-        free: { total: 0, ativas: 0, receita: 0 },
-        starter: { total: 0, ativas: 0, receita: 0 },
-        professional: { total: 0, ativas: 0, receita: 0 },
-        business: { total: 0, ativas: 0, receita: 0 },
-        enterprise: { total: 0, ativas: 0, receita: 0 }
+        start: { total: 0, ativas: 0, receita: 0 },
+        pro: { total: 0, ativas: 0, receita: 0 },
+        elite: { total: 0, ativas: 0, receita: 0 },
+        prime: { total: 0, ativas: 0, receita: 0 },
+        infinity: { total: 0, ativas: 0, receita: 0 }
       };
       
       locadoras.forEach(locadora => {
-        const plano = locadora.plano || 'free';
+        const plano = locadora.plano || 'start';
         if (estatisticas[plano]) {
           estatisticas[plano].total++;
           if (locadora.status === 'ativa') {
             estatisticas[plano].ativas++;
             
             // Calcular receita baseada no plano
-            const precos = { free: 0, starter: 49, professional: 99, business: 199, enterprise: 399 };
+            const precos = { start: 50, pro: 99, elite: 250, prime: 500, infinity: 0 };
             estatisticas[plano].receita += precos[plano] || 0;
           }
         }
