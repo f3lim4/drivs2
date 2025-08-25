@@ -967,13 +967,40 @@ export function EditarVeiculoModal({
                   {veiculo?.documentos && veiculo.documentos.length > 0 ? (
                     <>
                       <FileText className="w-4 h-4 text-green-500" />
-                      <span className="text-xs text-muted-foreground">Documento salvo</span>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">Documento salvo</span>
+                        <span className="text-xs text-gray-500 truncate max-w-[200px]">
+                          {(() => {
+                            const documentoAtual = veiculo.documentos[veiculo.documentos.length - 1];
+                            return documentoAtual ? "documento_veiculo.pdf" : "Documento salvo";
+                          })()}
+                        </span>
+                      </div>
                     </>
                   ) : (
                     <span className="text-xs text-muted-foreground">Documento:</span>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
+                  {/* Botão para visualizar documento existente */}
+                  {veiculo?.documentos && veiculo.documentos.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const documentoAtual = veiculo.documentos[veiculo.documentos.length - 1];
+                        if (documentoAtual) {
+                          window.open(documentoAtual, '_blank');
+                        }
+                      }}
+                      className="text-xs h-7 px-3"
+                    >
+                      <Download className="w-3 h-3 mr-1" />
+                      Baixar
+                    </Button>
+                  )}
+                  
                   <input
                     type="file"
                     id="documento-upload-edit"
