@@ -2838,24 +2838,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Endpoint para obter documentos de um veículo (SISTEMA ANTIGO)
+  // Endpoint para obter documentos de um veículo (NOVO SISTEMA)
   app.get("/api/veiculos/:id/documentos", async (req, res) => {
     try {
-      const veiculo = await storage.getVeiculo(req.params.id);
-      if (!veiculo) {
-        return res.status(404).json({ error: "Veículo não encontrado" });
-      }
+      const veiculoId = req.params.id;
+      const documentos = await storage.getDocumentosVeiculo(veiculoId);
+      console.log(`[DOCUMENTO NOVO] Buscando documentos do veículo ${veiculoId}: ${documentos.length} documentos`);
 
-      const documentos = veiculo.documentos || [];
-      console.log(`[DOCUMENTO] Buscando documentos do veículo ${req.params.id}: ${documentos.length} documentos`);
-
-      res.status(200).json({
-        veiculoId: req.params.id,
-        totalDocumentos: documentos.length,
-        documentos: documentos
-      });
+      res.json(documentos.map(d => ({
+        id: d.id,
+        url: d.url,
+        nomeOriginal: d.nomeOriginal,
+        tamanho: d.tamanho,
+        tipo: d.tipo,
+        createdAt: d.createdAt
+      })));
     } catch (error) {
-      console.error("[DOCUMENTO] Error fetching documentos:", error);
+      console.error("[DOCUMENTO NOVO] Error fetching documentos:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });

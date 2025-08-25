@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Car, Fuel, Calendar, DollarSign, Shield, Gauge, Eye, FileText, Download } from 'lucide-react';
 import { Veiculo } from '@/types';
+import { useQuery } from '@tanstack/react-query';
 
 interface VisualizarVeiculoModalProps {
   open: boolean;
@@ -57,19 +58,29 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
               Detalhes completos do veículo
             </DialogDescription>
             {/* Botão Download Documento */}
-            {(() => {
-              const documentos = veiculo.documentos;
-              const documentoAtual = documentos && documentos.length > 0 ? documentos[documentos.length - 1] : null;
+            {veiculo && (() => {
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const { data: documentosVeiculo = [] } = useQuery({
+                queryKey: ['veiculos', veiculo.id, 'documentos'],
+                queryFn: async () => {
+                  const response = await fetch(`/api/veiculos/${veiculo.id}/documentos`);
+                  if (!response.ok) return [];
+                  return await response.json();
+                },
+                enabled: !!veiculo.id
+              });
+              
+              const documentoAtual = documentosVeiculo.length > 0 ? documentosVeiculo[documentosVeiculo.length - 1] : null;
               
               return documentoAtual ? (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.open(documentoAtual, '_blank')}
+                  onClick={() => window.open(documentoAtual.url, '_blank')}
                   className="gap-2"
                 >
                   <Download className="w-4 h-4" />
-                  Baixar Documento
+                  {documentoAtual.nomeOriginal || 'Baixar Documento'}
                 </Button>
               ) : null;
             })()}
