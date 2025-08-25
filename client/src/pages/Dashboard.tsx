@@ -465,7 +465,7 @@ export default function Dashboard() {
     <div className="flex-1 space-y-6 p-6">
       {/* Grid de estatísticas principais - apenas para locadoras */}
       {isLocadora && (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total de Motoristas - Card Futurista */}
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg h-32">
           <CardContent className="p-6 h-full">
@@ -605,7 +605,7 @@ export default function Dashboard() {
           </div>
 
           {/* Métricas do Sistema */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {/* Status do Sistema */}
             <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
               <CardContent className="p-6">
@@ -684,7 +684,7 @@ export default function Dashboard() {
           </div>
 
           {/* Informações Técnicas do Sistema */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
             {/* Dados do Sistema */}
             <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-lg">
               <CardHeader>
@@ -694,7 +694,7 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-4 bg-white rounded-lg border border-slate-200">
                     <p className="text-sm font-medium text-slate-600">Motoristas</p>
                     <p className="text-2xl font-bold text-slate-800">{motoristasRaw.length}</p>
@@ -760,7 +760,7 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {locadoras.map((locadora: any) => (
                   <div key={locadora.id} className="p-4 bg-white rounded-lg border border-slate-200 hover:shadow-md transition-all">
                     <div className="flex items-center gap-3 mb-3">
@@ -798,7 +798,7 @@ export default function Dashboard() {
 
       {/* Seção inferior com alertas e aluguéis recentes - apenas para locadoras */}
       {isLocadora && (
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
         {/* Card de Atividade Recentes */}
         <AtividadesRecentes />
 
@@ -851,7 +851,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Estatísticas detalhadas em grid menor */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
           <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 shadow-lg">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
