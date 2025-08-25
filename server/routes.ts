@@ -2757,6 +2757,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Veículo não encontrado" });
       }
 
+      console.log(`[DOCUMENTO DEBUG] Veículo ${req.params.id} atual:`, {
+        id: veiculo.id,
+        placa: veiculo.placa,
+        documentosAtuais: veiculo.documentos || [],
+        locadoraId: veiculo.locadoraId
+      });
+
       // Adicionar novo documento preservando documentos existentes únicos deste veículo
       const documentosAtuais = veiculo.documentos || [];
       
@@ -2778,6 +2785,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Atualizar veículo com nova lista de documentos
       await storage.updateVeiculo(req.params.id, { documentos: novosDocumentos });
+      
+      // Verificar se a atualização foi realmente salva no banco
+      const veiculoVerificacao = await storage.getVeiculo(req.params.id);
+      console.log(`[DOCUMENTO VERIFICAÇÃO] Veículo ${req.params.id} após atualização:`, {
+        id: veiculoVerificacao?.id,
+        placa: veiculoVerificacao?.placa,
+        documentosApos: veiculoVerificacao?.documentos || [],
+        locadoraId: veiculoVerificacao?.locadoraId
+      });
       
       console.log(`[DOCUMENTO] Documento salvo com sucesso para veículo ${req.params.id}. Total: ${novosDocumentos.length}`);
 
