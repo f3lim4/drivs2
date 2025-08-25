@@ -25,6 +25,7 @@ import Perfil from "./pages/Perfil";
 import Login from "./pages/Login";
 import CadastroLocadora from "./pages/CadastroLocadora";
 import TermosUso from "./pages/TermosUso";
+import Suporte from "./pages/Suporte";
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Index from "./pages/Index";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro-locadora" element={<CadastroLocadora />} />
             <Route path="/termos-uso" element={<TermosUso />} />
+            <Route path="/suporte" element={<Suporte />} />
             <Route path="/landing" element={<Landing />} />
             <Route path="/site" element={<Home />} />
             <Route path="/home" element={<Home />} />

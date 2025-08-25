@@ -43,7 +43,7 @@ export function ConfiguracoesModal({ open, onOpenChange }: ConfiguracoesModalPro
     nomeEmpresa: 'DRIVS LOCADORA DE VEÍCULOS LTDA',
     cnpj: '12.345.678/0001-90',
     endereco: 'Rua das Empresas, 123 - Centro, Embu das Artes/SP',
-    telefone: '(11) 99999-9999',
+    telefone: '11977263156',
     email: 'contato@drivs.com.br',
     
     // Configurações do sistema

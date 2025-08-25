@@ -617,7 +617,7 @@ export function NovoContratoModal({
         cnpj: "12.345.678/0001-90",
         endereco: "Rua das Empresas, 123 - Centro, Embu das Artes/SP",
         responsavel: "Responsável da Locadora",
-        telefone: "(11) 9999-9999"
+        telefone: "11977263156"
       };
 
       // Calcula data final apenas se fornecida, caso contrário deixa como contrato renovável

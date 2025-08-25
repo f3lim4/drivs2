@@ -185,7 +185,7 @@ export default function TermosUso() {
                 </p>
                 <ul className="list-none ml-4 space-y-1">
                   <li><strong>E-mail:</strong> suporte@drivs.com.br</li>
-                  <li><strong>Telefone:</strong> (11) 9999-9999</li>
+                  <li><strong>Telefone:</strong> 11977263156</li>
                   <li><strong>Horário de atendimento:</strong> Segunda a sexta, 8h às 18h</li>
                 </ul>
               </section>

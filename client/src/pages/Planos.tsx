@@ -342,7 +342,7 @@ export default function Planos() {
             </div>
             <div className="space-y-2">
               <Button variant="outline" size="sm">
-                📞 (11) 99999-9999
+                📞 11977263156
               </Button>
               <Button variant="outline" size="sm">
                 ✉️ suporte@drivs.com.br
