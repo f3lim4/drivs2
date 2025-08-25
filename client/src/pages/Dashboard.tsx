@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown, Crown, Phone, ExternalLink, Mail } from 'lucide-react';
+import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown, Crown, Phone, ExternalLink, Mail, Play, Link } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -924,6 +924,112 @@ export default function Dashboard() {
                   >
                     Central de Ajuda
                   </a>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Card de Vídeo Explicativo */}
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+              <Play className="w-5 h-5" />
+              Vídeo Explicativo
+            </CardTitle>
+            <CardDescription className="text-purple-600">
+              Aprenda como usar o sistema DRIVS
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="aspect-video bg-white rounded-lg border border-purple-200 overflow-hidden">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                title="Vídeo Explicativo DRIVS"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="rounded-lg"
+              />
+            </div>
+            <p className="text-xs text-purple-600 mt-2 text-center">
+              📹 Assista ao tutorial completo do sistema
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Card de Links Úteis */}
+        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-green-800 flex items-center gap-2">
+              <Link className="w-5 h-5" />
+              Links Úteis
+            </CardTitle>
+            <CardDescription className="text-green-600">
+              Recursos importantes para sua locadora
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="p-3 bg-white rounded-lg border border-green-200">
+                <div className="space-y-2">
+                  <a 
+                    href="https://www.detran.sp.gov.br" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Portal DETRAN SP
+                  </a>
+                  <p className="text-xs text-gray-600">Consultas de veículos e habilitação</p>
+                </div>
+              </div>
+              
+              <div className="p-3 bg-white rounded-lg border border-green-200">
+                <div className="space-y-2">
+                  <a 
+                    href="https://www.receita.fazenda.gov.br" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Receita Federal
+                  </a>
+                  <p className="text-xs text-gray-600">Consultas de CPF e CNPJ</p>
+                </div>
+              </div>
+              
+              <div className="p-3 bg-white rounded-lg border border-green-200">
+                <div className="space-y-2">
+                  <a 
+                    href="https://www.spc.org.br" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Consulta SPC/Serasa
+                  </a>
+                  <p className="text-xs text-gray-600">Verificação de score e restrições</p>
+                </div>
+              </div>
+              
+              <div className="p-3 bg-white rounded-lg border border-green-200">
+                <div className="space-y-2">
+                  <a 
+                    href="https://viacep.com.br" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    ViaCEP
+                  </a>
+                  <p className="text-xs text-gray-600">Consulta de endereços por CEP</p>
                 </div>
               </div>
             </div>
