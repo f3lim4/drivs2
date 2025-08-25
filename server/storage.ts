@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, pagamentosExcluidos,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -20,6 +20,7 @@ import {
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 
 // Função para gerar código único de pagamento
 const gerarCodigoPagamento = async (): Promise<string> => {
@@ -884,16 +885,51 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log(`[STORAGE] Iniciando exclusão do pagamento: ${id}`);
       
+      // Buscar dados do pagamento antes de excluir para registrar a exclusão
+      const pagamento = await this.getPagamento(id);
+      if (!pagamento) {
+        console.log(`[STORAGE] Pagamento ${id} não encontrado`);
+        return false;
+      }
+      
       const result = await db.delete(pagamentos).where(eq(pagamentos.id, id));
       
       // Verificar se alguma linha foi afetada
       const rowsAffected = result.rowCount || result.changes || 0;
       console.log(`[STORAGE] Pagamento excluído do banco, linhas afetadas: ${rowsAffected}`);
       
+      // Se a exclusão foi bem-sucedida e o pagamento era automático, registrar na tabela de exclusões
+      if (rowsAffected > 0 && pagamento.automatico) {
+        console.log(`[STORAGE] Registrando exclusão manual de pagamento automático: ${id}`);
+        await this.registrarExclusaoManual(
+          pagamento.locadoraId, 
+          pagamento.aluguelId, 
+          pagamento.dataPagamento
+        );
+      }
+      
       return rowsAffected > 0;
     } catch (error) {
       console.error(`[STORAGE] Erro ao excluir pagamento ${id}:`, error);
       throw error;
+    }
+  }
+
+  async registrarExclusaoManual(locadoraId: string, aluguelId: string | null, dataPagamento: string): Promise<void> {
+    try {
+      await db.insert(pagamentosExcluidos).values({
+        id: crypto.randomUUID(),
+        locadoraId,
+        aluguelId,
+        dataPagamento,
+        motivo: 'exclusao_manual',
+        usuarioId: null, // Pode ser expandido no futuro
+      });
+      
+      console.log(`[STORAGE] Exclusão registrada: locadora ${locadoraId}, aluguel ${aluguelId}, data ${dataPagamento}`);
+    } catch (error) {
+      console.error(`[STORAGE] Erro ao registrar exclusão manual:`, error);
+      // Não interrompe o fluxo se falhar
     }
   }
 

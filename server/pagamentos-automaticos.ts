@@ -1,6 +1,6 @@
 // Sistema de Pagamentos Automáticos para Aluguéis Ativos
 import { db } from './db';
-import { contratos, pagamentos, alugueis } from '../shared/schema';
+import { contratos, pagamentos, alugueis, pagamentosExcluidos } from '../shared/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import crypto from 'crypto';
 
@@ -108,6 +108,22 @@ const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
 
     if (pagamentoExistente.length > 0) {
       console.log(`[SKIP] Pagamento já existe para aluguel ${aluguel.id} em ${dataVencimento.toDateString()}`);
+      return;
+    }
+
+    // Verificar se este pagamento foi excluído manualmente
+    const foiExcluidoManualmente = await db
+      .select()
+      .from(pagamentosExcluidos)
+      .where(and(
+        eq(pagamentosExcluidos.aluguelId, aluguel.id),
+        eq(pagamentosExcluidos.locadoraId, aluguel.locadoraId),
+        eq(pagamentosExcluidos.dataPagamento, dataFormatada)
+      ))
+      .limit(1);
+
+    if (foiExcluidoManualmente.length > 0) {
+      console.log(`[SKIP] Pagamento foi excluído manualmente para aluguel ${aluguel.id} em ${dataVencimento.toDateString()}`);
       return;
     }
 
