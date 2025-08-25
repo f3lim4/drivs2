@@ -255,15 +255,27 @@ export function EditarVeiculoModal({
       if (response.ok) {
         const result = await response.json();
         
+        console.log(`[FRONTEND] Resposta do servidor:`, result);
+        
         // Atualizar o veículo localmente com todos os documentos retornados do backend
         const veiculoAtualizado = {
           ...veiculo,
           documentos: result.documentos || [result.objectPath] // Usar array completo do backend
         };
+        
+        console.log(`[FRONTEND] Veículo atualizado localmente:`, {
+          id: veiculoAtualizado.id,
+          placa: veiculoAtualizado.placa,
+          documentos: veiculoAtualizado.documentos
+        });
+        
         onVeiculoEditado(veiculoAtualizado);
         
         // Invalidar cache de veículos para atualizar a lista
         await queryClient.invalidateQueries({ queryKey: ['/api/veiculos'] });
+        
+        // Invalidar também queries específicas por locadora
+        await queryClient.invalidateQueries({ queryKey: ['/api/veiculos', veiculo.locadoraId] });
       } else {
         throw new Error('Erro ao salvar documento');
       }
