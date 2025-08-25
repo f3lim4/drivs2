@@ -1056,7 +1056,7 @@ export function EditarVeiculoModal({
                         });
 
                         if (uploadResponse.ok) {
-                          await handleDocumentUpload(data.uploadURL);
+                          await handleDocumentUpload(data.uploadURL, file.name);
                           setUploadedFileName(file.name);
                         }
                       } catch (error) {
