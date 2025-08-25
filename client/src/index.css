@@ -267,29 +267,42 @@
   }
 }
 
-/* Notificações toast mais compactas */
+/* Notificações toast ultra compactas e rápidas */
 [data-sonner-toast] {
-  padding: 6px 10px !important;
-  min-height: 36px !important;
+  padding: 4px 8px !important;
+  min-height: 28px !important;
   height: auto !important;
-  margin: 2px 0 !important;
+  margin: 1px 0 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+  animation-duration: 0.2s !important;
 }
 
 [data-sonner-toast] [data-title] {
-  font-size: 13px !important;
-  line-height: 1.2 !important;
+  font-size: 12px !important;
+  line-height: 1.1 !important;
   margin: 0 !important;
   font-weight: 500 !important;
 }
 
 [data-sonner-toast] [data-description] {
-  font-size: 12px !important;
-  line-height: 1.1 !important;
-  margin: 1px 0 0 0 !important;
-  opacity: 0.8;
+  font-size: 11px !important;
+  line-height: 1.0 !important;
+  margin: 0 !important;
+  opacity: 0.75;
 }
 
-/* Container do toaster com menos espaçamento */
+/* Container do toaster com menos espaçamento e animações rápidas */
 [data-sonner-toaster] {
-  gap: 4px !important;
+  gap: 2px !important;
+}
+
+/* Animações de entrada e saída mais rápidas */
+[data-sonner-toast][data-styled="true"] {
+  animation-duration: 0.15s !important;
+}
+
+/* Reduzir ainda mais o espaçamento */
+[data-sonner-toast] [data-content] {
+  gap: 2px !important;
 }
