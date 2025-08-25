@@ -46,9 +46,11 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
         const response = await fetch(`/api/motoristas/${motorista.id}/imagens`);
         if (response.ok) {
           const data = await response.json();
+          console.log('[VISUALIZAR] Dados da API:', data);
           // Converter documentos em array de URLs válidas
           const imagensArray = Object.values(data.documentos || {})
             .filter(url => url !== null) as string[];
+          console.log('[VISUALIZAR] Array de imagens:', imagensArray);
           setImagens(imagensArray);
         }
       } catch (error) {
