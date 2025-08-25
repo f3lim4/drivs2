@@ -24,6 +24,7 @@ import {
   Crown,
   Search
 } from 'lucide-react';
+import { FaInstagram, FaYoutube, FaLinkedin } from 'react-icons/fa';
 import logoPath from "@assets/icone_1752434737434.png";
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -241,9 +242,40 @@ export function DrivsSidebar() {
 
         {/* Informações do sistema */}
         <div className="p-6 border-t border-blue-500">
-          <div className="text-xs text-white/70">
+          <div className="text-xs text-white/70 mb-3">
             <p>DRIVS v1.0</p>
             <p>Sistema de Gestão</p>
+          </div>
+          
+          {/* Redes Sociais */}
+          <div className="flex flex-col space-y-2">
+            <a 
+              href="https://instagram.com/drivs.me" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 text-white/70 hover:text-pink-400 transition-colors duration-300 text-xs"
+            >
+              <FaInstagram className="w-3 h-3" />
+              <span>@drivs.me</span>
+            </a>
+            <a 
+              href="https://youtube.com/@drivs.me" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 text-white/70 hover:text-red-400 transition-colors duration-300 text-xs"
+            >
+              <FaYoutube className="w-3 h-3" />
+              <span>@drivs.me</span>
+            </a>
+            <a 
+              href="https://linkedin.com/company/drivs.me" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 text-white/70 hover:text-blue-400 transition-colors duration-300 text-xs"
+            >
+              <FaLinkedin className="w-3 h-3" />
+              <span>@drivs.me</span>
+            </a>
           </div>
         </div>
       </SidebarContent>
