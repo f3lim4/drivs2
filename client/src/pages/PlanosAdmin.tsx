@@ -206,8 +206,35 @@ export default function PlanosAdmin() {
     }
   });
 
-  // Usar dados do servidor se disponíveis, senão usar padrão
-  const planos = planosFromServer || planosData;
+  // Converter dados do servidor para array se necessário
+  const planos = React.useMemo(() => {
+    if (!planosFromServer) return planosData;
+    
+    // Se planosFromServer é um objeto com propriedades de planos, converter para array
+    if (typeof planosFromServer === 'object' && !Array.isArray(planosFromServer)) {
+      const serverPlanos = Object.values(planosFromServer).filter(plano => plano && typeof plano === 'object');
+      
+      // Mapear com dados padrão para propriedades faltantes
+      return serverPlanos.map((plano: any) => {
+        const defaultPlano = planosData.find(p => p.id === plano.id);
+        return {
+          ...defaultPlano,
+          ...plano,
+          recursos: plano.recursos || defaultPlano?.recursos || [],
+          icone: plano.icone || defaultPlano?.icone || 'Car',
+          cor: plano.cor || defaultPlano?.cor || 'blue'
+        };
+      });
+    }
+    
+    // Se já é um array, usar diretamente
+    if (Array.isArray(planosFromServer)) {
+      return planosFromServer;
+    }
+    
+    // Fallback para dados padrão
+    return planosData;
+  }, [planosFromServer, planosData]);
 
   const updatePlanoMutation = useMutation({
     mutationFn: async (plano: Plano) => {
@@ -253,7 +280,7 @@ export default function PlanosAdmin() {
   };
 
   const handleInputChange = (planoId: string, field: keyof Plano, value: any) => {
-    const updatedPlanos = planos.map(p => 
+    const updatedPlanos = (planos as Plano[]).map((p: Plano) => 
       p.id === planoId ? { ...p, [field]: value } : p
     );
     if (!planosFromServer) {
@@ -287,7 +314,7 @@ export default function PlanosAdmin() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {planos.map((plano) => {
+            {(planos as Plano[]).map((plano: Plano) => {
               const IconComponent = getIconComponent(plano.icone);
               const colors = getColorClasses(plano.cor);
               const isEditing = editingPlano === plano.id;
@@ -359,15 +386,15 @@ export default function PlanosAdmin() {
                     </div>
 
                     <ul className="space-y-3 mb-6">
-                      {plano.recursos.slice(0, 4).map((recurso, index) => (
+                      {(plano.recursos || []).slice(0, 4).map((recurso: string, index: number) => (
                         <li key={index} className="flex items-start text-sm text-gray-700">
                           <CheckCircle className={`h-4 w-4 ${colors.check} mr-2 mt-0.5 flex-shrink-0`} />
                           <span>{recurso}</span>
                         </li>
                       ))}
-                      {plano.recursos.length > 4 && (
+                      {(plano.recursos || []).length > 4 && (
                         <li className="text-xs text-gray-500 text-center">
-                          +{plano.recursos.length - 4} recursos adicionais
+                          +{(plano.recursos || []).length - 4} recursos adicionais
                         </li>
                       )}
                     </ul>
