@@ -2757,24 +2757,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Veículo não encontrado" });
       }
 
-      // Substituir documento existente (sistema de documento único)
+      // Adicionar novo documento preservando documentos existentes únicos deste veículo
       const documentosAtuais = veiculo.documentos || [];
-      const novosDocumentos = [objectPath]; // Apenas 1 documento permitido
       
-      console.log(`[DOCUMENTO] Substituindo documento - Atuais: ${documentosAtuais.length}, novo: ${novosDocumentos.length}`);
+      // Verificar se já existe este documento para evitar duplicatas
+      if (documentosAtuais.includes(objectPath)) {
+        console.log(`[DOCUMENTO] Documento já existe para veículo ${req.params.id}: ${objectPath}`);
+        return res.status(200).json({
+          objectPath: objectPath,
+          totalDocumentos: documentosAtuais.length,
+          documentos: documentosAtuais,
+          message: "Documento já existe"
+        });
+      }
+      
+      // Adicionar novo documento ao array existente (cada veículo tem seus próprios documentos)
+      const novosDocumentos = [...documentosAtuais, objectPath];
+      
+      console.log(`[DOCUMENTO] Adicionando documento para veículo ${req.params.id} - Atuais: ${documentosAtuais.length}, total após adição: ${novosDocumentos.length}`);
 
       // Atualizar veículo com nova lista de documentos
       await storage.updateVeiculo(req.params.id, { documentos: novosDocumentos });
       
-      console.log(`[DOCUMENTO] Documento salvo com sucesso. Total: ${novosDocumentos.length}`);
+      console.log(`[DOCUMENTO] Documento salvo com sucesso para veículo ${req.params.id}. Total: ${novosDocumentos.length}`);
 
       res.status(200).json({
         objectPath: objectPath,
         totalDocumentos: novosDocumentos.length,
-        documentos: novosDocumentos
+        documentos: novosDocumentos,
+        message: "Documento adicionado com sucesso"
       });
     } catch (error) {
       console.error("[DOCUMENTO] Error setting documento:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Endpoint para obter documentos de um veículo
+  app.get("/api/veiculos/:id/documentos", async (req, res) => {
+    try {
+      const veiculo = await storage.getVeiculo(req.params.id);
+      if (!veiculo) {
+        return res.status(404).json({ error: "Veículo não encontrado" });
+      }
+
+      const documentos = veiculo.documentos || [];
+      console.log(`[DOCUMENTO] Buscando documentos do veículo ${req.params.id}: ${documentos.length} documentos`);
+
+      res.status(200).json({
+        veiculoId: req.params.id,
+        totalDocumentos: documentos.length,
+        documentos: documentos
+      });
+    } catch (error) {
+      console.error("[DOCUMENTO] Error fetching documentos:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Endpoint para remover um documento específico de um veículo
+  app.delete("/api/veiculos/:id/documentos", async (req, res) => {
+    try {
+      const { documentPath } = req.body;
+      
+      if (!documentPath) {
+        return res.status(400).json({ error: "documentPath é obrigatório" });
+      }
+
+      const veiculo = await storage.getVeiculo(req.params.id);
+      if (!veiculo) {
+        return res.status(404).json({ error: "Veículo não encontrado" });
+      }
+
+      const documentosAtuais = veiculo.documentos || [];
+      const novosDocumentos = documentosAtuais.filter(doc => doc !== documentPath);
+
+      if (documentosAtuais.length === novosDocumentos.length) {
+        return res.status(404).json({ error: "Documento não encontrado" });
+      }
+
+      await storage.updateVeiculo(req.params.id, { documentos: novosDocumentos });
+      
+      console.log(`[DOCUMENTO] Documento removido do veículo ${req.params.id}. Restam: ${novosDocumentos.length} documentos`);
+
+      res.status(200).json({
+        veiculoId: req.params.id,
+        documentoRemovido: documentPath,
+        totalDocumentos: novosDocumentos.length,
+        documentos: novosDocumentos,
+        message: "Documento removido com sucesso"
+      });
+    } catch (error) {
+      console.error("[DOCUMENTO] Error removing documento:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
