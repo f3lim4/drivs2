@@ -276,23 +276,19 @@ export function EditarVeiculoModal({
         body: JSON.stringify(requestData),
       });
 
+      console.log(`[FRONTEND] Response status: ${response.status}`);
+      console.log(`[FRONTEND] Response ok: ${response.ok}`);
+      
       if (response.ok) {
         const result = await response.json();
+        console.log(`[FRONTEND] Response resultado:`, result);
         
-        // Atualizar o veículo localmente com todos os documentos retornados do backend
-        const veiculoAtualizado = {
-          ...veiculo,
-          documentos: result.documentos?.map((d: any) => d.url) || [result.objectPath] // Usar array completo do backend
-        };
-        
-        onVeiculoEditado(veiculoAtualizado);
+        // Invalidar query dos documentos para recarregar
+        await queryClient.invalidateQueries({ queryKey: ['veiculos', veiculo.id, 'documentos'] });
         
         // Invalidar cache de veículos para atualizar a lista (usando query key correta)
         await queryClient.invalidateQueries({ queryKey: ['veiculos'] });
         await queryClient.invalidateQueries({ queryKey: ['veiculos', veiculo.locadoraId] });
-        
-        // Invalidar query dos documentos para recarregar
-        await queryClient.invalidateQueries({ queryKey: ['veiculos', veiculo.id, 'documentos'] });
         
         toast({
           title: "Documento salvo",
@@ -300,7 +296,9 @@ export function EditarVeiculoModal({
           variant: "default",
         });
       } else {
-        throw new Error('Erro ao salvar documento');
+        const errorText = await response.text();
+        console.log(`[FRONTEND] Response erro:`, errorText);
+        throw new Error(`Erro ${response.status}: ${errorText}`);
       }
     } catch (error) {
       console.error('Erro ao fazer upload do documento:', error);
@@ -1063,6 +1061,29 @@ export function EditarVeiculoModal({
                       setUploadedFileName(null);
 
                       try {
+                        // Se já existem documentos, removê-los primeiro (substituição)
+                        if (documentosVeiculo.length > 0) {
+                          console.log(`[FRONTEND] Substituindo documentos existentes para veículo ${veiculo.id}`);
+                          
+                          // Remover todos os documentos existentes
+                          for (const documento of documentosVeiculo) {
+                            try {
+                              const deleteResponse = await fetch(`/api/veiculos/${veiculo.id}/documentos/${documento.id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                },
+                              });
+                              
+                              if (!deleteResponse.ok) {
+                                console.warn(`Falha ao remover documento ${documento.id}`);
+                              }
+                            } catch (deleteError) {
+                              console.warn('Erro ao remover documento:', deleteError);
+                            }
+                          }
+                        }
+
                         // Obter URL de upload
                         const response = await fetch('/api/objects/upload', {
                           method: 'POST',
@@ -1084,6 +1105,12 @@ export function EditarVeiculoModal({
                         if (uploadResponse.ok) {
                           await handleDocumentUpload(data.uploadURL, file.name);
                           setUploadedFileName(file.name);
+                          
+                          toast({
+                            title: documentosVeiculo.length > 0 ? "Documento substituído" : "Documento adicionado",
+                            description: file.name,
+                            variant: "default",
+                          });
                         }
                       } catch (error) {
                         console.error('Erro no upload:', error);

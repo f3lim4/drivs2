@@ -2735,108 +2735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ uploadURL });
   });
 
-  // [ANTIGO] Endpoint removido - Usando novo sistema documentos_veiculos
-  // app.put("/api/veiculos/:id/documentos", async (req, res) => {
-  //   console.log(`[DOCUMENTO] Recebido para veículo ${req.params.id}:`, req.body);
-  //   
-  //   if (!req.body.documentURL) {
-  //     return res.status(400).json({ error: "documentURL é obrigatório" });
-  //   }
-  //
-  //   try {
-  //     const objectStorageService = new ObjectStorageService();
-  //     const objectPath = objectStorageService.normalizeObjectEntityPath(
-  //       req.body.documentURL,
-  //     );
-  //     console.log(`[DOCUMENTO] URL normalizada: ${req.body.documentURL} -> ${objectPath}`);
-  //
-  //     // Buscar veículo atual para preservar documentos existentes
-  //     const veiculo = await storage.getVeiculo(req.params.id);
-  //     if (!veiculo) {
-  //       console.log(`[DOCUMENTO] Veículo ${req.params.id} não encontrado`);
-  //       return res.status(404).json({ error: "Veículo não encontrado" });
-  //     }
-  //
-  //     console.log(`[DOCUMENTO DEBUG] Veículo ${req.params.id} atual:`, {
-  //       id: veiculo.id,
-  //       placa: veiculo.placa,
-  //       documentosAtuais: veiculo.documentos || [],
-  //       locadoraId: veiculo.locadoraId
-  //     });
-  //
-  //     // Adicionar novo documento preservando documentos existentes únicos deste veículo
-  //     const documentosAtuais = veiculo.documentos || [];
-  //     
-  //     // Verificar se já existe este documento para evitar duplicatas
-  //     if (documentosAtuais.includes(objectPath)) {
-  //       console.log(`[DOCUMENTO] Documento já existe para veículo ${req.params.id}: ${objectPath}`);
-  //       return res.status(200).json({
-  //         objectPath: objectPath,
-  //         totalDocumentos: documentosAtuais.length,
-  //         documentos: documentosAtuais,
-  //         message: "Documento já existe"
-  //       });
-  //     }
-  //     
-  //     // Adicionar novo documento ao array existente (cada veículo tem seus próprios documentos)
-  //     const novosDocumentos = [...documentosAtuais, objectPath];
-  //     
-  //     console.log(`[DOCUMENTO] Adicionando documento para veículo ${req.params.id} - Atuais: ${documentosAtuais.length}, total após adição: ${novosDocumentos.length}`);
-  //
-  //     // Atualizar veículo com nova lista de documentos
-  //     await storage.updateVeiculo(req.params.id, { documentos: novosDocumentos });
-  //     
-  //     // Verificar se a atualização foi realmente salva no banco
-  //     const veiculoVerificacao = await storage.getVeiculo(req.params.id);
-  //     console.log(`[DOCUMENTO VERIFICAÇÃO] Veículo ${req.params.id} após atualização:`, {
-  //       id: veiculoVerificacao?.id,
-  //       placa: veiculoVerificacao?.placa,
-  //       documentosApos: veiculoVerificacao?.documentos || [],
-  //       locadoraId: veiculoVerificacao?.locadoraId
-  //     });
-  //     
-  //     console.log(`[DOCUMENTO] Documento salvo com sucesso para veículo ${req.params.id}. Total: ${novosDocumentos.length}`);
-  //
-  //     res.status(200).json({
-  //       objectPath: objectPath,
-  //       totalDocumentos: novosDocumentos.length,
-  //       documentos: novosDocumentos,
-  //       message: "Documento adicionado com sucesso"
-  //     });
-  //   } catch (error) {
-  //     console.error("[DOCUMENTO] Error setting documento:", error);
-  //     res.status(500).json({ error: "Internal server error" });
-  //   }
-  // });
 
-  // Endpoint para obter documentos de um veículo (NOVO SISTEMA)
-  app.get("/api/veiculos/:id/documentos/novo", async (req, res) => {
-    try {
-      const veiculo = await storage.getVeiculo(req.params.id);
-      if (!veiculo) {
-        return res.status(404).json({ error: "Veículo não encontrado" });
-      }
-
-      const documentos = await storage.getDocumentosVeiculo(req.params.id);
-      console.log(`[DOCUMENTO NOVO] Buscando documentos do veículo ${req.params.id}: ${documentos.length} documentos`);
-
-      res.status(200).json({
-        veiculoId: req.params.id,
-        totalDocumentos: documentos.length,
-        documentos: documentos.map(d => ({
-          id: d.id,
-          url: d.url,
-          nome: d.nomeOriginal,
-          tamanho: d.tamanho,
-          tipo: d.tipo,
-          createdAt: d.createdAt
-        }))
-      });
-    } catch (error) {
-      console.error("[DOCUMENTO NOVO] Error fetching documentos:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
 
   // Endpoint para obter documentos de um veículo (NOVO SISTEMA)
   app.get("/api/veiculos/:id/documentos", async (req, res) => {
@@ -2945,6 +2844,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("[DOCUMENTO] Error removing documento:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Endpoint para remover um documento específico por ID (NOVO SISTEMA)
+  app.delete("/api/veiculos/:id/documentos/:documentoId", async (req, res) => {
+    try {
+      const { id: veiculoId, documentoId } = req.params;
+      
+      console.log(`[DOCUMENTO NOVO] Removendo documento ${documentoId} do veículo ${veiculoId}`);
+      
+      // Verificar se o veículo existe
+      const veiculo = await storage.getVeiculo(veiculoId);
+      if (!veiculo) {
+        return res.status(404).json({ error: "Veículo não encontrado" });
+      }
+
+      // Verificar se o documento existe e pertence ao veículo
+      const documento = await storage.getDocumentoVeiculoById(documentoId);
+      if (!documento || documento.veiculoId !== veiculoId) {
+        return res.status(404).json({ error: "Documento não encontrado" });
+      }
+
+      // Remover documento
+      await storage.deleteDocumentoVeiculo(documentoId);
+
+      // Buscar documentos restantes
+      const documentosRestantes = await storage.getDocumentosVeiculo(veiculoId);
+
+      console.log(`[DOCUMENTO NOVO] Documento ${documentoId} removido com sucesso. Restantes: ${documentosRestantes.length}`);
+
+      res.status(200).json({
+        message: "Documento removido com sucesso",
+        totalDocumentos: documentosRestantes.length,
+        documentos: documentosRestantes.map(d => ({ url: d.url, nome: d.nomeOriginal }))
+      });
+    } catch (error) {
+      console.error("Error removing documento:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });

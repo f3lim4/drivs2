@@ -75,6 +75,7 @@ export interface IStorage {
   createDocumentoVeiculo(documento: InsertDocumentoVeiculo): Promise<DocumentoVeiculo>;
   getDocumentosVeiculo(veiculoId: string): Promise<DocumentoVeiculo[]>;
   deleteDocumentoVeiculo(documentoId: string): Promise<void>;
+  getDocumentoVeiculoById(documentoId: string): Promise<DocumentoVeiculo | undefined>;
   
   // Motorista operations
   getAllMotoristas(): Promise<Motorista[]>;
@@ -461,6 +462,11 @@ export class DatabaseStorage implements IStorage {
 
   async deleteDocumentoVeiculo(documentoId: string): Promise<void> {
     await db.delete(documentosVeiculos).where(eq(documentosVeiculos.id, documentoId));
+  }
+
+  async getDocumentoVeiculoById(documentoId: string): Promise<DocumentoVeiculo | undefined> {
+    const [documento] = await db.select().from(documentosVeiculos).where(eq(documentosVeiculos.id, documentoId));
+    return documento;
   }
 
   // Motorista operations
