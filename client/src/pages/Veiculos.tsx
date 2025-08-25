@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, Car, Bike, Truck, Bus, Eye } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Car, Bike, Truck, Bus, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useVeiculos } from '@/hooks/useVeiculos';
@@ -104,6 +104,7 @@ export default function Veiculos() {
   const [selectedVeiculo, setSelectedVeiculo] = useState<Veiculo | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showAllColumns, setShowAllColumns] = useState(true);
 
 
   // Filtra e ordena veículos baseado na busca, filtros e ordenação
@@ -420,7 +421,22 @@ export default function Veiculos() {
       {/* Tabela de veículos */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Frota de Veículos</CardTitle>
+          <div className="flex items-center gap-3">
+            <CardTitle>Frota de Veículos</CardTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowAllColumns(!showAllColumns)}
+              title={showAllColumns ? "Esconder colunas extras" : "Mostrar todas as colunas"}
+              data-testid="button-toggle-columns"
+            >
+              {showAllColumns ? (
+                <Eye className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <EyeOff className="w-4 h-4 text-muted-foreground" />
+              )}
+            </Button>
+          </div>
           
           {/* Ordenação */}
           <Select value={sortOrder} onValueChange={setSortOrder}>
@@ -471,30 +487,46 @@ export default function Veiculos() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <p className="font-medium">{veiculo.placa}</p>
+                    {showAllColumns ? (
+                      <p className="font-medium">{veiculo.placa}</p>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </TableCell>
                    {isAdmin && (
                      <TableCell>
-                       <div className="flex items-center gap-2">
-                         <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
-                           <span className="text-blue-600 text-xs font-medium">
-                             {veiculo.locadoraNome?.substring(0, 2).toUpperCase() || 'LO'}
-                           </span>
+                       {showAllColumns ? (
+                         <div className="flex items-center gap-2">
+                           <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
+                             <span className="text-blue-600 text-xs font-medium">
+                               {veiculo.locadoraNome?.substring(0, 2).toUpperCase() || 'LO'}
+                             </span>
+                           </div>
+                           <span className="text-sm">{veiculo.locadoraNome || 'Locadora'}</span>
                          </div>
-                         <span className="text-sm">{veiculo.locadoraNome || 'Locadora'}</span>
-                       </div>
+                       ) : (
+                         <span className="text-muted-foreground">-</span>
+                       )}
                      </TableCell>
                    )}
                   <TableCell>
-                    <div>
-                      <p className="font-medium">{formatCurrency(veiculo.valorSemanal)}/sem</p>
-                      <p className="text-sm text-muted-foreground">
-                        Caução: {formatCurrency(veiculo.caucao)}
-                      </p>
-                    </div>
+                    {showAllColumns ? (
+                      <div>
+                        <p className="font-medium">{formatCurrency(veiculo.valorSemanal)}/sem</p>
+                        <p className="text-sm text-muted-foreground">
+                          Caução: {formatCurrency(veiculo.caucao)}
+                        </p>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </TableCell>
                   <TableCell>
-                    {getStatusBadge(veiculo.status)}
+                    {showAllColumns ? (
+                      getStatusBadge(veiculo.status)
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
                   </TableCell>
                   {isLocadora && (
                     <TableCell>
