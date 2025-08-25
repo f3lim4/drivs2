@@ -4,7 +4,7 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { testConnection, db } from "./db";
-import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, updateContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, insertTemplateContratoSchema, insertSeoConfigSchema, contratos } from "@shared/schema";
+import { insertProfileSchema, insertLocadoraSchema, insertVeiculoSchema, insertMotoristaSchema, insertAluguelSchema, insertContratoSchema, updateContratoSchema, insertPagamentoSchema, insertInfracaoSchema, insertDespesaSchema, insertManutencaoSchema, insertLocalSchema, insertAnuncioSchema, insertAtividadeSchema, insertTemplateContratoSchema, insertSeoConfigSchema, insertDashboardConfigSchema, contratos, dashboardConfig } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import fs from "fs";
@@ -2070,6 +2070,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting anuncio:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Dashboard Configuration Routes - Admin only
+  app.get('/api/admin/dashboard-config', async (req, res) => {
+    try {
+      const config = await db.select().from(dashboardConfig).limit(1);
+      
+      if (config.length === 0) {
+        // Se não existe configuração, criar uma padrão
+        const defaultConfig = await db.insert(dashboardConfig).values({}).returning();
+        return res.json(defaultConfig[0]);
+      }
+      
+      res.json(config[0]);
+    } catch (error) {
+      console.error('Erro ao buscar configuração do dashboard:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  app.put('/api/admin/dashboard-config', async (req, res) => {
+    try {
+      const data = insertDashboardConfigSchema.parse(req.body);
+      
+      // Verificar se já existe uma configuração
+      const existingConfig = await db.select().from(dashboardConfig).limit(1);
+      
+      let updatedConfig;
+      if (existingConfig.length === 0) {
+        // Criar nova configuração
+        updatedConfig = await db.insert(dashboardConfig).values(data).returning();
+      } else {
+        // Atualizar configuração existente
+        updatedConfig = await db
+          .update(dashboardConfig)
+          .set({
+            ...data,
+            updatedAt: new Date()
+          })
+          .where(eq(dashboardConfig.id, existingConfig[0].id))
+          .returning();
+      }
+
+      res.json(updatedConfig[0]);
+    } catch (error) {
+      console.error('Erro ao atualizar configuração do dashboard:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Dados inválidos', details: error.errors });
+      }
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Rota pública para locadoras obterem as configurações do dashboard
+  app.get('/api/dashboard-config', async (req, res) => {
+    try {
+      const config = await db.select().from(dashboardConfig).limit(1);
+      
+      if (config.length === 0) {
+        // Retornar configuração padrão se não existe
+        return res.json({
+          videoTutorialUrl: null,
+          videoTutorialTitulo: "Tutorial do Sistema",
+          videoTutorialDescricao: "Aprenda a usar o sistema",
+          videoDemoUrl: null,
+          videoDemoTitulo: "Demonstração",
+          videoDemoDescricao: "Veja o sistema em ação",
+          linkSuporteUrl: "https://wa.me/5511977263156",
+          linkSuporteTitulo: "Suporte WhatsApp",
+          linkSuporteDescricao: "Atendimento especializado",
+          linkTreinamentoUrl: null,
+          linkTreinamentoTitulo: "Treinamentos",
+          linkTreinamentoDescricao: "Capacitação completa",
+          linkManualUrl: null,
+          linkManualTitulo: "Manual do Sistema",
+          linkManualDescricao: "Guia completo de uso",
+          linkDetranUrl: "https://www.detran.sp.gov.br",
+          linkDetranTitulo: "Portal DETRAN SP",
+          linkDetranDescricao: "Consultas de veículos e habilitação",
+          linkReceitaUrl: "https://www.receita.fazenda.gov.br",
+          linkReceitaTitulo: "Receita Federal",
+          linkReceitaDescricao: "Consultas de CPF e CNPJ",
+          linkSpcUrl: "https://www.spc.org.br",
+          linkSpcTitulo: "Consulta SPC/Serasa",
+          linkSpcDescricao: "Verificação de score e restrições",
+          linkViaCepUrl: "https://viacep.com.br",
+          linkViaCepTitulo: "Busca CEP",
+          linkViaCepDescricao: "Consulta de endereços",
+          mostrarVideoTutorial: true,
+          mostrarVideoDemo: true,
+          mostrarLinksSuporte: true,
+          mostrarLinksUteis: true,
+          telefoneSuporte: "11977263156",
+          emailSuporte: "suporte@drivs.com.br"
+        });
+      }
+      
+      res.json(config[0]);
+    } catch (error) {
+      console.error('Erro ao buscar configuração do dashboard:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });
 

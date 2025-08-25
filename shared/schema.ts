@@ -677,3 +677,70 @@ export type Atividade = typeof atividades.$inferSelect;
 
 export type InsertSeoConfig = z.infer<typeof insertSeoConfigSchema>;
 export type SeoConfig = typeof seoConfig.$inferSelect;
+
+// Dashboard Config table - Configurações do dashboard para locadoras
+export const dashboardConfig = pgTable("dashboard_config", {
+  id: serial("id").primaryKey(),
+  
+  // Vídeos
+  videoTutorialUrl: text("video_tutorial_url"),
+  videoTutorialTitulo: text("video_tutorial_titulo").default("Tutorial do Sistema"),
+  videoTutorialDescricao: text("video_tutorial_descricao").default("Aprenda a usar o sistema"),
+  
+  videoDemoUrl: text("video_demo_url"),
+  videoDemoTitulo: text("video_demo_titulo").default("Demonstração"),
+  videoDemoDescricao: text("video_demo_descricao").default("Veja o sistema em ação"),
+  
+  // Links Úteis
+  linkSuporteUrl: text("link_suporte_url").default("https://wa.me/5511977263156"),
+  linkSuporteTitulo: text("link_suporte_titulo").default("Suporte WhatsApp"),
+  linkSuporteDescricao: text("link_suporte_descricao").default("Atendimento especializado"),
+  
+  linkTreinamentoUrl: text("link_treinamento_url"),
+  linkTreinamentoTitulo: text("link_treinamento_titulo").default("Treinamentos"),
+  linkTreinamentoDescricao: text("link_treinamento_descricao").default("Capacitação completa"),
+  
+  linkManualUrl: text("link_manual_url"),
+  linkManualTitulo: text("link_manual_titulo").default("Manual do Sistema"),
+  linkManualDescricao: text("link_manual_descricao").default("Guia completo de uso"),
+  
+  // Links Externos Úteis
+  linkDetranUrl: text("link_detran_url").default("https://www.detran.sp.gov.br"),
+  linkDetranTitulo: text("link_detran_titulo").default("Portal DETRAN SP"),
+  linkDetranDescricao: text("link_detran_descricao").default("Consultas de veículos e habilitação"),
+  
+  linkReceitaUrl: text("link_receita_url").default("https://www.receita.fazenda.gov.br"),
+  linkReceitaTitulo: text("link_receita_titulo").default("Receita Federal"),
+  linkReceitaDescricao: text("link_receita_descricao").default("Consultas de CPF e CNPJ"),
+  
+  linkSpcUrl: text("link_spc_url").default("https://www.spc.org.br"),
+  linkSpcTitulo: text("link_spc_titulo").default("Consulta SPC/Serasa"),
+  linkSpcDescricao: text("link_spc_descricao").default("Verificação de score e restrições"),
+  
+  linkViaCepUrl: text("link_via_cep_url").default("https://viacep.com.br"),
+  linkViaCepTitulo: text("link_via_cep_titulo").default("Busca CEP"),
+  linkViaCepDescricao: text("link_via_cep_descricao").default("Consulta de endereços"),
+  
+  // Configurações de exibição
+  mostrarVideoTutorial: boolean("mostrar_video_tutorial").default(true),
+  mostrarVideoDemo: boolean("mostrar_video_demo").default(true),
+  mostrarLinksSuporte: boolean("mostrar_links_suporte").default(true),
+  mostrarLinksUteis: boolean("mostrar_links_uteis").default(true),
+  
+  // Informações de contato personalizáveis
+  telefoneSuporte: text("telefone_suporte").default("11977263156"),
+  emailSuporte: text("email_suporte").default("suporte@drivs.com.br"),
+  
+  // Controle
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertDashboardConfigSchema = createInsertSchema(dashboardConfig).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DashboardConfig = typeof dashboardConfig.$inferSelect;
+export type InsertDashboardConfig = z.infer<typeof insertDashboardConfigSchema>;
