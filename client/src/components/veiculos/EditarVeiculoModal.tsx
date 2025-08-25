@@ -241,6 +241,8 @@ export function EditarVeiculoModal({
   const handleDocumentUpload = async (uploadURL: string) => {
     if (!veiculo) return;
     
+    console.log(`[FRONTEND UPLOAD] Iniciando upload para veículo ID: ${veiculo.id}, uploadURL: ${uploadURL}`);
+    
     try {
       const response = await fetch(`/api/veiculos/${veiculo.id}/documentos`, {
         method: 'PUT',
