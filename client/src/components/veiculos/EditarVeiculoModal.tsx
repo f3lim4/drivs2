@@ -1031,10 +1031,6 @@ export function EditarVeiculoModal({
 
                         if (uploadResponse.ok) {
                           await handleDocumentUpload(data.uploadURL);
-                          toast({
-                            title: "Documento carregado",
-                            description: `${file.name} carregado com sucesso. ${veiculo?.documentos && veiculo.documentos.length > 0 ? 'O documento anterior foi substituído.' : ''}`,
-                          });
                         }
                       } catch (error) {
                         console.error('Erro no upload:', error);
