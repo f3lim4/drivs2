@@ -949,56 +949,54 @@ export function EditarVeiculoModal({
                 Documentos do Veículo
               </h3>
               
-              {/* Upload de documentos - alinhado */}
+              {/* Upload de documento único */}
               <div className="flex items-center justify-between p-2 border rounded bg-gray-50/50">
-                <span className="text-xs text-muted-foreground">Documentos:</span>
+                <span className="text-xs text-muted-foreground">Documento:</span>
                 <div className="flex items-center gap-2">
                   <input
                     type="file"
                     id="documento-upload-edit"
-                    multiple
                     accept=".pdf,.jpg,.jpeg,.png"
                     style={{ display: 'none' }}
                     onChange={async (e) => {
-                      const files = e.target.files;
-                      if (!files || files.length === 0) return;
+                      const file = e.target.files?.[0];
+                      if (!file) return;
 
-                      for (const file of Array.from(files)) {
-                        try {
-                          // Obter URL de upload
-                          const response = await fetch('/api/objects/upload', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                          });
-                          const data = await response.json();
+                      try {
+                        // Obter URL de upload
+                        const response = await fetch('/api/objects/upload', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                        });
+                        const data = await response.json();
 
-                          // Upload do arquivo
-                          const uploadResponse = await fetch(data.uploadURL, {
-                            method: 'PUT',
-                            body: file,
-                            headers: {
-                              'Content-Type': file.type,
-                            },
-                          });
+                        // Upload do arquivo
+                        const uploadResponse = await fetch(data.uploadURL, {
+                          method: 'PUT',
+                          body: file,
+                          headers: {
+                            'Content-Type': file.type,
+                          },
+                        });
 
-                          if (uploadResponse.ok) {
-                            await handleDocumentUpload(data.uploadURL);
-                            toast({
-                              title: "Documento adicionado",
-                              description: `${file.name} carregado com sucesso.`,
-                            });
-                          }
-                        } catch (error) {
-                          console.error('Erro no upload:', error);
+                        if (uploadResponse.ok) {
+                          await handleDocumentUpload(data.uploadURL);
                           toast({
-                            title: "Erro no upload",
-                            description: `Falha ao carregar ${file.name}`,
-                            variant: "destructive",
+                            title: "Documento carregado",
+                            description: `${file.name} carregado com sucesso. O documento anterior foi substituído.`,
                           });
                         }
+                      } catch (error) {
+                        console.error('Erro no upload:', error);
+                        toast({
+                          title: "Erro no upload",
+                          description: `Falha ao carregar ${file.name}`,
+                          variant: "destructive",
+                        });
                       }
+                      
                       // Limpar input
                       e.target.value = '';
                     }}
@@ -1011,39 +1009,35 @@ export function EditarVeiculoModal({
                     className="text-xs h-7 px-3 bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                   >
                     <Upload className="w-3 h-3 mr-1" />
-                    Adicionar
+                    {veiculo?.documentos && veiculo.documentos.length > 0 ? 'Substituir' : 'Adicionar'}
                   </Button>
                   {veiculo?.documentos && veiculo.documentos.length > 0 && (
                     <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
-                      {veiculo.documentos.length} arquivo(s)
+                      1 documento
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Lista de documentos existentes */}
+              {/* Documento existente */}
               {veiculo?.documentos && veiculo.documentos.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-medium">Documentos Salvos:</h4>
-                  <div className="grid gap-2">
-                    {veiculo.documentos.map((doc, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-blue-500" />
-                          <span className="text-sm">Documento {index + 1}</span>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(doc, '_blank')}
-                          className="flex items-center gap-1"
-                        >
-                          <Download className="w-3 h-3" />
-                          Baixar
-                        </Button>
-                      </div>
-                    ))}
+                  <h4 className="font-medium">Documento Salvo:</h4>
+                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-blue-500" />
+                      <span className="text-sm">Documento do Veículo</span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(veiculo.documentos[0], '_blank')}
+                      className="flex items-center gap-1"
+                    >
+                      <Download className="w-3 h-3" />
+                      Baixar
+                    </Button>
                   </div>
                 </div>
               )}
