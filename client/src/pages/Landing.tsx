@@ -20,6 +20,7 @@ import {
   ArrowRight,
   PlayCircle
 } from "lucide-react";
+import { FaInstagram, FaYoutube, FaLinkedin } from 'react-icons/fa';
 
 export default function Landing() {
   const [email, setEmail] = useState("");
@@ -415,7 +416,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-5 gap-8">
             <div>
               <h3 className="text-xl font-bold mb-4">DRIVS</h3>
               <p className="text-gray-400">
@@ -447,6 +448,41 @@ export default function Landing() {
                 <li>📱 11977263156</li>
                 <li>🏢 São Paulo, SP</li>
               </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Redes Sociais</h4>
+              <div className="space-y-3">
+                <div className="text-sm text-gray-300 mb-3">DRIVS v1.0 - Sistema de Gestão</div>
+                <div className="flex flex-col space-y-3">
+                  <a 
+                    href="https://instagram.com/drive.me" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 text-gray-400 hover:text-pink-400 transition-colors duration-300"
+                  >
+                    <FaInstagram className="w-5 h-5" />
+                    <span>@drive.me</span>
+                  </a>
+                  <a 
+                    href="https://youtube.com/@drive.me" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 text-gray-400 hover:text-red-500 transition-colors duration-300"
+                  >
+                    <FaYoutube className="w-5 h-5" />
+                    <span>@drive.me</span>
+                  </a>
+                  <a 
+                    href="https://linkedin.com/company/drive.me" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 text-gray-400 hover:text-blue-500 transition-colors duration-300"
+                  >
+                    <FaLinkedin className="w-5 h-5" />
+                    <span>@drive.me</span>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
           
