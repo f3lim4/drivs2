@@ -1174,11 +1174,6 @@ export function NovoVeiculoModal({
                         }
                         
                         form.setValue('documento', documentoURL);
-                        
-                        toast({
-                          title: "Documento carregado",
-                          description: `${file.name} carregado com sucesso.`,
-                        });
                       }
                     } catch (error) {
                       console.error('[UPLOAD DIRETO] Erro:', error);
