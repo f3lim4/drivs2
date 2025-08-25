@@ -2,7 +2,8 @@
  * Modal para editar dados da locadora
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,6 +49,29 @@ interface EditarLocadoraModalProps {
 
 export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLocadoraModalProps) {
   const { toast } = useToast();
+  
+  // Buscar planos da API
+  const { data: planosFromServer } = useQuery({
+    queryKey: ['/api/planos'],
+    retry: false
+  });
+  
+  // Converter dados do servidor para array se necessário
+  const planos = React.useMemo(() => {
+    if (!planosFromServer) return [];
+    
+    // Se planosFromServer é um objeto com propriedades de planos, converter para array
+    if (typeof planosFromServer === 'object' && !Array.isArray(planosFromServer)) {
+      return Object.values(planosFromServer).filter(plano => plano && typeof plano === 'object');
+    }
+    
+    // Se já é um array, usar diretamente
+    if (Array.isArray(planosFromServer)) {
+      return planosFromServer;
+    }
+    
+    return [];
+  }, [planosFromServer]);
   const [formData, setFormData] = useState({
     nome: '',
     razaoSocial: '',
@@ -170,18 +194,19 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="basico">Básico - R$ 49/mês</SelectItem>
-                  <SelectItem value="profissional">Profissional - R$ 99/mês</SelectItem>
-                  <SelectItem value="avancado">Avançado - R$ 200/mês</SelectItem>
-                  <SelectItem value="master">Master - R$ 500/mês</SelectItem>
+                  {planos.map((plano: any) => (
+                    <SelectItem key={plano.id} value={plano.id}>
+                      {plano.nome} - R$ {plano.preco}/mês
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               {formData.plano && (
                 <div className="text-sm text-slate-600 mt-1">
-                  {formData.plano === 'basico' && 'Até 5 veículos na frota - R$ 49/mês'}
-                  {formData.plano === 'profissional' && 'Até 20 veículos na frota - R$ 99/mês'}
-                  {formData.plano === 'avancado' && 'Até 50 veículos na frota - R$ 200/mês'}
-                  {formData.plano === 'master' && 'Veículos ilimitados + Suporte 24/7 - R$ 500/mês'}
+                  {(() => {
+                    const planoSelecionado = planos.find((p: any) => p.id === formData.plano);
+                    return planoSelecionado ? planoSelecionado.descricao : '';
+                  })()}
                 </div>
               )}
             </div>
