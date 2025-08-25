@@ -106,15 +106,39 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
     }
   }, [locadora]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    toast({
-      title: "Locadora atualizada com sucesso!",
-      description: `Os dados de ${formData.nome} foram atualizados.`,
-    });
+    try {
+      const response = await fetch(`/api/locadoras/${locadora.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    onOpenChange(false);
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar locadora');
+      }
+
+      toast({
+        title: "Locadora atualizada com sucesso!",
+        description: `Os dados de ${formData.nome} foram atualizados.`,
+      });
+
+      onOpenChange(false);
+      
+      // Recarregar a página para atualizar os dados
+      window.location.reload();
+      
+    } catch (error) {
+      toast({
+        title: "Erro ao atualizar locadora",
+        description: "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
+    }
   };
 
   const updateFormData = (field: string, value: string) => {
