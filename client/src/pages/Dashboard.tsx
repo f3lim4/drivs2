@@ -19,6 +19,7 @@ import { useVeiculos } from '@/hooks/useVeiculos';
 import { useAlugueis } from '@/hooks/useAlugueis';
 import { usePagamentos } from '@/hooks/usePagamentos';
 import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
+import type { DashboardConfig } from '@shared/schema';
 
 
 export default function Dashboard() {
@@ -26,6 +27,13 @@ export default function Dashboard() {
   
   // Buscar anúncios ativos
   const { data: anuncios = [], isLoading: loadingAnuncios } = useAnunciosAtivos();
+
+  // Buscar configurações do dashboard
+  const { data: dashboardConfig, isLoading: loadingDashboardConfig } = useQuery<DashboardConfig>({
+    queryKey: ['/api/dashboard-config'],
+    refetchOnWindowFocus: false,
+    staleTime: 10 * 60 * 1000, // 10 minutos
+  });
 
   // Função para mapear tipos de anúncios para português e cores
   const getAnuncioConfig = (tipo: string) => {
@@ -106,7 +114,7 @@ export default function Dashboard() {
   });
 
   // SISTEMA DE LOADING COMPLETO - Dashboard só carrega quando TODOS os dados estão prontos
-  const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis || loadingPagamentos || loadingDespesas || loadingAnuncios || loadingLocadoras;
+  const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis || loadingPagamentos || loadingDespesas || loadingAnuncios || loadingLocadoras || loadingDashboardConfig;
 
   // Usar dados diretamente dos hooks (já filtrados corretamente)
   const motoristasSeguro = motoristasRaw;
@@ -895,146 +903,232 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Card de Suporte */}
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
-              <Phone className="w-5 h-5" />
-              Suporte DRIVS
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="p-3 bg-white rounded-lg border border-blue-200">
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-green-600" />
-                  <span className="text-gray-700 font-medium">11977263156</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-blue-600" />
-                  <span className="text-gray-700 font-medium">suporte@drivs.com.br</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ExternalLink className="w-4 h-4 text-blue-600" />
-                  <a 
-                    href="/suporte" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
-                  >
-                    Central de Ajuda
-                  </a>
+        {/* Card de Suporte - Configurável pelo Admin */}
+        {dashboardConfig?.mostrarLinksSuporte && (
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
+                <Phone className="w-5 h-5" />
+                Suporte DRIVS
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="p-3 bg-white rounded-lg border border-blue-200">
+                <div className="space-y-3 text-sm">
+                  {dashboardConfig?.telefoneSuporte && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-green-600" />
+                      <span className="text-gray-700 font-medium">{dashboardConfig.telefoneSuporte}</span>
+                    </div>
+                  )}
+                  {dashboardConfig?.emailSuporte && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-blue-600" />
+                      <span className="text-gray-700 font-medium">{dashboardConfig.emailSuporte}</span>
+                    </div>
+                  )}
+                  {dashboardConfig?.linkSuporteUrl && (
+                    <div className="flex items-center gap-2">
+                      <ExternalLink className="w-4 h-4 text-blue-600" />
+                      <a 
+                        href={dashboardConfig.linkSuporteUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
+                      >
+                        {dashboardConfig.linkSuporteTitulo || "Central de Ajuda"}
+                      </a>
+                    </div>
+                  )}
+                  {dashboardConfig?.linkTreinamentoUrl && (
+                    <div className="flex items-center gap-2">
+                      <ExternalLink className="w-4 h-4 text-blue-600" />
+                      <a 
+                        href={dashboardConfig.linkTreinamentoUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
+                      >
+                        {dashboardConfig.linkTreinamentoTitulo || "Treinamentos"}
+                      </a>
+                    </div>
+                  )}
+                  {dashboardConfig?.linkManualUrl && (
+                    <div className="flex items-center gap-2">
+                      <ExternalLink className="w-4 h-4 text-blue-600" />
+                      <a 
+                        href={dashboardConfig.linkManualUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
+                      >
+                        {dashboardConfig.linkManualTitulo || "Manual"}
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Card de Vídeo Explicativo */}
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-semibold text-purple-800 flex items-center gap-2">
-              <Play className="w-5 h-5" />
-              Vídeo Explicativo
-            </CardTitle>
-            <CardDescription className="text-purple-600">
-              Aprenda como usar o sistema DRIVS
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="aspect-video bg-white rounded-lg border border-purple-200 overflow-hidden">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                title="Vídeo Explicativo DRIVS"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="rounded-lg"
-              />
-            </div>
-            <p className="text-xs text-purple-600 mt-2 text-center">
-              📹 Assista ao tutorial completo do sistema
-            </p>
-          </CardContent>
-        </Card>
+        {/* Card de Vídeo Tutorial - Configurável pelo Admin */}
+        {dashboardConfig?.mostrarVideoTutorial && dashboardConfig?.videoTutorialUrl && (
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-purple-800 flex items-center gap-2">
+                <Play className="w-5 h-5" />
+                {dashboardConfig.videoTutorialTitulo || "Vídeo Tutorial"}
+              </CardTitle>
+              <CardDescription className="text-purple-600">
+                {dashboardConfig.videoTutorialDescricao || "Aprenda como usar o sistema DRIVS"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-video bg-white rounded-lg border border-purple-200 overflow-hidden">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={dashboardConfig.videoTutorialUrl}
+                  title={dashboardConfig.videoTutorialTitulo || "Vídeo Tutorial DRIVS"}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="rounded-lg"
+                />
+              </div>
+              <p className="text-xs text-purple-600 mt-2 text-center">
+                📹 {dashboardConfig.videoTutorialDescricao || "Assista ao tutorial completo do sistema"}
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Card de Links Úteis */}
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-semibold text-green-800 flex items-center gap-2">
-              <Link className="w-5 h-5" />
-              Links Úteis
-            </CardTitle>
-            <CardDescription className="text-green-600">
-              Recursos importantes para sua locadora
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="p-3 bg-white rounded-lg border border-green-200">
-                <div className="space-y-2">
-                  <a 
-                    href="https://www.detran.sp.gov.br" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Portal DETRAN SP
-                  </a>
-                  <p className="text-xs text-gray-600">Consultas de veículos e habilitação</p>
-                </div>
+        {/* Card de Vídeo Demo - Configurável pelo Admin */}
+        {dashboardConfig?.mostrarVideoDemo && dashboardConfig?.videoDemoUrl && (
+          <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-indigo-800 flex items-center gap-2">
+                <Play className="w-5 h-5" />
+                {dashboardConfig.videoDemoTitulo || "Demonstração"}
+              </CardTitle>
+              <CardDescription className="text-indigo-600">
+                {dashboardConfig.videoDemoDescricao || "Veja o sistema em ação"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-video bg-white rounded-lg border border-indigo-200 overflow-hidden">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={dashboardConfig.videoDemoUrl}
+                  title={dashboardConfig.videoDemoTitulo || "Demonstração DRIVS"}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="rounded-lg"
+                />
               </div>
-              
-              <div className="p-3 bg-white rounded-lg border border-green-200">
-                <div className="space-y-2">
-                  <a 
-                    href="https://www.receita.fazenda.gov.br" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Receita Federal
-                  </a>
-                  <p className="text-xs text-gray-600">Consultas de CPF e CNPJ</p>
-                </div>
+              <p className="text-xs text-indigo-600 mt-2 text-center">
+                📺 {dashboardConfig.videoDemoDescricao || "Veja como o sistema funciona"}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Card de Links Úteis - Configurável pelo Admin */}
+        {dashboardConfig?.mostrarLinksUteis && (
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-green-800 flex items-center gap-2">
+                <Link className="w-5 h-5" />
+                Links Úteis
+              </CardTitle>
+              <CardDescription className="text-green-600">
+                Recursos importantes para sua locadora
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {dashboardConfig?.linkDetranUrl && (
+                  <div className="p-3 bg-white rounded-lg border border-green-200">
+                    <div className="space-y-2">
+                      <a 
+                        href={dashboardConfig.linkDetranUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        {dashboardConfig.linkDetranTitulo || "Portal DETRAN"}
+                      </a>
+                      <p className="text-xs text-gray-600">
+                        {dashboardConfig.linkDetranDescricao || "Consultas de veículos e habilitação"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {dashboardConfig?.linkReceitaUrl && (
+                  <div className="p-3 bg-white rounded-lg border border-green-200">
+                    <div className="space-y-2">
+                      <a 
+                        href={dashboardConfig.linkReceitaUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        {dashboardConfig.linkReceitaTitulo || "Receita Federal"}
+                      </a>
+                      <p className="text-xs text-gray-600">
+                        {dashboardConfig.linkReceitaDescricao || "Consultas de CPF e CNPJ"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {dashboardConfig?.linkSpcUrl && (
+                  <div className="p-3 bg-white rounded-lg border border-green-200">
+                    <div className="space-y-2">
+                      <a 
+                        href={dashboardConfig.linkSpcUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        {dashboardConfig.linkSpcTitulo || "Consulta SPC/Serasa"}
+                      </a>
+                      <p className="text-xs text-gray-600">
+                        {dashboardConfig.linkSpcDescricao || "Verificação de score e restrições"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {dashboardConfig?.linkViaCepUrl && (
+                  <div className="p-3 bg-white rounded-lg border border-green-200">
+                    <div className="space-y-2">
+                      <a 
+                        href={dashboardConfig.linkViaCepUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        {dashboardConfig.linkViaCepTitulo || "ViaCEP"}
+                      </a>
+                      <p className="text-xs text-gray-600">
+                        {dashboardConfig.linkViaCepDescricao || "Consulta de endereços por CEP"}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-              
-              <div className="p-3 bg-white rounded-lg border border-green-200">
-                <div className="space-y-2">
-                  <a 
-                    href="https://www.spc.org.br" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Consulta SPC/Serasa
-                  </a>
-                  <p className="text-xs text-gray-600">Verificação de score e restrições</p>
-                </div>
-              </div>
-              
-              <div className="p-3 bg-white rounded-lg border border-green-200">
-                <div className="space-y-2">
-                  <a 
-                    href="https://viacep.com.br" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    ViaCEP
-                  </a>
-                  <p className="text-xs text-gray-600">Consulta de endereços por CEP</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
       </div>
       )}
     </div>

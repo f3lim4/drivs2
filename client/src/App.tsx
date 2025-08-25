@@ -20,6 +20,7 @@ import AnunciosAdmin from "./pages/AnunciosAdmin";
 import Planos from "./pages/Planos";
 import PlanosLocadora from "./pages/PlanosLocadora";
 import PlanosAdmin from "./pages/PlanosAdmin";
+import DashboardAdmin from "./pages/DashboardAdmin";
 import Seo from "./pages/Seo";
 import Perfil from "./pages/Perfil";
 import Login from "./pages/Login";
@@ -144,6 +145,11 @@ const App = () => (
           <Route path="/admin/planos" element={
             <AuthGuard>
               <DrivsLayout><PlanosAdmin /></DrivsLayout>
+            </AuthGuard>
+          } />
+          <Route path="/admin/dashboard" element={
+            <AuthGuard>
+              <DrivsLayout><DashboardAdmin /></DrivsLayout>
             </AuthGuard>
           } />
           <Route path="/perfil" element={
