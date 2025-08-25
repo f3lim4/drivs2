@@ -78,15 +78,9 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
 
         <div className="space-y-6">
           {/* Status */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Status:</span>
-              {getStatusBadge(veiculo.status)}
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Categoria:</span>
-              <Badge variant="outline" className="capitalize">{veiculo.categoria}</Badge>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Status:</span>
+            {getStatusBadge(veiculo.status)}
           </div>
 
           <Separator />
@@ -120,12 +114,28 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
                   <p className="text-sm">{veiculo.cor}</p>
                 </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Combustível</p>
-                <p className="text-sm flex items-center gap-1">
-                  <Fuel className="w-3 h-3" />
-                  {veiculo.combustivel || 'Flex'}
-                </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Categoria</p>
+                  <p className="text-sm capitalize">{veiculo.categoria}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Combustível</p>
+                  <p className="text-sm flex items-center gap-1">
+                    <Fuel className="w-3 h-3" />
+                    {veiculo.combustivel || 'Flex'}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">RENAVAM</p>
+                  <p className="text-sm font-mono">{veiculo.renavam || 'Não informado'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Chassi</p>
+                  <p className="text-sm font-mono">{veiculo.chassi || 'Não informado'}</p>
+                </div>
               </div>
               
               
@@ -195,25 +205,6 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
             </CardContent>
           </Card>
 
-          {/* Documentação */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Documentação
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">RENAVAM</p>
-                <p className="text-sm font-mono">{veiculo.renavam || 'Não informado'}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Chassi</p>
-                <p className="text-sm font-mono">{veiculo.chassi || 'Não informado'}</p>
-              </div>
-            </CardContent>
-          </Card>
           {/* Observações Visuais - Destaque especial */}
           {(veiculo as any).visualizar && (
             <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
