@@ -2403,7 +2403,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      res.json(planosDisponiveis);
+      // Mesclar planos padrão com atualizações em memória
+      const planosComAtualizacoes = { ...planosDisponiveis };
+      Object.keys(planosAtualizados).forEach(planoId => {
+        planosComAtualizacoes[planoId] = planosAtualizados[planoId];
+      });
+      
+      res.json(planosComAtualizacoes);
     } catch (error) {
       console.error("Error fetching planos:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -2418,11 +2424,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[PLANOS UPDATE] Atualizando plano ${planoId} com dados:`, updates);
       
-      // Por enquanto, apenas retornar sucesso já que os planos são estáticos
-      // Em uma implementação real, aqui salvaria no banco de dados
+      // Salvar as atualizações em memória
+      planosAtualizados[planoId] = {
+        ...planosDisponiveis[planoId],
+        ...updates,
+        id: planoId
+      };
+      
+      console.log(`[PLANOS UPDATE] Plano ${planoId} salvo em memória:`, planosAtualizados[planoId]);
+      
       res.json({
         message: "Plano atualizado com sucesso",
-        plano: { id: planoId, ...updates }
+        plano: planosAtualizados[planoId]
       });
       
     } catch (error) {
