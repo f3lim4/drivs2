@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [credentials, setCredentials] = useState({
     email: '',
     password: ''
@@ -47,6 +48,7 @@ export default function Login() {
     setIsLoading(true);
 
     try {
+      setErrorMessage(''); // Limpar erro anterior
       await login(credentials.email, credentials.password);
 
       toast({
@@ -57,21 +59,17 @@ export default function Login() {
     } catch (error: any) {
       console.error('Erro no login:', error);
       
-      let errorMessage = 'Erro ao fazer login';
+      let loginErrorMessage = 'Erro ao fazer login';
       
-      if (error.message === 'Invalid login credentials') {
-        errorMessage = 'Email ou senha incorretos';
+      if (error.message === 'Invalid login credentials' || error.message === 'Invalid credentials') {
+        loginErrorMessage = 'Email ou senha incorretos';
       } else if (error.message === 'Email not confirmed') {
-        errorMessage = 'Email não confirmado';
+        loginErrorMessage = 'Email não confirmado';
       } else if (error.message) {
-        errorMessage = error.message;
+        loginErrorMessage = error.message;
       }
       
-      toast({
-        title: "Erro no Login",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      setErrorMessage(loginErrorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +126,10 @@ export default function Login() {
                   type="email"
                   placeholder="seu@email.com"
                   value={credentials.email}
-                  onChange={(e) => setCredentials(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) => {
+                    setCredentials(prev => ({ ...prev, email: e.target.value }));
+                    if (errorMessage) setErrorMessage(''); // Limpar erro ao digitar
+                  }}
                   required
                   className="h-11"
                 />
@@ -142,9 +143,12 @@ export default function Login() {
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={credentials.password}
-                    onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
+                    onChange={(e) => {
+                      setCredentials(prev => ({ ...prev, password: e.target.value }));
+                      if (errorMessage) setErrorMessage(''); // Limpar erro ao digitar
+                    }}
                     required
-                    className="h-11 pr-10"
+                    className={`h-11 pr-10 ${errorMessage ? 'border-red-500 focus:border-red-500' : ''}`}
                   />
                   <Button
                     type="button"
@@ -160,6 +164,9 @@ export default function Login() {
                     )}
                   </Button>
                 </div>
+                {errorMessage && (
+                  <p className="text-sm text-red-500 mt-1">{errorMessage}</p>
+                )}
               </div>
 
               <div className="flex items-center justify-between">
