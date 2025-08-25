@@ -28,6 +28,7 @@ import logoPath from "@assets/icone_1752434737434.png";
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { NotificacaoFixa } from './NotificacaoFixa';
 import {
   Sidebar,
   SidebarContent,
@@ -233,8 +234,13 @@ export function DrivsSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Área de notificação fixa */}
+        <div className="mt-auto p-3">
+          <NotificacaoFixa />
+        </div>
+
         {/* Informações do sistema */}
-        <div className="mt-auto p-6 border-t border-blue-500">
+        <div className="p-6 border-t border-blue-500">
           <div className="text-xs text-white/70">
             <p>DRIVS v1.0</p>
             <p>Sistema de Gestão</p>
