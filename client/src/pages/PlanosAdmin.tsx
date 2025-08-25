@@ -192,6 +192,7 @@ export default function PlanosAdmin() {
   
   const [editingPlano, setEditingPlano] = useState<string | null>(null);
   const [planosData, setPlanosData] = useState<Plano[]>(defaultPlanos);
+  const [editingValues, setEditingValues] = useState<{[key: string]: {preco: number, limiteVeiculos: number}}>({});
 
   // Buscar planos do servidor (se existir API)
   const { data: planosFromServer, isLoading } = useQuery({
@@ -272,20 +273,32 @@ export default function PlanosAdmin() {
   };
 
   const handleEdit = (planoId: string) => {
+    const plano = planos.find((p: any) => p.id === planoId);
+    if (plano) {
+      setEditingValues({
+        ...editingValues,
+        [planoId]: {
+          preco: plano.preco || 0,
+          limiteVeiculos: plano.limiteVeiculos || 0
+        }
+      });
+    }
     setEditingPlano(planoId);
   };
 
   const handleCancel = () => {
     setEditingPlano(null);
+    setEditingValues({});
   };
 
-  const handleInputChange = (planoId: string, field: keyof Plano, value: any) => {
-    const updatedPlanos = (planos as Plano[]).map((p: Plano) => 
-      p.id === planoId ? { ...p, [field]: value } : p
-    );
-    if (!planosFromServer) {
-      setPlanosData(updatedPlanos);
-    }
+  const handleInputChange = (planoId: string, field: 'preco' | 'limiteVeiculos', value: number) => {
+    setEditingValues(prev => ({
+      ...prev,
+      [planoId]: {
+        ...prev[planoId],
+        [field]: value
+      }
+    }));
   };
 
   if (!isAdmin) {
@@ -352,7 +365,7 @@ export default function PlanosAdmin() {
                             <Input
                               id={`preco-${plano.id}`}
                               type="number"
-                              value={plano.preco || 0}
+                              value={editingValues[plano.id]?.preco ?? plano.preco ?? 0}
                               className="mt-1"
                               onChange={(e) => handleInputChange(plano.id, 'preco', Number(e.target.value))}
                             />
@@ -363,13 +376,9 @@ export default function PlanosAdmin() {
                               id={`limite-${plano.id}`}
                               type="number"
                               placeholder="0 para ilimitados"
-                              value={plano.limiteVeiculos || 0}
+                              value={editingValues[plano.id]?.limiteVeiculos ?? plano.limiteVeiculos ?? 0}
                               className="mt-1"
-                              onChange={(e) => {
-                                const value = Number(e.target.value);
-                                const limite = value === 0 ? null : value;
-                                handleInputChange(plano.id, 'limiteVeiculos', limite);
-                              }}
+                              onChange={(e) => handleInputChange(plano.id, 'limiteVeiculos', Number(e.target.value))}
                             />
                           </div>
                         </div>
@@ -403,7 +412,16 @@ export default function PlanosAdmin() {
                       {isEditing ? (
                         <>
                           <Button 
-                            onClick={() => handleSave(planos.find(p => p.id === plano.id)!)}
+                            onClick={() => {
+                              const editingData = editingValues[plano.id];
+                              if (editingData) {
+                                handleSave({
+                                  ...plano,
+                                  preco: editingData.preco,
+                                  limiteVeiculos: editingData.limiteVeiculos === 0 ? null : editingData.limiteVeiculos
+                                });
+                              }
+                            }}
                             disabled={updatePlanoMutation.isPending}
                             className="flex-1 bg-green-600 hover:bg-green-700"
                             size="sm"
