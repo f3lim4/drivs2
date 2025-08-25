@@ -744,3 +744,26 @@ export const insertDashboardConfigSchema = createInsertSchema(dashboardConfig).o
 
 export type DashboardConfig = typeof dashboardConfig.$inferSelect;
 export type InsertDashboardConfig = z.infer<typeof insertDashboardConfigSchema>;
+
+// Links Úteis Dinâmicos - Permite adicionar/remover links personalizados
+export const linksUteis = pgTable("links_uteis", {
+  id: serial("id").primaryKey(),
+  titulo: text("titulo").notNull(),
+  url: text("url").notNull(),
+  descricao: text("descricao").notNull(),
+  ativo: boolean("ativo").notNull().default(true),
+  ordem: integer("ordem").notNull().default(0), // Para controlar a ordem de exibição
+  
+  // Controle
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertLinkUtilSchema = createInsertSchema(linksUteis).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type LinkUtil = typeof linksUteis.$inferSelect;
+export type InsertLinkUtil = z.infer<typeof insertLinkUtilSchema>;
