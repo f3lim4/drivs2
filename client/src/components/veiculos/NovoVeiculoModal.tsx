@@ -164,6 +164,8 @@ export function NovoVeiculoModal({
   onVeiculoAdicionado 
 }: NovoVeiculoModalProps) {
   const [loading, setLoading] = useState(false);
+  const [documentUploading, setDocumentUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const [marcasDisponiveis, setMarcasDisponiveis] = useState<MarcaVeiculo[]>([]);
   const [modelosDisponiveis, setModelosDisponiveis] = useState<ModeloVeiculo[]>([]);
   const { profile } = useAuth();
@@ -1121,7 +1123,29 @@ export function NovoVeiculoModal({
 
             {/* Upload de documento único */}
             <div className="flex items-center justify-between p-2 border rounded bg-gray-50/50">
-              <span className="text-xs text-muted-foreground">Documento:</span>
+              <div className="flex items-center gap-2">
+                {documentUploading ? (
+                  <>
+                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-blue-600 font-medium">Carregando...</span>
+                      <span className="text-xs text-gray-500">Fazendo upload do documento</span>
+                    </div>
+                  </>
+                ) : uploadedFileName ? (
+                  <>
+                    <FileText className="w-4 h-4 text-green-600" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-green-600 font-medium">Documento salvo</span>
+                      <span className="text-xs text-gray-500 truncate max-w-[200px]">
+                        {uploadedFileName}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Documento:</span>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 <input
                   type="file"
@@ -1133,6 +1157,8 @@ export function NovoVeiculoModal({
                     if (!file) return;
                     
                     console.log('[UPLOAD DIRETO] Arquivo selecionado:', file.name);
+                    setDocumentUploading(true);
+                    setUploadedFileName(null);
                     
                     try {
                       // Obter URL de upload
@@ -1174,6 +1200,7 @@ export function NovoVeiculoModal({
                         }
                         
                         form.setValue('documento', documentoURL);
+                        setUploadedFileName(file.name);
                       }
                     } catch (error) {
                       console.error('[UPLOAD DIRETO] Erro:', error);
@@ -1182,6 +1209,8 @@ export function NovoVeiculoModal({
                         description: `Falha ao carregar ${file.name}`,
                         variant: "destructive",
                       });
+                    } finally {
+                      setDocumentUploading(false);
                     }
                     
                     // Limpar input

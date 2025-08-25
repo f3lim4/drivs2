@@ -108,6 +108,8 @@ export function EditarVeiculoModal({
   onVeiculoEditado 
 }: EditarVeiculoModalProps) {
   const [loading, setLoading] = useState(false);
+  const [documentUploading, setDocumentUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const { profile } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -260,11 +262,6 @@ export function EditarVeiculoModal({
         
         // Invalidar cache de veículos para atualizar a lista
         await queryClient.invalidateQueries({ queryKey: ['/api/veiculos'] });
-        
-        toast({
-          title: "Documento salvo",
-          description: "O documento foi salvo com sucesso.",
-        });
       } else {
         throw new Error('Erro ao salvar documento');
       }
@@ -964,16 +961,31 @@ export function EditarVeiculoModal({
               {/* Upload de documento único */}
               <div className="flex items-center justify-between p-2 border rounded bg-gray-50/50">
                 <div className="flex items-center gap-2">
-                  {veiculo?.documentos && veiculo.documentos.length > 0 ? (
+                  {documentUploading ? (
                     <>
-                      <FileText className="w-4 h-4 text-green-500" />
+                      <div className="w-4 h-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
                       <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground">Documento salvo</span>
+                        <span className="text-xs text-blue-600 font-medium">Carregando...</span>
+                        <span className="text-xs text-gray-500">Fazendo upload do documento</span>
+                      </div>
+                    </>
+                  ) : uploadedFileName ? (
+                    <>
+                      <FileText className="w-4 h-4 text-green-600" />
+                      <div className="flex flex-col">
+                        <span className="text-xs text-green-600 font-medium">Documento salvo</span>
                         <span className="text-xs text-gray-500 truncate max-w-[200px]">
-                          {(() => {
-                            const documentoAtual = veiculo.documentos[veiculo.documentos.length - 1];
-                            return documentoAtual ? "documento_veiculo.pdf" : "Documento salvo";
-                          })()}
+                          {uploadedFileName}
+                        </span>
+                      </div>
+                    </>
+                  ) : veiculo?.documentos && veiculo.documentos.length > 0 ? (
+                    <>
+                      <FileText className="w-4 h-4 text-green-600" />
+                      <div className="flex flex-col">
+                        <span className="text-xs text-green-600 font-medium">Documento salvo</span>
+                        <span className="text-xs text-gray-500 truncate max-w-[200px]">
+                          documento_veiculo.pdf
                         </span>
                       </div>
                     </>
@@ -1010,6 +1022,9 @@ export function EditarVeiculoModal({
                       const file = e.target.files?.[0];
                       if (!file) return;
 
+                      setDocumentUploading(true);
+                      setUploadedFileName(null);
+
                       try {
                         // Obter URL de upload
                         const response = await fetch('/api/objects/upload', {
@@ -1031,6 +1046,7 @@ export function EditarVeiculoModal({
 
                         if (uploadResponse.ok) {
                           await handleDocumentUpload(data.uploadURL);
+                          setUploadedFileName(file.name);
                         }
                       } catch (error) {
                         console.error('Erro no upload:', error);
@@ -1039,6 +1055,8 @@ export function EditarVeiculoModal({
                           description: `Falha ao carregar ${file.name}`,
                           variant: "destructive",
                         });
+                      } finally {
+                        setDocumentUploading(false);
                       }
                       
                       // Limpar input
