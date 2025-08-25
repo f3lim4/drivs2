@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useMotoristas } from '@/hooks/useMotoristas';
@@ -60,6 +60,7 @@ export default function Motoristas() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [sortBy, setSortBy] = useState<string>('nome-asc');
+  const [showAllColumns, setShowAllColumns] = useState(true);
 
   // Buscar locadoras para exibir nome na coluna
   const { data: locadoras = [], isLoading: loadingLocadoras } = useQuery({
@@ -270,18 +271,6 @@ export default function Motoristas() {
     setViewModalOpen(true);
   };
 
-  const handleUploadImagens = (motorista: Motorista) => {
-    setSelectedMotorista(motorista);
-    setUploadImagensModalOpen(true);
-  };
-
-  const handleUploadImagensSuccess = () => {
-    // A atualização da lista é feita automaticamente pelo hook
-    toast({
-      title: "Imagens atualizadas",
-      description: "As imagens do motorista foram atualizadas com sucesso!",
-    });
-  };
 
   // Retorna badge de status com cor apropriada
   const getStatusBadge = (motorista: Motorista) => {
@@ -461,7 +450,22 @@ export default function Motoristas() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Lista de Motoristas</CardTitle>
+            <div className="flex items-center gap-3">
+              <CardTitle>Lista de Motoristas</CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowAllColumns(!showAllColumns)}
+                title={showAllColumns ? "Esconder colunas extras" : "Mostrar todas as colunas"}
+                data-testid="button-toggle-columns"
+              >
+                {showAllColumns ? (
+                  <Eye className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <EyeOff className="w-4 h-4 text-muted-foreground" />
+                )}
+              </Button>
+            </div>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-48">
                 <SelectValue />
@@ -484,11 +488,11 @@ export default function Motoristas() {
             <TableHeader>
               <TableRow>
                 <TableHead>MOTORISTA</TableHead>
-                {isAdmin && <TableHead>LOCADORA</TableHead>}
-                <TableHead>CPF</TableHead>
-                <TableHead>CNH</TableHead>
-                <TableHead>CONTATO</TableHead>
-                <TableHead>VENCIMENTO CNH / STATUS</TableHead>
+                {showAllColumns && isAdmin && <TableHead>LOCADORA</TableHead>}
+                {showAllColumns && <TableHead>CPF</TableHead>}
+                {showAllColumns && <TableHead>CNH</TableHead>}
+                {showAllColumns && <TableHead>CONTATO</TableHead>}
+                {showAllColumns && <TableHead>VENCIMENTO CNH / STATUS</TableHead>}
                 <TableHead>AÇÕES</TableHead>
               </TableRow>
             </TableHeader>
@@ -525,7 +529,7 @@ export default function Motoristas() {
                       </div>
                     </div>
                   </TableCell>
-                  {isAdmin && (
+                  {showAllColumns && isAdmin && (
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
@@ -537,27 +541,35 @@ export default function Motoristas() {
                       </div>
                     </TableCell>
                   )}
-                  <TableCell>
-                    <div>
-                      <p>{motorista.cpf}</p>
-                      <p className="text-sm text-muted-foreground">RG: {motorista.cpf.slice(0, 9)}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <p>{motorista.cnh}</p>
-                      <p className="text-sm text-muted-foreground">{motorista.categoria}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <p>{motorista.telefone || motorista.contato}</p>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <p className="text-sm">{motorista.vencimentoCnh}</p>
-                      {getCnhStatusBadge(motorista)}
-                    </div>
-                  </TableCell>
+                  {showAllColumns && (
+                    <TableCell>
+                      <div>
+                        <p>{motorista.cpf}</p>
+                        <p className="text-sm text-muted-foreground">RG: {motorista.cpf.slice(0, 9)}</p>
+                      </div>
+                    </TableCell>
+                  )}
+                  {showAllColumns && (
+                    <TableCell>
+                      <div>
+                        <p>{motorista.cnh}</p>
+                        <p className="text-sm text-muted-foreground">{motorista.categoria}</p>
+                      </div>
+                    </TableCell>
+                  )}
+                  {showAllColumns && (
+                    <TableCell>
+                      <p>{motorista.telefone || motorista.contato}</p>
+                    </TableCell>
+                  )}
+                  {showAllColumns && (
+                    <TableCell>
+                      <div className="space-y-1">
+                        <p className="text-sm">{motorista.vencimentoCnh}</p>
+                        {getCnhStatusBadge(motorista)}
+                      </div>
+                    </TableCell>
+                  )}
                   {isLocadora && (
                     <TableCell>
                       <div className="flex items-center gap-2">
