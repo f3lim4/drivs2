@@ -963,7 +963,16 @@ export function EditarVeiculoModal({
               
               {/* Upload de documento único */}
               <div className="flex items-center justify-between p-2 border rounded bg-gray-50/50">
-                <span className="text-xs text-muted-foreground">Documento:</span>
+                <div className="flex items-center gap-2">
+                  {veiculo?.documentos && veiculo.documentos.length > 0 ? (
+                    <>
+                      <FileText className="w-4 h-4 text-green-500" />
+                      <span className="text-xs text-muted-foreground">Documento salvo</span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">Documento:</span>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
                   <input
                     type="file"
@@ -997,7 +1006,7 @@ export function EditarVeiculoModal({
                           await handleDocumentUpload(data.uploadURL);
                           toast({
                             title: "Documento carregado",
-                            description: `${file.name} carregado com sucesso. O documento anterior foi substituído.`,
+                            description: `${file.name} carregado com sucesso. ${veiculo?.documentos && veiculo.documentos.length > 0 ? 'O documento anterior foi substituído.' : ''}`,
                           });
                         }
                       } catch (error) {
@@ -1023,36 +1032,8 @@ export function EditarVeiculoModal({
                     <Upload className="w-3 h-3 mr-1" />
                     {veiculo?.documentos && veiculo.documentos.length > 0 ? 'Substituir' : 'Adicionar'}
                   </Button>
-                  {veiculo?.documentos && veiculo.documentos.length > 0 && (
-                    <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
-                      1 documento
-                    </span>
-                  )}
                 </div>
               </div>
-
-              {/* Documento existente */}
-              {veiculo?.documentos && veiculo.documentos.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-medium">Documento Salvo:</h4>
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-blue-500" />
-                      <span className="text-sm">Documento do Veículo</span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(veiculo.documentos[0], '_blank')}
-                      className="flex items-center gap-1"
-                    >
-                      <Download className="w-3 h-3" />
-                      Baixar
-                    </Button>
-                  </div>
-                </div>
-              )}
             </div>
 
             <DialogFooter>
