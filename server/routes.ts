@@ -2333,50 +2333,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Planos disponíveis com informações específicas
       const planosDisponiveis = {
-        start: {
-          id: "start",
-          nome: "Start",
-          preco: 50.00,
-          valor: 50.00,
-          descricao: "Para locadoras iniciantes com até 5 veículos",
-          popular: false,
-          stripePrice: "price_start_50_monthly"
-        },
-        pro: {
-          id: "pro",
-          nome: "Pro", 
-          preco: 99.00,
-          valor: 99.00,
-          descricao: "Para locadoras em crescimento com até 20 veículos",
-          popular: true,
-          stripePrice: "price_pro_99_monthly"
-        },
-        elite: {
-          id: "elite",
-          nome: "Elite",
-          preco: 250.00,
-          valor: 250.00,
-          descricao: "Para frotas médias com até 50 veículos", 
-          popular: false,
-          stripePrice: "price_elite_250_monthly"
-        },
-        prime: {
-          id: "prime",
-          nome: "Prime",
-          preco: 500.00,
-          valor: 500.00,
-          descricao: "Para grandes frotas com até 100 veículos",
-          popular: false,
-          stripePrice: "price_prime_500_monthly"
-        },
-        infinity: {
-          id: "infinity",
-          nome: "Infinity",
+        free: {
+          id: "free",
+          nome: "Free",
           preco: 0,
           valor: 0,
-          descricao: "Veículos ilimitados - Preço a consultar",
+          limiteVeiculos: 3,
+          descricao: "Para testes e locadoras muito pequenas",
           popular: false,
-          consultar: true
+          stripePrice: null,
+          recursos: [
+            "Até 3 veículos",
+            "Gestão básica de motoristas",
+            "Contratos simples",
+            "Suporte por email"
+          ],
+          icone: "Car",
+          cor: "gray"
+        },
+        starter: {
+          id: "starter", 
+          nome: "Starter",
+          preco: 49,
+          valor: 49,
+          limiteVeiculos: 10,
+          descricao: "Para locadoras iniciantes",
+          popular: false,
+          stripePrice: "price_starter_49_monthly",
+          recursos: [
+            "Até 10 veículos",
+            "Gestão completa de motoristas",
+            "Contratos automáticos",
+            "Controle de pagamentos",
+            "Suporte prioritário"
+          ],
+          icone: "CarFront",
+          cor: "blue"
+        },
+        professional: {
+          id: "professional",
+          nome: "Professional",
+          preco: 99,
+          valor: 99,
+          limiteVeiculos: 25,
+          descricao: "Para locadoras em crescimento",
+          popular: true,
+          stripePrice: "price_professional_99_monthly",
+          recursos: [
+            "Até 25 veículos",
+            "Gestão completa de motoristas",
+            "Contratos automáticos profissionais",
+            "Controle de pagamentos avançado",
+            "Controle de infrações e multas",
+            "Relatórios financeiros",
+            "Suporte prioritário"
+          ],
+          icone: "Truck",
+          cor: "green"
+        },
+        business: {
+          id: "business",
+          nome: "Business",
+          preco: 199,
+          valor: 199,
+          limiteVeiculos: 50,
+          descricao: "Para locadoras estabelecidas",
+          popular: false,
+          stripePrice: "price_business_199_monthly",
+          recursos: [
+            "Até 50 veículos",
+            "Gestão completa de motoristas",
+            "Contratos automáticos profissionais",
+            "Controle de pagamentos e cobrança",
+            "Controle de infrações e multas",
+            "Controle financeiro com lucros/perdas",
+            "Controle de manutenções",
+            "API para integração",
+            "Suporte dedicado"
+          ],
+          icone: "Bus",
+          cor: "purple"
+        },
+        enterprise: {
+          id: "enterprise",
+          nome: "Enterprise",
+          preco: 399,
+          valor: 399,
+          limiteVeiculos: null,
+          descricao: "Para grandes frotas - Veículos ilimitados",
+          popular: false,
+          stripePrice: "price_enterprise_399_monthly",
+          recursos: [
+            "Veículos ilimitados",
+            "Gestão completa de motoristas",
+            "Contratos automáticos profissionais",
+            "Sistema de cobrança avançado",
+            "Controle completo de infrações",
+            "Relatórios financeiros avançados",
+            "Controle de manutenções",
+            "API completa para integração",
+            "White label disponível",
+            "Suporte 24/7 dedicado",
+            "Treinamento personalizado"
+          ],
+          icone: "Building",
+          cor: "gold"
         }
       };
 
@@ -2403,20 +2464,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Mesclar planos padrão com atualizações em memória
-      const planosComAtualizacoes = { ...planosDisponiveis };
-      Object.keys(planosAtualizados).forEach(planoId => {
-        planosComAtualizacoes[planoId] = planosAtualizados[planoId];
-      });
-      
-      res.json(planosComAtualizacoes);
+      res.json(planosDisponiveis);
     } catch (error) {
       console.error("Error fetching planos:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  // Rota para atualizar planos
+  // Rota para estatísticas dos planos
+  app.get("/api/planos/stats", async (req, res) => {
+    try {
+      const locadoras = await storage.getAllLocadoras();
+      
+      // Contar locadoras por plano
+      const estatisticas = {
+        free: { total: 0, ativas: 0, receita: 0 },
+        starter: { total: 0, ativas: 0, receita: 0 },
+        professional: { total: 0, ativas: 0, receita: 0 },
+        business: { total: 0, ativas: 0, receita: 0 },
+        enterprise: { total: 0, ativas: 0, receita: 0 }
+      };
+      
+      locadoras.forEach(locadora => {
+        const plano = locadora.plano || 'free';
+        if (estatisticas[plano]) {
+          estatisticas[plano].total++;
+          if (locadora.status === 'ativa') {
+            estatisticas[plano].ativas++;
+            
+            // Calcular receita baseada no plano
+            const precos = { free: 0, starter: 49, professional: 99, business: 199, enterprise: 399 };
+            estatisticas[plano].receita += precos[plano] || 0;
+          }
+        }
+      });
+      
+      // Calcular totais gerais
+      const totalLocadoras = locadoras.length;
+      const locadorasAtivas = locadoras.filter(l => l.status === 'ativa').length;
+      const receitaTotal = Object.values(estatisticas).reduce((acc, stat) => acc + stat.receita, 0);
+      
+      res.json({
+        estatisticas,
+        resumo: {
+          totalLocadoras,
+          locadorasAtivas,
+          receitaTotal,
+          receitaMensal: receitaTotal,
+          conversao: totalLocadoras > 0 ? ((locadorasAtivas / totalLocadoras) * 100).toFixed(1) : 0
+        }
+      });
+      
+    } catch (error) {
+      console.error("Error fetching planos stats:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Rota para atualizar planos (simulado)
   app.put("/api/planos/:id", async (req, res) => {
     try {
       const planoId = req.params.id;
@@ -2424,18 +2529,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[PLANOS UPDATE] Atualizando plano ${planoId} com dados:`, updates);
       
-      // Salvar as atualizações em memória
-      planosAtualizados[planoId] = {
-        ...planosDisponiveis[planoId],
-        ...updates,
-        id: planoId
-      };
-      
-      console.log(`[PLANOS UPDATE] Plano ${planoId} salvo em memória:`, planosAtualizados[planoId]);
-      
       res.json({
         message: "Plano atualizado com sucesso",
-        plano: planosAtualizados[planoId]
+        plano: { id: planoId, ...updates }
       });
       
     } catch (error) {
