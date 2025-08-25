@@ -455,31 +455,31 @@ export default function Landing() {
                 <div className="text-sm text-gray-300 mb-3">DRIVS v1.0 - Sistema de Gestão</div>
                 <div className="flex flex-col space-y-3">
                   <a 
-                    href="https://instagram.com/drive.me" 
+                    href="https://instagram.com/drivs.me" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center space-x-3 text-gray-400 hover:text-pink-400 transition-colors duration-300"
                   >
                     <FaInstagram className="w-5 h-5" />
-                    <span>@drive.me</span>
+                    <span>@drivs.me</span>
                   </a>
                   <a 
-                    href="https://youtube.com/@drive.me" 
+                    href="https://youtube.com/@drivs.me" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center space-x-3 text-gray-400 hover:text-red-500 transition-colors duration-300"
                   >
                     <FaYoutube className="w-5 h-5" />
-                    <span>@drive.me</span>
+                    <span>@drivs.me</span>
                   </a>
                   <a 
-                    href="https://linkedin.com/company/drive.me" 
+                    href="https://linkedin.com/company/drivs.me" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center space-x-3 text-gray-400 hover:text-blue-500 transition-colors duration-300"
                   >
                     <FaLinkedin className="w-5 h-5" />
-                    <span>@drive.me</span>
+                    <span>@drivs.me</span>
                   </a>
                 </div>
               </div>
