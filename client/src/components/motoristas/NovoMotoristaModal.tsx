@@ -341,7 +341,7 @@ export function NovoMotoristaModal({
         cidade: data.cidade,
         estado: data.estado,
         cep: data.cep,
-        status: 'ativo', // Sempre definir como ativo
+        status: 'ativo' as const, // Sempre definir como ativo
       };
 
       // Usar hook do React Query para criar motorista
@@ -372,7 +372,7 @@ export function NovoMotoristaModal({
           if (imagens.fotoExtra) formData.append('fotoExtra', imagens.fotoExtra);
           if (imagens.fotoExtra2) formData.append('fotoExtra2', imagens.fotoExtra2);
           
-          const uploadResponse = await fetch('/api/motoristas/upload-imagens', {
+          const uploadResponse = await fetch(`/api/motoristas/${novoMotorista.id}/upload-imagens`, {
             method: 'POST',
             body: formData,
           });
