@@ -48,12 +48,15 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Car className="w-5 h-5" />
-              {veiculo.modelo} - {veiculo.placa}
-            </div>
-            {/* Botão Download Documento no Topo */}
+          <DialogTitle className="flex items-center gap-2">
+            <Car className="w-5 h-5" />
+            {veiculo.modelo} - {veiculo.placa}
+          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogDescription>
+              Detalhes completos do veículo
+            </DialogDescription>
+            {/* Botão Download Documento */}
             {(() => {
               const documentos = veiculo.documentos;
               const documentoAtual = documentos && documentos.length > 0 ? documentos[documentos.length - 1] : null;
@@ -70,10 +73,7 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
                 </Button>
               ) : null;
             })()}
-          </DialogTitle>
-          <DialogDescription>
-            Detalhes completos do veículo
-          </DialogDescription>
+          </div>
         </DialogHeader>
 
         <div className="space-y-6">
