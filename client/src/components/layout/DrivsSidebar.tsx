@@ -22,7 +22,8 @@ import {
   Wrench,
   Megaphone,
   Crown,
-  Search
+  Search,
+  Settings
 } from 'lucide-react';
 import { FaInstagram, FaYoutube, FaLinkedin } from 'react-icons/fa';
 import logoPath from "@assets/icone_1752434737434.png";
@@ -108,6 +109,13 @@ const navigationItems = [
     url: '/admin/planos',
     icon: Crown,
     description: 'Gerenciar planos do sistema',
+    adminOnly: true  // Só admins podem ver este item
+  },
+  {
+    title: 'Dashboard Config',
+    url: '/admin/dashboard',
+    icon: Settings,
+    description: 'Configurar conteúdo do dashboard das locadoras',
     adminOnly: true  // Só admins podem ver este item
   },
   {

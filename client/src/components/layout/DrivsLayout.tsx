@@ -41,6 +41,8 @@ export function DrivsLayout({ children }: DrivsLayoutProps) {
         return { title: 'Anúncios', subtitle: 'Gerencie comunicados do sistema' };
       case '/admin/planos':
         return { title: 'Gestão de Planos', subtitle: 'Configure planos e limites de veículos' };
+      case '/admin/dashboard':
+        return { title: 'Configuração do Dashboard', subtitle: 'Configure o conteúdo exibido no dashboard das locadoras' };
       case '/locadoras':
         return { title: 'Locadoras', subtitle: 'Gerencie locadoras do sistema' };
       case '/perfil':
