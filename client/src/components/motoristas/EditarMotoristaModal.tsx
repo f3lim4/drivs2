@@ -365,16 +365,20 @@ export function EditarMotoristaModal({
       });
       
       // Carregar imagens existentes do motorista
-      carregarImagensExistentes(motorista.id);
+      if (motorista?.id) {
+        carregarImagensExistentes(motorista.id);
+      }
     }
   }, [motorista, open, form]);
 
   // Função para carregar imagens existentes do motorista
   const carregarImagensExistentes = async (motoristaId: string) => {
     try {
+      console.log('[EDITAR] Carregando imagens para motorista:', motoristaId);
       const response = await fetch(`/api/motoristas/${motoristaId}/imagens`);
       if (response.ok) {
         const data = await response.json();
+        console.log('[EDITAR] Dados recebidos da API:', data);
         const documentos = data.documentos || {};
         
         // Mapear documentos para previews
@@ -387,6 +391,7 @@ export function EditarMotoristaModal({
           fotoExtra2: documentos.fotoExtra2 || null,
         };
         
+        console.log('[EDITAR] Previews configurados:', novosPreviews);
         setImagePreviews(novosPreviews);
       }
     } catch (error) {
