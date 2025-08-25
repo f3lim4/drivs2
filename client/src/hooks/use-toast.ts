@@ -169,23 +169,33 @@ function toast({ ...props }: Toast) {
 }
 
 function useToast() {
-  const [state, setState] = React.useState<State>(memoryState)
-
-  React.useEffect(() => {
-    listeners.push(setState)
-    return () => {
-      const index = listeners.indexOf(setState)
-      if (index > -1) {
-        listeners.splice(index, 1)
-      }
-    }
-  }, [state])
-
   return {
-    ...state,
-    toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
-  }
+    toast: (options: { 
+      title?: string; 
+      description?: string; 
+      variant?: 'default' | 'destructive' | 'success' 
+    }) => {
+      try {
+        // Usar a notificação fixa do sidebar
+        const { mostrarNotificacao } = (window as any).__notificacao || {};
+        if (mostrarNotificacao) {
+          const mensagem = options.title || options.description || '';
+          let tipo: 'sucesso' | 'erro' | 'aviso' | 'info' = 'info';
+          
+          if (options.variant === 'destructive') {
+            tipo = 'erro';
+          } else if (options.variant === 'success') {
+            tipo = 'sucesso';
+          }
+          
+          mostrarNotificacao(mensagem, tipo);
+        }
+      } catch (e) {
+        console.log('Notificação:', options.title || options.description);
+      }
+    },
+    dismiss: () => {} // Não usado
+  };
 }
 
 export { useToast, toast }
