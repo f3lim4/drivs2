@@ -215,6 +215,8 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
           {/* Documentos do Veículo - Compacto */}
           {(() => {
             const documentos = veiculo.documentos;
+            // Mostrar apenas o último documento (sistema de documento único)
+            const documentoAtual = documentos && documentos.length > 0 ? [documentos[documentos.length - 1]] : [];
             
             return (
               <Card className="border-gray-200">
@@ -224,31 +226,28 @@ export function VisualizarVeiculoModal({ open, onOpenChange, veiculo }: Visualiz
                       <FileText className="w-4 h-4" />
                       Documentos
                     </div>
-                    {documentos && documentos.length > 0 && (
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                        {documentos.length}
+                    {documentoAtual.length > 0 && (
+                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                        1
                       </span>
                     )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  {!documentos || documentos.length === 0 ? (
+                  {documentoAtual.length === 0 ? (
                     <p className="text-xs text-muted-foreground">Nenhum documento</p>
                   ) : (
                     <div className="flex flex-wrap gap-2">
-                      {documentos.map((doc: string, index: number) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(doc, '_blank')}
-                          className="h-8 text-xs gap-1"
-                        >
-                          <FileText className="w-3 h-3" />
-                          Doc {index + 1}
-                          <Download className="w-3 h-3" />
-                        </Button>
-                      ))}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(documentoAtual[0], '_blank')}
+                        className="h-8 text-xs gap-1"
+                      >
+                        <FileText className="w-3 h-3" />
+                        Documento
+                        <Download className="w-3 h-3" />
+                      </Button>
                     </div>
                   )}
                 </CardContent>
