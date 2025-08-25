@@ -23,7 +23,8 @@ import {
   Megaphone,
   Crown,
   Search,
-  Settings
+  Settings,
+  BookOpen
 } from 'lucide-react';
 import { FaInstagram, FaYoutube, FaLinkedin } from 'react-icons/fa';
 import logoPath from "@assets/icone_1752434737434.png";
@@ -131,6 +132,12 @@ const navigationItems = [
     icon: Building2,
     description: 'Gerenciar locadoras',
     adminOnly: true  // Só admins podem ver este item
+  },
+  {
+    title: 'Manual & Treinamento',
+    url: '/manual-treinamento',
+    icon: BookOpen,
+    description: 'Documentação e vídeos de treinamento'
   }
 ];
 
