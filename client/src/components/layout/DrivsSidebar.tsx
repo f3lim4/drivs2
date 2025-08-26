@@ -133,12 +133,6 @@ const navigationItems = [
     description: 'Gerenciar locadoras',
     adminOnly: true  // Só admins podem ver este item
   },
-  {
-    title: 'Manual & Treinamento',
-    url: '/manual-treinamento',
-    icon: BookOpen,
-    description: 'Documentação e vídeos de treinamento'
-  }
 ];
 
 // Ícones de veículos para alternância
