@@ -18,6 +18,7 @@ import { useMotoristas } from '@/hooks/useMotoristas';
 import { useVeiculos } from '@/hooks/useVeiculos';
 import { useAlugueis } from '@/hooks/useAlugueis';
 import { usePagamentos } from '@/hooks/usePagamentos';
+import { useLinksUteisAtivos } from '@/hooks/useLinksUteis';
 import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
 import type { DashboardConfig } from '@shared/schema';
 
@@ -25,15 +26,19 @@ import type { DashboardConfig } from '@shared/schema';
 export default function Dashboard() {
   const { profile, isLocadora, isAdmin } = useAuth();
   
-  // Buscar anúncios ativos
+  // Buscar anúncios ativos - cache otimizado
   const { data: anuncios = [], isLoading: loadingAnuncios } = useAnunciosAtivos();
 
-  // Buscar configurações do dashboard
+  // Buscar configurações do dashboard - cache estendido
   const { data: dashboardConfig, isLoading: loadingDashboardConfig } = useQuery<DashboardConfig>({
     queryKey: ['/api/dashboard-config'],
     refetchOnWindowFocus: false,
-    staleTime: 10 * 60 * 1000, // 10 minutos
+    staleTime: 15 * 60 * 1000, // 15 minutos
+    gcTime: 30 * 60 * 1000, // 30 minutos
   });
+
+  // Buscar links úteis dinâmicos
+  const { data: linksUteis = [], isLoading: loadingLinksUteis } = useLinksUteisAtivos();
 
   // Função para mapear tipos de anúncios para português e cores
   const getAnuncioConfig = (tipo: string) => {
@@ -90,14 +95,14 @@ export default function Dashboard() {
     }
   };
 
-  // Buscar dados das locadoras (apenas para admin)
+  // Buscar dados das locadoras (apenas para admin) - com cache otimizado
   const { data: locadoras = [], isLoading: loadingLocadoras } = useQuery<any[]>({
     queryKey: ['/api/locadoras'],
     enabled: isAdmin,
     refetchOnWindowFocus: false,
-    refetchOnMount: true,
-    staleTime: 0,
-    gcTime: 0,
+    refetchOnMount: false,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos
   });
   
   // Usar hooks especializados para buscar dados
@@ -110,11 +115,11 @@ export default function Dashboard() {
     queryKey: ['/api/despesas', profile?.locadoraId],
     enabled: !!profile && isLocadora,
     refetchOnWindowFocus: false,
-    staleTime: 0,
+    staleTime: 2 * 60 * 1000, // 2 minutos
   });
 
   // SISTEMA DE LOADING COMPLETO - Dashboard só carrega quando TODOS os dados estão prontos
-  const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis || loadingPagamentos || loadingDespesas || loadingAnuncios || loadingLocadoras || loadingDashboardConfig;
+  const loading = loadingMotoristas || loadingVeiculos || loadingAlugueis || loadingPagamentos || loadingDespesas || loadingAnuncios || loadingLocadoras || loadingDashboardConfig || loadingLinksUteis;
 
   // Usar dados diretamente dos hooks (já filtrados corretamente)
   const motoristasSeguro = motoristasRaw;
@@ -1036,8 +1041,8 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Card de Links Úteis - Configurável pelo Admin */}
-        {dashboardConfig?.mostrarLinksUteis && (
+        {/* Card de Links Úteis Dinâmicos - Configurável pelo Admin */}
+        {dashboardConfig?.mostrarLinksUteis && linksUteis.length > 0 && (
           <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold text-green-800 flex items-center gap-2">
@@ -1050,81 +1055,24 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {dashboardConfig?.linkDetranUrl && (
-                  <div className="p-3 bg-white rounded-lg border border-green-200">
+                {linksUteis.map((link) => (
+                  <div key={link.id} className="p-3 bg-white rounded-lg border border-green-200">
                     <div className="space-y-2">
                       <a 
-                        href={dashboardConfig.linkDetranUrl} 
+                        href={link.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
                       >
                         <ExternalLink className="w-4 h-4" />
-                        {dashboardConfig.linkDetranTitulo || "Portal DETRAN"}
+                        {link.titulo}
                       </a>
                       <p className="text-xs text-gray-600">
-                        {dashboardConfig.linkDetranDescricao || "Consultas de veículos e habilitação"}
+                        {link.descricao}
                       </p>
                     </div>
                   </div>
-                )}
-                
-                {dashboardConfig?.linkReceitaUrl && (
-                  <div className="p-3 bg-white rounded-lg border border-green-200">
-                    <div className="space-y-2">
-                      <a 
-                        href={dashboardConfig.linkReceitaUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        {dashboardConfig.linkReceitaTitulo || "Receita Federal"}
-                      </a>
-                      <p className="text-xs text-gray-600">
-                        {dashboardConfig.linkReceitaDescricao || "Consultas de CPF e CNPJ"}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                
-                {dashboardConfig?.linkSpcUrl && (
-                  <div className="p-3 bg-white rounded-lg border border-green-200">
-                    <div className="space-y-2">
-                      <a 
-                        href={dashboardConfig.linkSpcUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        {dashboardConfig.linkSpcTitulo || "Consulta SPC/Serasa"}
-                      </a>
-                      <p className="text-xs text-gray-600">
-                        {dashboardConfig.linkSpcDescricao || "Verificação de score e restrições"}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                
-                {dashboardConfig?.linkViaCepUrl && (
-                  <div className="p-3 bg-white rounded-lg border border-green-200">
-                    <div className="space-y-2">
-                      <a 
-                        href={dashboardConfig.linkViaCepUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        {dashboardConfig.linkViaCepTitulo || "ViaCEP"}
-                      </a>
-                      <p className="text-xs text-gray-600">
-                        {dashboardConfig.linkViaCepDescricao || "Consulta de endereços por CEP"}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                ))}
               </div>
             </CardContent>
           </Card>
