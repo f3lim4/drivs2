@@ -57,10 +57,9 @@ export function useVeiculos() {
       return data.map(formatVeiculo);
     },
     enabled: !!profile,
-    staleTime: 30000, // 30 segundos
-    gcTime: 60000, // 1 minuto
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    staleTime: 0, // Dados sempre considerados "stale" para permitir invalidação
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   // Função para formatar dados do veículo
@@ -91,7 +90,6 @@ export function useVeiculos() {
     ipva: v.ipva ? parseFloat(v.ipva) : undefined,
     rastreador: v.rastreador,
     valorRastreadorMensal: v.valorRastreadorMensal ? parseFloat(v.valorRastreadorMensal) : undefined,
-    dataCompra: v.dataCompra,
     financiado: v.financiado,
     valorFinanciamento: v.valorFinanciamento ? parseFloat(v.valorFinanciamento) : undefined,
     quantidadeParcelas: v.quantidadeParcelas,
