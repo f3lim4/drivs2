@@ -89,6 +89,15 @@ export function useNotifications() {
     staleTime: 0,
   });
 
+  // Buscar dados da locadora para verificar período de teste
+  const { data: locadoraData } = useQuery({
+    queryKey: [`/api/locadoras/${profile?.locadoraId}`],
+    enabled: !!profile?.locadoraId,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+  });
+
   // Filtrar dados com isolamento de segurança
   const motoristas = profile?.locadoraId ? motoristasRaw.filter((m: any) => m.locadoraId === profile.locadoraId) : motoristasRaw;
   const alugueis = profile?.locadoraId ? alugueisRaw.filter((a: any) => a.locadoraId === profile.locadoraId) : alugueisRaw;
@@ -385,6 +394,51 @@ export function useNotifications() {
         });
       }
     });
+  }
+
+  // Notificações de período de teste gratuito
+  if (locadoraData && locadoraData.testeGratuito && locadoraData.dataVencimentoTeste) {
+    const dataVencimento = new Date(locadoraData.dataVencimentoTeste);
+    const diasRestantes = differenceInDays(dataVencimento, today);
+    
+    if (diasRestantes < 0) {
+      // Período de teste vencido
+      notifications.push({
+        id: `teste-vencido-${profile?.locadoraId}`,
+        type: 'danger',
+        title: 'Período de Teste Expirado',
+        message: `Seu período de teste gratuito de ${locadoraData.diasTesteGratuito} dias expirou. Faça o upgrade para continuar usando o sistema.`,
+        timestamp: dataVencimento,
+        isRead: false,
+      });
+    } else if (diasRestantes <= 5) {
+      // Período de teste vencendo em 5 dias ou menos
+      const tipoNotificacao = diasRestantes <= 1 ? 'danger' : 'warning';
+      const tituloNotificacao = diasRestantes === 0 
+        ? 'Período de Teste Expira Hoje!' 
+        : diasRestantes === 1 
+        ? 'Período de Teste Expira Amanhã!' 
+        : `Período de Teste Expira em ${diasRestantes} dias`;
+      
+      notifications.push({
+        id: `teste-vencendo-${profile?.locadoraId}`,
+        type: tipoNotificacao,
+        title: tituloNotificacao,
+        message: `Seu período de teste gratuito expira ${diasRestantes === 0 ? 'hoje' : diasRestantes === 1 ? 'amanhã' : `em ${diasRestantes} dias`}. Faça o upgrade para não perder acesso ao sistema.`,
+        timestamp: new Date(Date.now() - Math.random() * 3600000),
+        isRead: false,
+      });
+    } else if (diasRestantes <= 10) {
+      // Aviso suave quando restam entre 6-10 dias
+      notifications.push({
+        id: `teste-aviso-${profile?.locadoraId}`,
+        type: 'info',
+        title: `${diasRestantes} dias restantes do período gratuito`,
+        message: `Aproveite os últimos ${diasRestantes} dias do seu período de teste gratuito. Considere fazer upgrade para ter acesso completo.`,
+        timestamp: new Date(Date.now() - Math.random() * 3600000),
+        isRead: false,
+      });
+    }
   }
 
   // Notificações de anúncios críticos (warning e error)
