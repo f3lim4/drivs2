@@ -21,6 +21,7 @@ import { usePagamentos } from '@/hooks/usePagamentos';
 import { useLinksUteisAtivos } from '@/hooks/useLinksUteis';
 import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
 import type { DashboardConfig } from '@shared/schema';
+import { differenceInDays } from 'date-fns';
 
 
 export default function Dashboard() {
@@ -39,6 +40,14 @@ export default function Dashboard() {
 
   // Buscar links úteis dinâmicos
   const { data: linksUteis = [], isLoading: loadingLinksUteis } = useLinksUteisAtivos();
+
+  // Buscar dados da locadora para verificar período de teste
+  const { data: locadoraData } = useQuery({
+    queryKey: [`/api/locadoras/${profile?.locadoraId}`],
+    enabled: !!profile?.locadoraId && isLocadora,
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+  });
 
   // Função para mapear tipos de anúncios para português e cores
   const getAnuncioConfig = (tipo: string) => {
@@ -125,6 +134,26 @@ export default function Dashboard() {
   const motoristasSeguro = motoristasRaw;
   const veiculosSeguro = veiculosRaw;
   const alugueisSeguro = alugueisRaw;
+
+  // Calcular dias restantes do período de teste
+  const getTrialStatus = () => {
+    if (!locadoraData || !locadoraData.testeGratuito || !locadoraData.dataVencimentoTeste) {
+      return null;
+    }
+    
+    const today = new Date();
+    const vencimento = new Date(locadoraData.dataVencimentoTeste);
+    const diasRestantes = differenceInDays(vencimento, today);
+    
+    return {
+      diasRestantes,
+      diasTotais: locadoraData.diasTesteGratuito || 30,
+      vencimento,
+      isActive: diasRestantes >= 0
+    };
+  };
+
+  const trialStatus = getTrialStatus();
 
 
 
@@ -561,7 +590,48 @@ export default function Dashboard() {
       </div>
       )}
 
-
+      {/* Card de Período de Teste Gratuito */}
+      {isLocadora && trialStatus && trialStatus.isActive && (
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-orange-600" />
+                  <h3 className="text-lg font-semibold text-orange-800">Período de Teste Gratuito</h3>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-2xl font-bold text-orange-900">
+                    {trialStatus.diasRestantes} {trialStatus.diasRestantes === 1 ? 'dia restante' : 'dias restantes'}
+                  </p>
+                  <p className="text-sm text-orange-700">
+                    De {trialStatus.diasTotais} dias totais • Expira em {formatDate(trialStatus.vencimento.toISOString())}
+                  </p>
+                  <div className="w-full bg-orange-200 rounded-full h-2.5 mt-3">
+                    <div 
+                      className="bg-orange-600 h-2.5 rounded-full transition-all duration-300" 
+                      style={{ 
+                        width: `${Math.max(0, Math.min(100, (trialStatus.diasRestantes / trialStatus.diasTotais) * 100))}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right space-y-2">
+                <Badge 
+                  variant={trialStatus.diasRestantes <= 5 ? "destructive" : trialStatus.diasRestantes <= 10 ? "secondary" : "default"}
+                  className="text-xs"
+                >
+                  {trialStatus.diasRestantes <= 5 ? "⚠️ Urgente" : trialStatus.diasRestantes <= 10 ? "⏰ Atenção" : "✅ Ativo"}
+                </Badge>
+                <div className="text-xs text-orange-600">
+                  Faça upgrade para<br />continuar usando
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Seção de Anúncios */}
       {isLocadora && anuncios.length > 0 && (
