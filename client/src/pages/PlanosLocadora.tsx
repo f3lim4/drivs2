@@ -134,9 +134,6 @@ export default function PlanosLocadora() {
     valor: number;
   } | null>(null);
 
-  console.log('PlanosLocadora rendering', { profile, subscriptionStatus });
-
-
   // Cache dos planos estáticos (carregamento instantâneo)
   const planosEstaticos = {
     start: { nome: "Start", preco: 50.00, valor: 50.00, icone: Car, cor: "bg-blue-500", descricao: "Para locadoras iniciantes com até 5 veículos", popular: false },
@@ -162,8 +159,6 @@ export default function PlanosLocadora() {
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
   });
-
-  console.log('Planos query:', { planoDetalhes, isLoading, planosError });
 
   // Dados carregados com sucesso - continuar com renderização normal
 
@@ -249,24 +244,26 @@ export default function PlanosLocadora() {
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
   const planoAtual = locadoraData?.plano || planoDetalhes?.planoAtual || 'pro';
   
-  console.log('Dados principais:', { locadoraData, planoAtual, planoDetalhes });
-  
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = planoAtual === 'vip' || locadoraData?.vitalia === true;
   
   // Verificar se o plano está expirado - valor padrão para produção
   const isPlanExpired = (subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false;
 
-  console.log('Antes do return - tudo ok, renderizando...');
+  // Verificações de segurança para produção
+  if (!planoDetalhes && !planosEstaticos) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="text-center">
+          <LoadingSpinner />
+          <p className="mt-2 text-muted-foreground">Carregando planos...</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Teste simples primeiro
   return (
     <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold">Planos DRIVS</h1>
-        <p>Plano atual: {planoAtual}</p>
-        <p>Total de planos: {Object.keys(planoDetalhes || {}).length}</p>
-      </div>
 
       {/* Status do teste gratuito - ocultar para locadoras VIP */}
       {planoDetalhes?.testeGratuito && planoAtual !== 'vip' && (
@@ -456,8 +453,14 @@ export default function PlanosLocadora() {
               return true;
             })
             .map(([key, plano]: [string, any]) => {
-            const Icone = typeof plano.icone === 'string' ? iconeMap[plano.icone as keyof typeof iconeMap] || Car : plano.icone;
-            return (
+            // Garantir que plano existe e tem icone
+            if (!plano || typeof plano !== 'object') return null;
+            
+            try {
+              const iconeName = plano.icone || 'Car';
+              const Icone = typeof iconeName === 'string' ? (iconeMap[iconeName as keyof typeof iconeMap] || Car) : (iconeName || Car);
+              
+              return (
               <Card key={key} className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500 relative' : ''}`}>
                 {plano.popular && (
                   <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-cyan-500 text-white z-10">
@@ -535,7 +538,11 @@ export default function PlanosLocadora() {
                   </div>
                 </CardContent>
               </Card>
-            );
+              );
+            } catch (error) {
+              console.error('Erro ao renderizar plano:', key, error);
+              return null;
+            }
           })}
         </div>
       </div>
@@ -692,8 +699,14 @@ function PlanoCarousel({
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {Object.entries(planosInfo).map(([key, plano]: [string, any]) => {
-            const Icone = typeof plano.icone === 'string' ? iconeMap[plano.icone as keyof typeof iconeMap] || Car : plano.icone;
-            return (
+            // Garantir que plano existe e tem icone
+            if (!plano || typeof plano !== 'object') return null;
+            
+            try {
+              const iconeName = plano.icone || 'Car';
+              const Icone = typeof iconeName === 'string' ? (iconeMap[iconeName as keyof typeof iconeMap] || Car) : (iconeName || Car);
+              
+              return (
               <div key={key} className="flex-[0_0_85%] sm:flex-[0_0_60%] md:flex-[0_0_45%] mr-4">
                 <Card className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500' : ''}`}>
                   <CardHeader className="text-center relative">
@@ -766,7 +779,11 @@ function PlanoCarousel({
                   </CardContent>
                 </Card>
               </div>
-            );
+              );
+            } catch (error) {
+              console.error('Erro ao renderizar plano no carrossel:', key, error);
+              return null;
+            }
           })}
         </div>
       </div>
