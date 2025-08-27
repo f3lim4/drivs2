@@ -41,6 +41,7 @@ import { registrarAtividade } from '@/utils/activityLogger';
 
 import { Veiculo } from '@/types';
 import { CheckCircle, AlertTriangle, Wrench, BarChart3 } from 'lucide-react';
+import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 
 // Função para obter ícone baseado na categoria do veículo
 const getVehicleIconByCategory = (categoria: string) => {
@@ -405,13 +406,15 @@ export default function Veiculos() {
 
 
               {isLocadora && (
-                <Button 
-                  className="bg-primary text-primary-foreground hover:bg-primary/90"
-                  onClick={handleNovoVeiculo}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Novo Veículo
-                </Button>
+                <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novos veículos">
+                  <Button 
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={handleNovoVeiculo}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Novo Veículo
+                  </Button>
+                </ProtectedAction>
               )}
             </div>
           </div>

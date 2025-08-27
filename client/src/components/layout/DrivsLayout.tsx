@@ -7,6 +7,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { DrivsSidebar } from './DrivsSidebar';
 import { DrivsHeader } from './DrivsHeader';
 import { SubscriptionGuard } from '@/components/subscription/SubscriptionGuard';
+import { SubscriptionAlert } from '@/components/subscription/SubscriptionAlert';
 import { useLocation } from 'wouter';
 
 interface DrivsLayoutProps {
@@ -72,7 +73,12 @@ export function DrivsLayout({ children }: DrivsLayoutProps) {
             
             {/* Área de conteúdo */}
             <main className="flex-1 overflow-auto pt-16 md:pt-0">
-              {children}
+              <div className="p-6">
+                <SubscriptionAlert />
+                <div className="-mx-6 -mb-6">
+                  {children}
+                </div>
+              </div>
             </main>
           </div>
         </div>
