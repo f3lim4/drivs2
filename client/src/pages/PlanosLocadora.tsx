@@ -246,12 +246,12 @@ export default function PlanosLocadora() {
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = locadoraData?.vitalia === true;
   
-  // Se for VIP, o plano atual é 'vip', caso contrário usar o plano salvo
+  // Se for VIP ou Infinity, mostrar plano especial; caso contrário usar o plano salvo
   const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || planoDetalhes?.planoAtual || 'pro');
   
   
-  // VIP sempre tem acesso - não pode estar expirado
-  const isPlanExpired = isVipPlan ? false : ((subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false);
+  // VIP e Infinity sempre têm acesso - não podem estar expirados
+  const isPlanExpired = (isVipPlan || planoAtual === 'infinity') ? false : ((subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false);
 
   // Dados fallback para garantir renderização em produção
   const planosSegurosProdução = {
@@ -352,6 +352,12 @@ export default function PlanosLocadora() {
                   VIP
                 </Badge>
               )}
+              {planoAtual === 'infinity' && (
+                <Badge variant="secondary" className="px-3 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0">
+                  <Star className="h-3 w-3 mr-1" />
+                  INFINITY
+                </Badge>
+              )}
               <Badge variant="default" className="px-3 py-1">
                 {planoAtual === 'vip' ? 'VIP' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro')}
               </Badge>
@@ -362,9 +368,10 @@ export default function PlanosLocadora() {
           <div className={`p-4 rounded-lg ${isPlanExpired ? 'bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200' : 'bg-muted'}`}>
             {/* Layout Desktop */}
             <div className="hidden sm:flex items-center gap-4">
-              <div className={`p-3 rounded-full ${planoAtual === 'vip' ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500')}`}>
+              <div className={`p-3 rounded-full ${planoAtual === 'vip' ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : planoAtual === 'infinity' ? 'bg-gradient-to-r from-purple-600 to-pink-600' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500')}`}>
                 {(() => {
                   if (planoAtual === 'vip') return <Crown className="h-6 w-6 text-white" />;
+                  if (planoAtual === 'infinity') return <Star className="h-6 w-6 text-white" />;
                   const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
                   if (!planoData) return <Rocket className="h-6 w-6 text-white" />;
                   const IconComponent = planoData.icone;
@@ -373,16 +380,19 @@ export default function PlanosLocadora() {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">
-                  Plano {planoAtual === 'vip' ? 'VIP' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro')}
+                  Plano {planoAtual === 'vip' ? 'VIP' : planoAtual === 'infinity' ? 'Infinity' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro')}
                   {planoAtual === 'vip' && <span className="text-purple-600 ml-2">(Premium)</span>}
-                  {isPlanExpired && planoAtual !== 'vip' && <span className="text-orange-600 ml-2">(Expirado)</span>}
+                  {planoAtual === 'infinity' && <span className="text-purple-600 ml-2">(Ilimitado)</span>}
+                  {isPlanExpired && planoAtual !== 'vip' && planoAtual !== 'infinity' && <span className="text-orange-600 ml-2">(Expirado)</span>}
                 </h3>
                 <p className="text-sm text-muted-foreground">
                   {planoAtual === 'vip'
                     ? 'Plano VIP com acesso total e ilimitado a todos os recursos do sistema'
-                    : isPlanExpired 
-                      ? 'Renove seu plano para continuar aproveitando todos os recursos' 
-                      : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento')
+                    : planoAtual === 'infinity'
+                      ? 'Plano Infinity com veículos ilimitados e acesso total ao sistema'
+                      : isPlanExpired 
+                        ? 'Renove seu plano para continuar aproveitando todos os recursos' 
+                        : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento')
                   }
                 </p>
               </div>
@@ -391,11 +401,13 @@ export default function PlanosLocadora() {
                   <p className="text-2xl font-bold">
                     {isVipPlan
                       ? 'VIP'
-                      : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
+                      : planoAtual === 'infinity'
+                        ? 'INFINITY'
+                        : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                     }
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {isVipPlan ? 'Plano VIP' : 'por mês'}
+                    {isVipPlan ? 'Plano VIP' : planoAtual === 'infinity' ? 'Plano Infinity' : 'por mês'}
                   </p>
                 </div>
                 {isPlanExpired && !isVipPlan && (
@@ -414,9 +426,10 @@ export default function PlanosLocadora() {
             {/* Layout Mobile */}
             <div className="block sm:hidden space-y-4">
               <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-full ${planoAtual === 'vip' ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500')}`}>
+                <div className={`p-2.5 rounded-full ${planoAtual === 'vip' ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : planoAtual === 'infinity' ? 'bg-gradient-to-r from-purple-600 to-pink-600' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500')}`}>
                   {(() => {
                     if (planoAtual === 'vip') return <Crown className="h-5 w-5 text-white" />;
+                    if (planoAtual === 'infinity') return <Star className="h-5 w-5 text-white" />;
                     const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
                     if (!planoData) return <Rocket className="h-5 w-5 text-white" />;
                     const IconComponent = planoData.icone;
