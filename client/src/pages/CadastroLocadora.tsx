@@ -370,7 +370,7 @@ export default function CadastroLocadora() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Nome e CNPJ na mesma linha */}
-                <div className="col-span-2 grid grid-cols-2 gap-4">
+                <div className="col-span-2 grid grid-cols-1 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="nome" >Nome da Empresa *</Label>
                     <Input
@@ -395,7 +395,7 @@ export default function CadastroLocadora() {
                 </div>
 
                 {/* Email, Telefone e Responsável na mesma linha */}
-                <div className="col-span-2 grid grid-cols-3 gap-3">
+                <div className="col-span-2 grid grid-cols-1 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="email" >Email *</Label>
                     <Input
@@ -482,7 +482,7 @@ export default function CadastroLocadora() {
                 </div>
 
                 {/* Bairro, Cidade e Estado na mesma linha */}
-                <div className="col-span-2 grid grid-cols-3 gap-3">
+                <div className="col-span-2 grid grid-cols-1 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="bairro" >Bairro *</Label>
                     <Input
@@ -551,7 +551,7 @@ export default function CadastroLocadora() {
               </div>
 
               {/* Logo da Empresa e Senhas lado a lado */}
-              <div className="grid grid-cols-2 gap-6 pt-6 border-t">
+              <div className="grid grid-cols-1 gap-6 pt-6 border-t">
                 {/* Coluna Logo */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium flex items-center text-gray-900">
