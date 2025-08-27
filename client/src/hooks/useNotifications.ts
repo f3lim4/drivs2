@@ -397,7 +397,7 @@ export function useNotifications() {
   }
 
   // Notificações de período de teste gratuito - excluir para locadoras Vitalia VIP
-  if (locadoraData && locadoraData.testeGratuito && locadoraData.dataVencimentoTeste && !locadoraData.vitalia) {
+  if (locadoraData && locadoraData.testeGratuito && locadoraData.dataVencimentoTeste && !locadoraData.vitalia && locadoraData.plano !== 'vip') {
     const dataVencimento = new Date(locadoraData.dataVencimentoTeste);
     const diasRestantes = differenceInDays(dataVencimento, today);
     
