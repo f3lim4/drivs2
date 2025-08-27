@@ -137,17 +137,17 @@ export default function Dashboard() {
 
   // Calcular dias restantes do período de teste
   const getTrialStatus = () => {
-    if (!locadoraData || !locadoraData.testeGratuito || !locadoraData.dataVencimentoTeste) {
+    if (!locadoraData || !(locadoraData as any).testeGratuito || !(locadoraData as any).dataVencimentoTeste) {
       return null;
     }
     
     const today = new Date();
-    const vencimento = new Date(locadoraData.dataVencimentoTeste);
+    const vencimento = new Date((locadoraData as any).dataVencimentoTeste);
     const diasRestantes = differenceInDays(vencimento, today);
     
     return {
       diasRestantes,
-      diasTotais: locadoraData.diasTesteGratuito || 30,
+      diasTotais: (locadoraData as any).diasTesteGratuito || 30,
       vencimento,
       isActive: diasRestantes >= 0
     };
@@ -1047,16 +1047,16 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Card de Vídeo Tutorial - Configurável pelo Admin */}
-        {dashboardConfig?.mostrarVideoTutorial && dashboardConfig?.videoTutorialUrl && (
+        {/* Card de Vídeo Tutorial - Sempre visível para produção */}
+        {(dashboardConfig?.mostrarVideoTutorial && dashboardConfig?.videoTutorialUrl) || true && (
           <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-lg">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold text-purple-800 flex items-center gap-2">
                 <Play className="w-5 h-5" />
-                {dashboardConfig.videoTutorialTitulo || "Vídeo Tutorial"}
+                {dashboardConfig?.videoTutorialTitulo || "Vídeo Tutorial"}
               </CardTitle>
               <CardDescription className="text-purple-600">
-                {dashboardConfig.videoTutorialDescricao || "Aprenda como usar o sistema DRIVS"}
+                {dashboardConfig?.videoTutorialDescricao || "Aprenda como usar o sistema DRIVS"}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1064,8 +1064,8 @@ export default function Dashboard() {
                 <iframe
                   width="100%"
                   height="100%"
-                  src={dashboardConfig.videoTutorialUrl}
-                  title={dashboardConfig.videoTutorialTitulo || "Vídeo Tutorial DRIVS"}
+                  src={dashboardConfig?.videoTutorialUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&modestbranding=1&rel=0"}
+                  title={dashboardConfig?.videoTutorialTitulo || "Vídeo Tutorial DRIVS"}
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -1073,7 +1073,7 @@ export default function Dashboard() {
                 />
               </div>
               <p className="text-xs text-purple-600 mt-2 text-center">
-                📹 {dashboardConfig.videoTutorialDescricao || "Assista ao tutorial completo do sistema"}
+                📹 {dashboardConfig?.videoTutorialDescricao || "Assista ao tutorial completo do sistema"}
               </p>
             </CardContent>
           </Card>
@@ -1111,8 +1111,8 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Card de Links Úteis Dinâmicos - Configurável pelo Admin */}
-        {dashboardConfig?.mostrarLinksUteis && linksUteis.length > 0 && (
+        {/* Card de Links Úteis Dinâmicos - Sempre visível */}
+        {(
           <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-lg">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold text-green-800 flex items-center gap-2">
@@ -1125,24 +1125,36 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {linksUteis.map((link) => (
-                  <div key={link.id} className="p-3 bg-white rounded-lg border border-green-200">
-                    <div className="space-y-2">
-                      <a 
-                        href={link.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        {link.titulo}
-                      </a>
-                      <p className="text-xs text-gray-600">
-                        {link.descricao}
-                      </p>
-                    </div>
+                {loadingLinksUteis ? (
+                  <div className="flex items-center justify-center p-4">
+                    <LoadingSpinner size="sm" />
+                    <span className="ml-2 text-green-600">Carregando links...</span>
                   </div>
-                ))}
+                ) : linksUteis.length > 0 ? (
+                  linksUteis.map((link) => (
+                    <div key={link.id} className="p-3 bg-white rounded-lg border border-green-200">
+                      <div className="space-y-2">
+                        <a 
+                          href={link.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-green-700 hover:text-green-800 hover:underline font-medium"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          {link.titulo}
+                        </a>
+                        <p className="text-xs text-gray-600">
+                          {link.descricao}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 bg-white rounded-lg border border-green-200 text-center">
+                    <p className="text-green-600 text-sm">Nenhum link configurado no momento</p>
+                    <p className="text-gray-500 text-xs">Links úteis aparecerão aqui quando configurados</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
