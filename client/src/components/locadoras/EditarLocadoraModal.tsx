@@ -200,20 +200,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
   };
 
   const updateFormData = (field: string, value: string | boolean) => {
-    setFormData(prev => {
-      // Se estiver ativando/desativando VIP (Vitalia)
-      if (field === 'vitalia') {
-        return { 
-          ...prev, 
-          [field]: value,
-          // Se ativar VIP, definir plano como "vip"
-          // Se desativar VIP, manter o plano atual (não alterar automaticamente)
-          plano: value === true ? 'vip' : prev.plano
-        };
-      }
-      
-      return { ...prev, [field]: value };
-    });
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -428,19 +415,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
                 )}
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="vitalia">Locadora VIP (Vitalia)</Label>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="vitalia"
-                    checked={formData.vitalia}
-                    onCheckedChange={(checked) => updateFormData('vitalia', checked)}
-                  />
-                  <span className="text-sm text-slate-600">
-                    {formData.vitalia ? 'Locadora VIP - Acesso ilimitado sem cobrança' : 'Locadora padrão - Sujeita a cobrança'}
-                  </span>
-                </div>
-              </div>
 
             </div>
           </div>
