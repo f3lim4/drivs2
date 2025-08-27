@@ -341,7 +341,7 @@ export default function PlanosLocadora() {
                 <div>
                   <p className="text-2xl font-bold">
                     {planoAtual === 'vip'
-                      ? 'Gratuito'
+                      ? 'R$ 0,00'
                       : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                     }
                   </p>
