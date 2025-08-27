@@ -167,6 +167,27 @@ export default function Planos() {
     }
   };
 
+  const handleRenovarPlano = async (plano: string) => {
+    setSolicitando(true);
+    try {
+      // Simular processo de renovação
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Renovação solicitada",
+        description: `Sua solicitação de renovação do plano ${planosInfo[plano as keyof typeof planosInfo].nome} foi enviada. Nossa equipe entrará em contato para finalizar o pagamento.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erro na renovação",
+        description: "Ocorreu um erro ao solicitar a renovação. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setSolicitando(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -314,7 +335,7 @@ export default function Planos() {
                     <Button 
                       disabled={!isPlanExpired} 
                       className="w-full"
-                      onClick={isPlanExpired ? () => handleSolicitarMudanca(key) : undefined}
+                      onClick={isPlanExpired ? () => handleRenovarPlano(key) : undefined}
                       variant={isPlanExpired ? "default" : "secondary"}
                     >
                       {isPlanExpired ? "Renovar Plano" : "Plano Atual"}
