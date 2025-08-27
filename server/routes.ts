@@ -500,6 +500,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(locadora);
     } catch (error) {
       console.error("Error updating locadora:", error);
+      
+      if (error instanceof Error) {
+        if (error.message.includes('not found')) {
+          return res.status(404).json({ message: "Locadora não encontrada" });
+        }
+      }
+      
       res.status(500).json({ message: "Internal server error" });
     }
   });

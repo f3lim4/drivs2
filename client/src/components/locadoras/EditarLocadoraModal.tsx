@@ -102,6 +102,12 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
 
   useEffect(() => {
     if (locadora) {
+      console.log('[DEBUG MODAL] Carregando dados da locadora:', {
+        id: locadora.id,
+        nome: locadora.nome,
+        isentoCobranca: locadora.isentoCobranca
+      });
+      
       setFormData({
         nome: locadora.nome || '',
         razaoSocial: locadora.razaoSocial || '',
@@ -119,7 +125,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
         logo: locadora.logo || '',
         status: locadora.status || 'ativa',
         plano: locadora.plano || 'start',
-        isentoCobranca: locadora.isentoCobranca || false,
+        isentoCobranca: Boolean(locadora.isentoCobranca),
       });
     }
   }, [locadora]);
@@ -182,6 +188,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
       // Invalidar caches para atualizar os dados automaticamente
       await queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
       await queryClient.invalidateQueries({ queryKey: [`/api/locadoras/${locadora.id}`] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/subscription-status'] });
       
       toast({
         title: "Locadora atualizada com sucesso!",
