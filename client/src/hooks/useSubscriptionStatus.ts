@@ -33,8 +33,8 @@ export function useSubscriptionStatus() {
       const locadora = await response.json();
       const today = new Date();
       
-      // Verificar se é locadora Vitalia (VIP) - acesso sempre liberado
-      if (locadora.vitalia) {
+      // Verificar se é locadora VIP (Vitalia ou plano VIP) - acesso sempre liberado
+      if (locadora.vitalia || locadora.plano === 'vip') {
         return {
           isActive: true,
           isExpired: false,

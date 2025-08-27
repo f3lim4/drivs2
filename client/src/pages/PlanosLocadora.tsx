@@ -130,6 +130,7 @@ export default function PlanosLocadora() {
     pro: { nome: "Pro", preco: 99.00, valor: 99.00, icone: Rocket, cor: "bg-cyan-500", descricao: "Para locadoras em crescimento com até 20 veículos", popular: true },
     elite: { nome: "Elite", preco: 250.00, valor: 250.00, icone: Zap, cor: "bg-green-500", descricao: "Para frotas médias com até 50 veículos", popular: false },
     prime: { nome: "Prime", preco: 500.00, valor: 500.00, icone: Crown, cor: "bg-purple-500", descricao: "Para grandes frotas com até 100 veículos", popular: false },
+    vip: { nome: "VIP", preco: 0.00, valor: 0.00, icone: Crown, cor: "bg-gradient-to-r from-purple-600 to-pink-600", descricao: "Acesso ilimitado premium - Sem mensalidade", popular: false, vip: true },
     infinity: { nome: "Infinity", preco: 0.00, valor: 0.00, icone: Star, cor: "bg-gradient-to-r from-purple-600 to-pink-600", descricao: "Veículos ilimitados - Preço a consultar", popular: false, consultar: true }
   };
 
@@ -234,8 +235,8 @@ export default function PlanosLocadora() {
   // Sempre mostrar a página de planos, mesmo sem locadora específica
   // O sistema deve permitir visualizar os planos disponíveis
 
-  // Para locadoras Vitalia VIP, sempre mostrar plano Infinity
-  const planoAtual = (locadora as any)?.vitalia ? 'infinity' : ((locadora as any)?.plano || 'pro');
+  // Determinar o plano atual baseado nos dados da locadora
+  const planoAtual = (locadora as any)?.vitalia ? 'vip' : ((locadora as any)?.plano || 'pro');
   
   // Verificar se o plano está expirado
   const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
@@ -294,10 +295,10 @@ export default function PlanosLocadora() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              {locadora?.vitalia && (
+              {(locadora?.vitalia || planoAtual === 'vip') && (
                 <Badge variant="secondary" className="px-3 py-1 bg-gradient-to-r from-purple-500 to-indigo-500 text-white border-0">
                   <Crown className="h-3 w-3 mr-1" />
-                  Vitalia VIP
+                  VIP
                 </Badge>
               )}
               <Badge variant="default" className="px-3 py-1">
@@ -321,12 +322,12 @@ export default function PlanosLocadora() {
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">
                   Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
-                  {locadora?.vitalia && <span className="text-purple-600 ml-2">(Vitalia VIP)</span>}
-                  {isPlanExpired && !locadora?.vitalia && <span className="text-orange-600 ml-2">(Expirado)</span>}
+                  {(locadora?.vitalia || planoAtual === 'vip') && <span className="text-purple-600 ml-2">(Premium)</span>}
+                  {isPlanExpired && !locadora?.vitalia && planoAtual !== 'vip' && <span className="text-orange-600 ml-2">(Expirado)</span>}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {locadora?.vitalia 
-                    ? 'Locadora VIP com acesso total e ilimitado a todos os recursos do sistema'
+                  {(locadora?.vitalia || planoAtual === 'vip')
+                    ? 'Plano VIP com acesso total e ilimitado a todos os recursos do sistema'
                     : isPlanExpired 
                       ? 'Renove seu plano para continuar aproveitando todos os recursos' 
                       : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento')
@@ -336,16 +337,16 @@ export default function PlanosLocadora() {
               <div className="text-right space-y-2">
                 <div>
                   <p className="text-2xl font-bold">
-                    {locadora?.vitalia 
-                      ? (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.consultar ? 'Sob Consulta' : 'Gratuito')
+                    {(locadora?.vitalia || planoAtual === 'vip')
+                      ? 'Gratuito'
                       : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                     }
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {locadora?.vitalia ? 'Vitalia VIP' : 'por mês'}
+                    {(locadora?.vitalia || planoAtual === 'vip') ? 'Plano VIP' : 'por mês'}
                   </p>
                 </div>
-                {isPlanExpired && !locadora?.vitalia && (
+                {isPlanExpired && !locadora?.vitalia && planoAtual !== 'vip' && (
                   <Button 
                     size="sm" 
                     className="bg-orange-500 hover:bg-orange-600 text-white"
@@ -372,33 +373,33 @@ export default function PlanosLocadora() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-base">
                     Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
-                    {locadora?.vitalia && <span className="text-purple-600 ml-1 text-sm">(Vitalia VIP)</span>}
-                    {isPlanExpired && !locadora?.vitalia && <span className="text-orange-600 ml-1 text-sm">(Expirado)</span>}
+                    {(locadora?.vitalia || planoAtual === 'vip') && <span className="text-purple-600 ml-1 text-sm">(Premium)</span>}
+                    {isPlanExpired && !locadora?.vitalia && planoAtual !== 'vip' && <span className="text-orange-600 ml-1 text-sm">(Expirado)</span>}
                   </h3>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-xl font-bold">
-                      {locadora?.vitalia 
-                        ? (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.consultar ? 'Sob Consulta' : 'Gratuito')
+                      {(locadora?.vitalia || planoAtual === 'vip')
+                        ? 'Gratuito'
                         : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                       }
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {locadora?.vitalia ? 'Vitalia VIP' : 'por mês'}
+                      {(locadora?.vitalia || planoAtual === 'vip') ? 'Plano VIP' : 'por mês'}
                     </p>
                   </div>
                 </div>
               </div>
               
               <p className="text-sm text-muted-foreground">
-                {locadora?.vitalia 
-                  ? 'Locadora VIP com acesso total e ilimitado a todos os recursos do sistema'
+                {(locadora?.vitalia || planoAtual === 'vip')
+                  ? 'Plano VIP com acesso total e ilimitado a todos os recursos do sistema'
                   : isPlanExpired 
                     ? 'Renove seu plano para continuar aproveitando todos os recursos' 
                     : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento')
                 }
               </p>
               
-              {isPlanExpired && !locadora?.vitalia && (
+              {isPlanExpired && !locadora?.vitalia && planoAtual !== 'vip' && (
                 <Button 
                   className="w-full bg-orange-500 hover:bg-orange-600 text-white"
                   disabled={solicitando}
