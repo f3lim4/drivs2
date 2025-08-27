@@ -33,19 +33,8 @@ export function useSubscriptionStatus() {
       const locadora = await response.json();
       const today = new Date();
       
-      console.log('[DEBUG SUBSCRIPTION] Dados da locadora:', {
-        id: locadora.id,
-        nome: locadora.nome,
-        vitalia: locadora.vitalia,
-        plano: locadora.plano,
-        testeGratuito: locadora.testeGratuito,
-        dataVencimentoTeste: locadora.dataVencimentoTeste,
-        status: locadora.status
-      });
-      
       // PRIMEIRO: Verificar se é locadora VIP/Vitalia - acesso sempre liberado
       if (locadora.vitalia === true) {
-        console.log('[DEBUG SUBSCRIPTION] Locadora VIP detectada - acesso total liberado');
         return {
           isActive: true,
           isExpired: false,
