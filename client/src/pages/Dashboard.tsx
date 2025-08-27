@@ -4,10 +4,11 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown, Crown, Phone, ExternalLink, Mail, Play, Link } from 'lucide-react';
+import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown, Crown, Phone, ExternalLink, Mail, Play, Link, Lightbulb } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { DashboardStats, Alert, Motorista, Veiculo } from '@/types';
 
@@ -19,9 +20,12 @@ import { useVeiculos } from '@/hooks/useVeiculos';
 import { useAlugueis } from '@/hooks/useAlugueis';
 import { usePagamentos } from '@/hooks/usePagamentos';
 import { useLinksUteisAtivos } from '@/hooks/useLinksUteis';
+import { useRecommendations } from '@/hooks/useRecommendations';
 import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
+import PersonalizedRecommendations from '@/components/PersonalizedRecommendations';
 import type { DashboardConfig } from '@shared/schema';
 import { differenceInDays } from 'date-fns';
+import { useLocation } from 'wouter';
 
 
 export default function Dashboard() {
@@ -134,6 +138,24 @@ export default function Dashboard() {
   const motoristasSeguro = motoristasRaw;
   const veiculosSeguro = veiculosRaw;
   const alugueisSeguro = alugueisRaw;
+
+  const [, setLocation] = useLocation();
+
+  // Sistema de Recomendações Personalizadas
+  const {
+    showRecommendations,
+    recommendationData,
+    settings: recommendationSettings,
+    forceShow,
+    closeRecommendations
+  } = useRecommendations({
+    locadoraId: profile?.locadoraId,
+    motoristas: motoristasSeguro,
+    veiculos: veiculosSeguro,
+    alugueis: alugueisSeguro,
+    pagamentos,
+    manutencoes: [] // Placeholder para futuro uso
+  });
 
   // Calcular dias restantes do período de teste
   const getTrialStatus = () => {
@@ -1160,6 +1182,37 @@ export default function Dashboard() {
           </Card>
         )}
       </div>
+      )}
+
+      {/* Botão Flutuante de Recomendações - Apenas para locadoras */}
+      {isLocadora && recommendationData && (
+        <div className="fixed bottom-6 right-6 z-40">
+          <Button
+            onClick={forceShow}
+            className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse"
+            title="Ver Recomendações Personalizadas"
+          >
+            <Lightbulb className="w-6 h-6" />
+          </Button>
+        </div>
+      )}
+
+      {/* Pop-up de Recomendações Personalizadas */}
+      {showRecommendations && recommendationData && (
+        <PersonalizedRecommendations
+          data={recommendationData}
+          settings={recommendationSettings}
+          onClose={closeRecommendations}
+          onAction={(route) => {
+            if (route) {
+              setLocation(route);
+            }
+            closeRecommendations();
+          }}
+          onSettingsChange={(newSettings) => {
+            // As configurações são salvas automaticamente pelo hook useRecommendations
+          }}
+        />
       )}
     </div>
   );
