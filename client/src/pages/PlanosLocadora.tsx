@@ -124,13 +124,6 @@ export default function PlanosLocadora() {
     valor: number;
   } | null>(null);
 
-  // Invalidar cache forçadamente para dados VIP
-  useEffect(() => {
-    if (profile?.locadoraId) {
-      queryClient.invalidateQueries({ queryKey: ['/api/locadoras', profile.locadoraId] });
-      queryClient.invalidateQueries({ queryKey: ['subscription-status-v2', profile.locadoraId] });
-    }
-  }, [profile?.locadoraId, queryClient]);
 
   // Cache dos planos estáticos (carregamento instantâneo)
   const planosEstaticos = {
@@ -146,8 +139,8 @@ export default function PlanosLocadora() {
   const { data: locadora, isLoading: isLoadingLocadora } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId],
     enabled: !!profile?.locadoraId && isLocadora,
-    staleTime: 0, // Forçar revalidação para dados VIP
-    gcTime: 0, // Não usar cache para garantir dados atualizados
+    staleTime: 5 * 60 * 1000, // 5 minutos
+    gcTime: 10 * 60 * 1000, // 10 minutos
   });
 
   const { data: planoDetalhes, isLoading } = useQuery({
@@ -244,15 +237,9 @@ export default function PlanosLocadora() {
   // O sistema deve permitir visualizar os planos disponíveis
 
   // Determinar o plano atual baseado nos dados da locadora
-  const planoAtual = locadora?.plano || 'pro';
-  
-  // Debug temporário para verificar dados VIP
-  console.log('Debug PlanosLocadora:', { 
-    locadora: locadora?.id, 
-    plano: locadora?.plano, 
-    planoAtual,
-    hasLocadora: !!locadora 
-  });
+  // Fix: locadora vem como array, pegamos o primeiro item
+  const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
+  const planoAtual = locadoraData?.plano || 'pro';
   
   // Verificar se o plano está expirado
   const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
