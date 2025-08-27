@@ -33,17 +33,7 @@ export function useSubscriptionStatus() {
       const locadora = await response.json();
       const today = new Date();
       
-      // PRIMEIRO: Verificar se é isenta de cobrança pelo admin
-      if (locadora.isentoCobranca === true) {
-        return {
-          isActive: true,
-          isExpired: false,
-          status: 'active',
-          canAccess: true
-        };
-      }
-      
-      // SEGUNDO: Verificar se está em teste gratuito
+      // PRIMEIRO: Verificar se está em teste gratuito
       if (locadora.testeGratuito && locadora.dataVencimentoTeste) {
         const expiresAt = new Date(locadora.dataVencimentoTeste);
         const daysRemaining = Math.ceil((expiresAt.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
