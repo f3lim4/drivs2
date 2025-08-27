@@ -333,12 +333,12 @@ export default function Planos() {
                 <div className="pt-4">
                   {planoAtual === key ? (
                     <Button 
-                      disabled={!isPlanExpired} 
                       className="w-full"
-                      onClick={isPlanExpired ? () => handleRenovarPlano(key) : undefined}
-                      variant={isPlanExpired ? "default" : "secondary"}
+                      onClick={() => handleRenovarPlano(key)}
+                      disabled={solicitando}
+                      variant="default"
                     >
-                      {isPlanExpired ? "Renovar Plano" : "Plano Atual"}
+                      Renovar Plano
                     </Button>
                   ) : (
                     <Button
