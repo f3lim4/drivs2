@@ -250,8 +250,17 @@ export default function PlanosLocadora() {
   // Se for VIP, o plano atual é 'vip', caso contrário usar o plano salvo
   const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || planoDetalhes?.planoAtual || 'pro');
   
-  // Force cache refresh
-  console.clear();
+  // Debug VIP final
+  if (locadoraData?.vitalia === true) {
+    console.log('🎯 LOCADORA VIP DETECTADA:', { 
+      id: locadoraData.id, 
+      nome: locadoraData.nome, 
+      vitalia: locadoraData.vitalia,
+      plano: locadoraData.plano,
+      isVipPlan,
+      planoAtual 
+    });
+  }
   
   // VIP sempre tem acesso - não pode estar expirado
   const isPlanExpired = isVipPlan ? false : ((subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false);
