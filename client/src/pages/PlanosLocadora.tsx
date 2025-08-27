@@ -423,7 +423,9 @@ export default function PlanosLocadora() {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
-          {Object.entries(planosEstaticos).map(([key, plano]) => {
+          {Object.entries(planosEstaticos)
+            .filter(([key]) => key !== 'vip') // Remover VIP da lista de planos disponíveis
+            .map(([key, plano]) => {
             const Icone = plano.icone;
             return (
               <Card key={key} className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500 relative' : ''}`}>
