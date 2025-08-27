@@ -376,8 +376,10 @@ export default function CadastroLocadora() {
         }
         break;
       case 'telefone':
-        const telefoneRegex = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
-        errors.telefone = value && !telefoneRegex.test(value) ? 'Digite um telefone válido' : '';
+        // Aceita formatos: (11) 95945-6978, (11) 9 5945-6978, 11959456978, ou 11 95945-6978
+        const telefoneRegex = /^(\(\d{2}\)\s?\d{4,5}-?\d{4}|\d{10,11})$/;
+        const telefoneNumerico = value.replace(/\D/g, ''); // Remove tudo que não é número
+        errors.telefone = value && telefoneNumerico.length < 10 ? 'Digite um telefone válido (10 ou 11 dígitos)' : '';
         break;
       case 'senha':
         errors.senha = value.length > 0 && value.length < 6 ? 'Senha deve ter pelo menos 6 caracteres' : '';
