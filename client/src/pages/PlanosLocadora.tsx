@@ -244,7 +244,15 @@ export default function PlanosLocadora() {
   // O sistema deve permitir visualizar os planos disponíveis
 
   // Determinar o plano atual baseado nos dados da locadora
-  const planoAtual = (locadora as any)?.plano || 'pro';
+  const planoAtual = locadora?.plano || 'pro';
+  
+  // Debug temporário para verificar dados VIP
+  console.log('Debug PlanosLocadora:', { 
+    locadora: locadora?.id, 
+    plano: locadora?.plano, 
+    planoAtual,
+    hasLocadora: !!locadora 
+  });
   
   // Verificar se o plano está expirado
   const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
