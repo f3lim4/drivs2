@@ -6,6 +6,7 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DrivsSidebar } from './DrivsSidebar';
 import { DrivsHeader } from './DrivsHeader';
+import { SubscriptionGuard } from '@/components/subscription/SubscriptionGuard';
 import { useLocation } from 'wouter';
 
 interface DrivsLayoutProps {
@@ -55,25 +56,27 @@ export function DrivsLayout({ children }: DrivsLayoutProps) {
   const pageInfo = getPageInfo();
   
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        {/* Sidebar principal */}
-        <DrivsSidebar />
-        
-        {/* Conteúdo principal */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header fixo no topo */}
-          <DrivsHeader 
-            title={pageInfo.title}
-            subtitle={pageInfo.subtitle}
-          />
+    <SubscriptionGuard>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          {/* Sidebar principal */}
+          <DrivsSidebar />
           
-          {/* Área de conteúdo */}
-          <main className="flex-1 overflow-auto pt-16 md:pt-0">
-            {children}
-          </main>
+          {/* Conteúdo principal */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Header fixo no topo */}
+            <DrivsHeader 
+              title={pageInfo.title}
+              subtitle={pageInfo.subtitle}
+            />
+            
+            {/* Área de conteúdo */}
+            <main className="flex-1 overflow-auto pt-16 md:pt-0">
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </SubscriptionGuard>
   );
 }
