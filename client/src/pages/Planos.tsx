@@ -343,11 +343,11 @@ export default function Planos() {
                   ) : (
                     <Button
                       onClick={() => handleSolicitarMudanca(key)}
-                      disabled={solicitando}
+                      disabled={solicitando || !canPerformActions}
                       className="w-full"
                       variant={plano.popular ? "default" : "outline"}
                     >
-                      {solicitando ? "Solicitando..." : isExpired ? "Renovar" : "Solicitar Mudança"}
+                      {solicitando ? "Solicitando..." : isPlanExpired ? "Renovar" : "Solicitar Mudança"}
                     </Button>
                   )}
                 </div>
