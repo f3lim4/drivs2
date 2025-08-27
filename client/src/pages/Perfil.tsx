@@ -236,7 +236,6 @@ export default function Perfil() {
         }
 
         try {
-          setLoading(true);
           const response = await fetch(`/api/locadoras/${currentProfile?.locadoraId}`);
           
           if (!response.ok) {
@@ -277,7 +276,7 @@ export default function Perfil() {
     };
 
     carregarDados();
-  }, [profile?.locadoraId, profile?.email, form, toast, isAdmin, isLocadora]);
+  }, [profile?.locadoraId, isAdmin, isLocadora]);
   
   // Se não tem perfil, mostrar mensagem de erro
   if (!profile) {
