@@ -44,6 +44,7 @@ interface Locadora {
   status: 'ativa' | 'inativa' | 'pendente';
   plano: 'free' | 'basico' | 'premium' | 'enterprise';
   dataCadastro: string;
+  vitalia?: boolean; // Campo VIP
 }
 
 interface EditarLocadoraModalProps {
@@ -96,6 +97,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
     logo: '',
     status: 'ativa' as 'ativa' | 'inativa' | 'pendente',
     plano: 'free' as 'free' | 'basico' | 'premium' | 'enterprise',
+    vitalia: false, // Campo VIP
   });
 
   useEffect(() => {
@@ -117,6 +119,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
         logo: locadora.logo || '',
         status: locadora.status || 'ativa',
         plano: locadora.plano || 'free',
+        vitalia: locadora.vitalia || false, // Campo VIP
       });
     }
   }, [locadora]);
@@ -410,6 +413,20 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
                     })()}
                   </div>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="vitalia">Locadora VIP (Vitalia)</Label>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="vitalia"
+                    checked={formData.vitalia}
+                    onCheckedChange={(checked) => updateFormData('vitalia', checked)}
+                  />
+                  <span className="text-sm text-slate-600">
+                    {formData.vitalia ? 'Locadora VIP - Acesso ilimitado sem cobrança' : 'Locadora padrão - Sujeita a cobrança'}
+                  </span>
+                </div>
               </div>
 
             </div>

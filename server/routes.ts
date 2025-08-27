@@ -449,7 +449,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/locadoras/:id", async (req, res) => {
     try {
+      console.log("[DEBUG LOCADORA] Atualizando locadora:", req.params.id);
+      console.log("[DEBUG LOCADORA] Dados recebidos:", req.body);
+      
       const locadora = await storage.updateLocadora(req.params.id, req.body);
+      
+      console.log("[DEBUG LOCADORA] Locadora atualizada com sucesso:", {
+        id: locadora.id,
+        nome: locadora.nome,
+        vitalia: locadora.vitalia
+      });
+      
       res.json(locadora);
     } catch (error) {
       console.error("Error updating locadora:", error);
