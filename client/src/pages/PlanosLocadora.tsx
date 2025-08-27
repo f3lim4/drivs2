@@ -244,25 +244,11 @@ export default function PlanosLocadora() {
   // Valores padrão para garantir funcionamento em produção
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
   
-  // DEBUG: Logs para verificar em produção
-  console.log('[DEBUG PLANOS] Dados da locadora:', {
-    locadoraData,
-    vitalia: locadoraData?.vitalia,
-    planoSalvo: locadoraData?.plano,
-    planoDetalhes: planoDetalhes?.planoAtual
-  });
-  
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = locadoraData?.vitalia === true;
   
   // Se for VIP, o plano atual é 'vip', caso contrário usar o plano salvo
   const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || planoDetalhes?.planoAtual || 'pro');
-  
-  console.log('[DEBUG PLANOS] Resultado:', {
-    isVipPlan,
-    planoAtual,
-    vitalia: locadoraData?.vitalia
-  });
   
   // VIP sempre tem acesso - não pode estar expirado
   const isPlanExpired = isVipPlan ? false : ((subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false);
@@ -367,11 +353,7 @@ export default function PlanosLocadora() {
                 </Badge>
               )}
               <Badge variant="default" className="px-3 py-1">
-                {(() => {
-                  const nomeAtual = planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro';
-                  console.log('[DEBUG BADGE] Plano atual renderizado:', { planoAtual, nomeAtual });
-                  return nomeAtual;
-                })()}
+                {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
               </Badge>
             </div>
           </div>
