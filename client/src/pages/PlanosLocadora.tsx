@@ -468,47 +468,30 @@ export default function PlanosLocadora() {
                   </Badge>
                 )}
                 <CardHeader className="text-center pb-4">
-                  <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 rounded-full flex items-center justify-center ${plano.cor}`}>
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 rounded-full flex items-center justify-center ${plano.cor || 'bg-blue-500'}`}>
                     <Icone className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <CardTitle className="text-lg sm:text-xl">{plano.nome}</CardTitle>
+                  <CardTitle className="text-lg sm:text-xl">{plano.nome || 'Plano'}</CardTitle>
                   <CardDescription className="text-base sm:text-lg font-semibold">
-                    {'consultar' in plano && plano.consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
+                    {'consultar' in plano && plano.consultar ? "Preço a consultar" : `R$ ${(plano.preco || plano.valor || 0).toFixed(2)}/mês`}
                   </CardDescription>
-                  <p className="text-xs text-muted-foreground leading-tight">{plano.descricao}</p>
+                  <p className="text-xs text-muted-foreground leading-tight">{plano.descricao || ''}</p>
                 </CardHeader>
                 <CardContent className="space-y-3 pt-0">
                   {/* Features do plano */}
                   <div className="space-y-2">
-                    {planosFeatures.slice(0, 6).map((feature, index) => {
-                      const valor = feature[key as keyof PlanoFeature];
-                      return (
-                        <div key={index} className="flex items-start gap-2 text-xs sm:text-sm">
-                          {typeof valor === 'boolean' ? (
-                            valor ? (
-                              <>
-                                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                                <span className="leading-tight">{feature.nome}</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0 mt-0.5">—</span>
-                                <span className="text-muted-foreground leading-tight">{feature.nome}</span>
-                              </>
-                            )
-                          ) : (
-                            <>
-                              <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                              <div className="leading-tight">
-                                <span className="font-medium">{feature.nome}:</span>
-                                <br />
-                                <span className="text-muted-foreground">{valor}</span>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      );
-                    })}
+                    {(plano.recursos || ['Sistema completo', 'Gestão de motoristas', 'Contratos automáticos']).slice(0, 4).map((recurso: string, index: number) => (
+                      <div key={index} className="flex items-start gap-2 text-xs sm:text-sm">
+                        <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="leading-tight">{recurso}</span>
+                      </div>
+                    ))}
+                    {plano.limiteVeiculos && (
+                      <div className="flex items-start gap-2 text-xs sm:text-sm">
+                        <Car className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                        <span className="leading-tight">Até {plano.limiteVeiculos} veículos</span>
+                      </div>
+                    )}
                   </div>
                   
                   {/* Botão de ação */}
@@ -715,40 +698,30 @@ function PlanoCarousel({
                         Mais Popular
                       </Badge>
                     )}
-                    <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center ${plano.cor}`}>
+                    <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center ${plano.cor || 'bg-blue-500'}`}>
                       <Icone className="h-6 w-6 text-white" />
                     </div>
-                    <CardTitle className="text-xl">{plano.nome}</CardTitle>
+                    <CardTitle className="text-xl">{plano.nome || 'Plano'}</CardTitle>
                     <CardDescription className="text-sm">
-                      {plano.consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
+                      {plano.consultar ? "Preço a consultar" : `R$ ${(plano.preco || plano.valor || 0).toFixed(2)}/mês`}
                     </CardDescription>
-                    <p className="text-xs text-muted-foreground mt-1">{plano.descricao}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{plano.descricao || ''}</p>
                   </CardHeader>
                   <CardContent>
                     {/* Features do Plano */}
                     <div className="space-y-2 mb-6">
-                      {planosFeatures.slice(0, 6).map((feature, index) => (
+                      {(plano.recursos || ['Sistema completo', 'Gestão de motoristas', 'Contratos automáticos']).slice(0, 4).map((recurso: string, index: number) => (
                         <div key={index} className="flex items-center gap-2 text-sm">
-                          {typeof feature[key as keyof PlanoFeature] === 'boolean' ? (
-                            feature[key as keyof PlanoFeature] ? (
-                              <>
-                                <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                                <span>{feature.nome}</span>
-                              </>
-                            ) : (
-                              <>
-                                <span className="h-4 w-4 text-muted-foreground flex-shrink-0">—</span>
-                                <span className="text-muted-foreground">{feature.nome}</span>
-                              </>
-                            )
-                          ) : (
-                            <>
-                              <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                              <span>{feature.nome}: <strong>{feature[key as keyof PlanoFeature]}</strong></span>
-                            </>
-                          )}
+                          <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                          <span>{recurso}</span>
                         </div>
                       ))}
+                      {plano.limiteVeiculos && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Car className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                          <span>Até {plano.limiteVeiculos} veículos</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Botão de Ação */}
