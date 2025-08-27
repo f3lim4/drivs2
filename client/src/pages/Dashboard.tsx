@@ -4,7 +4,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown, Crown, Phone, ExternalLink, Mail, Play, Link, Lightbulb } from 'lucide-react';
+import { Users, Car, TrendingUp, DollarSign, AlertTriangle, Clock, Activity, BarChart3, Megaphone, Building2, FileText, Globe, Zap, Cpu, Database, TrendingDown, Crown, Phone, ExternalLink, Mail, Play, Link } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,9 +20,7 @@ import { useVeiculos } from '@/hooks/useVeiculos';
 import { useAlugueis } from '@/hooks/useAlugueis';
 import { usePagamentos } from '@/hooks/usePagamentos';
 import { useLinksUteisAtivos } from '@/hooks/useLinksUteis';
-import { useRecommendations } from '@/hooks/useRecommendations';
 import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
-import PersonalizedRecommendations from '@/components/PersonalizedRecommendations';
 import type { DashboardConfig } from '@shared/schema';
 import { differenceInDays } from 'date-fns';
 import { useLocation } from 'wouter';
@@ -141,21 +139,6 @@ export default function Dashboard() {
 
   const [, setLocation] = useLocation();
 
-  // Sistema de Recomendações Personalizadas
-  const {
-    showRecommendations,
-    recommendationData,
-    settings: recommendationSettings,
-    forceShow,
-    closeRecommendations
-  } = useRecommendations({
-    locadoraId: profile?.locadoraId,
-    motoristas: motoristasSeguro,
-    veiculos: veiculosSeguro,
-    alugueis: alugueisSeguro,
-    pagamentos,
-    manutencoes: [] // Placeholder para futuro uso
-  });
 
   // Calcular dias restantes do período de teste
   const getTrialStatus = () => {
@@ -1185,23 +1168,6 @@ export default function Dashboard() {
       )}
 
 
-      {/* Pop-up de Recomendações Personalizadas */}
-      {showRecommendations && recommendationData && (
-        <PersonalizedRecommendations
-          data={recommendationData}
-          settings={recommendationSettings}
-          onClose={closeRecommendations}
-          onAction={(route) => {
-            if (route) {
-              setLocation(route);
-            }
-            closeRecommendations();
-          }}
-          onSettingsChange={(newSettings) => {
-            // As configurações são salvas automaticamente pelo hook useRecommendations
-          }}
-        />
-      )}
     </div>
   );
 }
