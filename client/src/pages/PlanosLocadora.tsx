@@ -243,10 +243,12 @@ export default function PlanosLocadora() {
   // Fix: locadora vem como array, pegamos o primeiro item
   // Valores padrão para garantir funcionamento em produção
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
-  const planoAtual = locadoraData?.plano || planoDetalhes?.planoAtual || 'pro';
   
   // Validação extra para garantir que VIP seja reconhecido
-  const isVipPlan = planoAtual === 'vip' || locadoraData?.vitalia === true;
+  const isVipPlan = locadoraData?.vitalia === true;
+  
+  // Se for VIP, o plano atual é 'vip', caso contrário usar o plano salvo
+  const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || planoDetalhes?.planoAtual || 'pro');
   
   // VIP sempre tem acesso - não pode estar expirado
   const isPlanExpired = isVipPlan ? false : ((subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false);
