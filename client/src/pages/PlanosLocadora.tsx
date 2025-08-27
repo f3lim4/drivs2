@@ -234,7 +234,8 @@ export default function PlanosLocadora() {
   // Sempre mostrar a página de planos, mesmo sem locadora específica
   // O sistema deve permitir visualizar os planos disponíveis
 
-  const planoAtual = (locadora as any)?.plano || 'pro'; // Padrão pro se não definido
+  // Para locadoras Vitalia VIP, sempre mostrar plano Infinity
+  const planoAtual = (locadora as any)?.vitalia ? 'infinity' : ((locadora as any)?.plano || 'pro');
   
   // Verificar se o plano está expirado
   const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
@@ -336,7 +337,7 @@ export default function PlanosLocadora() {
                 <div>
                   <p className="text-2xl font-bold">
                     {locadora?.vitalia 
-                      ? 'Gratuito' 
+                      ? (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.consultar ? 'Sob Consulta' : 'Gratuito')
                       : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                     }
                   </p>
@@ -377,7 +378,7 @@ export default function PlanosLocadora() {
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-xl font-bold">
                       {locadora?.vitalia 
-                        ? 'Gratuito' 
+                        ? (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.consultar ? 'Sob Consulta' : 'Gratuito')
                         : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                       }
                     </p>
