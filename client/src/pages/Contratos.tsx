@@ -472,8 +472,9 @@ export default function Contratos() {
       {/* Filtros */}
       <Card className="bg-gray-50/50 border-gray-200">
         <CardContent className="p-4">
-          <div className="grid gap-4 md:grid-cols-5 items-end">
-            <div className="space-y-2 md:col-span-2">
+          <div className="space-y-4">
+            {/* Busca */}
+            <div className="w-full">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
@@ -493,9 +494,10 @@ export default function Contratos() {
               </div>
             </div>
 
-            <div className="space-y-2">
+            {/* Filtros e botões */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
               <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full sm:w-48">
                   <SelectValue placeholder="Todos os status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -505,27 +507,28 @@ export default function Contratos() {
                   <SelectItem value="cancelado">Cancelado</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
 
-            <div className="flex gap-2 md:col-span-2">
-              <Button 
-                variant="outline"
-                onClick={() => setShowTemplatesModal(true)}
-                className="flex items-center gap-2 py-2 px-4 text-sm"
-              >
-                <FileText className="w-4 h-4" />
-                Templates
-              </Button>
-              
-              <ProtectedAction fallbackMessage="Renove seu plano para gerar novos contratos">
+              <div className="flex gap-2">
                 <Button 
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-2 px-4 text-sm"
-                  onClick={() => setShowNovoContratoModal(true)}
+                  variant="outline"
+                  onClick={() => setShowTemplatesModal(true)}
+                  className="flex items-center gap-2 py-2 px-3 sm:px-4 text-sm flex-1 sm:flex-initial"
                 >
-                  <Plus className="w-4 h-4" />
-                  Gerar Contrato
+                  <FileText className="w-4 h-4" />
+                  <span className="hidden sm:inline">Templates</span>
                 </Button>
-              </ProtectedAction>
+                
+                <ProtectedAction fallbackMessage="Renove seu plano para gerar novos contratos">
+                  <Button 
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-2 px-3 sm:px-4 text-sm flex-1 sm:flex-initial"
+                    onClick={() => setShowNovoContratoModal(true)}
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Gerar Contrato</span>
+                    <span className="sm:hidden">Novo</span>
+                  </Button>
+                </ProtectedAction>
+              </div>
             </div>
           </div>
         </CardContent>

@@ -375,22 +375,24 @@ export default function Veiculos() {
       {/* Controles de busca e filtros */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="space-y-4">
             {/* Busca */}
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Buscar veículo..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+            <div className="w-full">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Buscar veículo..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
 
-            {/* Filtros */}
-            <div className="flex gap-2">
+            {/* Filtros e botões */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-full sm:w-48">
                   <Filter className="w-4 h-4 mr-2" />
                   <SelectValue />
                 </SelectTrigger>
@@ -403,12 +405,10 @@ export default function Veiculos() {
                 </SelectContent>
               </Select>
 
-
-
               {isLocadora && (
                 <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novos veículos">
                   <Button 
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto"
                     onClick={handleNovoVeiculo}
                   >
                     <Plus className="w-4 h-4 mr-2" />

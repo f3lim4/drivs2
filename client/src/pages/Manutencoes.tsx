@@ -285,22 +285,24 @@ export default function Manutencoes() {
           {/* Controles de busca e filtros */}
           <Card>
             <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              <div className="space-y-4">
                 {/* Busca */}
-                <div className="relative flex-1 max-w-sm">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    placeholder="Buscar manutenção..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+                <div className="w-full">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Buscar manutenção..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
                 </div>
 
-                {/* Filtros */}
-                <div className="flex gap-2">
+                {/* Filtros e botões */}
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-48">
+                    <SelectTrigger className="w-full sm:w-48">
                       <Filter className="w-4 h-4 mr-2" />
                       <SelectValue />
                     </SelectTrigger>
@@ -313,23 +315,28 @@ export default function Manutencoes() {
                     </SelectContent>
                   </Select>
 
-                  <Button 
-                    variant="outline"
-                    onClick={() => setGerenciarLocaisModalOpen(true)}
-                  >
-                    <MapPin className="w-4 h-4 mr-2" />
-                    Gerenciar Locais
-                  </Button>
-                  
-                  <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novas manutenções">
+                  <div className="flex gap-2">
                     <Button 
-                      className="bg-primary text-primary-foreground hover:bg-primary/90"
-                      onClick={() => setNovaManutencaoModalOpen(true)}
+                      variant="outline"
+                      onClick={() => setGerenciarLocaisModalOpen(true)}
+                      className="flex-1 sm:flex-initial"
                     >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Nova Manutenção
+                      <MapPin className="w-4 h-4 mr-2" />
+                      <span className="hidden sm:inline">Gerenciar Locais</span>
+                      <span className="sm:hidden">Locais</span>
                     </Button>
-                  </ProtectedAction>
+                    
+                    <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novas manutenções">
+                      <Button 
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 sm:flex-initial"
+                        onClick={() => setNovaManutencaoModalOpen(true)}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        <span className="hidden sm:inline">Nova Manutenção</span>
+                        <span className="sm:hidden">Nova</span>
+                      </Button>
+                    </ProtectedAction>
+                  </div>
                 </div>
               </div>
             </CardContent>
