@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useCanPerformActions } from '@/hooks/useCanPerformActions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -131,6 +132,7 @@ const planosInfo = {
 export default function Planos() {
   const { profile, isLocadora } = useAuth();
   const { toast } = useToast();
+  const { canPerformActions, isExpired } = useCanPerformActions();
   const [solicitando, setSolicitando] = useState(false);
 
   // Buscar dados da locadora
@@ -215,7 +217,9 @@ export default function Planos() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+          <div className={`flex items-center gap-4 p-4 rounded-lg ${
+            isExpired ? "bg-orange-100 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800" : "bg-muted"
+          }`}>
             <div className={`p-3 rounded-full ${planosInfo[planoAtual as keyof typeof planosInfo].cor}`}>
               {(() => {
                 const IconComponent = planosInfo[planoAtual as keyof typeof planosInfo].icone;
@@ -225,9 +229,13 @@ export default function Planos() {
             <div className="flex-1">
               <h3 className="font-semibold text-lg">
                 Plano {planosInfo[planoAtual as keyof typeof planosInfo].nome}
+                {isExpired && <span className="text-orange-600 ml-2">(Expirado)</span>}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {planosInfo[planoAtual as keyof typeof planosInfo].descricao}
+                {isExpired 
+                  ? "Renove seu plano para continuar usando todas as funcionalidades do sistema."
+                  : planosInfo[planoAtual as keyof typeof planosInfo].descricao
+                }
               </p>
             </div>
             <div className="text-right">
@@ -298,8 +306,13 @@ export default function Planos() {
                 ))}
                 <div className="pt-4">
                   {planoAtual === key ? (
-                    <Button disabled className="w-full">
-                      Plano Atual
+                    <Button 
+                      disabled={!isExpired} 
+                      className="w-full"
+                      onClick={isExpired ? () => handleSolicitarMudanca(key) : undefined}
+                      variant={isExpired ? "default" : "secondary"}
+                    >
+                      {isExpired ? "Renovar Plano" : "Plano Atual"}
                     </Button>
                   ) : (
                     <Button
@@ -308,7 +321,7 @@ export default function Planos() {
                       className="w-full"
                       variant={plano.popular ? "default" : "outline"}
                     >
-                      {solicitando ? "Solicitando..." : "Solicitar Mudança"}
+                      {solicitando ? "Solicitando..." : isExpired ? "Renovar" : "Solicitar Mudança"}
                     </Button>
                   )}
                 </div>
