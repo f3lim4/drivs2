@@ -138,7 +138,7 @@ export default function PlanosLocadora() {
   // Buscar dados da locadora se usuário é uma locadora
   const { data: locadora, isLoading: isLoadingLocadora } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId],
-    enabled: !!profile?.locadoraId && isLocadora,
+    enabled: true, // Sempre habilitado para funcionar em produção
     staleTime: 30000, // 30 segundos para deploy
     gcTime: 60000, // 1 minuto para deploy
   });
@@ -146,7 +146,7 @@ export default function PlanosLocadora() {
   const { data: planoDetalhes, isLoading } = useQuery({
     queryKey: ['/api/planos', profile?.locadoraId],
     queryFn: () => fetch(`/api/planos${profile?.locadoraId ? `?locadoraId=${profile.locadoraId}` : ''}`).then(res => res.json()),
-    enabled: !!profile?.locadoraId,
+    enabled: true, // Sempre habilitado para funcionar em produção
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
   });
@@ -221,30 +221,23 @@ export default function PlanosLocadora() {
     }
   };
 
-  if (isLoading || isLoadingLocadora) {
-    return (
-      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
-        <div className="text-center space-y-4">
-          <LoadingSpinner />
-          <p className="text-muted-foreground">Carregando planos...</p>
-        </div>
-      </div>
-    );
-  }
+  // Removido loading restritivo para funcionar em produção
+  // Página deve carregar mesmo com dados pendentes
 
   // Sempre mostrar a página de planos, mesmo sem locadora específica
   // O sistema deve permitir visualizar os planos disponíveis
 
   // Determinar o plano atual baseado nos dados da locadora
   // Fix: locadora vem como array, pegamos o primeiro item
+  // Valores padrão para garantir funcionamento em produção
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
-  const planoAtual = locadoraData?.plano || 'pro';
+  const planoAtual = locadoraData?.plano || planoDetalhes?.planoAtual || 'pro';
   
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = planoAtual === 'vip' || locadoraData?.vitalia === true;
   
-  // Verificar se o plano está expirado
-  const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
+  // Verificar se o plano está expirado - valor padrão para produção
+  const isPlanExpired = (subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false;
 
   return (
     <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
@@ -428,7 +421,7 @@ export default function PlanosLocadora() {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
-          {Object.entries(planosEstaticos)
+          {Object.entries(planoDetalhes || planosEstaticos)
             .filter(([key]) => {
               // Remover VIP da lista de planos disponíveis
               if (key === 'vip') return false;
@@ -672,7 +665,7 @@ function PlanoCarousel({
       {/* Carrossel */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {Object.entries(planosInfo).map(([key, plano]) => {
+          {Object.entries(planoDetalhes || planosEstaticos).map(([key, plano]) => {
             const Icone = plano.icone;
             return (
               <div key={key} className="flex-[0_0_85%] sm:flex-[0_0_60%] md:flex-[0_0_45%] mr-4">
@@ -754,7 +747,7 @@ function PlanoCarousel({
 
       {/* Indicadores */}
       <div className="flex justify-center gap-2 mt-4">
-        {Object.keys(planosInfo).map((_, index) => (
+        {Object.keys(planoDetalhes || planosEstaticos).map((_, index) => (
           <div
             key={index}
             className="w-2 h-2 rounded-full bg-muted-foreground/30"
