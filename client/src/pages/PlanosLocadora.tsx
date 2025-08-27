@@ -367,7 +367,11 @@ export default function PlanosLocadora() {
                 </Badge>
               )}
               <Badge variant="default" className="px-3 py-1">
-                {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
+                {(() => {
+                  const nomeAtual = planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro';
+                  console.log('[DEBUG BADGE] Plano atual renderizado:', { planoAtual, nomeAtual });
+                  return nomeAtual;
+                })()}
               </Badge>
             </div>
           </div>
