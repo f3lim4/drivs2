@@ -354,7 +354,7 @@ export default function PlanosLocadora() {
                 </Badge>
               )}
               <Badge variant="default" className="px-3 py-1">
-                {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
+                {planoAtual === 'vip' ? 'VIP' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro')}
               </Badge>
             </div>
           </div>
@@ -474,7 +474,7 @@ export default function PlanosLocadora() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Plano Start */}
           <Card className="relative">
             <CardHeader className="text-center pb-4">
@@ -519,6 +519,60 @@ export default function PlanosLocadora() {
                     variant="outline"
                   >
                     {solicitando ? "Processando..." : "Escolher Start"}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Plano Pro */}
+          <Card className="relative border-2 border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <Badge className="bg-cyan-500 text-white px-3 py-1">
+                Mais Popular
+              </Badge>
+            </div>
+            <CardHeader className="text-center pb-4">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-cyan-500 flex items-center justify-center">
+                <Rocket className="h-6 w-6 text-white" />
+              </div>
+              <CardTitle className="text-2xl">Pro</CardTitle>
+              <div className="text-3xl font-bold text-cyan-600">R$ 99,00</div>
+              <CardDescription className="text-base">por mês</CardDescription>
+              <p className="text-sm text-muted-foreground mt-2">Para locadoras em crescimento com até 20 veículos</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Até 20 veículos na frota</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Gestão completa de motoristas</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Contratos automáticos profissionais</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Controle de pagamentos</span>
+                </div>
+              </div>
+              
+              <div className="pt-4">
+                {planoAtual === 'pro' ? (
+                  <Button disabled className="w-full">
+                    Plano Atual
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleSolicitarMudanca('pro')}
+                    disabled={solicitando}
+                    className="w-full bg-cyan-500 hover:bg-cyan-600"
+                  >
+                    {solicitando ? "Processando..." : "Escolher Pro"}
                   </Button>
                 )}
               </div>
