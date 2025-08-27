@@ -494,7 +494,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("[DEBUG LOCADORA] Locadora atualizada com sucesso:", {
         id: locadora.id,
         nome: locadora.nome,
-        vitalia: locadora.vitalia
+        isentoCobranca: locadora.isentoCobranca
       });
       
       res.json(locadora);
