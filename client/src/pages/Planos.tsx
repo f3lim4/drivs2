@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useCanPerformActions } from '@/hooks/useCanPerformActions';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -133,7 +134,11 @@ export default function Planos() {
   const { profile, isLocadora } = useAuth();
   const { toast } = useToast();
   const { canPerformActions, isExpired } = useCanPerformActions();
+  const { data: subscriptionStatus } = useSubscriptionStatus();
   const [solicitando, setSolicitando] = useState(false);
+  
+  // Verificar se o plano está realmente expirado/suspenso
+  const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
 
   // Buscar dados da locadora
   const { data: locadora, isLoading } = useQuery({
@@ -307,12 +312,12 @@ export default function Planos() {
                 <div className="pt-4">
                   {planoAtual === key ? (
                     <Button 
-                      disabled={!isExpired} 
+                      disabled={!isPlanExpired} 
                       className="w-full"
-                      onClick={isExpired ? () => handleSolicitarMudanca(key) : undefined}
-                      variant={isExpired ? "default" : "secondary"}
+                      onClick={isPlanExpired ? () => handleSolicitarMudanca(key) : undefined}
+                      variant={isPlanExpired ? "default" : "secondary"}
                     >
-                      {isExpired ? "Renovar Plano" : "Plano Atual"}
+                      {isPlanExpired ? "Renovar Plano" : "Plano Atual"}
                     </Button>
                   ) : (
                     <Button

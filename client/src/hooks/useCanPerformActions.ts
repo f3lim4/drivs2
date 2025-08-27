@@ -5,12 +5,8 @@ export function useCanPerformActions() {
   const { isLocadora } = useAuth();
   const { data: subscriptionStatus } = useSubscriptionStatus();
 
-  console.log('[CAN_PERFORM_ACTIONS] isLocadora:', isLocadora);
-  console.log('[CAN_PERFORM_ACTIONS] subscriptionStatus:', subscriptionStatus);
-
   // Admin sempre pode realizar ações
   if (!isLocadora) {
-    console.log('[CAN_PERFORM_ACTIONS] Admin - pode realizar ações');
     return {
       canPerformActions: true,
       isExpired: false,
@@ -20,7 +16,6 @@ export function useCanPerformActions() {
 
   // Se não tem dados ou não pode acessar
   if (!subscriptionStatus || !subscriptionStatus.canAccess) {
-    console.log('[CAN_PERFORM_ACTIONS] Bloqueado - não pode realizar ações');
     return {
       canPerformActions: false,
       isExpired: true,
@@ -30,7 +25,6 @@ export function useCanPerformActions() {
     };
   }
 
-  console.log('[CAN_PERFORM_ACTIONS] Permitido - pode realizar ações');
   return {
     canPerformActions: true,
     isExpired: false,

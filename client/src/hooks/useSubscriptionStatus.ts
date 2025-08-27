@@ -17,7 +17,6 @@ export function useSubscriptionStatus() {
     queryKey: ['subscription-status', profile?.locadoraId],
     queryFn: async (): Promise<SubscriptionStatus> => {
       if (!profile?.locadoraId) {
-        console.log('[SUBSCRIPTION] Sem locadora ID');
         return {
           isActive: false,
           isExpired: true,
@@ -32,7 +31,6 @@ export function useSubscriptionStatus() {
       }
 
       const locadora = await response.json();
-      console.log('[SUBSCRIPTION] Status da locadora:', locadora.status);
       const today = new Date();
       
       // Verificar se está em teste gratuito
