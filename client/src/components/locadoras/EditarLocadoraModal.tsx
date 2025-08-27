@@ -43,7 +43,6 @@ interface Locadora {
   logo: string;
   status: 'ativa' | 'inativa' | 'pendente';
   plano: 'start' | 'pro' | 'premium' | 'ultimate' | 'enterprise';
-  isentoCobranca?: boolean;
   dataCadastro: string;
 }
 
@@ -97,7 +96,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
     logo: '',
     status: 'ativa' as 'ativa' | 'inativa' | 'pendente',
     plano: 'start' as 'start' | 'pro' | 'premium' | 'ultimate' | 'enterprise',
-    isentoCobranca: false,
   });
 
   useEffect(() => {
@@ -120,7 +118,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
         logo: locadora.logo || '',
         status: locadora.status || 'ativa',
         plano: locadora.plano || 'start',
-        isentoCobranca: Boolean(locadora.isentoCobranca),
       });
     }
   }, [locadora]);
@@ -429,19 +426,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
                 )}
               </div>
 
-              {/* ISENTO DE COBRANÇA */}
-              <div className="flex items-center space-x-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                <input
-                  type="checkbox"
-                  id="isentoCobranca"
-                  checked={formData.isentoCobranca}
-                  onChange={(e) => updateFormData('isentoCobranca', e.target.checked)}
-                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                />
-                <label htmlFor="isentoCobranca" className="text-sm font-medium text-green-700 dark:text-green-300">
-                  💰 Isento de cobrança - Locadora não paga mensalidade
-                </label>
-              </div>
 
             </div>
           </div>
