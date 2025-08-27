@@ -118,7 +118,8 @@ const iconeMap = {
   Zap: Zap,
   Crown: Crown,
   Star: Star,
-  TrendingUp: TrendingUp
+  TrendingUp: TrendingUp,
+  Infinity: Star // Fallback para Infinity
 };
 
 export default function PlanosLocadora() {
@@ -283,7 +284,7 @@ export default function PlanosLocadora() {
     infinity: {
       id: "infinity", nome: "Infinity", consultar: true,
       descricao: "Solução personalizada para mega frotas", 
-      icone: "Infinity", cor: "bg-gradient-to-r from-purple-500 to-pink-500",
+      icone: "Star", cor: "bg-gradient-to-r from-purple-500 to-pink-500",
       recursos: ["Veículos ilimitados", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"]
     }
   };
