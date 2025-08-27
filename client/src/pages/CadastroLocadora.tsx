@@ -48,6 +48,8 @@ export default function CadastroLocadora() {
     logo: ''
   });
 
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
   // Função para buscar endereço por CEP
   const buscarEnderecoPorCEP = async (cep: string) => {
     const cepLimpo = cep.replace(/\D/g, '');
@@ -154,19 +156,6 @@ export default function CadastroLocadora() {
     setFormData({ ...formData, logo: '' });
   };
 
-  // Função para verificar se email já existe
-  const checkEmailExists = async (email: string) => {
-    if (!email || !email.includes('@')) return;
-    
-    try {
-      const response = await fetch(`/api/profiles/check-email?email=${encodeURIComponent(email)}`);
-      const data = await response.json();
-      setEmailExists(data.exists);
-    } catch (error) {
-      // Se der erro, não bloqueia o usuário
-      setEmailExists(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -310,8 +299,103 @@ export default function CadastroLocadora() {
     }
   };
 
+  // Função para verificar se email já existe
+  const checkEmailExists = async (email: string) => {
+    if (!email || !email.includes('@')) return;
+    
+    try {
+      const response = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.exists) {
+          setFieldErrors(prev => ({ ...prev, email: 'Este email já está cadastrado no sistema' }));
+        } else {
+          setFieldErrors(prev => ({ ...prev, email: '' }));
+        }
+      }
+    } catch (error) {
+      console.log('Erro ao verificar email:', error);
+    }
+  };
+
+  // Função para verificar se CNPJ já existe
+  const checkCNPJExists = async (cnpj: string) => {
+    const cnpjLimpo = limparDocumento(cnpj);
+    if (!cnpjLimpo || cnpjLimpo.length < 11) return;
+    
+    try {
+      const response = await fetch('/api/locadoras/check-cnpj', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cnpj: cnpjLimpo })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.exists) {
+          setFieldErrors(prev => ({ ...prev, cnpj: 'Este CNPJ já está cadastrado no sistema' }));
+        } else {
+          setFieldErrors(prev => ({ ...prev, cnpj: '' }));
+        }
+      }
+    } catch (error) {
+      console.log('Erro ao verificar CNPJ:', error);
+    }
+  };
+
+  // Validação de campos
+  const validateField = (field: string, value: string) => {
+    const errors = { ...fieldErrors };
+    
+    switch (field) {
+      case 'nome':
+        errors.nome = value.length < 2 ? 'Nome deve ter pelo menos 2 caracteres' : '';
+        break;
+      case 'cnpj':
+        if (value && !validarDocumento(value)) {
+          errors.cnpj = 'Digite um CPF ou CNPJ válido';
+        } else if (value && validarDocumento(value)) {
+          errors.cnpj = '';
+          // Verificar se já existe no sistema
+          checkCNPJExists(value);
+        }
+        break;
+      case 'email':
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (value && !emailRegex.test(value)) {
+          errors.email = 'Digite um email válido';
+        } else if (value && emailRegex.test(value)) {
+          errors.email = '';
+          // Verificar se já existe no sistema
+          checkEmailExists(value);
+        }
+        break;
+      case 'telefone':
+        const telefoneRegex = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
+        errors.telefone = value && !telefoneRegex.test(value) ? 'Digite um telefone válido' : '';
+        break;
+      case 'senha':
+        errors.senha = value.length > 0 && value.length < 6 ? 'Senha deve ter pelo menos 6 caracteres' : '';
+        break;
+      case 'confirmarSenha':
+        errors.confirmarSenha = value && value !== formData.senha ? 'As senhas não coincidem' : '';
+        break;
+      case 'responsavel':
+        errors.responsavel = value.length > 0 && value.length < 2 ? 'Nome do responsável deve ter pelo menos 2 caracteres' : '';
+        break;
+    }
+    
+    setFieldErrors(errors);
+  };
+
   const updateFormData = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    validateField(field, value);
   };
 
   return (
@@ -375,8 +459,12 @@ export default function CadastroLocadora() {
                     value={formData.nome}
                     onChange={(e) => updateFormData('nome', e.target.value)}
                     placeholder="Digite o nome da sua empresa"
+                    className={fieldErrors.nome ? 'border-red-500' : ''}
                     required
                   />
+                  {fieldErrors.nome && (
+                    <p className="text-red-500 text-sm mt-1">{fieldErrors.nome}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -386,8 +474,12 @@ export default function CadastroLocadora() {
                     value={formatarDocumento(formData.cnpj)}
                     onChange={(e) => updateFormData('cnpj', e.target.value)}
                     placeholder={getPlaceholderDocumento(formData.cnpj)}
+                    className={fieldErrors.cnpj ? 'border-red-500' : ''}
                     required
                   />
+                  {fieldErrors.cnpj && (
+                    <p className="text-red-500 text-sm mt-1">{fieldErrors.cnpj}</p>
+                  )}
                 </div>
 
                 {/* Email, Telefone e Responsável na mesma linha */}
@@ -400,8 +492,12 @@ export default function CadastroLocadora() {
                       value={formData.email}
                       onChange={(e) => updateFormData('email', e.target.value)}
                       placeholder="seuemail@empresa.com"
+                      className={fieldErrors.email ? 'border-red-500' : ''}
                       required
                     />
+                    {fieldErrors.email && (
+                      <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -411,8 +507,12 @@ export default function CadastroLocadora() {
                       value={formData.telefone}
                       onChange={(e) => updateFormData('telefone', e.target.value)}
                       placeholder="(11) 99999-9999"
+                      className={fieldErrors.telefone ? 'border-red-500' : ''}
                       required
                     />
+                    {fieldErrors.telefone && (
+                      <p className="text-red-500 text-sm mt-1">{fieldErrors.telefone}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -422,8 +522,12 @@ export default function CadastroLocadora() {
                       value={formData.responsavel}
                       onChange={(e) => updateFormData('responsavel', e.target.value)}
                       placeholder="Nome do responsável"
+                      className={fieldErrors.responsavel ? 'border-red-500' : ''}
                       required
                     />
+                    {fieldErrors.responsavel && (
+                      <p className="text-red-500 text-sm mt-1">{fieldErrors.responsavel}</p>
+                    )}
                   </div>
                 </div>
 

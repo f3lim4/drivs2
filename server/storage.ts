@@ -282,6 +282,11 @@ export class DatabaseStorage implements IStorage {
     return result[0];
   }
 
+  async getLocadoraByCNPJ(cnpj: string): Promise<Locadora | undefined> {
+    const result = await db.select().from(locadoras).where(eq(locadoras.cnpj, cnpj));
+    return result[0];
+  }
+
   async createLocadora(locadora: InsertLocadora): Promise<Locadora> {
     // Verificar se já existe uma locadora com esse CNPJ
     const existingLocadora = await db.select().from(locadoras).where(eq(locadoras.cnpj, locadora.cnpj));

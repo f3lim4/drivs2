@@ -395,6 +395,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check if email exists
+  app.post('/api/auth/check-email', async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    try {
+      const user = await storage.getUserByUsername(email);
+      res.json({ exists: !!user });
+    } catch (error) {
+      console.error('Error checking email existence:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
+  // Check if CNPJ exists
+  app.post('/api/locadoras/check-cnpj', async (req, res) => {
+    const { cnpj } = req.body;
+    if (!cnpj) {
+      return res.status(400).json({ message: 'CNPJ is required' });
+    }
+
+    try {
+      const locadora = await storage.getLocadoraByCNPJ(cnpj);
+      res.json({ exists: !!locadora });
+    } catch (error) {
+      console.error('Error checking CNPJ existence:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
   app.post("/api/locadoras", async (req, res) => {
     try {
       // Calcular data de vencimento do teste (7 dias a partir de hoje)
