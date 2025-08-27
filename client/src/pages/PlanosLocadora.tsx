@@ -134,6 +134,8 @@ export default function PlanosLocadora() {
     valor: number;
   } | null>(null);
 
+  console.log('PlanosLocadora rendering', { profile, subscriptionStatus });
+
 
   // Cache dos planos estáticos (carregamento instantâneo)
   const planosEstaticos = {
@@ -153,13 +155,17 @@ export default function PlanosLocadora() {
     gcTime: 60000, // 1 minuto para deploy
   });
 
-  const { data: planoDetalhes, isLoading } = useQuery({
+  const { data: planoDetalhes, isLoading, error: planosError } = useQuery({
     queryKey: ['/api/planos', profile?.locadoraId],
     queryFn: () => fetch(`/api/planos${profile?.locadoraId ? `?locadoraId=${profile.locadoraId}` : ''}`).then(res => res.json()),
     enabled: true, // Sempre habilitado para funcionar em produção
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
   });
+
+  console.log('Planos query:', { planoDetalhes, isLoading, planosError });
+
+  // Dados carregados com sucesso - continuar com renderização normal
 
   const handleSolicitarMudanca = async (novoPlano: string) => {
     try {
@@ -243,14 +249,24 @@ export default function PlanosLocadora() {
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
   const planoAtual = locadoraData?.plano || planoDetalhes?.planoAtual || 'pro';
   
+  console.log('Dados principais:', { locadoraData, planoAtual, planoDetalhes });
+  
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = planoAtual === 'vip' || locadoraData?.vitalia === true;
   
   // Verificar se o plano está expirado - valor padrão para produção
   const isPlanExpired = (subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false;
 
+  console.log('Antes do return - tudo ok, renderizando...');
+
+  // Teste simples primeiro
   return (
     <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold">Planos DRIVS</h1>
+        <p>Plano atual: {planoAtual}</p>
+        <p>Total de planos: {Object.keys(planoDetalhes || {}).length}</p>
+      </div>
 
       {/* Status do teste gratuito - ocultar para locadoras VIP */}
       {planoDetalhes?.testeGratuito && planoAtual !== 'vip' && (
