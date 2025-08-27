@@ -11,7 +11,6 @@ interface SubscriptionGuardProps {
 export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
   const { profile, isLocadora } = useAuth();
   const { data: subscriptionStatus, isLoading } = useSubscriptionStatus();
-  const [location] = useLocation();
 
   // Se é admin, não precisa verificar assinatura
   if (!isLocadora) {
@@ -27,27 +26,6 @@ export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
     );
   }
 
-  // Rotas que devem sempre estar acessíveis, mesmo com plano expirado
-  const allowedRoutes = ['/planos', '/perfil', '/suporte'];
-  const isAllowedRoute = allowedRoutes.includes(location);
-
-  // Se não conseguiu carregar ou não pode acessar, verificar se é rota permitida
-  if (!subscriptionStatus || !subscriptionStatus.canAccess) {
-    // Se está em uma rota permitida, deixar acessar
-    if (isAllowedRoute) {
-      return <>{children}</>;
-    }
-    
-    // Caso contrário, mostrar bloqueio
-    return (
-      <SubscriptionBlock 
-        status={subscriptionStatus?.status === 'pending' ? 'pending' : 'expired'}
-        expiresAt={subscriptionStatus?.expiresAt}
-        companyName={profile?.name}
-      />
-    );
-  }
-
-  // Pode acessar normalmente
+  // Agora sempre permite visualização - o bloqueio será feito em ações específicas
   return <>{children}</>;
 }
