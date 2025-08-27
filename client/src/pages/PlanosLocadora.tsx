@@ -320,15 +320,10 @@ export default function PlanosLocadora() {
                 <Button 
                   size="sm" 
                   className="bg-orange-500 hover:bg-orange-600 text-white"
-                  onClick={() => {
-                    // Scroll para os planos disponíveis
-                    const planosSection = document.querySelector('[data-section="planos-disponiveis"]');
-                    if (planosSection) {
-                      planosSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
+                  disabled={solicitando}
+                  onClick={() => handleSolicitarMudanca(planoAtual)}
                 >
-                  Renovar Plano
+                  {solicitando ? "Processando..." : "Renovar Plano"}
                 </Button>
               )}
             </div>
