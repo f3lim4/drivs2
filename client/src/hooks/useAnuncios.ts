@@ -22,6 +22,10 @@ export function useAnuncios() {
   return useQuery<Anuncio[]>({
     queryKey: ['/api/anuncios'],
     queryFn: () => apiRequest('/api/anuncios'),
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
 
@@ -29,6 +33,10 @@ export function useAnunciosAtivos() {
   return useQuery<Anuncio[]>({
     queryKey: ['/api/anuncios/ativos'],
     queryFn: () => apiRequest('/api/anuncios/ativos'),
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
 
@@ -37,6 +45,10 @@ export function useAnuncio(id: string) {
     queryKey: ['/api/anuncios', id],
     queryFn: () => apiRequest(`/api/anuncios/${id}`),
     enabled: !!id,
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
 

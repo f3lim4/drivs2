@@ -62,10 +62,10 @@ export function useMotoristas() {
       return data;
     },
     enabled: !!profile,
-    staleTime: 30000, // 30 segundos
-    cacheTime: 60000, // 1 minuto
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   // Criar motorista

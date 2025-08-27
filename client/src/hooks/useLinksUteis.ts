@@ -14,8 +14,10 @@ const apiRequest = async (url: string, options?: RequestInit) => {
 export function useLinksUteis() {
   return useQuery<LinkUtil[]>({
     queryKey: ['/api/links-uteis'],
-    refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
 
@@ -32,9 +34,10 @@ export function useLinksUteisAtivos() {
       // Filtrar apenas links ativos e ordenar
       return links.filter((link: LinkUtil) => link.ativo).sort((a: LinkUtil, b: LinkUtil) => a.ordem - b.ordem);
     },
-    refetchOnWindowFocus: false,
-    staleTime: 10 * 60 * 1000, // 10 minutos - cache estendido para links
-    gcTime: 20 * 60 * 1000, // 20 minutos
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
 

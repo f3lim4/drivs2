@@ -15,7 +15,13 @@ export function useAlugueis() {
       
       console.log('Alugueis - Fazendo requisição para locadora:', locadoraId);
       
-      const response = await fetch(`/api/alugueis?locadoraId=${locadoraId}`);
+      const response = await fetch(`/api/alugueis?locadoraId=${locadoraId}`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       if (!response.ok) throw new Error('Failed to fetch alugueis');
       
       const data = await response.json();
@@ -29,6 +35,10 @@ export function useAlugueis() {
       return data as Aluguel[];
     },
     enabled: !!locadoraId,
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 
   const createMutation = useMutation({

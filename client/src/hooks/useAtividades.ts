@@ -26,7 +26,10 @@ export function useAtividades() {
       return response.json() as Promise<Atividade[]>;
     },
     enabled: !!profile?.locadoraId,
-    staleTime: 30 * 1000, // 30 segundos
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
 
