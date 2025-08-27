@@ -248,8 +248,8 @@ export default function PlanosLocadora() {
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = planoAtual === 'vip' || locadoraData?.vitalia === true;
   
-  // Verificar se o plano está expirado - valor padrão para produção
-  const isPlanExpired = (subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false;
+  // VIP sempre tem acesso - não pode estar expirado
+  const isPlanExpired = isVipPlan ? false : ((subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false);
 
   // Dados fallback para garantir renderização em produção
   const planosSegurosProdução = {
@@ -294,7 +294,7 @@ export default function PlanosLocadora() {
     <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
 
       {/* Status do teste gratuito - ocultar para locadoras VIP */}
-      {planoDetalhes?.testeGratuito && planoAtual !== 'vip' && (
+      {planoDetalhes?.testeGratuito && !isVipPlan && (
         <div className={`p-4 rounded-lg ${
           planoDetalhes.testeGratuito.ativo 
             ? 'bg-gradient-to-r from-green-50 to-green-100 border border-green-200' 
