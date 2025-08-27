@@ -223,7 +223,7 @@ export default function CadastroLocadora() {
       if (!authResponse.ok) {
         const error = await authResponse.json();
         if (error.message === 'User already exists') {
-          throw new Error('Este email já está cadastrado. Use outro email ou faça login se já tem uma conta.');
+          throw new Error('Este email já está cadastrado no sistema. Use outro email ou faça login se já tem uma conta.');
         }
         throw new Error(error.message || 'Erro ao criar usuário');
       }
@@ -303,10 +303,8 @@ export default function CadastroLocadora() {
         variant: "destructive",
       });
       
-      // Se o erro for de usuário existente, limpar apenas o campo email
-      if (error instanceof Error && error.message.includes('já está cadastrado')) {
-        setFormData(prev => ({ ...prev, email: '' }));
-      }
+      // Se o erro for de usuário existente, não limpar o campo para o usuário ver qual email já existe
+      // Remover a limpeza automática do email para melhor UX
     } finally {
       setIsLoading(false);
     }
