@@ -474,333 +474,131 @@ export default function PlanosLocadora() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
-          {Object.entries(planosSegurosProdução)
-            .filter(([key]) => {
-              // Remover VIP da lista de planos disponíveis
-              if (key === 'vip') return false;
-              // Remover o plano atual da lista (exceto se estiver expirado)
-              if (key === planoAtual && !isPlanExpired) return false;
-              return true;
-            })
-            .map(([key, plano]: [string, any]) => {
-            // Garantir que plano existe e tem icone
-            if (!plano || typeof plano !== 'object') return null;
-            
-            try {
-              const iconeName = plano.icone || 'Car';
-              const Icone = typeof iconeName === 'string' ? (iconeMap[iconeName as keyof typeof iconeMap] || Car) : (iconeName || Car);
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Plano Start */}
+          <Card className="relative">
+            <CardHeader className="text-center pb-4">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-500 flex items-center justify-center">
+                <Car className="h-6 w-6 text-white" />
+              </div>
+              <CardTitle className="text-2xl">Start</CardTitle>
+              <div className="text-3xl font-bold text-blue-600">R$ 50,00</div>
+              <CardDescription className="text-base">por mês</CardDescription>
+              <p className="text-sm text-muted-foreground mt-2">Para locadoras iniciantes</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Até 5 veículos na frota</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Gestão completa de motoristas</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Contratos automáticos profissionais</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Controle de pagamentos</span>
+                </div>
+              </div>
               
-              return (
-              <Card key={key} className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500 relative' : ''}`}>
-                {plano.popular && (
-                  <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-cyan-500 text-white z-10">
-                    Mais Popular
-                  </Badge>
+              <div className="pt-4">
+                {planoAtual === 'start' ? (
+                  <Button disabled className="w-full">
+                    Plano Atual
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleSolicitarMudanca('start')}
+                    disabled={solicitando}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    {solicitando ? "Processando..." : "Escolher Start"}
+                  </Button>
                 )}
-                <CardHeader className="text-center pb-4">
-                  <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 rounded-full flex items-center justify-center ${plano.cor || 'bg-blue-500'}`}>
-                    <Icone className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                  </div>
-                  <CardTitle className="text-lg sm:text-xl">{plano.nome || 'Plano'}</CardTitle>
-                  <CardDescription className="text-base sm:text-lg font-semibold">
-                    {'consultar' in plano && plano.consultar ? "Preço a consultar" : `R$ ${(plano.preco || plano.valor || 0).toFixed(2)}/mês`}
-                  </CardDescription>
-                  <p className="text-xs text-muted-foreground leading-tight">{plano.descricao || ''}</p>
-                </CardHeader>
-                <CardContent className="space-y-3 pt-0">
-                  {/* Features do plano */}
-                  <div className="space-y-2">
-                    {(plano.recursos || ['Sistema completo', 'Gestão de motoristas', 'Contratos automáticos']).slice(0, 4).map((recurso: string, index: number) => (
-                      <div key={index} className="flex items-start gap-2 text-xs sm:text-sm">
-                        <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="leading-tight">{recurso}</span>
-                      </div>
-                    ))}
-                    {plano.limiteVeiculos && (
-                      <div className="flex items-start gap-2 text-xs sm:text-sm">
-                        <Car className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                        <span className="leading-tight">Até {plano.limiteVeiculos} veículos</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Botão de ação */}
-                  <div className="pt-3">
-                    {planoAtual === key ? (
-                      <Button disabled className="w-full text-sm sm:text-base">
-                        Plano Atual
-                      </Button>
-                    ) : ('consultar' in plano && plano.consultar) ? (
-                      <Button
-                        onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
-                        className="w-full text-sm sm:text-base"
-                        variant="outline"
-                      >
-                        Solicitar Orçamento
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() => handleSolicitarMudanca(key)}
-                        disabled={solicitando}
-                        className="w-full text-sm sm:text-base"
-                        variant={plano.popular ? "default" : "outline"}
-                      >
-                        {solicitando ? "Processando..." : "Mudar Plano"}
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-              );
-            } catch (error) {
-              console.error('Erro ao renderizar plano:', key, error);
-              return null;
-            }
-          })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Plano Elite */}
+          <Card className="relative">
+            <CardHeader className="text-center pb-4">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-500 flex items-center justify-center">
+                <Zap className="h-6 w-6 text-white" />
+              </div>
+              <CardTitle className="text-2xl">Elite</CardTitle>
+              <div className="text-3xl font-bold text-green-600">R$ 250,00</div>
+              <CardDescription className="text-base">por mês</CardDescription>
+              <p className="text-sm text-muted-foreground mt-2">Para frotas médias</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Até 50 veículos na frota</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Gestão completa de motoristas</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Contratos automáticos profissionais</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Controle de pagamentos</span>
+                </div>
+              </div>
+              
+              <div className="pt-4">
+                {planoAtual === 'elite' ? (
+                  <Button disabled className="w-full">
+                    Plano Atual
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleSolicitarMudanca('elite')}
+                    disabled={solicitando}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    {solicitando ? "Processando..." : "Escolher Elite"}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* Suporte */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <HeadphonesIcon className="h-5 w-5" />
-            Precisa de Ajuda?
-          </CardTitle>
-          <CardDescription>
-            Nossa equipe está pronta para ajudar com a escolha do melhor plano
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-            <div className="space-y-3 md:space-y-4">
-              <h4 className="font-semibold text-base">Todos os planos incluem:</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span>Sistema completo de gerenciamento</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span>Controle financeiro com lucros/perdas reais</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span>Contratos automáticos profissionais</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                  <span>Suporte por email</span>
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-3 md:space-y-4">
-              <h4 className="font-semibold text-base">Diferenciais dos Planos Premium:</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-purple-500 flex-shrink-0" />
-                  <span>Prime: Suporte por telefone + 100 veículos</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-pink-500 flex-shrink-0" />
-                  <span>Infinity: Veículos ilimitados + Suporte VIP 24/7</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-pink-500 flex-shrink-0" />
-                  <span>Infinity: Treinamento personalizado exclusivo</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-4 md:mt-6 p-3 md:p-4 bg-muted rounded-lg">
-            <p className="text-sm text-center text-muted-foreground">
-              Dúvidas sobre qual plano escolher? Entre em contato conosco pelo WhatsApp ou email
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Checkout do Stripe */}
+      {/* Modal de Checkout do Stripe */}
       {checkoutData && (
         <StripeCheckout
           clientSecret={checkoutData.clientSecret}
           subscriptionId={checkoutData.subscriptionId}
           planoNome={checkoutData.planoNome}
           valor={checkoutData.valor}
-          onSuccess={() => {
+          onCancel={() => {
             setCheckoutData(null);
             toast({
-              title: "Pagamento realizado!",
-              description: `Plano ${checkoutData.planoNome} ativado com sucesso.`,
+              title: "Pagamento cancelado",
+              description: "Você pode tentar novamente quando desejar.",
             });
-            // Invalidar cache para atualizar dados
+          }}
+          onSuccess={() => {
+            setCheckoutData(null);
+            // Invalidar cache para recarregar dados
             queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
             queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
           }}
-          onCancel={() => {
-            setCheckoutData(null);
-          }}
         />
       )}
-    </div>
-  );
-}
-
-// Componente de Carrossel para Mobile/Tablet
-interface PlanoInfo {
-  nome: string;
-  preco: number;
-  valor: number;
-  icone: any;
-  cor: string;
-  descricao: string;
-  popular: boolean;
-  consultar?: boolean;
-}
-
-function PlanoCarousel({ 
-  planoAtual, 
-  handleSolicitarMudanca, 
-  solicitando 
-}: {
-  planoAtual: string | undefined;
-  handleSolicitarMudanca: (plano: string) => void;
-  solicitando: boolean;
-}) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: 'start',
-    slidesToScroll: 1,
-    breakpoints: {
-      '(min-width: 768px)': { slidesToScroll: 2 },
-      '(min-width: 1024px)': { slidesToScroll: 3 }
-    }
-  });
-
-  const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
-  const scrollNext = () => emblaApi && emblaApi.scrollNext();
-
-  return (
-    <div className="lg:hidden">
-      {/* Controles do Carrossel */}
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Planos Disponíveis</h3>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={scrollPrev}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={scrollNext}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Carrossel */}
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex">
-          {Object.entries({
-            start: { id: "start", nome: "Start", preco: 50, descricao: "Para locadoras iniciantes", icone: "Car", cor: "bg-blue-500", recursos: ["Até 5 veículos", "Sistema completo"], limiteVeiculos: 5 },
-            pro: { id: "pro", nome: "Pro", preco: 99, descricao: "Para locadoras em crescimento", icone: "Rocket", cor: "bg-cyan-500", popular: true, recursos: ["Até 20 veículos", "Sistema completo"], limiteVeiculos: 20 },
-            elite: { id: "elite", nome: "Elite", preco: 250, descricao: "Para frotas médias", icone: "Zap", cor: "bg-green-500", recursos: ["Até 50 veículos", "Sistema completo"], limiteVeiculos: 50 }
-          }).map(([key, plano]: [string, any]) => {
-            // Garantir que plano existe e tem icone
-            if (!plano || typeof plano !== 'object') return null;
-            
-            try {
-              const iconeName = plano.icone || 'Car';
-              const Icone = typeof iconeName === 'string' ? (iconeMap[iconeName as keyof typeof iconeMap] || Car) : (iconeName || Car);
-              
-              return (
-              <div key={key} className="flex-[0_0_85%] sm:flex-[0_0_60%] md:flex-[0_0_45%] mr-4">
-                <Card className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500' : ''}`}>
-                  <CardHeader className="text-center relative">
-                    {plano.popular && (
-                      <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-cyan-500 text-white">
-                        Mais Popular
-                      </Badge>
-                    )}
-                    <div className={`w-12 h-12 mx-auto mb-2 rounded-full flex items-center justify-center ${plano.cor || 'bg-blue-500'}`}>
-                      <Icone className="h-6 w-6 text-white" />
-                    </div>
-                    <CardTitle className="text-xl">{plano.nome || 'Plano'}</CardTitle>
-                    <CardDescription className="text-sm">
-                      {plano.consultar ? "Preço a consultar" : `R$ ${(plano.preco || plano.valor || 0).toFixed(2)}/mês`}
-                    </CardDescription>
-                    <p className="text-xs text-muted-foreground mt-1">{plano.descricao || ''}</p>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Features do Plano */}
-                    <div className="space-y-2 mb-6">
-                      {(plano.recursos || ['Sistema completo', 'Gestão de motoristas', 'Contratos automáticos']).slice(0, 4).map((recurso: string, index: number) => (
-                        <div key={index} className="flex items-center gap-2 text-sm">
-                          <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                          <span>{recurso}</span>
-                        </div>
-                      ))}
-                      {plano.limiteVeiculos && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Car className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                          <span>Até {plano.limiteVeiculos} veículos</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Botão de Ação */}
-                    <div className="mt-auto">
-                      {planoAtual === key ? (
-                        <Button disabled className="w-full">
-                          Plano Atual
-                        </Button>
-                      ) : plano.consultar ? (
-                        <Button
-                          onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
-                          className="w-full"
-                          variant="outline"
-                        >
-                          Solicitar Orçamento
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => handleSolicitarMudanca(key)}
-                          disabled={solicitando}
-                          className="w-full"
-                          variant={plano.popular ? "default" : "outline"}
-                        >
-                          {solicitando ? "Processando..." : "Mudar Plano"}
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              );
-            } catch (error) {
-              console.error('Erro ao renderizar plano no carrossel:', key, error);
-              return null;
-            }
-          })}
-        </div>
-      </div>
-
-      {/* Indicadores */}
-      <div className="flex justify-center gap-2 mt-4">
-        {Object.keys({ start: {}, pro: {}, elite: {} }).map((_, index) => (
-          <div
-            key={index}
-            className="w-2 h-2 rounded-full bg-muted-foreground/30"
-          />
-        ))}
-      </div>
     </div>
   );
 }
