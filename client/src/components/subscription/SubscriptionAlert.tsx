@@ -33,7 +33,7 @@ export function SubscriptionAlert() {
           className="ml-4 border-orange-300 text-orange-700 hover:bg-orange-100 dark:border-orange-700 dark:text-orange-300 dark:hover:bg-orange-900"
         >
           <Crown className="h-3 w-3 mr-1" />
-          Renovar Plano
+          Ir para Planos
         </Button>
       </AlertDescription>
     </Alert>
