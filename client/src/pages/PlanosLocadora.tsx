@@ -244,21 +244,31 @@ export default function PlanosLocadora() {
 
       {/* Status do teste gratuito */}
       {planoDetalhes?.testeGratuito && (
-        <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg">
+        <div className={`p-4 rounded-lg ${
+          planoDetalhes.testeGratuito.ativo 
+            ? 'bg-gradient-to-r from-green-50 to-green-100 border border-green-200' 
+            : 'bg-gradient-to-r from-red-50 to-red-100 border border-red-200'
+        }`}>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500 rounded-full">
+            <div className={`p-2 rounded-full ${
+              planoDetalhes.testeGratuito.ativo ? 'bg-green-500' : 'bg-red-500'
+            }`}>
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-green-800">
+              <h3 className={`font-semibold ${
+                planoDetalhes.testeGratuito.ativo ? 'text-green-800' : 'text-red-800'
+              }`}>
                 {planoDetalhes.testeGratuito.ativo ? 
                   `Teste Gratuito Ativo - ${planoDetalhes.testeGratuito.diasRestantes} dias restantes` : 
                   'Teste Gratuito Expirado'
                 }
               </h3>
-              <p className="text-green-700 text-sm">
+              <p className={`text-sm ${
+                planoDetalhes.testeGratuito.ativo ? 'text-green-700' : 'text-red-700'
+              }`}>
                 {planoDetalhes.testeGratuito.ativo ? 
                   `Você está aproveitando seu teste gratuito do Plano Pro (20 veículos). Vence em ${new Date(planoDetalhes.testeGratuito.dataVencimento).toLocaleDateString('pt-BR')}.` :
                   `Seu teste gratuito expirou em ${new Date(planoDetalhes.testeGratuito.dataVencimento).toLocaleDateString('pt-BR')}. Escolha um plano para continuar.`
