@@ -431,7 +431,7 @@ export function NovoVeiculoModal({
             <div className="space-y-4">
               
               {/* Primeira linha: Tipo, Marca, Modelo */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="tipoVeiculo"
@@ -510,7 +510,7 @@ export function NovoVeiculoModal({
               </div>
 
               {/* Segunda linha: Placa, RENAVAM, Chassi */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="placa"
@@ -687,7 +687,7 @@ export function NovoVeiculoModal({
             {/* CARACTERÍSTICAS TÉCNICAS */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="combustivel"
@@ -780,7 +780,7 @@ export function NovoVeiculoModal({
                 />
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="valorSemanal"
@@ -859,7 +859,7 @@ export function NovoVeiculoModal({
             {/* SEGURO */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="seguradora"
@@ -908,7 +908,7 @@ export function NovoVeiculoModal({
             {/* VALOR DO VEÍCULO E IPVA */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="valorVeiculo"
@@ -966,7 +966,7 @@ export function NovoVeiculoModal({
             {/* RASTREADOR */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="rastreador"
@@ -1061,7 +1061,7 @@ export function NovoVeiculoModal({
               />
 
               {form.watch('financiado') && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <FormField
                     control={form.control}
                     name="valorFinanciamento"

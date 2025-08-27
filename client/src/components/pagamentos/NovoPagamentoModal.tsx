@@ -264,7 +264,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {/* Motorista */}
               <FormField
                 control={form.control}
@@ -404,7 +404,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
 
 
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 {/* Valor Total */}
                 <FormField
                   control={form.control}
@@ -467,7 +467,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
                     <DollarSign className="w-4 h-4" />
                     Receita Extra
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {/* Juros */}
                     <FormField
                       control={form.control}

@@ -723,7 +723,7 @@ export function EditarVeiculoModal({
             {/* SEGURO */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="seguradora"
@@ -766,7 +766,7 @@ export function EditarVeiculoModal({
             {/* VALOR DO VEÍCULO E IPVA */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="valorVeiculo"
@@ -824,7 +824,7 @@ export function EditarVeiculoModal({
             {/* RASTREADOR */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <FormField
                   control={form.control}
                   name="rastreador"
