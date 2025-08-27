@@ -250,7 +250,7 @@ export default function PlanosLocadora() {
   // Verificar se o plano está expirado - valor padrão para produção
   const isPlanExpired = (subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false;
 
-  // DADOS FORÇADOS PARA PRODUÇÃO - resolver problema de planos vazios
+  // Dados fallback para garantir renderização em produção
   const planosSegurosProdução = {
     start: { 
       id: "start", nome: "Start", preco: 50, valor: 50, 
