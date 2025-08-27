@@ -108,6 +108,7 @@ export function useSubscriptionStatus() {
     },
     enabled: !!profile?.locadoraId,
     refetchInterval: 30000, // Verificar a cada 30 segundos
-    staleTime: 20000, // Dados são considerados frescos por 20 segundos
+    staleTime: 0, // Forçar revalidação para dados VIP atualizados
+    cacheTime: 0, // Não usar cache para garantir dados atualizados
   });
 }
