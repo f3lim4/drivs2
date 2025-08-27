@@ -111,15 +111,15 @@
 
     --radius: 0.5rem;
     
-    /* Sidebar customizado com preto */
-    --sidebar: 0 0% 8%;
+    /* Sidebar customizado com azul mais escuro */
+    --sidebar: 210 100% 20%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 0 0% 15%;
+    --sidebar-primary: 210 100% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent: 210 90% 30%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 0 0% 25%;
+    --sidebar-border: 210 80% 25%;
+    --sidebar-ring: 210 100% 40%;
 
 
     /* Gradientes para cards de estatísticas */
