@@ -2639,11 +2639,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             const response = {
               ...planosDisponiveis,
-              testeGratuito: {
-                ativo: locadora.testeGratuito && diasRestantes > 0,
-                diasRestantes: diasRestantes,
-                dataVencimento: locadora.dataVencimentoTeste
-              }
+              // Locadoras Vitalia VIP não têm teste gratuito
+              ...(locadora.vitalia ? {} : {
+                testeGratuito: {
+                  ativo: locadora.testeGratuito && diasRestantes > 0,
+                  diasRestantes: diasRestantes,
+                  dataVencimento: locadora.dataVencimentoTeste
+                }
+              })
             };
             return res.json(response);
           }
