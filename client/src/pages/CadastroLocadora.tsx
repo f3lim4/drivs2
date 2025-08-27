@@ -548,13 +548,13 @@ export default function CadastroLocadora() {
 
               </div>
 
-              {/* Logo da Empresa e Senhas lado a lado */}
-              <div className="grid grid-cols-1 gap-6 pt-6 border-t">
-                {/* Coluna Logo */}
+              {/* Logo, Senha e Confirmar Senha na mesma linha */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t">
+                {/* Logo */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium flex items-center text-gray-900">
                     <Image className="h-5 w-5 mr-2" />
-                    Logo da Empresa (Opcional)
+                    Logo (Opcional)
                   </h3>
                   
                   <div className="space-y-4">
@@ -571,14 +571,6 @@ export default function CadastroLocadora() {
                           <Image className="w-8 h-8 text-gray-400" />
                         )}
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-600">
-                          {logoPreview ? 'Logo selecionado' : 'Nenhum logo selecionado'}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Formatos aceitos: JPG, PNG, SVG (máximo 5MB)
-                        </p>
-                      </div>
                     </div>
 
                     {/* Controles de upload */}
@@ -587,7 +579,7 @@ export default function CadastroLocadora() {
                         <div className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 transition-colors">
                           <Upload className="w-4 h-4" />
                           <span className="text-sm font-medium">
-                            {uploadingLogo ? 'Carregando...' : 'Selecionar Logo'}
+                            {uploadingLogo ? 'Carregando...' : 'Selecionar'}
                           </span>
                         </div>
                       </Label>
@@ -612,66 +604,70 @@ export default function CadastroLocadora() {
                       )}
                     </div>
                   </div>
-                  
-                  {/* Checkbox Termos de Uso */}
-                  <div className="mt-6 pt-4 border-t border-gray-200">
-                    <div className="flex items-start space-x-3">
-                      <input
-                        type="checkbox"
-                        id="aceitarTermos"
-                        required
-                        className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="aceitarTermos" className="text-sm text-gray-700">
-                        Li e aceito os{' '}
-                        <Button
-                          type="button"
-                          variant="link"
-                          className="p-0 h-auto text-blue-600 hover:text-blue-800 underline"
-                          onClick={() => window.open('/termos-uso', '_blank')}
-                        >
-                          Termos de Uso
-                        </Button>
-                        {' '}da plataforma DRIVS *
-                      </label>
-                    </div>
-                  </div>
                 </div>
 
-                {/* Coluna Senhas */}
+                {/* Senha */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium flex items-center text-gray-900">
                     <Lock className="h-5 w-5 mr-2" />
-                    Credenciais de Acesso
+                    Senha *
                   </h3>
                   
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="senha" >Senha *</Label>
-                      <Input
-                        id="senha"
-                        type="password"
-                        value={formData.senha}
-                        onChange={(e) => updateFormData('senha', e.target.value)}
-                        placeholder=""
-                        required
-                        minLength={6}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="confirmarSenha" >Confirmar Senha *</Label>
-                      <Input
-                        id="confirmarSenha"
-                        type="password"
-                        value={formData.confirmarSenha}
-                        onChange={(e) => updateFormData('confirmarSenha', e.target.value)}
-                        placeholder=""
-                        required
-                        minLength={6}
-                      />
-                    </div>
+                  <div className="space-y-2">
+                    <Input
+                      id="senha"
+                      type="password"
+                      value={formData.senha}
+                      onChange={(e) => updateFormData('senha', e.target.value)}
+                      placeholder="Mínimo 6 caracteres"
+                      required
+                      minLength={6}
+                    />
                   </div>
+                </div>
+
+                {/* Confirmar Senha */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center text-gray-900">
+                    <Lock className="h-5 w-5 mr-2" />
+                    Confirmar Senha *
+                  </h3>
+                  
+                  <div className="space-y-2">
+                    <Input
+                      id="confirmarSenha"
+                      type="password"
+                      value={formData.confirmarSenha}
+                      onChange={(e) => updateFormData('confirmarSenha', e.target.value)}
+                      placeholder="Repita a senha"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Checkbox Termos de Uso */}
+              <div className="pt-4">
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id="aceitarTermos"
+                    required
+                    className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="aceitarTermos" className="text-sm text-gray-700">
+                    Li e aceito os{' '}
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="p-0 h-auto text-blue-600 hover:text-blue-800 underline"
+                      onClick={() => window.open('/termos-uso', '_blank')}
+                    >
+                      Termos de Uso
+                    </Button>
+                    {' '}da plataforma DRIVS *
+                  </label>
                 </div>
               </div>
 
