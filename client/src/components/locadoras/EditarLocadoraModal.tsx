@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -54,6 +54,7 @@ interface EditarLocadoraModalProps {
 
 export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLocadoraModalProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   // Buscar planos da API
   const { data: planosFromServer } = useQuery({
@@ -175,15 +176,16 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
         throw new Error('Erro ao atualizar locadora');
       }
 
+      // Invalidar caches para atualizar os dados automaticamente
+      await queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
+      await queryClient.invalidateQueries({ queryKey: [`/api/locadoras/${locadora.id}`] });
+      
       toast({
         title: "Locadora atualizada com sucesso!",
         description: `Os dados de ${formData.nome} foram atualizados.`,
       });
 
       onOpenChange(false);
-      
-      // Recarregar a página para atualizar os dados
-      window.location.reload();
       
     } catch (error) {
       toast({
