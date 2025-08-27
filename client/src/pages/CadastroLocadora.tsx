@@ -558,8 +558,8 @@ export default function CadastroLocadora() {
                   </h3>
                   
                   <div className="space-y-4">
-                    {/* Preview do logo */}
-                    <div className="flex items-center space-x-4">
+                    {/* Preview do logo e controles lado a lado */}
+                    <div className="flex items-start space-x-4">
                       <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
                         {logoPreview ? (
                           <img 
@@ -571,37 +571,37 @@ export default function CadastroLocadora() {
                           <Image className="w-8 h-8 text-gray-400" />
                         )}
                       </div>
-                    </div>
-
-                    {/* Controles de upload */}
-                    <div className="flex space-x-2">
-                      <Label htmlFor="logo-upload" className="cursor-pointer">
-                        <div className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg border border-blue-200 transition-colors">
-                          <Upload className="w-4 h-4" />
-                          <span className="text-sm font-medium">
-                            {uploadingLogo ? 'Carregando...' : 'Selecionar'}
-                          </span>
-                        </div>
-                      </Label>
-                      <input
-                        id="logo-upload"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleLogoUpload}
-                        disabled={uploadingLogo}
-                      />
-                      {logoPreview && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleRemoveLogo}
+                      
+                      {/* Controles de upload */}
+                      <div className="flex flex-col space-y-2">
+                        <Label htmlFor="logo-upload" className="cursor-pointer">
+                          <div className="flex items-center space-x-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-2 rounded-lg border border-blue-200 transition-colors">
+                            <Upload className="w-4 h-4" />
+                            <span className="text-sm font-medium">
+                              {uploadingLogo ? 'Carregando...' : 'Selecionar'}
+                            </span>
+                          </div>
+                        </Label>
+                        <input
+                          id="logo-upload"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleLogoUpload}
                           disabled={uploadingLogo}
-                        >
-                          Remover
-                        </Button>
-                      )}
+                        />
+                        {logoPreview && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleRemoveLogo}
+                            disabled={uploadingLogo}
+                          >
+                            Remover
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
