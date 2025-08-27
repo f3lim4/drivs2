@@ -1,10 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Car, Rocket, Zap, Crown, Infinity, Star } from "lucide-react";
 
-export default function PlanosLocadoraSimples() {
+const PlanosLocadoraSimples = () => {
   const [solicitando, setSolicitando] = useState(false);
 
   const handleSolicitarMudanca = async (plano: string) => {
@@ -252,4 +252,6 @@ export default function PlanosLocadoraSimples() {
       </Card>
     </div>
   );
-}
+};
+
+export default PlanosLocadoraSimples;
