@@ -24,7 +24,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Crown } from 'lucide-react';
 
 interface Locadora {
   id: string;
@@ -44,7 +43,6 @@ interface Locadora {
   logo: string;
   status: 'ativa' | 'inativa' | 'pendente';
   plano: 'free' | 'basico' | 'premium' | 'enterprise';
-  vitalia: boolean;
   dataCadastro: string;
 }
 
@@ -97,7 +95,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
     logo: '',
     status: 'ativa' as 'ativa' | 'inativa' | 'pendente',
     plano: 'free' as 'free' | 'basico' | 'premium' | 'enterprise',
-    vitalia: false
   });
 
   useEffect(() => {
@@ -119,7 +116,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
         logo: locadora.logo || '',
         status: locadora.status || 'ativa',
         plano: locadora.plano || 'free',
-        vitalia: locadora.vitalia || false
       });
     }
   }, [locadora]);
@@ -414,25 +410,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
                 )}
               </div>
 
-              {/* VITALIA VIP */}
-              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
-                <div className="flex items-center space-x-3">
-                  <Crown className="h-6 w-6 text-purple-600" />
-                  <div>
-                    <Label htmlFor="vitalia" className="text-base font-medium text-purple-900">
-                      Locadora Vitalia VIP
-                    </Label>
-                    <p className="text-sm text-purple-700 mt-1">
-                      Locadora premium que não precisa pagar pelo sistema
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  id="vitalia"
-                  checked={formData.vitalia}
-                  onCheckedChange={(checked) => updateFormData('vitalia', checked)}
-                />
-              </div>
             </div>
           </div>
 
