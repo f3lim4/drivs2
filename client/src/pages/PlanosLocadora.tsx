@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import StripeCheckout from "@/components/stripe/StripeCheckout";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -113,6 +114,7 @@ const planosFeatures: PlanoFeature[] = [
 export default function PlanosLocadora() {
   const { profile, isLocadora } = useAuth();
   const { toast } = useToast();
+  const { data: subscriptionStatus } = useSubscriptionStatus();
   const queryClient = useQueryClient();
   const [solicitando, setSolicitando] = useState(false);
   const [checkoutData, setCheckoutData] = useState<{
@@ -233,6 +235,9 @@ export default function PlanosLocadora() {
   // O sistema deve permitir visualizar os planos disponíveis
 
   const planoAtual = (locadora as any)?.plano || 'pro'; // Padrão pro se não definido
+  
+  // Verificar se o plano está expirado
+  const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -283,7 +288,7 @@ export default function PlanosLocadora() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+          <div className={`flex items-center gap-4 p-4 rounded-lg ${isPlanExpired ? 'bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200' : 'bg-muted'}`}>
             <div className={`p-3 rounded-full ${planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500'}`}>
               {(() => {
                 const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
@@ -295,23 +300,44 @@ export default function PlanosLocadora() {
             <div className="flex-1">
               <h3 className="font-semibold text-lg">
                 Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
+                {isPlanExpired && <span className="text-orange-600 ml-2">(Expirado)</span>}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento'}
+                {isPlanExpired 
+                  ? 'Renove seu plano para continuar aproveitando todos os recursos' 
+                  : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento')
+                }
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold">
-                R$ {(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}
-              </p>
-              <p className="text-sm text-muted-foreground">por mês</p>
+            <div className="text-right space-y-2">
+              <div>
+                <p className="text-2xl font-bold">
+                  R$ {(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}
+                </p>
+                <p className="text-sm text-muted-foreground">por mês</p>
+              </div>
+              {isPlanExpired && (
+                <Button 
+                  size="sm" 
+                  className="bg-orange-500 hover:bg-orange-600 text-white"
+                  onClick={() => {
+                    // Scroll para os planos disponíveis
+                    const planosSection = document.querySelector('[data-section="planos-disponiveis"]');
+                    if (planosSection) {
+                      planosSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  Renovar Plano
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Planos Disponíveis */}
-      <div className="space-y-4">
+      <div className="space-y-4" data-section="planos-disponiveis">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Planos Disponíveis</h2>
           <p className="text-muted-foreground">
