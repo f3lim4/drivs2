@@ -244,7 +244,7 @@ export default function Planos() {
         </CardHeader>
         <CardContent>
           <div className={`flex items-center gap-4 p-4 rounded-lg ${
-            isExpired ? "bg-orange-100 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800" : "bg-muted"
+            isPlanExpired ? "bg-orange-100 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800" : "bg-muted"
           }`}>
             <div className={`p-3 rounded-full ${planosInfo[planoAtual as keyof typeof planosInfo].cor}`}>
               {(() => {
@@ -255,10 +255,10 @@ export default function Planos() {
             <div className="flex-1">
               <h3 className="font-semibold text-lg">
                 Plano {planosInfo[planoAtual as keyof typeof planosInfo].nome}
-                {isExpired && <span className="text-orange-600 ml-2">(Expirado)</span>}
+                {isPlanExpired && <span className="text-orange-600 ml-2">(Expirado)</span>}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {isExpired 
+                {isPlanExpired 
                   ? "Renove seu plano para continuar usando todas as funcionalidades do sistema."
                   : planosInfo[planoAtual as keyof typeof planosInfo].descricao
                 }
