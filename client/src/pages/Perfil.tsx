@@ -207,6 +207,12 @@ export default function Perfil() {
   // Carregar dados do usuário
   useEffect(() => {
     const carregarDados = async () => {
+      // Se não tem perfil, parar loading
+      if (!profile) {
+        setLoading(false);
+        return;
+      }
+      
       // Se é admin, não precisa carregar dados de locadora
       if (isAdmin) {
         setLoading(false);
@@ -383,6 +389,34 @@ export default function Perfil() {
       setChangingPassword(false);
     }
   };
+
+  // Se não tem perfil após o loading, mostrar mensagem de erro
+  if (!profile && !loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-96">
+          <CardHeader>
+            <CardTitle>Dados não encontrados</CardTitle>
+            <CardDescription>
+              Não foi possível carregar suas informações de perfil.
+              Tente fazer logout e login novamente.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => {
+                localStorage.removeItem('drivs_profile');
+                window.location.href = '/login';
+              }}
+              className="w-full"
+            >
+              Fazer Login Novamente
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Se é locadora mas não tem locadoraId, mostrar opção para recarregar
   if (isLocadora && !profile?.locadoraId && !loading) {
