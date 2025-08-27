@@ -33,19 +33,8 @@ export function useSubscriptionStatus() {
       const locadora = await response.json();
       const today = new Date();
       
-      // DEBUG TEMPORÁRIO - REMOVER DEPOIS
-      console.log('[PRODUCTION DEBUG] Dados da locadora:', {
-        id: locadora.id,
-        nome: locadora.nome,
-        vitalia: locadora.vitalia,
-        plano: locadora.plano,
-        testeGratuito: locadora.testeGratuito,
-        dataVencimentoTeste: locadora.dataVencimentoTeste
-      });
-      
       // PRIMEIRO: Verificar se é locadora VIP/Vitalia - acesso sempre liberado
       if (locadora.vitalia === true) {
-        console.log('[PRODUCTION DEBUG] Locadora VIP detectada - liberando acesso');
         return {
           isActive: true,
           isExpired: false,
@@ -53,8 +42,6 @@ export function useSubscriptionStatus() {
           canAccess: true
         };
       }
-      
-      console.log('[PRODUCTION DEBUG] Não é VIP, seguindo para verificação de teste');
       
       // SEGUNDO: Verificar se está em teste gratuito
       if (locadora.testeGratuito && locadora.dataVencimentoTeste) {
