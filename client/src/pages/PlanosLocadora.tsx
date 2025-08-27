@@ -467,14 +467,15 @@ export default function PlanosLocadora() {
         </CardContent>
       </Card>
 
-      {/* Planos Disponíveis */}
-      <div className="space-y-4" data-section="planos-disponiveis">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Planos Disponíveis</h2>
-          <p className="text-muted-foreground">
-            Escolha o plano ideal para sua locadora
-          </p>
-        </div>
+      {/* Planos Disponíveis - ocultar para locadoras VIP */}
+      {!isVipPlan && (
+        <div className="space-y-4" data-section="planos-disponiveis">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-2">Planos Disponíveis</h2>
+            <p className="text-muted-foreground">
+              Escolha o plano ideal para sua locadora
+            </p>
+          </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {/* Plano Start */}
@@ -730,7 +731,8 @@ export default function PlanosLocadora() {
             </CardContent>
           </Card>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Modal de Checkout do Stripe */}
       {checkoutData && (
