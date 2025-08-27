@@ -325,59 +325,63 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="numero">Número *</Label>
-                <Input
-                  id="numero"
-                  value={formData.numero}
-                  onChange={(e) => updateFormData('numero', e.target.value)}
-                  placeholder="123"
-                  required
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="numero">Número *</Label>
+                  <Input
+                    id="numero"
+                    value={formData.numero}
+                    onChange={(e) => updateFormData('numero', e.target.value)}
+                    placeholder="123"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="complemento">Complemento</Label>
+                  <Input
+                    id="complemento"
+                    value={formData.complemento}
+                    onChange={(e) => updateFormData('complemento', e.target.value)}
+                    placeholder="Apto, sala, etc."
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="complemento">Complemento</Label>
-                <Input
-                  id="complemento"
-                  value={formData.complemento}
-                  onChange={(e) => updateFormData('complemento', e.target.value)}
-                  placeholder="Apto, sala, etc."
-                />
-              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bairro">Bairro *</Label>
+                  <Input
+                    id="bairro"
+                    value={formData.bairro}
+                    onChange={(e) => updateFormData('bairro', e.target.value)}
+                    placeholder="Nome do bairro"
+                    required
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bairro">Bairro *</Label>
-                <Input
-                  id="bairro"
-                  value={formData.bairro}
-                  onChange={(e) => updateFormData('bairro', e.target.value)}
-                  placeholder="Nome do bairro"
-                  required
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cidade">Cidade *</Label>
+                  <Input
+                    id="cidade"
+                    value={formData.cidade}
+                    onChange={(e) => updateFormData('cidade', e.target.value)}
+                    placeholder="São Paulo"
+                    required
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="cidade">Cidade *</Label>
-                <Input
-                  id="cidade"
-                  value={formData.cidade}
-                  onChange={(e) => updateFormData('cidade', e.target.value)}
-                  placeholder="São Paulo"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="estado">Estado *</Label>
-                <Input
-                  id="estado"
-                  value={formData.estado}
-                  onChange={(e) => updateFormData('estado', e.target.value.toUpperCase())}
-                  placeholder="SP"
-                  maxLength={2}
-                  required
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="estado">Estado *</Label>
+                  <Input
+                    id="estado"
+                    value={formData.estado}
+                    onChange={(e) => updateFormData('estado', e.target.value.toUpperCase())}
+                    placeholder="SP"
+                    maxLength={2}
+                    required
+                  />
+                </div>
               </div>
             </div>
           </div>
