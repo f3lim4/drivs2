@@ -189,10 +189,10 @@ export function DrivsSidebar() {
     const baseClasses = "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 min-h-[48px]";
     
     if (isActive(path)) {
-      return `${baseClasses} bg-blue-800 text-white font-medium`;
+      return `${baseClasses} bg-gray-800 text-white font-medium`;
     }
     
-    return `${baseClasses} text-white hover:bg-blue-500/50 hover:text-white`;
+    return `${baseClasses} text-white hover:bg-gray-600/50 hover:text-white`;
   };
 
   // Função para lidar com cliques em links do menu
@@ -204,10 +204,10 @@ export function DrivsSidebar() {
   };
 
   return (
-    <Sidebar className="border-r transition-all duration-300 bg-blue-600 border-blue-500">
-      <SidebarContent className="bg-blue-600">
+    <Sidebar className="border-r transition-all duration-300 bg-black border-gray-800">
+      <SidebarContent className="bg-black">
         {/* Header da sidebar com logo DRIVS */}
-        <div className="p-6 border-b border-blue-500 flex items-center justify-center">
+        <div className="p-6 border-b border-gray-700 flex items-center justify-center">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1">
               <img src={logoPath} alt="DRIVS Logo" className="w-full h-full" />
@@ -250,7 +250,7 @@ export function DrivsSidebar() {
         </div>
 
         {/* Informações do sistema */}
-        <div className="p-6 border-t border-blue-500">
+        <div className="p-6 border-t border-gray-700">
           <div className="text-xs text-white/70 mb-3">
             <p>DRIVS v1.0</p>
             <p>Sistema de Gestão</p>
