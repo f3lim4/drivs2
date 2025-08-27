@@ -39,6 +39,7 @@ import { VisualizarMotoristaModal } from '@/components/motoristas/VisualizarMoto
 import { PesquisarCpfModal } from '@/components/motoristas/PesquisarCpfModal';
 import { registrarAtividade } from '@/utils/activityLogger';
 import { MotoristaAvatar } from '@/components/motoristas/MotoristaAvatar';
+import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 
 import { Motorista } from '@/types';
 import { Users, UserCheck, UserX, Clock, Activity } from 'lucide-react';
@@ -432,13 +433,15 @@ export default function Motoristas() {
                   >
                     <Search className="w-4 h-4" />
                   </Button>
-                  <Button 
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                    onClick={handleNovoMotorista}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Novo Motorista
-                  </Button>
+                  <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novos motoristas">
+                    <Button 
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                      onClick={handleNovoMotorista}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Novo Motorista
+                    </Button>
+                  </ProtectedAction>
                 </div>
               )}
             </div>
@@ -578,22 +581,26 @@ export default function Motoristas() {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleEditarMotorista(motorista)}
-                          title="Editar"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleExcluirMotorista(motorista)}
-                          title="Excluir"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <ProtectedAction fallbackMessage="Renove seu plano para editar motoristas">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleEditarMotorista(motorista)}
+                            title="Editar"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </ProtectedAction>
+                        <ProtectedAction fallbackMessage="Renove seu plano para excluir motoristas">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleExcluirMotorista(motorista)}
+                            title="Excluir"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </ProtectedAction>
                       </div>
                     </TableCell>
                   )}

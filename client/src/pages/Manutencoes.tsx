@@ -35,6 +35,7 @@ import { VisualizarManutencaoModal } from '@/components/manutencoes/VisualizarMa
 import { NovoLocalModal } from '@/components/locais/NovoLocalModal';
 import { formatDate } from '@/lib/utils';
 import type { Manutencao, Local } from '@shared/schema';
+import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 
 export default function Manutencoes() {
   const { profile } = useAuth();
@@ -320,13 +321,15 @@ export default function Manutencoes() {
                     Gerenciar Locais
                   </Button>
                   
-                  <Button 
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                    onClick={() => setNovaManutencaoModalOpen(true)}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Nova Manutenção
-                  </Button>
+                  <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novas manutenções">
+                    <Button 
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                      onClick={() => setNovaManutencaoModalOpen(true)}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Nova Manutenção
+                    </Button>
+                  </ProtectedAction>
                 </div>
               </div>
             </CardContent>
@@ -442,21 +445,25 @@ export default function Manutencoes() {
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => setEditarManutencaoModal({ open: true, manutencao })}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon"
-                              onClick={() => handleDeleteManutencao(manutencao.id)}
-                              disabled={isDeleting}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            <ProtectedAction fallbackMessage="Renove seu plano para editar manutenções">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => setEditarManutencaoModal({ open: true, manutencao })}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            </ProtectedAction>
+                            <ProtectedAction fallbackMessage="Renove seu plano para excluir manutenções">
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => handleDeleteManutencao(manutencao.id)}
+                                disabled={isDeleting}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </ProtectedAction>
                           </div>
                         </TableCell>
                       </TableRow>

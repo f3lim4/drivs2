@@ -15,6 +15,7 @@ import { useLocadoras } from '@/hooks/useLocadoras';
 import type { Infracao } from '@shared/schema';
 import { NovaInfracaoModal } from '@/components/infracoes/NovaInfracaoModal';
 import { EditarInfracaoModal } from '@/components/infracoes/EditarInfracaoModal';
+import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 
 export default function Infracoes() {
   const { infracoes, isLoading, isDeleting, deleteInfracao } = useInfracoes();
@@ -277,10 +278,12 @@ export default function Infracoes() {
                 <SelectItem value="cancelado">Cancelado</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={() => setShowNovaInfracao(true)} className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="h-4 w-4 mr-2" />
-              Nova Infração
-            </Button>
+            <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novas infrações">
+              <Button onClick={() => setShowNovaInfracao(true)} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="h-4 w-4 mr-2" />
+                Nova Infração
+              </Button>
+            </ProtectedAction>
           </div>
         </CardContent>
       </Card>
@@ -366,21 +369,25 @@ export default function Infracoes() {
                       <TableCell>{getStatusBadge(infracao.status)}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditingInfracao(infracao)}
-                          >
-                            Editar
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteInfracao(infracao.id)}
-                            disabled={isDeleting}
-                          >
-                            Excluir
-                          </Button>
+                          <ProtectedAction fallbackMessage="Renove seu plano para editar infrações">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingInfracao(infracao)}
+                            >
+                              Editar
+                            </Button>
+                          </ProtectedAction>
+                          <ProtectedAction fallbackMessage="Renove seu plano para excluir infrações">
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteInfracao(infracao.id)}
+                              disabled={isDeleting}
+                            >
+                              Excluir
+                            </Button>
+                          </ProtectedAction>
                         </div>
                       </TableCell>
                     </TableRow>
