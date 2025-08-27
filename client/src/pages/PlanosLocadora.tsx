@@ -236,7 +236,7 @@ export default function PlanosLocadora() {
   // O sistema deve permitir visualizar os planos disponíveis
 
   // Determinar o plano atual baseado nos dados da locadora
-  const planoAtual = (locadora as any)?.vitalia ? 'vip' : ((locadora as any)?.plano || 'pro');
+  const planoAtual = (locadora as any)?.plano || 'pro';
   
   // Verificar se o plano está expirado
   const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
@@ -244,8 +244,8 @@ export default function PlanosLocadora() {
   return (
     <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
 
-      {/* Status do teste gratuito - ocultar para locadoras Vitalia VIP */}
-      {planoDetalhes?.testeGratuito && !locadora?.vitalia && (
+      {/* Status do teste gratuito - ocultar para locadoras VIP */}
+      {planoDetalhes?.testeGratuito && planoAtual !== 'vip' && (
         <div className={`p-4 rounded-lg ${
           planoDetalhes.testeGratuito.ativo 
             ? 'bg-gradient-to-r from-green-50 to-green-100 border border-green-200' 
@@ -295,7 +295,7 @@ export default function PlanosLocadora() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              {(locadora?.vitalia || planoAtual === 'vip') && (
+              {planoAtual === 'vip' && (
                 <Badge variant="secondary" className="px-3 py-1 bg-gradient-to-r from-purple-500 to-indigo-500 text-white border-0">
                   <Crown className="h-3 w-3 mr-1" />
                   VIP
@@ -322,11 +322,11 @@ export default function PlanosLocadora() {
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">
                   Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
-                  {(locadora?.vitalia || planoAtual === 'vip') && <span className="text-purple-600 ml-2">(Premium)</span>}
-                  {isPlanExpired && !locadora?.vitalia && planoAtual !== 'vip' && <span className="text-orange-600 ml-2">(Expirado)</span>}
+                  {planoAtual === 'vip' && <span className="text-purple-600 ml-2">(Premium)</span>}
+                  {isPlanExpired && planoAtual !== 'vip' && <span className="text-orange-600 ml-2">(Expirado)</span>}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {(locadora?.vitalia || planoAtual === 'vip')
+                  {planoAtual === 'vip'
                     ? 'Plano VIP com acesso total e ilimitado a todos os recursos do sistema'
                     : isPlanExpired 
                       ? 'Renove seu plano para continuar aproveitando todos os recursos' 
@@ -337,16 +337,16 @@ export default function PlanosLocadora() {
               <div className="text-right space-y-2">
                 <div>
                   <p className="text-2xl font-bold">
-                    {(locadora?.vitalia || planoAtual === 'vip')
+                    {planoAtual === 'vip'
                       ? 'Gratuito'
                       : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                     }
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {(locadora?.vitalia || planoAtual === 'vip') ? 'Plano VIP' : 'por mês'}
+                    {planoAtual === 'vip' ? 'Plano VIP' : 'por mês'}
                   </p>
                 </div>
-                {isPlanExpired && !locadora?.vitalia && planoAtual !== 'vip' && (
+                {isPlanExpired && planoAtual !== 'vip' && (
                   <Button 
                     size="sm" 
                     className="bg-orange-500 hover:bg-orange-600 text-white"
@@ -373,25 +373,25 @@ export default function PlanosLocadora() {
                 <div className="flex-1">
                   <h3 className="font-semibold text-base">
                     Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
-                    {(locadora?.vitalia || planoAtual === 'vip') && <span className="text-purple-600 ml-1 text-sm">(Premium)</span>}
-                    {isPlanExpired && !locadora?.vitalia && planoAtual !== 'vip' && <span className="text-orange-600 ml-1 text-sm">(Expirado)</span>}
+                    {planoAtual === 'vip' && <span className="text-purple-600 ml-1 text-sm">(Premium)</span>}
+                    {isPlanExpired && planoAtual !== 'vip' && <span className="text-orange-600 ml-1 text-sm">(Expirado)</span>}
                   </h3>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-xl font-bold">
-                      {(locadora?.vitalia || planoAtual === 'vip')
+                      {planoAtual === 'vip'
                         ? 'Gratuito'
                         : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                       }
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {(locadora?.vitalia || planoAtual === 'vip') ? 'Plano VIP' : 'por mês'}
+                      {planoAtual === 'vip' ? 'Plano VIP' : 'por mês'}
                     </p>
                   </div>
                 </div>
               </div>
               
               <p className="text-sm text-muted-foreground">
-                {(locadora?.vitalia || planoAtual === 'vip')
+                {planoAtual === 'vip'
                   ? 'Plano VIP com acesso total e ilimitado a todos os recursos do sistema'
                   : isPlanExpired 
                     ? 'Renove seu plano para continuar aproveitando todos os recursos' 
@@ -399,7 +399,7 @@ export default function PlanosLocadora() {
                 }
               </p>
               
-              {isPlanExpired && !locadora?.vitalia && planoAtual !== 'vip' && (
+              {isPlanExpired && planoAtual !== 'vip' && (
                 <Button 
                   className="w-full bg-orange-500 hover:bg-orange-600 text-white"
                   disabled={solicitando}
