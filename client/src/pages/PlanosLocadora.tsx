@@ -139,8 +139,8 @@ export default function PlanosLocadora() {
   const { data: locadora, isLoading: isLoadingLocadora } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId],
     enabled: !!profile?.locadoraId && isLocadora,
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    gcTime: 10 * 60 * 1000, // 10 minutos
+    staleTime: 30000, // 30 segundos para deploy
+    gcTime: 60000, // 1 minuto para deploy
   });
 
   const { data: planoDetalhes, isLoading } = useQuery({
@@ -194,7 +194,6 @@ export default function PlanosLocadora() {
         toast({
           title: "✅ Plano atualizado com sucesso!",
           description: `Você mudou para o plano ${planosEstaticos[novoPlano as keyof typeof planosEstaticos].nome}. Simulação ativada.`,
-          duration: 5000,
         });
         
         // Invalidar cache para atualizar dados
@@ -240,6 +239,9 @@ export default function PlanosLocadora() {
   // Fix: locadora vem como array, pegamos o primeiro item
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
   const planoAtual = locadoraData?.plano || 'pro';
+  
+  // Validação extra para garantir que VIP seja reconhecido
+  const isVipPlan = planoAtual === 'vip' || locadoraData?.vitalia === true;
   
   // Verificar se o plano está expirado
   const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
@@ -340,16 +342,16 @@ export default function PlanosLocadora() {
               <div className="text-right space-y-2">
                 <div>
                   <p className="text-2xl font-bold">
-                    {planoAtual === 'vip'
+                    {isVipPlan
                       ? 'VIP'
                       : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                     }
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {planoAtual === 'vip' ? 'Plano VIP' : 'por mês'}
+                    {isVipPlan ? 'Plano VIP' : 'por mês'}
                   </p>
                 </div>
-                {isPlanExpired && planoAtual !== 'vip' && (
+                {isPlanExpired && !isVipPlan && (
                   <Button 
                     size="sm" 
                     className="bg-orange-500 hover:bg-orange-600 text-white"
@@ -443,7 +445,7 @@ export default function PlanosLocadora() {
                   </div>
                   <CardTitle className="text-lg sm:text-xl">{plano.nome}</CardTitle>
                   <CardDescription className="text-base sm:text-lg font-semibold">
-                    {plano.consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
+                    {'consultar' in plano && plano.consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
                   </CardDescription>
                   <p className="text-xs text-muted-foreground leading-tight">{plano.descricao}</p>
                 </CardHeader>
@@ -487,7 +489,7 @@ export default function PlanosLocadora() {
                       <Button disabled className="w-full text-sm sm:text-base">
                         Plano Atual
                       </Button>
-                    ) : plano.consultar ? (
+                    ) : ('consultar' in plano && plano.consultar) ? (
                       <Button
                         onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
                         className="w-full text-sm sm:text-base"
