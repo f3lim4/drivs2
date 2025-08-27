@@ -399,23 +399,7 @@ export default function PlanosLocadora() {
                     {isVipPlan ? 'Plano VIP' : 'por mês'}
                   </p>
                 </div>
-                {isVipPlan ? (
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    className="border-purple-200 text-purple-600 hover:bg-purple-50"
-                    disabled={solicitando}
-                    onClick={() => {
-                      toast({
-                        title: "Renovação VIP",
-                        description: "Entre em contato conosco para renovar seu plano VIP",
-                      });
-                    }}
-                  >
-                    <Crown className="h-4 w-4 mr-1" />
-                    Renovar VIP
-                  </Button>
-                ) : isPlanExpired && (
+                {isPlanExpired && !isVipPlan && (
                   <Button 
                     size="sm" 
                     className="bg-orange-500 hover:bg-orange-600 text-white"
@@ -469,22 +453,7 @@ export default function PlanosLocadora() {
                 }
               </p>
               
-              {planoAtual === 'vip' ? (
-                <Button 
-                  className="w-full border-purple-200 text-purple-600 hover:bg-purple-50"
-                  variant="outline"
-                  disabled={solicitando}
-                  onClick={() => {
-                    toast({
-                      title: "Renovação VIP",
-                      description: "Entre em contato conosco para renovar seu plano VIP",
-                    });
-                  }}
-                >
-                  <Crown className="h-4 w-4 mr-1" />
-                  Renovar VIP
-                </Button>
-              ) : isPlanExpired && (
+              {isPlanExpired && planoAtual !== 'vip' && (
                 <Button 
                   className="w-full bg-orange-500 hover:bg-orange-600 text-white"
                   disabled={solicitando}
