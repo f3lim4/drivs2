@@ -165,15 +165,15 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224 71% 48%;
     
-    /* Sidebar customizado no modo dark */
-    --sidebar: 217.2 32.6% 17.5%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 210 100% 50%;
+    /* Sidebar customizado no modo dark - preto */
+    --sidebar: 0 0% 8%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 15%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217.2 32.6% 22%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 22%;
-    --sidebar-ring: 210 100% 50%;
+    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 0 0% 25%;
   }
 }
 
