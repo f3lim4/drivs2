@@ -363,8 +363,9 @@ export default function PlanosLocadora() {
           <div className={`p-4 rounded-lg ${isPlanExpired ? 'bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200' : 'bg-muted'}`}>
             {/* Layout Desktop */}
             <div className="hidden sm:flex items-center gap-4">
-              <div className={`p-3 rounded-full ${planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500'}`}>
+              <div className={`p-3 rounded-full ${planoAtual === 'vip' ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500')}`}>
                 {(() => {
+                  if (planoAtual === 'vip') return <Crown className="h-6 w-6 text-white" />;
                   const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
                   if (!planoData) return <Rocket className="h-6 w-6 text-white" />;
                   const IconComponent = planoData.icone;
@@ -373,7 +374,7 @@ export default function PlanosLocadora() {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">
-                  Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
+                  Plano {planoAtual === 'vip' ? 'VIP' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro')}
                   {planoAtual === 'vip' && <span className="text-purple-600 ml-2">(Premium)</span>}
                   {isPlanExpired && planoAtual !== 'vip' && <span className="text-orange-600 ml-2">(Expirado)</span>}
                 </h3>
@@ -414,8 +415,9 @@ export default function PlanosLocadora() {
             {/* Layout Mobile */}
             <div className="block sm:hidden space-y-4">
               <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-full ${planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500'}`}>
+                <div className={`p-2.5 rounded-full ${planoAtual === 'vip' ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500')}`}>
                   {(() => {
+                    if (planoAtual === 'vip') return <Crown className="h-5 w-5 text-white" />;
                     const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
                     if (!planoData) return <Rocket className="h-5 w-5 text-white" />;
                     const IconComponent = planoData.icone;
@@ -424,7 +426,7 @@ export default function PlanosLocadora() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-base">
-                    Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
+                    Plano {planoAtual === 'vip' ? 'VIP' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro')}
                     {planoAtual === 'vip' && <span className="text-purple-600 ml-1 text-sm">(Premium)</span>}
                     {isPlanExpired && planoAtual !== 'vip' && <span className="text-orange-600 ml-1 text-sm">(Expirado)</span>}
                   </h3>
@@ -474,7 +476,7 @@ export default function PlanosLocadora() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {/* Plano Start */}
           <Card className="relative">
             <CardHeader className="text-center pb-4">
@@ -623,6 +625,105 @@ export default function PlanosLocadora() {
                     variant="outline"
                   >
                     {solicitando ? "Processando..." : "Escolher Elite"}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Plano Prime */}
+          <Card className="relative">
+            <CardHeader className="text-center pb-4">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-500 flex items-center justify-center">
+                <Crown className="h-6 w-6 text-white" />
+              </div>
+              <CardTitle className="text-2xl">Prime</CardTitle>
+              <div className="text-3xl font-bold text-purple-600">R$ 500,00</div>
+              <CardDescription className="text-base">por mês</CardDescription>
+              <p className="text-sm text-muted-foreground mt-2">Para grandes frotas</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Até 100 veículos na frota</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Gestão completa de motoristas</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Contratos automáticos profissionais</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Suporte telefônico</span>
+                </div>
+              </div>
+              
+              <div className="pt-4">
+                {planoAtual === 'prime' ? (
+                  <Button disabled className="w-full">
+                    Plano Atual
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleSolicitarMudanca('prime')}
+                    disabled={solicitando}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    {solicitando ? "Processando..." : "Escolher Prime"}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Plano Infinity */}
+          <Card className="relative border-2 border-gradient-to-r from-pink-300 to-purple-300">
+            <CardHeader className="text-center pb-4">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center">
+                <Star className="h-6 w-6 text-white" />
+              </div>
+              <CardTitle className="text-2xl bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">Infinity</CardTitle>
+              <div className="text-2xl font-bold text-muted-foreground">Consultar</div>
+              <CardDescription className="text-base">preço personalizado</CardDescription>
+              <p className="text-sm text-muted-foreground mt-2">Para empresas premium</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Veículos ilimitados</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Gestão completa premium</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Suporte VIP 24/7</span>
+                </div>
+                <div className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span>Treinamento exclusivo</span>
+                </div>
+              </div>
+              
+              <div className="pt-4">
+                {planoAtual === 'infinity' ? (
+                  <Button disabled className="w-full">
+                    Plano Atual
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    Solicitar Orçamento
                   </Button>
                 )}
               </div>
