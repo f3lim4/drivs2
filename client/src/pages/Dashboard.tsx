@@ -1184,18 +1184,6 @@ export default function Dashboard() {
       </div>
       )}
 
-      {/* Botão Flutuante de Recomendações - Apenas para locadoras */}
-      {isLocadora && recommendationData && (
-        <div className="fixed bottom-6 right-6 z-40">
-          <Button
-            onClick={forceShow}
-            className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse"
-            title="Ver Recomendações Personalizadas"
-          >
-            <Lightbulb className="w-6 h-6" />
-          </Button>
-        </div>
-      )}
 
       {/* Pop-up de Recomendações Personalizadas */}
       {showRecommendations && recommendationData && (
