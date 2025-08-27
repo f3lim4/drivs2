@@ -23,7 +23,7 @@ export function SubscriptionAlert() {
       <AlertDescription className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <span className="text-orange-800 dark:text-orange-200">
-            {reason} - Visualização disponível, mas ações de edição estão bloqueadas.
+            {reason}
           </span>
         </div>
         <Button 
