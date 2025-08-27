@@ -33,6 +33,15 @@ export function useSubscriptionStatus() {
       const locadora = await response.json();
       const today = new Date();
       
+      // PRIMEIRO: Verificar se é isenta de cobrança pelo admin
+      if (locadora.isentoCobranca === true) {
+        return {
+          isActive: true,
+          isExpired: false,
+          status: 'active',
+          canAccess: true
+        };
+      }
       
       // SEGUNDO: Verificar se está em teste gratuito
       if (locadora.testeGratuito && locadora.dataVencimentoTeste) {
