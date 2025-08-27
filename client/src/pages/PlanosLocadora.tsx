@@ -111,6 +111,16 @@ const planosFeatures: PlanoFeature[] = [
 
 
 
+// Mapeamento de ícones para compatibilidade entre API e estático
+const iconeMap = {
+  Car: Car,
+  Rocket: Rocket,
+  Zap: Zap,
+  Crown: Crown,
+  Star: Star,
+  TrendingUp: TrendingUp
+};
+
 export default function PlanosLocadora() {
   const { profile, isLocadora } = useAuth();
   const { toast } = useToast();
@@ -429,8 +439,8 @@ export default function PlanosLocadora() {
               if (key === planoAtual && !isPlanExpired) return false;
               return true;
             })
-            .map(([key, plano]) => {
-            const Icone = plano.icone;
+            .map(([key, plano]: [string, any]) => {
+            const Icone = typeof plano.icone === 'string' ? iconeMap[plano.icone as keyof typeof iconeMap] || Car : plano.icone;
             return (
               <Card key={key} className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500 relative' : ''}`}>
                 {plano.popular && (
@@ -619,7 +629,7 @@ function PlanoCarousel({
   handleSolicitarMudanca, 
   solicitando 
 }: {
-  planosInfo: Record<string, PlanoInfo>;
+  planosInfo: Record<string, any>;
   planosFeatures: PlanoFeature[];
   planoAtual: string | undefined;
   handleSolicitarMudanca: (plano: string) => void;
@@ -665,8 +675,8 @@ function PlanoCarousel({
       {/* Carrossel */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {Object.entries(planoDetalhes || planosEstaticos).map(([key, plano]) => {
-            const Icone = plano.icone;
+          {Object.entries(planosInfo).map(([key, plano]: [string, any]) => {
+            const Icone = typeof plano.icone === 'string' ? iconeMap[plano.icone as keyof typeof iconeMap] || Car : plano.icone;
             return (
               <div key={key} className="flex-[0_0_85%] sm:flex-[0_0_60%] md:flex-[0_0_45%] mr-4">
                 <Card className={`h-full ${plano.popular ? 'ring-2 ring-cyan-500' : ''}`}>
@@ -747,7 +757,7 @@ function PlanoCarousel({
 
       {/* Indicadores */}
       <div className="flex justify-center gap-2 mt-4">
-        {Object.keys(planoDetalhes || planosEstaticos).map((_, index) => (
+        {Object.keys(planosInfo).map((_, index) => (
           <div
             key={index}
             className="w-2 h-2 rounded-full bg-muted-foreground/30"
