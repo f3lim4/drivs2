@@ -334,16 +334,15 @@ export default function Planos() {
                   {planoAtual === key ? (
                     <Button 
                       className="w-full"
-                      onClick={() => handleRenovarPlano(key)}
-                      disabled={solicitando}
-                      variant="default"
+                      disabled={true}
+                      variant="secondary"
                     >
-                      Renovar Plano
+                      Plano Atual
                     </Button>
                   ) : (
                     <Button
                       onClick={() => handleSolicitarMudanca(key)}
-                      disabled={solicitando || !canPerformActions}
+                      disabled={solicitando}
                       className="w-full"
                       variant={plano.popular ? "default" : "outline"}
                     >
