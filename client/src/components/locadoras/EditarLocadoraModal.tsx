@@ -173,6 +173,9 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
     console.log('[DEBUG SUBMIT] Função handleSubmit chamada!', e);
     e.preventDefault();
     
+    console.log('[DEBUG SUBMIT] Form target:', e.target);
+    console.log('[DEBUG SUBMIT] Form currentTarget:', e.currentTarget);
+    
     console.log('[DEBUG SUBMIT] Enviando dados:', {
       id: locadora.id,
       isentoCobranca: formData.isentoCobranca,
@@ -466,9 +469,15 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit" onClick={(e) => {
-              console.log('[DEBUG BUTTON] Botão clicado!');
-            }}>Salvar Alterações</Button>
+            <Button 
+              type="submit" 
+              onClick={(e) => {
+                console.log('[DEBUG BUTTON] Botão clicado!', e);
+                console.log('[DEBUG BUTTON] Dados no momento do clique:', formData);
+              }}
+            >
+              Salvar Alterações
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
