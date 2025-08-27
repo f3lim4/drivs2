@@ -14,7 +14,7 @@ export function useSubscriptionStatus() {
   const { profile } = useAuth();
 
   return useQuery({
-    queryKey: ['subscription-status', profile?.locadoraId],
+    queryKey: ['subscription-status-v2', profile?.locadoraId],
     queryFn: async (): Promise<SubscriptionStatus> => {
       if (!profile?.locadoraId) {
         return {
@@ -32,6 +32,16 @@ export function useSubscriptionStatus() {
 
       const locadora = await response.json();
       const today = new Date();
+      
+      // Verificar se é locadora Vitalia (VIP) - acesso sempre liberado
+      if (locadora.vitalia) {
+        return {
+          isActive: true,
+          isExpired: false,
+          status: 'active',
+          canAccess: true
+        };
+      }
       
       // Verificar se está em teste gratuito
       if (locadora.testeGratuito && locadora.dataVencimentoTeste) {

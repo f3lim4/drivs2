@@ -54,6 +54,7 @@ DRIVS is built with a full-stack architecture prioritizing scalability, security
 - **Pagination and Sorting**: Implemented in all tables and lists for improved usability and performance.
 - **Column Visibility Controls**: Eye icon controls implemented across all main data tables (drivers, vehicles, contracts) allowing users to hide/show table content while keeping headers and main entity columns always visible.
 - **Automatic Trial System**: All new registrations receive a 30-day free Pro plan (20 vehicles). The system automatically assigns the trial and displays its status and remaining days.
+- **VIP Locadora System (Vitalia)**: Premium locadoras can be marked as "Vitalia VIP" which bypasses all payment and subscription requirements, providing unlimited access to all system features. The vitalia field is integrated into subscription status checking logic and UI components.
 
 ## External Dependencies
 
