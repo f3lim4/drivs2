@@ -218,12 +218,6 @@ export default function Planos() {
 
   return (
     <div className="flex-1 space-y-6 p-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Planos</h1>
-        <p className="text-muted-foreground">
-          Gerencie o plano da sua locadora e descubra recursos adicionais
-        </p>
-      </div>
 
       {/* Plano Atual */}
       <Card>
