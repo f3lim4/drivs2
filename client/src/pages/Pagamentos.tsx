@@ -25,6 +25,7 @@ import { DetalhesPagamentoModal } from '@/components/pagamentos/DetalhesPagament
 import { ExcluirPagamentoModal } from '@/components/pagamentos/ExcluirPagamentoModal';
 import { formatDate } from '@/lib/utils';
 import type { Pagamento } from '@shared/schema';
+import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 
 export default function Pagamentos() {
   const { profile } = useAuth();
@@ -651,10 +652,12 @@ export default function Pagamentos() {
 
 
 
-              <Button onClick={() => setShowNovoPagamento(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Novo
-              </Button>
+              <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novos pagamentos">
+                <Button onClick={() => setShowNovoPagamento(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Novo
+                </Button>
+              </ProtectedAction>
             </div>
           </div>
         </CardContent>
@@ -756,22 +759,26 @@ export default function Pagamentos() {
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditar(pagamento)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleExcluir(pagamento)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <ProtectedAction fallbackMessage="Renove seu plano para editar pagamentos">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditar(pagamento)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </ProtectedAction>
+                      <ProtectedAction fallbackMessage="Renove seu plano para excluir pagamentos">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleExcluir(pagamento)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </ProtectedAction>
                     </div>
                   </TableCell>
                 </TableRow>

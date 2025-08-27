@@ -542,22 +542,26 @@ export default function Veiculos() {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleEditarVeiculo(veiculo)}
-                          title="Editar veículo"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleExcluirVeiculo(veiculo)}
-                          title="Excluir veículo"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <ProtectedAction fallbackMessage="Renove seu plano para editar veículos">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleEditarVeiculo(veiculo)}
+                            title="Editar veículo"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </ProtectedAction>
+                        <ProtectedAction fallbackMessage="Renove seu plano para excluir veículos">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleExcluirVeiculo(veiculo)}
+                            title="Excluir veículo"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </ProtectedAction>
                       </div>
                     </TableCell>
                   )}

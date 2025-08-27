@@ -37,6 +37,7 @@ import { useTemplateContratos } from '@/hooks/useTemplateContratos';
 import { Contrato } from '@/types';
 import jsPDF from 'jspdf';
 import { calcularContratoExato } from '@/utils/contratoCalculos';
+import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 
 export default function Contratos() {
   const { isAdmin, isLocadora, profile } = useAuth();
@@ -516,13 +517,15 @@ export default function Contratos() {
                 Templates
               </Button>
               
-              <Button 
-                className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-2 px-4 text-sm"
-                onClick={() => setShowNovoContratoModal(true)}
-              >
-                <Plus className="w-4 h-4" />
-                Gerar Contrato
-              </Button>
+              <ProtectedAction fallbackMessage="Renove seu plano para gerar novos contratos">
+                <Button 
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 py-2 px-4 text-sm"
+                  onClick={() => setShowNovoContratoModal(true)}
+                >
+                  <Plus className="w-4 h-4" />
+                  Gerar Contrato
+                </Button>
+              </ProtectedAction>
             </div>
           </div>
         </CardContent>
@@ -677,22 +680,26 @@ export default function Contratos() {
                             </Button>
                             {isLocadora && (
                               <>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon"
-                                  onClick={() => handleEditarContrato(contrato)}
-                                  title="Editar"
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon"
-                                  onClick={() => handleExcluirContrato(contrato)}
-                                  title="Excluir"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
+                                <ProtectedAction fallbackMessage="Renove seu plano para editar contratos">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={() => handleEditarContrato(contrato)}
+                                    title="Editar"
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                </ProtectedAction>
+                                <ProtectedAction fallbackMessage="Renove seu plano para excluir contratos">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={() => handleExcluirContrato(contrato)}
+                                    title="Excluir"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </ProtectedAction>
                               </>
                             )}
                           </div>
