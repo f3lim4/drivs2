@@ -250,17 +250,30 @@ export default function PlanosLocadora() {
   // Verificar se o plano está expirado - valor padrão para produção
   const isPlanExpired = (subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false;
 
-  // Verificações de segurança para produção
-  if (!planoDetalhes && !planosEstaticos) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="text-center">
-          <LoadingSpinner />
-          <p className="mt-2 text-muted-foreground">Carregando planos...</p>
-        </div>
-      </div>
-    );
-  }
+  // Garantir dados de planos sempre disponíveis para produção
+  const planosSegurosProdução = planoDetalhes || {
+    start: { 
+      id: "start", nome: "Start", preco: 50, valor: 50, 
+      descricao: "Para locadoras iniciantes", 
+      icone: "Car", cor: "bg-blue-500", 
+      recursos: ["Até 5 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
+      limiteVeiculos: 5
+    },
+    pro: { 
+      id: "pro", nome: "Pro", preco: 99, valor: 99, 
+      descricao: "Para locadoras em crescimento", 
+      icone: "Rocket", cor: "bg-cyan-500", popular: true,
+      recursos: ["Até 20 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
+      limiteVeiculos: 20
+    },
+    elite: { 
+      id: "elite", nome: "Elite", preco: 250, valor: 250, 
+      descricao: "Para frotas médias", 
+      icone: "Zap", cor: "bg-green-500",
+      recursos: ["Até 50 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
+      limiteVeiculos: 50
+    }
+  };
 
   return (
     <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
@@ -444,7 +457,7 @@ export default function PlanosLocadora() {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
-          {Object.entries(planoDetalhes || planosEstaticos)
+          {Object.entries(planosSegurosProdução)
             .filter(([key]) => {
               // Remover VIP da lista de planos disponíveis
               if (key === 'vip') return false;
@@ -681,7 +694,7 @@ function PlanoCarousel({
       {/* Carrossel */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {Object.entries(planosInfo).map(([key, plano]: [string, any]) => {
+          {Object.entries(planosSegurosProdução).map(([key, plano]: [string, any]) => {
             // Garantir que plano existe e tem icone
             if (!plano || typeof plano !== 'object') return null;
             
@@ -763,7 +776,7 @@ function PlanoCarousel({
 
       {/* Indicadores */}
       <div className="flex justify-center gap-2 mt-4">
-        {Object.keys(planosInfo).map((_, index) => (
+        {Object.keys(planosSegurosProdução).map((_, index) => (
           <div
             key={index}
             className="w-2 h-2 rounded-full bg-muted-foreground/30"
