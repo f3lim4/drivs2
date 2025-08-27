@@ -35,11 +35,9 @@ export function usePagamentos() {
       return data as Pagamento[];
     },
     enabled: !!locadoraId,
-    // OTIMIZADO: Cache de 5 segundos para melhor performance
-    staleTime: 5 * 1000,
-    gcTime: 10 * 1000,
-    // ATUALIZAÇÃO AUTOMÁTICA: Refetch a cada 10 segundos para dados sempre atuais
-    refetchInterval: 10 * 1000,
+    // SEM CACHE: Dados sempre frescos do banco
+    staleTime: 0,
+    gcTime: 0,
     refetchOnWindowFocus: true,
     refetchOnMount: 'always',
   });

@@ -98,6 +98,10 @@ export function useDespesas() {
       return todasDespesas as Despesa[];
     },
     enabled: !!locadoraId,
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 
   const createMutation = useMutation({
@@ -249,5 +253,9 @@ export function useDespesasByVeiculo(veiculoId: string) {
       return todasDespesas as Despesa[];
     },
     enabled: !!veiculoId && !!locadoraId,
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }

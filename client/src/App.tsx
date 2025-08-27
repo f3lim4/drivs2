@@ -45,14 +45,23 @@ const queryClient = new QueryClient({
           url += `?locadoraId=${encodeURIComponent(locadoraId)}`;
         }
         
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         return response.json();
       },
       retry: 3,
-      staleTime: 5 * 60 * 1000, // 5 minutos
+      staleTime: 0, // SEM CACHE - Dados sempre frescos do banco
+      gcTime: 0, // SEM CACHE - Não manter dados em memoria
+      refetchOnWindowFocus: true, // Sempre refetch quando voltar à janela
+      refetchOnMount: true, // Sempre refetch ao montar componente
     },
   },
 });

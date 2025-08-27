@@ -57,7 +57,8 @@ export function useVeiculos() {
       return data.map(formatVeiculo);
     },
     enabled: !!profile,
-    staleTime: 0, // Dados sempre considerados "stale" para permitir invalidação
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });

@@ -31,6 +31,10 @@ export function useSeoConfig() {
   return useQuery({
     queryKey: ['seo-config'],
     queryFn: fetchSeoConfig,
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
 

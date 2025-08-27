@@ -21,7 +21,10 @@ export function useLocais() {
       return response.json() as Promise<Local[]>;
     },
     enabled: !!profile?.locadoraId,
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 
   const createMutation = useMutation({

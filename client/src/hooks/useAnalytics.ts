@@ -10,6 +10,9 @@ interface SystemAnalytics {
 export function useAnalytics() {
   return useQuery<SystemAnalytics>({
     queryKey: ['/api/analytics'],
-    staleTime: 1000 * 60 * 5, // 5 minutos
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache  
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }

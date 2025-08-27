@@ -19,6 +19,10 @@ export function useInfracoes() {
       return response.json() as Promise<Infracao[]>;
     },
     enabled: !!profile && (isAdmin || !!profile?.locadoraId),
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 
 
@@ -96,5 +100,9 @@ export function useInfracoesByMotorista(motoristaId: string) {
       return response.json() as Promise<Infracao[]>;
     },
     enabled: !!motoristaId,
+    staleTime: 0, // Sem cache
+    gcTime: 0, // Sem cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
