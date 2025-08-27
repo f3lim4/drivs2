@@ -264,11 +264,21 @@ export default function Planos() {
                 }
               </p>
             </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold">
-                R$ {planosInfo[planoAtual as keyof typeof planosInfo].preco.toFixed(2)}
-              </p>
-              <p className="text-sm text-muted-foreground">por mês</p>
+            <div className="text-right space-y-2">
+              <div>
+                <p className="text-2xl font-bold">
+                  R$ {planosInfo[planoAtual as keyof typeof planosInfo].preco.toFixed(2)}
+                </p>
+                <p className="text-sm text-muted-foreground">por mês</p>
+              </div>
+              <Button 
+                onClick={() => handleRenovarPlano(planoAtual)}
+                disabled={solicitando}
+                size="sm"
+                className="w-full"
+              >
+                {solicitando ? "Renovando..." : "Renovar Plano"}
+              </Button>
             </div>
           </div>
         </CardContent>
