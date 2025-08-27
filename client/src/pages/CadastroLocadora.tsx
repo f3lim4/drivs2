@@ -369,66 +369,63 @@ export default function CadastroLocadora() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Nome e CNPJ na mesma linha */}
-                <div className="col-span-2 grid grid-cols-1 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="nome" >Nome da Empresa *</Label>
-                    <Input
-                      id="nome"
-                      value={formData.nome}
-                      onChange={(e) => updateFormData('nome', e.target.value)}
-                      placeholder=""
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="cnpj">{getLabelDocumento(formData.cnpj)} *</Label>
-                    <Input
-                      id="cnpj"
-                      value={formatarDocumento(formData.cnpj)}
-                      onChange={(e) => updateFormData('cnpj', e.target.value)}
-                      placeholder={getPlaceholderDocumento(formData.cnpj)}
-                      required
-                    />
-                  </div>
+                {/* Nome da Empresa (ocupa linha inteira) */}
+                <div className="col-span-full space-y-2">
+                  <Label htmlFor="nome" >Nome da Empresa *</Label>
+                  <Input
+                    id="nome"
+                    value={formData.nome}
+                    onChange={(e) => updateFormData('nome', e.target.value)}
+                    placeholder="Digite o nome da sua empresa"
+                    required
+                  />
                 </div>
 
-                {/* Email, Telefone e Responsável na mesma linha */}
-                <div className="col-span-2 grid grid-cols-1 gap-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" >Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => updateFormData('email', e.target.value)}
-                      placeholder=""
-                      required
-                    />
-                  </div>
+                {/* CNPJ e Email lado a lado */}
+                <div className="space-y-2">
+                  <Label htmlFor="cnpj">{getLabelDocumento(formData.cnpj)} *</Label>
+                  <Input
+                    id="cnpj"
+                    value={formatarDocumento(formData.cnpj)}
+                    onChange={(e) => updateFormData('cnpj', e.target.value)}
+                    placeholder={getPlaceholderDocumento(formData.cnpj)}
+                    required
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="telefone" >Telefone *</Label>
-                    <Input
-                      id="telefone"
-                      value={formData.telefone}
-                      onChange={(e) => updateFormData('telefone', e.target.value)}
-                      placeholder=""
-                      required
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" >Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => updateFormData('email', e.target.value)}
+                    placeholder="seuemail@empresa.com"
+                    required
+                  />
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="responsavel" >Responsável *</Label>
-                    <Input
-                      id="responsavel"
-                      value={formData.responsavel}
-                      onChange={(e) => updateFormData('responsavel', e.target.value)}
-                      placeholder=""
-                      required
-                    />
-                  </div>
+                {/* Telefone e Responsável lado a lado */}
+                <div className="space-y-2">
+                  <Label htmlFor="telefone" >Telefone *</Label>
+                  <Input
+                    id="telefone"
+                    value={formData.telefone}
+                    onChange={(e) => updateFormData('telefone', e.target.value)}
+                    placeholder="(11) 99999-9999"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="responsavel" >Responsável *</Label>
+                  <Input
+                    id="responsavel"
+                    value={formData.responsavel}
+                    onChange={(e) => updateFormData('responsavel', e.target.value)}
+                    placeholder="Nome do responsável"
+                    required
+                  />
                 </div>
 
                 {/* CEP, Endereço, Número e Complemento na mesma linha */}

@@ -283,6 +283,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLocadora(locadora: InsertLocadora): Promise<Locadora> {
+    // Verificar se já existe uma locadora com esse CNPJ
+    const existingLocadora = await db.select().from(locadoras).where(eq(locadoras.cnpj, locadora.cnpj));
+    if (existingLocadora.length > 0) {
+      throw new Error('CNPJ já está cadastrado no sistema');
+    }
+
     // Calcular data de vencimento do teste (30 dias a partir de hoje)
     const dataVencimentoTeste = new Date();
     dataVencimentoTeste.setDate(dataVencimentoTeste.getDate() + 30);
