@@ -51,8 +51,8 @@ export const locadoras = pgTable("locadoras", {
   testeGratuito: boolean("teste_gratuito").notNull().default(true), // Se está no período de teste
   diasTesteGratuito: integer("dias_teste_gratuito").notNull().default(30), // Quantos dias de teste (30 por padrão)
   dataVencimentoTeste: date("data_vencimento_teste"), // Data de vencimento do teste
-  // Controle VIP/Premium
- // Se é locadora VIP que não precisa pagar pelo sistema
+  // Controle de cobrança
+  isentoCobranca: boolean("isento_cobranca").notNull().default(false), // Se é isenta de cobrança pelo admin
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
