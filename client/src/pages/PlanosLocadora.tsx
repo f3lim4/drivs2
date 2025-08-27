@@ -3,7 +3,7 @@
  * Permite visualizar o plano atual e solicitar mudança de plano
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
@@ -124,6 +124,14 @@ export default function PlanosLocadora() {
     valor: number;
   } | null>(null);
 
+  // Invalidar cache forçadamente para dados VIP
+  useEffect(() => {
+    if (profile?.locadoraId) {
+      queryClient.invalidateQueries({ queryKey: ['/api/locadoras', profile.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['subscription-status-v2', profile.locadoraId] });
+    }
+  }, [profile?.locadoraId, queryClient]);
+
   // Cache dos planos estáticos (carregamento instantâneo)
   const planosEstaticos = {
     start: { nome: "Start", preco: 50.00, valor: 50.00, icone: Car, cor: "bg-blue-500", descricao: "Para locadoras iniciantes com até 5 veículos", popular: false },
@@ -138,8 +146,8 @@ export default function PlanosLocadora() {
   const { data: locadora, isLoading: isLoadingLocadora } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId],
     enabled: !!profile?.locadoraId && isLocadora,
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    gcTime: 10 * 60 * 1000, // 10 minutos
+    staleTime: 0, // Forçar revalidação para dados VIP
+    gcTime: 0, // Não usar cache para garantir dados atualizados
   });
 
   const { data: planoDetalhes, isLoading } = useQuery({
