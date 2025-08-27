@@ -200,7 +200,20 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
   };
 
   const updateFormData = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      // Se estiver alterando o plano
+      if (field === 'plano') {
+        return { 
+          ...prev, 
+          [field]: value,
+          // Se selecionar plano "vip", automaticamente ativar vitalia
+          // Se selecionar outro plano, desativar vitalia
+          vitalia: value === 'vip'
+        };
+      }
+      
+      return { ...prev, [field]: value };
+    });
   };
 
   return (
