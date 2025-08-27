@@ -138,7 +138,8 @@ export default function Planos() {
   const [solicitando, setSolicitando] = useState(false);
   
   // Verificar se o plano está realmente expirado/suspenso
-  const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
+  const isPlanExpired = true; // Forçar expirado temporariamente para teste
+  // const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
 
   // Buscar dados da locadora
   const { data: locadora, isLoading } = useQuery({
