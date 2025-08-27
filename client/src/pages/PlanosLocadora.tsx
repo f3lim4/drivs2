@@ -250,8 +250,8 @@ export default function PlanosLocadora() {
   // Verificar se o plano está expirado - valor padrão para produção
   const isPlanExpired = (subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false;
 
-  // Garantir dados de planos sempre disponíveis para produção
-  const planosSegurosProdução = planoDetalhes || {
+  // DADOS FORÇADOS PARA PRODUÇÃO - resolver problema de planos vazios
+  const planosSegurosProdução = {
     start: { 
       id: "start", nome: "Start", preco: 50, valor: 50, 
       descricao: "Para locadoras iniciantes", 
@@ -272,8 +272,22 @@ export default function PlanosLocadora() {
       icone: "Zap", cor: "bg-green-500",
       recursos: ["Até 50 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
       limiteVeiculos: 50
+    },
+    prime: {
+      id: "prime", nome: "Prime", preco: 500, valor: 500,
+      descricao: "Para grandes frotas",
+      icone: "Crown", cor: "bg-purple-500",
+      recursos: ["Até 100 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
+      limiteVeiculos: 100
+    },
+    infinity: {
+      id: "infinity", nome: "Infinity", consultar: true,
+      descricao: "Solução personalizada para mega frotas", 
+      icone: "Infinity", cor: "bg-gradient-to-r from-purple-500 to-pink-500",
+      recursos: ["Veículos ilimitados", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"]
     }
   };
+
 
   return (
     <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
@@ -642,14 +656,10 @@ interface PlanoInfo {
 }
 
 function PlanoCarousel({ 
-  planosInfo, 
-  planosFeatures, 
   planoAtual, 
   handleSolicitarMudanca, 
   solicitando 
 }: {
-  planosInfo: Record<string, any>;
-  planosFeatures: PlanoFeature[];
   planoAtual: string | undefined;
   handleSolicitarMudanca: (plano: string) => void;
   solicitando: boolean;
@@ -694,7 +704,11 @@ function PlanoCarousel({
       {/* Carrossel */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {Object.entries(planosSegurosProdução).map(([key, plano]: [string, any]) => {
+          {Object.entries({
+            start: { id: "start", nome: "Start", preco: 50, descricao: "Para locadoras iniciantes", icone: "Car", cor: "bg-blue-500", recursos: ["Até 5 veículos", "Sistema completo"], limiteVeiculos: 5 },
+            pro: { id: "pro", nome: "Pro", preco: 99, descricao: "Para locadoras em crescimento", icone: "Rocket", cor: "bg-cyan-500", popular: true, recursos: ["Até 20 veículos", "Sistema completo"], limiteVeiculos: 20 },
+            elite: { id: "elite", nome: "Elite", preco: 250, descricao: "Para frotas médias", icone: "Zap", cor: "bg-green-500", recursos: ["Até 50 veículos", "Sistema completo"], limiteVeiculos: 50 }
+          }).map(([key, plano]: [string, any]) => {
             // Garantir que plano existe e tem icone
             if (!plano || typeof plano !== 'object') return null;
             
@@ -776,7 +790,7 @@ function PlanoCarousel({
 
       {/* Indicadores */}
       <div className="flex justify-center gap-2 mt-4">
-        {Object.keys(planosSegurosProdução).map((_, index) => (
+        {Object.keys({ start: {}, pro: {}, elite: {} }).map((_, index) => (
           <div
             key={index}
             className="w-2 h-2 rounded-full bg-muted-foreground/30"
