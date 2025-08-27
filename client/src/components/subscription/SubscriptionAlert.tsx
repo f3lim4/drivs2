@@ -2,14 +2,20 @@ import { AlertTriangle, Crown, CreditCard } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useCanPerformActions } from "@/hooks/useCanPerformActions";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export function SubscriptionAlert() {
   const { canPerformActions, isExpired, reason } = useCanPerformActions();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Se pode realizar ações, não mostrar alerta
   if (canPerformActions) {
+    return null;
+  }
+
+  // Não mostrar alerta na página de planos
+  if (location.pathname === '/planos') {
     return null;
   }
 
