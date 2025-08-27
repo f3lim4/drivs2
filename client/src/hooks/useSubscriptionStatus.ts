@@ -79,6 +79,15 @@ export function useSubscriptionStatus() {
         };
       }
       
+      if (locadora.status === 'suspensa') {
+        return {
+          isActive: false,
+          isExpired: true,
+          status: 'expired',
+          canAccess: false
+        };
+      }
+      
       // Status inativo ou não definido
       return {
         isActive: false,
