@@ -18,7 +18,7 @@ import RelatoriosFinanceiros from "./pages/RelatoriosFinanceiros";
 import Manutencoes from "./pages/Manutencoes";
 import AnunciosAdmin from "./pages/AnunciosAdmin";
 import Planos from "./pages/Planos";
-import PlanosLocadoraSimples from "./pages/PlanosLocadoraSimples";
+import PlanosLocadora from "./pages/PlanosLocadora";
 import PlanosAdmin from "./pages/PlanosAdmin";
 import DashboardAdmin from "./pages/DashboardAdmin";
 import ManualTreinamento from "./pages/ManualTreinamento";
@@ -135,7 +135,7 @@ const App = () => (
           } />
           <Route path="/planos" element={
             <AuthGuard>
-              <DrivsLayout><PlanosLocadoraSimples /></DrivsLayout>
+              <DrivsLayout><PlanosLocadora /></DrivsLayout>
             </AuthGuard>
           } />
           <Route path="/seo" element={
