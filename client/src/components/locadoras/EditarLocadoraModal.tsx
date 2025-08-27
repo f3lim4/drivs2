@@ -470,10 +470,11 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
               Cancelar
             </Button>
             <Button 
-              type="submit" 
+              type="button"
               onClick={(e) => {
-                console.log('[DEBUG BUTTON] Botão clicado!', e);
+                console.log('[DEBUG BUTTON] Botão clicado diretamente!', e);
                 console.log('[DEBUG BUTTON] Dados no momento do clique:', formData);
+                handleSubmit(e as any);
               }}
             >
               Salvar Alterações
