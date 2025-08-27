@@ -2662,25 +2662,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           icone: "Crown",
           cor: "purple"
         },
-        vip: {
-          id: "vip",
-          nome: "VIP",
-          preco: 0,
-          valor: 0,
-          limiteVeiculos: null,
-          descricao: "Acesso ilimitado premium",
-          popular: false,
-          vip: true,
-          recursos: [
-            "Veículos ilimitados",
-            "Acesso total aos recursos",
-            "Sem mensalidade",
-            "Suporte VIP prioritário",
-            "Recursos exclusivos"
-          ],
-          icone: "Crown",
-          cor: "purple"
-        },
         infinity: {
           id: "infinity",
           nome: "Infinity",
@@ -2712,8 +2693,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             const response = {
               ...planosDisponiveis,
-              // Locadoras Vitalia VIP não têm teste gratuito
-              ...(locadora.vitalia ? {} : {
+              // Locadoras com teste gratuito
+              ...({
                 testeGratuito: {
                   ativo: locadora.testeGratuito && diasRestantes > 0,
                   diasRestantes: diasRestantes,
@@ -2746,7 +2727,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         pro: { total: 0, ativas: 0, receita: 0 },
         elite: { total: 0, ativas: 0, receita: 0 },
         prime: { total: 0, ativas: 0, receita: 0 },
-        vip: { total: 0, ativas: 0, receita: 0 },
         infinity: { total: 0, ativas: 0, receita: 0 }
       };
       
@@ -2758,7 +2738,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             estatisticas[plano].ativas++;
             
             // Calcular receita baseada no plano
-            const precos = { start: 50, pro: 99, elite: 250, prime: 500, vip: 0, infinity: 0 };
+            const precos = { start: 50, pro: 99, elite: 250, prime: 500, infinity: 0 };
             estatisticas[plano].receita += precos[plano] || 0;
           }
         }
@@ -2786,30 +2766,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Rota para promover locadora para VIP
-  app.post("/api/locadoras/:id/vip", async (req, res) => {
-    try {
-      const locadoraId = req.params.id;
-      
-      const locadora = await storage.getLocadora(locadoraId);
-      if (!locadora) {
-        return res.status(404).json({ message: "Locadora não encontrada" });
-      }
-      
-      // Atualizar plano para VIP
-      const locadoraAtualizada = await storage.updateLocadora(locadoraId, {
-        ...locadora,
-        plano: 'vip',
-        vitalia: true, // Manter compatibilidade
-        status: 'ativa'
-      });
-      
-      res.json(locadoraAtualizada);
-    } catch (error) {
-      console.error("Error promoting locadora to VIP:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
 
   // Rota para atualizar planos (simulado)
   app.put("/api/planos/:id", async (req, res) => {

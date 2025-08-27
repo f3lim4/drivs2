@@ -141,7 +141,6 @@ export default function PlanosLocadora() {
     pro: { nome: "Pro", preco: 99.00, valor: 99.00, icone: Rocket, cor: "bg-cyan-500", descricao: "Para locadoras em crescimento com até 20 veículos", popular: true },
     elite: { nome: "Elite", preco: 250.00, valor: 250.00, icone: Zap, cor: "bg-green-500", descricao: "Para frotas médias com até 50 veículos", popular: false },
     prime: { nome: "Prime", preco: 500.00, valor: 500.00, icone: Crown, cor: "bg-purple-500", descricao: "Para grandes frotas com até 100 veículos", popular: false },
-    vip: { nome: "VIP", preco: 0.00, valor: 0.00, icone: Crown, cor: "bg-gradient-to-r from-purple-600 to-pink-600", descricao: "Acesso ilimitado premium - Sem mensalidade", popular: false, vip: true },
     infinity: { nome: "Infinity", preco: 0.00, valor: 0.00, icone: Star, cor: "bg-gradient-to-r from-purple-600 to-pink-600", descricao: "Veículos ilimitados - Preço a consultar", popular: false, consultar: true }
   };
 
