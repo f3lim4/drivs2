@@ -318,6 +318,11 @@ export class DatabaseStorage implements IStorage {
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(locadoras.id, id))
       .returning();
+    
+    if (!result || result.length === 0) {
+      throw new Error('Locadora not found');
+    }
+    
     return result[0];
   }
 
