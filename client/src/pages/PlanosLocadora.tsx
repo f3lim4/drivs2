@@ -240,7 +240,7 @@ export default function PlanosLocadora() {
   const isPlanExpired = subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess;
 
   return (
-    <div className="flex-1 space-y-6 p-6">
+    <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
 
       {/* Status do teste gratuito */}
       {planoDetalhes?.testeGratuito && (
@@ -298,38 +298,84 @@ export default function PlanosLocadora() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className={`flex items-center gap-4 p-4 rounded-lg ${isPlanExpired ? 'bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200' : 'bg-muted'}`}>
-            <div className={`p-3 rounded-full ${planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500'}`}>
-              {(() => {
-                const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
-                if (!planoData) return <Rocket className="h-6 w-6 text-white" />;
-                const IconComponent = planoData.icone;
-                return <IconComponent className="h-6 w-6 text-white" />;
-              })()}
+          <div className={`p-4 rounded-lg ${isPlanExpired ? 'bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200' : 'bg-muted'}`}>
+            {/* Layout Desktop */}
+            <div className="hidden sm:flex items-center gap-4">
+              <div className={`p-3 rounded-full ${planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500'}`}>
+                {(() => {
+                  const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
+                  if (!planoData) return <Rocket className="h-6 w-6 text-white" />;
+                  const IconComponent = planoData.icone;
+                  return <IconComponent className="h-6 w-6 text-white" />;
+                })()}
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg">
+                  Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
+                  {isPlanExpired && <span className="text-orange-600 ml-2">(Expirado)</span>}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {isPlanExpired 
+                    ? 'Renove seu plano para continuar aproveitando todos os recursos' 
+                    : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento')
+                  }
+                </p>
+              </div>
+              <div className="text-right space-y-2">
+                <div>
+                  <p className="text-2xl font-bold">
+                    R$ {(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}
+                  </p>
+                  <p className="text-sm text-muted-foreground">por mês</p>
+                </div>
+                {isPlanExpired && (
+                  <Button 
+                    size="sm" 
+                    className="bg-orange-500 hover:bg-orange-600 text-white"
+                    disabled={solicitando}
+                    onClick={() => handleSolicitarMudanca(planoAtual)}
+                  >
+                    {solicitando ? "Processando..." : "Renovar Plano"}
+                  </Button>
+                )}
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg">
-                Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
-                {isPlanExpired && <span className="text-orange-600 ml-2">(Expirado)</span>}
-              </h3>
+
+            {/* Layout Mobile */}
+            <div className="block sm:hidden space-y-4">
+              <div className="flex items-center gap-3">
+                <div className={`p-2.5 rounded-full ${planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500'}`}>
+                  {(() => {
+                    const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
+                    if (!planoData) return <Rocket className="h-5 w-5 text-white" />;
+                    const IconComponent = planoData.icone;
+                    return <IconComponent className="h-5 w-5 text-white" />;
+                  })()}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base">
+                    Plano {planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro'}
+                    {isPlanExpired && <span className="text-orange-600 ml-1 text-sm">(Expirado)</span>}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-xl font-bold">
+                      R$ {(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}
+                    </p>
+                    <p className="text-sm text-muted-foreground">por mês</p>
+                  </div>
+                </div>
+              </div>
+              
               <p className="text-sm text-muted-foreground">
                 {isPlanExpired 
                   ? 'Renove seu plano para continuar aproveitando todos os recursos' 
                   : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento')
                 }
               </p>
-            </div>
-            <div className="text-right space-y-2">
-              <div>
-                <p className="text-2xl font-bold">
-                  R$ {(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}
-                </p>
-                <p className="text-sm text-muted-foreground">por mês</p>
-              </div>
+              
               {isPlanExpired && (
                 <Button 
-                  size="sm" 
-                  className="bg-orange-500 hover:bg-orange-600 text-white"
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white"
                   disabled={solicitando}
                   onClick={() => handleSolicitarMudanca(planoAtual)}
                 >
@@ -350,7 +396,7 @@ export default function PlanosLocadora() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
           {Object.entries(planosEstaticos).map(([key, plano]) => {
             const Icone = plano.icone;
             return (
@@ -360,39 +406,39 @@ export default function PlanosLocadora() {
                     Mais Popular
                   </Badge>
                 )}
-                <CardHeader className="text-center">
-                  <div className={`w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center ${plano.cor}`}>
-                    <Icone className="h-6 w-6 text-white" />
+                <CardHeader className="text-center pb-4">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 rounded-full flex items-center justify-center ${plano.cor}`}>
+                    <Icone className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <CardTitle className="text-xl">{plano.nome}</CardTitle>
-                  <CardDescription className="text-lg font-semibold">
+                  <CardTitle className="text-lg sm:text-xl">{plano.nome}</CardTitle>
+                  <CardDescription className="text-base sm:text-lg font-semibold">
                     {plano.consultar ? "Preço a consultar" : `R$ ${plano.preco.toFixed(2)}/mês`}
                   </CardDescription>
-                  <p className="text-xs text-muted-foreground">{plano.descricao}</p>
+                  <p className="text-xs text-muted-foreground leading-tight">{plano.descricao}</p>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3 pt-0">
                   {/* Features do plano */}
-                  <div className="space-y-3">
-                    {planosFeatures.slice(0, 8).map((feature, index) => {
+                  <div className="space-y-2">
+                    {planosFeatures.slice(0, 6).map((feature, index) => {
                       const valor = feature[key as keyof PlanoFeature];
                       return (
-                        <div key={index} className="flex items-start gap-2 text-sm">
+                        <div key={index} className="flex items-start gap-2 text-xs sm:text-sm">
                           {typeof valor === 'boolean' ? (
                             valor ? (
                               <>
-                                <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                                <span>{feature.nome}</span>
+                                <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                                <span className="leading-tight">{feature.nome}</span>
                               </>
                             ) : (
                               <>
-                                <span className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5">—</span>
-                                <span className="text-muted-foreground">{feature.nome}</span>
+                                <span className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0 mt-0.5">—</span>
+                                <span className="text-muted-foreground leading-tight">{feature.nome}</span>
                               </>
                             )
                           ) : (
                             <>
-                              <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                              <div>
+                              <Check className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <div className="leading-tight">
                                 <span className="font-medium">{feature.nome}:</span>
                                 <br />
                                 <span className="text-muted-foreground">{valor}</span>
@@ -405,15 +451,15 @@ export default function PlanosLocadora() {
                   </div>
                   
                   {/* Botão de ação */}
-                  <div className="pt-4">
+                  <div className="pt-3">
                     {planoAtual === key ? (
-                      <Button disabled className="w-full">
+                      <Button disabled className="w-full text-sm sm:text-base">
                         Plano Atual
                       </Button>
                     ) : plano.consultar ? (
                       <Button
                         onClick={() => window.open('https://wa.me/5511999999999', '_blank')}
-                        className="w-full"
+                        className="w-full text-sm sm:text-base"
                         variant="outline"
                       >
                         Solicitar Orçamento
@@ -422,7 +468,7 @@ export default function PlanosLocadora() {
                       <Button
                         onClick={() => handleSolicitarMudanca(key)}
                         disabled={solicitando}
-                        className="w-full"
+                        className="w-full text-sm sm:text-base"
                         variant={plano.popular ? "default" : "outline"}
                       >
                         {solicitando ? "Processando..." : "Mudar Plano"}
@@ -448,47 +494,47 @@ export default function PlanosLocadora() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <h4 className="font-semibold">Todos os planos incluem:</h4>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            <div className="space-y-3 md:space-y-4">
+              <h4 className="font-semibold text-base">Todos os planos incluem:</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Sistema completo de gerenciamento
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span>Sistema completo de gerenciamento</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Controle financeiro com lucros/perdas reais
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span>Controle financeiro com lucros/perdas reais</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Contratos automáticos profissionais
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span>Contratos automáticos profissionais</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-green-500" />
-                  Suporte por email
+                  <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                  <span>Suporte por email</span>
                 </li>
               </ul>
             </div>
-            <div className="space-y-4">
-              <h4 className="font-semibold">Diferenciais dos Planos Premium:</h4>
+            <div className="space-y-3 md:space-y-4">
+              <h4 className="font-semibold text-base">Diferenciais dos Planos Premium:</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
-                  <Crown className="h-4 w-4 text-purple-500" />
-                  Prime: Suporte por telefone + 100 veículos
+                  <Crown className="h-4 w-4 text-purple-500 flex-shrink-0" />
+                  <span>Prime: Suporte por telefone + 100 veículos</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-pink-500" />
-                  Infinity: Veículos ilimitados + Suporte VIP 24/7
+                  <Star className="h-4 w-4 text-pink-500 flex-shrink-0" />
+                  <span>Infinity: Veículos ilimitados + Suporte VIP 24/7</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-pink-500" />
-                  Infinity: Treinamento personalizado exclusivo
+                  <Star className="h-4 w-4 text-pink-500 flex-shrink-0" />
+                  <span>Infinity: Treinamento personalizado exclusivo</span>
                 </li>
               </ul>
             </div>
           </div>
-          <div className="mt-6 p-4 bg-muted rounded-lg">
+          <div className="mt-4 md:mt-6 p-3 md:p-4 bg-muted rounded-lg">
             <p className="text-sm text-center text-muted-foreground">
               Dúvidas sobre qual plano escolher? Entre em contato conosco pelo WhatsApp ou email
             </p>
