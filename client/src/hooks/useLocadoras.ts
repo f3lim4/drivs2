@@ -25,7 +25,6 @@ export const useLocadoras = () => {
       }
       
       const data = await response.json();
-      console.log('[DEBUG useLocadoras] Dados carregados:', data?.length || 0, 'locadoras');
       return data || [];
     },
     onError: (error) => {
