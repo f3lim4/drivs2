@@ -42,9 +42,8 @@ interface Locadora {
   responsavel: string;
   logo: string;
   status: 'ativa' | 'inativa' | 'pendente';
-  plano: 'free' | 'basico' | 'premium' | 'enterprise' | 'vip';
+  plano: 'start' | 'pro' | 'premium' | 'ultimate' | 'enterprise';
   dataCadastro: string;
-  vitalia?: boolean; // Campo VIP
 }
 
 interface EditarLocadoraModalProps {
@@ -96,8 +95,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
     responsavel: '',
     logo: '',
     status: 'ativa' as 'ativa' | 'inativa' | 'pendente',
-    plano: 'free' as 'free' | 'basico' | 'premium' | 'enterprise' | 'vip',
-    vitalia: false, // Campo VIP
+    plano: 'start' as 'start' | 'pro' | 'premium' | 'ultimate' | 'enterprise',
   });
 
   useEffect(() => {
@@ -118,8 +116,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
         responsavel: locadora.responsavel || '',
         logo: locadora.logo || '',
         status: locadora.status || 'ativa',
-        plano: locadora.plano || 'free',
-        vitalia: locadora.vitalia || false, // Campo VIP
+        plano: locadora.plano || 'start',
       });
     }
   }, [locadora]);
@@ -206,9 +203,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
         return { 
           ...prev, 
           [field]: value,
-          // Se selecionar plano "vip", automaticamente ativar vitalia
-          // Se selecionar outro plano, desativar vitalia
-          vitalia: value === 'vip'
         };
       }
       
