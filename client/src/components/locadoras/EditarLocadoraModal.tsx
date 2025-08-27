@@ -102,11 +102,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
 
   useEffect(() => {
     if (locadora) {
-      console.log('[DEBUG MODAL] Carregando dados da locadora:', {
-        id: locadora.id,
-        nome: locadora.nome,
-        isentoCobranca: locadora.isentoCobranca
-      });
       
       setFormData({
         nome: locadora.nome || '',
@@ -170,17 +165,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log('[DEBUG SUBMIT] Função handleSubmit chamada!', e);
     e.preventDefault();
-    
-    console.log('[DEBUG SUBMIT] Form target:', e.target);
-    console.log('[DEBUG SUBMIT] Form currentTarget:', e.currentTarget);
-    
-    console.log('[DEBUG SUBMIT] Enviando dados:', {
-      id: locadora.id,
-      isentoCobranca: formData.isentoCobranca,
-      formData: formData
-    });
     
     try {
       const response = await fetch(`/api/locadoras/${locadora.id}`, {
@@ -193,12 +178,10 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('[DEBUG SUBMIT] Erro na resposta:', errorData);
         throw new Error('Erro ao atualizar locadora');
       }
 
       const result = await response.json();
-      console.log('[DEBUG SUBMIT] Resposta da API:', result);
 
       // Invalidar caches para atualizar os dados automaticamente
       await queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
@@ -208,7 +191,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
       // Forçar refetch imediato para garantir atualização da interface
       await queryClient.refetchQueries({ queryKey: ['/api/locadoras'] });
       
-      console.log('[DEBUG SUBMIT] Cache invalidado e refetch executado');
       
       toast({
         title: "Locadora atualizada com sucesso!",
@@ -218,7 +200,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
       onOpenChange(false);
       
     } catch (error) {
-      console.error('[DEBUG SUBMIT] Erro:', error);
+      console.error('Erro ao atualizar locadora:', error);
       toast({
         title: "Erro ao atualizar locadora",
         description: "Tente novamente mais tarde.",
@@ -228,13 +210,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
   };
 
   const updateFormData = (field: string, value: string | boolean) => {
-    console.log('[DEBUG UPDATE] Alterando campo:', { field, value, type: typeof value });
-    
-    setFormData(prev => {
-      const newData = { ...prev, [field]: value };
-      console.log('[DEBUG UPDATE] Novo formData:', newData);
-      return newData;
-    });
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -477,8 +453,6 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
             <Button 
               type="button"
               onClick={(e) => {
-                console.log('[DEBUG BUTTON] Botão clicado diretamente!', e);
-                console.log('[DEBUG BUTTON] Dados no momento do clique:', formData);
                 handleSubmit(e as any);
               }}
             >
