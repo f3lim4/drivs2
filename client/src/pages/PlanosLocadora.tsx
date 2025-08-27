@@ -429,7 +429,13 @@ export default function PlanosLocadora() {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
           {Object.entries(planosEstaticos)
-            .filter(([key]) => key !== 'vip') // Remover VIP da lista de planos disponíveis
+            .filter(([key]) => {
+              // Remover VIP da lista de planos disponíveis
+              if (key === 'vip') return false;
+              // Remover o plano atual da lista (exceto se estiver expirado)
+              if (key === planoAtual && !isPlanExpired) return false;
+              return true;
+            })
             .map(([key, plano]) => {
             const Icone = plano.icone;
             return (
