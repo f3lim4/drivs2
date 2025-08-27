@@ -95,6 +95,7 @@ export default function Perfil() {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  
 
 
   // Função para recarregar o perfil do servidor
@@ -277,6 +278,33 @@ export default function Perfil() {
 
     carregarDados();
   }, [profile?.locadoraId, profile?.email, form, toast, isAdmin, isLocadora]);
+  
+  // Se não tem perfil, mostrar mensagem de erro
+  if (!profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Card className="w-96">
+          <CardHeader>
+            <CardTitle>Acesso Restrito</CardTitle>
+            <CardDescription>
+              Você precisa estar logado para acessar esta página.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => {
+                localStorage.removeItem('drivs_profile');
+                window.location.href = '/login';
+              }}
+              className="w-full"
+            >
+              Fazer Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const onSubmit = async (data: PerfilFormData) => {
     // Verificar se está realmente em modo de edição
@@ -390,61 +418,7 @@ export default function Perfil() {
     }
   };
 
-  // Se não tem perfil após o loading, mostrar mensagem de erro
-  if (!profile && !loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-96">
-          <CardHeader>
-            <CardTitle>Dados não encontrados</CardTitle>
-            <CardDescription>
-              Não foi possível carregar suas informações de perfil.
-              Tente fazer logout e login novamente.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button 
-              onClick={() => {
-                localStorage.removeItem('drivs_profile');
-                window.location.href = '/login';
-              }}
-              className="w-full"
-            >
-              Fazer Login Novamente
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
-  // Se é locadora mas não tem locadoraId, mostrar opção para recarregar
-  if (isLocadora && !profile?.locadoraId && !loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-96">
-          <CardHeader>
-            <CardTitle>Dados Incompletos</CardTitle>
-            <CardDescription>
-              Seus dados de locadora não foram encontrados. 
-              Tente fazer logout e login novamente.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button 
-              onClick={() => {
-                localStorage.removeItem('drivs_profile');
-                window.location.href = '/login';
-              }}
-              className="w-full"
-            >
-              Fazer Login Novamente
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
