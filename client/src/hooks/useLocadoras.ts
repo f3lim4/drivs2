@@ -2,16 +2,22 @@
  * Custom hook for managing Locadoras data and operations
  */
 
-import { useState, useEffect } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
 import { Locadora } from '@/types';
 
 export const useLocadoras = () => {
-  const [locadoras, setLocadoras] = useState<Locadora[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const fetchLocadoras = async () => {
-    try {
+  // Usar React Query para buscar locadoras
+  const { 
+    data: locadoras = [], 
+    isLoading, 
+    refetch: fetchLocadoras 
+  } = useQuery({
+    queryKey: ['/api/locadoras'],
+    queryFn: async () => {
       const response = await fetch('/api/locadoras');
       
       if (!response.ok) {
@@ -19,18 +25,18 @@ export const useLocadoras = () => {
       }
       
       const data = await response.json();
-      setLocadoras(data || []);
-    } catch (error) {
+      console.log('[DEBUG useLocadoras] Dados carregados:', data?.length || 0, 'locadoras');
+      return data || [];
+    },
+    onError: (error) => {
       console.error('Erro ao carregar locadoras:', error);
       toast({
         title: "Erro ao carregar locadoras",
         description: "Não foi possível carregar a lista de locadoras",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
-  };
+  });
 
   const deleteLocadora = async (id: string) => {
     try {
@@ -42,7 +48,8 @@ export const useLocadoras = () => {
         throw new Error('Erro ao excluir locadora');
       }
 
-      setLocadoras(prev => prev.filter(l => l.id !== id));
+      // Invalidar cache para atualizar a lista
+      await queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
       
       toast({
         title: "Locadora excluída",
@@ -57,10 +64,6 @@ export const useLocadoras = () => {
       });
     }
   };
-
-  useEffect(() => {
-    fetchLocadoras();
-  }, []);
 
   return {
     locadoras,

@@ -172,6 +172,12 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('[DEBUG SUBMIT] Enviando dados:', {
+      id: locadora.id,
+      isentoCobranca: formData.isentoCobranca,
+      formData: formData
+    });
+    
     try {
       const response = await fetch(`/api/locadoras/${locadora.id}`, {
         method: 'PUT',
@@ -182,8 +188,13 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error('[DEBUG SUBMIT] Erro na resposta:', errorData);
         throw new Error('Erro ao atualizar locadora');
       }
+
+      const result = await response.json();
+      console.log('[DEBUG SUBMIT] Resposta da API:', result);
 
       // Invalidar caches para atualizar os dados automaticamente
       await queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
@@ -198,6 +209,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
       onOpenChange(false);
       
     } catch (error) {
+      console.error('[DEBUG SUBMIT] Erro:', error);
       toast({
         title: "Erro ao atualizar locadora",
         description: "Tente novamente mais tarde.",
@@ -207,16 +219,12 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
   };
 
   const updateFormData = (field: string, value: string | boolean) => {
+    console.log('[DEBUG UPDATE] Alterando campo:', { field, value, type: typeof value });
+    
     setFormData(prev => {
-      // Se estiver alterando o plano
-      if (field === 'plano') {
-        return { 
-          ...prev, 
-          [field]: value,
-        };
-      }
-      
-      return { ...prev, [field]: value };
+      const newData = { ...prev, [field]: value };
+      console.log('[DEBUG UPDATE] Novo formData:', newData);
+      return newData;
     });
   };
 
