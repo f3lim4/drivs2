@@ -49,6 +49,8 @@ export function DrivsLayout({ children }: DrivsLayoutProps) {
         return { title: 'Locadoras', subtitle: 'Gerencie locadoras do sistema' };
       case '/perfil':
         return { title: 'Perfil', subtitle: 'Gerencie informações da conta' };
+      case '/planos':
+        return { title: 'Planos', subtitle: 'Gerencie planos e assinatura' };
       default:
         return { title: 'DRIVS', subtitle: 'Sistema de gerenciamento de locadoras' };
     }
