@@ -170,6 +170,7 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('[DEBUG SUBMIT] Função handleSubmit chamada!', e);
     e.preventDefault();
     
     console.log('[DEBUG SUBMIT] Enviando dados:', {
@@ -465,7 +466,9 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
-            <Button type="submit">Salvar Alterações</Button>
+            <Button type="submit" onClick={(e) => {
+              console.log('[DEBUG BUTTON] Botão clicado!');
+            }}>Salvar Alterações</Button>
           </DialogFooter>
         </form>
       </DialogContent>
