@@ -205,6 +205,11 @@ export function EditarLocadoraModal({ open, onOpenChange, locadora }: EditarLoca
       await queryClient.invalidateQueries({ queryKey: [`/api/locadoras/${locadora.id}`] });
       await queryClient.invalidateQueries({ queryKey: ['/api/subscription-status'] });
       
+      // Forçar refetch imediato para garantir atualização da interface
+      await queryClient.refetchQueries({ queryKey: ['/api/locadoras'] });
+      
+      console.log('[DEBUG SUBMIT] Cache invalidado e refetch executado');
+      
       toast({
         title: "Locadora atualizada com sucesso!",
         description: `Os dados de ${formData.nome} foram atualizados.`,
