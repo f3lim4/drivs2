@@ -99,13 +99,6 @@ const navigationItems = [
     description: 'Análise financeira completa'
   },
   {
-    title: 'Planos',
-    url: '/planos',
-    icon: Crown,
-    description: 'Gerencie planos e assinatura',
-    locadoraOnly: true  // Só locadoras podem ver este item
-  },
-  {
     title: 'Anúncios',
     url: '/anuncios',
     icon: Megaphone,
