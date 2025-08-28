@@ -374,11 +374,9 @@ export function EditarMotoristaModal({
   // Função para carregar imagens existentes do motorista
   const carregarImagensExistentes = async (motoristaId: string) => {
     try {
-      console.log('[EDITAR] Carregando imagens para motorista:', motoristaId);
       const response = await fetch(`/api/motoristas/${motoristaId}/imagens`);
       if (response.ok) {
         const data = await response.json();
-        console.log('[EDITAR] Dados recebidos da API:', data);
         const documentos = data.documentos || {};
         
         // Mapear documentos para previews
@@ -391,7 +389,6 @@ export function EditarMotoristaModal({
           fotoExtra2: documentos.fotoExtra2 || null,
         };
         
-        console.log('[EDITAR] Previews configurados:', novosPreviews);
         setImagePreviews(novosPreviews);
       }
     } catch (error) {
@@ -590,7 +587,7 @@ export function EditarMotoristaModal({
                 )}
               />
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -644,7 +641,7 @@ export function EditarMotoristaModal({
 
             {/* CONTATO */}
             <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="telefone"
@@ -684,7 +681,7 @@ export function EditarMotoristaModal({
 
             {/* CNH */}
             <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="cnh"
@@ -779,7 +776,7 @@ export function EditarMotoristaModal({
                 )}
               />
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <FormField
                     control={form.control}
@@ -811,7 +808,7 @@ export function EditarMotoristaModal({
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="bairro"
@@ -841,7 +838,7 @@ export function EditarMotoristaModal({
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="cidade"
