@@ -295,8 +295,8 @@ export default function PlanosLocadora() {
   return (
     <div className="flex-1 space-y-4 md:space-y-6 p-4 md:p-6">
 
-      {/* Status do teste gratuito - ocultar para locadoras VIP */}
-      {planoDetalhes?.testeGratuito && !isVipPlan && (
+      {/* Status do teste gratuito - ocultar para locadoras VIP, Infinity e planos ativos */}
+      {planoDetalhes?.testeGratuito && !isVipPlan && planoAtual !== 'infinity' && !subscriptionStatus?.isActive && (
         <div className={`p-4 rounded-lg ${
           planoDetalhes.testeGratuito.ativo 
             ? 'bg-gradient-to-r from-green-50 to-green-100 border border-green-200' 
