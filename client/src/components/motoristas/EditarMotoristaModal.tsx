@@ -390,6 +390,7 @@ export function EditarMotoristaModal({
         };
         
         setImagePreviews(novosPreviews);
+        console.log('[DEBUG] Previews setados:', novosPreviews);
       }
     } catch (error) {
       console.error('Erro ao carregar imagens existentes:', error);
