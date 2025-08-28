@@ -396,8 +396,8 @@ export function useNotifications() {
     });
   }
 
-  // Notificações de período de teste gratuito - excluir para locadoras Vitalia VIP
-  if (locadoraData && locadoraData.testeGratuito && locadoraData.dataVencimentoTeste && !locadoraData.vitalia && locadoraData.plano !== 'vip') {
+  // Notificações de período de teste gratuito - excluir para locadoras Vitalia VIP e Infinity
+  if (locadoraData && locadoraData.testeGratuito && locadoraData.dataVencimentoTeste && !locadoraData.vitalia && locadoraData.plano !== 'vip' && locadoraData.plano !== 'infinity') {
     const dataVencimento = new Date(locadoraData.dataVencimentoTeste);
     const diasRestantes = differenceInDays(dataVencimento, today);
     
