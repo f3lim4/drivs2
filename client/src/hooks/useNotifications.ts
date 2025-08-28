@@ -27,75 +27,66 @@ export function useNotifications() {
   const { data: motoristasRaw = [] } = useQuery({
     queryKey: [motoristasUrl],
     enabled: !!profile?.locadoraId,
-    refetchInterval: 30000, // Refetch a cada 30 segundos
-    refetchOnWindowFocus: true,
-    staleTime: 0,
+    refetchInterval: 2 * 60 * 1000, // Refetch a cada 2 minutos ao invés de 30 segundos
+    staleTime: 60 * 1000, // 1 minuto de cache
   });
 
   const { data: alugueisRaw = [] } = useQuery({
     queryKey: [alugueisUrl],
     enabled: !!profile?.locadoraId,
-    refetchInterval: 30000,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
+    refetchInterval: 2 * 60 * 1000,
+    staleTime: 60 * 1000,
   });
 
   const { data: veiculosRaw = [] } = useQuery({
     queryKey: [veiculosUrl],
     enabled: !!profile?.locadoraId,
-    refetchInterval: 30000,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
+    refetchInterval: 2 * 60 * 1000,
+    staleTime: 60 * 1000,
   });
 
   const { data: manutencoesRaw = [] } = useQuery({
     queryKey: [manutencoesUrl],
     enabled: !!profile?.locadoraId,
-    refetchInterval: 30000,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
+    refetchInterval: 3 * 60 * 1000, // Manutenções podem ser menos frequentes
+    staleTime: 2 * 60 * 1000,
   });
 
   const { data: despesasRaw = [] } = useQuery({
     queryKey: [despesasUrl],
     enabled: !!profile?.locadoraId,
-    refetchInterval: 30000,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
+    refetchInterval: 3 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
   });
 
   const { data: infracoesRaw = [] } = useQuery({
     queryKey: [infracoesUrl],
     enabled: !!profile?.locadoraId,
-    refetchInterval: 30000,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
+    refetchInterval: 3 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
   });
 
   const { data: pagamentosRaw = [] } = useQuery({
     queryKey: [pagamentosUrl],
     enabled: !!profile?.locadoraId,
-    refetchInterval: 30000,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
+    refetchInterval: 2 * 60 * 1000,
+    staleTime: 60 * 1000,
   });
 
   // Buscar anúncios ativos
   const { data: anunciosRaw = [] } = useQuery({
     queryKey: ['/api/anuncios/ativos'],
     enabled: !!profile,
-    refetchInterval: 60000, // Anúncios podem ser atualizados menos frequentemente
-    refetchOnWindowFocus: true,
-    staleTime: 0,
+    refetchInterval: 5 * 60 * 1000, // Anúncios podem ser atualizados menos frequentemente (5 min)
+    staleTime: 3 * 60 * 1000,
   });
 
   // Buscar dados da locadora para verificar período de teste
   const { data: locadoraData } = useQuery({
     queryKey: [`/api/locadoras/${profile?.locadoraId}`],
     enabled: !!profile?.locadoraId,
-    refetchInterval: 30000,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
+    refetchInterval: 5 * 60 * 1000, // Dados da locadora mudam pouco (5 min)
+    staleTime: 3 * 60 * 1000,
   });
 
   // Filtrar dados com isolamento de segurança
