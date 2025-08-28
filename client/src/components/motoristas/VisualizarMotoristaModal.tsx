@@ -43,12 +43,15 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
     const carregarImagens = async () => {
       setLoadingImagens(true);
       try {
+        console.log('Carregando imagens para motorista:', motorista.id);
         const response = await fetch(`/api/motoristas/${motorista.id}/imagens`);
         if (response.ok) {
           const data = await response.json();
+          console.log('Dados recebidos da API:', data);
           // Converter documentos em array de URLs válidas
           const imagensArray = Object.values(data.documentos || {})
             .filter(url => url !== null) as string[];
+          console.log('Array de imagens processado:', imagensArray);
           setImagens(imagensArray);
         }
       } catch (error) {
