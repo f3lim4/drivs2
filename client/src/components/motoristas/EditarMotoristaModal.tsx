@@ -799,45 +799,47 @@ export function EditarMotoristaModal({
 
             {/* ENDEREÇO */}
             <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="cep"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CEP *</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="00000-000" 
-                        {...field}
-                        onChange={(e) => {
-                          let value = e.target.value.replace(/\D/g, '');
-                          if (value.length <= 8) {
-                            value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
-                          }
-                          field.onChange(value);
-                          
-                          // Buscar endereço automaticamente quando CEP tiver 8 dígitos
-                          if (value.replace(/\D/g, '').length === 8) {
-                            buscarEnderecoPorCep(value);
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              
+              {/* Linha 4: CEP (menor), Rua e Número (menor) e Complemento (menor) */}
+              <div className="grid grid-cols-5 lg:grid-cols-5 gap-4">
+                <FormField
+                  control={form.control}
+                  name="cep"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CEP *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="00000-000" 
+                          {...field}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length <= 8) {
+                              value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+                            }
+                            field.onChange(value);
+                            
+                            // Buscar endereço automaticamente quando CEP tiver 8 dígitos
+                            if (value.replace(/\D/g, '').length === 8) {
+                              buscarEnderecoPorCep(value);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
+                <div className="col-span-2">
                   <FormField
                     control={form.control}
                     name="rua"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Rua/Avenida *</FormLabel>
+                        <FormLabel>Rua *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Rua das Flores" {...field} />
+                          <Input placeholder="Nome da rua" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -858,22 +860,6 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="bairro"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Bairro *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Centro" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 <FormField
                   control={form.control}
@@ -882,7 +868,7 @@ export function EditarMotoristaModal({
                     <FormItem>
                       <FormLabel>Complemento</FormLabel>
                       <FormControl>
-                        <Input placeholder="Apto, casa, bloco..." {...field} />
+                        <Input placeholder="Apto, casa..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -890,7 +876,22 @@ export function EditarMotoristaModal({
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Linha 5: Bairro, Cidade e Estado */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="bairro"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bairro *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nome do bairro" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="cidade"
@@ -898,7 +899,7 @@ export function EditarMotoristaModal({
                     <FormItem>
                       <FormLabel>Cidade *</FormLabel>
                       <FormControl>
-                        <Input placeholder="São Paulo" {...field} />
+                        <Input placeholder="Nome da cidade" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -914,7 +915,7 @@ export function EditarMotoristaModal({
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione o estado" />
+                            <SelectValue placeholder="UF" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -942,8 +943,8 @@ export function EditarMotoristaModal({
                           <SelectItem value="RO">RO</SelectItem>
                           <SelectItem value="RR">RR</SelectItem>
                           <SelectItem value="SC">SC</SelectItem>
-                          <SelectItem value="SP">SP</SelectItem>
                           <SelectItem value="SE">SE</SelectItem>
+                          <SelectItem value="SP">SP</SelectItem>
                           <SelectItem value="TO">TO</SelectItem>
                         </SelectContent>
                       </Select>
