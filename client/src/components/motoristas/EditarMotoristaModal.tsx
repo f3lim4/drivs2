@@ -587,7 +587,8 @@ export function EditarMotoristaModal({
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* CPF, Telefone, RG - Layout otimizado em 3 colunas */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -643,7 +644,10 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
+              </div>
 
+              {/* Data de Nascimento em linha separada */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="dataNascimento"
@@ -663,12 +667,14 @@ export function EditarMotoristaModal({
 
             {/* CNH */}
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* CNH e Categoria na primeira linha - Categoria menor */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="cnh"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="md:col-span-3">
                       <FormLabel>Número da CNH *</FormLabel>
                       <FormControl>
                         <Input 
@@ -694,7 +700,7 @@ export function EditarMotoristaModal({
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecionar" />
+                            <SelectValue placeholder="Cat." />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -710,7 +716,10 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
+              </div>
 
+              {/* Vencimento da CNH e Email na segunda linha */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="vencimentoCnh"
