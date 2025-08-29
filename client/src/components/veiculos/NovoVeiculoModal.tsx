@@ -925,7 +925,7 @@ export function NovoVeiculoModal({
 
                 <FormField
                   control={form.control}
-                  name="valorRastreador"
+                  name="valorRastreadorMensal"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Valor Rastreador (R$)</FormLabel>
@@ -969,78 +969,6 @@ export function NovoVeiculoModal({
             </div>
 
 
-            {/* RASTREADOR */}
-            <div className="space-y-4">
-              
-              {/* Oitava linha: Rastreador, Valor Rastreador, Data de Compra, campo vazio */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                <FormField
-                  control={form.control}
-                  name="rastreador"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Rastreador</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="valorRastreadorMensal"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Valor Mensal do Rastreador (R$)</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          step="0.01"
-                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          {...field}
-                          value={field.value === undefined ? '' : field.value}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || value === null) {
-                              field.onChange(undefined);
-                            } else {
-                              const numValue = parseFloat(value);
-                              field.onChange(isNaN(numValue) ? undefined : numValue);
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="dataCompra"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Data de Compra</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="date"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div>
-                  {/* Campo vazio para manter alinhamento */}
-                </div>
-              </div>
-            </div>
 
             {/* FINANCIAMENTO */}
             <div className="space-y-4">
