@@ -24,6 +24,8 @@ interface VisualizarMotoristaModalProps {
 export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: VisualizarMotoristaModalProps) {
   const [imagens, setImagens] = useState<string[]>([]);
   const [loadingImagens, setLoadingImagens] = useState(false);
+  const [imageErrors, setImageErrors] = useState<{[key: number]: boolean}>({});
+  const [imageLoading, setImageLoading] = useState<{[key: number]: boolean}>({});
   const { toast } = useToast();
 
   // Carregar imagens do motorista
@@ -47,6 +49,13 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
           
           console.log('[DEBUG] Array de imagens filtrado:', imagensArray);
           setImagens(imagensArray);
+          // Reset dos estados de erro e loading
+          setImageErrors({});
+          const initialLoading: {[key: number]: boolean} = {};
+          imagensArray.forEach((_, index) => {
+            initialLoading[index] = true;
+          });
+          setImageLoading(initialLoading);
         } else {
           console.error(`[DEBUG] Erro na resposta: ${response.status} - ${response.statusText}`);
           const errorData = await response.text();
@@ -218,8 +227,8 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
               ) : imagens.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {imagens.map((imagemUrl, index) => {
-                    const [hasError, setHasError] = useState(false);
-                    const [isLoading, setIsLoading] = useState(true);
+                    const hasError = imageErrors[index] || false;
+                    const isLoading = imageLoading[index] || false;
                     
                     return (
                       <div key={index} className="relative group">
@@ -233,12 +242,12 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                               onClick={() => window.open(imagemUrl, '_blank')}
                               onLoad={() => {
                                 console.log(`[DEBUG] ✅ Imagem carregada: ${imagemUrl}`);
-                                setIsLoading(false);
+                                setImageLoading(prev => ({ ...prev, [index]: false }));
                               }}
                               onError={(e) => {
                                 console.error(`[DEBUG] ❌ Erro ao carregar imagem: ${imagemUrl}`);
-                                setHasError(true);
-                                setIsLoading(false);
+                                setImageErrors(prev => ({ ...prev, [index]: true }));
+                                setImageLoading(prev => ({ ...prev, [index]: false }));
                               }}
                               style={{ display: isLoading ? 'none' : 'block' }}
                             />
