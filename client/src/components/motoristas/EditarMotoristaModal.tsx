@@ -587,8 +587,8 @@ export function EditarMotoristaModal({
                 )}
               />
 
-              {/* CPF, Telefone, RG - Layout otimizado em 3 colunas */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* CPF e RG - Sem telefone aqui pois vai ficar depois do vencimento CNH */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -598,27 +598,6 @@ export function EditarMotoristaModal({
                       <FormControl>
                         <Input 
                           placeholder="000.000.000-00" 
-                          {...field}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/\D/g, '');
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="telefone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefone *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="11977263156" 
                           {...field}
                           onChange={(e) => {
                             const value = e.target.value.replace(/\D/g, '');
@@ -718,8 +697,8 @@ export function EditarMotoristaModal({
                 />
               </div>
 
-              {/* Vencimento da CNH e Email na segunda linha */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Vencimento da CNH, Telefone e Email em 3 colunas no desktop */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="vencimentoCnh"
@@ -728,6 +707,27 @@ export function EditarMotoristaModal({
                       <FormLabel>Vencimento da CNH *</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="telefone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefone *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="11977263156" 
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '');
+                            field.onChange(value);
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
