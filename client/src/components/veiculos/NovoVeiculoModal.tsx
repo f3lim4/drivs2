@@ -856,7 +856,8 @@ export function NovoVeiculoModal({
             {/* SEGURO */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 gap-4">
+              {/* Sexta linha: Seguradora, Valor Seguro, Vigência Seguro */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="seguradora"
@@ -881,7 +882,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="" 
+                          placeholder="150.00" 
                           {...field}
                           value={field.value === undefined ? '' : field.value}
                           onChange={(e) => {
@@ -899,13 +900,18 @@ export function NovoVeiculoModal({
                     </FormItem>
                   )}
                 />
+
+                <div>
+                  {/* Campo vazio para manter alinhamento */}
+                </div>
               </div>
             </div>
 
             {/* VALOR DO VEÍCULO E IPVA */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 gap-4">
+              {/* Sétima linha: Valor Veículo, IPVA, campo vazio */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="valorVeiculo"
@@ -916,7 +922,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder=""
+                          placeholder="50000.00"
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => {
@@ -947,7 +953,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder=""
+                          placeholder="2000.00"
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -957,13 +963,18 @@ export function NovoVeiculoModal({
                     </FormItem>
                   )}
                 />
+
+                <div>
+                  {/* Campo vazio para manter alinhamento */}
+                </div>
               </div>
             </div>
 
             {/* RASTREADOR */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 gap-4">
+              {/* Oitava linha: Rastreador, Valor Rastreador, campo vazio */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="rastreador"
@@ -991,7 +1002,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder=""
+                          placeholder="40.00"
                           {...field}
                           value={field.value === undefined ? '' : field.value}
                           onChange={(e) => {
@@ -1009,27 +1020,36 @@ export function NovoVeiculoModal({
                     </FormItem>
                   )}
                 />
+
+                <div>
+                  {/* Campo vazio para manter alinhamento */}
+                </div>
               </div>
             </div>
 
             {/* DATA DE COMPRA */}
             <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="dataCompra"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data de Compra (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="date"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Nona linha: Data de Compra, campos vazios */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="dataCompra"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data de Compra (Opcional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="date"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div></div>
+                <div></div>
+              </div>
             </div>
 
             {/* FINANCIAMENTO */}
@@ -1058,7 +1078,7 @@ export function NovoVeiculoModal({
               />
 
               {form.watch('financiado') && (
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="valorFinanciamento"
@@ -1069,7 +1089,7 @@ export function NovoVeiculoModal({
                           <Input 
                             type="number" 
                             step="0.01"
-                            placeholder=""
+                            placeholder="30000.00"
                             {...field}
                             value={field.value || ''}
                             onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
