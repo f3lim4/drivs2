@@ -419,7 +419,6 @@ export function EditarVeiculoModal({
                       <FormLabel>Placa *</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="ABC-1234" 
                           {...field}
                           onChange={(e) => {
                             const value = e.target.value.toUpperCase();
@@ -439,7 +438,7 @@ export function EditarVeiculoModal({
                     <FormItem>
                       <FormLabel>Marca *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Toyota, Honda, etc." {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -453,7 +452,7 @@ export function EditarVeiculoModal({
                     <FormItem>
                       <FormLabel>Modelo *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Corolla, Civic, etc." {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -473,7 +472,7 @@ export function EditarVeiculoModal({
                       <FormControl>
                         <Input 
                           type="number" 
-                          placeholder="2025" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                         />
@@ -493,7 +492,7 @@ export function EditarVeiculoModal({
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecionar" />
+                              <SelectValue />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -525,7 +524,7 @@ export function EditarVeiculoModal({
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Selecionar categoria" />
+                              <SelectValue />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -552,7 +551,6 @@ export function EditarVeiculoModal({
                     <FormLabel>Visualizar Veículo</FormLabel>
                     <FormControl>
                       <Input 
-                        placeholder="Observações visuais do veículo (ex: arranhões, detalhes, etc.)" 
                         {...field}
                         data-testid="input-visualizar-veiculo"
                       />
@@ -576,7 +574,7 @@ export function EditarVeiculoModal({
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Flex" />
+                            <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -621,7 +619,7 @@ export function EditarVeiculoModal({
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Quilometragem Ilimitada" />
+                            <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -646,7 +644,7 @@ export function EditarVeiculoModal({
                       <FormControl>
                         <Input 
                           type="number" 
-                          placeholder="Ex: 1000"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                         />
@@ -668,7 +666,7 @@ export function EditarVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
@@ -688,7 +686,7 @@ export function EditarVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
@@ -708,7 +706,7 @@ export function EditarVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
@@ -732,7 +730,6 @@ export function EditarVeiculoModal({
                       <FormLabel>Seguradora</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Allianz, Porto Seguro, etc."
                           {...field}
                         />
                       </FormControl>
@@ -751,7 +748,7 @@ export function EditarVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
@@ -777,7 +774,7 @@ export function EditarVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder=""
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => {
@@ -808,7 +805,7 @@ export function EditarVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder=""
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -833,7 +830,6 @@ export function EditarVeiculoModal({
                       <FormLabel>Empresa do Rastreador</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Positron, Pósitron, etc."
                           {...field}
                         />
                       </FormControl>
@@ -852,7 +848,7 @@ export function EditarVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="0"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
@@ -943,7 +939,7 @@ export function EditarVeiculoModal({
                         <FormControl>
                           <Input 
                             type="number"
-                            placeholder="48"
+                            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             {...field}
                             value={field.value || ''}
                             onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
