@@ -458,8 +458,8 @@ export function NovoMotoristaModal({
                 )}
               />
 
-              {/* CPF, Telefone, RG e Data de Nascimento - Layout otimizado */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* CPF e RG - Sem telefone aqui pois vai ficar depois do vencimento CNH */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -474,30 +474,6 @@ export function NovoMotoristaModal({
                             let value = e.target.value.replace(/\D/g, '');
                             if (value.length <= 11) {
                               value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-                            }
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="telefone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefone *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="11977263156" 
-                          {...field}
-                          onChange={(e) => {
-                            let value = e.target.value.replace(/\D/g, '');
-                            if (value.length <= 11) {
-                              value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
                             }
                             field.onChange(value);
                           }}
@@ -595,8 +571,8 @@ export function NovoMotoristaModal({
                 />
               </div>
 
-              {/* Vencimento da CNH e Email na segunda linha */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Vencimento da CNH, Telefone e Email em 3 colunas no desktop */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="vencimentoCnh"
@@ -605,6 +581,30 @@ export function NovoMotoristaModal({
                       <FormLabel>Vencimento da CNH *</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="telefone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefone *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="11977263156" 
+                          {...field}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length <= 11) {
+                              value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                            }
+                            field.onChange(value);
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
