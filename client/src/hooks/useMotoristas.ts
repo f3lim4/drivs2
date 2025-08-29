@@ -42,7 +42,7 @@ export function useMotoristas() {
       
       // FILTRO DE SEGURANÇA: Verificar se todos os motoristas pertencem à locadora
       if (isLocadora && locadoraId) {
-        const filteredData = data.filter(m => m.locadoraId === locadoraId);
+        const filteredData = data.filter((m: Motorista) => m.locadoraId === locadoraId);
         
         // Log de segurança se houver dados mistos
         if (filteredData.length !== data.length) {
