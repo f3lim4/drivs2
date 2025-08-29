@@ -430,8 +430,8 @@ export function NovoVeiculoModal({
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
               
-              {/* Primeira linha: Tipo, Marca, Modelo */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Primeira linha: Tipo, Marca, Modelo, Categoria */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="tipoVeiculo"
@@ -507,10 +507,39 @@ export function NovoVeiculoModal({
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="categoria"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoria *</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value}
+                        disabled={!tipoSelecionado}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={!tipoSelecionado ? "Selecione o tipo primeiro" : "Selecionar categoria"} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categoriasDisponiveis.map((categoria) => (
+                            <SelectItem key={categoria.value} value={categoria.value}>
+                              {categoria.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              {/* Segunda linha: Placa, RENAVAM, Chassi */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Segunda linha: Placa, RENAVAM, Chassi, Ano */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="placa"
@@ -573,10 +602,7 @@ export function NovoVeiculoModal({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              {/* Terceira linha: Ano, Cor, Categoria */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="ano"
@@ -596,7 +622,10 @@ export function NovoVeiculoModal({
                     </FormItem>
                   )}
                 />
+              </div>
 
+              {/* Terceira linha: Cor, Combustível, Quilometragem, Limite Quilometragem */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="cor"
@@ -627,63 +656,6 @@ export function NovoVeiculoModal({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="categoria"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Categoria *</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                        disabled={!tipoSelecionado}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={!tipoSelecionado ? "Selecione o tipo primeiro" : "Selecionar categoria"} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {categoriasDisponiveis.map((categoria) => (
-                            <SelectItem key={categoria.value} value={categoria.value}>
-                              {categoria.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Campo Visualizar Veículo */}
-              <FormField
-                control={form.control}
-                name="visualizar"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Visualizar Veículo</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Observações visuais do veículo (ex: arranhões, detalhes, etc.)" 
-                        {...field}
-                        data-testid="input-visualizar-veiculo"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-
-
-            {/* CARACTERÍSTICAS TÉCNICAS */}
-            <div className="space-y-4">
-              
-              {/* Quarta linha: Combustível, Quilometragem, Limite Quilometragem */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="combustivel"
@@ -753,6 +725,82 @@ export function NovoVeiculoModal({
                 />
               </div>
 
+            </div>
+
+
+
+            {/* VALORES E TAXAS */}
+            <div className="space-y-4">
+              
+              {/* Quarta linha: Valor Semanal, Caução, Taxa Admin, (vazio) */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <FormField
+                  control={form.control}
+                  name="valorSemanal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor Semanal (R$) *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="350.00" 
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="caucao"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Caução (R$) *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="1000.00" 
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="taxaAdmin"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Taxa Admin (R$) *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="50.00" 
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Campo vazio para manter o layout 4 colunas */}
+                <div></div>
+              </div>
+
               {/* Campo condicional para valor limite km semanal */}
               {form.watch('limiteQuilometragem') === 'limitada' && (
                 <FormField
@@ -776,88 +824,8 @@ export function NovoVeiculoModal({
                 />
               )}
 
-              {/* Quinta linha: Valor Semanal, Caução, Taxa Admin */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <FormField
-                  control={form.control}
-                  name="valorSemanal"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Valor Semanal (R$) *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          step="0.01"
-                          placeholder="500.00" 
-                          {...field}
-                          value={field.value || ''}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="caucao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Caução (R$) *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          step="0.01"
-                          placeholder="" 
-                          {...field}
-                          value={field.value || ''}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="taxaAdministrativa"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Taxa Administrativa (R$) - Opcional</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          step="0.01"
-                          placeholder="" 
-                          {...field}
-                          value={field.value === undefined ? '' : field.value}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || value === null) {
-                              field.onChange(undefined);
-                            } else {
-                              const numValue = parseFloat(value);
-                              field.onChange(isNaN(numValue) ? undefined : numValue);
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-
-
-            {/* SEGURO */}
-            <div className="space-y-4">
-              
-              {/* Sexta linha: Seguradora, Valor Seguro, Vigência Seguro */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Quinta linha: Seguradora, Valor Seguro, Valor Veículo, IPVA */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="seguradora"
@@ -865,7 +833,7 @@ export function NovoVeiculoModal({
                     <FormItem>
                       <FormLabel>Seguradora</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nome da seguradora" {...field} />
+                        <Input placeholder="Porto Seguro" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -874,26 +842,18 @@ export function NovoVeiculoModal({
 
                 <FormField
                   control={form.control}
-                  name="valorSeguroMensal"
+                  name="valorSeguro"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor Mensal (R$) - Opcional</FormLabel>
+                      <FormLabel>Valor do Seguro (R$)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
                           step="0.01"
                           placeholder="150.00" 
                           {...field}
-                          value={field.value === undefined ? '' : field.value}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || value === null) {
-                              field.onChange(undefined);
-                            } else {
-                              const numValue = parseFloat(value);
-                              field.onChange(isNaN(numValue) ? undefined : numValue);
-                            }
-                          }}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -901,17 +861,6 @@ export function NovoVeiculoModal({
                   )}
                 />
 
-                <div>
-                  {/* Campo vazio para manter alinhamento */}
-                </div>
-              </div>
-            </div>
-
-            {/* VALOR DO VEÍCULO E IPVA */}
-            <div className="space-y-4">
-              
-              {/* Sétima linha: Valor Veículo, IPVA, campo vazio */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="valorVeiculo"
@@ -922,20 +871,10 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="50000.00"
+                          placeholder="45000.00" 
                           {...field}
                           value={field.value || ''}
-                          onChange={(e) => {
-                            const valor = parseFloat(e.target.value) || undefined;
-                            field.onChange(valor);
-                            // Calcular IPVA automaticamente (4% do valor)
-                            if (valor && valor > 0) {
-                              const ipva = valor * 0.04;
-                              form.setValue('ipva', ipva);
-                            } else {
-                              form.setValue('ipva', undefined);
-                            }
-                          }}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
                       </FormControl>
                       <FormMessage />
@@ -948,12 +887,56 @@ export function NovoVeiculoModal({
                   name="ipva"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>IPVA (R$) <span className="text-xs text-green-600">(4% do valor)</span></FormLabel>
+                      <FormLabel>IPVA (R$)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="2000.00"
+                          placeholder="1800.00" 
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+
+
+            {/* RASTREAMENTO E COMPRA */}
+            <div className="space-y-4">
+              
+              {/* Sexta linha: Rastreador, Valor Rastreador, Data Compra, (vazio) */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <FormField
+                  control={form.control}
+                  name="rastreador"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rastreador</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Tracker XYZ" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="valorRastreador"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Valor Rastreador (R$)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01"
+                          placeholder="80.00" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -964,11 +947,30 @@ export function NovoVeiculoModal({
                   )}
                 />
 
-                <div>
-                  {/* Campo vazio para manter alinhamento */}
-                </div>
+                <FormField
+                  control={form.control}
+                  name="dataCompra"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data de Compra</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="date" 
+                          {...field}
+                          value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
+                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value + 'T00:00:00') : undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Campo vazio para manter o layout 4 colunas */}
+                <div></div>
               </div>
             </div>
+
 
             {/* RASTREADOR */}
             <div className="space-y-4">
