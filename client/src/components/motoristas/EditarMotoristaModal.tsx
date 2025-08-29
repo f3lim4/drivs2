@@ -587,8 +587,8 @@ export function EditarMotoristaModal({
                 )}
               />
 
-              {/* CPF e RG - Sem telefone aqui pois vai ficar depois do vencimento CNH */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* CPF, RG e Data de Nascimento - 3 colunas no desktop */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -623,10 +623,7 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              {/* Data de Nascimento em linha separada */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="dataNascimento"
@@ -698,7 +695,7 @@ export function EditarMotoristaModal({
               </div>
 
               {/* Vencimento da CNH, Telefone e Email em 3 colunas no desktop */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="vencimentoCnh"
