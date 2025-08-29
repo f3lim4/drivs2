@@ -88,10 +88,12 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
             </div>
           </div>
 
-          {/* Dados Compactos */}
+          {/* Dados Organizados */}
           <Card>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <CardContent className="pt-6 space-y-4">
+              
+              {/* Linha 1: Nome, CPF e RG */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Nome Completo</p>
                   <p className="text-sm">{motorista.nome}</p>
@@ -101,8 +103,35 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                   <p className="text-sm font-mono">{motorista.cpf}</p>
                 </div>
                 <div>
+                  <p className="text-sm font-medium text-muted-foreground">RG</p>
+                  <p className="text-sm font-mono">{motorista.rg || 'Não informado'}</p>
+                </div>
+              </div>
+
+              {/* Linha 2: Data de Nascimento, Número CNH e Categoria */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div>
                   <p className="text-sm font-medium text-muted-foreground">Data de Nascimento</p>
                   <p className="text-sm">{motorista.dataNascimento || 'Não informado'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Número da CNH</p>
+                  <p className="text-sm font-mono">{motorista.cnh}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Categoria</p>
+                  <p className="text-sm">{motorista.categoria}</p>
+                </div>
+              </div>
+
+              {/* Linha 3: Vencimento CNH, Telefone e Email */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Vencimento CNH</p>
+                  <p className="text-sm flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {motorista.vencimentoCnh}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Telefone</p>
@@ -118,31 +147,44 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                     {motorista.email || 'Não informado'}
                   </p>
                 </div>
+              </div>
+
+              {/* Linha 4: CEP, Rua, Número e Complemento */}
+              <div className="grid grid-cols-5 lg:grid-cols-5 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Endereço</p>
-                  <p className="text-sm">
-                    {motorista.rua}, {motorista.numero} - {motorista.bairro}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {motorista.cidade} - {motorista.estado} | CEP: {motorista.cep}
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground">CEP</p>
+                  <p className="text-sm font-mono">{motorista.cep}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-muted-foreground">Rua</p>
+                  <p className="text-sm">{motorista.rua}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Número da CNH</p>
-                  <p className="text-sm font-mono">{motorista.cnh}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Número</p>
+                  <p className="text-sm">{motorista.numero}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Categoria</p>
-                  <p className="text-sm">{motorista.categoria}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Vencimento CNH</p>
-                  <p className="text-sm flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {motorista.vencimentoCnh}
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground">Complemento</p>
+                  <p className="text-sm">{motorista.complemento || 'Não informado'}</p>
                 </div>
               </div>
+
+              {/* Linha 5: Bairro, Cidade e Estado */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Bairro</p>
+                  <p className="text-sm">{motorista.bairro}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Cidade</p>
+                  <p className="text-sm">{motorista.cidade}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Estado</p>
+                  <p className="text-sm">{motorista.estado}</p>
+                </div>
+              </div>
+              
             </CardContent>
           </Card>
 
