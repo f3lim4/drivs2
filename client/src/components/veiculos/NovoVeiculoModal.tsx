@@ -809,7 +809,7 @@ export function NovoVeiculoModal({
                       <FormControl>
                         <Input 
                           type="number" 
-                          placeholder=""
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
@@ -972,17 +972,16 @@ export function NovoVeiculoModal({
             {/* RASTREADOR */}
             <div className="space-y-4">
               
-              {/* Oitava linha: Rastreador, Valor Rastreador, campo vazio */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Oitava linha: Rastreador, Valor Rastreador, Data de Compra, campo vazio */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="rastreador"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Empresa do Rastreador</FormLabel>
+                      <FormLabel>Rastreador</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="Positron, Pósitron, etc."
                           {...field}
                         />
                       </FormControl>
@@ -996,12 +995,12 @@ export function NovoVeiculoModal({
                   name="valorRastreadorMensal"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor Mensal do Rastreador (R$) - Opcional</FormLabel>
+                      <FormLabel>Valor Mensal do Rastreador (R$)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="40.00"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           value={field.value === undefined ? '' : field.value}
                           onChange={(e) => {
@@ -1020,22 +1019,12 @@ export function NovoVeiculoModal({
                   )}
                 />
 
-                <div>
-                  {/* Campo vazio para manter alinhamento */}
-                </div>
-              </div>
-            </div>
-
-            {/* DATA DE COMPRA */}
-            <div className="space-y-4">
-              {/* Nona linha: Data de Compra, campos vazios */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="dataCompra"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Data de Compra (Opcional)</FormLabel>
+                      <FormLabel>Data de Compra</FormLabel>
                       <FormControl>
                         <Input 
                           type="date"
@@ -1046,8 +1035,10 @@ export function NovoVeiculoModal({
                     </FormItem>
                   )}
                 />
-                <div></div>
-                <div></div>
+
+                <div>
+                  {/* Campo vazio para manter alinhamento */}
+                </div>
               </div>
             </div>
 
