@@ -548,7 +548,6 @@ export function NovoVeiculoModal({
                       <FormLabel>Placa *</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="ABC-1234" 
                           {...field}
                           onChange={(e) => {
                             const value = e.target.value.toUpperCase();
@@ -569,7 +568,6 @@ export function NovoVeiculoModal({
                       <FormLabel>RENAVAM *</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="12345678901" 
                           {...field}
                           onChange={(e) => {
                             const value = e.target.value.replace(/\D/g, '');
@@ -590,7 +588,6 @@ export function NovoVeiculoModal({
                       <FormLabel>Chassi *</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="9BWZZZ377VT004251" 
                           {...field}
                           onChange={(e) => {
                             const value = e.target.value.toUpperCase();
@@ -612,7 +609,7 @@ export function NovoVeiculoModal({
                       <FormControl>
                         <Input 
                           type="number" 
-                          placeholder="2024" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
@@ -635,7 +632,7 @@ export function NovoVeiculoModal({
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecionar" />
+                            <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -665,7 +662,7 @@ export function NovoVeiculoModal({
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecionar" />
+                            <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -691,7 +688,7 @@ export function NovoVeiculoModal({
                       <FormControl>
                         <Input 
                           type="number" 
-                          placeholder="50000" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
@@ -711,7 +708,7 @@ export function NovoVeiculoModal({
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecionar" />
+                            <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -744,7 +741,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="350.00" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -765,7 +762,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="1000.00" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -786,7 +783,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="50.00" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -833,7 +830,7 @@ export function NovoVeiculoModal({
                     <FormItem>
                       <FormLabel>Seguradora</FormLabel>
                       <FormControl>
-                        <Input placeholder="Porto Seguro" {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -850,7 +847,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="150.00" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -871,7 +868,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="45000.00" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -892,7 +889,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="1800.00" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -919,7 +916,7 @@ export function NovoVeiculoModal({
                     <FormItem>
                       <FormLabel>Rastreador</FormLabel>
                       <FormControl>
-                        <Input placeholder="Tracker XYZ" {...field} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -936,7 +933,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="80.00" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -1091,7 +1088,7 @@ export function NovoVeiculoModal({
                           <Input 
                             type="number" 
                             step="0.01"
-                            placeholder="30000.00"
+                            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             {...field}
                             value={field.value || ''}
                             onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
