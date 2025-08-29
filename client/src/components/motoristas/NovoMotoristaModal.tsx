@@ -443,22 +443,23 @@ export function NovoMotoristaModal({
             {/* INFORMAÇÕES PESSOAIS */}
             <div className="space-y-4">
               
-              {/* Nome, CPF e RG - 3 colunas */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <FormField
-                  control={form.control}
-                  name="nome"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome Completo *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Digite o nome completo" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              {/* Nome sozinho no topo */}
+              <FormField
+                control={form.control}
+                name="nome"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome Completo *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Digite o nome completo" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+              {/* CPF, RG e Telefone - 3 colunas */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -491,6 +492,30 @@ export function NovoMotoristaModal({
                       <FormLabel>RG *</FormLabel>
                       <FormControl>
                         <Input placeholder="00.000.000-0" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="telefone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefone *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="11977263156" 
+                          {...field}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length <= 11) {
+                              value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                            }
+                            field.onChange(value);
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -567,7 +592,7 @@ export function NovoMotoristaModal({
             {/* CARTEIRA DE MOTORISTA */}
             <div className="space-y-4">
 
-              {/* Vencimento da CNH, Telefone e Email em 3 colunas no desktop */}
+              {/* Vencimento da CNH e Email - completando linha anterior */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
@@ -577,30 +602,6 @@ export function NovoMotoristaModal({
                       <FormLabel>Vencimento da CNH *</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="telefone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefone *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="11977263156" 
-                          {...field}
-                          onChange={(e) => {
-                            let value = e.target.value.replace(/\D/g, '');
-                            if (value.length <= 11) {
-                              value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-                            }
-                            field.onChange(value);
-                          }}
-                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -624,6 +625,9 @@ export function NovoMotoristaModal({
                     </FormItem>
                   )}
                 />
+
+                {/* Campo vazio */}
+                <div></div>
               </div>
             </div>
 
@@ -793,7 +797,7 @@ export function NovoMotoristaModal({
             {/* DOCUMENTOS */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Foto de Perfil */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-foreground">
