@@ -217,18 +217,46 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                 </div>
               ) : imagens.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {imagens.map((imagemUrl, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={imagemUrl}
-                        alt={`Imagem ${index + 1} do motorista`}
-                        className="w-full h-32 object-cover rounded-lg border hover:shadow-md transition-shadow cursor-pointer"
-                        onClick={() => window.open(imagemUrl, '_blank')}
-                        onError={(e) => {
-                          console.error(`[DEBUG] Erro ao carregar imagem: ${imagemUrl}`);
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
+                  {imagens.map((imagemUrl, index) => {
+                    const [hasError, setHasError] = useState(false);
+                    const [isLoading, setIsLoading] = useState(true);
+                    
+                    return (
+                      <div key={index} className="relative group">
+                      <div className="w-full h-32 rounded-lg border bg-gray-50 flex items-center justify-center overflow-hidden">
+                        {!hasError ? (
+                          <>
+                            <img
+                              src={imagemUrl}
+                              alt={`Imagem ${index + 1} do motorista`}
+                              className="w-full h-full object-cover cursor-pointer transition-transform group-hover:scale-105"
+                              onClick={() => window.open(imagemUrl, '_blank')}
+                              onLoad={() => {
+                                console.log(`[DEBUG] ✅ Imagem carregada: ${imagemUrl}`);
+                                setIsLoading(false);
+                              }}
+                              onError={(e) => {
+                                console.error(`[DEBUG] ❌ Erro ao carregar imagem: ${imagemUrl}`);
+                                setHasError(true);
+                                setIsLoading(false);
+                              }}
+                              style={{ display: isLoading ? 'none' : 'block' }}
+                            />
+                            {isLoading && (
+                              <div className="flex flex-col items-center justify-center text-gray-400">
+                                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mb-1"></div>
+                                <span className="text-xs">Carregando...</span>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-gray-400 cursor-pointer" 
+                               onClick={() => window.open(imagemUrl, '_blank')}>
+                            <Image className="w-8 h-8 mb-1" />
+                            <span className="text-xs text-center">Erro ao carregar<br/>Clique para abrir</span>
+                          </div>
+                        )}
+                      </div>
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded-lg flex items-center justify-center gap-2">
                         <Button
                           variant="secondary"
@@ -274,7 +302,8 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                         </Button>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
