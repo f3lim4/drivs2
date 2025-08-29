@@ -625,8 +625,8 @@ export function EditarMotoristaModal({
                 />
               </div>
 
-              {/* Data de Nascimento, CNH e Categoria - 3 colunas */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Data de Nascimento, CNH e Categoria - 4 colunas */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="dataNascimento"
@@ -649,7 +649,6 @@ export function EditarMotoristaModal({
                       <FormLabel>Número da CNH *</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="00000000000" 
                           {...field}
                           onChange={(e) => {
                             const value = e.target.value.replace(/\D/g, '');
@@ -671,7 +670,7 @@ export function EditarMotoristaModal({
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Cat." />
+                            <SelectValue />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -687,65 +686,13 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
-              </div>
-            </div>
 
-
-            {/* CNH */}
-            <div className="space-y-4">
-              
-              {/* CNH e Categoria na primeira linha - Categoria menor */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <FormField
-                  control={form.control}
-                  name="cnh"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-3">
-                      <FormLabel>Número da CNH *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="00000000000" 
-                          {...field}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/\D/g, '');
-                            field.onChange(value);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="categoria"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Categoria *</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Cat." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Cat. A">Cat. A</SelectItem>
-                          <SelectItem value="Cat. B">Cat. B</SelectItem>
-                          <SelectItem value="Cat. AB">Cat. AB</SelectItem>
-                          <SelectItem value="Cat. C">Cat. C</SelectItem>
-                          <SelectItem value="Cat. D">Cat. D</SelectItem>
-                          <SelectItem value="Cat. E">Cat. E</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Campo vazio para manter alinhamento em 4 colunas */}
+                <div></div>
               </div>
 
-              {/* Linha 3: Vencimento CNH, Telefone e Email */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Linha 3: Vencimento CNH, Telefone, Email e espaço */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="vencimentoCnh"
@@ -768,7 +715,6 @@ export function EditarMotoristaModal({
                       <FormLabel>Telefone *</FormLabel>
                       <FormControl>
                         <Input 
-                          placeholder="11977263156" 
                           {...field}
                           onChange={(e) => {
                             const value = e.target.value.replace(/\D/g, '');
@@ -788,12 +734,15 @@ export function EditarMotoristaModal({
                     <FormItem>
                       <FormLabel>E-mail</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="joao@exemplo.com" {...field} />
+                        <Input type="email" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {/* Campo vazio para manter alinhamento em 4 colunas */}
+                <div></div>
               </div>
             </div>
 
