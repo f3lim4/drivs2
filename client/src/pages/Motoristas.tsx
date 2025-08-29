@@ -150,7 +150,7 @@ export default function Motoristas() {
   };
 
   // Filtra e ordena motoristas baseado na busca e filtros
-  const filteredMotoristas = sortMotoristas(motoristas.filter(motorista => {
+  const filteredMotoristas = sortMotoristas(motoristas.filter((motorista: Motorista) => {
     const matchesSearch = motorista.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          motorista.cpf.includes(searchTerm) ||
                          motorista.cnh.includes(searchTerm);
@@ -183,9 +183,9 @@ export default function Motoristas() {
   // Calcula estatísticas baseadas no status da CNH
   const stats = {
     total: motoristas.length,
-    ativos: motoristas.filter(m => getStatusFromVencimento(m.vencimentoCnh) === 'ativo').length,
-    cnhVencendo: motoristas.filter(m => getStatusFromVencimento(m.vencimentoCnh) === 'vencendo').length,
-    cnhVencida: motoristas.filter(m => getStatusFromVencimento(m.vencimentoCnh) === 'vencido').length,
+    ativos: motoristas.filter((m: Motorista) => getStatusFromVencimento(m.vencimentoCnh) === 'ativo').length,
+    cnhVencendo: motoristas.filter((m: Motorista) => getStatusFromVencimento(m.vencimentoCnh) === 'vencendo').length,
+    cnhVencida: motoristas.filter((m: Motorista) => getStatusFromVencimento(m.vencimentoCnh) === 'vencido').length,
   };
 
   // Funções dos botões
@@ -239,14 +239,16 @@ export default function Motoristas() {
       await deleteMotorista.mutateAsync(motorista.id);
 
       // Log da atividade
-      await registrarAtividade(
-        profile.locadoraId,
-        profile.email || 'usuario@drivs.me',
-        'excluir',
-        'motorista',
-        motorista.id,
-        `Motorista excluído: ${motorista.nome} (CPF: ${motorista.cpf})`
-      );
+      if (profile?.locadoraId) {
+        await registrarAtividade(
+          profile.locadoraId,
+          profile.email || 'usuario@drivs.me',
+          'excluir',
+          'motorista',
+          motorista.id,
+          `Motorista excluído: ${motorista.nome} (CPF: ${motorista.cpf})`
+        );
+      }
       
       toast({
         title: "Motorista Excluído",
@@ -640,9 +642,8 @@ export default function Motoristas() {
       {filteredMotoristas.length > 0 && (
         <Pagination
           currentPage={currentPage}
-          totalPages={totalPages}
-          itemsPerPage={itemsPerPage}
           totalItems={filteredMotoristas.length}
+          itemsPerPage={itemsPerPage}
           onPageChange={handlePageChange}
           onItemsPerPageChange={handleItemsPerPageChange}
         />
