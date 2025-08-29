@@ -409,8 +409,8 @@ export function EditarVeiculoModal({
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
               
-              {/* Primeira linha: Placa, Marca, Modelo */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Primeira linha: Placa, Marca, Modelo, Ano */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="placa"
@@ -461,8 +461,8 @@ export function EditarVeiculoModal({
 
               </div>
 
-              {/* Segunda linha: Ano, Cor, Categoria */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Segunda linha: Cor, Categoria, Combustível, RENAVAM */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="ano"
@@ -471,7 +471,7 @@ export function EditarVeiculoModal({
                       <FormLabel>Ano *</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
+                          type="number"
                           className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
@@ -599,8 +599,9 @@ export function EditarVeiculoModal({
                       <FormLabel>Quilometragem *</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
-                          placeholder="0" 
+                          type="number"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+ 
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                         />
@@ -643,7 +644,7 @@ export function EditarVeiculoModal({
                       <FormLabel>Limite Semanal (km) *</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
+                          type="number"
                           className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
@@ -664,9 +665,9 @@ export function EditarVeiculoModal({
                       <FormLabel>Valor Semanal (R$) *</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
-                          step="0.01"
+                          type="number"
                           className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                          step="0.01" 
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
@@ -684,9 +685,9 @@ export function EditarVeiculoModal({
                       <FormLabel>Caução (R$) *</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
-                          step="0.01"
+                          type="number"
                           className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                          step="0.01" 
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
@@ -704,9 +705,9 @@ export function EditarVeiculoModal({
                       <FormLabel>Taxa Administrativa (R$) - Opcional</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
-                          step="0.01"
+                          type="number"
                           className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                          step="0.01" 
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
@@ -746,9 +747,9 @@ export function EditarVeiculoModal({
                       <FormLabel>Valor do Seguro Mensal (R$) - Opcional</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
+                          type="number"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           step="0.01"
-                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
                         />
@@ -772,9 +773,9 @@ export function EditarVeiculoModal({
                       <FormLabel>Valor do Veículo (R$)</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
+                          type="number"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           step="0.01"
-                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => {
@@ -803,9 +804,9 @@ export function EditarVeiculoModal({
                       <FormLabel>IPVA (R$) <span className="text-xs text-green-600">(4% do valor)</span></FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
+                          type="number"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           step="0.01"
-                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
@@ -846,9 +847,9 @@ export function EditarVeiculoModal({
                       <FormLabel>Valor Mensal do Rastreador (R$) - Opcional</FormLabel>
                       <FormControl>
                         <Input 
-                          type="number" 
+                          type="number"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                           step="0.01"
-                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         />
@@ -917,9 +918,10 @@ export function EditarVeiculoModal({
                         <FormLabel>Valor do Financiamento (R$)</FormLabel>
                         <FormControl>
                           <Input 
-                            type="number" 
+                            type="number"
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
                             step="0.01"
-                            placeholder="0"
+  
                             {...field}
                             value={field.value || ''}
                             onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
