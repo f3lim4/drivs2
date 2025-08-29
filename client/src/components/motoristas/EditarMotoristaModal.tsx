@@ -573,22 +573,22 @@ export function EditarMotoristaModal({
             
             {/* INFORMAÇÕES PESSOAIS */}
             <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="nome"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome Completo *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="João da Silva" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* CPF, RG e Data de Nascimento - 3 colunas no desktop */}
+              {/* Nome, CPF e RG - 3 colunas */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="nome"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome Completo *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="João da Silva" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -623,7 +623,10 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
+              </div>
 
+              {/* Data de Nascimento, CNH e Categoria - 3 colunas */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="dataNascimento"
@@ -633,6 +636,53 @@ export function EditarMotoristaModal({
                       <FormControl>
                         <Input type="date" {...field} />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="cnh"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Número da CNH *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="00000000000" 
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '');
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="categoria"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoria *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Cat." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Cat. A">Cat. A</SelectItem>
+                          <SelectItem value="Cat. B">Cat. B</SelectItem>
+                          <SelectItem value="Cat. AB">Cat. AB</SelectItem>
+                          <SelectItem value="Cat. C">Cat. C</SelectItem>
+                          <SelectItem value="Cat. D">Cat. D</SelectItem>
+                          <SelectItem value="Cat. E">Cat. E</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

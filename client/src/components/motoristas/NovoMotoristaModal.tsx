@@ -443,23 +443,22 @@ export function NovoMotoristaModal({
             {/* INFORMAÇÕES PESSOAIS */}
             <div className="space-y-4">
               
-              {/* Nome */}
-              <FormField
-                control={form.control}
-                name="nome"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome Completo *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite o nome completo" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* CPF, RG e Data de Nascimento - 3 colunas no desktop */}
+              {/* Nome, CPF e RG - 3 colunas */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="nome"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome Completo *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Digite o nome completo" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -497,7 +496,10 @@ export function NovoMotoristaModal({
                     </FormItem>
                   )}
                 />
+              </div>
 
+              {/* Data de Nascimento, CNH e Categoria - 3 colunas */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="dataNascimento"
@@ -511,20 +513,12 @@ export function NovoMotoristaModal({
                     </FormItem>
                   )}
                 />
-              </div>
-            </div>
 
-
-            {/* CARTEIRA DE MOTORISTA */}
-            <div className="space-y-4">
-              
-              {/* CNH e Categoria na primeira linha - Categoria menor */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <FormField
                   control={form.control}
                   name="cnh"
                   render={({ field }) => (
-                    <FormItem className="md:col-span-3">
+                    <FormItem>
                       <FormLabel>Número da CNH *</FormLabel>
                       <FormControl>
                         <Input 
@@ -567,6 +561,11 @@ export function NovoMotoristaModal({
                   )}
                 />
               </div>
+            </div>
+
+
+            {/* CARTEIRA DE MOTORISTA */}
+            <div className="space-y-4">
 
               {/* Vencimento da CNH, Telefone e Email em 3 colunas no desktop */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -631,52 +630,51 @@ export function NovoMotoristaModal({
             {/* ENDEREÇO */}
             <div className="space-y-4">
               
-              <FormField
-                control={form.control}
-                name="cep"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CEP *</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="00000-000" 
-                        {...field}
-                        onChange={(e) => {
-                          let value = e.target.value.replace(/\D/g, '');
-                          if (value.length <= 8) {
-                            value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
-                          }
-                          field.onChange(value);
-                          
-                          // Buscar endereço automaticamente quando CEP tiver 8 dígitos
-                          if (value.replace(/\D/g, '').length === 8) {
-                            buscarEnderecoPorCep(value);
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* CEP, Rua e Número - 3 colunas */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="cep"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CEP *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="00000-000" 
+                          {...field}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length <= 8) {
+                              value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+                            }
+                            field.onChange(value);
+                            
+                            // Buscar endereço automaticamente quando CEP tiver 8 dígitos
+                            if (value.replace(/\D/g, '').length === 8) {
+                              buscarEnderecoPorCep(value);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="rua"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Rua *</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nome da rua" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
+                <FormField
+                  control={form.control}
+                  name="rua"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rua *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nome da rua" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="numero"
@@ -692,7 +690,8 @@ export function NovoMotoristaModal({
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Bairro, Complemento e Cidade - 3 colunas */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="bairro"
@@ -720,9 +719,7 @@ export function NovoMotoristaModal({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="cidade"
@@ -730,13 +727,16 @@ export function NovoMotoristaModal({
                     <FormItem>
                       <FormLabel>Cidade *</FormLabel>
                       <FormControl>
-                        <Input placeholder="São Paulo" {...field} />
+                        <Input placeholder="Nome da cidade" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </div>
 
+              {/* Estado - completando a linha anterior que já tem cidade */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="estado"
@@ -783,6 +783,10 @@ export function NovoMotoristaModal({
                     </FormItem>
                   )}
                 />
+
+                {/* Campos vazios para completar 3 colunas */}
+                <div></div>
+                <div></div>
               </div>
             </div>
 
