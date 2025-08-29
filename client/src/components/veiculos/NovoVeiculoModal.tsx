@@ -416,7 +416,7 @@ export function NovoVeiculoModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] sm:max-w-[700px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+      <DialogContent className="w-[95vw] sm:max-w-[900px] lg:max-w-[1100px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-6">
         <DialogHeader>
           <DialogTitle>Novo Veículo</DialogTitle>
           <DialogDescription>
@@ -431,7 +431,7 @@ export function NovoVeiculoModal({
             <div className="space-y-4">
               
               {/* Primeira linha: Tipo, Marca, Modelo */}
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="tipoVeiculo"
@@ -510,7 +510,7 @@ export function NovoVeiculoModal({
               </div>
 
               {/* Segunda linha: Placa, RENAVAM, Chassi */}
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="placa"
@@ -575,91 +575,86 @@ export function NovoVeiculoModal({
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-                <div className="col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="ano"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ano *</FormLabel>
+              {/* Terceira linha: Ano, Cor, Categoria */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="ano"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ano *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="2024" 
+                          {...field}
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="cor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Cor *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                          <Input 
-                            type="number" 
-                            placeholder="" 
-                            {...field}
-                            value={field.value || ''}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
-                          />
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecionar" />
+                          </SelectTrigger>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                        <SelectContent>
+                          <SelectItem value="branco">Branco</SelectItem>
+                          <SelectItem value="preto">Preto</SelectItem>
+                          <SelectItem value="prata">Prata</SelectItem>
+                          <SelectItem value="cinza">Cinza</SelectItem>
+                          <SelectItem value="azul">Azul</SelectItem>
+                          <SelectItem value="vermelho">Vermelho</SelectItem>
+                          <SelectItem value="verde">Verde</SelectItem>
+                          <SelectItem value="bege">Bege</SelectItem>
+                          <SelectItem value="amarelo">Amarelo</SelectItem>
+                          <SelectItem value="marrom">Marrom</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                <div className="col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="cor"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cor *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecionar" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="branco">Branco</SelectItem>
-                            <SelectItem value="preto">Preto</SelectItem>
-                            <SelectItem value="prata">Prata</SelectItem>
-                            <SelectItem value="cinza">Cinza</SelectItem>
-                            <SelectItem value="azul">Azul</SelectItem>
-                            <SelectItem value="vermelho">Vermelho</SelectItem>
-                            <SelectItem value="verde">Verde</SelectItem>
-                            <SelectItem value="bege">Bege</SelectItem>
-                            <SelectItem value="amarelo">Amarelo</SelectItem>
-                            <SelectItem value="marrom">Marrom</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="categoria"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Categoria *</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          value={field.value}
-                          disabled={!tipoSelecionado}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={!tipoSelecionado ? "Selecione o tipo primeiro" : "Selecionar categoria"} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {categoriasDisponiveis.map((categoria) => (
-                              <SelectItem key={categoria.value} value={categoria.value}>
-                                {categoria.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="categoria"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoria *</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value}
+                        disabled={!tipoSelecionado}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={!tipoSelecionado ? "Selecione o tipo primeiro" : "Selecionar categoria"} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {categoriasDisponiveis.map((categoria) => (
+                            <SelectItem key={categoria.value} value={categoria.value}>
+                              {categoria.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               {/* Campo Visualizar Veículo */}
@@ -687,7 +682,8 @@ export function NovoVeiculoModal({
             {/* CARACTERÍSTICAS TÉCNICAS */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 gap-4">
+              {/* Quarta linha: Combustível, Quilometragem, Limite Quilometragem */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="combustivel"
@@ -723,7 +719,7 @@ export function NovoVeiculoModal({
                       <FormControl>
                         <Input 
                           type="number" 
-                          placeholder="" 
+                          placeholder="50000" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
@@ -780,7 +776,8 @@ export function NovoVeiculoModal({
                 />
               )}
 
-              <div className="grid grid-cols-1 gap-4">
+              {/* Quinta linha: Valor Semanal, Caução, Taxa Admin */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="valorSemanal"
@@ -791,7 +788,7 @@ export function NovoVeiculoModal({
                         <Input 
                           type="number" 
                           step="0.01"
-                          placeholder="" 
+                          placeholder="500.00" 
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}

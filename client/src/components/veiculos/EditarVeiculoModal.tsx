@@ -395,7 +395,7 @@ export function EditarVeiculoModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] sm:max-w-[900px] lg:max-w-[1100px] max-h-[90vh] overflow-y-auto p-3 sm:p-6">
         <DialogHeader>
           <DialogTitle>Editar Veículo</DialogTitle>
           <DialogDescription>
@@ -409,7 +409,8 @@ export function EditarVeiculoModal({
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {/* Primeira linha: Placa, Marca, Modelo */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="placa"
@@ -461,27 +462,26 @@ export function EditarVeiculoModal({
 
               </div>
 
-              <div className="grid grid-cols-6 gap-4">
-                <div className="col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="ano"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ano *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            placeholder="2025" 
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+              {/* Segunda linha: Ano, Cor, Categoria */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="ano"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Ano *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          placeholder="2025" 
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <div className="col-span-2">
                   <FormField
