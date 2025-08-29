@@ -33,13 +33,24 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
     const carregarImagens = async () => {
       setLoadingImagens(true);
       try {
+        console.log(`[DEBUG] Buscando imagens para motorista: ${motorista.id}`);
         const response = await fetch(`/api/motoristas/${motorista.id}/imagens`);
+        console.log(`[DEBUG] Response status: ${response.status}`);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log('[DEBUG] Dados recebidos:', data);
+          
           // Converter documentos em array de URLs válidas
           const imagensArray = Object.values(data.documentos || {})
-            .filter(url => url !== null) as string[];
+            .filter(url => url !== null && url !== undefined) as string[];
+          
+          console.log('[DEBUG] Array de imagens filtrado:', imagensArray);
           setImagens(imagensArray);
+        } else {
+          console.error(`[DEBUG] Erro na resposta: ${response.status} - ${response.statusText}`);
+          const errorData = await response.text();
+          console.error('[DEBUG] Dados do erro:', errorData);
         }
       } catch (error) {
         console.error('Erro ao carregar imagens:', error);
@@ -202,6 +213,7 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
               {loadingImagens ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <span className="ml-2 text-sm text-muted-foreground">Carregando imagens...</span>
                 </div>
               ) : imagens.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -213,6 +225,7 @@ export function VisualizarMotoristaModal({ open, onOpenChange, motorista }: Visu
                         className="w-full h-32 object-cover rounded-lg border hover:shadow-md transition-shadow cursor-pointer"
                         onClick={() => window.open(imagemUrl, '_blank')}
                         onError={(e) => {
+                          console.error(`[DEBUG] Erro ao carregar imagem: ${imagemUrl}`);
                           e.currentTarget.style.display = 'none';
                         }}
                       />
