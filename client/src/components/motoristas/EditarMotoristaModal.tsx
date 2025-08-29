@@ -573,22 +573,23 @@ export function EditarMotoristaModal({
             
             {/* INFORMAÇÕES PESSOAIS */}
             <div className="space-y-4">
-              {/* Nome, CPF e RG - 3 colunas */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <FormField
-                  control={form.control}
-                  name="nome"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome Completo *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="João da Silva" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              {/* Nome sozinho no topo */}
+              <FormField
+                control={form.control}
+                name="nome"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome Completo *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="João da Silva" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+              {/* CPF, RG e Telefone - 3 colunas */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="cpf"
@@ -618,6 +619,27 @@ export function EditarMotoristaModal({
                       <FormLabel>RG *</FormLabel>
                       <FormControl>
                         <Input placeholder="00.000.000-0" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="telefone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefone *</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="11977263156" 
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '');
+                            field.onChange(value);
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -744,7 +766,7 @@ export function EditarMotoristaModal({
                 />
               </div>
 
-              {/* Vencimento da CNH, Telefone e Email em 3 colunas no desktop */}
+              {/* Vencimento da CNH e Email - completando linha anterior */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
@@ -754,27 +776,6 @@ export function EditarMotoristaModal({
                       <FormLabel>Vencimento da CNH *</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="telefone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefone *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="11977263156" 
-                          {...field}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/\D/g, '');
-                            field.onChange(value);
-                          }}
-                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -794,6 +795,9 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
+
+                {/* Campo vazio */}
+                <div></div>
               </div>
             </div>
 
