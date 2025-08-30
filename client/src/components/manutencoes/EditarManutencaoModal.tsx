@@ -102,13 +102,13 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Manutenção</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label htmlFor="veiculoId">Veículo</Label>
               <Select 
@@ -157,7 +157,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label htmlFor="oficina">Oficina</Label>
               <Input
@@ -177,7 +177,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dataInicio">Data de Início</Label>
               <Input
@@ -197,7 +197,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dataConclusao">Data de Conclusão</Label>
               <Input
@@ -226,7 +226,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label htmlFor="valorOrcamento">Valor do Orçamento</Label>
               <Input
@@ -250,7 +250,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label htmlFor="quilometragemInicio">Quilometragem Inicial</Label>
               <Input
@@ -309,7 +309,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label htmlFor="statusPagamento">Status do Pagamento</Label>
               <Select 
