@@ -701,10 +701,10 @@ export default function Dashboard() {
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-green-700">Sistema Online</p>
                     <p className="text-2xl font-bold text-green-800">100%</p>
-                    <p className="text-xs text-green-600 flex items-center gap-1">
+                    <div className="text-xs text-green-600 flex items-center gap-1">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       Operacional
-                    </p>
+                    </div>
                   </div>
                   <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center">
                     <Activity className="w-6 h-6 text-green-700" />
@@ -720,10 +720,10 @@ export default function Dashboard() {
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-blue-700">Locadoras Ativas</p>
                     <p className="text-2xl font-bold text-blue-800">{locadoras.length}</p>
-                    <p className="text-xs text-blue-600 flex items-center gap-1">
+                    <div className="text-xs text-blue-600 flex items-center gap-1">
                       <TrendingUp className="w-3 h-3" />
                       Empresas cadastradas
-                    </p>
+                    </div>
                   </div>
                   <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
                     <Building2 className="w-6 h-6 text-blue-700" />
@@ -739,10 +739,10 @@ export default function Dashboard() {
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-purple-700">Total de Veículos</p>
                     <p className="text-2xl font-bold text-purple-800">{veiculosRaw.length}</p>
-                    <p className="text-xs text-purple-600 flex items-center gap-1">
+                    <div className="text-xs text-purple-600 flex items-center gap-1">
                       <Car className="w-3 h-3" />
                       Frota total
-                    </p>
+                    </div>
                   </div>
                   <div className="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center">
                     <Car className="w-6 h-6 text-purple-700" />
@@ -758,10 +758,10 @@ export default function Dashboard() {
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-indigo-700">PostgreSQL</p>
                     <p className="text-2xl font-bold text-indigo-800">OK</p>
-                    <p className="text-xs text-indigo-600 flex items-center gap-1">
+                    <div className="text-xs text-indigo-600 flex items-center gap-1">
                       <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
                       Conectado
-                    </p>
+                    </div>
                   </div>
                   <div className="w-12 h-12 bg-indigo-200 rounded-full flex items-center justify-center">
                     <Database className="w-6 h-6 text-indigo-700" />
