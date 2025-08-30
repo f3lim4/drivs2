@@ -522,10 +522,11 @@ export function EditarMotoristaModal({
         });
         
         if (!uploadResponse.ok) {
-          console.error('Erro ao fazer upload das imagens');
+          const errorText = await uploadResponse.text();
+          console.error('Erro ao fazer upload das imagens:', uploadResponse.status, errorText);
           toast({
             title: "Dados atualizados",
-            description: "Motorista atualizado, mas houve erro no upload das imagens",
+            description: `Motorista atualizado, mas houve erro no upload das imagens: ${uploadResponse.status}`,
             variant: "destructive",
           });
         } else {
