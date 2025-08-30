@@ -115,7 +115,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[95vw] sm:max-w-[900px] lg:max-w-[1100px] max-h-[90vh] overflow-y-auto p-8">
+      <DialogContent className="w-[90vw] sm:max-w-[600px] lg:max-w-[800px] max-h-[90vh] overflow-y-auto p-8">
         <DialogHeader>
           <DialogTitle>Nova Manutenção</DialogTitle>
         </DialogHeader>
