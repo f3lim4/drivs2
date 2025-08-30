@@ -1053,6 +1053,39 @@ export function EditarMotoristaModal({
                           <span className="text-xs text-blue-600">Substituir</span>
                         </label>
                       </div>
+                    ) : imagePreviews.fotoPerfil ? (
+                      <div className="space-y-2">
+                        <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.fotoPerfil} 
+                            alt="Foto de perfil atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.fotoPerfil!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
+                        <label
+                          htmlFor="foto-perfil"
+                          className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
+                        >
+                          <Upload className="h-3 w-3 text-blue-600 mr-1" />
+                          <span className="text-xs text-blue-600">Substituir</span>
+                        </label>
+                      </div>
                     ) : (
                       <label
                         htmlFor="foto-perfil"
@@ -1258,6 +1291,39 @@ export function EditarMotoristaModal({
                           />
                         )}
                       </div>
+                    ) : imagePreviews.fotoComCnh ? (
+                      <div className="space-y-2">
+                        <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.fotoComCnh} 
+                            alt="Foto com CNH atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.fotoComCnh!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
+                        <label
+                          htmlFor="foto-com-cnh"
+                          className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
+                        >
+                          <Upload className="h-3 w-3 text-blue-600 mr-1" />
+                          <span className="text-xs text-blue-600">Substituir</span>
+                        </label>
+                      </div>
                     ) : (
                       <label
                         htmlFor="foto-com-cnh"
@@ -1307,6 +1373,45 @@ export function EditarMotoristaModal({
                           </div>
                         )}
                       </div>
+                    ) : imagePreviews.comprovanteEndereco ? (
+                      <div className="space-y-2">
+                        <div className="text-xs text-gray-600 mb-1">Documento atual:</div>
+                        <div className="relative group">
+                          {imagePreviews.comprovanteEndereco.includes('.pdf') ? (
+                            <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded">
+                              <FileText className="h-4 w-4 text-gray-400" />
+                            </div>
+                          ) : (
+                            <img 
+                              src={imagePreviews.comprovanteEndereco} 
+                              alt="Comprovante atual" 
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.comprovanteEndereco!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
+                        <label
+                          htmlFor="comprovante-endereco"
+                          className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
+                        >
+                          <Upload className="h-3 w-3 text-blue-600 mr-1" />
+                          <span className="text-xs text-blue-600">Substituir</span>
+                        </label>
+                      </div>
                     ) : (
                       <label
                         htmlFor="comprovante-endereco"
@@ -1351,6 +1456,39 @@ export function EditarMotoristaModal({
                           />
                         )}
                       </div>
+                    ) : imagePreviews.fotoExtra ? (
+                      <div className="space-y-2">
+                        <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.fotoExtra} 
+                            alt="Foto extra atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.fotoExtra!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
+                        <label
+                          htmlFor="foto-extra"
+                          className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
+                        >
+                          <Upload className="h-3 w-3 text-blue-600 mr-1" />
+                          <span className="text-xs text-blue-600">Substituir</span>
+                        </label>
+                      </div>
                     ) : (
                       <label
                         htmlFor="foto-extra"
@@ -1394,6 +1532,39 @@ export function EditarMotoristaModal({
                             className="w-12 h-12 object-cover rounded"
                           />
                         )}
+                      </div>
+                    ) : imagePreviews.fotoExtra2 ? (
+                      <div className="space-y-2">
+                        <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.fotoExtra2} 
+                            alt="Foto extra 2 atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.fotoExtra2!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
+                        <label
+                          htmlFor="foto-extra-2"
+                          className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
+                        >
+                          <Upload className="h-3 w-3 text-blue-600 mr-1" />
+                          <span className="text-xs text-blue-600">Substituir</span>
+                        </label>
                       </div>
                     ) : (
                       <label
