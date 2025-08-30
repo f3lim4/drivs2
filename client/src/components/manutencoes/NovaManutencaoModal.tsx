@@ -115,13 +115,13 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nova Manutenção</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="veiculoId">Veículo</Label>
               <Select 
@@ -241,7 +241,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dataInicio">Data de Início</Label>
               <Input
@@ -261,7 +261,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="valorOrcamento">Valor do Orçamento</Label>
               <Input
@@ -292,7 +292,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="quilometragemInicio">Quilometragem Atual</Label>
               <Input
@@ -328,7 +328,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
               <div className="border-t pt-4">
                 <h4 className="text-lg font-semibold mb-4">Conclusão da Manutenção</h4>
                 
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="dataConclusao">Data de Conclusão</Label>
                     <Input
@@ -350,7 +350,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="quilometragemFim">Quilometragem Final</Label>
                     <Input
@@ -372,7 +372,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="proximaManutencao">Próxima Manutenção (Data) - Opcional</Label>
                     <Input
@@ -396,7 +396,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </>
           )}
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="statusPagamento">Status do Pagamento</Label>
               <Select 
