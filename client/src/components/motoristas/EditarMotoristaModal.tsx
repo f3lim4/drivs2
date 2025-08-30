@@ -627,8 +627,8 @@ export function EditarMotoristaModal({
                 />
               </div>
 
-              {/* Data de Nascimento, CNH e Categoria - 4 colunas */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              {/* Linha 2: Data de Nascimento, CNH e Categoria */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="dataNascimento"
@@ -688,13 +688,10 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
-
-                {/* Campo vazio para manter alinhamento em 4 colunas */}
-                <div></div>
               </div>
 
-              {/* Linha 3: Vencimento CNH, Telefone, Email e espaço */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              {/* Linha 3: Vencimento CNH, Telefone e E-mail */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="vencimentoCnh"
@@ -742,9 +739,6 @@ export function EditarMotoristaModal({
                     </FormItem>
                   )}
                 />
-
-                {/* Campo vazio para manter alinhamento em 4 colunas */}
-                <div></div>
               </div>
             </div>
 
