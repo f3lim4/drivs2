@@ -269,7 +269,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] sm:max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+      <DialogContent className="max-w-[98vw] w-full max-h-[95vh] overflow-y-auto p-8">
         <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-500" />
@@ -280,7 +280,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
             {/* Motorista e Tipo da Infração na mesma linha */}
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Seleção de Motorista com Aluguel Ativo */}
               <div className="space-y-2">
                 {!selecaoManual && (
@@ -425,7 +425,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
             </div>
 
             {/* Número do Auto e Código da Infração na mesma linha */}
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="numeroAuto"
@@ -476,7 +476,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
             />
 
             {/* Valores Financeiros */}
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="valorOriginal"
@@ -538,7 +538,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               </div>
 
             {/* Datas */}
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="dataInfracao"
@@ -597,7 +597,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               </div>
 
             {/* Local da Infração e Órgão Autuador */}
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="localInfracao"
@@ -628,7 +628,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
               </div>
 
             {/* Cidade e Estado */}
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="cidade"

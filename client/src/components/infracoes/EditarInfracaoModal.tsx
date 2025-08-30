@@ -136,7 +136,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[98vw] w-full max-h-[95vh] overflow-y-auto p-8">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Edit className="h-5 w-5 text-blue-500" />
@@ -149,7 +149,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Dados do Motorista e Veículo */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Dados do Motorista e Veículo</h3>
@@ -328,7 +328,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
             />
 
             {/* Valores Financeiros */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="valorOriginal"
@@ -390,7 +390,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
             </div>
 
             {/* Datas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="dataInfracao"
@@ -449,7 +449,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
             </div>
 
             {/* Local da Infração */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="localInfracao"
@@ -505,7 +505,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
             </div>
 
             {/* Órgão Autuador */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="orgaoAutuador"
@@ -536,7 +536,7 @@ export function EditarInfracaoModal({ open, onClose, infracao }: EditarInfracaoM
             </div>
 
             {/* Status e Controle */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <FormField
                 control={form.control}
                 name="status"
