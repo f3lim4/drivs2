@@ -509,6 +509,7 @@ export function EditarMotoristaModal({
       
       if (imagensParaUpload.length > 0) {
         const formData = new FormData();
+        formData.append('motoristaId', motorista.id);
         
         imagensParaUpload.forEach(([tipo, file]) => {
           if (file) {
