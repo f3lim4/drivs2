@@ -115,12 +115,12 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-[95vw] w-full max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[90vw] w-[90vw] max-h-[85vh] overflow-y-auto p-8">
         <DialogHeader>
           <DialogTitle>Nova Manutenção</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             <div className="space-y-2">
               <Label htmlFor="veiculoId">Veículo</Label>
@@ -160,20 +160,20 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 md:col-span-2 lg:col-span-3 xl:col-span-4">
             <Label htmlFor="descricao">Descrição</Label>
             <Textarea
               id="descricao"
               {...form.register('descricao')}
               placeholder="Descreva o serviço a ser realizado"
-              rows={3}
+              rows={2}
             />
           </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Local/Oficina</Label>
-              <div className="space-y-2">
+          <div className="space-y-4 md:col-span-3 lg:col-span-4 xl:col-span-5">
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Local/Oficina</Label>
+              <div className="flex gap-6">
                 <div className="flex items-center space-x-2">
                   <input
                     type="radio"
@@ -325,8 +325,8 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
           {/* Campos condicionais quando a manutenção está concluída */}
           {form.watch('status') === 'concluida' && (
             <>
-              <div className="border-t pt-4">
-                <h4 className="text-lg font-semibold mb-4">Conclusão da Manutenção</h4>
+              <div className="border-t pt-6 md:col-span-3 lg:col-span-4 xl:col-span-5">
+                <h4 className="text-lg font-semibold mb-6">Conclusão da Manutenção</h4>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                   <div className="space-y-2">
@@ -372,7 +372,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="proximaManutencao">Próxima Manutenção (Data) - Opcional</Label>
                     <Input
@@ -383,13 +383,13 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-3 lg:col-span-4 xl:col-span-5">
                   <Label htmlFor="pecasSubstituidas">Peças Substituídas</Label>
                   <Textarea
                     id="pecasSubstituidas"
                     {...form.register('pecasSubstituidas')}
                     placeholder="Liste as peças que foram substituídas"
-                    rows={3}
+                    rows={2}
                   />
                 </div>
               </div>
@@ -434,11 +434,11 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={handleClose}>
+          <div className="flex justify-end gap-4 pt-6 border-t mt-6">
+            <Button type="button" variant="outline" onClick={handleClose} className="px-8">
               Cancelar
             </Button>
-            <Button type="submit" disabled={isCreating}>
+            <Button type="submit" disabled={isCreating} className="px-8">
               {isCreating ? 'Criando...' : 'Criar Manutenção'}
             </Button>
           </div>
