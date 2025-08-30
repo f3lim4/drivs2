@@ -608,12 +608,13 @@ export default function Pagamentos() {
         </Card>
       </div>
 
-      {/* Controles de busca e filtros - igual página veículos */}
+      {/* Controles de busca e filtros */}
       <Card>
         <CardContent className="p-6">
-          <div className="space-y-4">
+          {/* Layout horizontal no PC - única linha com todos os filtros e botões */}
+          <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
             {/* Busca */}
-            <div className="w-full">
+            <div className="flex-1 max-w-md">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
@@ -625,39 +626,37 @@ export default function Pagamentos() {
               </div>
             </div>
 
-            {/* Filtros e botões */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-                  <SelectTrigger className="w-full sm:w-36">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todos">Todos os Status</SelectItem>
-                    <SelectItem value="em_aberto">Em Aberto</SelectItem>
-                    <SelectItem value="pago">Pago</SelectItem>
-                    <SelectItem value="parcial">Parcial</SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Filtros */}
+            <div className="flex gap-3 items-center">
+              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+                <SelectTrigger className="w-36">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os Status</SelectItem>
+                  <SelectItem value="em_aberto">Em Aberto</SelectItem>
+                  <SelectItem value="pago">Pago</SelectItem>
+                  <SelectItem value="parcial">Parcial</SelectItem>
+                </SelectContent>
+              </Select>
 
-                <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-                  <SelectTrigger className="w-full sm:w-36">
-                    <SelectValue placeholder="Tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todos">Todos os Tipos</SelectItem>
-                    <SelectItem value="aluguel">Aluguel</SelectItem>
-                    <SelectItem value="infrações">Infrações</SelectItem>
-                    <SelectItem value="manutenção">Manutenção</SelectItem>
-                    <SelectItem value="outros">Outros</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+                <SelectTrigger className="w-36">
+                  <SelectValue placeholder="Tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os Tipos</SelectItem>
+                  <SelectItem value="aluguel">Aluguel</SelectItem>
+                  <SelectItem value="infrações">Infrações</SelectItem>
+                  <SelectItem value="manutenção">Manutenção</SelectItem>
+                  <SelectItem value="outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
 
+              {/* Botões */}
               <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novos pagamentos">
                 <Button 
                   onClick={() => setShowNovoPagamento(true)}
-                  className="w-full sm:w-auto"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Novo Pagamento
