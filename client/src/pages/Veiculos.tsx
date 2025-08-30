@@ -375,9 +375,10 @@ export default function Veiculos() {
       {/* Controles de busca e filtros */}
       <Card>
         <CardContent className="p-6">
-          <div className="space-y-4">
+          {/* Layout horizontal no PC - única linha com todos os filtros e botões */}
+          <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
             {/* Busca */}
-            <div className="w-full">
+            <div className="flex-1 max-w-md">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
@@ -389,10 +390,10 @@ export default function Veiculos() {
               </div>
             </div>
 
-            {/* Filtros e botões */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            {/* Filtros */}
+            <div className="flex gap-3 items-center">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-48">
+                <SelectTrigger className="w-48">
                   <Filter className="w-4 h-4 mr-2" />
                   <SelectValue />
                 </SelectTrigger>
@@ -405,10 +406,11 @@ export default function Veiculos() {
                 </SelectContent>
               </Select>
 
+              {/* Botões */}
               {isLocadora && (
                 <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novos veículos">
                   <Button 
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 w-full sm:w-auto"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={handleNovoVeiculo}
                   >
                     <Plus className="w-4 h-4 mr-2" />

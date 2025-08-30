@@ -285,9 +285,10 @@ export default function Manutencoes() {
           {/* Controles de busca e filtros */}
           <Card>
             <CardContent className="p-6">
-              <div className="space-y-4">
+              {/* Layout horizontal no PC - única linha com todos os filtros e botões */}
+              <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
                 {/* Busca */}
-                <div className="w-full">
+                <div className="flex-1 max-w-md">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input
@@ -299,10 +300,10 @@ export default function Manutencoes() {
                   </div>
                 </div>
 
-                {/* Filtros e botões */}
-                <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                {/* Filtros */}
+                <div className="flex gap-3 items-center">
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full sm:w-48">
+                    <SelectTrigger className="w-48">
                       <Filter className="w-4 h-4 mr-2" />
                       <SelectValue />
                     </SelectTrigger>
@@ -315,11 +316,11 @@ export default function Manutencoes() {
                     </SelectContent>
                   </Select>
 
+                  {/* Botões */}
                   <div className="flex gap-2">
                     <Button 
                       variant="outline"
                       onClick={() => setGerenciarLocaisModalOpen(true)}
-                      className="flex-1 sm:flex-initial"
                     >
                       <MapPin className="w-4 h-4 mr-2" />
                       <span className="hidden sm:inline">Gerenciar Locais</span>
@@ -328,7 +329,7 @@ export default function Manutencoes() {
                     
                     <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novas manutenções">
                       <Button 
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 sm:flex-initial"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90"
                         onClick={() => setNovaManutencaoModalOpen(true)}
                       >
                         <Plus className="w-4 h-4 mr-2" />
