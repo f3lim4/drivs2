@@ -115,7 +115,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl w-full max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nova Manutenção</DialogTitle>
         </DialogHeader>
@@ -160,7 +160,8 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </div>
           </div>
 
-          <div className="space-y-2 md:col-span-2 lg:col-span-3">
+          {/* Linha 2: Descrição */}
+          <div className="space-y-2">
             <Label htmlFor="descricao">Descrição</Label>
             <Textarea
               id="descricao"
@@ -170,7 +171,8 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             />
           </div>
 
-          <div className="space-y-4 md:col-span-2 lg:col-span-3">
+          {/* Linha 3: Local/Oficina e Contato na mesma linha */}
+          <div className="space-y-4">
             <div className="space-y-3">
               <Label className="text-base font-semibold">Local/Oficina</Label>
               <div className="flex gap-4">
@@ -219,7 +221,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                 </Select>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="oficina">Oficina</Label>
                   <Input
@@ -241,7 +243,8 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Linha 4: Data de Início, Data Prevista, Valor do Orçamento, Prioridade */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dataInicio">Data de Início</Label>
               <Input
@@ -259,9 +262,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                 {...form.register('dataPrevisao')}
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="valorOrcamento">Valor do Orçamento</Label>
               <Input
@@ -292,35 +293,6 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="quilometragemInicio">Quilometragem Atual</Label>
-              <Input
-                id="quilometragemInicio"
-                type="number"
-                {...form.register('quilometragemInicio', { valueAsNumber: true })}
-                placeholder="0"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select 
-                value={form.watch('status')} 
-                onValueChange={(value) => form.setValue('status', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="agendada">Agendada</SelectItem>
-                  <SelectItem value="em_andamento">Em Andamento</SelectItem>
-                  <SelectItem value="concluida">Concluída</SelectItem>
-                  <SelectItem value="cancelada">Cancelada</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
           {/* Campos condicionais quando a manutenção está concluída */}
           {form.watch('status') === 'concluida' && (
@@ -396,7 +368,36 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Linha 5: Quilometragem, Status, Status Pagamento, Forma de Pagamento */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="quilometragemInicio">Quilometragem Atual</Label>
+              <Input
+                id="quilometragemInicio"
+                type="number"
+                {...form.register('quilometragemInicio', { valueAsNumber: true })}
+                placeholder="0"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select 
+                value={form.watch('status')} 
+                onValueChange={(value) => form.setValue('status', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="agendada">Agendada</SelectItem>
+                  <SelectItem value="em_andamento">Em Andamento</SelectItem>
+                  <SelectItem value="concluida">Concluída</SelectItem>
+                  <SelectItem value="cancelada">Cancelada</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="statusPagamento">Status do Pagamento</Label>
               <Select 
