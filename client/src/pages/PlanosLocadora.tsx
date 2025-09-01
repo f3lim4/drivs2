@@ -149,16 +149,21 @@ export default function PlanosLocadora() {
     queryKey: ['/api/locadoras', profile?.locadoraId],
     enabled: true, // Sempre habilitado para funcionar em produção
     staleTime: 0, // Sempre buscar dados frescos
-    gcTime: 60000, // 1 minuto para deploy
-    refetchInterval: 10000, // Atualizar a cada 10 segundos
+    gcTime: 0, // Não manter cache
+    refetchInterval: 5000, // Atualizar a cada 5 segundos
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const { data: planoDetalhes, isLoading, error: planosError } = useQuery({
     queryKey: ['/api/planos', profile?.locadoraId],
     queryFn: () => fetch(`/api/planos${profile?.locadoraId ? `?locadoraId=${profile.locadoraId}` : ''}`).then(res => res.json()),
     enabled: true, // Sempre habilitado para funcionar em produção
-    staleTime: 5 * 60 * 1000, // 5 minutos
-    gcTime: 10 * 60 * 1000, // 10 minutos
+    staleTime: 0, // Sempre buscar dados frescos
+    gcTime: 0, // Não manter cache
+    refetchInterval: 5000, // Atualizar a cada 5 segundos
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // Forçar atualização dos dados quando a página carregar
@@ -259,8 +264,17 @@ export default function PlanosLocadora() {
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = locadoraData?.vitalia === true;
   
-  // Se for VIP ou Infinity, mostrar plano especial; caso contrário usar o plano salvo
-  const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || planoDetalhes?.planoAtual || 'pro');
+  // Debug: verificar dados recebidos
+  console.log('🔍 PLANOS DEBUG:', {
+    locadoraData: locadoraData,
+    planoDetalhes: planoDetalhes,
+    isVipPlan,
+    planoLocadora: locadoraData?.plano,
+    planoDetalhesAtual: planoDetalhes?.planoAtual
+  });
+
+  // Se for VIP ou Infinity, mostrar plano especial; caso contrário priorizar planoDetalhes
+  const planoAtual = isVipPlan ? 'vip' : (planoDetalhes?.planoAtual || locadoraData?.plano || 'pro');
   
   
   // VIP e Infinity sempre têm acesso - não podem estar expirados
