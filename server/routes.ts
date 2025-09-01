@@ -1257,7 +1257,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log('[DEBUG] Dados validados, criando contrato...');
-      const contrato = await storage.createContrato(result.data);
+      
+      // Função auxiliar para normalizar datas de string ISO para formato YYYY-MM-DD local
+      const normalizarData = (data: any) => {
+        if (!data) return data;
+        if (typeof data === 'string') return data; // Se já é string, mantem
+        return data?.toISOString?.()?.split('T')[0] || data; // Se é Date, extrai só a data
+      };
+
+      // Normalizar datas para evitar problemas de fuso horário
+      const dadosNormalizados = {
+        ...result.data,
+        dataInicio: normalizarData(result.data.dataInicio),
+        dataFim: normalizarData(result.data.dataFim)
+      };
+      
+      console.log('[DEBUG] Dados normalizados:', {
+        dataInicio: dadosNormalizados.dataInicio,
+        dataFim: dadosNormalizados.dataFim,
+        dataInicioTipo: typeof dadosNormalizados.dataInicio,
+        dataFimTipo: typeof dadosNormalizados.dataFim
+      });
+      
+      const contrato = await storage.createContrato(dadosNormalizados);
       console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
       
       // Limpar cache após criação bem-sucedida
@@ -1312,7 +1334,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
-      const contrato = await storage.updateContrato(req.params.id, result.data);
+      // Função auxiliar para normalizar datas
+      const normalizarData = (data: any) => {
+        if (!data) return data;
+        if (typeof data === 'string') return data;
+        return data?.toISOString?.()?.split('T')[0] || data;
+      };
+
+      // Normalizar datas também na atualização
+      const dadosNormalizados = {
+        ...result.data,
+        dataInicio: normalizarData(result.data.dataInicio),
+        dataFim: normalizarData(result.data.dataFim)
+      };
+      
+      const contrato = await storage.updateContrato(req.params.id, dadosNormalizados);
       
       // Se status mudou para encerrado ou cancelado, parar pagamentos automáticos
       if (result.data.status && (result.data.status === 'encerrado' || result.data.status === 'cancelado')) {
