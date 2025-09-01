@@ -115,7 +115,10 @@ function CheckoutForm({ clientSecret, subscriptionId, planoNome, valor, onSucces
                   <RadioGroupItem value="anual" id="anual" />
                   <Label htmlFor="anual" className="flex-1 cursor-pointer">
                     <div className="flex justify-between items-center">
-                      <span>Anual (2 meses grátis)</span>
+                      <div className="flex flex-col">
+                        <span>Anual (2 meses grátis)</span>
+                        <span className="text-xs text-blue-600">+ Todas as atualizações do sistema</span>
+                      </div>
                       <div className="text-right">
                         <span className="font-semibold">R$ {Math.round(valor * 10)}/ano</span>
                         <div className="text-xs text-green-600">Economize R$ {Math.round(valor * 2)}</div>
