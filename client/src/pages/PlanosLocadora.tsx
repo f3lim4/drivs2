@@ -146,10 +146,12 @@ export default function PlanosLocadora() {
 
   // Buscar dados da locadora se usuário é uma locadora
   const { data: locadora, isLoading: isLoadingLocadora, refetch: refetchLocadora } = useQuery({
-    queryKey: ['/api/locadoras', profile?.locadoraId],
+    queryKey: ['/api/locadoras', profile?.locadoraId, Date.now()], // Força cache único
     enabled: !!profile?.locadoraId,
     staleTime: 0, // Sempre dados frescos para corrigir bug do plano
-    refetchOnMount: true, // Sempre refetch quando montar
+    gcTime: 0, // Não manter cache
+    refetchOnMount: 'always', // Sempre refetch quando montar
+    refetchOnWindowFocus: true, // Refetch quando focar janela
   });
 
   const { data: planoDetalhes, isLoading, error: planosError } = useQuery({
@@ -255,8 +257,14 @@ export default function PlanosLocadora() {
     locadoraData: locadoraData?.plano, 
     planoAtual, 
     isVipPlan,
-    locadoraStatus: locadoraData?.status 
+    locadoraStatus: locadoraData?.status,
+    timestamp: new Date().toLocaleTimeString()
   });
+  
+  // Alert temporário para forçar visibilidade em produção
+  if (locadoraData && locadoraData.plano === 'elite' && planoAtual !== 'elite') {
+    console.error('🚨 BUG DETECTADO: Plano no banco é elite mas planoAtual é:', planoAtual);
+  }
   
   
   // VIP e Infinity sempre têm acesso - não podem estar expirados
