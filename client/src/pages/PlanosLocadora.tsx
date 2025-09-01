@@ -168,14 +168,20 @@ export default function PlanosLocadora() {
 
   // Forçar atualização dos dados quando a página carregar
   useEffect(() => {
-    // Invalidar cache para garantir dados frescos
+    // Limpar COMPLETAMENTE o cache
+    queryClient.clear();
+    
+    // Invalidar todas as queries relacionadas
     queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
     queryClient.invalidateQueries({ queryKey: ['subscription-status-v2'] });
     
-    // Refetch dos dados da locadora
-    if (profile?.locadoraId) {
-      refetchLocadora();
-    }
+    // Forçar reload completo da página se necessário
+    setTimeout(() => {
+      if (profile?.locadoraId) {
+        refetchLocadora();
+      }
+    }, 100);
   }, [profile?.locadoraId, queryClient, refetchLocadora]);
 
   // Dados carregados com sucesso - continuar com renderização normal
