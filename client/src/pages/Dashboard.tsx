@@ -376,19 +376,26 @@ export default function Dashboard() {
     .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
     .reduce((total: number, aluguel: any) => total + parseFloat(aluguel.valorMensal || '0'), 0);
 
-  // CORRIGIDO: Calcular receita semanal esperada usando fórmula correta (4.35)
-  const receitaSemanalEsperada = alugueisSeguro
-    .filter((a: any) => a.status === 'ativo' || a.status === 'pendente')
-    .reduce((total: number, aluguel: any) => {
-      const valorMensal = parseFloat(aluguel.valorMensal || '0');
-      const valorSemanal = valorMensal / 4.35; // Divide por 4.35 (fórmula correta)
-      return total + valorSemanal;
-    }, 0);
-
   // CORRIGIDO: Calcular receita semanal recebida usando mesma lógica da página Pagamentos
   // Últimos 7 dias (igual à função calcularValorVisualizacaoRecebido da página Pagamentos)
   const seteDiasAtras = new Date();
   seteDiasAtras.setDate(hoje.getDate() - 7);
+
+  // CORRIGIDO: Calcular receita semanal esperada baseada apenas nos pagamentos em aberto dessa semana
+  const pagamentosSemanaEsperados = pagamentos
+    .filter((p: any) => {
+      if (!p.dataPagamento) return false;
+      const dataPagamento = new Date(p.dataPagamento);
+      return dataPagamento >= seteDiasAtras && 
+             dataPagamento <= hoje &&
+             (p.status === 'em_aberto' || p.status === 'pendente');
+    });
+
+  const receitaSemanalEsperada = pagamentosSemanaEsperados
+    .reduce((sum: number, p: any) => {
+      const valorTotal = parseFloat(p.valorTotal || '0');
+      return sum + valorTotal;
+    }, 0);
 
   const pagamentosSemanaRecebidos = pagamentos
     .filter((p: any) => {
