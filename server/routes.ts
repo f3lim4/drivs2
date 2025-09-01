@@ -385,7 +385,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/locadoras/:id", async (req, res) => {
     try {
       const locadora = await storage.getLocadora(req.params.id);
-      console.log(`🔍 API LOCADORA DEBUG - ID: ${req.params.id}, Plano retornado:`, locadora?.plano);
       if (!locadora) {
         return res.status(404).json({ message: "Locadora not found" });
       }

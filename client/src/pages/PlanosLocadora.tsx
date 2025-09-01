@@ -147,39 +147,15 @@ export default function PlanosLocadora() {
   // Buscar dados da locadora se usuário é uma locadora
   const { data: locadora, isLoading: isLoadingLocadora, refetch: refetchLocadora } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId],
-    enabled: true, // Sempre habilitado para funcionar em produção
-    staleTime: 0, // Sempre buscar dados frescos
-    gcTime: 0, // Não manter cache
-    refetchInterval: 5000, // Atualizar a cada 5 segundos
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    enabled: !!profile?.locadoraId,
   });
 
   const { data: planoDetalhes, isLoading, error: planosError } = useQuery({
     queryKey: ['/api/planos', profile?.locadoraId],
     queryFn: () => fetch(`/api/planos${profile?.locadoraId ? `?locadoraId=${profile.locadoraId}` : ''}`).then(res => res.json()),
-    enabled: true, // Sempre habilitado para funcionar em produção
-    staleTime: 0, // Sempre buscar dados frescos
-    gcTime: 0, // Não manter cache
-    refetchInterval: 5000, // Atualizar a cada 5 segundos
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    enabled: !!profile?.locadoraId,
   });
 
-  // Forçar atualização dos dados quando a página carregar
-  useEffect(() => {
-    // Invalidar apenas as queries relevantes sem quebrar tudo
-    queryClient.invalidateQueries({ queryKey: ['/api/locadoras', profile?.locadoraId] });
-    queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
-    queryClient.invalidateQueries({ queryKey: ['subscription-status-v2'] });
-    
-    // Refetch com timeout para dar tempo de invalidar
-    if (profile?.locadoraId) {
-      setTimeout(() => {
-        refetchLocadora();
-      }, 50);
-    }
-  }, [profile?.locadoraId, queryClient, refetchLocadora]);
 
   // Dados carregados com sucesso - continuar com renderização normal
 
@@ -264,15 +240,6 @@ export default function PlanosLocadora() {
   // Valores padrão para garantir funcionamento em produção
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
   
-  // Debug logs temporários
-  console.log('🔍 PLANOS PAGE DEBUG:', { 
-    locadora, 
-    locadoraData, 
-    plano: locadoraData?.plano, 
-    isLoadingLocadora, 
-    isLoading,
-    profile: profile?.locadoraId 
-  });
   
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = locadoraData?.vitalia === true;
