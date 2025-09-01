@@ -399,6 +399,31 @@ export default function Landing() {
             </ul>
           </div>
 
+          {/* Destaque do Plano Anual */}
+          <div className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 backdrop-blur-md p-8 rounded-2xl max-w-2xl mx-auto mb-8 border-2 border-yellow-400/50 shadow-2xl">
+            <div className="text-center">
+              <div className="inline-flex items-center bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-4 py-2 rounded-full text-sm font-bold mb-4">
+                🎯 SUPER DESCONTO - PLANO ANUAL
+              </div>
+              <h3 className="text-2xl font-bold text-yellow-100 mb-3">
+                Pague 10 meses e receba 12 meses!
+              </h3>
+              <div className="grid md:grid-cols-2 gap-4 text-lg text-yellow-100">
+                <div className="flex items-center justify-center gap-2">
+                  <CheckCircle className="h-6 w-6 text-green-400" />
+                  <span><strong>2 meses grátis</strong> no plano anual</span>
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <CheckCircle className="h-6 w-6 text-green-400" />
+                  <span><strong>Atualizações gratuitas</strong> para sempre</span>
+                </div>
+              </div>
+              <p className="text-sm text-yellow-200 mt-4">
+                Entre em contato para ativar seu plano anual e economizar ainda mais!
+              </p>
+            </div>
+          </div>
+
           <Button 
             onClick={handleCadastro}
             size="lg" 
