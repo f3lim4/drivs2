@@ -457,9 +457,9 @@ export default function Veiculos() {
                       Novo Veículo
                     </Button>
                   </ProtectedAction>
-                  {locadora && !locadora.vitalia && limiteAtual > 0 && (
-                    <span className="text-xs text-muted-foreground">
-                      {quantidadeAtual}/{limiteAtual} veículos
+                  {locadora && !locadora.vitalia && limiteAtual > 0 && quantidadeAtual >= limiteAtual && (
+                    <span className="text-xs text-red-500 font-medium">
+                      {quantidadeAtual}/{limiteAtual} veículos (limite excedido)
                     </span>
                   )}
                 </div>
