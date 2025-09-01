@@ -363,24 +363,31 @@ export default function CadastroLocadora() {
     switch (field) {
       case 'nome':
         errors.nome = value.length < 2 ? 'Nome deve ter pelo menos 2 caracteres' : '';
+        setFieldErrors(errors);
         break;
       case 'cnpj':
         if (value && !validarDocumento(value)) {
           errors.cnpj = 'Digite um CPF ou CNPJ válido';
+          setFieldErrors(errors);
         } else if (value && validarDocumento(value)) {
-          errors.cnpj = '';
-          // Verificar se já existe no sistema
+          // Verificar se já existe no sistema (não atualizar errors aqui)
           checkCNPJExists(value);
+        } else {
+          errors.cnpj = '';
+          setFieldErrors(errors);
         }
         break;
       case 'email':
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (value && !emailRegex.test(value)) {
           errors.email = 'Digite um email válido';
+          setFieldErrors(errors);
         } else if (value && emailRegex.test(value)) {
-          errors.email = '';
-          // Verificar se já existe no sistema
+          // Verificar se já existe no sistema (não atualizar errors aqui)
           checkEmailExists(value);
+        } else {
+          errors.email = '';
+          setFieldErrors(errors);
         }
         break;
       case 'telefone':
@@ -388,19 +395,21 @@ export default function CadastroLocadora() {
         const telefoneRegex = /^(\(\d{2}\)\s?\d{4,5}-?\d{4}|\d{10,11})$/;
         const telefoneNumerico = value.replace(/\D/g, ''); // Remove tudo que não é número
         errors.telefone = value && telefoneNumerico.length < 10 ? 'Digite um telefone válido (10 ou 11 dígitos)' : '';
+        setFieldErrors(errors);
         break;
       case 'senha':
         errors.senha = value.length > 0 && value.length < 6 ? 'Senha deve ter pelo menos 6 caracteres' : '';
+        setFieldErrors(errors);
         break;
       case 'confirmarSenha':
         errors.confirmarSenha = value && value !== formData.senha ? 'As senhas não coincidem' : '';
+        setFieldErrors(errors);
         break;
       case 'responsavel':
         errors.responsavel = value.length > 0 && value.length < 2 ? 'Nome do responsável deve ter pelo menos 2 caracteres' : '';
+        setFieldErrors(errors);
         break;
     }
-    
-    setFieldErrors(errors);
   };
 
   const updateFormData = (field: string, value: string) => {
