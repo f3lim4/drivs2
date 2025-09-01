@@ -155,6 +155,8 @@ export default function Pagamentos() {
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Parcial</Badge>;
       case 'em_aberto':
         return <Badge variant="secondary" className="bg-red-100 text-red-800">Em Aberto</Badge>;
+      case 'pendente':
+        return <Badge variant="secondary" className="bg-red-100 text-red-800">Pendente</Badge>;
       case 'atrasado':
         return <Badge variant="secondary" className="bg-red-100 text-red-800">Atrasado</Badge>;
       default:
@@ -230,7 +232,9 @@ export default function Pagamentos() {
         case 'status-pago':
           return a.status === 'pago' ? -1 : b.status === 'pago' ? 1 : 0;
         case 'status-em_aberto':
-          return a.status === 'em_aberto' ? -1 : b.status === 'em_aberto' ? 1 : 0;
+          const aAberto = a.status === 'em_aberto' || a.status === 'pendente';
+          const bAberto = b.status === 'em_aberto' || b.status === 'pendente';
+          return aAberto ? -1 : bAberto ? 1 : 0;
         default:
           return 0;
       }
@@ -258,9 +262,9 @@ export default function Pagamentos() {
 
 
 
-  // Estatísticas (baseado nos dados filtrados) - usando 'em_aberto' em vez de 'pendente'
+  // Estatísticas (baseado nos dados filtrados) - aceita tanto 'pendente' quanto 'em_aberto'
   const totalPendente = pagamentosFiltrados
-    .filter(p => p.status === 'em_aberto' || p.status === 'parcial')
+    .filter(p => p.status === 'em_aberto' || p.status === 'pendente' || p.status === 'parcial')
     .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
 
   const totalRecebido = pagamentosFiltrados
@@ -400,7 +404,7 @@ export default function Pagamentos() {
     const hoje = new Date();
     const anoAtual = hoje.getFullYear();
     const mesAtual = hoje.getMonth();
-    const pagamentosAberto = pagamentosFiltrados.filter(p => p.status === 'em_aberto');
+    const pagamentosAberto = pagamentosFiltrados.filter(p => p.status === 'em_aberto' || p.status === 'pendente');
     
     switch (visualizacaoAberto) {
       case 'mensal':
