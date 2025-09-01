@@ -581,6 +581,25 @@ export default function Home() {
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
               Transforme sua locadora com o sistema completo que dobra receita e elimina inadimplência
             </p>
+            
+            {/* Destaque Promoção Anual */}
+            <div className="mt-8 mb-8">
+              <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 backdrop-blur-md p-6 rounded-2xl max-w-2xl mx-auto border-2 border-red-400/50 shadow-2xl">
+                <div className="text-center">
+                  <div className="inline-flex items-center bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-3 animate-pulse">
+                    🔥 PROMOÇÃO VÁLIDA ATÉ 10/10 - PLANO ANUAL
+                  </div>
+                  <h3 className="text-xl font-bold text-red-100 mb-2">
+                    Assine Anual e Leve 2 Meses GRÁTIS!
+                  </h3>
+                  <div className="text-red-100 text-sm">
+                    ✅ <strong>2 meses grátis</strong> na assinatura anual<br/>
+                    ✅ <strong>TODAS as atualizações GRATUITAS</strong><br/>
+                    ⏰ <strong>Promoção válida apenas até 10/10/2025!</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-5 gap-4 max-w-9xl mx-auto">
