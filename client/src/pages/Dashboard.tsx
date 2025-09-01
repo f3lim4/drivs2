@@ -582,9 +582,6 @@ export default function Dashboard() {
                 <p className="text-lg font-bold text-yellow-800">
                   {formatCurrency(receitaSemanalRecebida)}
                 </p>
-                <p className="text-xs text-yellow-600">
-                  últimos 7 dias
-                </p>
               </div>
               <div className="w-8 h-8 bg-yellow-200 rounded-full flex items-center justify-center">
                 <DollarSign className="w-4 h-4 text-yellow-700" />
