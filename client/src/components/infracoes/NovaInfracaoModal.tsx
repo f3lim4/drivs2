@@ -582,6 +582,10 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   )}
                 />
 
+              </div>
+
+            {/* Data do Pagamento, Local da Infração e Órgão Autuador na mesma linha */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="dataPagamento"
@@ -595,10 +599,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   </FormItem>
                 )}
               />
-              </div>
 
-            {/* Local da Infração e Órgão Autuador */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="localInfracao"
