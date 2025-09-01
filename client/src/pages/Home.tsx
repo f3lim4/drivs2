@@ -132,7 +132,7 @@ export default function Home() {
             <a href="#planos" className="text-white/90 hover:text-white transition-colors font-medium">Planos</a>
             <a href="#casos" className="text-white/90 hover:text-white transition-colors font-medium">Casos de Sucesso</a>
             <Button onClick={handleDemo} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg px-6">
-              1 Mês Grátis
+              15 Dias Grátis
             </Button>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-lg blur-sm"></div>
@@ -147,7 +147,7 @@ export default function Home() {
           
           <div className="flex gap-3 md:hidden">
             <Button onClick={handleDemo} className="bg-blue-600 hover:bg-blue-700 text-white text-sm">
-              1 Mês Grátis
+              15 Dias Grátis
             </Button>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-white/10 rounded-lg blur-sm"></div>
@@ -376,7 +376,7 @@ export default function Home() {
               size="lg" 
               className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 text-lg shadow-2xl border border-blue-400/30 backdrop-blur-sm"
             >
-              1 Mês Grátis <ArrowRight className="ml-2 h-5 w-5" />
+              15 Dias Grátis <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent rounded-lg blur-sm"></div>
@@ -890,7 +890,7 @@ export default function Home() {
                     size="lg" 
                     className="relative bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-12 py-4 text-xl font-bold shadow-2xl border border-blue-400/30 backdrop-blur-sm transition-all duration-500 hover:scale-105"
                   >
-                    Começar 1 Mês Grátis
+                    Começar 15 Dias Grátis
                   </Button>
                 </div>
               </div>
