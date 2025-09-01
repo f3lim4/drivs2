@@ -30,7 +30,7 @@ export default function Landing() {
     if (!email) {
       toast({
         title: "Email necessário",
-        description: "Digite seu email para começar o teste grátis de 1 mês.",
+        description: "Digite seu email para começar o teste grátis de 15 dias.",
         variant: "destructive"
       });
       return;
@@ -132,7 +132,7 @@ export default function Landing() {
           <Badge className="mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 text-black text-sm px-6 py-3 rounded-full font-bold border border-cyan-300 shadow-lg shadow-cyan-500/50">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
-              OFERTA LIMITADA - 1 MÊS GRÁTIS
+              OFERTA LIMITADA - 15 DIAS GRÁTIS
             </span>
           </Badge>
           
@@ -164,7 +164,7 @@ export default function Landing() {
           </div>
 
           <p className="text-sm opacity-75">
-            ✅ Sem cartão de crédito • ✅ Setup em 24h • ✅ Suporte brasileiro
+            ✅ 15 dias grátis • ✅ Setup em 24h • ✅ Suporte brasileiro
           </p>
         </div>
       </section>
@@ -383,7 +383,7 @@ export default function Landing() {
             </h3>
             <ul className="text-xl space-y-4">
               {[
-                "1 mês GRÁTIS (sem cartão)",
+                "15 dias GRÁTIS (sem cartão)",
                 "Configuração completa em 24h", 
                 "Migração dos seus dados GRATUITA",
                 "Suporte brasileiro especializado",
