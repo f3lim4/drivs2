@@ -1395,6 +1395,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // CORREÇÃO: Excluir pagamentos relacionados ao contrato antes de excluir o contrato
+      if (contrato) {
+        console.log(`[CONTRACT DELETE] Excluindo pagamentos relacionados ao contrato: ${contrato.id}`);
+        const pagamentos = await storage.getPagamentosByLocadora(contrato.locadoraId);
+        const pagamentosDoContrato = pagamentos.filter(p => 
+          p.motoristaId === contrato.motoristaId || 
+          p.motoristaNome === contrato.cliente ||
+          (p.veiculoId && p.veiculoId === contrato.veiculoId)
+        );
+        
+        console.log(`[CONTRACT DELETE] Encontrados ${pagamentosDoContrato.length} pagamentos para exclusão`);
+        for (const pagamento of pagamentosDoContrato) {
+          console.log(`[CONTRACT DELETE] Excluindo pagamento: ${pagamento.id} - ${pagamento.motoristaNome}`);
+          await storage.deletePagamento(pagamento.id);
+        }
+      }
+      
       // Excluir o contrato
       await storage.deleteContrato(req.params.id);
       res.json({ message: "Contrato deleted successfully" });
