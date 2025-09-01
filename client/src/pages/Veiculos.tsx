@@ -42,6 +42,7 @@ import { registrarAtividade } from '@/utils/activityLogger';
 import { Veiculo } from '@/types';
 import { CheckCircle, AlertTriangle, Wrench, BarChart3 } from 'lucide-react';
 import { ProtectedAction } from '@/components/subscription/ProtectedAction';
+import { ToastAction } from '@/components/ui/toast';
 
 // Função para obter ícone baseado na categoria do veículo
 const getVehicleIconByCategory = (categoria: string) => {
@@ -77,9 +78,9 @@ export default function Veiculos() {
 
   // Buscar informações da locadora para verificar limites do plano
   const { data: locadora } = useQuery({
-    queryKey: ['/api/locadoras', profile?.locadoraId],
+    queryKey: [`/api/locadoras/${profile?.locadoraId}`],
     enabled: !!profile?.locadoraId && profile?.type === 'locadora',
-  });
+  }) as { data: { plano: string; vitalia?: boolean } | undefined };
 
   // Calcular limites por plano
   const limitesPorPlano: { [key: string]: number } = {
@@ -93,6 +94,8 @@ export default function Veiculos() {
   const limiteAtual = limitesPorPlano[locadora?.plano] || 0;
   const quantidadeAtual = veiculos?.length || 0;
   const limiteBloqueado = limiteAtual > 0 && quantidadeAtual >= limiteAtual && !locadora?.vitalia;
+
+  // Sistema detecta limite de veículos do plano
 
 
 
@@ -205,13 +208,9 @@ export default function Veiculos() {
         description: `O plano ${nomePlano} permite até ${limiteAtual} veículos. Faça upgrade para cadastrar mais veículos.`,
         variant: "destructive",
         action: (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => window.open('/planos', '_blank')}
-          >
+          <ToastAction altText="Ver planos" onClick={() => window.open('/planos', '_blank')}>
             Ver Planos
-          </Button>
+          </ToastAction>
         ),
       });
       return;
