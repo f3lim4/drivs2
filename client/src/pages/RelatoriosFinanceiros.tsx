@@ -67,6 +67,13 @@ export default function RelatoriosFinanceiros() {
     enabled: isAdmin,
   });
 
+  // Para admins, buscar dados consolidados financeiros em tempo real
+  const { data: dadosConsolidados = [], isLoading: isLoadingConsolidados } = useQuery({
+    queryKey: ['/api/admin/consolidado'],
+    enabled: isAdmin,
+    refetchInterval: 30000, // Atualizar a cada 30 segundos para dados em tempo real
+  });
+
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);
   const [despesaParaExcluir, setDespesaParaExcluir] = useState<string | null>(null);
   // Removido estados do modal duplicado - usando componente NovaDespesaModal
@@ -1382,53 +1389,56 @@ export default function RelatoriosFinanceiros() {
       )}
 
       {/* Seção especial para admins - Dados consolidados de todas as locadoras */}
-      {isAdmin && locadoras.length > 0 && (
+      {isAdmin && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg font-semibold">Dados Consolidados por Locadora</CardTitle>
-            <CardDescription>Resumo financeiro de todas as locadoras do sistema</CardDescription>
+            <CardDescription>Resumo financeiro de todas as locadoras do sistema - Tempo real</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Locadora</TableHead>
-                    <TableHead>Receita</TableHead>
-                    <TableHead>Despesas</TableHead>
-                    <TableHead>Lucro</TableHead>
-                    <TableHead>Margem (%)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {locadoras.map((locadora: any) => {
-                    // Usar dados reais ao invés de valores aleatórios
-                    const receitaLocadora = 0; // Dados reais não disponíveis no momento
-                    const despesasLocadora = 0; // Dados reais não disponíveis no momento
-                    const lucroLocadora = receitaLocadora - despesasLocadora;
-                    const margemLocadora = receitaLocadora > 0 ? (lucroLocadora / receitaLocadora) * 100 : 0;
-                    
-                    return (
-                      <TableRow key={locadora.id}>
-                        <TableCell className="font-medium">{locadora.nome}</TableCell>
+            {isLoadingConsolidados ? (
+              <div className="flex justify-center py-8">
+                <LoadingSpinner />
+                <span className="ml-2">Carregando dados em tempo real...</span>
+              </div>
+            ) : dadosConsolidados.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                Nenhuma locadora encontrada no sistema
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Locadora</TableHead>
+                      <TableHead>Receita</TableHead>
+                      <TableHead>Despesas</TableHead>
+                      <TableHead>Lucro</TableHead>
+                      <TableHead>Margem (%)</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {dadosConsolidados.map((dados: any) => (
+                      <TableRow key={dados.locadoraId}>
+                        <TableCell className="font-medium">{dados.locadora}</TableCell>
                         <TableCell className="text-green-600 font-semibold">
-                          {formatCurrency(receitaLocadora)}
+                          {formatCurrency(dados.receita)}
                         </TableCell>
                         <TableCell className="text-red-600 font-semibold">
-                          {formatCurrency(despesasLocadora)}
+                          {formatCurrency(dados.despesas)}
                         </TableCell>
-                        <TableCell className={`font-semibold ${lucroLocadora >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {formatCurrency(lucroLocadora)}
+                        <TableCell className={`font-semibold ${dados.lucro >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatCurrency(dados.lucro)}
                         </TableCell>
-                        <TableCell className={`font-semibold ${margemLocadora >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {margemLocadora.toFixed(1)}%
+                        <TableCell className={`font-semibold ${dados.margem >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {dados.margem.toFixed(1)}%
                         </TableCell>
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
