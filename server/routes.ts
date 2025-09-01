@@ -429,15 +429,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/locadoras", async (req, res) => {
     try {
-      // Calcular data de vencimento do teste (7 dias a partir de hoje)
+      // Calcular data de vencimento do teste (15 dias a partir de hoje)
       const dataVencimentoTeste = new Date();
-      dataVencimentoTeste.setDate(dataVencimentoTeste.getDate() + 7);
+      dataVencimentoTeste.setDate(dataVencimentoTeste.getDate() + 15);
       
       // Adicionar campos de teste gratuito aos dados recebidos
       const dadosComTeste = {
         ...req.body,
+        plano: 'pro', // Sempre começar no plano Pro
         testeGratuito: true,
-        diasTesteGratuito: 7,
+        diasTesteGratuito: 15,
         dataVencimentoTeste: dataVencimentoTeste.toISOString().split('T')[0] // Formato YYYY-MM-DD
       };
       
@@ -455,7 +456,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Error updating profile with locadora_id:", error);
       }
       
-      console.log(`[CADASTRO] Locadora ${locadora.nome} criada com teste gratuito de 7 dias até ${dataVencimentoTeste.toLocaleDateString('pt-BR')}`);
+      console.log(`[CADASTRO] Locadora ${locadora.nome} criada com teste gratuito de 15 dias do Plano Pro até ${dataVencimentoTeste.toLocaleDateString('pt-BR')}`);
       
       res.json(locadora);
     } catch (error) {

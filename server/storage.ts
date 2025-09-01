@@ -294,9 +294,9 @@ export class DatabaseStorage implements IStorage {
       throw new Error('CNPJ já está cadastrado no sistema');
     }
 
-    // Calcular data de vencimento do teste (30 dias a partir de hoje)
+    // Calcular data de vencimento do teste (15 dias a partir de hoje)
     const dataVencimentoTeste = new Date();
-    dataVencimentoTeste.setDate(dataVencimentoTeste.getDate() + 30);
+    dataVencimentoTeste.setDate(dataVencimentoTeste.getDate() + 15);
 
     // Se o id não estiver definido, usar o CNPJ como ID
     const locadoraWithId = {
@@ -304,7 +304,7 @@ export class DatabaseStorage implements IStorage {
       id: locadora.id || locadora.cnpj,
       plano: 'pro', // Sempre começar no plano Pro
       testeGratuito: true,
-      diasTesteGratuito: 30,
+      diasTesteGratuito: 15,
       dataVencimentoTeste: dataVencimentoTeste.toISOString().split('T')[0], // Formato YYYY-MM-DD
       status: 'ativa' // Ativar automaticamente
     };
