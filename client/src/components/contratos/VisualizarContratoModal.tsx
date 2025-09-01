@@ -178,7 +178,7 @@ export function VisualizarContratoModal({
       // Conteúdo do template com fonte menor
       pdf.setFontSize(9);
       pdf.setFont('helvetica', 'normal');
-      const lines = contrato.template.split('\n');
+      const lines = (contrato.template || '').split('\n');
       
       for (const line of lines) {
         // Verifica se precisa de nova página
@@ -341,7 +341,7 @@ export function VisualizarContratoModal({
                 {!contrato.dataFim && (
                   <div>
                     <p className="text-sm font-medium text-gray-600">Tempo Mínimo</p>
-                    <p className="font-semibold">{contrato.tempoMinimoContrato || 1} mês{(contrato.tempoMinimoContrato || 1) > 1 ? 'es' : ''}</p>
+                    <p className="font-semibold">{contrato.prazoMinimo || '1 mês'}</p>
                   </div>
                 )}
               </div>
