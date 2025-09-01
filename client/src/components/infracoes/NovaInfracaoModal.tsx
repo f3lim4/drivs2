@@ -269,7 +269,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-[98vw] w-full max-h-[95vh] overflow-y-auto p-8">
+      <DialogContent className="max-w-4xl w-full max-h-[85vh] overflow-y-auto p-6">
         <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-500" />
