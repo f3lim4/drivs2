@@ -145,11 +145,12 @@ export default function PlanosLocadora() {
   };
 
   // Buscar dados da locadora se usuário é uma locadora
-  const { data: locadora, isLoading: isLoadingLocadora } = useQuery({
+  const { data: locadora, isLoading: isLoadingLocadora, refetch: refetchLocadora } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId],
     enabled: true, // Sempre habilitado para funcionar em produção
-    staleTime: 30000, // 30 segundos para deploy
+    staleTime: 0, // Sempre buscar dados frescos
     gcTime: 60000, // 1 minuto para deploy
+    refetchInterval: 10000, // Atualizar a cada 10 segundos
   });
 
   const { data: planoDetalhes, isLoading, error: planosError } = useQuery({
@@ -159,6 +160,18 @@ export default function PlanosLocadora() {
     staleTime: 5 * 60 * 1000, // 5 minutos
     gcTime: 10 * 60 * 1000, // 10 minutos
   });
+
+  // Forçar atualização dos dados quando a página carregar
+  useEffect(() => {
+    // Invalidar cache para garantir dados frescos
+    queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
+    queryClient.invalidateQueries({ queryKey: ['subscription-status-v2'] });
+    
+    // Refetch dos dados da locadora
+    if (profile?.locadoraId) {
+      refetchLocadora();
+    }
+  }, [profile?.locadoraId, queryClient, refetchLocadora]);
 
   // Dados carregados com sucesso - continuar com renderização normal
 
