@@ -390,14 +390,16 @@ export default function Dashboard() {
   const seteDiasAtras = new Date();
   seteDiasAtras.setDate(hoje.getDate() - 7);
 
-  const receitaSemanalRecebida = pagamentos
+  const pagamentosSemanaRecebidos = pagamentos
     .filter((p: any) => {
       if (!p.dataPagamento) return false;
       const dataPagamento = new Date(p.dataPagamento);
       return dataPagamento >= seteDiasAtras && 
              dataPagamento <= hoje &&
              p.status === 'pago';
-    })
+    });
+
+  const receitaSemanalRecebida = pagamentosSemanaRecebidos
     .reduce((sum: number, p: any) => {
       const valorPago = parseFloat(p.valorPago || '0');
       return sum + valorPago;
@@ -581,6 +583,9 @@ export default function Dashboard() {
                 <p className="text-xs font-medium text-yellow-700">ENTRADAS DESSA SEMANA</p>
                 <p className="text-lg font-bold text-yellow-800">
                   {formatCurrency(receitaSemanalRecebida)}
+                </p>
+                <p className="text-xs text-yellow-600">
+                  do total de {formatCurrency(receitaSemanalEsperada)} esperado
                 </p>
               </div>
               <div className="w-8 h-8 bg-yellow-200 rounded-full flex items-center justify-center">
