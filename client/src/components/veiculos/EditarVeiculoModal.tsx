@@ -146,7 +146,6 @@ export function EditarVeiculoModal({
       quantidadeParcelas: undefined,
       // Status será controlado automaticamente
       valorLimiteKm: undefined,
-      visualizar: '',
     },
   });
 
@@ -185,7 +184,6 @@ export function EditarVeiculoModal({
         quantidadeParcelas: veiculo.quantidadeParcelas || undefined,
         // Status não será editável
         valorLimiteKm: veiculo.valorLimiteKm,
-        visualizar: (veiculo as any).visualizar || '',
       });
     }
   }, [veiculo, open, form]);
@@ -345,7 +343,6 @@ export function EditarVeiculoModal({
         financiado: data.financiado,
         valorFinanciamento: data.valorFinanciamento?.toString(),
         quantidadeParcelas: data.quantidadeParcelas,
-        visualizar: data.visualizar || null,
         // Status não será enviado na edição
       };
 
@@ -395,7 +392,7 @@ export function EditarVeiculoModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] sm:max-w-[900px] lg:max-w-[1100px] max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
         <DialogHeader>
           <DialogTitle>Editar Veículo</DialogTitle>
           <DialogDescription>
@@ -409,8 +406,8 @@ export function EditarVeiculoModal({
             {/* INFORMAÇÕES BÁSICAS */}
             <div className="space-y-4">
               
-              {/* Primeira linha: Placa, Marca, Modelo, Ano */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              {/* Primeira linha: Placa, Marca, Modelo */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="placa"
@@ -461,8 +458,8 @@ export function EditarVeiculoModal({
 
               </div>
 
-              {/* Segunda linha: Cor, Categoria, Combustível, RENAVAM */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              {/* Segunda linha: Ano, Cor, Categoria */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="ano"
@@ -542,29 +539,12 @@ export function EditarVeiculoModal({
                 </div>
               </div>
 
-              {/* Campo Visualizar Veículo */}
-              <FormField
-                control={form.control}
-                name="visualizar"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Visualizar Veículo</FormLabel>
-                    <FormControl>
-                      <Input 
-                        {...field}
-                        data-testid="input-visualizar-veiculo"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             {/* CARACTERÍSTICAS TÉCNICAS */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="combustivel"
@@ -656,7 +636,7 @@ export function EditarVeiculoModal({
                 />
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
                   name="valorSemanal"
@@ -909,7 +889,7 @@ export function EditarVeiculoModal({
               />
 
               {form.watch('financiado') && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="valorFinanciamento"
