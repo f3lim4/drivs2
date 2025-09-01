@@ -48,9 +48,11 @@ const getVehicleIconByCategory = (categoria: string) => {
   switch (categoria?.toLowerCase()) {
     case 'moto':
     case 'motocicleta':
+    case 'scooter':
       return Bike;
     case 'caminhao':
     case 'caminhão':
+    case 'caminhao-leve':
     case 'truck':
       return Truck;
     case 'utilitario':
