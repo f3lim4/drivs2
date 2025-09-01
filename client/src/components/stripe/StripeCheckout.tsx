@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, CreditCard } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
@@ -27,6 +29,7 @@ function CheckoutForm({ clientSecret, subscriptionId, planoNome, valor, onSucces
   const elements = useElements();
   const { toast } = useToast();
   const [loading, setLoading] = React.useState(false);
+  const [tipoPlano, setTipoPlano] = React.useState<'mensal' | 'anual'>('mensal');
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -86,12 +89,43 @@ function CheckoutForm({ clientSecret, subscriptionId, planoNome, valor, onSucces
           </CardTitle>
           <div className="text-sm text-muted-foreground">
             <p>Plano: <span className="font-semibold">{planoNome}</span></p>
-            <p>Valor: <span className="font-semibold">R$ {valor}/mês</span></p>
           </div>
         </CardHeader>
         
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Seleção do tipo de plano */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Escolha o período:</Label>
+              <RadioGroup 
+                value={tipoPlano} 
+                onValueChange={(value: 'mensal' | 'anual') => setTipoPlano(value)}
+                className="space-y-2"
+              >
+                <div className="flex items-center space-x-2 p-3 border rounded-md hover:bg-muted/50">
+                  <RadioGroupItem value="mensal" id="mensal" />
+                  <Label htmlFor="mensal" className="flex-1 cursor-pointer">
+                    <div className="flex justify-between items-center">
+                      <span>Mensal</span>
+                      <span className="font-semibold">R$ {valor}/mês</span>
+                    </div>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-md hover:bg-muted/50">
+                  <RadioGroupItem value="anual" id="anual" />
+                  <Label htmlFor="anual" className="flex-1 cursor-pointer">
+                    <div className="flex justify-between items-center">
+                      <span>Anual (2 meses grátis)</span>
+                      <div className="text-right">
+                        <span className="font-semibold">R$ {Math.round(valor * 10)}/ano</span>
+                        <div className="text-xs text-green-600">Economize R$ {Math.round(valor * 2)}</div>
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
             <div className="p-3 border rounded-md">
               <CardElement 
                 options={{
@@ -130,7 +164,9 @@ function CheckoutForm({ clientSecret, subscriptionId, planoNome, valor, onSucces
                     Processando...
                   </>
                 ) : (
-                  `Pagar R$ ${valor}`
+                  tipoPlano === 'anual' 
+                    ? `Pagar R$ ${Math.round(valor * 10)} (anual)`
+                    : `Pagar R$ ${valor} (mensal)`
                 )}
               </Button>
             </div>
