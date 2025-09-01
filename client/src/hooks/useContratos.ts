@@ -58,10 +58,34 @@ export function useContratos() {
         intersecao: alugueisNomes.filter((nome: string) => contratosClientes.includes(nome))
       });
 
-      // Converter apenas aluguéis que NÃO têm contrato formal correspondente
+      // CORREÇÃO: Deduplicação mais robusta - usar ID único para evitar duplicatas
+      const contratosIdUnicos = new Set();
+      const alugueisIdUnicos = new Set();
+      
+      // Marcar contratos formais existentes
+      contratosFormais.forEach((c: any) => {
+        contratosIdUnicos.add(c.id);
+      });
+      
+      // Converter apenas aluguéis que NÃO têm contrato formal correspondente e não são duplicados
       const aluguelsSemContrato = alugueisAtivos.filter((aluguel: any) => {
         const nomeMotorista: string = cpfParaNome.get(aluguel.motoristaId);
-        return !contratosClientes.includes(nomeMotorista);
+        const idUnico = `aluguel_${aluguel.id}`;
+        
+        // Verificar se já foi processado
+        if (alugueisIdUnicos.has(idUnico)) {
+          console.log('[ANTI-DUPLICATE] Aluguel já processado:', idUnico);
+          return false;
+        }
+        
+        // Verificar se não tem contrato formal correspondente
+        const temContratoFormal = contratosClientes.includes(nomeMotorista);
+        if (!temContratoFormal) {
+          alugueisIdUnicos.add(idUnico);
+          return true;
+        }
+        
+        return false;
       });
 
       const contratosDeAlugueis = aluguelsSemContrato.map((aluguel: any) => ({
@@ -93,11 +117,38 @@ export function useContratos() {
       }));
 
       // Combinar contratos formais corrigidos + aluguéis sem contrato formal
-      return [...contratosFormaisCorrigidos, ...contratosDeAlugueis];
+      const todosContratos = [...contratosFormaisCorrigidos, ...contratosDeAlugueis];
+      
+      // VERIFICAÇÃO FINAL: Deduplicação por cliente para evitar duplicatas visuais
+      const contratosDeduplicados = todosContratos.filter((contrato, index, arr) => {
+        const primeiroIndice = arr.findIndex(c => c.cliente === contrato.cliente || c.motoristaNome === contrato.cliente);
+        const isDuplicado = primeiroIndice !== index;
+        
+        if (isDuplicado) {
+          console.log('[ANTI-DUPLICATE] Contrato duplicado removido:', {
+            cliente: contrato.cliente || contrato.motoristaNome,
+            id: contrato.id,
+            primeiroIndice,
+            indiceAtual: index
+          });
+        }
+        
+        return !isDuplicado;
+      });
+      
+      console.log('[CONTRATOS FINAL]', {
+        contratosOriginais: todosContratos.length,
+        contratosDeduplicados: contratosDeduplicados.length,
+        removidos: todosContratos.length - contratosDeduplicados.length
+      });
+      
+      return contratosDeduplicados;
     },
     enabled: !!locadoraId,
     staleTime: 0, // Sempre buscar dados frescos
     gcTime: 0, // Não manter cache
+    refetchOnMount: true, // Sempre recarregar ao montar
+    refetchOnWindowFocus: true, // Recarregar ao focar na janela
   });
 
   // Criar contrato
@@ -138,7 +189,11 @@ export function useContratos() {
       return response.json();
     },
     onSuccess: () => {
+      // Limpar cache completamente para evitar duplicações
       queryClient.invalidateQueries({ queryKey: ['contratos', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['alugueis', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['motoristas', locadoraId] });
+      queryClient.removeQueries({ queryKey: ['contratos', locadoraId] });
     },
   });
 
@@ -201,6 +256,15 @@ export function useContratos() {
     },
   });
 
+  // Função para limpar cache completamente
+  const clearCache = () => {
+    console.log('[CACHE CLEAR] Limpando cache de contratos...');
+    queryClient.removeQueries({ queryKey: ['contratos'] });
+    queryClient.removeQueries({ queryKey: ['alugueis'] });
+    queryClient.removeQueries({ queryKey: ['motoristas'] });
+    queryClient.invalidateQueries({ queryKey: ['contratos', locadoraId] });
+  };
+
   return {
     contratos,
     isLoading,
@@ -208,5 +272,6 @@ export function useContratos() {
     createContrato,
     updateContrato,
     deleteContrato,
+    clearCache, // Nova função para limpar cache
   };
 }
