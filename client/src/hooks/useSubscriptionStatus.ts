@@ -33,8 +33,8 @@ export function useSubscriptionStatus() {
       const locadora = await response.json();
       const today = new Date();
       
-      // PRIMEIRO: Verificar se é plano Infinity (acesso total)
-      if (locadora.plano === 'infinity') {
+      // PRIMEIRO: Verificar se é Vitalia VIP ou plano Infinity (acesso total)
+      if (locadora.vitalia === true || locadora.plano === 'infinity') {
         return {
           isActive: true,
           isExpired: false,
