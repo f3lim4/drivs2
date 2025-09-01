@@ -212,7 +212,9 @@ export default function CadastroLocadora() {
       if (!authResponse.ok) {
         const error = await authResponse.json();
         if (error.message === 'User already exists') {
-          throw new Error('Este email já está cadastrado no sistema. Use outro email ou faça login se já tem uma conta.');
+          setFieldErrors(prev => ({ ...prev, email: 'Este email já está cadastrado no sistema' }));
+          setIsLoading(false);
+          return;
         }
         throw new Error(error.message || 'Erro ao criar usuário');
       }
@@ -250,13 +252,19 @@ export default function CadastroLocadora() {
         const error = await locadoraResponse.json();
         // Tratar erros específicos de duplicação
         if (error.message && error.message.includes('telefone')) {
-          throw new Error('Este telefone já está cadastrado. Use outro número de telefone.');
+          setFieldErrors(prev => ({ ...prev, telefone: 'Este telefone já está cadastrado no sistema' }));
+          setIsLoading(false);
+          return;
         }
         if (error.message && error.message.includes('cnpj')) {
-          throw new Error('Este CNPJ já está cadastrado. Verifique o CNPJ informado.');
+          setFieldErrors(prev => ({ ...prev, cnpj: 'Este CNPJ já está cadastrado no sistema' }));
+          setIsLoading(false);
+          return;
         }
         if (error.message && error.message.includes('email')) {
-          throw new Error('Este email já está cadastrado. Use outro email.');
+          setFieldErrors(prev => ({ ...prev, email: 'Este email já está cadastrado no sistema' }));
+          setIsLoading(false);
+          return;
         }
         throw new Error(error.message || 'Erro ao criar locadora');
       }
