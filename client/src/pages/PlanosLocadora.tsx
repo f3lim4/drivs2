@@ -147,6 +147,7 @@ export default function PlanosLocadora() {
   // Buscar dados da locadora se usuário é uma locadora
   const { data: locadora, isLoading: isLoadingLocadora, refetch: refetchLocadora } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId, Date.now()], // Força cache único
+    queryFn: () => fetch(`/api/locadoras/${profile?.locadoraId}`).then(res => res.json()),
     enabled: !!profile?.locadoraId,
     staleTime: 0, // Sempre dados frescos para corrigir bug do plano
     gcTime: 0, // Não manter cache
