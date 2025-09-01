@@ -264,17 +264,8 @@ export default function PlanosLocadora() {
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = locadoraData?.vitalia === true;
   
-  // Debug: verificar dados recebidos
-  console.log('🔍 PLANOS DEBUG:', {
-    locadoraData: locadoraData,
-    planoDetalhes: planoDetalhes,
-    isVipPlan,
-    planoLocadora: locadoraData?.plano,
-    planoDetalhesAtual: planoDetalhes?.planoAtual
-  });
-
-  // Se for VIP ou Infinity, mostrar plano especial; caso contrário priorizar planoDetalhes
-  const planoAtual = isVipPlan ? 'vip' : (planoDetalhes?.planoAtual || locadoraData?.plano || 'pro');
+  // Se for VIP ou Infinity, mostrar plano especial; caso contrário priorizar dados da locadora
+  const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || planoDetalhes?.planoAtual || 'pro');
   
   
   // VIP e Infinity sempre têm acesso - não podem estar expirados
