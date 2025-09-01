@@ -573,6 +573,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
+      // Validar limite de veículos por plano
+      const locadoraId = result.data.locadoraId;
+      const locadora = await storage.getLocadora(locadoraId);
+      
+      if (!locadora) {
+        return res.status(404).json({ message: "Locadora não encontrada" });
+      }
+      
+      // Verificar se a locadora é VIP (Vitalia) - bypass dos limites
+      if (locadora.vitalia) {
+        const veiculo = await storage.createVeiculo(result.data);
+        return res.json(veiculo);
+      }
+      
+      // Definir limites por plano
+      const limitesPorPlano: { [key: string]: number } = {
+        'start': 5,
+        'pro': 20,
+        'elite': 50,
+        'prime': 100,
+        'infinity': -1 // -1 = ilimitado
+      };
+      
+      const limite = limitesPorPlano[locadora.plano] || 0;
+      
+      // Se o limite for -1 (ilimitado), não verificar
+      if (limite > 0) {
+        const veiculosExistentes = await storage.getVeiculosByLocadora(locadoraId);
+        const quantidadeAtual = veiculosExistentes.length;
+        
+        if (quantidadeAtual >= limite) {
+          const nomePlano = locadora.plano.charAt(0).toUpperCase() + locadora.plano.slice(1);
+          return res.status(400).json({ 
+            message: `Limite de veículos excedido. O plano ${nomePlano} permite até ${limite} veículos. Você já possui ${quantidadeAtual} veículos cadastrados. Faça upgrade do seu plano para cadastrar mais veículos.`,
+            code: 'VEHICLE_LIMIT_EXCEEDED',
+            currentCount: quantidadeAtual,
+            limit: limite,
+            plan: locadora.plano
+          });
+        }
+      }
+      
       const veiculo = await storage.createVeiculo(result.data);
       res.json(veiculo);
     } catch (error) {
