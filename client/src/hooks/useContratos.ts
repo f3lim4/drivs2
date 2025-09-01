@@ -251,8 +251,11 @@ export function useContratos() {
       }
     },
     onSuccess: () => {
+      // Invalidar cache de contratos, aluguéis E pagamentos ao excluir contrato
       queryClient.invalidateQueries({ queryKey: ['contratos', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['alugueis', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
+      queryClient.removeQueries({ queryKey: ['/api/pagamentos', locadoraId] });
     },
   });
 
