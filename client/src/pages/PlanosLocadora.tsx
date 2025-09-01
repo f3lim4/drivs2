@@ -168,20 +168,17 @@ export default function PlanosLocadora() {
 
   // Forçar atualização dos dados quando a página carregar
   useEffect(() => {
-    // Limpar COMPLETAMENTE o cache
-    queryClient.clear();
-    
-    // Invalidar todas as queries relacionadas
-    queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
+    // Invalidar apenas as queries relevantes sem quebrar tudo
+    queryClient.invalidateQueries({ queryKey: ['/api/locadoras', profile?.locadoraId] });
     queryClient.invalidateQueries({ queryKey: ['/api/planos'] });
     queryClient.invalidateQueries({ queryKey: ['subscription-status-v2'] });
     
-    // Forçar reload completo da página se necessário
-    setTimeout(() => {
-      if (profile?.locadoraId) {
+    // Refetch com timeout para dar tempo de invalidar
+    if (profile?.locadoraId) {
+      setTimeout(() => {
         refetchLocadora();
-      }
-    }, 100);
+      }, 50);
+    }
   }, [profile?.locadoraId, queryClient, refetchLocadora]);
 
   // Dados carregados com sucesso - continuar com renderização normal
@@ -266,6 +263,16 @@ export default function PlanosLocadora() {
   // Fix: locadora vem como array, pegamos o primeiro item
   // Valores padrão para garantir funcionamento em produção
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
+  
+  // Debug logs temporários
+  console.log('🔍 PLANOS PAGE DEBUG:', { 
+    locadora, 
+    locadoraData, 
+    plano: locadoraData?.plano, 
+    isLoadingLocadora, 
+    isLoading,
+    profile: profile?.locadoraId 
+  });
   
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = locadoraData?.vitalia === true;
