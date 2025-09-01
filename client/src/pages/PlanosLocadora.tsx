@@ -500,8 +500,9 @@ export default function PlanosLocadora() {
               <CardTitle className="text-2xl">Start</CardTitle>
               <div className="text-3xl font-bold text-blue-600">R$ 50,00</div>
               <CardDescription className="text-base">por mês</CardDescription>
-              <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1">
-                💰 Anual: R$ 500 (10 meses + 2 grátis)
+              <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1 space-y-1">
+                <div>💰 Anual: R$ 500 (10 meses + 2 grátis)</div>
+                <div className="text-blue-700 font-medium">+ Todas as atualizações do sistema</div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">Para locadoras iniciantes</p>
             </CardHeader>
@@ -558,8 +559,9 @@ export default function PlanosLocadora() {
               <CardTitle className="text-2xl">Pro</CardTitle>
               <div className="text-3xl font-bold text-cyan-600">R$ 99,00</div>
               <CardDescription className="text-base">por mês</CardDescription>
-              <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1">
-                💰 Anual: R$ 990 (10 meses + 2 grátis)
+              <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1 space-y-1">
+                <div>💰 Anual: R$ 990 (10 meses + 2 grátis)</div>
+                <div className="text-blue-700 font-medium">+ Todas as atualizações do sistema</div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">Para locadoras em crescimento com até 20 veículos</p>
             </CardHeader>
@@ -610,8 +612,9 @@ export default function PlanosLocadora() {
               <CardTitle className="text-2xl">Elite</CardTitle>
               <div className="text-3xl font-bold text-green-600">R$ 250,00</div>
               <CardDescription className="text-base">por mês</CardDescription>
-              <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1">
-                💰 Anual: R$ 2.500 (10 meses + 2 grátis)
+              <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1 space-y-1">
+                <div>💰 Anual: R$ 2.500 (10 meses + 2 grátis)</div>
+                <div className="text-blue-700 font-medium">+ Todas as atualizações do sistema</div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">Para frotas médias</p>
             </CardHeader>
@@ -663,8 +666,9 @@ export default function PlanosLocadora() {
               <CardTitle className="text-2xl">Prime</CardTitle>
               <div className="text-3xl font-bold text-purple-600">R$ 500,00</div>
               <CardDescription className="text-base">por mês</CardDescription>
-              <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1">
-                💰 Anual: R$ 5.000 (10 meses + 2 grátis)
+              <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1 space-y-1">
+                <div>💰 Anual: R$ 5.000 (10 meses + 2 grátis)</div>
+                <div className="text-blue-700 font-medium">+ Todas as atualizações do sistema</div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">Para grandes frotas</p>
             </CardHeader>
