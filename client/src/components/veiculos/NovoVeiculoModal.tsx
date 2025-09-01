@@ -844,7 +844,7 @@ export function NovoVeiculoModal({
 
                 <FormField
                   control={form.control}
-                  name="taxaAdmin"
+                  name="taxaAdministrativa"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Taxa Admin (R$) *</FormLabel>
@@ -863,32 +863,32 @@ export function NovoVeiculoModal({
                   )}
                 />
 
-                {/* Campo vazio para manter o layout 4 colunas */}
-                <div></div>
+                {/* Campo condicional para valor limite km semanal */}
+                {form.watch('limiteQuilometragem') === 'limitada' ? (
+                  <FormField
+                    control={form.control}
+                    name="valorLimiteKm"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Limite Semanal (km) *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            {...field}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  <div></div>
+                )}
               </div>
 
-              {/* Campo condicional para valor limite km semanal */}
-              {form.watch('limiteQuilometragem') === 'limitada' && (
-                <FormField
-                  control={form.control}
-                  name="valorLimiteKm"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Limite Semanal (km) *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          {...field}
-                          value={field.value || ''}
-                          onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
 
               {/* Quinta linha: Seguradora, Valor Seguro, Valor Veículo, IPVA */}
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
