@@ -490,8 +490,9 @@ export default function PlanosLocadora() {
             
           </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {/* Plano Start */}
+          {planoAtual !== 'start' && (
           <Card className="relative">
             <CardHeader className="text-center pb-4">
               <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-500 flex items-center justify-center">
@@ -544,8 +545,10 @@ export default function PlanosLocadora() {
               </div>
             </CardContent>
           </Card>
+          )}
 
           {/* Plano Pro */}
+          {planoAtual !== 'pro' && (
           <Card className="relative border-2 border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100">
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
               <Badge className="bg-cyan-500 text-white px-3 py-1">
@@ -602,8 +605,10 @@ export default function PlanosLocadora() {
               </div>
             </CardContent>
           </Card>
+          )}
 
           {/* Plano Elite */}
+          {planoAtual !== 'elite' && (
           <Card className="relative">
             <CardHeader className="text-center pb-4">
               <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-500 flex items-center justify-center">
@@ -656,8 +661,10 @@ export default function PlanosLocadora() {
               </div>
             </CardContent>
           </Card>
+          )}
 
           {/* Plano Prime */}
+          {planoAtual !== 'prime' && (
           <Card className="relative">
             <CardHeader className="text-center pb-4">
               <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-500 flex items-center justify-center">
@@ -710,8 +717,10 @@ export default function PlanosLocadora() {
               </div>
             </CardContent>
           </Card>
+          )}
 
           {/* Plano Infinity */}
+          {planoAtual !== 'infinity' && (
           <Card className="relative border-2 border-gradient-to-r from-pink-300 to-purple-300">
             <CardHeader className="text-center pb-4">
               <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center">
@@ -759,6 +768,7 @@ export default function PlanosLocadora() {
               </div>
             </CardContent>
           </Card>
+          )}
         </div>
         </div>
       )}
