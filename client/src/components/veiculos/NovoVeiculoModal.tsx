@@ -10,6 +10,8 @@ import * as z from 'zod';
 
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useVeiculos } from '@/hooks/useVeiculos';
+import { useQuery } from '@tanstack/react-query';
 import { tiposVeiculos, getTiposVeiculos, getMarcasPorTipo, getModelosPorMarca, ModeloVeiculo, MarcaVeiculo } from '@shared/veiculos-data';
 import { Button } from '@/components/ui/button';
 // Imports de ícones removidos (não mais necessários)
@@ -40,7 +42,8 @@ import {
 import { Veiculo } from '@/types';
 import { generateId } from '@/utils/formatters';
 import { registrarAtividade } from '@/utils/activityLogger';
-import { Upload, FileText } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, Crown } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ObjectUploader } from '@/components/ObjectUploader';
 
 // Schema de validação
@@ -170,6 +173,26 @@ export function NovoVeiculoModal({
   const [modelosDisponiveis, setModelosDisponiveis] = useState<ModeloVeiculo[]>([]);
   const { profile } = useAuth();
   const { toast } = useToast();
+  const { veiculos } = useVeiculos();
+
+  // Buscar informações da locadora para mostrar limites do plano
+  const { data: locadora } = useQuery({
+    queryKey: ['/api/locadoras', profile?.locadoraId],
+    enabled: !!profile?.locadoraId && profile?.type === 'locadora',
+  });
+
+  // Calcular limites por plano
+  const limitesPorPlano: { [key: string]: number } = {
+    'start': 5,
+    'pro': 20,
+    'elite': 50,
+    'prime': 100,
+    'infinity': -1 // -1 = ilimitado
+  };
+
+  const limiteAtual = limitesPorPlano[locadora?.plano] || 0;
+  const quantidadeAtual = veiculos?.length || 0;
+  const proximoDoLimite = limiteAtual > 0 && quantidadeAtual >= limiteAtual - 1;
 
   const form = useForm<VeiculoFormData>({
     resolver: zodResolver(veiculoSchema),
@@ -351,6 +374,26 @@ export function NovoVeiculoModal({
 
       if (!response.ok) {
         const error = await response.json();
+        
+        // Detectar erro de limite de veículos
+        if (error.code === 'VEHICLE_LIMIT_EXCEEDED') {
+          toast({
+            title: "Limite de veículos excedido!",
+            description: error.message,
+            variant: "destructive",
+            action: (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => window.open('/planos', '_blank')}
+              >
+                Ver Planos
+              </Button>
+            ),
+          });
+          return; // Não prosseguir com o throw
+        }
+        
         throw new Error(error.message || 'Erro ao criar veículo');
       }
 
@@ -423,6 +466,32 @@ export function NovoVeiculoModal({
             Preencha as informações do novo veículo para adicioná-lo à frota.
           </DialogDescription>
         </DialogHeader>
+
+        {/* Aviso sobre limite do plano */}
+        {locadora && !locadora.vitalia && limiteAtual > 0 && (
+          <Alert className={proximoDoLimite ? "border-amber-200 bg-amber-50" : "border-blue-200 bg-blue-50"}>
+            <AlertTriangle className={`h-4 w-4 ${proximoDoLimite ? "text-amber-600" : "text-blue-600"}`} />
+            <AlertDescription className={proximoDoLimite ? "text-amber-800" : "text-blue-800"}>
+              <div className="flex items-center justify-between">
+                <span>
+                  <strong>Plano {locadora.plano.charAt(0).toUpperCase() + locadora.plano.slice(1)}:</strong> {quantidadeAtual} de {limiteAtual} veículos utilizados
+                  {proximoDoLimite && " (próximo ao limite!)"}
+                </span>
+                {proximoDoLimite && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open('/planos', '_blank')}
+                    className="ml-3"
+                  >
+                    <Crown className="w-3 h-3 mr-1" />
+                    Upgrade
+                  </Button>
+                )}
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
