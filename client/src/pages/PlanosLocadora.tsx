@@ -376,7 +376,7 @@ export default function PlanosLocadora() {
                 </Badge>
               )}
               <Badge variant="default" className="px-3 py-1">
-                {planoAtual === 'vip' ? 'VIP' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro')}
+                {planoAtual === 'vip' ? 'VIP' : (planosSegurosProdução[planoAtual as keyof typeof planosSegurosProdução]?.nome || 'Pro')}
               </Badge>
             </div>
           </div>
@@ -385,19 +385,21 @@ export default function PlanosLocadora() {
           <div className={`p-4 rounded-lg ${isPlanExpired ? 'bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200' : 'bg-muted'}`}>
             {/* Layout Desktop */}
             <div className="hidden sm:flex items-center gap-4">
-              <div className={`p-3 rounded-full ${planoAtual === 'vip' ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : planoAtual === 'infinity' ? 'bg-gradient-to-r from-purple-600 to-pink-600' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.cor || 'bg-blue-500')}`}>
+              <div className={`p-3 rounded-full ${planoAtual === 'vip' ? 'bg-gradient-to-r from-purple-500 to-indigo-500' : planoAtual === 'infinity' ? 'bg-gradient-to-r from-purple-600 to-pink-600' : (planosSegurosProdução[planoAtual as keyof typeof planosSegurosProdução]?.cor || 'bg-blue-500')}`}>
                 {(() => {
                   if (planoAtual === 'vip') return <Crown className="h-6 w-6 text-white" />;
                   if (planoAtual === 'infinity') return <Star className="h-6 w-6 text-white" />;
-                  const planoData = planosEstaticos[planoAtual as keyof typeof planosEstaticos];
+                  const planoData = planosSegurosProdução[planoAtual as keyof typeof planosSegurosProdução];
                   if (!planoData) return <Rocket className="h-6 w-6 text-white" />;
-                  const IconComponent = planoData.icone;
+                  // Os ícones estão como string, precisamos mapear para componentes
+                  const iconMap = { Car, Rocket, Zap, Crown, Star };
+                  const IconComponent = iconMap[planoData.icone as keyof typeof iconMap] || Rocket;
                   return <IconComponent className="h-6 w-6 text-white" />;
                 })()}
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-lg">
-                  Plano {planoAtual === 'vip' ? 'VIP' : planoAtual === 'infinity' ? 'Infinity' : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.nome || 'Pro')}
+                  Plano {planoAtual === 'vip' ? 'VIP' : planoAtual === 'infinity' ? 'Infinity' : (planosSegurosProdução[planoAtual as keyof typeof planosSegurosProdução]?.nome || 'Pro')}
                   {planoAtual === 'vip' && <span className="text-purple-600 ml-2">(Premium)</span>}
                   {planoAtual === 'infinity' && <span className="text-purple-600 ml-2">(Ilimitado)</span>}
                   {isPlanExpired && planoAtual !== 'vip' && planoAtual !== 'infinity' && <span className="text-orange-600 ml-2">(Expirado)</span>}
@@ -409,7 +411,7 @@ export default function PlanosLocadora() {
                       ? 'Plano Infinity com veículos ilimitados e acesso total ao sistema'
                       : isPlanExpired 
                         ? 'Renove seu plano para continuar aproveitando todos os recursos' 
-                        : (planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.descricao || 'Para locadoras em crescimento')
+                        : (planosSegurosProdução[planoAtual as keyof typeof planosSegurosProdução]?.descricao || 'Para locadoras em crescimento')
                   }
                 </p>
               </div>
@@ -420,7 +422,7 @@ export default function PlanosLocadora() {
                       ? 'VIP'
                       : planoAtual === 'infinity'
                         ? 'INFINITY'
-                        : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
+                        : `R$ ${(planosSegurosProdução[planoAtual as keyof typeof planosSegurosProdução]?.preco || 99).toFixed(2)}`
                     }
                   </p>
                   <p className="text-sm text-muted-foreground">
