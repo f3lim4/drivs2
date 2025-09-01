@@ -146,14 +146,11 @@ export default function PlanosLocadora() {
 
   // Buscar dados da locadora se usuário é uma locadora
   const { data: locadora, isLoading: isLoadingLocadora, refetch: refetchLocadora } = useQuery({
-    queryKey: ['locadora-especifica', profile?.locadoraId], // Key única e simples
+    queryKey: ['locadora-especifica', profile?.locadoraId],
     queryFn: async () => {
       if (!profile?.locadoraId) return null;
-      console.log('🚀 FAZENDO FETCH PARA:', `/api/locadoras/${profile.locadoraId}`);
       const response = await fetch(`/api/locadoras/${profile.locadoraId}`);
-      const data = await response.json();
-      console.log('🚀 DADOS RECEBIDOS:', data);
-      return data;
+      return response.json();
     },
     enabled: !!profile?.locadoraId,
     staleTime: 0,
@@ -248,41 +245,13 @@ export default function PlanosLocadora() {
   // O sistema deve permitir visualizar os planos disponíveis
 
   // Determinar o plano atual baseado nos dados da locadora
-  // Fix: locadora vem como array, pegamos o primeiro item
-  // Valores padrão para garantir funcionamento em produção
-  console.log('🔍 DEBUG LOCADORA RAW:', locadora);
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
-  console.log('🔍 DEBUG LOCADORA PROCESSED:', locadoraData);
-  
   
   // Validação extra para garantir que VIP seja reconhecido
   const isVipPlan = locadoraData?.vitalia === true;
   
   // Se for VIP ou Infinity, mostrar plano especial; caso contrário priorizar dados da locadora
-  // FORÇAR uso dos dados frescos da locadora
-  console.log('🔍 DEBUG ANTES DE DEFINIR PLANO:', { 
-    isVipPlan, 
-    'locadoraData?.plano': locadoraData?.plano,
-    'locadoraData?.vitalia': locadoraData?.vitalia 
-  });
   const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || 'pro');
-  console.log('🔍 DEBUG PLANO DEFINIDO:', planoAtual);
-  
-  // Debug temporário para produção - LOGS DETALHADOS
-  console.log('🔧 PLANO DEBUG PRODUÇÃO DETALHADO:', { 
-    locadoraDataCompleta: locadoraData, 
-    planoDoBank: locadoraData?.plano,
-    planoAtual, 
-    isVipPlan,
-    locadoraStatus: locadoraData?.status,
-    tipoObjeto: typeof locadoraData?.plano,
-    timestamp: new Date().toLocaleTimeString()
-  });
-  
-  // Alert temporário para forçar visibilidade em produção
-  if (locadoraData && locadoraData.plano === 'elite' && planoAtual !== 'elite') {
-    console.error('🚨 BUG DETECTADO: Plano no banco é elite mas planoAtual é:', planoAtual);
-  }
   
   
   // VIP e Infinity sempre têm acesso - não podem estar expirados
