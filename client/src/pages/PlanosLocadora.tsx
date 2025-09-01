@@ -242,7 +242,9 @@ export default function PlanosLocadora() {
   // Determinar o plano atual baseado nos dados da locadora
   // Fix: locadora vem como array, pegamos o primeiro item
   // Valores padrão para garantir funcionamento em produção
+  console.log('🔍 DEBUG LOCADORA RAW:', locadora);
   const locadoraData = Array.isArray(locadora) ? locadora[0] : locadora;
+  console.log('🔍 DEBUG LOCADORA PROCESSED:', locadoraData);
   
   
   // Validação extra para garantir que VIP seja reconhecido
@@ -250,7 +252,13 @@ export default function PlanosLocadora() {
   
   // Se for VIP ou Infinity, mostrar plano especial; caso contrário priorizar dados da locadora
   // FORÇAR uso dos dados frescos da locadora
+  console.log('🔍 DEBUG ANTES DE DEFINIR PLANO:', { 
+    isVipPlan, 
+    'locadoraData?.plano': locadoraData?.plano,
+    'locadoraData?.vitalia': locadoraData?.vitalia 
+  });
   const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || 'pro');
+  console.log('🔍 DEBUG PLANO DEFINIDO:', planoAtual);
   
   // Debug temporário para produção - LOGS DETALHADOS
   console.log('🔧 PLANO DEBUG PRODUÇÃO DETALHADO:', { 
