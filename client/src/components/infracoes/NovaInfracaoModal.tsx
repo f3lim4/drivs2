@@ -279,8 +279,8 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
-            {/* Motorista e Tipo da Infração na mesma linha */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Primeira linha: Motorista, Tipo da Infração, Número do Auto e Código da Infração */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Seleção de Motorista com Aluguel Ativo */}
               <div className="space-y-2">
                 {!selecaoManual && (
@@ -321,73 +321,6 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   </label>
                 </div>
 
-                {/* Campos manuais quando checkbox marcado */}
-                {selecaoManual && (
-                  <div className="space-y-3 bg-gray-50 p-3 rounded border">
-                    <FormField
-                      control={form.control}
-                      name="motoristaId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm">Motorista</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value} defaultValue="">
-                            <FormControl>
-                              <SelectTrigger className="h-9">
-                                <SelectValue placeholder="Selecione o motorista" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {motoristas.length > 0 ? (
-                                motoristas.map((motorista: any) => (
-                                  <SelectItem key={motorista.id} value={motorista.id}>
-                                    {motorista.nome} - {motorista.id}
-                                  </SelectItem>
-                                ))
-                              ) : (
-                                <SelectItem value="loading" disabled>
-                                  Carregando motoristas...
-                                </SelectItem>
-                              )}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="veiculoId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm">Veículo</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value} defaultValue="">
-                            <FormControl>
-                              <SelectTrigger className="h-9">
-                                <SelectValue placeholder="Selecionar" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {veiculos.length > 0 ? (
-                                veiculos.map((veiculo: any) => (
-                                  <SelectItem key={veiculo.id} value={veiculo.id}>
-                                    {veiculo.modelo} - {veiculo.placa}
-                                  </SelectItem>
-                                ))
-                              ) : (
-                                <SelectItem value="loading" disabled>
-                                  Carregando veículos...
-                                </SelectItem>
-                              )}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                )}
-
                 {/* Campo oculto para aluguelId */}
                 <FormField
                   control={form.control}
@@ -422,10 +355,8 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                   </FormItem>
                 )}
               />
-            </div>
 
-            {/* Número do Auto e Código da Infração na mesma linha */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Número do Auto */}
               <FormField
                 control={form.control}
                 name="numeroAuto"
@@ -440,6 +371,7 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                 )}
               />
 
+              {/* Código da Infração */}
               <FormField
                 control={form.control}
                 name="codigoInfracao"
@@ -454,6 +386,75 @@ export function NovaInfracaoModal({ open, onClose }: NovaInfracaoModalProps) {
                 )}
               />
             </div>
+
+            {/* Campos manuais quando checkbox marcado */}
+            {selecaoManual && (
+              <div className="space-y-4 bg-gray-50 p-4 rounded border">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="motoristaId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">Motorista</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value} defaultValue="">
+                          <FormControl>
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Selecione o motorista" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {motoristas.length > 0 ? (
+                              motoristas.map((motorista: any) => (
+                                <SelectItem key={motorista.id} value={motorista.id}>
+                                  {motorista.nome} - {motorista.id}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="loading" disabled>
+                                Carregando motoristas...
+                              </SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="veiculoId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm">Veículo</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value} defaultValue="">
+                          <FormControl>
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Selecionar" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {veiculos.length > 0 ? (
+                              veiculos.map((veiculo: any) => (
+                                <SelectItem key={veiculo.id} value={veiculo.id}>
+                                  {veiculo.modelo} - {veiculo.placa}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="loading" disabled>
+                                Carregando veículos...
+                              </SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Descrição da Infração */}
             <FormField
