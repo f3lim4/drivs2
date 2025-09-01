@@ -1228,7 +1228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contratosExistentes = await storage.getContratosByLocadora(result.data.locadoraId);
       const contratoExistente = contratosExistentes.find(c => 
         c.cliente === result.data.cliente && 
-        c.status === 'ativo'
+        (c.status === 'ativo' || c.status === 'em_aberto')
       );
       
       // Verificar se há aluguel ativo para o mesmo motorista
@@ -1248,9 +1248,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           aluguelId: aluguelAtivo?.id
         });
         return res.status(400).json({ 
-          message: "Já existe um contrato/aluguel ativo para este motorista",
+          message: "Já existe um contrato ativo ou em aberto para este motorista, ou um aluguel ativo",
           motorista: result.data.cliente,
           contratoExistente: !!contratoExistente,
+          contratoStatus: contratoExistente?.status,
           aluguelAtivo: !!aluguelAtivo
         });
       }
