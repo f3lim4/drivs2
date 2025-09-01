@@ -258,11 +258,11 @@ const criarPagamentosRecorrentes = async (
       marcarComosPago: marcarAnterioresComoPago
     });
     
-    // Se checkbox marcado, semana atual também fica como PAGO (pois pagamentos são sempre segundas)
-    // Se checkbox desmarcado, semana atual fica como EM ABERTO
-    const statusSemanaAtual = marcarAnterioresComoPago ? 'pago' : 'em_aberto';
-    const valorPagoAtual = marcarAnterioresComoPago ? valorSemanal.toString() : "0";
-    const valorRestanteAtual = marcarAnterioresComoPago ? "0" : valorSemanal.toString();
+    // CORREÇÃO: Semana atual SEMPRE fica como EM ABERTO, independente do checkbox
+    // O checkbox "marcar anteriores" se refere apenas aos pagamentos ANTERIORES à semana atual
+    const statusSemanaAtual = 'em_aberto'; // Sempre pendente, independente do checkbox
+    const valorPagoAtual = "0"; // Sempre 0 pago na semana atual
+    const valorRestanteAtual = valorSemanal.toString(); // Sempre valor total restante
     
     const pagamentoAtual = {
       id: crypto.randomUUID(),
@@ -277,12 +277,8 @@ const criarPagamentosRecorrentes = async (
       valorMulta: "0.00",
       status: statusSemanaAtual,
       tipo: 'aluguel',
-      descricao: marcarAnterioresComoPago 
-        ? 'Pagamento da semana atual - Marcado como pago'
-        : 'Pagamento da semana atual',
-      observacoes: marcarAnterioresComoPago 
-        ? 'Pagamento da semana atual - Marcado como pago (pagamentos são sempre segundas-feiras)'
-        : 'Pagamento da semana atual',
+      descricao: 'Pagamento da semana atual',
+      observacoes: 'Pagamento da semana atual - sempre fica em aberto (pagamentos são sempre segundas-feiras)',
       automatico: true
     };
     
@@ -847,11 +843,11 @@ ____________________________________        ____________________________________
           let mensagem = '';
           
           if (quantidadePagamentos.statusRetroativos === 'pago') {
-            // Checkbox marcado - todos pagamentos como pagos
+            // Checkbox marcado - pagamentos anteriores como pagos, semana atual em aberto
             if (quantidadePagamentos.retroativos > 0) {
-              mensagem = `${quantidadePagamentos.totalCriados} pagamentos marcados como PAGOS (${quantidadePagamentos.retroativos} retroativos + semana atual) - pagamentos são sempre segundas`;
+              mensagem = `${quantidadePagamentos.totalCriados} pagamentos criados: ${quantidadePagamentos.retroativos} retroativos como PAGOS + semana atual EM ABERTO`;
             } else {
-              mensagem = `1 pagamento da semana atual marcado como PAGO - pagamentos são sempre segundas`;
+              mensagem = `1 pagamento da semana atual criado como EM ABERTO - pagamentos são sempre segundas`;
             }
           } else {
             // Checkbox desmarcado - todos em aberto
