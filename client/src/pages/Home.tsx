@@ -599,7 +599,7 @@ export default function Home() {
                 <p className="text-blue-200 text-center mb-4 text-sm">Para locadoras iniciantes</p>
                 
                 <div className="text-center mb-6">
-                  <div className="text-3xl font-bold mb-2">R$ 50<span className="text-sm font-normal">/mês</span></div>
+                  <div className="text-3xl font-bold mb-2">R$ 29<span className="text-sm font-normal">/mês</span></div>
                   <div className="text-blue-300 text-sm">Até 5 veículos</div>
                 </div>
 

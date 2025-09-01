@@ -137,7 +137,7 @@ export default function PlanosLocadora() {
 
   // Cache dos planos estáticos (carregamento instantâneo)
   const planosEstaticos = {
-    start: { nome: "Start", preco: 50.00, valor: 50.00, icone: Car, cor: "bg-blue-500", descricao: "Para locadoras iniciantes com até 5 veículos", popular: false },
+    start: { nome: "Start", preco: 29.00, valor: 29.00, icone: Car, cor: "bg-blue-500", descricao: "Para locadoras iniciantes com até 5 veículos", popular: false },
     pro: { nome: "Pro", preco: 99.00, valor: 99.00, icone: Rocket, cor: "bg-cyan-500", descricao: "Para locadoras em crescimento com até 20 veículos", popular: true },
     elite: { nome: "Elite", preco: 250.00, valor: 250.00, icone: Zap, cor: "bg-green-500", descricao: "Para frotas médias com até 50 veículos", popular: false },
     prime: { nome: "Prime", preco: 500.00, valor: 500.00, icone: Crown, cor: "bg-purple-500", descricao: "Para grandes frotas com até 100 veículos", popular: false },
@@ -261,7 +261,7 @@ export default function PlanosLocadora() {
   // Dados fallback para garantir renderização em produção
   const planosSegurosProdução = {
     start: { 
-      id: "start", nome: "Start", preco: 50, valor: 50, 
+      id: "start", nome: "Start", preco: 29, valor: 29, 
       descricao: "Para locadoras iniciantes", 
       icone: "Car", cor: "bg-blue-500", 
       recursos: ["Até 5 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
@@ -517,10 +517,10 @@ export default function PlanosLocadora() {
                 <Car className="h-6 w-6 text-white" />
               </div>
               <CardTitle className="text-2xl">Start</CardTitle>
-              <div className="text-3xl font-bold text-blue-600">R$ 50,00</div>
+              <div className="text-3xl font-bold text-blue-600">R$ 29,00</div>
               <CardDescription className="text-base">por mês</CardDescription>
               <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1 space-y-1">
-                <div>💰 Anual: R$ 500 (10 meses + 2 grátis)</div>
+                <div>💰 Anual: R$ 290 (10 meses + 2 grátis)</div>
                 <div className="text-blue-700 font-medium">+ Todas as atualizações do sistema</div>
               </div>
               <p className="text-sm text-muted-foreground mt-2">Para locadoras iniciantes</p>
