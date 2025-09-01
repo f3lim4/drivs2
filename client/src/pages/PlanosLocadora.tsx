@@ -488,28 +488,6 @@ export default function PlanosLocadora() {
               Escolha o plano ideal para sua locadora
             </p>
             
-            {/* Destaque do Plano Anual */}
-            <div className="mt-6 mb-8">
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 max-w-2xl mx-auto">
-                <div className="flex items-center justify-center mb-3">
-                  <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
-                    🔥 PROMOÇÃO VÁLIDA ATÉ 10/10 - PLANO ANUAL
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-green-800 mb-2">
-                  Assine Anual e Leve 2 Meses GRÁTIS!
-                </h3>
-                <p className="text-green-700 text-lg">
-                  ✅ <strong>2 meses grátis</strong> na assinatura anual<br/>
-                  ✅ <strong>TODAS as atualizações do sistema GRATUITAS</strong><br/>
-                  ✅ Suporte prioritário e desconto permanente<br/>
-                  ⏰ <strong>Promoção válida apenas até 10/10/2025</strong>
-                </p>
-                <p className="text-sm text-red-600 mt-3 font-semibold">
-                  🚨 ÚLTIMOS DIAS! Entre em contato para ativar seu plano anual com 2 meses grátis!
-                </p>
-              </div>
-            </div>
           </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
