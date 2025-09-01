@@ -252,12 +252,14 @@ export default function PlanosLocadora() {
   // FORÇAR uso dos dados frescos da locadora
   const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || 'pro');
   
-  // Debug temporário para produção
-  console.log('🔧 PLANO DEBUG PRODUÇÃO:', { 
-    locadoraData: locadoraData?.plano, 
+  // Debug temporário para produção - LOGS DETALHADOS
+  console.log('🔧 PLANO DEBUG PRODUÇÃO DETALHADO:', { 
+    locadoraDataCompleta: locadoraData, 
+    planoDoBank: locadoraData?.plano,
     planoAtual, 
     isVipPlan,
     locadoraStatus: locadoraData?.status,
+    tipoObjeto: typeof locadoraData?.plano,
     timestamp: new Date().toLocaleTimeString()
   });
   
