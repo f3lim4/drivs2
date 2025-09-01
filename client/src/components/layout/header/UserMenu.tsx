@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Crown, Clock } from 'lucide-react';
+import { User, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -83,7 +83,6 @@ export function UserMenu() {
                 </p>
                 {profile?.type !== 'admin' && planoInfo?.testeGratuito?.ativo && (
                   <Badge variant="secondary" className="text-xs">
-                    <Clock className="w-3 h-3 mr-1" />
                     {planoInfo.testeGratuito.diasRestantes}d
                   </Badge>
                 )}
