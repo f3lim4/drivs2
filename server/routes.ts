@@ -3262,6 +3262,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API para dados consolidados do admin (relatórios financeiros)
+  app.get("/api/admin/consolidado", async (req, res) => {
+    try {
+      console.log("[DEBUG CONSOLIDADO] Iniciando busca de dados consolidados do admin");
+
+      // Buscar todas as locadoras
+      const todasLocadoras = await storage.getAllLocadoras();
+      console.log("[DEBUG CONSOLIDADO] Locadoras encontradas:", todasLocadoras.length);
+
+      const dadosConsolidados = [];
+
+      for (const locadora of todasLocadoras) {
+        try {
+          console.log("[DEBUG CONSOLIDADO] Processando locadora:", locadora.nome, locadora.id);
+
+          // Buscar dados da locadora
+          const veiculos = await storage.getVeiculosByLocadora(locadora.id);
+          const alugueis = await storage.getAlugueisAtivosByLocadora(locadora.id);
+          const pagamentos = await storage.getPagamentosByLocadora(locadora.id);
+          const despesas = await storage.getDespesasByLocadora(locadora.id);
+
+          console.log("[DEBUG CONSOLIDADO] Dados da locadora:", {
+            locadora: locadora.nome,
+            veiculos: veiculos.length,
+            alugueis: alugueis.length,
+            pagamentos: pagamentos.length,
+            despesas: despesas.length
+          });
+
+          // Calcular receita (pagamentos realizados)
+          const receitaTotal = pagamentos
+            .filter(p => p.status === 'realizado')
+            .reduce((acc, p) => acc + (parseFloat(p.valor) || 0), 0);
+
+          // Calcular despesas manuais
+          const despesasTotal = despesas
+            .reduce((acc, d) => acc + (parseFloat(d.valor?.toString() || '0') || 0), 0);
+
+          // Calcular despesas fixas dos veículos (IPVA, Seguro, Rastreador, Financiamento)
+          const despesasFixas = veiculos.reduce((acc, veiculo) => {
+            let despesasVeiculo = 0;
+            
+            // IPVA anual dividido por 12
+            if (veiculo.ipva && Number(veiculo.ipva) > 0) {
+              despesasVeiculo += Number(veiculo.ipva) / 12;
+            }
+            
+            // Seguro mensal
+            if (veiculo.valorSeguroMensal && Number(veiculo.valorSeguroMensal) > 0) {
+              despesasVeiculo += Number(veiculo.valorSeguroMensal);
+            }
+            
+            // Rastreador mensal
+            if (veiculo.valorRastreadorMensal && Number(veiculo.valorRastreadorMensal) > 0) {
+              despesasVeiculo += Number(veiculo.valorRastreadorMensal);
+            }
+            
+            // Financiamento mensal
+            if (veiculo.valorFinanciamento && Number(veiculo.valorFinanciamento) > 0) {
+              despesasVeiculo += Number(veiculo.valorFinanciamento);
+            }
+            
+            return acc + despesasVeiculo;
+          }, 0);
+
+          const totalDespesas = despesasTotal + despesasFixas;
+          const lucro = receitaTotal - totalDespesas;
+          const margem = receitaTotal > 0 ? ((lucro / receitaTotal) * 100) : 0;
+
+          dadosConsolidados.push({
+            locadora: locadora.nome,
+            locadoraId: locadora.id,
+            receita: receitaTotal,
+            despesas: totalDespesas,
+            lucro: lucro,
+            margem: margem,
+            veiculos: veiculos.length,
+            alugueisAtivos: alugueis.length
+          });
+
+          console.log("[DEBUG CONSOLIDADO] Resultado calculado:", {
+            locadora: locadora.nome,
+            receita: receitaTotal,
+            despesas: totalDespesas,
+            lucro: lucro,
+            margem: margem
+          });
+
+        } catch (error) {
+          console.error("[DEBUG CONSOLIDADO] Erro ao processar locadora:", locadora.nome, error);
+          // Adicionar dados zerados em caso de erro
+          dadosConsolidados.push({
+            locadora: locadora.nome,
+            locadoraId: locadora.id,
+            receita: 0,
+            despesas: 0,
+            lucro: 0,
+            margem: 0,
+            veiculos: 0,
+            alugueisAtivos: 0
+          });
+        }
+      }
+
+      console.log("[DEBUG CONSOLIDADO] Dados consolidados finais:", dadosConsolidados);
+      res.json(dadosConsolidados);
+
+    } catch (error) {
+      console.error("[DEBUG CONSOLIDADO] Error fetching consolidated data:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
