@@ -2589,12 +2589,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         start: {
           id: "start",
           nome: "Start",
-          preco: 50,
-          valor: 50,
+          preco: 29,
+          valor: 29,
           limiteVeiculos: 5,
           descricao: "Para locadoras iniciantes",
           popular: false,
-          stripePrice: "price_start_50_monthly",
+          stripePrice: "price_start_29_monthly",
           recursos: [
             "Até 5 veículos na frota",
             "Gestão completa de motoristas",
