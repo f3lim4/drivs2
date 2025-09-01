@@ -148,6 +148,8 @@ export default function PlanosLocadora() {
   const { data: locadora, isLoading: isLoadingLocadora, refetch: refetchLocadora } = useQuery({
     queryKey: ['/api/locadoras', profile?.locadoraId],
     enabled: !!profile?.locadoraId,
+    staleTime: 0, // Sempre dados frescos para corrigir bug do plano
+    refetchOnMount: true, // Sempre refetch quando montar
   });
 
   const { data: planoDetalhes, isLoading, error: planosError } = useQuery({
@@ -245,7 +247,16 @@ export default function PlanosLocadora() {
   const isVipPlan = locadoraData?.vitalia === true;
   
   // Se for VIP ou Infinity, mostrar plano especial; caso contrário priorizar dados da locadora
-  const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || planoDetalhes?.planoAtual || 'pro');
+  // FORÇAR uso dos dados frescos da locadora
+  const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || 'pro');
+  
+  // Debug temporário para produção
+  console.log('🔧 PLANO DEBUG PRODUÇÃO:', { 
+    locadoraData: locadoraData?.plano, 
+    planoAtual, 
+    isVipPlan,
+    locadoraStatus: locadoraData?.status 
+  });
   
   
   // VIP e Infinity sempre têm acesso - não podem estar expirados
