@@ -251,7 +251,8 @@ export default function PlanosLocadora() {
   const isVipPlan = locadoraData?.vitalia === true;
   
   // Se for VIP ou Infinity, mostrar plano especial; caso contrário priorizar dados da locadora
-  const planoAtual = isVipPlan ? 'vip' : (locadoraData?.plano || 'pro');
+  // Só mostrar plano quando dados estiverem carregados para evitar flicker
+  const planoAtual = isLoadingLocadora ? null : (isVipPlan ? 'vip' : locadoraData?.plano);
   
   
   // VIP e Infinity sempre têm acesso - não podem estar expirados
@@ -369,6 +370,12 @@ export default function PlanosLocadora() {
           </div>
         </CardHeader>
         <CardContent>
+          {isLoadingLocadora ? (
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Carregando informações do plano...</p>
+            </div>
+          ) : planoAtual ? (
           <div className={`p-4 rounded-lg ${isPlanExpired ? 'bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200' : 'bg-muted'}`}>
             {/* Layout Desktop */}
             <div className="hidden sm:flex items-center gap-4">
@@ -482,6 +489,11 @@ export default function PlanosLocadora() {
               )}
             </div>
           </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8">
+              <p className="text-gray-600 dark:text-gray-400">Dados do plano não disponíveis</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
