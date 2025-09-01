@@ -75,6 +75,25 @@ export default function Veiculos() {
   const { profile, isAdmin, isLocadora } = useAuth();
   const { veiculos, loading: loadingVeiculos, adicionarVeiculo, atualizarVeiculo, removerVeiculo } = useVeiculos();
 
+  // Buscar informações da locadora para verificar limites do plano
+  const { data: locadora } = useQuery({
+    queryKey: ['/api/locadoras', profile?.locadoraId],
+    enabled: !!profile?.locadoraId && profile?.type === 'locadora',
+  });
+
+  // Calcular limites por plano
+  const limitesPorPlano: { [key: string]: number } = {
+    'start': 5,
+    'pro': 20,
+    'elite': 50,
+    'prime': 100,
+    'infinity': -1 // -1 = ilimitado
+  };
+
+  const limiteAtual = limitesPorPlano[locadora?.plano] || 0;
+  const quantidadeAtual = veiculos?.length || 0;
+  const limiteBloqueado = limiteAtual > 0 && quantidadeAtual >= limiteAtual && !locadora?.vitalia;
+
 
 
   // Buscar dados adicionais necessários para o sistema completo
@@ -179,6 +198,24 @@ export default function Veiculos() {
 
   // Funções dos botões
   const handleNovoVeiculo = () => {
+    if (limiteBloqueado) {
+      const nomePlano = locadora?.plano.charAt(0).toUpperCase() + locadora?.plano.slice(1);
+      toast({
+        title: "Limite de veículos atingido!",
+        description: `O plano ${nomePlano} permite até ${limiteAtual} veículos. Faça upgrade para cadastrar mais veículos.`,
+        variant: "destructive",
+        action: (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => window.open('/planos', '_blank')}
+          >
+            Ver Planos
+          </Button>
+        ),
+      });
+      return;
+    }
     setModalOpen(true);
   };
 
@@ -410,15 +447,23 @@ export default function Veiculos() {
 
               {/* Botões */}
               {isLocadora && (
-                <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novos veículos">
-                  <Button 
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
-                    onClick={handleNovoVeiculo}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Novo Veículo
-                  </Button>
-                </ProtectedAction>
+                <div className="flex flex-col items-end gap-1">
+                  <ProtectedAction fallbackMessage="Renove seu plano para cadastrar novos veículos">
+                    <Button 
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handleNovoVeiculo}
+                      disabled={limiteBloqueado}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Novo Veículo
+                    </Button>
+                  </ProtectedAction>
+                  {locadora && !locadora.vitalia && limiteAtual > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      {quantidadeAtual}/{limiteAtual} veículos
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           </div>
