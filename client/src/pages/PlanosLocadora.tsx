@@ -146,13 +146,20 @@ export default function PlanosLocadora() {
 
   // Buscar dados da locadora se usuário é uma locadora
   const { data: locadora, isLoading: isLoadingLocadora, refetch: refetchLocadora } = useQuery({
-    queryKey: ['/api/locadoras', profile?.locadoraId, Date.now()], // Força cache único
-    queryFn: () => fetch(`/api/locadoras/${profile?.locadoraId}`).then(res => res.json()),
+    queryKey: ['locadora-especifica', profile?.locadoraId], // Key única e simples
+    queryFn: async () => {
+      if (!profile?.locadoraId) return null;
+      console.log('🚀 FAZENDO FETCH PARA:', `/api/locadoras/${profile.locadoraId}`);
+      const response = await fetch(`/api/locadoras/${profile.locadoraId}`);
+      const data = await response.json();
+      console.log('🚀 DADOS RECEBIDOS:', data);
+      return data;
+    },
     enabled: !!profile?.locadoraId,
-    staleTime: 0, // Sempre dados frescos para corrigir bug do plano
-    gcTime: 0, // Não manter cache
-    refetchOnMount: 'always', // Sempre refetch quando montar
-    refetchOnWindowFocus: true, // Refetch quando focar janela
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   const { data: planoDetalhes, isLoading, error: planosError } = useQuery({
