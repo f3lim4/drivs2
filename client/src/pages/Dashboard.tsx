@@ -598,23 +598,23 @@ export default function Dashboard() {
       {/* Card de Período de Teste Gratuito */}
       {isLocadora && trialStatus && trialStatus.isActive && (
         <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <div className="space-y-2">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-orange-600" />
-                  <h3 className="text-lg font-semibold text-orange-800">Período de Teste Gratuito</h3>
+                  <Crown className="w-4 h-4 text-orange-600" />
+                  <h3 className="text-sm font-semibold text-orange-800">Período de Teste Gratuito</h3>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-2xl font-bold text-orange-900">
+                  <p className="text-xl font-bold text-orange-900">
                     {trialStatus.diasRestantes} {trialStatus.diasRestantes === 1 ? 'dia restante' : 'dias restantes'}
                   </p>
-                  <p className="text-sm text-orange-700">
+                  <p className="text-xs text-orange-700">
                     De {trialStatus.diasTotais} dias totais • Expira em {formatDate(trialStatus.vencimento.toISOString())}
                   </p>
-                  <div className="w-full bg-orange-200 rounded-full h-2.5 mt-3">
+                  <div className="w-full bg-orange-200 rounded-full h-2 mt-2">
                     <div 
-                      className="bg-orange-600 h-2.5 rounded-full transition-all duration-300" 
+                      className="bg-orange-600 h-2 rounded-full transition-all duration-300" 
                       style={{ 
                         width: `${Math.max(0, Math.min(100, (trialStatus.diasRestantes / trialStatus.diasTotais) * 100))}%` 
                       }}
@@ -622,7 +622,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-              <div className="text-right space-y-2">
+              <div className="text-right space-y-1">
                 <Badge 
                   variant={trialStatus.diasRestantes <= 5 ? "destructive" : trialStatus.diasRestantes <= 10 ? "secondary" : "default"}
                   className="text-xs"
