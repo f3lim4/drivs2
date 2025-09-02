@@ -381,8 +381,7 @@ export function NovoContratoModal({
     const loadData = async () => {
       if (!open) return;
       
-      // FORÇA PRODUÇÃO: Sempre usar locadora de produção
-      const locadoraId = '50764571000170';
+      const locadoraId = profile?.locadoraId || profile?.id;
       
       console.log('🏢 MODAL CONTRATO - Locadora atual:', locadoraId);
       console.log('🏢 MODAL CONTRATO - Profile completo:', profile);
@@ -413,17 +412,15 @@ export function NovoContratoModal({
           console.log('PRODUÇÃO - DADOS BRUTOS veículos da API:', veiculosData);
           
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => {
-            // Verifica se o veículo está disponível
-            if (veiculo.status !== 'disponivel') return false;
-            
-            // Verifica se o veículo não tem contrato ativo
+            // REGRA: Veículo deve estar disponível E não ter contrato ativo/aberto
             const temContratoAtivo = contratosAtivos.some((contrato: any) => 
               contrato.veiculoId === veiculo.id || contrato.veiculo_id === veiculo.id
             );
             
-            console.log(`Veículo ${veiculo.id}: status=${veiculo.status}, temContratoAtivo=${temContratoAtivo}`);
+            const disponivel = veiculo.status === 'disponivel' && !temContratoAtivo;
+            console.log(`🚗 Veículo ${veiculo.placa}: status=${veiculo.status}, contratoAtivo=${temContratoAtivo}, disponível=${disponivel}`);
             
-            return !temContratoAtivo;
+            return disponivel;
           });
           
           console.log('VEÍCULOS DISPONÍVEIS filtrados:', veiculosDisponiveis);
@@ -453,6 +450,7 @@ export function NovoContratoModal({
           const now = new Date();
           
           const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
+            // REGRA: Motorista não pode ter aluguel ativo NEM contrato ativo
             // Verifica CNH válida
             const temVencimento = !!motorista.vencimentoCnh;
             let cnhValida = false;
@@ -466,12 +464,16 @@ export function NovoContratoModal({
               aluguel.motoristaCpf === motorista.id || aluguel.motoristaId === motorista.id
             );
             
-            // Verifica se tem contrato ativo
+            // Verifica se tem contrato ativo (usando campo cliente que contém o nome do motorista)
             const temContratoAtivo = contratosAtivos.some((contrato: any) => 
-              contrato.motoristaCpf === motorista.id || contrato.motoristaId === motorista.id
+              contrato.cliente === motorista.nome || 
+              contrato.motoristaCpf === motorista.id || 
+              contrato.motoristaId === motorista.id
             );
             
             const disponivel = temVencimento && cnhValida && !temAluguelAtivo && !temContratoAtivo;
+            
+            console.log(`👤 Motorista ${motorista.nome}: CNH=${cnhValida}, aluguel=${temAluguelAtivo}, contrato=${temContratoAtivo}, disponível=${disponivel}`);
             
             return disponivel;
           }).map((motorista: any) => ({
