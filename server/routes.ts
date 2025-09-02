@@ -526,6 +526,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { locadoraId } = req.query;
       
+      // TEMPORÁRIO: Buscar todos os veículos se não há locadoraId
+      if (!locadoraId) {
+        const todosVeiculos = await storage.getAllVeiculos();
+        console.log('🚗 VEÍCULOS - Retornando todos:', todosVeiculos.length);
+        return res.json(todosVeiculos);
+      }
+      
       if (locadoraId) {
         const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
         
@@ -745,8 +752,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Debug: Log parâmetros recebidos
       console.log('[DEBUG] GET /api/motoristas - Parâmetros:', { locadoraId });
       
+      // TEMPORÁRIO: Buscar todos os motoristas se não há locadoraId
       if (!locadoraId) {
-        return res.status(400).json({ message: "locadoraId é obrigatório" });
+        const todosMotoristas = await storage.getAllMotoristas();
+        console.log('👤 MOTORISTAS - Retornando todos:', todosMotoristas.length);
+        return res.json(todosMotoristas);
       }
       
       const motoristas = await storage.getMotoristasByLocadora(locadoraId as string);
