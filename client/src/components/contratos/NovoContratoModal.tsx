@@ -381,7 +381,8 @@ export function NovoContratoModal({
     const loadData = async () => {
       if (!open) return;
       
-      const locadoraId = profile?.locadoraId || profile?.id;
+      // FORÇA PRODUÇÃO: Sempre usar locadora de produção
+      const locadoraId = '50764571000170';
       
       console.log('🏢 MODAL CONTRATO - Locadora atual:', locadoraId);
       console.log('🏢 MODAL CONTRATO - Profile completo:', profile);
