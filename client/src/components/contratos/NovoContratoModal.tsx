@@ -405,8 +405,8 @@ export function NovoContratoModal({
           console.log('PRODUÇÃO - CONTRATOS ATIVOS filtrados:', contratosAtivos);
         }
 
-        // Carrega veículos disponíveis
-        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
+        // Carrega veículos disponíveis (com cache buster)
+        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}&t=${Date.now()}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
           console.log('PRODUÇÃO - DADOS BRUTOS veículos da API:', veiculosData);
