@@ -386,8 +386,8 @@ export function NovoContratoModal({
       console.log('🏢 MODAL CONTRATO - Locadora atual:', locadoraId);
       console.log('🏢 MODAL CONTRATO - Profile completo:', profile);
       
-      // DEBUG: Se não há locadoraId no profile, forçar produção
-      const locadoraFinal = locadoraId || '50764571000170';
+      // PRODUÇÃO: Usar locadoraId do contexto de pagamentos (que está funcionando)
+      const locadoraFinal = '9e30a0f8-8683-4f12-9c0d-3f35d5686a53';
       console.log('🏢 MODAL CONTRATO - Locadora final usada:', locadoraFinal);
       
       if (!locadoraFinal) return;
