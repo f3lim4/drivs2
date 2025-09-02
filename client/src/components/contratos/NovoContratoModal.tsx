@@ -400,35 +400,75 @@ export function NovoContratoModal({
       setLoadingData(true);
       
       try {
-        console.log('🔍 BUSCANDO DADOS REAIS DO BANCO');
+        console.log('🔍 BUSCANDO DADOS REAIS COM REGRAS DE NEGÓCIO');
         
-        // Buscar veículos reais SEM locadoraId (remover verificação temporariamente)
+        // 1. BUSCAR CONTRATOS ATIVOS PRIMEIRO
+        let contratosAtivos: any[] = [];
+        try {
+          const contratosResponse = await fetch(`/api/contratos`);
+          if (contratosResponse.ok) {
+            const contratosData = await contratosResponse.json();
+            contratosAtivos = contratosData.filter((contrato: any) => 
+              contrato.status === 'ativo' || contrato.status === 'aberto'
+            );
+            console.log('📋 CONTRATOS ATIVOS/ABERTOS encontrados:', contratosAtivos.length);
+          }
+        } catch (error) {
+          console.error('❌ Erro ao buscar contratos:', error);
+        }
+
+        // 2. BUSCAR VEÍCULOS E FILTRAR OS OCUPADOS
         try {
           const veiculosResponse = await fetch(`/api/veiculos`, {
             headers: { 'Cache-Control': 'no-cache' }
           });
           if (veiculosResponse.ok) {
             const veiculosData = await veiculosResponse.json();
-            console.log('✅ VEÍCULOS REAIS encontrados:', veiculosData);
-            setVeiculos(veiculosData);
+            console.log('🚗 VEÍCULOS TOTAIS encontrados:', veiculosData.length);
+            
+            // FILTRAR: Remover veículos com contratos ativos/abertos
+            const veiculosOcupados = contratosAtivos.map(c => c.veiculo);
+            const veiculosDisponiveis = veiculosData.filter((veiculo: any) => 
+              !veiculosOcupados.includes(veiculo.id)
+            );
+            
+            console.log('🚗 VEÍCULOS FILTRADOS (disponíveis):', {
+              total: veiculosData.length,
+              ocupados: veiculosOcupados.length,
+              disponiveis: veiculosDisponiveis.length
+            });
+            
+            setVeiculos(veiculosDisponiveis);
           }
         } catch (error) {
           console.error('❌ Erro ao buscar veículos:', error);
         }
 
-        // Buscar motoristas reais SEM locadoraId (remover verificação temporariamente)
+        // 3. BUSCAR MOTORISTAS E FILTRAR OS OCUPADOS
         try {
           const motoristasResponse = await fetch(`/api/motoristas`, {
             headers: { 'Cache-Control': 'no-cache' }
           });
           if (motoristasResponse.ok) {
             const motoristasData = await motoristasResponse.json();
-            console.log('✅ MOTORISTAS REAIS encontrados:', motoristasData);
-            const motoristasFormatados = motoristasData.map((motorista: any) => ({
+            console.log('👤 MOTORISTAS TOTAIS encontrados:', motoristasData.length);
+            
+            // FILTRAR: Remover motoristas com contratos ativos/abertos
+            const motoristasOcupados = contratosAtivos.map(c => c.cliente);
+            const motoristasDisponiveis = motoristasData.filter((motorista: any) => 
+              !motoristasOcupados.includes(motorista.id)
+            ).map((motorista: any) => ({
               ...motorista,
               nome: motorista.nome?.trim() || motorista.nome
             }));
-            setMotoristas(motoristasFormatados);
+            
+            console.log('👤 MOTORISTAS FILTRADOS (disponíveis):', {
+              total: motoristasData.length,
+              ocupados: motoristasOcupados.length,
+              disponiveis: motoristasDisponiveis.length
+            });
+            
+            setMotoristas(motoristasDisponiveis);
           }
         } catch (error) {
           console.error('❌ Erro ao buscar motoristas:', error);
