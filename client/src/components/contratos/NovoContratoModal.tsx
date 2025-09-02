@@ -427,7 +427,8 @@ export function NovoContratoModal({
             console.log('🚗 VEÍCULOS TOTAIS encontrados:', veiculosData.length);
             
             // FILTRAR: Remover veículos com contratos ativos/abertos
-            const veiculosOcupados = contratosAtivos.map(c => c.veiculo);
+            // CORREÇÃO: Usar veiculo_id do contrato para comparar com id do veículo
+            const veiculosOcupados = contratosAtivos.map(c => c.veiculo_id || c.veiculo);
             const veiculosDisponiveis = veiculosData.filter((veiculo: any) => 
               !veiculosOcupados.includes(veiculo.id)
             );
@@ -454,9 +455,10 @@ export function NovoContratoModal({
             console.log('👤 MOTORISTAS TOTAIS encontrados:', motoristasData.length);
             
             // FILTRAR: Remover motoristas com contratos ativos/abertos
-            const motoristasOcupados = contratosAtivos.map(c => c.cliente);
+            // CORREÇÃO: Comparar nome do motorista com cliente do contrato
+            const clientesOcupados = contratosAtivos.map(c => c.cliente);
             const motoristasDisponiveis = motoristasData.filter((motorista: any) => 
-              !motoristasOcupados.includes(motorista.id)
+              !clientesOcupados.includes(motorista.nome)
             ).map((motorista: any) => ({
               ...motorista,
               nome: motorista.nome?.trim() || motorista.nome
