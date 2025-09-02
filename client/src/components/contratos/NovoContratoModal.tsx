@@ -384,6 +384,11 @@ export function NovoContratoModal({
       const locadoraId = profile?.locadoraId || profile?.id;
       if (!locadoraId) return;
       
+      // LIMPAR ESTADO ANTERIOR
+      setVeiculos([]);
+      setMotoristas([]);
+      setAlugueis([]);
+      
       setLoadingData(true);
       
       try {
