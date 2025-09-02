@@ -382,6 +382,8 @@ export function NovoContratoModal({
       if (!open) return;
       
       const locadoraId = profile?.locadoraId || profile?.id;
+      console.log('🏢 MODAL CONTRATO - Locadora atual:', locadoraId);
+      console.log('🏢 MODAL CONTRATO - Profile completo:', profile);
       if (!locadoraId) return;
       
       // LIMPAR ESTADO ANTERIOR
