@@ -449,21 +449,19 @@ export function NovoContratoModal({
             
             const disponivel = temVencimento && cnhValida && !temAluguelAtivo && !temContratoAtivo;
             
-            console.log(`Motorista ${motorista.nome}:`, {
-              temVencimento,
-              cnhValida,
-              temAluguelAtivo,
-              temContratoAtivo,
-              disponivel
-            });
-            
             return disponivel;
           }).map((motorista: any) => ({
             ...motorista,
             nome: motorista.nome.trim() // Remove espaços extras do nome
           }));
           
-          console.log('Motoristas disponíveis encontrados:', motoristasDisponiveis.length);
+          console.log('Debug modal contrato:', {
+            motoristasTotal: motoristasData.length,
+            motoristasDisponiveis: motoristasDisponiveis.length,
+            contratosAtivos: contratosAtivos.length,
+            alugueisAtivos: alugueisAtivos.length
+          });
+          
           setMotoristas(motoristasDisponiveis);
         }
       } catch (error) {
