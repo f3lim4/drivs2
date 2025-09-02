@@ -1021,12 +1021,17 @@ ____________________________________        ____________________________________
                             ))
                           ) : (
                             <SelectItem value="none" disabled>
-                              Nenhum motorista com CNH válida
+                              {loadingData ? "Carregando motoristas..." : "Nenhum motorista disponível. Cadastre um motorista com CNH válida primeiro."}
                             </SelectItem>
                           )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
+                      {motoristas.length === 0 && !loadingData && (
+                        <p className="text-sm text-orange-600 mt-1">
+                          💡 Para criar contratos, primeiro cadastre motoristas na seção "Motoristas" do menu.
+                        </p>
+                      )}
                     </FormItem>
                   )}
                 />
