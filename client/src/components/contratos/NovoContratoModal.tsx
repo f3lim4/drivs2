@@ -381,7 +381,13 @@ export function NovoContratoModal({
     const loadData = async () => {
       if (!open) return;
       
-      const locadoraId = profile?.locadoraId || profile?.id;
+      let locadoraId = profile?.locadoraId || profile?.id;
+      
+      // CORREÇÃO EMERGENCIAL: Forçar locadora de produção se estiver logado na produção
+      if (window.location.href.includes('drivs') || profile?.name?.toLowerCase().includes('drivs') || profile?.email?.includes('drivs')) {
+        locadoraId = '50764571000170'; // Forçar locadora de produção
+      }
+      
       console.log('🏢 MODAL CONTRATO - Locadora atual:', locadoraId);
       console.log('🏢 MODAL CONTRATO - Profile completo:', profile);
       if (!locadoraId) return;
