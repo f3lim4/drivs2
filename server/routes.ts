@@ -544,8 +544,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.setHeader('Expires', '0');
         res.json(veiculos);
       } else {
-        const veiculos = await storage.getAllVeiculos();
-        res.json(veiculos);
+        // SEGURANÇA: Nunca retornar todos os veículos sem locadoraId
+        return res.status(400).json({ message: "locadoraId é obrigatório" });
       }
     } catch (error) {
       console.error("Error fetching veiculos:", error);
@@ -745,12 +745,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Debug: Log parâmetros recebidos
       console.log('[DEBUG] GET /api/motoristas - Parâmetros:', { locadoraId });
       
-      let motoristas;
-      if (locadoraId) {
-        motoristas = await storage.getMotoristasByLocadora(locadoraId as string);
-      } else {
-        motoristas = await storage.getAllMotoristas();
+      if (!locadoraId) {
+        return res.status(400).json({ message: "locadoraId é obrigatório" });
       }
+      
+      const motoristas = await storage.getMotoristasByLocadora(locadoraId as string);
       
       // Debug: Log resultado do storage
       console.log('[DEBUG] GET /api/motoristas - Resultado do storage:', motoristas.length, 'motoristas');
