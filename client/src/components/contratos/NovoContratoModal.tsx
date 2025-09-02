@@ -397,13 +397,17 @@ export function NovoContratoModal({
         let contratosAtivos: any[] = [];
         if (contratosResponse.ok) {
           const contratosData = await contratosResponse.json();
+          console.log('DADOS BRUTOS contratos da API:', contratosData);
           contratosAtivos = contratosData.filter((contrato: any) => contrato.status === 'ativo' || contrato.status === 'aberto');
+          console.log('CONTRATOS ATIVOS filtrados:', contratosAtivos);
         }
 
         // Carrega veículos disponíveis
         const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
+          console.log('DADOS BRUTOS veículos da API:', veiculosData);
+          
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => {
             // Verifica se o veículo está disponível
             if (veiculo.status !== 'disponivel') return false;
@@ -413,8 +417,12 @@ export function NovoContratoModal({
               contrato.veiculoId === veiculo.id || contrato.veiculo_id === veiculo.id
             );
             
+            console.log(`Veículo ${veiculo.id}: status=${veiculo.status}, temContratoAtivo=${temContratoAtivo}`);
+            
             return !temContratoAtivo;
           });
+          
+          console.log('VEÍCULOS DISPONÍVEIS filtrados:', veiculosDisponiveis);
           setVeiculos(veiculosDisponiveis);
         }
 
