@@ -423,9 +423,16 @@ export function NovoContratoModal({
         }
 
         // Carrega motoristas disponíveis (sem aluguéis ou contratos ativos)
-        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`);
+        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
         if (motoristasResponse.ok) {
           const motoristasData = await motoristasResponse.json();
+          console.log('DADOS BRUTOS da API motoristas:', motoristasData);
           const now = new Date();
           
           const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
