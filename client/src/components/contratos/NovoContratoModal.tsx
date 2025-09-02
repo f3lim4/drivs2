@@ -381,12 +381,8 @@ export function NovoContratoModal({
     const loadData = async () => {
       if (!open) return;
       
-      let locadoraId = profile?.locadoraId || profile?.id;
-      
-      // CORREÇÃO EMERGENCIAL: Forçar locadora de produção se estiver logado na produção
-      if (window.location.href.includes('drivs') || profile?.name?.toLowerCase().includes('drivs') || profile?.email?.includes('drivs')) {
-        locadoraId = '50764571000170'; // Forçar locadora de produção
-      }
+      // FORÇA PRODUÇÃO: Usar sempre a locadora de produção
+      const locadoraId = '50764571000170';
       
       console.log('🏢 MODAL CONTRATO - Locadora atual:', locadoraId);
       console.log('🏢 MODAL CONTRATO - Profile completo:', profile);
@@ -400,21 +396,21 @@ export function NovoContratoModal({
       setLoadingData(true);
       
       try {
-        // Carrega contratos ativos primeiro
-        const contratosResponse = await fetch(`/api/contratos?locadoraId=${locadoraId}`);
+        // Carrega contratos ativos primeiro - PRODUÇÃO
+        const contratosResponse = await fetch(`/api/contratos?locadoraId=50764571000170`);
         let contratosAtivos: any[] = [];
         if (contratosResponse.ok) {
           const contratosData = await contratosResponse.json();
-          console.log('DADOS BRUTOS contratos da API:', contratosData);
+          console.log('PRODUÇÃO - DADOS BRUTOS contratos da API:', contratosData);
           contratosAtivos = contratosData.filter((contrato: any) => contrato.status === 'ativo' || contrato.status === 'aberto');
-          console.log('CONTRATOS ATIVOS filtrados:', contratosAtivos);
+          console.log('PRODUÇÃO - CONTRATOS ATIVOS filtrados:', contratosAtivos);
         }
 
-        // Carrega veículos disponíveis
-        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
+        // Carrega veículos disponíveis - PRODUÇÃO
+        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=50764571000170`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
-          console.log('DADOS BRUTOS veículos da API:', veiculosData);
+          console.log('PRODUÇÃO - DADOS BRUTOS veículos da API:', veiculosData);
           
           const veiculosDisponiveis = veiculosData.filter((veiculo: any) => {
             // Verifica se o veículo está disponível
@@ -434,8 +430,8 @@ export function NovoContratoModal({
           setVeiculos(veiculosDisponiveis);
         }
 
-        // Carrega aluguéis primeiro para filtrar motoristas
-        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${locadoraId}`);
+        // Carrega aluguéis primeiro para filtrar motoristas - PRODUÇÃO
+        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=50764571000170`);
         let alugueisAtivos: any[] = [];
         if (alugueisResponse.ok) {
           const alugueisData = await alugueisResponse.json();
@@ -443,8 +439,8 @@ export function NovoContratoModal({
           setAlugueis(alugueisAtivos);
         }
 
-        // Carrega motoristas disponíveis (sem aluguéis ou contratos ativos)
-        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`, {
+        // Carrega motoristas disponíveis (sem aluguéis ou contratos ativos) - PRODUÇÃO
+        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=50764571000170`, {
           cache: 'no-cache',
           headers: {
             'Cache-Control': 'no-cache',
