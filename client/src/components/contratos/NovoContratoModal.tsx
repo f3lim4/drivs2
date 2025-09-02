@@ -385,7 +385,12 @@ export function NovoContratoModal({
       
       console.log('🏢 MODAL CONTRATO - Locadora atual:', locadoraId);
       console.log('🏢 MODAL CONTRATO - Profile completo:', profile);
-      if (!locadoraId) return;
+      
+      // DEBUG: Se não há locadoraId no profile, forçar produção
+      const locadoraFinal = locadoraId || '50764571000170';
+      console.log('🏢 MODAL CONTRATO - Locadora final usada:', locadoraFinal);
+      
+      if (!locadoraFinal) return;
       
       // LIMPAR ESTADO ANTERIOR
       setVeiculos([]);
@@ -396,7 +401,7 @@ export function NovoContratoModal({
       
       try {
         // Carrega contratos ativos primeiro
-        const contratosResponse = await fetch(`/api/contratos?locadoraId=${locadoraId}`);
+        const contratosResponse = await fetch(`/api/contratos?locadoraId=${locadoraFinal}`);
         let contratosAtivos: any[] = [];
         if (contratosResponse.ok) {
           const contratosData = await contratosResponse.json();
@@ -406,7 +411,7 @@ export function NovoContratoModal({
         }
 
         // Carrega veículos disponíveis (com cache buster)
-        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}&t=${Date.now()}`);
+        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraFinal}&t=${Date.now()}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
           console.log('PRODUÇÃO - DADOS BRUTOS veículos da API:', veiculosData);
@@ -428,7 +433,7 @@ export function NovoContratoModal({
         }
 
         // Carrega aluguéis primeiro para filtrar motoristas
-        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${locadoraId}`);
+        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${locadoraFinal}`);
         let alugueisAtivos: any[] = [];
         if (alugueisResponse.ok) {
           const alugueisData = await alugueisResponse.json();
@@ -437,7 +442,7 @@ export function NovoContratoModal({
         }
 
         // Carrega motoristas disponíveis (sem aluguéis ou contratos ativos)
-        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`, {
+        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraFinal}`, {
           cache: 'no-cache',
           headers: {
             'Cache-Control': 'no-cache',
