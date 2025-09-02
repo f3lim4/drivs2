@@ -381,8 +381,7 @@ export function NovoContratoModal({
     const loadData = async () => {
       if (!open) return;
       
-      // FORÇA PRODUÇÃO: Usar sempre a locadora de produção
-      const locadoraId = '50764571000170';
+      const locadoraId = profile?.locadoraId || profile?.id;
       
       console.log('🏢 MODAL CONTRATO - Locadora atual:', locadoraId);
       console.log('🏢 MODAL CONTRATO - Profile completo:', profile);
@@ -396,8 +395,8 @@ export function NovoContratoModal({
       setLoadingData(true);
       
       try {
-        // Carrega contratos ativos primeiro - PRODUÇÃO
-        const contratosResponse = await fetch(`/api/contratos?locadoraId=50764571000170`);
+        // Carrega contratos ativos primeiro
+        const contratosResponse = await fetch(`/api/contratos?locadoraId=${locadoraId}`);
         let contratosAtivos: any[] = [];
         if (contratosResponse.ok) {
           const contratosData = await contratosResponse.json();
@@ -406,8 +405,8 @@ export function NovoContratoModal({
           console.log('PRODUÇÃO - CONTRATOS ATIVOS filtrados:', contratosAtivos);
         }
 
-        // Carrega veículos disponíveis - PRODUÇÃO
-        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=50764571000170`);
+        // Carrega veículos disponíveis
+        const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
           console.log('PRODUÇÃO - DADOS BRUTOS veículos da API:', veiculosData);
@@ -430,8 +429,8 @@ export function NovoContratoModal({
           setVeiculos(veiculosDisponiveis);
         }
 
-        // Carrega aluguéis primeiro para filtrar motoristas - PRODUÇÃO
-        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=50764571000170`);
+        // Carrega aluguéis primeiro para filtrar motoristas
+        const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${locadoraId}`);
         let alugueisAtivos: any[] = [];
         if (alugueisResponse.ok) {
           const alugueisData = await alugueisResponse.json();
@@ -439,8 +438,8 @@ export function NovoContratoModal({
           setAlugueis(alugueisAtivos);
         }
 
-        // Carrega motoristas disponíveis (sem aluguéis ou contratos ativos) - PRODUÇÃO
-        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=50764571000170`, {
+        // Carrega motoristas disponíveis (sem aluguéis ou contratos ativos)
+        const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`, {
           cache: 'no-cache',
           headers: {
             'Cache-Control': 'no-cache',
