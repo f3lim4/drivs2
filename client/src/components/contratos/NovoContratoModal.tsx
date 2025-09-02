@@ -400,22 +400,39 @@ export function NovoContratoModal({
       setLoadingData(true);
       
       try {
-        // EMERGENCIAL: Dados de teste para modal funcionar
-        console.log('🚨 MODO EMERGENCIAL: Usando dados de teste');
+        console.log('🔍 BUSCANDO DADOS REAIS DO BANCO');
         
-        // Dados de teste - veículos
-        const veiculosTeste = [
-          { id: 'test1', placa: 'ABC1234', marca: 'Fiat', modelo: 'Uno', ano: 2020, cor: 'branco', status: 'disponivel', valorSemanal: 350, caucao: 1000 },
-          { id: 'test2', placa: 'DEF5678', marca: 'Chevrolet', modelo: 'Onix', ano: 2021, cor: 'prata', status: 'disponivel', valorSemanal: 400, caucao: 1200 }
-        ];
-        setVeiculos(veiculosTeste);
-        
-        // Dados de teste - motoristas  
-        const motoristasTeste = [
-          { id: 'test1', nome: 'João Silva', telefone: '11999999999', email: 'joao@teste.com' },
-          { id: 'test2', nome: 'Maria Santos', telefone: '11888888888', email: 'maria@teste.com' }
-        ];
-        setMotoristas(motoristasTeste);
+        // Buscar veículos reais SEM locadoraId (remover verificação temporariamente)
+        try {
+          const veiculosResponse = await fetch(`/api/veiculos`, {
+            headers: { 'Cache-Control': 'no-cache' }
+          });
+          if (veiculosResponse.ok) {
+            const veiculosData = await veiculosResponse.json();
+            console.log('✅ VEÍCULOS REAIS encontrados:', veiculosData);
+            setVeiculos(veiculosData);
+          }
+        } catch (error) {
+          console.error('❌ Erro ao buscar veículos:', error);
+        }
+
+        // Buscar motoristas reais SEM locadoraId (remover verificação temporariamente)
+        try {
+          const motoristasResponse = await fetch(`/api/motoristas`, {
+            headers: { 'Cache-Control': 'no-cache' }
+          });
+          if (motoristasResponse.ok) {
+            const motoristasData = await motoristasResponse.json();
+            console.log('✅ MOTORISTAS REAIS encontrados:', motoristasData);
+            const motoristasFormatados = motoristasData.map((motorista: any) => ({
+              ...motorista,
+              nome: motorista.nome?.trim() || motorista.nome
+            }));
+            setMotoristas(motoristasFormatados);
+          }
+        } catch (error) {
+          console.error('❌ Erro ao buscar motoristas:', error);
+        }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
       } finally {
