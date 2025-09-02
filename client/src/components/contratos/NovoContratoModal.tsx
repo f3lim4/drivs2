@@ -387,11 +387,29 @@ export function NovoContratoModal({
       setLoadingData(true);
       
       try {
+        // Carrega contratos ativos primeiro
+        const contratosResponse = await fetch(`/api/contratos?locadoraId=${locadoraId}`);
+        let contratosAtivos: any[] = [];
+        if (contratosResponse.ok) {
+          const contratosData = await contratosResponse.json();
+          contratosAtivos = contratosData.filter((contrato: any) => contrato.status === 'ativo' || contrato.status === 'aberto');
+        }
+
         // Carrega veículos disponíveis
         const veiculosResponse = await fetch(`/api/veiculos?locadoraId=${locadoraId}`);
         if (veiculosResponse.ok) {
           const veiculosData = await veiculosResponse.json();
-          const veiculosDisponiveis = veiculosData.filter((veiculo: any) => veiculo.status === 'disponivel');
+          const veiculosDisponiveis = veiculosData.filter((veiculo: any) => {
+            // Verifica se o veículo está disponível
+            if (veiculo.status !== 'disponivel') return false;
+            
+            // Verifica se o veículo não tem contrato ativo
+            const temContratoAtivo = contratosAtivos.some((contrato: any) => 
+              contrato.veiculoId === veiculo.id || contrato.veiculo_id === veiculo.id
+            );
+            
+            return !temContratoAtivo;
+          });
           setVeiculos(veiculosDisponiveis);
         }
 
@@ -404,7 +422,7 @@ export function NovoContratoModal({
           setAlugueis(alugueisAtivos);
         }
 
-        // Carrega motoristas disponíveis (sem aluguéis ativos)
+        // Carrega motoristas disponíveis (sem aluguéis ou contratos ativos)
         const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`);
         if (motoristasResponse.ok) {
           const motoristasData = await motoristasResponse.json();
@@ -424,7 +442,20 @@ export function NovoContratoModal({
               aluguel.motoristaCpf === motorista.id || aluguel.motoristaId === motorista.id
             );
             
-            const disponivel = temVencimento && cnhValida && !temAluguelAtivo;
+            // Verifica se tem contrato ativo
+            const temContratoAtivo = contratosAtivos.some((contrato: any) => 
+              contrato.motoristaCpf === motorista.id || contrato.motoristaId === motorista.id
+            );
+            
+            const disponivel = temVencimento && cnhValida && !temAluguelAtivo && !temContratoAtivo;
+            
+            console.log(`Motorista ${motorista.nome}:`, {
+              temVencimento,
+              cnhValida,
+              temAluguelAtivo,
+              temContratoAtivo,
+              disponivel
+            });
             
             return disponivel;
           }).map((motorista: any) => ({
@@ -432,6 +463,7 @@ export function NovoContratoModal({
             nome: motorista.nome.trim() // Remove espaços extras do nome
           }));
           
+          console.log('Motoristas disponíveis encontrados:', motoristasDisponiveis.length);
           setMotoristas(motoristasDisponiveis);
         }
       } catch (error) {
