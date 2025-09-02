@@ -1159,9 +1159,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/contratos", async (req, res) => {
     try {
       const { locadoraId } = req.query;
+      console.log('[CONTRATOS API] Parâmetros recebidos:', { locadoraId });
       
       if (locadoraId) {
         const contratos = await storage.getContratosByLocadora(locadoraId as string);
+        console.log('[CONTRATOS API] Resultado do storage:', { locadoraId, total: contratos.length, contratos });
         res.json(contratos);
       } else {
         const contratos = await storage.getAllContratos();
