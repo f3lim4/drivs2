@@ -1235,34 +1235,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Registrar tentativa de criação
       contratoCreationCache.set(cacheKey, agora);
       
-      // VERIFICAÇÃO DUPLA: Contrato existente E aluguel ativo (COM TOLERÂNCIA PARA NOVOS ALUGUÉIS)
-      const contratosExistentes = await storage.getContratosByLocadora(result.data.locadoraId);
-      const contratoExistente = contratosExistentes.find(c => 
+      // VERIFICAÇÃO UNIVERSAL: Contrato existente para MOTORISTA
+      const contratosExistentes = await storage.getAllContratos();
+      const contratoClienteExistente = contratosExistentes.find(c => 
         c.cliente === result.data.cliente && 
-        (c.status === 'ativo' || c.status === 'em_aberto')
+        (c.status === 'ativo' || c.status === 'aberto')
+      );
+      
+      // VERIFICAÇÃO UNIVERSAL: Contrato existente para VEÍCULO
+      const contratoVeiculoExistente = contratosExistentes.find(c => 
+        (c.veiculo_id === result.data.veiculo || c.veiculo === result.data.veiculo) && 
+        (c.status === 'ativo' || c.status === 'aberto')
       );
       
       // Verificar se há aluguel ativo para o mesmo motorista
-      const alugueis = await storage.getAlugueisByLocadora(result.data.locadoraId);
+      const alugueis = await storage.getAllAlugueis();
       const aluguelAtivo = alugueis.find(a => 
         a.motoristaNome === result.data.cliente && 
         a.status === 'ativo'
       );
       
       // BLOQUEAR SEMPRE: Não permitir múltiplos contratos/aluguéis ativos
-      if (contratoExistente || aluguelAtivo) {
+      if (contratoClienteExistente || contratoVeiculoExistente || aluguelAtivo) {
         console.log('[ANTI-DUPLICATE] Duplicação detectada:', {
           cliente: result.data.cliente,
-          contratoExistente: !!contratoExistente,
+          veiculo: result.data.veiculo,
+          contratoClienteExistente: !!contratoClienteExistente,
+          contratoVeiculoExistente: !!contratoVeiculoExistente,
           aluguelAtivo: !!aluguelAtivo,
-          contratoId: contratoExistente?.id,
+          contratoClienteId: contratoClienteExistente?.id,
+          contratoVeiculoId: contratoVeiculoExistente?.id,
           aluguelId: aluguelAtivo?.id
         });
+        
+        let message = "Não é possível criar contrato: ";
+        if (contratoClienteExistente) {
+          message += `Cliente '${result.data.cliente}' já possui contrato ${contratoClienteExistente.status}. `;
+        }
+        if (contratoVeiculoExistente) {
+          message += `Veículo já está ocupado por contrato ${contratoVeiculoExistente.status} com cliente '${contratoVeiculoExistente.cliente}'. `;
+        }
+        if (aluguelAtivo) {
+          message += `Cliente possui aluguel ativo. `;
+        }
+        
         return res.status(400).json({ 
-          message: "Já existe um contrato ativo ou em aberto para este motorista, ou um aluguel ativo",
+          message: message.trim(),
           motorista: result.data.cliente,
-          contratoExistente: !!contratoExistente,
-          contratoStatus: contratoExistente?.status,
+          veiculo: result.data.veiculo,
+          contratoClienteExistente: !!contratoClienteExistente,
+          contratoVeiculoExistente: !!contratoVeiculoExistente,
           aluguelAtivo: !!aluguelAtivo
         });
       }
