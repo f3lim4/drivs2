@@ -1485,6 +1485,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Atualizar status do veículo para disponível
           console.log(`[CONTRACT DELETE] Liberando veículo: ${aluguelRelacionado.veiculoId}`);
           await storage.updateVeiculo(aluguelRelacionado.veiculoId, { status: 'disponivel' });
+          
+          // CORREÇÃO: Atualizar status do motorista para aprovado
+          console.log(`[CONTRACT DELETE] Retornando motorista para status aprovado: ${aluguelRelacionado.motoristaId}`);
+          await storage.updateMotorista(aluguelRelacionado.motoristaId, { status: 'aprovado' });
         }
       }
       
@@ -1507,6 +1511,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Excluir o contrato
       await storage.deleteContrato(req.params.id);
+      
+      // CORREÇÃO: Forçar sincronização de status após exclusão
+      if (contrato) {
+        console.log(`[CONTRACT DELETE] Iniciando sincronização automática de status - Locadora: ${contrato.locadoraId}`);
+        try {
+          await syncMotoristaStatus(contrato.locadoraId);
+          await syncVeiculoStatus();
+          console.log(`[CONTRACT DELETE] Sincronização concluída com sucesso`);
+        } catch (syncError) {
+          console.error(`[CONTRACT DELETE] Erro na sincronização:`, syncError);
+        }
+      }
+      
       res.json({ message: "Contrato deleted successfully" });
     } catch (error) {
       console.error("Error deleting contrato:", error);
