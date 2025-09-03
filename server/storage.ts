@@ -219,24 +219,8 @@ export class DatabaseStorage implements IStorage {
   // Função para sincronizar status dos motoristas com contratos ativos
   private async syncMotoristasStatus(): Promise<void> {
     try {
-      // Buscar todos os contratos ativos/em_aberto para debug
-      const contratosAtivos = await db.execute(sql`
-        SELECT DISTINCT cliente 
-        FROM contratos 
-        WHERE status IN ('ativo', 'em_aberto')
-      `);
-      
-      // Buscar todos os motoristas para debug
-      const todosMotoristas = await db.execute(sql`
-        SELECT nome, status 
-        FROM motoristas
-      `);
-      
-      console.log('[SYNC MOTORISTAS DEBUG] Contratos ativos clientes:', contratosAtivos.map((c: any) => c.cliente));
-      console.log('[SYNC MOTORISTAS DEBUG] Motoristas atuais:', todosMotoristas.map((m: any) => `${m.nome} (${m.status})`));
-
       // Atualizar motoristas para 'aprovado' que não têm contrato ativo ou em aberto
-      const resultLiberar = await db.execute(sql`
+      await db.execute(sql`
         UPDATE motoristas 
         SET status = 'aprovado' 
         WHERE status = 'ativo' 
@@ -248,7 +232,7 @@ export class DatabaseStorage implements IStorage {
       `);
 
       // Atualizar motoristas para 'ativo' que têm contrato ativo ou em aberto
-      const resultAtivar = await db.execute(sql`
+      await db.execute(sql`
         UPDATE motoristas 
         SET status = 'ativo' 
         WHERE status = 'aprovado' 
@@ -259,7 +243,7 @@ export class DatabaseStorage implements IStorage {
         )
       `);
 
-      console.log(`[STATUS SYNC] Motoristas atualizados: ${resultLiberar.rowCount} liberados, ${resultAtivar.rowCount} ativados`);
+      console.log('[STATUS SYNC] Status dos motoristas sincronizado com contratos (ativo + em_aberto)');
     } catch (error) {
       console.error('[STATUS SYNC] Erro ao sincronizar status dos motoristas:', error);
     }
