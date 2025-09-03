@@ -1239,13 +1239,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contratosExistentes = await storage.getAllContratos();
       const contratoClienteExistente = contratosExistentes.find(c => 
         c.cliente === result.data.cliente && 
-        (c.status === 'ativo' || c.status === 'aberto')
+        (c.status === 'ativo' || c.status === 'em_aberto')
       );
       
       // VERIFICAÇÃO UNIVERSAL: Contrato existente para VEÍCULO
       const contratoVeiculoExistente = contratosExistentes.find(c => 
-        (c.veiculo_id === result.data.veiculo || c.veiculo === result.data.veiculo) && 
-        (c.status === 'ativo' || c.status === 'aberto')
+        (c.veiculoId === result.data.veiculoId || c.veiculo_id === result.data.veiculoId || c.veiculo === result.data.veiculoId) && 
+        (c.status === 'ativo' || c.status === 'em_aberto')
       );
       
       // Verificar se há aluguel ativo para o mesmo motorista
@@ -1273,7 +1273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message += `Cliente '${result.data.cliente}' já possui contrato ${contratoClienteExistente.status}. `;
         }
         if (contratoVeiculoExistente) {
-          message += `Veículo já está ocupado por contrato ${contratoVeiculoExistente.status} com cliente '${contratoVeiculoExistente.cliente}'. `;
+          message += `Veículo ID '${result.data.veiculoId}' já está ocupado por contrato ${contratoVeiculoExistente.status} com cliente '${contratoVeiculoExistente.cliente}'. `;
         }
         if (aluguelAtivo) {
           message += `Cliente possui aluguel ativo. `;
@@ -1282,7 +1282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ 
           message: message.trim(),
           motorista: result.data.cliente,
-          veiculo: result.data.veiculo,
+          veiculo: result.data.veiculoId,
           contratoClienteExistente: !!contratoClienteExistente,
           contratoVeiculoExistente: !!contratoVeiculoExistente,
           aluguelAtivo: !!aluguelAtivo
