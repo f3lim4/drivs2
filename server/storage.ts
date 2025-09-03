@@ -215,6 +215,39 @@ export class DatabaseStorage implements IStorage {
       console.error('[STATUS SYNC] Erro ao sincronizar status:', error);
     }
   }
+
+  // Função para sincronizar status dos motoristas com contratos ativos
+  private async syncMotoristasStatus(): Promise<void> {
+    try {
+      // Atualizar motoristas para 'aprovado' que não têm contrato ativo ou em aberto
+      await db.execute(sql`
+        UPDATE motoristas 
+        SET status = 'aprovado' 
+        WHERE status = 'ativo' 
+        AND nome NOT IN (
+          SELECT DISTINCT cliente 
+          FROM contratos 
+          WHERE status IN ('ativo', 'em_aberto')
+        )
+      `);
+
+      // Atualizar motoristas para 'ativo' que têm contrato ativo ou em aberto
+      await db.execute(sql`
+        UPDATE motoristas 
+        SET status = 'ativo' 
+        WHERE status = 'aprovado' 
+        AND nome IN (
+          SELECT DISTINCT cliente 
+          FROM contratos 
+          WHERE status IN ('ativo', 'em_aberto')
+        )
+      `);
+
+      console.log('[STATUS SYNC] Status dos motoristas sincronizado com contratos (ativo + em_aberto)');
+    } catch (error) {
+      console.error('[STATUS SYNC] Erro ao sincronizar status dos motoristas:', error);
+    }
+  }
   // User operations
   async getUser(id: number): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id));
@@ -487,11 +520,17 @@ export class DatabaseStorage implements IStorage {
 
   // Motorista operations
   async getAllMotoristas(): Promise<Motorista[]> {
+    // Sincronizar status antes de buscar
+    await this.syncMotoristasStatus();
+    
     const result = await db.select().from(motoristas);
     return result;
   }
 
   async getMotoristasByLocadora(locadoraId: string): Promise<Motorista[]> {
+    // Sincronizar status antes de buscar
+    await this.syncMotoristasStatus();
+    
     const result = await db.select().from(motoristas).where(eq(motoristas.locadoraId, locadoraId));
     return result;
   }
