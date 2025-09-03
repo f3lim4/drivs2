@@ -410,11 +410,11 @@ export function NovoContratoModal({
             const contratosData = await contratosResponse.json();
             console.log('📋 CONTRATOS TODOS encontrados:', contratosData);
             contratosAtivos = contratosData.filter((contrato: any) => 
-              contrato.status === 'ativo' || contrato.status === 'aberto'
+              contrato.status === 'ativo' || contrato.status === 'em_aberto'
             );
             console.log('📋 CONTRATOS ATIVOS/ABERTOS encontrados:', contratosAtivos);
             console.log('📋 Clientes ocupados:', contratosAtivos.map(c => c.cliente));
-            console.log('📋 Veículos ocupados:', contratosAtivos.map(c => c.veiculo_id || c.veiculo));
+            console.log('📋 Veículos ocupados (IDs):', contratosAtivos.map(c => c.veiculoId || c.veiculo_id || c.veiculo));
           }
         } catch (error) {
           console.error('❌ Erro ao buscar contratos:', error);
@@ -431,8 +431,8 @@ export function NovoContratoModal({
             console.log('🚗 DADOS dos veículos:', veiculosData);
             
             // FILTRAR: Remover veículos com contratos ativos/abertos
-            // CORREÇÃO: Usar veiculo_id do contrato para comparar com id do veículo
-            const veiculosOcupados = contratosAtivos.map(c => c.veiculo_id || c.veiculo);
+            // CORREÇÃO: Usar veiculoId do contrato para comparar com id do veículo
+            const veiculosOcupados = contratosAtivos.map(c => c.veiculoId || c.veiculo_id || c.veiculo);
             console.log('🚗 VEÍCULOS OCUPADOS (IDs):', veiculosOcupados);
             
             const veiculosDisponiveis = veiculosData.filter((veiculo: any) => {
