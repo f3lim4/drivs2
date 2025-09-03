@@ -22,19 +22,9 @@ export function useMotoristas() {
     queryFn: async () => {
       let url = '/api/motoristas';
       
-      // DEBUG: Log estado de autenticação
-      console.log('useMotoristas - Estado:', { 
-        isLocadora, 
-        locadoraId, 
-        profile: profile ? { type: profile.type, locadoraId: profile.locadoraId } : null 
-      });
-      
       // SEMPRE enviar locadoraId quando disponível para garantir isolamento
       if (locadoraId) {
         url += `?locadoraId=${locadoraId}`;
-        console.log('useMotoristas - Fazendo requisição para:', url);
-      } else {
-        console.warn('useMotoristas - ERRO: locadoraId é undefined!');
       }
 
       const response = await fetch(url, {
