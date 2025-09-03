@@ -217,33 +217,63 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Função para sincronizar status dos motoristas com contratos ativos
-  private async syncMotoristasStatus(): Promise<void> {
+  private async syncMotoristasStatus(locadoraId?: string): Promise<void> {
     try {
-      // Atualizar motoristas para 'aprovado' que não têm contrato ativo ou em aberto
-      await db.execute(sql`
-        UPDATE motoristas 
-        SET status = 'aprovado' 
-        WHERE status = 'ativo' 
-        AND nome NOT IN (
-          SELECT DISTINCT cliente 
-          FROM contratos 
-          WHERE status IN ('ativo', 'em_aberto')
-        )
-      `);
+      if (locadoraId) {
+        // Sincronização por locadora específica (isolada)
+        // Atualizar motoristas para 'aprovado' que não têm contrato ativo ou em aberto
+        await db.execute(sql`
+          UPDATE motoristas 
+          SET status = 'aprovado' 
+          WHERE status = 'ativo' 
+          AND locadora_id = ${locadoraId}
+          AND nome NOT IN (
+            SELECT DISTINCT cliente 
+            FROM contratos 
+            WHERE status IN ('ativo', 'em_aberto')
+            AND locadora_id = ${locadoraId}
+          )
+        `);
 
-      // Atualizar motoristas para 'ativo' que têm contrato ativo ou em aberto
-      await db.execute(sql`
-        UPDATE motoristas 
-        SET status = 'ativo' 
-        WHERE status = 'aprovado' 
-        AND nome IN (
-          SELECT DISTINCT cliente 
-          FROM contratos 
-          WHERE status IN ('ativo', 'em_aberto')
-        )
-      `);
+        // Atualizar motoristas para 'ativo' que têm contrato ativo ou em aberto
+        await db.execute(sql`
+          UPDATE motoristas 
+          SET status = 'ativo' 
+          WHERE status = 'aprovado' 
+          AND locadora_id = ${locadoraId}
+          AND nome IN (
+            SELECT DISTINCT cliente 
+            FROM contratos 
+            WHERE status IN ('ativo', 'em_aberto')
+            AND locadora_id = ${locadoraId}
+          )
+        `);
+      } else {
+        // Sincronização global (todas as locadoras)
+        await db.execute(sql`
+          UPDATE motoristas 
+          SET status = 'aprovado' 
+          WHERE status = 'ativo' 
+          AND nome NOT IN (
+            SELECT DISTINCT cliente 
+            FROM contratos 
+            WHERE status IN ('ativo', 'em_aberto')
+          )
+        `);
 
-      console.log('[STATUS SYNC] Status dos motoristas sincronizado com contratos (ativo + em_aberto)');
+        await db.execute(sql`
+          UPDATE motoristas 
+          SET status = 'ativo' 
+          WHERE status = 'aprovado' 
+          AND nome IN (
+            SELECT DISTINCT cliente 
+            FROM contratos 
+            WHERE status IN ('ativo', 'em_aberto')
+          )
+        `);
+      }
+
+      console.log(`[STATUS SYNC] Status dos motoristas sincronizado com contratos (ativo + em_aberto) - Locadora: ${locadoraId || 'todas'}`);
     } catch (error) {
       console.error('[STATUS SYNC] Erro ao sincronizar status dos motoristas:', error);
     }
@@ -528,8 +558,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getMotoristasByLocadora(locadoraId: string): Promise<Motorista[]> {
-    // Sincronizar status antes de buscar
-    await this.syncMotoristasStatus();
+    // Sincronizar status antes de buscar (isolado por locadora)
+    await this.syncMotoristasStatus(locadoraId);
     
     const result = await db.select().from(motoristas).where(eq(motoristas.locadoraId, locadoraId));
     return result;
