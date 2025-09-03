@@ -8,7 +8,7 @@ import { Motorista } from '@/types';
 
 export function useMotoristas() {
   const { profile, isLocadora } = useAuth();
-  const locadoraId = profile?.locadoraId;
+  const locadoraId = profile?.locadoraId || profile?.id;
   const queryClient = useQueryClient();
 
   // Buscar motoristas com isolamento de segurança
@@ -22,9 +22,19 @@ export function useMotoristas() {
     queryFn: async () => {
       let url = '/api/motoristas';
       
-      // Se for locadora, só carregar seus motoristas
-      if (isLocadora && locadoraId) {
+      // DEBUG: Log estado de autenticação
+      console.log('useMotoristas - Estado:', { 
+        isLocadora, 
+        locadoraId, 
+        profile: profile ? { type: profile.type, locadoraId: profile.locadoraId } : null 
+      });
+      
+      // SEMPRE enviar locadoraId quando disponível para garantir isolamento
+      if (locadoraId) {
         url += `?locadoraId=${locadoraId}`;
+        console.log('useMotoristas - Fazendo requisição para:', url);
+      } else {
+        console.warn('useMotoristas - ERRO: locadoraId é undefined!');
       }
 
       const response = await fetch(url, {
