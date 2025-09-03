@@ -1315,6 +1315,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contrato = await storage.createContrato(dadosNormalizados);
       console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
       
+      // 🎯 REGRA DE NEGÓCIO: Atualizar status automaticamente após criação do contrato
+      try {
+        console.log('[STATUS-UPDATE] Aplicando regras de negócio...');
+        
+        // 1. Atualizar veículo para status "alugado"
+        if (result.data.veiculoId) {
+          await storage.updateVeiculo(result.data.veiculoId, { status: 'alugado' });
+          console.log(`[STATUS-UPDATE] Veículo ${result.data.veiculoId} → status: alugado`);
+        }
+        
+        // 2. Buscar motorista pelo nome e atualizar para status "ativo"
+        const motoristas = await storage.getAllMotoristas();
+        const motorista = motoristas.find(m => m.nome === result.data.cliente);
+        if (motorista) {
+          await storage.updateMotorista(motorista.id, { status: 'ativo' });
+          console.log(`[STATUS-UPDATE] Motorista ${motorista.nome} (${motorista.id}) → status: ativo`);
+        } else {
+          console.warn(`[STATUS-UPDATE] Motorista '${result.data.cliente}' não encontrado para atualização de status`);
+        }
+        
+        console.log('[STATUS-UPDATE] Regras de negócio aplicadas com sucesso');
+      } catch (error) {
+        console.error('[STATUS-UPDATE] Erro ao aplicar regras de negócio:', error);
+        // Não falha a criação do contrato, apenas log do erro
+      }
+      
       // Limpar cache após criação bem-sucedida
       setTimeout(() => {
         contratoCreationCache.delete(cacheKey);
@@ -1383,10 +1409,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const contrato = await storage.updateContrato(req.params.id, dadosNormalizados);
       
-      // Se status mudou para encerrado ou cancelado, parar pagamentos automáticos
+      // 🎯 REGRA DE NEGÓCIO: Aplicar mudanças de status automaticamente
       if (result.data.status && (result.data.status === 'encerrado' || result.data.status === 'cancelado')) {
+        console.log(`[STATUS-UPDATE] Contrato alterado para ${result.data.status} - aplicando regras de negócio...`);
+        
+        try {
+          // 1. Atualizar veículo para "disponivel" 
+          if (contrato.veiculoId) {
+            await storage.updateVeiculo(contrato.veiculoId, { status: 'disponivel' });
+            console.log(`[STATUS-UPDATE] Veículo ${contrato.veiculoId} → status: disponivel`);
+          }
+          
+          // 2. Buscar motorista e atualizar status baseado no tipo de finalização
+          const motoristas = await storage.getAllMotoristas();
+          const motorista = motoristas.find(m => m.nome === contrato.cliente);
+          
+          if (motorista) {
+            let novoStatusMotorista = 'aprovado'; // Default para encerrado
+            
+            // Se cancelado, verificar se deve negativar o motorista
+            if (result.data.status === 'cancelado') {
+              // Aqui você pode adicionar lógica para decidir se negativa ou não
+              // Por agora, vou deixar como aprovado. Pode ser mudado depois.
+              const negativarMotorista = result.data.motivoCancelamento?.includes('negativo') || false;
+              novoStatusMotorista = negativarMotorista ? 'negativo' : 'aprovado';
+            }
+            
+            await storage.updateMotorista(motorista.id, { status: novoStatusMotorista });
+            console.log(`[STATUS-UPDATE] Motorista ${motorista.nome} (${motorista.id}) → status: ${novoStatusMotorista}`);
+          } else {
+            console.warn(`[STATUS-UPDATE] Motorista '${contrato.cliente}' não encontrado para atualização de status`);
+          }
+          
+          console.log(`[STATUS-UPDATE] Regras de negócio aplicadas para ${result.data.status}`);
+        } catch (error) {
+          console.error('[STATUS-UPDATE] Erro ao aplicar regras de negócio:', error);
+        }
+        
         console.log(`[PAGAMENTOS AUTOMÁTICOS] Status alterado para ${result.data.status} - parando geração automática`);
-        // O sistema automático irá detectar na próxima verificação que o contrato não está mais ativo
       }
       
       // Se arquivo foi enviado/aprovado, mudar status para "ativo" (apenas se não estiver sendo mudado para outro status)

@@ -420,7 +420,7 @@ export function NovoContratoModal({
           console.error('❌ Erro ao buscar contratos:', error);
         }
 
-        // 2. BUSCAR VEÍCULOS E FILTRAR OS OCUPADOS
+        // 2. BUSCAR VEÍCULOS E FILTRAR APENAS OS DISPONÍVEIS
         try {
           const veiculosResponse = await fetch(`/api/veiculos`, {
             headers: { 'Cache-Control': 'no-cache' }
@@ -430,20 +430,15 @@ export function NovoContratoModal({
             console.log('🚗 VEÍCULOS TOTAIS encontrados:', veiculosData.length);
             console.log('🚗 DADOS dos veículos:', veiculosData);
             
-            // FILTRAR: Remover veículos com contratos ativos/abertos
-            // CORREÇÃO: Usar veiculoId do contrato para comparar com id do veículo
-            const veiculosOcupados = contratosAtivos.map(c => c.veiculoId || c.veiculo_id || c.veiculo);
-            console.log('🚗 VEÍCULOS OCUPADOS (IDs):', veiculosOcupados);
-            
+            // 🎯 REGRA DE NEGÓCIO: Mostrar apenas veículos com status "disponivel"
             const veiculosDisponiveis = veiculosData.filter((veiculo: any) => {
-              const veiculoDisponivel = !veiculosOcupados.includes(veiculo.id);
-              console.log(`🚗 VERIFICANDO ${veiculo.placa} (ID: ${veiculo.id}): ${veiculoDisponivel ? 'DISPONÍVEL' : 'OCUPADO'}`);
-              return veiculoDisponivel;
+              const isDisponivel = veiculo.status === 'disponivel';
+              console.log(`🚗 VERIFICANDO ${veiculo.placa} (Status: ${veiculo.status}): ${isDisponivel ? 'DISPONÍVEL' : 'NÃO DISPONÍVEL'}`);
+              return isDisponivel;
             });
             
-            console.log('🚗 VEÍCULOS FILTRADOS (disponíveis):', {
+            console.log('🚗 VEÍCULOS FILTRADOS (status disponivel):', {
               total: veiculosData.length,
-              ocupados: veiculosOcupados.length,
               disponiveis: veiculosDisponiveis.length,
               placasDisponiveis: veiculosDisponiveis.map(v => v.placa)
             });
@@ -454,7 +449,7 @@ export function NovoContratoModal({
           console.error('❌ Erro ao buscar veículos:', error);
         }
 
-        // 3. BUSCAR MOTORISTAS E FILTRAR OS OCUPADOS
+        // 3. BUSCAR MOTORISTAS E FILTRAR APENAS OS APROVADOS
         try {
           const motoristasResponse = await fetch(`/api/motoristas`, {
             headers: { 'Cache-Control': 'no-cache' }
@@ -464,25 +459,20 @@ export function NovoContratoModal({
             console.log('👤 MOTORISTAS TOTAIS encontrados:', motoristasData.length);
             console.log('👤 DADOS dos motoristas:', motoristasData);
             
-            // FILTRAR: Remover motoristas com contratos ativos/abertos
-            // CORREÇÃO: Comparar nome do motorista com cliente do contrato
-            const clientesOcupados = contratosAtivos.map(c => c.cliente);
-            console.log('👤 CLIENTES OCUPADOS (nomes):', clientesOcupados);
-            
+            // 🎯 REGRA DE NEGÓCIO: Mostrar apenas motoristas com status "aprovado"
             const motoristasDisponiveis = motoristasData.filter((motorista: any) => {
-              const motoristaDisponivel = !clientesOcupados.includes(motorista.nome);
-              console.log(`👤 VERIFICANDO ${motorista.nome}: ${motoristaDisponivel ? 'DISPONÍVEL' : 'OCUPADO'}`);
-              return motoristaDisponivel;
+              const isAprovado = motorista.status === 'aprovado';
+              console.log(`👤 VERIFICANDO ${motorista.nome} (Status: ${motorista.status}): ${isAprovado ? 'APROVADO' : 'NÃO APROVADO'}`);
+              return isAprovado;
             }).map((motorista: any) => ({
               ...motorista,
               nome: motorista.nome?.trim() || motorista.nome
             }));
             
-            console.log('👤 MOTORISTAS FILTRADOS (disponíveis):', {
+            console.log('👤 MOTORISTAS FILTRADOS (status aprovado):', {
               total: motoristasData.length,
-              ocupados: clientesOcupados.length,
-              disponiveis: motoristasDisponiveis.length,
-              nomesDisponiveis: motoristasDisponiveis.map(m => m.nome)
+              aprovados: motoristasDisponiveis.length,
+              nomesAprovados: motoristasDisponiveis.map(m => m.nome)
             });
             
             setMotoristas(motoristasDisponiveis);
