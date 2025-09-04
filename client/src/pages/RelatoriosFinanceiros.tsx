@@ -667,7 +667,17 @@ export default function RelatoriosFinanceiros() {
 
   const receitaPagamentos = useMemo(() => {
     return pagamentos
-      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.dataPagamento || p.data), { start: monthStart, end: monthEnd }))
+      .filter(p => {
+        if (p.status !== 'pago') return false;
+        const dataStr = p.dataPagamento || p.data;
+        if (!dataStr) return false;
+        
+        // Criar data no fuso horário local para evitar problemas com UTC
+        const dateParts = dataStr.split('-');
+        const dataPagamento = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+        
+        return isWithinInterval(dataPagamento, { start: monthStart, end: monthEnd });
+      })
       .reduce((total, pagamento) => {
         const valor = Number(pagamento.valorPago || pagamento.valorTotal || '0');
         return total + (isNaN(valor) ? 0 : valor);
@@ -677,7 +687,17 @@ export default function RelatoriosFinanceiros() {
   // Taxa administrativa de aluguéis
   const receitaTaxaAdministrativa = useMemo(() => {
     return pagamentos
-      .filter(p => p.status === 'pago' && p.tipo === 'taxa administrativa' && isWithinInterval(new Date(p.dataPagamento || p.data), { start: monthStart, end: monthEnd }))
+      .filter(p => {
+        if (p.status !== 'pago' || p.tipo !== 'taxa administrativa') return false;
+        const dataStr = p.dataPagamento || p.data;
+        if (!dataStr) return false;
+        
+        // Criar data no fuso horário local para evitar problemas com UTC
+        const dateParts = dataStr.split('-');
+        const dataPagamento = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+        
+        return isWithinInterval(dataPagamento, { start: monthStart, end: monthEnd });
+      })
       .reduce((total, pagamento) => {
         const valor = Number(pagamento.valorPago || pagamento.valorTotal || '0');
         return total + (isNaN(valor) ? 0 : valor);
@@ -687,7 +707,17 @@ export default function RelatoriosFinanceiros() {
   // Receita extra de juros e multas
   const receitaExtra = useMemo(() => {
     const pagamentosFiltrados = pagamentos
-      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }));
+      .filter(p => {
+        if (p.status !== 'pago') return false;
+        const dataStr = p.data || p.dataPagamento;
+        if (!dataStr) return false;
+        
+        // Criar data no fuso horário local para evitar problemas com UTC
+        const dateParts = dataStr.split('-');
+        const dataPagamento = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+        
+        return isWithinInterval(dataPagamento, { start: monthStart, end: monthEnd });
+      });
     
     const totalJuros = pagamentosFiltrados.reduce((total, pagamento) => {
       const juros = parseFloat(pagamento.valorJuros || '0');
