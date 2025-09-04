@@ -23,14 +23,6 @@ export function usePagamentos() {
       
       const data = await response.json();
       
-      console.log('Pagamentos - Verificando isolamento:', {
-        locadoraId,
-        pagamentosTotal: data.length,
-        primeiroPagamento: data[0]?.locadoraId,
-        url: `/api/pagamentos?locadoraId=${locadoraId}`,
-        primeiroNomeMotorista: data[0]?.motoristaNome,
-        responseData: data.slice(0, 1).map(p => ({ id: p.id, motoristaNome: p.motoristaNome, motoristaId: p.motoristaId }))
-      });
       
       return data as Pagamento[];
     },
