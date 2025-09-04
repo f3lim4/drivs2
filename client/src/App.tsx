@@ -32,6 +32,7 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import EmergencyLogout from "./pages/EmergencyLogout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,6 +85,7 @@ const App = () => (
             <Route path="/landing" element={<Landing />} />
             <Route path="/site" element={<Home />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/emergency-logout" element={<EmergencyLogout />} />
             <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={
             <AuthGuard>
