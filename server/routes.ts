@@ -26,6 +26,7 @@ declare module 'express-session' {
       id: number;
       email: string;
       nome: string;
+      locadoraId?: string | null;
     };
   }
 }
@@ -247,11 +248,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
-      // Store user info in session
+      // Store user info in session (incluindo locadoraId)
       req.session.user = {
         id: user.id,
         email: profile.email,
-        nome: profile.name
+        nome: profile.name,
+        locadoraId: profile.locadoraId
       };
       
       console.log("Login successful for:", email);
