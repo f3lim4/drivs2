@@ -914,10 +914,12 @@ export function EditarMotoristaModal({
                       onChange={(e) => handleImageUpload(e.target.files, 'fotoPerfil')}
                       className="hidden"
                     />
-                    {imagens.fotoPerfil ? (
+                    {imagens.fotoPerfil || imagePreviews.fotoPerfil ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-600">{imagens.fotoPerfil.name}</span>
+                          <span className="text-xs text-gray-600">
+                            {imagens.fotoPerfil ? imagens.fotoPerfil.name : "Foto de perfil atual"}
+                          </span>
                           <Button
                             type="button"
                             variant="outline"
@@ -1103,10 +1105,12 @@ export function EditarMotoristaModal({
                       onChange={(e) => handleImageUpload(e.target.files, 'cnhImagem')}
                       className="hidden"
                     />
-                    {imagens.cnhImagem ? (
+                    {imagens.cnhImagem || imagePreviews.cnhImagem ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-600">{imagens.cnhImagem.name}</span>
+                          <span className="text-xs text-gray-600">
+                            {imagens.cnhImagem ? imagens.cnhImagem.name : "CNH atual"}
+                          </span>
                           <Button
                             type="button"
                             variant="outline"
@@ -1264,10 +1268,12 @@ export function EditarMotoristaModal({
                       onChange={(e) => handleImageUpload(e.target.files, 'fotoComCnh')}
                       className="hidden"
                     />
-                    {imagens.fotoComCnh ? (
+                    {imagens.fotoComCnh || imagePreviews.fotoComCnh ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-600">{imagens.fotoComCnh.name}</span>
+                          <span className="text-xs text-gray-600">
+                            {imagens.fotoComCnh ? imagens.fotoComCnh.name : "Foto com CNH atual"}
+                          </span>
                           <Button
                             type="button"
                             variant="outline"
@@ -1341,10 +1347,12 @@ export function EditarMotoristaModal({
                       onChange={(e) => handleImageUpload(e.target.files, 'comprovanteEndereco')}
                       className="hidden"
                     />
-                    {imagens.comprovanteEndereco ? (
+                    {imagens.comprovanteEndereco || imagePreviews.comprovanteEndereco ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-600">{imagens.comprovanteEndereco.name}</span>
+                          <span className="text-xs text-gray-600">
+                            {imagens.comprovanteEndereco ? imagens.comprovanteEndereco.name : "Comprovante de endereço atual"}
+                          </span>
                           <Button
                             type="button"
                             variant="outline"
@@ -1429,10 +1437,12 @@ export function EditarMotoristaModal({
                       onChange={(e) => handleImageUpload(e.target.files, 'fotoExtra')}
                       className="hidden"
                     />
-                    {imagens.fotoExtra ? (
+                    {imagens.fotoExtra || imagePreviews.fotoExtra ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-600">{imagens.fotoExtra.name}</span>
+                          <span className="text-xs text-gray-600">
+                            {imagens.fotoExtra ? imagens.fotoExtra.name : "Foto extra atual"}
+                          </span>
                           <Button
                             type="button"
                             variant="outline"
@@ -1506,10 +1516,12 @@ export function EditarMotoristaModal({
                       onChange={(e) => handleImageUpload(e.target.files, 'fotoExtra2')}
                       className="hidden"
                     />
-                    {imagens.fotoExtra2 ? (
+                    {imagens.fotoExtra2 || imagePreviews.fotoExtra2 ? (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-600">{imagens.fotoExtra2.name}</span>
+                          <span className="text-xs text-gray-600">
+                            {imagens.fotoExtra2 ? imagens.fotoExtra2.name : "Segunda foto extra atual"}
+                          </span>
                           <Button
                             type="button"
                             variant="outline"
