@@ -397,7 +397,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Check if email exists
+  // Check if email exists (verificar na tabela profiles, não users)
   app.post('/api/auth/check-email', async (req, res) => {
     const { email } = req.body;
     if (!email) {
@@ -405,8 +405,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const user = await storage.getUserByUsername(email);
-      res.json({ exists: !!user });
+      // Verificar se profile existe (não user)
+      const profile = await storage.getProfileByEmail(email);
+      res.json({ exists: !!profile });
     } catch (error) {
       console.error('Error checking email existence:', error);
       res.status(500).json({ message: 'Internal server error' });
