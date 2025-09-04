@@ -863,14 +863,24 @@ export default function RelatoriosFinanceiros() {
       });
       
       const receitaMensal = pagamentosVeiculo
-        .filter(p => isWithinInterval(new Date(p.data), { start: monthStart, end: monthEnd }))
+        .filter(p => {
+          if (!p.data) return false;
+          const dateParts = p.data.split('-');
+          const date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+          return isWithinInterval(date, { start: monthStart, end: monthEnd });
+        })
         .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0);
       
       const receitaAnual = pagamentosVeiculo
         .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0);
       
       const despesasManuaisMensais = despesasVeiculo
-        .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && d.categoria !== 'manutencao' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
+        .filter(d => {
+          if (d.tipo !== 'despesa' || d.categoria === 'financiamento' || d.categoria === 'manutencao' || !d.data) return false;
+          const dateParts = d.data.split('-');
+          const date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+          return isWithinInterval(date, { start: monthStart, end: monthEnd });
+        })
         .reduce((total, despesa) => {
           const valor = parseFloat(despesa.valor || '0');
           return total + (isNaN(valor) ? 0 : valor);
@@ -878,8 +888,14 @@ export default function RelatoriosFinanceiros() {
       
       // Incluir manutenções do período no cálculo das despesas mensais
       const manutencoesMensais = manutencoes
-        .filter(m => m.veiculoId === veiculo.id && m.status === 'concluida' && 
-          isWithinInterval(new Date(m.dataConclusao || m.dataInicio), { start: monthStart, end: monthEnd }))
+        .filter(m => {
+          if (m.veiculoId !== veiculo.id || m.status !== 'concluida') return false;
+          const dataManutencao = m.dataConclusao || m.dataInicio;
+          if (!dataManutencao) return false;
+          const dateParts = dataManutencao.split('-');
+          const date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+          return isWithinInterval(date, { start: monthStart, end: monthEnd });
+        })
         .reduce((total, manutencao) => {
           const valorFinal = parseFloat(manutencao.valorFinal || manutencao.valorOrcamento || '0');
           return total + (isNaN(valorFinal) ? 0 : valorFinal);
@@ -2189,7 +2205,6 @@ export default function RelatoriosFinanceiros() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
       </Tabs>
 
 
