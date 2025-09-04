@@ -3613,6 +3613,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ROTA ESPECIAL: LOGOUT MANUAL FORÇADO
+  app.get("/force-logout", async (req, res) => {
+    try {
+      console.log("🔄 LOGOUT MANUAL FORÇADO - Limpando tudo...");
+      
+      // Destruir sessão se existir
+      if (req.session) {
+        req.session.destroy((err) => {
+          if (err) {
+            console.error("Erro ao destruir sessão:", err);
+          }
+        });
+      }
+      
+      // Retornar HTML que limpa localStorage e redireciona
+      const htmlResponse = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Logout Forçado - DRIVS</title>
+          <meta charset="utf-8">
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              text-align: center;
+              padding: 50px 20px;
+              margin: 0;
+            }
+            .container {
+              max-width: 500px;
+              margin: 0 auto;
+              background: rgba(255,255,255,0.1);
+              padding: 40px;
+              border-radius: 15px;
+              backdrop-filter: blur(10px);
+            }
+            .logo {
+              font-size: 2.5em;
+              font-weight: bold;
+              margin-bottom: 20px;
+            }
+            .message {
+              font-size: 1.2em;
+              margin-bottom: 30px;
+              line-height: 1.5;
+            }
+            .button {
+              background: #28a745;
+              color: white;
+              padding: 12px 30px;
+              border: none;
+              border-radius: 8px;
+              font-size: 1.1em;
+              cursor: pointer;
+              text-decoration: none;
+              display: inline-block;
+              transition: background 0.3s;
+            }
+            .button:hover {
+              background: #218838;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="logo">🚗 DRIVS</div>
+            <div class="message">
+              <strong>Logout realizado com sucesso!</strong><br>
+              Todos os dados foram limpos.<br>
+              Você será redirecionado para o login.
+            </div>
+            <a href="/login" class="button">Ir para Login</a>
+          </div>
+          
+          <script>
+            // Limpar TUDO do localStorage
+            console.log("🧹 Limpando localStorage...");
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Limpar dados específicos do DRIVS
+            try {
+              localStorage.removeItem('drivs_profile');
+              localStorage.removeItem('user_data');
+              localStorage.removeItem('locadora_data');
+              console.log("✅ Dados do DRIVS removidos");
+            } catch (e) {
+              console.warn("Erro ao limpar dados:", e);
+            }
+            
+            // Redirecionar após 3 segundos
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 3000);
+          </script>
+        </body>
+        </html>
+      `;
+      
+      res.send(htmlResponse);
+      
+    } catch (error) {
+      console.error("Erro no logout forçado:", error);
+      res.status(500).send(`
+        <h1>Erro no Logout</h1>
+        <p>Houve um problema. <a href="/login">Clique aqui para ir ao login</a></p>
+        <script>
+          localStorage.clear();
+          sessionStorage.clear();
+        </script>
+      `);
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
