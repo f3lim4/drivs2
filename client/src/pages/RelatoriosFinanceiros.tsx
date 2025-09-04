@@ -321,26 +321,31 @@ export default function RelatoriosFinanceiros() {
   const monthEnd = endOfMonth(selectedMonth);
 
   const filteredData = useMemo(() => {
-    const isInPeriod = (date: Date) => isWithinInterval(date, { start: monthStart, end: monthEnd });
+    const isInPeriodSafe = (dateStr: string) => {
+      if (!dateStr) return false;
+      const dateParts = dateStr.split('-');
+      const date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+      return isWithinInterval(date, { start: monthStart, end: monthEnd });
+    };
 
     const alugueisAtivos = alugueis.filter(aluguel => 
       aluguel.status === 'ativo'
     );
 
     const pagamentosRealizados = pagamentos.filter(pagamento => 
-      pagamento.status === 'realizado' && isInPeriod(new Date(pagamento.dataPagamento))
+      pagamento.status === 'realizado' && isInPeriodSafe(pagamento.dataPagamento)
     );
 
     const infracoesPeriodo = infracoes.filter(infracao => 
-      isInPeriod(new Date(infracao.dataInfracao))
+      isInPeriodSafe(infracao.dataInfracao)
     );
 
     const despesasPeriodo = despesas.filter(despesa => 
-      isInPeriod(new Date(despesa.data))
+      isInPeriodSafe(despesa.data)
     );
 
     const manutencoesPeriodo = manutencoes.filter(manutencao => 
-      isInPeriod(new Date(manutencao.dataInicio))
+      isInPeriodSafe(manutencao.dataInicio)
     );
 
     return { alugueisAtivos, pagamentosRealizados, infracoesPeriodo, despesasPeriodo, manutencoes: manutencoesPeriodo };
