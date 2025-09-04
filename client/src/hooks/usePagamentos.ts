@@ -27,11 +27,11 @@ export function usePagamentos() {
       return data as Pagamento[];
     },
     enabled: !!locadoraId,
-    // SEM CACHE: Dados sempre frescos do banco
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnWindowFocus: true,
-    refetchOnMount: 'always',
+    // Cache otimizado para performance
+    staleTime: 30 * 1000, // 30 segundos de cache
+    gcTime: 5 * 60 * 1000, // 5 minutos
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
 
   const createMutation = useMutation({
