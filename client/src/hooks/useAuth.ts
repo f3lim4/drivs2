@@ -26,9 +26,12 @@ export function useAuth() {
         
         // Validar se o profile tem dados essenciais
         if (!profile || !profile.email || (!profile.locadoraId && !profile.id)) {
-          console.warn('Profile corrompido detectado, limpando localStorage');
+          console.warn('Profile corrompido detectado, redirecionando para logout de emergência');
           localStorage.removeItem('drivs_profile');
           setProfile(null);
+          // Redirecionar para página de emergência
+          window.location.href = '/emergency-logout';
+          return;
         } else {
           setProfile(profile);
         }
