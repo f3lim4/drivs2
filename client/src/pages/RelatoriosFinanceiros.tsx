@@ -372,9 +372,9 @@ export default function RelatoriosFinanceiros() {
 
   // Dados do histórico ordenados e paginados
   const historicoOrdenado = useMemo(() => {
-    // Combinar saídas (despesas/manutenções) e entradas (infrações pagas)
+    // Combinar saídas (despesas/manutenções) e entradas (pagamentos)
     const itensCombinados = [
-      // SAÍDAS - Filtrar despesas para remover as convertidas de manutenções (evitar duplicatas)
+      // SAÍDAS - Despesas manuais
       ...filteredDataBySearch.despesasPeriodo
         .filter(despesa => !despesa.id.startsWith('manutencao_'))
         .map(despesa => ({
@@ -403,6 +403,37 @@ export default function RelatoriosFinanceiros() {
           veiculoId: manutencao.veiculoId
         };
       }),
+      // ENTRADAS - Pagamentos de aluguel
+      ...pagamentos
+        .filter(pagamento => {
+          if (pagamento.status !== 'pago') return false;
+          const dataStr = pagamento.dataPagamento || pagamento.data;
+          if (!dataStr) return false;
+          
+          // Verificar se está no período selecionado
+          const dateParts = dataStr.split('-');
+          const dataPagamento = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+          return isWithinInterval(dataPagamento, { start: monthStart, end: monthEnd });
+        })
+        .map(pagamento => {
+          // Buscar o veículo através do aluguel/motorista
+          const aluguel = alugueis.find(a => a.id === pagamento.aluguelId);
+          const veiculoId = aluguel?.veiculoId || pagamento.veiculoId;
+          const motorista = motoristas.find(m => m.id === pagamento.motoristaId);
+          
+          return {
+            ...pagamento,
+            id: `pagamento_${pagamento.id}`,
+            tipo: 'entrada',
+            data: pagamento.dataPagamento || pagamento.data,
+            valor: parseFloat(pagamento.valorPago || pagamento.valorTotal || '0'),
+            categoria: pagamento.tipo === 'taxa administrativa' ? 'taxa_administrativa' : 'aluguel',
+            descricao: pagamento.tipo === 'taxa administrativa' 
+              ? `Taxa Administrativa - ${pagamento.descricao || 'Pagamento'}`
+              : `Pagamento Aluguel - ${motorista?.nome || 'Motorista'} - ${pagamento.descricao || 'Mensalidade'}`,
+            veiculoId: veiculoId
+          };
+        }),
       // ENTRADAS - Infrações pagas
       ...filteredDataBySearch.infracoesPeriodo
         .filter(infracao => infracao.status === 'pago' && infracao.valorFinal)
@@ -481,7 +512,7 @@ export default function RelatoriosFinanceiros() {
     });
 
     return itensOrdenados;
-  }, [filteredDataBySearch.despesasPeriodo, filteredDataBySearch.manutencoes, sortHistorico, veiculos]);
+  }, [filteredDataBySearch.despesasPeriodo, filteredDataBySearch.manutencoes, filteredDataBySearch.infracoesPeriodo, pagamentos, alugueis, motoristas, sortHistorico, veiculos, monthStart, monthEnd]);
 
   // Paginação do histórico
   const historicoPaginado = useMemo(() => {
@@ -1664,7 +1695,7 @@ export default function RelatoriosFinanceiros() {
               <div>
                 <CardTitle>Histórico de Entradas e Saídas dos Veículos</CardTitle>
                 <CardDescription>
-                  Histórico filtrado baseado na busca realizada - dados reais
+                  Histórico completo de entradas (pagamentos) e saídas (despesas) por veículo
                 </CardDescription>
               </div>
               <div className="flex items-center gap-4">
@@ -1691,7 +1722,7 @@ export default function RelatoriosFinanceiros() {
                   <p className="text-gray-500 text-center py-8">
                     {searchTerm || filterType !== 'todos' 
                       ? 'Nenhum resultado encontrado para os filtros aplicados.' 
-                      : 'Nenhuma despesa encontrada no período selecionado.'}
+                      : 'Nenhuma movimentação encontrada no período selecionado.'}
                   </p>
                 ) : (
                   <>
@@ -1753,8 +1784,8 @@ export default function RelatoriosFinanceiros() {
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
                                   )}
-                                  {/* Saídas automáticas (manutenção, financiamento) e entradas (infrações) não podem ser excluídas */}
-                                  {(item.id.startsWith('manutencao_') || item.id.startsWith('financiamento_') || item.id.startsWith('infracao_')) && (
+                                  {/* Entradas (pagamentos, infrações) e saídas automáticas não podem ser excluídas */}
+                                  {(item.id.startsWith('manutencao_') || item.id.startsWith('financiamento_') || item.id.startsWith('infracao_') || item.id.startsWith('pagamento_') || item.tipo === 'entrada') && (
                                     <span className="text-gray-400 text-xs">-</span>
                                   )}
                                 </td>
