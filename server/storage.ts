@@ -81,6 +81,7 @@ export interface IStorage {
   getAllMotoristas(): Promise<Motorista[]>;
   getMotoristasByLocadora(locadoraId: string): Promise<Motorista[]>;
   getMotorista(id: string): Promise<Motorista | undefined>;
+  getMotoristaByCPF(cpf: string): Promise<Motorista | undefined>;
   createMotorista(motorista: InsertMotorista): Promise<Motorista>;
   updateMotorista(id: string, updates: Partial<InsertMotorista>): Promise<Motorista>;
   deleteMotorista(id: string): Promise<void>;
@@ -390,7 +391,76 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteLocadora(id: string): Promise<void> {
-    await db.delete(locadoras).where(eq(locadoras.id, id));
+    try {
+      console.log(`[DELETE LOCADORA] Iniciando exclusão completa da locadora: ${id}`);
+      
+      // 1. Buscar todos os dados relacionados antes de excluir
+      const locadora = await db.select().from(locadoras).where(eq(locadoras.id, id)).limit(1);
+      if (locadora.length === 0) {
+        console.log(`[DELETE LOCADORA] Locadora não encontrada: ${id}`);
+        return;
+      }
+      
+      // 2. Buscar perfil da locadora pelo locadoraId
+      const profiles = await db.select().from(profilesTable).where(eq(profilesTable.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Encontrados ${profiles.length} perfis para excluir`);
+      
+      // 3. Excluir todos os dados relacionados EM ORDEM (para evitar conflitos de FK)
+      
+      // Excluir pagamentos
+      await db.delete(pagamentos).where(eq(pagamentos.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Pagamentos excluídos`);
+      
+      // Excluir contratos
+      await db.delete(contratos).where(eq(contratos.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Contratos excluídos`);
+      
+      // Excluir aluguéis
+      await db.delete(alugueis).where(eq(alugueis.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Aluguéis excluídos`);
+      
+      // Excluir manutenções
+      await db.delete(manutencoes).where(eq(manutencoes.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Manutenções excluídas`);
+      
+      // Excluir infrações
+      await db.delete(infracoes).where(eq(infracoes.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Infrações excluídas`);
+      
+      // Excluir despesas
+      await db.delete(despesas).where(eq(despesas.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Despesas excluídas`);
+      
+      // Excluir veículos
+      await db.delete(veiculos).where(eq(veiculos.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Veículos excluídos`);
+      
+      // Excluir motoristas
+      await db.delete(motoristas).where(eq(motoristas.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Motoristas excluídos`);
+      
+      // 4. Excluir perfis e usuários relacionados
+      for (const profile of profiles) {
+        if (profile.userId) {
+          // Excluir usuário
+          await db.delete(users).where(eq(users.uuid, profile.userId));
+          console.log(`[DELETE LOCADORA] Usuário excluído: ${profile.userId}`);
+        }
+        
+        // Excluir perfil
+        await db.delete(profilesTable).where(eq(profilesTable.id, profile.id));
+        console.log(`[DELETE LOCADORA] Perfil excluído: ${profile.id}`);
+      }
+      
+      // 5. Por último, excluir a locadora
+      await db.delete(locadoras).where(eq(locadoras.id, id));
+      console.log(`[DELETE LOCADORA] Locadora excluída: ${id}`);
+      
+      console.log(`[DELETE LOCADORA] Exclusão completa finalizada para locadora: ${id}`);
+    } catch (error) {
+      console.error(`[DELETE LOCADORA] Erro durante exclusão:`, error);
+      throw error;
+    }
   }
 
   // Veiculo operations
@@ -567,6 +637,11 @@ export class DatabaseStorage implements IStorage {
 
   async getMotorista(id: string): Promise<Motorista | undefined> {
     const result = await db.select().from(motoristas).where(eq(motoristas.id, id));
+    return result[0];
+  }
+
+  async getMotoristaByCPF(cpf: string): Promise<Motorista | undefined> {
+    const result = await db.select().from(motoristas).where(eq(motoristas.cpf, cpf));
     return result[0];
   }
 
