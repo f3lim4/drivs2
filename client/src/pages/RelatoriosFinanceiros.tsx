@@ -1525,7 +1525,7 @@ export default function RelatoriosFinanceiros() {
       </Card>
 
       {/* Tabs de Análise */}
-      <Tabs defaultValue="despesas-fixas" className="space-y-2">
+      <Tabs defaultValue="veiculos" className="space-y-2">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="despesas-fixas">Saídas Fixas</TabsTrigger>
           <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
