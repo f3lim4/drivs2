@@ -690,7 +690,7 @@ export default function RelatoriosFinanceiros() {
     
     // Calcular despesas manuais por categoria (excluindo financiamento que já é calculado nas fixas)
     filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'operacional' && despesa.categoria !== 'financiamento')
+      .filter(despesa => despesa.tipo === 'despesa' && despesa.categoria !== 'financiamento')
       .forEach(despesa => {
         const categoria = despesa.categoria || 'outros';
         const valor = parseFloat(despesa.valor || '0');
