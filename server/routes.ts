@@ -164,61 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Endpoint para verificar senha do usuário atual
-  app.post("/api/auth/verify-password", async (req, res) => {
-    try {
-      const { password, email } = req.body;
-      
-      console.log('[DEBUG] Verificação de senha - Dados recebidos:', { 
-        hasPassword: !!password, 
-        email, 
-        sessionUser: req.session?.user 
-      });
-      
-      if (!password) {
-        return res.status(400).json({ message: "Senha é obrigatória" });
-      }
-      
-      // Buscar a locadora do usuário atual através da sessão ou profile
-      let locadoraId = req.session?.user?.locadoraId;
-      
-      if (!locadoraId && req.session?.user?.email) {
-        // Buscar o locadoraId pelo email do perfil
-        const userProfile = await storage.getProfileByEmail(req.session.user.email);
-        locadoraId = userProfile?.locadoraId;
-      }
-      
-      console.log('[DEBUG] Verificação de senha - locadoraId:', locadoraId);
-      
-      if (!locadoraId) {
-        return res.status(401).json({ message: "Locadora não identificada" });
-      }
-
-      // Buscar dados da locadora para verificar senha
-      const locadora = await storage.getLocadoraById(locadoraId);
-      if (!locadora) {
-        return res.status(404).json({ message: "Locadora não encontrada" });
-      }
-
-      // Verificar se a locadora tem senha definida
-      if (!locadora.senhaAdmin) {
-        return res.status(500).json({ message: "Senha de administrador não configurada para esta locadora" });
-      }
-
-      const senhaValida = await bcrypt.compare(password, locadora.senhaAdmin);
-      
-      console.log('[DEBUG] Senha válida:', senhaValida);
-      
-      if (!senhaValida) {
-        return res.status(400).json({ message: "Senha incorreta" });
-      }
-
-      res.json({ message: "Senha verificada com sucesso" });
-    } catch (error) {
-      console.error("Error verifying password:", error);
-      res.status(500).json({ message: "Erro interno do servidor" });
-    }
-  });
+  // ENDPOINT REMOVIDO - Verificação de senha agora é feita no login principal
 
   app.post("/api/auth/login", async (req, res) => {
     try {
@@ -229,15 +175,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const profile = await storage.getProfileByEmail(email);
       if (!profile) {
         console.log("Profile not found for email:", email);
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Email não cadastrado no sistema" });
       }
       console.log("Profile found:", profile);
+      
+      // Verificar se a locadora está ativa (se for tipo locadora)
+      if (profile.type === 'locadora' && profile.locadoraId) {
+        const locadora = await storage.getLocadoraById(profile.locadoraId);
+        if (!locadora) {
+          console.log("Locadora não encontrada ou excluída:", profile.locadoraId);
+          return res.status(401).json({ message: "Conta excluída do sistema" });
+        }
+      }
       
       // Get user by user ID and verify password
       const user = await storage.getUserByUUID(profile.userId);
       if (!user) {
         console.log("User not found for UUID:", profile.userId);
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Conta não encontrada" });
       }
       console.log("User found, checking password...");
       
@@ -245,7 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isValidPassword = await bcrypt.compare(password, user.password);
       console.log("Password valid:", isValidPassword);
       if (!isValidPassword) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "Senha incorreta" });
       }
       
       // Store user info in session (incluindo locadoraId)
@@ -426,6 +381,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ exists: !!locadora });
     } catch (error) {
       console.error('Error checking CNPJ existence:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
+  // Check if CPF exists
+  app.post('/api/motoristas/check-cpf', async (req, res) => {
+    const { cpf } = req.body;
+    if (!cpf) {
+      return res.status(400).json({ message: 'CPF is required' });
+    }
+
+    try {
+      const motorista = await storage.getMotoristaByCPF(cpf);
+      res.json({ exists: !!motorista });
+    } catch (error) {
+      console.error('Error checking CPF existence:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
   });
@@ -829,6 +800,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
+      // Verificar se CPF já existe
+      if (result.data.cpf) {
+        const existingMotorista = await storage.getMotoristaByCPF(result.data.cpf);
+        if (existingMotorista) {
+          return res.status(400).json({ message: "Este CPF já está cadastrado no sistema" });
+        }
+      }
+      
       // Debug: Log dados validados
       console.log('[DEBUG] POST /api/motoristas - Dados validados:', result.data);
       
@@ -840,6 +819,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(motorista);
     } catch (error) {
       console.error("Error creating motorista:", error);
+      
+      // Tratar erros específicos
+      if (error instanceof Error && error.message.includes('duplicate key')) {
+        if (error.message.includes('cpf')) {
+          return res.status(400).json({ message: "Este CPF já está cadastrado" });
+        }
+      }
+      
       res.status(500).json({ message: "Internal server error" });
     }
   });
