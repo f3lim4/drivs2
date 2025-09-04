@@ -25,15 +25,13 @@ export function useManutencoes() {
         throw new Error('Failed to fetch manutencoes');
       }
       const data = await response.json() as Manutencao[];
-      console.log('Manutenções carregadas do servidor:', data.length, 'registros');
       return data;
     },
     enabled: !!profile?.locadoraId,
-    staleTime: 0, // Sem cache para debug
-    gcTime: 0, // Sem cache para debug
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-    refetchInterval: 30000 // Refetch a cada 30 segundos para garantir dados atuais
+    staleTime: 5 * 60 * 1000, // 5 minutos de cache
+    gcTime: 10 * 60 * 1000, // 10 minutos
+    refetchOnWindowFocus: false,
+    refetchOnMount: true
   });
 
   const createMutation = useMutation({
