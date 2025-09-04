@@ -77,10 +77,11 @@ export function useContratos() {
       return response.json();
     },
     onSuccess: () => {
-      // Limpar cache completamente para evitar duplicações
+      // Limpar cache para evitar duplicações (exceto motoristas para preservar imagens)
       queryClient.invalidateQueries({ queryKey: ['contratos', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['alugueis', locadoraId] });
-      queryClient.invalidateQueries({ queryKey: ['motoristas', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
+      // Removido: queryClient.invalidateQueries({ queryKey: ['motoristas', locadoraId] });
       queryClient.removeQueries({ queryKey: ['contratos', locadoraId] });
     },
   });
@@ -122,12 +123,12 @@ export function useContratos() {
       return response.json();
     },
     onSuccess: () => {
-      // Invalidar cache de contratos e dados relacionados
+      // Invalidar cache de contratos e dados relacionados (exceto motoristas para preservar imagens)
       queryClient.invalidateQueries({ queryKey: ['contratos', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['alugueis', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
-      queryClient.invalidateQueries({ queryKey: ['motoristas', locadoraId] });
+      // Removido: queryClient.invalidateQueries({ queryKey: ['motoristas', locadoraId] });
       queryClient.removeQueries({ queryKey: ['/api/pagamentos', locadoraId] });
     },
   });
@@ -137,7 +138,7 @@ export function useContratos() {
     console.log('[CACHE CLEAR] Limpando cache de contratos...');
     queryClient.removeQueries({ queryKey: ['contratos'] });
     queryClient.removeQueries({ queryKey: ['alugueis'] });
-    queryClient.removeQueries({ queryKey: ['motoristas'] });
+    // Removido: queryClient.removeQueries({ queryKey: ['motoristas'] });
     queryClient.invalidateQueries({ queryKey: ['contratos', locadoraId] });
   };
 
