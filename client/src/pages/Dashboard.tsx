@@ -217,20 +217,32 @@ export default function Dashboard() {
       // Calcular entradas do mês (pagamentos recebidos)
       const receitaMes = pagamentos
         .filter((p: any) => {
-          const dataPagamento = new Date(p.data);
+          if (p.status !== 'pago') return false;
+          const dataStr = p.dataPagamento || p.data;
+          if (!dataStr) return false;
+          
+          // Criar data no fuso horário local para evitar problemas com UTC
+          const dateParts = dataStr.split('-');
+          const dataPagamento = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+          
           return dataPagamento.getMonth() + 1 === mes && 
-                 dataPagamento.getFullYear() === ano &&
-                 p.status === 'pago';
+                 dataPagamento.getFullYear() === ano;
         })
-        .reduce((total: number, p: any) => total + parseFloat(p.valor || '0'), 0);
+        .reduce((total: number, p: any) => total + parseFloat(p.valorPago || p.valor || '0'), 0);
 
       // Calcular saídas do mês (despesas pagas)
       const despesasMes = (despesas as any[])
         .filter((d: any) => {
-          const dataDespesa = new Date(d.data);
+          if (d.status !== 'pago') return false;
+          const dataStr = d.data;
+          if (!dataStr) return false;
+          
+          // Criar data no fuso horário local para evitar problemas com UTC
+          const dateParts = dataStr.split('-');
+          const dataDespesa = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+          
           return dataDespesa.getMonth() + 1 === mes && 
-                 dataDespesa.getFullYear() === ano &&
-                 d.status === 'pago';
+                 dataDespesa.getFullYear() === ano;
         })
         .reduce((total: number, d: any) => total + parseFloat(d.valor || '0'), 0);
 
