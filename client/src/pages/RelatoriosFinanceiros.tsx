@@ -88,12 +88,9 @@ export default function RelatoriosFinanceiros() {
   // Estado para o modal de detalhes do veículo
   const [veiculoDetalhes, setVeiculoDetalhes] = useState<any>(null);
   
-  // Estado para o modal de detalhes do motorista
-  const [motoristaDetalhes, setMotoristaDetalhes] = useState<any>(null);
   
   // Estados de ordenação para as abas
   const [sortVeiculos, setSortVeiculos] = useState<string>('mais-lucrativos');
-  const [sortMotoristas, setSortMotoristas] = useState<string>('mais-pagamentos');
   const [sortDespesasFixas, setSortDespesasFixas] = useState<string>('maior-total');
   const [sortHistorico, setSortHistorico] = useState<string>('mais-recente');
 
@@ -132,20 +129,6 @@ export default function RelatoriosFinanceiros() {
     setCurrentPageVeiculos(1);
   };
   
-  // Estados de paginação para a aba "Análise por Motorista"
-  const [currentPageMotoristas, setCurrentPageMotoristas] = useState(1);
-  const [itemsPerPageMotoristas, setItemsPerPageMotoristas] = useState(10);
-  
-  // Função para alterar página
-  const handlePageChangeMotoristas = (page: number) => {
-    setCurrentPageMotoristas(page);
-  };
-  
-  // Função para alterar itens por página
-  const handleItemsPerPageChangeMotoristas = (items: number) => {
-    setItemsPerPageMotoristas(items);
-    setCurrentPageMotoristas(1);
-  };
 
 
   
@@ -305,16 +288,6 @@ export default function RelatoriosFinanceiros() {
     }
   };
 
-  // Função para ver detalhes do motorista
-  const handleVerDetalhesMotorista = (item: any) => {
-    // Encontrar o veículo do motorista
-    const veiculo = veiculos.find(v => v.placa === item.veiculoPlaca);
-    if (veiculo) {
-      // Gerar dados detalhados do veículo associado ao motorista
-      const dadosDetalhados = gerarDadosDetalhados(veiculo, selectedMonth);
-      setMotoristaDetalhes(dadosDetalhados);
-    }
-  };
 
   // Cálculos para o período selecionado
   const monthStart = startOfMonth(selectedMonth);
@@ -599,67 +572,6 @@ export default function RelatoriosFinanceiros() {
     }, 0);
   }, [veiculos]);
 
-  // Análise por Motorista
-  const analiseMotoristas = useMemo(() => {
-    const motoristasData = [];
-    
-    // Para cada aluguel ativo, buscar os dados do motorista e pagamentos
-    filteredData.alugueisAtivos.forEach(aluguel => {
-      const motorista = motoristas.find(m => m.id === aluguel.motoristaId);
-      const veiculo = veiculos.find(v => v.id === aluguel.veiculoId);
-      
-      if (motorista && veiculo) {
-        // Calcular pagamentos do período para este motorista
-        const pagamentosMotorista = pagamentos.filter(p => 
-          p.motoristaId === motorista.id && 
-          p.status === 'pago' && 
-          isWithinInterval(new Date(p.dataPagamento || p.dataVencimento), { start: monthStart, end: monthEnd })
-        );
-        
-        const totalPagamentos = pagamentosMotorista.reduce((total, pagamento) => {
-          const valor = Number(pagamento.valorTotal || '0');
-          return total + (isNaN(valor) ? 0 : valor);
-        }, 0);
-        
-        motoristasData.push({
-          motoristaId: motorista.id,
-          motoristaNome: motorista.nome,
-          motoristaCpf: motorista.cpf,
-          veiculoId: veiculo.id,
-          veiculoPlaca: veiculo.placa,
-          valorAluguel: Number(aluguel.valorMensal || aluguel.valorDiario || 0),
-          totalPagamentos: totalPagamentos
-        });
-      }
-    });
-    
-    // Aplicar ordenação
-    return motoristasData.sort((a, b) => {
-      switch (sortMotoristas) {
-        case 'maior-pagamento':
-          return b.totalPagamentos - a.totalPagamentos;
-        case 'menor-pagamento':
-          return a.totalPagamentos - b.totalPagamentos;
-        case 'maior-valor-aluguel':
-          return b.valorAluguel - a.valorAluguel;
-        case 'menor-valor-aluguel':
-          return a.valorAluguel - b.valorAluguel;
-        case 'nome-az':
-          return a.motoristaNome.localeCompare(b.motoristaNome);
-        case 'nome-za':
-          return b.motoristaNome.localeCompare(a.motoristaNome);
-        default:
-          return b.totalPagamentos - a.totalPagamentos;
-      }
-    });
-  }, [filteredData.alugueisAtivos, motoristas, veiculos, pagamentos, monthStart, monthEnd, sortMotoristas]);
-
-  // Paginação da análise por motoristas
-  const totalPaginasMotoristas = Math.ceil(analiseMotoristas.length / itemsPerPageMotoristas);
-  const analiseMotoristasPaginada = analiseMotoristas.slice(
-    (currentPageMotoristas - 1) * itemsPerPageMotoristas,
-    currentPageMotoristas * itemsPerPageMotoristas
-  );
 
   // Cálculos financeiros
   const receitaAlugueis = useMemo(() => {
@@ -2069,142 +1981,6 @@ export default function RelatoriosFinanceiros() {
           </Card>
         </TabsContent>
 
-        {/* Aba Análise por Motorista */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Análise por Motorista</CardTitle>
-                <CardDescription>
-                  Relatório de pagamentos e aluguéis por motorista
-                </CardDescription>
-              </div>
-              <div className="flex items-center gap-4">
-                <Select value={sortMotoristas} onValueChange={setSortMotoristas}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="maior-pagamento">Maior Pagamento</SelectItem>
-                    <SelectItem value="menor-pagamento">Menor Pagamento</SelectItem>
-                    <SelectItem value="maior-valor-aluguel">Maior Valor Aluguel</SelectItem>
-                    <SelectItem value="menor-valor-aluguel">Menor Valor Aluguel</SelectItem>
-                    <SelectItem value="nome-az">Nome (A-Z)</SelectItem>
-                    <SelectItem value="nome-za">Nome (Z-A)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {analiseMotoristas.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">
-                    Nenhum motorista com aluguel ativo encontrado.
-                  </p>
-                ) : (
-                  <>
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="bg-gray-50">
-                            <th className="text-left p-3 border-b">Ver</th>
-                            <th className="text-left p-3 border-b">Motorista</th>
-                            <th className="text-left p-3 border-b">CPF</th>
-                            <th className="text-left p-3 border-b">Veículo</th>
-                            <th className="text-left p-3 border-b">Valor Aluguel</th>
-                            <th className="text-left p-3 border-b">Pagamentos Período</th>
-                            <th className="text-left p-3 border-b">Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {analiseMotoristasPaginada.map((item) => (
-                            <tr key={item.motoristaId} className="border-b hover:bg-gray-50">
-                              <td className="p-3">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleVerDetalhesMotorista(item)}
-                                  className="text-blue-600 hover:text-blue-800"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                              </td>
-                              <td className="p-3 font-medium">{item.motoristaNome}</td>
-                              <td className="p-3 text-gray-600">{item.motoristaCpf}</td>
-                              <td className="p-3">{item.veiculoPlaca}</td>
-                              <td className="p-3 font-semibold text-blue-600">
-                                {formatCurrency(item.valorAluguel)}
-                              </td>
-                              <td className="p-3 font-semibold text-green-600">
-                                {formatCurrency(item.totalPagamentos)}
-                              </td>
-                              <td className="p-3">
-                                <span className={`px-2 py-1 rounded-full text-xs ${
-                                  item.totalPagamentos >= item.valorAluguel 
-                                    ? 'bg-green-100 text-green-700' 
-                                    : 'bg-red-100 text-red-700'
-                                }`}>
-                                  {item.totalPagamentos >= item.valorAluguel ? 'Em dia' : 'Pendente'}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Paginação */}
-                    <div className="border-t pt-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-700">
-                            Itens por página:
-                          </span>
-                          <Select
-                            value={itemsPerPageMotoristas.toString()}
-                            onValueChange={(value) => handleItemsPerPageChangeMotoristas(parseInt(value))}
-                          >
-                            <SelectTrigger className="w-16">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="10">10</SelectItem>
-                              <SelectItem value="20">20</SelectItem>
-                              <SelectItem value="50">50</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-700">
-                            Página {currentPageMotoristas} de {totalPaginasMotoristas} 
-                            ({analiseMotoristas.length} itens)
-                          </span>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handlePageChangeMotoristas(currentPageMotoristas - 1)}
-                              disabled={currentPageMotoristas === 1}
-                            >
-                              Anterior
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handlePageChangeMotoristas(currentPageMotoristas + 1)}
-                              disabled={currentPageMotoristas === totalPaginasMotoristas}
-                            >
-                              Próxima
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
       </Tabs>
 
 
@@ -2221,15 +1997,6 @@ export default function RelatoriosFinanceiros() {
         />
       )}
 
-      {/* Modal de detalhes do motorista */}
-      {motoristaDetalhes && (
-        <DetalhesVeiculoAnaliseModal
-          isOpen={!!motoristaDetalhes}
-          onClose={() => setMotoristaDetalhes(null)}
-          dadosVeiculo={motoristaDetalhes}
-          selectedMonth={selectedMonth}
-        />
-      )}
 
       {/* Modal de confirmação de exclusão */}
       <Dialog open={confirmDelete.open} onOpenChange={(open) => setConfirmDelete({ ...confirmDelete, open })}>
