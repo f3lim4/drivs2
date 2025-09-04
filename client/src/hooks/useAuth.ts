@@ -23,7 +23,15 @@ export function useAuth() {
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile);
-        setProfile(profile);
+        
+        // Validar se o profile tem dados essenciais
+        if (!profile || !profile.email || (!profile.locadoraId && !profile.id)) {
+          console.warn('Profile corrompido detectado, limpando localStorage');
+          localStorage.removeItem('drivs_profile');
+          setProfile(null);
+        } else {
+          setProfile(profile);
+        }
       } catch (error) {
         console.error('Error parsing saved profile:', error);
         localStorage.removeItem('drivs_profile');
