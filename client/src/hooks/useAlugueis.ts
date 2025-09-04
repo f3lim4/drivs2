@@ -13,8 +13,6 @@ export function useAlugueis() {
     queryFn: async () => {
       if (!locadoraId) return [];
       
-      console.log('Alugueis - Fazendo requisição para locadora:', locadoraId);
-      
       const response = await fetch(`/api/alugueis?locadoraId=${locadoraId}`, {
         cache: 'no-cache',
         headers: {
@@ -26,18 +24,12 @@ export function useAlugueis() {
       
       const data = await response.json();
       
-      console.log('Aluguéis - Verificando isolamento:', {
-        locadoraId,
-        alugueisTotal: data.length,
-        primeiroAluguel: data[0]?.locadoraId
-      });
-      
       return data as Aluguel[];
     },
     enabled: !!locadoraId,
-    staleTime: 0, // Sem cache
-    gcTime: 0, // Sem cache
-    refetchOnWindowFocus: true,
+    staleTime: 30 * 1000, // 30 segundos de cache
+    gcTime: 5 * 60 * 1000, // 5 minutos
+    refetchOnWindowFocus: false,
     refetchOnMount: true
   });
 

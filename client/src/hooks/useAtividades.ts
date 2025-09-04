@@ -26,9 +26,9 @@ export function useAtividades() {
       return response.json() as Promise<Atividade[]>;
     },
     enabled: !!profile?.locadoraId,
-    staleTime: 0, // Sem cache
-    gcTime: 0, // Sem cache
-    refetchOnWindowFocus: true,
+    staleTime: 2 * 60 * 1000, // 2 minutos de cache
+    gcTime: 5 * 60 * 1000, // 5 minutos
+    refetchOnWindowFocus: false,
     refetchOnMount: true
   });
 }
