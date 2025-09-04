@@ -79,6 +79,10 @@ export interface Veiculo {
   // Rastreador
   rastreador?: string;
   valorRastreadorMensal?: number;
+  // Financiamento
+  financiado?: boolean;
+  valorFinanciamento?: number;
+  quantidadeParcelas?: number;
   // Status
   status: 'disponivel' | 'alugado' | 'manutencao' | 'indisponivel';
   // Documentos

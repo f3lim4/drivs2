@@ -42,8 +42,8 @@ export default function RelatoriosFinanceiros() {
   const { pagamentos, isLoading: pagamentosLoading } = usePagamentos();
   const { infracoes, isLoading: infracoesLoading } = useInfracoes();
   const { despesas, isLoading: despesasLoading } = useDespesas();
-  const { receitas, isLoading: receitasLoading } = useReceitas(profile?.locadoraId);
-  const { veiculos, isLoading: veiculosLoading } = useVeiculos();
+  const { data: receitas = [], isLoading: receitasLoading } = useReceitas(profile?.locadoraId);
+  const { veiculos, loading: veiculosLoading } = useVeiculos();
   const { motoristas, isLoading: motoristasLoading } = useMotoristas();
   const { manutencoes, isLoading: manutencoesLoading } = useManutencoes();
 
@@ -712,7 +712,7 @@ export default function RelatoriosFinanceiros() {
     
     // Calcular despesas manuais por categoria (excluindo financiamento que já é calculado nas fixas)
     filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'despesa' && despesa.fonte !== 'manutencao' && despesa.categoria !== 'financiamento')
+      .filter(despesa => despesa.tipo === 'operacional' && despesa.categoria !== 'financiamento')
       .forEach(despesa => {
         const categoria = despesa.categoria || 'outros';
         const valor = parseFloat(despesa.valor || '0');
