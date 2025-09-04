@@ -12,7 +12,7 @@ export function useContratos() {
   const locadoraId = profile?.locadoraId;
   const queryClient = useQueryClient();
 
-  // Buscar contratos (incluindo aluguéis ativos como contratos)
+  // Buscar APENAS contratos formais (não misturar com aluguéis)
   const { 
     data: contratos = [], 
     isLoading, 
@@ -20,152 +20,17 @@ export function useContratos() {
   } = useQuery({
     queryKey: ['contratos', locadoraId],
     queryFn: async () => {
-      // Buscar contratos formais
+      // Buscar APENAS contratos formais da tabela contratos
       const contratosResponse = await fetch(`/api/contratos?locadoraId=${locadoraId}`);
       if (!contratosResponse.ok) throw new Error('Failed to fetch contratos');
       const contratosFormais = await contratosResponse.json();
 
-      // Buscar aluguéis ativos para incluir como contratos
-      const alugueisResponse = await fetch(`/api/alugueis?locadoraId=${locadoraId}`);
-      if (!alugueisResponse.ok) throw new Error('Failed to fetch alugueis');
-      const todosAlugueis = await alugueisResponse.json();
-      const alugueisAtivos = todosAlugueis.filter((aluguel: any) => aluguel.status === 'ativo');
-
-      // Buscar dados dos motoristas para fazer a comparação correta
-      const motoristasResponse = await fetch(`/api/motoristas?locadoraId=${locadoraId}`);
-      if (!motoristasResponse.ok) throw new Error('Failed to fetch motoristas');
-      const motoristas = await motoristasResponse.json();
-      
-      // Criar mapa de CPF -> Nome para comparação
-      const cpfParaNome = new Map();
-      motoristas.forEach((m: any) => {
-        cpfParaNome.set(m.id, m.nome); // m.id é o CPF
-      });
-
-      // Filtrar aluguéis que NÃO têm contrato formal correspondente
-      const alugueisMotoristas = alugueisAtivos.map((a: any) => a.motoristaId); // CPFs
-      const contratosClientes = contratosFormais.map((c: any) => c.cliente); // Nomes
-      
-      // Converter CPFs dos aluguéis para nomes para comparação
-      const alugueisNomes = alugueisMotoristas.map((cpf: string) => cpfParaNome.get(cpf));
-      
       console.log('[CONTRATOS DEBUG]', {
-        alugueisAtivos: alugueisAtivos.length,
         contratosFormais: contratosFormais.length,
-        alugueisMotoristas, // CPFs
-        contratosClientes, // Nomes
-        alugueisNomes, // Nomes convertidos dos CPFs
-        intersecao: alugueisNomes.filter((nome: string) => contratosClientes.includes(nome))
-      });
-
-      // CORREÇÃO: Deduplicação mais robusta - usar ID único para evitar duplicatas
-      const contratosIdUnicos = new Set();
-      const alugueisIdUnicos = new Set();
-      
-      // Marcar contratos formais existentes
-      contratosFormais.forEach((c: any) => {
-        contratosIdUnicos.add(c.id);
+        contratos: contratosFormais
       });
       
-      // Converter apenas aluguéis que NÃO têm contrato formal correspondente e não são duplicados
-      const aluguelsSemContrato = alugueisAtivos.filter((aluguel: any) => {
-        const nomeMotorista: string = cpfParaNome.get(aluguel.motoristaId);
-        const idUnico = `aluguel_${aluguel.id}`;
-        
-        // Verificar se já foi processado
-        if (alugueisIdUnicos.has(idUnico)) {
-          console.log('[ANTI-DUPLICATE] Aluguel já processado:', idUnico);
-          return false;
-        }
-        
-        // Verificar se não tem contrato formal correspondente (comparação mais robusta)
-        const temContratoFormal = contratosClientes.some((cliente: string) => {
-          return cliente && nomeMotorista && cliente.trim().toLowerCase() === nomeMotorista.trim().toLowerCase();
-        });
-        
-        if (!temContratoFormal) {
-          alugueisIdUnicos.add(idUnico);
-          console.log('[INCLUINDO ALUGUEL] Sem contrato formal:', {
-            nomeMotorista,
-            id: aluguel.id,
-            veiculoId: aluguel.veiculoId
-          });
-          return true;
-        } else {
-          console.log('[EXCLUINDO ALUGUEL] Já tem contrato formal:', {
-            nomeMotorista,
-            id: aluguel.id,
-            contratosClientes
-          });
-        }
-        
-        return false;
-      });
-
-      const contratosDeAlugueis = aluguelsSemContrato.map((aluguel: any) => ({
-        id: `aluguel_${aluguel.id}`,
-        locadoraId: aluguel.locadoraId,
-        motoristaId: aluguel.motoristaId,
-        motoristaNome: aluguel.motoristaNome,
-        motoristaCpf: aluguel.motoristaCpf,
-        veiculoId: aluguel.veiculoId,
-        veiculoPlaca: aluguel.veiculoPlaca,
-        veiculoMarca: aluguel.veiculoMarca,
-        veiculoModelo: aluguel.veiculoModelo,
-        dataInicio: aluguel.dataInicio,
-        dataFim: aluguel.dataFim,
-        valorMensal: aluguel.valorMensal,
-        valorSemanal: aluguel.valorSemanal,
-        caucao: aluguel.caucao,
-        observacoes: aluguel.observacoes,
-        status: 'ativo',
-        tipo: 'Ativo', // Status unificado para aluguéis ativos
-        createdAt: aluguel.createdAt,
-        updatedAt: aluguel.updatedAt,
-      }));
-
-      // Modificar tipo dos contratos formais ativos para "Ativo"
-      const contratosFormaisCorrigidos = contratosFormais.map((contrato: any) => ({
-        ...contrato,
-        tipo: contrato.status === 'ativo' ? 'Ativo' : contrato.tipo // Se status é ativo, tipo deve ser "Ativo"
-      }));
-
-      // Combinar contratos formais corrigidos + aluguéis sem contrato formal
-      const todosContratos = [...contratosFormaisCorrigidos, ...contratosDeAlugueis];
-      
-      // VERIFICAÇÃO FINAL: Deduplicação por cliente/motorista para evitar duplicatas visuais
-      const contratosDeduplicados = todosContratos.filter((contrato, index, arr) => {
-        const nomeDoContrato = contrato.cliente || contrato.motoristaNome;
-        
-        // Encontrar se há outro contrato/aluguel para o mesmo motorista
-        const primeiroIndice = arr.findIndex(c => {
-          const nomeComparacao = c.cliente || c.motoristaNome;
-          return nomeComparacao === nomeDoContrato;
-        });
-        
-        const isDuplicado = primeiroIndice !== index;
-        
-        if (isDuplicado) {
-          console.log('[ANTI-DUPLICATE] Contrato duplicado removido:', {
-            cliente: nomeDoContrato,
-            id: contrato.id,
-            tipo: contrato.tipo,
-            status: contrato.status,
-            primeiroIndice,
-            indiceAtual: index
-          });
-        }
-        
-        return !isDuplicado;
-      });
-      
-      console.log('[CONTRATOS FINAL]', {
-        contratosOriginais: todosContratos.length,
-        contratosDeduplicados: contratosDeduplicados.length,
-        removidos: todosContratos.length - contratosDeduplicados.length
-      });
-      
-      return contratosDeduplicados;
+      return contratosFormais;
     },
     enabled: !!locadoraId,
     staleTime: 0, // Sempre buscar dados frescos
@@ -245,39 +110,24 @@ export function useContratos() {
   // Excluir contrato
   const deleteContrato = useMutation({
     mutationFn: async (id: string) => {
-      // Se for um aluguel ativo (ID prefixado com "aluguel_"), extrair o ID real
-      if (id.startsWith('aluguel_')) {
-        const realAluguelId = id.replace('aluguel_', '');
-        console.log(`Excluindo aluguel ativo: ${realAluguelId}`);
-        
-        const response = await fetch(`/api/alugueis/${realAluguelId}`, {
-          method: 'DELETE',
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to delete aluguel');
-        }
-        
-        return response.json();
-      } else {
-        // É um contrato formal
-        console.log(`Excluindo contrato formal: ${id}`);
-        const response = await fetch(`/api/contratos/${id}`, {
-          method: 'DELETE',
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to delete contrato');
-        }
-        
-        return response.json();
+      console.log(`Excluindo contrato: ${id}`);
+      const response = await fetch(`/api/contratos/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete contrato');
       }
+      
+      return response.json();
     },
     onSuccess: () => {
-      // Invalidar cache de contratos, aluguéis E pagamentos ao excluir contrato
+      // Invalidar cache de contratos e dados relacionados
       queryClient.invalidateQueries({ queryKey: ['contratos', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['alugueis', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['motoristas', locadoraId] });
       queryClient.removeQueries({ queryKey: ['/api/pagamentos', locadoraId] });
     },
   });
