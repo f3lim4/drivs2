@@ -667,9 +667,9 @@ export default function RelatoriosFinanceiros() {
 
   const receitaPagamentos = useMemo(() => {
     return pagamentos
-      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.dataPagamento || p.dataVencimento), { start: monthStart, end: monthEnd }))
+      .filter(p => p.status === 'pago' && isWithinInterval(new Date(p.dataPagamento || p.data), { start: monthStart, end: monthEnd }))
       .reduce((total, pagamento) => {
-        const valor = Number(pagamento.valorTotal || '0');
+        const valor = Number(pagamento.valorPago || pagamento.valorTotal || '0');
         return total + (isNaN(valor) ? 0 : valor);
       }, 0);
   }, [pagamentos, monthStart, monthEnd]);
@@ -677,9 +677,9 @@ export default function RelatoriosFinanceiros() {
   // Taxa administrativa de aluguéis
   const receitaTaxaAdministrativa = useMemo(() => {
     return pagamentos
-      .filter(p => p.status === 'pago' && p.tipo === 'taxa administrativa' && isWithinInterval(new Date(p.dataPagamento || p.dataVencimento), { start: monthStart, end: monthEnd }))
+      .filter(p => p.status === 'pago' && p.tipo === 'taxa administrativa' && isWithinInterval(new Date(p.dataPagamento || p.data), { start: monthStart, end: monthEnd }))
       .reduce((total, pagamento) => {
-        const valor = Number(pagamento.valorTotal || '0');
+        const valor = Number(pagamento.valorPago || pagamento.valorTotal || '0');
         return total + (isNaN(valor) ? 0 : valor);
       }, 0);
   }, [pagamentos, monthStart, monthEnd]);
