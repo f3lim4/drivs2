@@ -78,11 +78,25 @@ export function useContratos() {
           return false;
         }
         
-        // Verificar se não tem contrato formal correspondente
-        const temContratoFormal = contratosClientes.includes(nomeMotorista);
+        // Verificar se não tem contrato formal correspondente (comparação mais robusta)
+        const temContratoFormal = contratosClientes.some((cliente: string) => {
+          return cliente && nomeMotorista && cliente.trim().toLowerCase() === nomeMotorista.trim().toLowerCase();
+        });
+        
         if (!temContratoFormal) {
           alugueisIdUnicos.add(idUnico);
+          console.log('[INCLUINDO ALUGUEL] Sem contrato formal:', {
+            nomeMotorista,
+            id: aluguel.id,
+            veiculoId: aluguel.veiculoId
+          });
           return true;
+        } else {
+          console.log('[EXCLUINDO ALUGUEL] Já tem contrato formal:', {
+            nomeMotorista,
+            id: aluguel.id,
+            contratosClientes
+          });
         }
         
         return false;
@@ -119,15 +133,24 @@ export function useContratos() {
       // Combinar contratos formais corrigidos + aluguéis sem contrato formal
       const todosContratos = [...contratosFormaisCorrigidos, ...contratosDeAlugueis];
       
-      // VERIFICAÇÃO FINAL: Deduplicação por cliente para evitar duplicatas visuais
+      // VERIFICAÇÃO FINAL: Deduplicação por cliente/motorista para evitar duplicatas visuais
       const contratosDeduplicados = todosContratos.filter((contrato, index, arr) => {
-        const primeiroIndice = arr.findIndex(c => c.cliente === contrato.cliente || c.motoristaNome === contrato.cliente);
+        const nomeDoContrato = contrato.cliente || contrato.motoristaNome;
+        
+        // Encontrar se há outro contrato/aluguel para o mesmo motorista
+        const primeiroIndice = arr.findIndex(c => {
+          const nomeComparacao = c.cliente || c.motoristaNome;
+          return nomeComparacao === nomeDoContrato;
+        });
+        
         const isDuplicado = primeiroIndice !== index;
         
         if (isDuplicado) {
           console.log('[ANTI-DUPLICATE] Contrato duplicado removido:', {
-            cliente: contrato.cliente || contrato.motoristaNome,
+            cliente: nomeDoContrato,
             id: contrato.id,
+            tipo: contrato.tipo,
+            status: contrato.status,
             primeiroIndice,
             indiceAtual: index
           });
