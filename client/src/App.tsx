@@ -47,6 +47,19 @@ const queryClient = new QueryClient({
         }
         
         const response = await fetch(url);
+        
+        // DETECTAR LOCADORA EXCLUÍDA
+        if (response.status === 410) {
+          const errorData = await response.json();
+          if (errorData.message === 'LOCADORA_DELETED') {
+            console.warn('Locadora foi excluída, forçando logout...');
+            // Limpar localStorage e redirecionar
+            localStorage.removeItem('drivs_profile');
+            window.location.href = '/emergency-logout';
+            return;
+          }
+        }
+        
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

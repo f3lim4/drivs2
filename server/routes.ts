@@ -532,6 +532,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log('🚗 VEÍCULOS - Retornando todos:', todosVeiculos.length);
         return res.json(todosVeiculos);
       }
+
+      // VERIFICAR SE A LOCADORA EXISTE
+      const locadora = await storage.getLocadora(locadoraId as string);
+      if (!locadora) {
+        console.warn(`[LOCADORA EXCLUÍDA] Tentativa de acesso à locadora inexistente: ${locadoraId}`);
+        return res.status(410).json({ 
+          message: "LOCADORA_DELETED",
+          details: "Esta locadora foi excluída. Faça login novamente." 
+        });
+      }
       
       if (locadoraId) {
         const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
@@ -757,6 +767,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const todosMotoristas = await storage.getAllMotoristas();
         console.log('👤 MOTORISTAS - Retornando todos:', todosMotoristas.length);
         return res.json(todosMotoristas);
+      }
+
+      // VERIFICAR SE A LOCADORA EXISTE
+      const locadora = await storage.getLocadora(locadoraId as string);
+      if (!locadora) {
+        console.warn(`[LOCADORA EXCLUÍDA] Tentativa de acesso à locadora inexistente: ${locadoraId}`);
+        return res.status(410).json({ 
+          message: "LOCADORA_DELETED",
+          details: "Esta locadora foi excluída. Faça login novamente." 
+        });
       }
       
       const motoristas = await storage.getMotoristasByLocadora(locadoraId as string);
@@ -1748,6 +1768,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         url: req.url,
         headers: req.headers
       });
+
+      // VERIFICAR SE A LOCADORA EXISTE (quando há locadoraId)
+      if (locadoraId) {
+        const locadora = await storage.getLocadora(locadoraId as string);
+        if (!locadora) {
+          console.warn(`[LOCADORA EXCLUÍDA] Tentativa de acesso à locadora inexistente: ${locadoraId}`);
+          return res.status(410).json({ 
+            message: "LOCADORA_DELETED",
+            details: "Esta locadora foi excluída. Faça login novamente." 
+          });
+        }
+      }
       
       const pagamentos = locadoraId
         ? await storage.getPagamentosByLocadora(locadoraId as string)
