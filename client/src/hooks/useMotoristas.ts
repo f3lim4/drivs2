@@ -61,7 +61,7 @@ export function useMotoristas() {
 
       return data;
     },
-    enabled: !!profile,
+    enabled: !!profile && !!locadoraId,
     staleTime: 0, // Sem cache
     gcTime: 0, // Sem cache
     refetchOnWindowFocus: true,

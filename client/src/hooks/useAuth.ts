@@ -23,14 +23,6 @@ export function useAuth() {
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile);
-        
-        // CORREÇÃO AUTOMÁTICA: Atualizar CNPJ incorreto no localStorage
-        if (profile.locadoraId === '5076457100170') {
-          profile.locadoraId = '50764571000170';
-          localStorage.setItem('drivs_profile', JSON.stringify(profile));
-          console.log('CNPJ corrigido automaticamente no localStorage');
-        }
-        
         setProfile(profile);
       } catch (error) {
         console.error('Error parsing saved profile:', error);
