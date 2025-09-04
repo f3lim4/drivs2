@@ -17,6 +17,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [credentials, setCredentials] = useState({
     email: '',
     password: ''
@@ -33,6 +34,30 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate]);
 
+  // Verificar se email existe no sistema
+  const checkEmailExists = async (email: string) => {
+    if (!email || !email.includes('@')) return;
+    
+    try {
+      const response = await fetch('/api/auth/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (!data.exists) {
+          setEmailError('Este email não está cadastrado no sistema');
+        } else {
+          setEmailError('');
+        }
+      }
+    } catch (error) {
+      console.log('Erro ao verificar email:', error);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -40,6 +65,16 @@ export default function Login() {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Verificar se há erro de email antes de tentar login
+    if (emailError) {
+      toast({
+        title: "Erro",
+        description: emailError,
         variant: "destructive",
       });
       return;
@@ -129,10 +164,15 @@ export default function Login() {
                   onChange={(e) => {
                     setCredentials(prev => ({ ...prev, email: e.target.value }));
                     if (errorMessage) setErrorMessage(''); // Limpar erro ao digitar
+                    if (emailError) setEmailError(''); // Limpar erro de email
                   }}
+                  onBlur={(e) => checkEmailExists(e.target.value)}
                   required
-                  className="h-11"
+                  className={`h-11 ${emailError ? 'border-red-500 focus:border-red-500' : ''}`}
                 />
+                {emailError && (
+                  <p className="text-sm text-red-500 mt-1">{emailError}</p>
+                )}
               </div>
 
               <div className="space-y-2">
