@@ -8,6 +8,7 @@ import { Plus, Search, Filter, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useMotoristas } from '@/hooks/useMotoristas';
+import { useContratos } from '@/hooks/useContratos';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +50,7 @@ export default function Motoristas() {
   const { toast } = useToast();
   const { isAdmin, isLocadora, profile } = useAuth();
   const { motoristas, isLoading, deleteMotorista, refetch } = useMotoristas();
+  const { contratos } = useContratos();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('todos');
   const [modalOpen, setModalOpen] = useState(false);
@@ -284,6 +286,20 @@ export default function Motoristas() {
       </Badge>;
     }
     
+    // Verificar se o motorista tem contrato ativo
+    const temContratoAtivo = contratos.some((contrato: any) => 
+      contrato.cliente === motorista.nome && 
+      (contrato.status === 'ativo' || contrato.status === 'em_aberto')
+    );
+    
+    // Se tem contrato ativo, mostrar como "Ativo"
+    if (temContratoAtivo) {
+      return <Badge variant="default" className="bg-green-100 text-green-800 border-green-200">
+        Ativo
+      </Badge>;
+    }
+    
+    // Caso contrário, usar o status do banco de dados
     return <Badge variant={motorista.status === 'ativo' ? 'default' : 'outline'} className="text-xs">
       {motorista.status === 'ativo' ? 'Ativo' : 'Inativo'}
     </Badge>;
