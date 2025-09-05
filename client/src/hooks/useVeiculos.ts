@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Veiculo } from '@/types';
 
 export function useVeiculos() {
-  const { isLocadora, profile } = useAuth();
+  const { isLocadora, profile, isAdmin } = useAuth();
   const locadoraId = profile?.locadoraId;
   const queryClient = useQueryClient();
 
@@ -16,7 +16,10 @@ export function useVeiculos() {
     queryKey: ['veiculos', locadoraId],
     queryFn: async () => {
       let url = '/api/veiculos';
-      if (isLocadora && locadoraId) {
+      
+      // ADMIN: Não enviar locadoraId para ver todos os veículos
+      // LOCADORA: Enviar locadoraId para ver apenas seus veículos
+      if (locadoraId && !isAdmin) {
         url += `?locadoraId=${locadoraId}`;
       }
 
@@ -35,8 +38,8 @@ export function useVeiculos() {
 
       const data = await response.json();
       
-      // FILTRO DE SEGURANÇA: Verificar se todos os veículos pertencem à locadora
-      if (isLocadora && locadoraId) {
+      // FILTRO DE SEGURANÇA: Aplicar apenas para locadoras, não para admins
+      if (isLocadora && locadoraId && !isAdmin) {
         const filteredData = data.filter((v: any) => v.locadoraId === locadoraId);
         
         // Log de segurança se houver dados mistos
@@ -54,9 +57,14 @@ export function useVeiculos() {
         return filteredData.map(formatVeiculo);
       }
 
+      // ADMIN: Retornar todos os veículos sem filtro
+      if (isAdmin) {
+        console.log('🚗 ADMIN - Carregando todos os veículos:', data.length);
+      }
+
       return data.map(formatVeiculo);
     },
-    enabled: !!profile,
+    enabled: !!profile && (isAdmin || !!locadoraId),
     staleTime: 0, // Sem cache
     gcTime: 0, // Sem cache
     refetchOnWindowFocus: true,
