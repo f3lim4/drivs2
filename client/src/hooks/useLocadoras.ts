@@ -40,6 +40,7 @@ export const useLocadoras = () => {
   const deleteLocadora = async (id: string) => {
     try {
       console.log('🗑️ [DELETE] Iniciando exclusão da locadora:', id);
+      console.log('🗑️ [DELETE] URL da requisição:', `/api/locadoras/${id}`);
       
       const response = await fetch(`/api/locadoras/${id}`, {
         method: 'DELETE',
