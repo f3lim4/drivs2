@@ -53,6 +53,13 @@ const navigationItems = [
     description: 'Visão geral do sistema'
   },
   {
+    title: 'Locadoras',
+    url: '/locadoras',
+    icon: Building2,
+    description: 'Gerenciar locadoras',
+    adminOnly: true  // Só admins podem ver este item
+  },
+  {
     title: 'Veículos',
     url: '/veiculos',
     icon: Car,
@@ -97,13 +104,6 @@ const navigationItems = [
     url: '/relatorios-financeiros',
     icon: FileText,
     description: 'Análise financeira completa'
-  },
-  {
-    title: 'Locadoras',
-    url: '/locadoras',
-    icon: Building2,
-    description: 'Gerenciar locadoras',
-    adminOnly: true  // Só admins podem ver este item
   },
   {
     title: 'Anúncios',
