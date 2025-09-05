@@ -17,14 +17,16 @@ import { LocadorasTable } from '@/components/locadoras/LocadorasTable';
 import { NovaLocadoraModal } from '@/components/locadoras/NovaLocadoraModal';
 import { EditarLocadoraModal } from '@/components/locadoras/EditarLocadoraModal';
 import { ExcluirLocadoraDialog } from '@/components/locadoras/ExcluirLocadoraDialog';
+import { DesativarLocadoraDialog } from '@/components/locadoras/DesativarLocadoraDialog';
 import { VisualizarLocadoraModal } from '@/components/locadoras/VisualizarLocadoraModal';
 
 export default function Locadoras() {
-  const { locadoras, deleteLocadora, fetchLocadoras } = useLocadoras();
+  const { locadoras, deleteLocadora, updateLocadora, fetchLocadoras } = useLocadoras();
   const [searchTerm, setSearchTerm] = useState('');
   const [showNovaModal, setShowNovaModal] = useState(false);
   const [showEditarModal, setShowEditarModal] = useState(false);
   const [showExcluirDialog, setShowExcluirDialog] = useState(false);
+  const [showDesativarDialog, setShowDesativarDialog] = useState(false);
   const [showVisualizarModal, setShowVisualizarModal] = useState(false);
   const [locadoraSelecionada, setLocadoraSelecionada] = useState<Locadora | null>(null);
 
@@ -43,6 +45,21 @@ export default function Locadoras() {
   const handleDelete = (locadora: Locadora) => {
     setLocadoraSelecionada(locadora);
     setShowExcluirDialog(true);
+  };
+
+  const handleToggleStatus = (locadora: Locadora) => {
+    setLocadoraSelecionada(locadora);
+    setShowDesativarDialog(true);
+  };
+
+  const handleConfirmToggleStatus = async () => {
+    if (locadoraSelecionada) {
+      const newStatus = locadoraSelecionada.status === 'ativa' ? 'inativa' : 'ativa';
+      await updateLocadora(locadoraSelecionada.id, { status: newStatus });
+      setShowDesativarDialog(false);
+      setLocadoraSelecionada(null);
+      fetchLocadoras();
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -164,6 +181,7 @@ export default function Locadoras() {
             onView={handleView}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onToggleStatus={handleToggleStatus}
           />
         </CardContent>
       </Card>
@@ -188,6 +206,13 @@ export default function Locadoras() {
             onOpenChange={setShowExcluirDialog}
             locadora={convertToModalFormat(locadoraSelecionada)}
             onConfirm={handleConfirmDelete}
+          />
+
+          <DesativarLocadoraDialog
+            open={showDesativarDialog}
+            onOpenChange={setShowDesativarDialog}
+            locadora={locadoraSelecionada}
+            onConfirm={handleConfirmToggleStatus}
           />
 
           <VisualizarLocadoraModal
