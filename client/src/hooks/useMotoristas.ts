@@ -7,7 +7,7 @@ import { useAuth } from './useAuth';
 import { Motorista } from '@/types';
 
 export function useMotoristas() {
-  const { profile, isLocadora } = useAuth();
+  const { profile, isLocadora, isAdmin } = useAuth();
   const locadoraId = profile?.locadoraId || profile?.id;
   const queryClient = useQueryClient();
 
@@ -22,8 +22,9 @@ export function useMotoristas() {
     queryFn: async () => {
       let url = '/api/motoristas';
       
-      // SEMPRE enviar locadoraId quando disponível para garantir isolamento
-      if (locadoraId) {
+      // ADMIN: Não enviar locadoraId para ver todos os motoristas
+      // LOCADORA: Enviar locadoraId para ver apenas seus motoristas
+      if (locadoraId && !isAdmin) {
         url += `?locadoraId=${locadoraId}`;
       }
 
@@ -40,8 +41,8 @@ export function useMotoristas() {
 
       const data = await response.json();
       
-      // FILTRO DE SEGURANÇA: Verificar se todos os motoristas pertencem à locadora
-      if (isLocadora && locadoraId) {
+      // FILTRO DE SEGURANÇA: Aplicar apenas para locadoras, não para admins
+      if (isLocadora && locadoraId && !isAdmin) {
         const filteredData = data.filter((m: Motorista) => m.locadoraId === locadoraId);
         
         // Log de segurança se houver dados mistos
@@ -59,9 +60,15 @@ export function useMotoristas() {
         return filteredData;
       }
 
+      // ADMIN: Retornar todos os motoristas sem filtro
+      if (isAdmin) {
+        console.log('👤 ADMIN - Carregando todos os motoristas:', data.length);
+        return data;
+      }
+
       return data;
     },
-    enabled: !!profile && !!locadoraId,
+    enabled: !!profile && (isAdmin || !!locadoraId),
     staleTime: 0, // Sem cache
     gcTime: 0, // Sem cache
     refetchOnWindowFocus: true,
