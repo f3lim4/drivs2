@@ -616,40 +616,6 @@ export default function Dashboard() {
       </div>
       )}
 
-      {/* Card de Período de Teste Gratuito */}
-      {isLocadora && trialStatus && trialStatus.isActive && (
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-1">
-                  <Crown className="w-3 h-3 text-orange-600" />
-                  <h3 className="text-xs font-semibold text-orange-800">Período de Teste Gratuito</h3>
-                </div>
-                <p className="text-lg font-bold text-orange-900">
-                  {trialStatus.diasRestantes} {trialStatus.diasRestantes === 1 ? 'dia restante' : 'dias restantes'}
-                </p>
-                <div className="w-full bg-orange-200 rounded-full h-1.5 mt-1">
-                  <div 
-                    className="bg-orange-600 h-1.5 rounded-full transition-all duration-300" 
-                    style={{ 
-                      width: `${Math.max(0, Math.min(100, (trialStatus.diasRestantes / trialStatus.diasTotais) * 100))}%` 
-                    }}
-                  ></div>
-                </div>
-              </div>
-              <div className="text-right">
-                <Badge 
-                  variant={trialStatus.diasRestantes <= 5 ? "destructive" : trialStatus.diasRestantes <= 10 ? "secondary" : "default"}
-                  className="text-xs"
-                >
-                  {trialStatus.diasRestantes <= 5 ? "⚠️ Urgente" : trialStatus.diasRestantes <= 10 ? "⏰ Atenção" : "✅ Ativo"}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Seção de Anúncios */}
       {isLocadora && anuncios.length > 0 && (
