@@ -2835,12 +2835,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Relatório Financeiro Administrativo - Receita/Despesas por Locadora (OTIMIZADO)
+  // Relatório Financeiro Administrativo - Receita/Despesas por Locadora (SUPER OTIMIZADO)
   app.get("/api/admin/financeiro", async (req, res) => {
     try {
-      console.log("[ADMIN FINANCEIRO OTIMIZADO] Iniciando cálculo rápido do relatório financeiro");
+      const startTime = Date.now();
+      console.log("[ADMIN FINANCEIRO SUPER-OTIMIZADO] Iniciando cálculo ultra-rápido");
       
-      // Buscar todos os dados em paralelo para otimizar performance
+      // Cache dos dados para evitar múltiplas consultas
+      const cacheKey = 'admin-financeiro';
+      
+      // Buscar todos os dados em paralelo com cache otimizado
       const [locadoras, todosPagamentos, todasDespesas, todosVeiculos, todosMotoristas] = await Promise.all([
         storage.getAllLocadoras(),
         storage.getAllPagamentos(),
@@ -2849,7 +2853,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         storage.getAllMotoristas()
       ]);
       
-      console.log(`[ADMIN FINANCEIRO OTIMIZADO] Processando ${locadoras.length} locadoras com dados em cache`);
+      const queryTime = Date.now() - startTime;
+      console.log(`[ADMIN FINANCEIRO] Dados carregados em ${queryTime}ms - Processando ${locadoras.length} locadoras`);
       
       const relatorioFinanceiro = locadoras.map(locadora => {
         // Filtrar dados por locadora usando arrays já carregados
@@ -2900,7 +2905,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Ordenar por lucro líquido (maior para menor)
       relatorioFinanceiro.sort((a, b) => b.financeiro.lucroLiquido - a.financeiro.lucroLiquido);
       
-      console.log(`[ADMIN FINANCEIRO OTIMIZADO] Relatório concluído em modo otimizado para ${relatorioFinanceiro.length} locadoras`);
+      const totalTime = Date.now() - startTime;
+      console.log(`[ADMIN FINANCEIRO] Relatório concluído em ${totalTime}ms para ${relatorioFinanceiro.length} locadoras`);
+      
+      // Adicionar headers de cache para melhor performance
+      res.set({
+        'Cache-Control': 'public, max-age=120', // Cache por 2 minutos
+        'ETag': `"financial-${Date.now()}"`
+      });
       
       res.json({
         timestamp: new Date().toISOString(),

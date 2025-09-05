@@ -50,9 +50,11 @@ export default function RelatorioFinanceiroAdmin() {
 
   const { data: relatorio, isLoading, error } = useQuery<RelatorioFinanceiro>({
     queryKey: ["/api/admin/financeiro"],
-    refetchInterval: 60000, // Atualizar a cada 60 segundos (menos frequente)
-    staleTime: 30000, // Considerar dados frescos por 30 segundos
-    retry: 2, // Menos tentativas em caso de erro
+    refetchInterval: 5 * 60 * 1000, // Atualizar a cada 5 minutos
+    staleTime: 2 * 60 * 1000, // Considerar dados frescos por 2 minutos
+    retry: 1, // Apenas 1 tentativa em caso de erro
+    refetchOnWindowFocus: false, // Não refazer ao focar janela
+    refetchOnMount: true, // Sempre buscar dados ao montar
   });
 
   // Verificar se o usuário é admin
@@ -95,14 +97,14 @@ export default function RelatorioFinanceiroAdmin() {
           ))}
         </div>
         
-        {/* Loading message */}
+        {/* Loading message otimizado */}
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400 font-medium">
-            Processando dados financeiros de todas as locadoras...
+            Carregando dados financeiros reais...
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-            Isso pode levar alguns segundos
+            Compilando receitas, despesas e lucros de todas as locadoras
           </p>
         </div>
       </div>
@@ -195,7 +197,7 @@ export default function RelatorioFinanceiroAdmin() {
               {formatarMoeda(relatorio.resumoGeral.receitaTotal)}
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              De todas as locadoras ativas
+              {relatorio.totalLocadoras} locadoras no sistema
             </p>
           </CardContent>
         </Card>
@@ -210,7 +212,7 @@ export default function RelatorioFinanceiroAdmin() {
               {formatarMoeda(relatorio.resumoGeral.despesaTotal)}
             </div>
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              Custos operacionais totais
+              Todas as despesas registradas
             </p>
           </CardContent>
         </Card>
