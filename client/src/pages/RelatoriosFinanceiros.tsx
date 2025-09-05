@@ -1493,12 +1493,18 @@ export default function RelatoriosFinanceiros() {
       </Card>
 
       {/* Tabs de Análise */}
-      <Tabs defaultValue="veiculos" className="space-y-2">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="despesas-fixas">Saídas Fixas</TabsTrigger>
-          <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
-          <TabsTrigger value="historico">Histórico</TabsTrigger>
-        </TabsList>
+      {/* ADMIN: Mostrar apenas dados consolidados sem abas */}
+      {isAdmin ? (
+        <div>
+          {/* Conteúdo admin sem abas será renderizado aqui */}
+        </div>
+      ) : (
+        <Tabs defaultValue="veiculos" className="space-y-2">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="despesas-fixas">Saídas Fixas</TabsTrigger>
+            <TabsTrigger value="veiculos">Análise por Veículo</TabsTrigger>
+            <TabsTrigger value="historico">Histórico</TabsTrigger>
+          </TabsList>
 
         {/* Aba Despesas Fixas */}
         <TabsContent value="despesas-fixas" className="space-y-2">
@@ -2021,11 +2027,8 @@ export default function RelatoriosFinanceiros() {
           </Card>
         </TabsContent>
 
-      </Tabs>
-
-
-
-      {/* Modal duplicado removido - usando componente NovaDespesaModal */}
+        </Tabs>
+      )}
 
       {/* Modal de detalhes do veículo */}
       {veiculoDetalhes && (
