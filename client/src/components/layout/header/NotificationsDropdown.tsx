@@ -15,11 +15,28 @@ import { useNotificationActions } from '@/hooks/useNotificationActions';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 export function NotificationsDropdown() {
   const { notifications, unreadCount, hasNotifications } = useHybridNotifications();
   const navigate = useNavigate();
   const { markAsRead, deleteNotification, isMarkingAsRead, isDeleting } = useNotificationActions();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  // Marcar todas as notificações persistentes como lidas quando o dropdown for aberto
+  useEffect(() => {
+    if (isDropdownOpen && notifications.length > 0) {
+      const unreadPersistentNotifications = notifications.filter(
+        notification => notification.isPersistent && !notification.isRead
+      );
+      
+      // Marcar cada notificação persistente não lida como lida
+      unreadPersistentNotifications.forEach(notification => {
+        const realId = notification.id.replace('persistent-', '');
+        markAsRead(realId);
+      });
+    }
+  }, [isDropdownOpen, notifications, markAsRead]);
   
   const handleMarkAsRead = (e: React.MouseEvent, notificationId: string, isPersistent: boolean) => {
     e.stopPropagation();
@@ -72,7 +89,7 @@ export function NotificationsDropdown() {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative w-10 h-10">
           <div className="w-5 h-5 flex items-center justify-center">
