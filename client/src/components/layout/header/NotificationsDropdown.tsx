@@ -1,5 +1,5 @@
 
-import { Bell, AlertTriangle, AlertCircle, Info, CheckCircle } from 'lucide-react';
+import { Bell, AlertTriangle, AlertCircle, Info, CheckCircle, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,13 +11,25 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationActions } from '@/hooks/useNotificationActions';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 
 export function NotificationsDropdown() {
   const { notifications, unreadCount, hasNotifications } = useNotifications();
+  const { markAsRead, deleteNotification, isMarkingAsRead, isDeleting } = useNotificationActions();
   const navigate = useNavigate();
+  
+  const handleMarkAsRead = (e: React.MouseEvent, notificationId: string) => {
+    e.stopPropagation();
+    markAsRead(notificationId);
+  };
+  
+  const handleDelete = (e: React.MouseEvent, notificationId: string) => {
+    e.stopPropagation();
+    deleteNotification(notificationId);
+  };
   
 
 
@@ -77,20 +89,44 @@ export function NotificationsDropdown() {
           {hasNotifications ? (
             notifications.map((notification, index) => (
               <div key={notification.id}>
-                <DropdownMenuItem className="flex flex-col items-start gap-1 p-4">
+                <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
                   <div className="flex items-center gap-2 w-full">
                     <div className={`w-2 h-2 rounded-full ${getNotificationColor(notification.type)}`}></div>
-                    <span className="font-medium text-sm">{notification.title}</span>
-                    <span className="text-xs text-muted-foreground ml-auto">
+                    <span className="font-medium text-sm flex-1">{notification.title}</span>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 w-6 p-0 hover:bg-green-100 hover:text-green-700"
+                        onClick={(e) => handleMarkAsRead(e, notification.id)}
+                        disabled={isMarkingAsRead || isDeleting}
+                        data-testid={`button-mark-read-${notification.id}`}
+                      >
+                        <Check className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-700"
+                        onClick={(e) => handleDelete(e, notification.id)}
+                        disabled={isMarkingAsRead || isDeleting}
+                        data-testid={`button-delete-${notification.id}`}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex items-start justify-between w-full gap-2">
+                    <p className="text-xs text-muted-foreground flex-1">
+                      {notification.message}
+                    </p>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
                       {formatDistanceToNow(notification.timestamp, { 
                         addSuffix: true, 
                         locale: ptBR 
                       })}
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {notification.message}
-                  </p>
                 </DropdownMenuItem>
                 {index < notifications.length - 1 && <DropdownMenuSeparator />}
               </div>

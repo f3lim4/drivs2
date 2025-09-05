@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, pagamentosExcluidos, documentosVeiculos,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, pagamentosExcluidos, documentosVeiculos, notificacoes,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -16,7 +16,8 @@ import {
   type Anuncio, type InsertAnuncio,
   type Atividade, type InsertAtividade,
   type SeoConfig, type InsertSeoConfig,
-  type DocumentoVeiculo, type InsertDocumentoVeiculo
+  type DocumentoVeiculo, type InsertDocumentoVeiculo,
+  type Notificacao, type InsertNotificacao
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -181,6 +182,14 @@ export interface IStorage {
     tempoMedio: number;
     taxaRetorno: number;
   }>;
+  
+  // Notificação operations
+  getNotificacoesByLocadora(locadoraId: string): Promise<Notificacao[]>;
+  getNotificacao(id: string): Promise<Notificacao | undefined>;
+  createOrUpdateNotificacao(notificacao: InsertNotificacao): Promise<Notificacao>;
+  marcarNotificacaoComoLida(id: string): Promise<void>;
+  excluirNotificacao(id: string): Promise<void>;
+  getNotificacaoPorIdentificador(locadoraId: string, identificador: string): Promise<Notificacao | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -2023,6 +2032,117 @@ export class DatabaseStorage implements IStorage {
       };
     }
   }
+
+  // Notificação operations
+  async getNotificacoesByLocadora(locadoraId: string): Promise<Notificacao[]> {
+    try {
+      const result = await db.select()
+        .from(notificacoes)
+        .where(and(
+          eq(notificacoes.locadoraId, locadoraId),
+          eq(notificacoes.excluida, false)
+        ))
+        .orderBy(desc(notificacoes.dataGeracao));
+      
+      return result;
+    } catch (error) {
+      console.error('Error getting notifications:', error);
+      throw error;
+    }
+  }
+
+  async getNotificacao(id: string): Promise<Notificacao | undefined> {
+    try {
+      const result = await db.select()
+        .from(notificacoes)
+        .where(eq(notificacoes.id, id))
+        .limit(1);
+      
+      return result[0];
+    } catch (error) {
+      console.error('Error getting notification:', error);
+      throw error;
+    }
+  }
+
+  async createOrUpdateNotificacao(notificacao: InsertNotificacao): Promise<Notificacao> {
+    try {
+      // Verificar se já existe uma notificação com o mesmo identificador
+      const existing = await this.getNotificacaoPorIdentificador(
+        notificacao.locadoraId, 
+        notificacao.identificador
+      );
+
+      if (existing) {
+        // Atualizar notificação existente
+        const [updated] = await db.update(notificacoes)
+          .set({
+            ...notificacao,
+            updatedAt: new Date(),
+          })
+          .where(eq(notificacoes.id, existing.id))
+          .returning();
+        
+        return updated;
+      } else {
+        // Criar nova notificação
+        const [created] = await db.insert(notificacoes)
+          .values(notificacao)
+          .returning();
+        
+        return created;
+      }
+    } catch (error) {
+      console.error('Error creating/updating notification:', error);
+      throw error;
+    }
+  }
+
+  async marcarNotificacaoComoLida(id: string): Promise<void> {
+    try {
+      await db.update(notificacoes)
+        .set({ 
+          lida: true,
+          updatedAt: new Date()
+        })
+        .where(eq(notificacoes.id, id));
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      throw error;
+    }
+  }
+
+  async excluirNotificacao(id: string): Promise<void> {
+    try {
+      await db.update(notificacoes)
+        .set({ 
+          excluida: true,
+          updatedAt: new Date()
+        })
+        .where(eq(notificacoes.id, id));
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      throw error;
+    }
+  }
+
+  async getNotificacaoPorIdentificador(locadoraId: string, identificador: string): Promise<Notificacao | undefined> {
+    try {
+      const result = await db.select()
+        .from(notificacoes)
+        .where(and(
+          eq(notificacoes.locadoraId, locadoraId),
+          eq(notificacoes.identificador, identificador),
+          eq(notificacoes.excluida, false)
+        ))
+        .limit(1);
+      
+      return result[0];
+    } catch (error) {
+      console.error('Error getting notification by identifier:', error);
+      throw error;
+    }
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -2579,6 +2699,31 @@ export class MemStorage implements IStorage {
       tempoMedio: 18,
       taxaRetorno: 78
     };
+  }
+
+  // Notificação operations - placeholders para desenvolvimento
+  async getNotificacoesByLocadora(locadoraId: string): Promise<Notificacao[]> {
+    return [];
+  }
+
+  async getNotificacao(id: string): Promise<Notificacao | undefined> {
+    return undefined;
+  }
+
+  async createOrUpdateNotificacao(notificacao: InsertNotificacao): Promise<Notificacao> {
+    throw new Error('Notificações não implementadas no MemStorage');
+  }
+
+  async marcarNotificacaoComoLida(id: string): Promise<void> {
+    throw new Error('Notificações não implementadas no MemStorage');
+  }
+
+  async excluirNotificacao(id: string): Promise<void> {
+    throw new Error('Notificações não implementadas no MemStorage');
+  }
+
+  async getNotificacaoPorIdentificador(locadoraId: string, identificador: string): Promise<Notificacao | undefined> {
+    return undefined;
   }
 }
 
