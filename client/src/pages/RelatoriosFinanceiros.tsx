@@ -72,7 +72,7 @@ export default function RelatoriosFinanceiros() {
   const { data: dadosConsolidados = [], isLoading: isLoadingConsolidados } = useQuery({
     queryKey: ['/api/admin/consolidado'],
     enabled: isAdmin,
-    refetchInterval: 30000, // Atualizar a cada 30 segundos para dados em tempo real
+    refetchInterval: 5 * 60 * 1000, // Atualizar a cada 5 minutos (reduzir recarregamentos)
   });
 
   const [despesaExcluindo, setDespesaExcluindo] = useState<string | null>(null);

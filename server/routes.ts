@@ -3681,9 +3681,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           console.log("[DEBUG CONSOLIDADO] Processando locadora:", locadora.nome, locadora.id);
 
-          // Buscar dados da locadora
+          // Buscar dados da locadora usando métodos existentes
           const veiculos = await storage.getVeiculosByLocadora(locadora.id);
-          const alugueis = await storage.getAlugueisAtivosByLocadora(locadora.id);
+          const todosAlugueis = await storage.getAlugueisByLocadora(locadora.id);
+          const alugueis = todosAlugueis.filter(a => a.status === 'ativo' || a.status === 'pendente');
           const pagamentos = await storage.getPagamentosByLocadora(locadora.id);
           const despesas = await storage.getDespesasByLocadora(locadora.id);
 
@@ -3695,10 +3696,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             despesas: despesas.length
           });
 
-          // Calcular receita (pagamentos realizados)
+          // Calcular receita (pagamentos pagos)
           const receitaTotal = pagamentos
-            .filter(p => p.status === 'realizado')
-            .reduce((acc, p) => acc + (parseFloat(p.valor) || 0), 0);
+            .filter(p => p.status === 'pago')
+            .reduce((acc, p) => acc + (parseFloat(p.valor.toString()) || 0), 0);
 
           // Calcular despesas manuais
           const despesasTotal = despesas

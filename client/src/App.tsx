@@ -70,8 +70,8 @@ const queryClient = new QueryClient({
       retry: 3,
       staleTime: 5 * 60 * 1000, // 5 minutos de cache - dados frescos sem ser excessivo
       gcTime: 10 * 60 * 1000, // 10 minutos na memória
-      refetchOnWindowFocus: false, // Reduzir refetch desnecessários
-      refetchOnMount: 'always' // Sempre refetch ao montar componente
+      refetchOnWindowFocus: false, // Reduzir refetch desnecessários  
+      refetchOnMount: true // Refetch ao montar componente apenas quando necessário
     },
   },
 });
