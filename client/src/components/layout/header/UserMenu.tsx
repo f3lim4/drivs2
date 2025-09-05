@@ -81,11 +81,6 @@ export function UserMenu() {
                 <p className="text-xs text-muted-foreground">
                   {profile?.type === 'admin' ? 'Sistema DRIVS' : (profile?.name || 'Usuário')}
                 </p>
-                {profile?.type !== 'admin' && planoInfo?.testeGratuito?.ativo && (
-                  <Badge variant="secondary" className="text-xs">
-                    {planoInfo.testeGratuito.diasRestantes}d
-                  </Badge>
-                )}
               </div>
             </div>
           </Button>
@@ -107,14 +102,7 @@ export function UserMenu() {
               <div className="mr-2 h-4 w-4 flex items-center justify-center">
                 <Crown className="w-full h-full" />
               </div>
-              <div className="flex items-center justify-between flex-1">
-                <span>Planos</span>
-                {planoInfo?.testeGratuito?.ativo && (
-                  <Badge variant="outline" className="text-xs ml-2">
-                    Teste: {planoInfo.testeGratuito.diasRestantes} dias
-                  </Badge>
-                )}
-              </div>
+              <span>Planos</span>
             </DropdownMenuItem>
           )}
           
