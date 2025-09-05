@@ -528,10 +528,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { locadoraId } = req.query;
       
-      // Verificar se locadoraId foi fornecido
+      // ADMIN: Se não há locadoraId, retornar todos os veículos (para admins)
       if (!locadoraId) {
-        console.warn('[DEBUG] GET /api/veiculos - ERRO: locadoraId obrigatório');
-        return res.status(400).json({ message: "locadoraId é obrigatório" });
+        const todosVeiculos = await storage.getAllVeiculos();
+        console.log('🚗 ADMIN VEÍCULOS - Retornando todos:', todosVeiculos.length);
+        return res.json(todosVeiculos);
       }
 
       // VERIFICAR SE A LOCADORA EXISTE
