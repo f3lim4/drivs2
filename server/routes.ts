@@ -2835,39 +2835,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Relatório Financeiro Administrativo - Receita/Despesas por Locadora
+  // Relatório Financeiro Administrativo - Receita/Despesas por Locadora (OTIMIZADO)
   app.get("/api/admin/financeiro", async (req, res) => {
     try {
-      console.log("[ADMIN FINANCEIRO] Iniciando cálculo do relatório financeiro de todas as locadoras");
+      console.log("[ADMIN FINANCEIRO OTIMIZADO] Iniciando cálculo rápido do relatório financeiro");
       
-      // Buscar todas as locadoras
-      const locadoras = await storage.getAllLocadoras();
-      console.log(`[ADMIN FINANCEIRO] Encontradas ${locadoras.length} locadoras`);
+      // Buscar todos os dados em paralelo para otimizar performance
+      const [locadoras, todosPagamentos, todasDespesas, todosVeiculos, todosMotoristas] = await Promise.all([
+        storage.getAllLocadoras(),
+        storage.getAllPagamentos(),
+        storage.getAllDespesas(),
+        storage.getAllVeiculos(),
+        storage.getAllMotoristas()
+      ]);
       
-      const relatorioFinanceiro = [];
+      console.log(`[ADMIN FINANCEIRO OTIMIZADO] Processando ${locadoras.length} locadoras com dados em cache`);
       
-      for (const locadora of locadoras) {
-        console.log(`[ADMIN FINANCEIRO] Processando locadora: ${locadora.nome} (${locadora.id})`);
+      const relatorioFinanceiro = locadoras.map(locadora => {
+        // Filtrar dados por locadora usando arrays já carregados
+        const pagamentosLocadora = todosPagamentos.filter(p => p.locadoraId === locadora.id);
+        const despesasLocadora = todasDespesas.filter(d => d.locadoraId === locadora.id);
+        const veiculosLocadora = todosVeiculos.filter(v => v.locadoraId === locadora.id);
+        const motoristasLocadora = todosMotoristas.filter(m => m.locadoraId === locadora.id);
         
-        // Buscar receitas (pagamentos)
-        const pagamentos = await storage.getPagamentosByLocadora(locadora.id);
-        const totalReceita = pagamentos
+        // Calcular receita (apenas pagamentos pagos)
+        const totalReceita = pagamentosLocadora
           .filter(p => p.status === 'pago')
           .reduce((sum, p) => sum + parseFloat(p.valor.toString()), 0);
         
-        // Buscar despesas
-        const despesas = await storage.getDespesasByLocadora(locadora.id);
-        const totalDespesas = despesas.reduce((sum, d) => sum + parseFloat(d.valor.toString()), 0);
+        // Calcular despesas
+        const totalDespesas = despesasLocadora
+          .reduce((sum, d) => sum + parseFloat(d.valor.toString()), 0);
         
         // Calcular lucro e margem
         const lucroLiquido = totalReceita - totalDespesas;
         const margemLucro = totalReceita > 0 ? (lucroLiquido / totalReceita) * 100 : 0;
         
-        // Buscar dados adicionais
-        const veiculos = await storage.getVeiculosByLocadora(locadora.id);
-        const motoristas = await storage.getMotoristasByLocadora(locadora.id);
-        
-        relatorioFinanceiro.push({
+        return {
           locadora: {
             id: locadora.id,
             nome: locadora.nome,
@@ -2885,20 +2889,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             margemLucro: Number(margemLucro.toFixed(2))
           },
           estatisticas: {
-            totalVeiculos: veiculos.length,
-            totalMotoristas: motoristas.length,
-            totalPagamentos: pagamentos.length,
-            totalDespesasCount: despesas.length
+            totalVeiculos: veiculosLocadora.length,
+            totalMotoristas: motoristasLocadora.length,
+            totalPagamentos: pagamentosLocadora.length,
+            totalDespesasCount: despesasLocadora.length
           }
-        });
-        
-        console.log(`[ADMIN FINANCEIRO] Locadora ${locadora.nome}: R$ ${totalReceita.toFixed(2)} receita, R$ ${totalDespesas.toFixed(2)} despesas, R$ ${lucroLiquido.toFixed(2)} lucro (${margemLucro.toFixed(1)}%)`);
-      }
+        };
+      });
       
       // Ordenar por lucro líquido (maior para menor)
       relatorioFinanceiro.sort((a, b) => b.financeiro.lucroLiquido - a.financeiro.lucroLiquido);
       
-      console.log(`[ADMIN FINANCEIRO] Relatório concluído para ${relatorioFinanceiro.length} locadoras`);
+      console.log(`[ADMIN FINANCEIRO OTIMIZADO] Relatório concluído em modo otimizado para ${relatorioFinanceiro.length} locadoras`);
       
       res.json({
         timestamp: new Date().toISOString(),

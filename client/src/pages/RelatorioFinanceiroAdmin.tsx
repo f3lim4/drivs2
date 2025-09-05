@@ -50,7 +50,9 @@ export default function RelatorioFinanceiroAdmin() {
 
   const { data: relatorio, isLoading, error } = useQuery<RelatorioFinanceiro>({
     queryKey: ["/api/admin/financeiro"],
-    refetchInterval: 30000, // Atualizar a cada 30 segundos
+    refetchInterval: 60000, // Atualizar a cada 60 segundos (menos frequente)
+    staleTime: 30000, // Considerar dados frescos por 30 segundos
+    retry: 2, // Menos tentativas em caso de erro
   });
 
   // Verificar se o usuário é admin
@@ -68,10 +70,40 @@ export default function RelatorioFinanceiroAdmin() {
 
   if (isLoading) {
     return (
-      <div className="p-8">
-        <div className="text-center">
+      <div className="p-6 space-y-6">
+        {/* Header com skeleton */}
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-6 h-6 text-blue-600" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            Relatório Financeiro - Locadoras
+          </h1>
+        </div>
+        
+        {/* Skeleton cards do resumo */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map(i => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-24"></div>
+                <div className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-32"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        
+        {/* Loading message */}
+        <div className="text-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando relatório financeiro...</p>
+          <p className="text-gray-600 dark:text-gray-400 font-medium">
+            Processando dados financeiros de todas as locadoras...
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+            Isso pode levar alguns segundos
+          </p>
         </div>
       </div>
     );
