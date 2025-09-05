@@ -42,6 +42,15 @@ export default function RelatoriosFinanceiros() {
   const { pagamentos, isLoading: pagamentosLoading } = usePagamentos();
   const { infracoes, isLoading: infracoesLoading } = useInfracoes();
   const { despesas, isLoading: despesasLoading } = useDespesas();
+  
+  // Debug temporário - remover depois
+  console.log('🔍 DESPESAS DEBUG:', {
+    profile: profile?.locadoraId,
+    despesasCount: despesas?.length || 0,
+    despesas: despesas?.filter(d => d.descricao?.includes('Fábio')) || [],
+    isAdmin,
+    profileFull: profile
+  });
   const { data: receitas = [], isLoading: receitasLoading } = useReceitas(profile?.locadoraId);
   const { veiculos, loading: veiculosLoading } = useVeiculos();
   const { motoristas, isLoading: motoristasLoading } = useMotoristas();
@@ -313,20 +322,9 @@ export default function RelatoriosFinanceiros() {
       isInPeriodSafe(infracao.dataInfracao)
     );
 
-    const despesasPeriodo = despesas.filter(despesa => {
-      const isInPeriod = isInPeriodSafe(despesa.data);
-      // Debug temporário - remove depois
-      if (despesa.descricao && despesa.descricao.includes('Fábio')) {
-        console.log('🔍 DEBUG FÁBIO:', {
-          descricao: despesa.descricao,
-          data: despesa.data,
-          isInPeriod,
-          monthStart: monthStart.toISOString(),
-          monthEnd: monthEnd.toISOString()
-        });
-      }
-      return isInPeriod;
-    });
+    const despesasPeriodo = despesas.filter(despesa => 
+      isInPeriodSafe(despesa.data)
+    );
 
     const manutencoesPeriodo = manutencoes.filter(manutencao => 
       isInPeriodSafe(manutencao.dataInicio)
