@@ -411,8 +411,8 @@ export class DatabaseStorage implements IStorage {
       }
       
       // 2. Buscar perfil da locadora pelo locadoraId
-      const profiles = await db.select().from(profilesTable).where(eq(profilesTable.locadoraId, id));
-      console.log(`[DELETE LOCADORA] Encontrados ${profiles.length} perfis para excluir`);
+      const profilesList = await db.select().from(profiles).where(eq(profiles.locadoraId, id));
+      console.log(`[DELETE LOCADORA] Encontrados ${profilesList.length} perfis para excluir`);
       
       // 3. Excluir todos os dados relacionados EM ORDEM (para evitar conflitos de FK)
       
@@ -449,7 +449,7 @@ export class DatabaseStorage implements IStorage {
       console.log(`[DELETE LOCADORA] Motoristas excluídos`);
       
       // 4. Excluir perfis e usuários relacionados
-      for (const profile of profiles) {
+      for (const profile of profilesList) {
         if (profile.userId) {
           // Excluir usuário
           await db.delete(users).where(eq(users.uuid, profile.userId));
@@ -457,7 +457,7 @@ export class DatabaseStorage implements IStorage {
         }
         
         // Excluir perfil
-        await db.delete(profilesTable).where(eq(profilesTable.id, profile.id));
+        await db.delete(profiles).where(eq(profiles.id, profile.id));
         console.log(`[DELETE LOCADORA] Perfil excluído: ${profile.id}`);
       }
       

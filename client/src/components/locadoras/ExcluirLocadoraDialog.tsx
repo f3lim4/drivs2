@@ -104,10 +104,7 @@ export function ExcluirLocadoraDialog({
               <div className="space-y-3 pt-4 border-t border-red-200">
                 <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
                   <p className="text-yellow-800 font-semibold text-sm">
-                    🔒 Para confirmar a exclusão PERMANENTE, digite exatamente:
-                  </p>
-                  <p className="text-yellow-900 font-mono text-sm mt-1 bg-yellow-100 px-2 py-1 rounded">
-                    {textoConfirmacao}
+                    🔒 Para confirmar a exclusão PERMANENTE, digite o código de confirmação:
                   </p>
                 </div>
                 
@@ -120,7 +117,7 @@ export function ExcluirLocadoraDialog({
                     type="text"
                     value={confirmText}
                     onChange={(e) => setConfirmText(e.target.value)}
-                    placeholder="Digite: excluir@locadora"
+                    placeholder="Digite o código de confirmação"
                     className={`${
                       confirmText && !podeExcluir 
                         ? 'border-red-300 focus:border-red-500' 
@@ -132,7 +129,7 @@ export function ExcluirLocadoraDialog({
                   />
                   {confirmText && !podeExcluir && (
                     <p className="text-red-600 text-xs">
-                      Texto incorreto. Digite exatamente: {textoConfirmacao}
+                      Código de confirmação incorreto.
                     </p>
                   )}
                   {podeExcluir && (
