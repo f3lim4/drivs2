@@ -39,26 +39,36 @@ export const useLocadoras = () => {
 
   const deleteLocadora = async (id: string) => {
     try {
+      console.log('🗑️ [DELETE] Iniciando exclusão da locadora:', id);
+      
       const response = await fetch(`/api/locadoras/${id}`, {
         method: 'DELETE',
       });
 
+      console.log('🗑️ [DELETE] Response status:', response.status);
+      console.log('🗑️ [DELETE] Response ok:', response.ok);
+
       if (!response.ok) {
+        const errorData = await response.text();
+        console.error('🗑️ [DELETE] Erro na resposta:', errorData);
         throw new Error('Erro ao excluir locadora');
       }
 
+      console.log('🗑️ [DELETE] Exclusão concluída, invalidando cache...');
       // Invalidar cache para atualizar a lista
       await queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
       
+      console.log('🗑️ [DELETE] Cache invalidado, mostrando toast...');
       toast({
         title: "Locadora EXCLUÍDA PERMANENTEMENTE",
         description: "A locadora e todos os dados relacionados (veículos, motoristas, contratos, pagamentos) foram removidos completamente do sistema",
       });
+      console.log('🗑️ [DELETE] Processo de exclusão finalizado com sucesso!');
     } catch (error) {
-      console.error('Erro ao excluir locadora:', error);
+      console.error('🗑️ [DELETE] Erro ao excluir locadora:', error);
       toast({
         title: "Erro ao excluir",
-        description: "Não foi possível excluir a locadora",
+        description: "Não foi possível excluir a locadora permanentemente",
         variant: "destructive",
       });
     }

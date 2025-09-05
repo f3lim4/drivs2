@@ -64,9 +64,12 @@ export default function Locadoras() {
 
   const handleConfirmDelete = async () => {
     if (locadoraSelecionada) {
+      console.log('Iniciando exclusão da locadora:', locadoraSelecionada.id);
       await deleteLocadora(locadoraSelecionada.id);
       setShowExcluirDialog(false);
       setLocadoraSelecionada(null);
+      await fetchLocadoras(); // Atualizar lista após exclusão
+      console.log('Exclusão concluída e lista atualizada');
     }
   };
 
