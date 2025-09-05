@@ -49,9 +49,22 @@ export const useLocadoras = () => {
       console.log('🗑️ [DELETE] Response ok:', response.ok);
 
       if (!response.ok) {
-        const errorData = await response.text();
+        const errorData = await response.json().catch(() => ({ message: 'Erro desconhecido' }));
         console.error('🗑️ [DELETE] Erro na resposta:', errorData);
-        throw new Error('Erro ao excluir locadora');
+        
+        // Tratar diferentes tipos de erro
+        if (response.status === 404) {
+          toast({
+            title: "Locadora já foi excluída",
+            description: "Esta locadora não existe mais no sistema",
+            variant: "destructive",
+          });
+          // Atualizar lista mesmo assim
+          await queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
+          return;
+        }
+        
+        throw new Error(errorData.message || 'Erro ao excluir locadora');
       }
 
       console.log('🗑️ [DELETE] Exclusão concluída, invalidando cache...');

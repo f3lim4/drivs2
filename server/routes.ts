@@ -497,11 +497,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/locadoras/:id", async (req, res) => {
     try {
+      console.log(`[DELETE LOCADORA API] Iniciando exclusão da locadora: ${req.params.id}`);
+      
+      // Primeiro verificar se a locadora existe
+      const locadora = await storage.getLocadoraById(req.params.id);
+      if (!locadora) {
+        console.log(`[DELETE LOCADORA API] Locadora não encontrada: ${req.params.id}`);
+        return res.status(404).json({ message: "Locadora não encontrada ou já foi excluída" });
+      }
+      
       await storage.deleteLocadora(req.params.id);
-      res.json({ message: "Locadora deleted successfully" });
+      console.log(`[DELETE LOCADORA API] Locadora excluída com sucesso: ${req.params.id}`);
+      res.json({ message: "Locadora excluída permanentemente com sucesso" });
     } catch (error) {
       console.error("Error deleting locadora:", error);
-      res.status(500).json({ message: "Internal server error" });
+      
+      // Se o erro for de FK constraint ou similar, tratar especificamente
+      if (error instanceof Error) {
+        if (error.message.includes('foreign key') || error.message.includes('constraint')) {
+          return res.status(409).json({ message: "Erro: Existem dados relacionados que impedem a exclusão. Contacte o suporte." });
+        }
+      }
+      
+      res.status(500).json({ message: "Erro interno do servidor ao excluir locadora" });
     }
   });
 
