@@ -184,7 +184,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const locadora = await storage.getLocadoraById(profile.locadoraId);
         if (!locadora) {
           console.log("Locadora não encontrada ou excluída:", profile.locadoraId);
-          return res.status(401).json({ message: "Conta excluída do sistema" });
+          return res.status(401).json({ message: "Esta conta foi excluída permanentemente do sistema" });
+        }
+        
+        // Verificar se a locadora está ativa
+        if (locadora.status !== 'ativa') {
+          console.log("Locadora inativa tentando fazer login:", profile.locadoraId, "Status:", locadora.status);
+          return res.status(401).json({ 
+            message: locadora.status === 'inativa' 
+              ? "Esta conta está temporariamente desativada. Entre em contato com o administrador."
+              : "Conta pendente de aprovação. Aguarde a ativação."
+          });
         }
       }
       
