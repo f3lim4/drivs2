@@ -518,8 +518,8 @@ export default function PlanosLocadora() {
         </CardContent>
       </Card>
 
-      {/* Card de Período de Teste Gratuito */}
-      {trialStatus && trialStatus.isActive && (
+      {/* Card de Período de Teste Gratuito - só mostrar se estiver em teste e não tiver plano pago */}
+      {trialStatus && trialStatus.isActive && locadora?.testeGratuito && planoAtual !== 'infinity' && !isVipPlan && (
         <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
