@@ -4,20 +4,30 @@
  */
 
 import { useState } from 'react';
-import { Bell, AlertTriangle, AlertCircle, Info, CheckCircle, Filter, Search } from 'lucide-react';
+import { Bell, AlertTriangle, AlertCircle, Info, CheckCircle, Filter, Search, Check, X, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useNotificationActions } from '@/hooks/useNotificationActions';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function Notificacoes() {
   const { notifications, unreadCount, hasNotifications } = useNotifications();
+  const { markAsRead, deleteNotification, isMarkingAsRead, isDeleting } = useNotificationActions();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
+  
+  const handleMarkAsRead = (notificationId: string) => {
+    markAsRead(notificationId);
+  };
+  
+  const handleDelete = (notificationId: string) => {
+    deleteNotification(notificationId);
+  };
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -227,15 +237,41 @@ export default function Notificacoes() {
                     </p>
                     
                     <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>
-                        {formatDistanceToNow(notification.timestamp, { 
-                          addSuffix: true, 
-                          locale: ptBR 
-                        })}
-                      </span>
-                      <span>
-                        {format(notification.timestamp, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span>
+                          {formatDistanceToNow(notification.timestamp, { 
+                            addSuffix: true, 
+                            locale: ptBR 
+                          })}
+                        </span>
+                        <span>
+                          {format(notification.timestamp, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 gap-2 text-green-700 border-green-200 hover:bg-green-50"
+                          onClick={() => handleMarkAsRead(notification.id)}
+                          disabled={isMarkingAsRead || isDeleting}
+                          data-testid={`button-mark-read-page-${notification.id}`}
+                        >
+                          <Check className="w-4 h-4" />
+                          Marcar como lida
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 gap-2 text-red-700 border-red-200 hover:bg-red-50"
+                          onClick={() => handleDelete(notification.id)}
+                          disabled={isMarkingAsRead || isDeleting}
+                          data-testid={`button-delete-page-${notification.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Excluir
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>

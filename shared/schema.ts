@@ -767,3 +767,27 @@ export const insertLinkUtilSchema = createInsertSchema(linksUteis).omit({
 
 export type LinkUtil = typeof linksUteis.$inferSelect;
 export type InsertLinkUtil = z.infer<typeof insertLinkUtilSchema>;
+
+// Notificações - Para persistir estado de leitura e exclusão
+export const notificacoes = pgTable("notificacoes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  locadoraId: text("locadora_id").notNull(), // Referência ao CNPJ da locadora
+  tipo: text("tipo").notNull(), // 'warning', 'danger', 'info', 'success'
+  titulo: text("titulo").notNull(),
+  mensagem: text("mensagem").notNull(),
+  identificador: text("identificador").notNull(), // Hash único para identificar a notificação (ex: "cnh_vencida_12345678901")
+  lida: boolean("lida").notNull().default(false),
+  excluida: boolean("excluida").notNull().default(false),
+  dataGeracao: timestamp("data_geracao").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertNotificacaoSchema = createInsertSchema(notificacoes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type Notificacao = typeof notificacoes.$inferSelect;
+export type InsertNotificacao = z.infer<typeof insertNotificacaoSchema>;

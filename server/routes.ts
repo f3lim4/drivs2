@@ -3490,6 +3490,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ====== ROTAS DE NOTIFICAÇÕES ======
+  // Buscar notificações por locadora
+  app.get("/api/notificacoes", async (req, res) => {
+    try {
+      const { locadoraId } = req.query;
+      
+      if (!locadoraId) {
+        return res.status(400).json({ error: "locadoraId é obrigatório" });
+      }
+
+      // Verificar se a locadora existe
+      const locadora = await storage.getLocadora(locadoraId as string);
+      if (!locadora) {
+        return res.status(410).json({ 
+          message: "LOCADORA_DELETED",
+          details: "Esta locadora foi excluída. Faça login novamente." 
+        });
+      }
+
+      const notificacoes = await storage.getNotificacoesByLocadora(locadoraId as string);
+      res.json(notificacoes);
+    } catch (error) {
+      console.error("Error getting notifications:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Marcar notificação como lida
+  app.put("/api/notificacoes/:id/lida", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      await storage.marcarNotificacaoComoLida(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Excluir notificação
+  app.delete("/api/notificacoes/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      await storage.excluirNotificacao(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // API para dados consolidados do admin (relatórios financeiros)
   app.get("/api/admin/consolidado", async (req, res) => {
     try {
