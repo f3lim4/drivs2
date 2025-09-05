@@ -702,7 +702,7 @@ export function EditarVeiculoModal({
             {/* SEGURO */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="seguradora"
@@ -728,13 +728,16 @@ export function EditarVeiculoModal({
                       <FormControl>
                         <Input 
                           type="number"
-                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" 
+                          className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none bg-gray-100" 
                           step="0.01"
                           {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                          readOnly
+                          disabled
+                          placeholder="Não editável"
                         />
                       </FormControl>
                       <FormMessage />
+                      <p className="text-xs text-gray-500">Este campo não pode ser editado diretamente</p>
                     </FormItem>
                   )}
                 />
@@ -744,7 +747,7 @@ export function EditarVeiculoModal({
             {/* VALOR DO VEÍCULO E IPVA */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="valorVeiculo"
@@ -802,7 +805,7 @@ export function EditarVeiculoModal({
             {/* RASTREADOR */}
             <div className="space-y-4">
               
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="rastreador"
@@ -844,22 +847,24 @@ export function EditarVeiculoModal({
             {/* DATA DE COMPRA */}
             <div className="space-y-4">
               
-              <FormField
-                control={form.control}
-                name="dataCompra"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data de Compra (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="date"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                <FormField
+                  control={form.control}
+                  name="dataCompra"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Data de Compra (Opcional)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="date"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             {/* FINANCIAMENTO */}
