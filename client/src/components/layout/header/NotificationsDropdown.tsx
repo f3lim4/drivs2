@@ -13,9 +13,11 @@ import { Badge } from '@/components/ui/badge';
 import { useNotifications } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 
 export function NotificationsDropdown() {
   const { notifications, unreadCount, hasNotifications } = useNotifications();
+  const navigate = useNavigate();
   
 
 
@@ -73,7 +75,7 @@ export function NotificationsDropdown() {
         
         <div className="max-h-96 overflow-y-auto">
           {hasNotifications ? (
-            notifications.slice(0, 5).map((notification, index) => (
+            notifications.map((notification, index) => (
               <div key={notification.id}>
                 <DropdownMenuItem className="flex flex-col items-start gap-1 p-4">
                   <div className="flex items-center gap-2 w-full">
@@ -90,7 +92,7 @@ export function NotificationsDropdown() {
                     {notification.message}
                   </p>
                 </DropdownMenuItem>
-                {index < Math.min(notifications.length, 5) - 1 && <DropdownMenuSeparator />}
+                {index < notifications.length - 1 && <DropdownMenuSeparator />}
               </div>
             ))
           ) : (
@@ -109,7 +111,10 @@ export function NotificationsDropdown() {
         {hasNotifications && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-center justify-center text-primary">
+            <DropdownMenuItem 
+              className="text-center justify-center text-primary cursor-pointer"
+              onClick={() => navigate('/notificacoes')}
+            >
               Ver todas as notificações
             </DropdownMenuItem>
           </>

@@ -33,6 +33,7 @@ import Home from "./pages/Home";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import EmergencyLogout from "./pages/EmergencyLogout";
+import Notificacoes from "./pages/Notificacoes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -179,6 +180,11 @@ const App = () => (
           <Route path="/perfil" element={
             <AuthGuard>
               <DrivsLayout><Perfil /></DrivsLayout>
+            </AuthGuard>
+          } />
+          <Route path="/notificacoes" element={
+            <AuthGuard>
+              <DrivsLayout><Notificacoes /></DrivsLayout>
             </AuthGuard>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
