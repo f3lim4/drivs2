@@ -688,9 +688,9 @@ export default function RelatoriosFinanceiros() {
   const despesasPorCategoria = useMemo(() => {
     const categorias = {};
     
-    // Calcular despesas manuais por categoria (excluindo financiamento que já é calculado nas fixas)
+    // Calcular despesas manuais por categoria (incluindo financiamentos manuais)
     filteredData.despesasPeriodo
-      .filter(despesa => despesa.tipo === 'despesa' && despesa.categoria !== 'financiamento')
+      .filter(despesa => despesa.tipo === 'despesa')
       .forEach(despesa => {
         const categoria = despesa.categoria || 'outros';
         const valor = parseFloat(despesa.valor || '0');
@@ -726,10 +726,18 @@ export default function RelatoriosFinanceiros() {
       return total + (isNaN(rastreador) ? 0 : rastreador);
     }, 0);
     
-    categorias['financiamento'] = veiculos.reduce((total, veiculo) => {
+    // Adicionar financiamentos automáticos dos veículos (apenas se não há despesas manuais de financiamento)
+    const financiamentoVeiculos = veiculos.reduce((total, veiculo) => {
       const financiamento = veiculo.financiado && veiculo.valorFinanciamento ? parseFloat(veiculo.valorFinanciamento) : 0;
       return total + (isNaN(financiamento) ? 0 : financiamento);
     }, 0);
+    
+    // Se já há despesas manuais de financiamento, somar com as automáticas
+    if (categorias['financiamento']) {
+      categorias['financiamento'] += financiamentoVeiculos;
+    } else {
+      categorias['financiamento'] = financiamentoVeiculos;
+    }
     
     // Remover categorias com valor zero
     Object.keys(categorias).forEach(key => {
@@ -760,8 +768,8 @@ export default function RelatoriosFinanceiros() {
 
   // Gráficos removidos - usando visualização simples com cards e tabelas
 
-  // Debug detalhado para verificar valores
-  const despesasManuaisFiltradas = filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao' && d.categoria !== 'financiamento');
+  // Debug detalhado para verificar valores (incluindo financiamentos manuais)
+  const despesasManuaisFiltradas = filteredData.despesasPeriodo.filter(d => d.tipo === 'despesa' && d.fonte !== 'manutencao');
   const despesasManuaisValor = despesasManuaisFiltradas.reduce((total, despesa) => {
     const valor = parseFloat(despesa.valor || '0');
     return total + (isNaN(valor) ? 0 : valor);
