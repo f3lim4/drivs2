@@ -2,6 +2,7 @@
  * Dialog para confirmar exclusão da locadora
  */
 
+import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +13,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Trash2, AlertTriangle } from 'lucide-react';
 
 interface Locadora {
@@ -44,8 +47,27 @@ export function ExcluirLocadoraDialog({
   locadora, 
   onConfirm 
 }: ExcluirLocadoraDialogProps) {
+  const [confirmText, setConfirmText] = useState('');
+  const textoConfirmacao = 'excluir@locadora';
+  const podeExcluir = confirmText === textoConfirmacao;
+
+  // Resetar texto quando dialog abre/fecha
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      setConfirmText('');
+    }
+    onOpenChange(newOpen);
+  };
+
+  const handleConfirm = () => {
+    if (podeExcluir) {
+      onConfirm();
+      setConfirmText('');
+    }
+  };
+
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2 text-red-600">
@@ -77,17 +99,65 @@ export function ExcluirLocadoraDialog({
                   </div>
                 </div>
               </div>
+
+              {/* Campo de confirmação obrigatório */}
+              <div className="space-y-3 pt-4 border-t border-red-200">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                  <p className="text-yellow-800 font-semibold text-sm">
+                    🔒 Para confirmar a exclusão PERMANENTE, digite exatamente:
+                  </p>
+                  <p className="text-yellow-900 font-mono text-sm mt-1 bg-yellow-100 px-2 py-1 rounded">
+                    {textoConfirmacao}
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-text" className="text-sm font-medium text-red-700">
+                    Digite o texto de confirmação:
+                  </Label>
+                  <Input
+                    id="confirm-text"
+                    type="text"
+                    value={confirmText}
+                    onChange={(e) => setConfirmText(e.target.value)}
+                    placeholder="Digite: excluir@locadora"
+                    className={`${
+                      confirmText && !podeExcluir 
+                        ? 'border-red-300 focus:border-red-500' 
+                        : podeExcluir 
+                        ? 'border-green-300 focus:border-green-500'
+                        : ''
+                    }`}
+                    autoComplete="off"
+                  />
+                  {confirmText && !podeExcluir && (
+                    <p className="text-red-600 text-xs">
+                      Texto incorreto. Digite exatamente: {textoConfirmacao}
+                    </p>
+                  )}
+                  {podeExcluir && (
+                    <p className="text-green-600 text-xs font-medium">
+                      ✅ Confirmação correta. Botão de exclusão habilitado.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
           <AlertDialogAction 
-            onClick={onConfirm}
-            className="bg-red-600 text-white hover:bg-red-700 border-red-600"
+            onClick={handleConfirm}
+            disabled={!podeExcluir}
+            className={`${
+              podeExcluir 
+                ? 'bg-red-600 text-white hover:bg-red-700 border-red-600' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            SIM, EXCLUIR TUDO PERMANENTEMENTE
+            {podeExcluir ? 'SIM, EXCLUIR TUDO PERMANENTEMENTE' : 'DIGITE O TEXTO PARA CONFIRMAR'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
