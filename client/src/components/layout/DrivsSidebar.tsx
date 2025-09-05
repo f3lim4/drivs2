@@ -99,6 +99,13 @@ const navigationItems = [
     description: 'Análise financeira completa'
   },
   {
+    title: 'Locadoras',
+    url: '/locadoras',
+    icon: Building2,
+    description: 'Gerenciar locadoras',
+    adminOnly: true  // Só admins podem ver este item
+  },
+  {
     title: 'Anúncios',
     url: '/anuncios',
     icon: Megaphone,
@@ -120,24 +127,10 @@ const navigationItems = [
     adminOnly: true  // Só admins podem ver este item
   },
   {
-    title: 'Financeiro Admin',
-    url: '/admin/financeiro',
-    icon: TrendingUp,
-    description: 'Relatório financeiro de locadoras',
-    adminOnly: true  // Só admins podem ver este item
-  },
-  {
     title: 'SEO',
     url: '/seo',
     icon: Search,
     description: 'Configurações de SEO e Analytics',
-    adminOnly: true  // Só admins podem ver este item
-  },
-  {
-    title: 'Locadoras',
-    url: '/locadoras',
-    icon: Building2,
-    description: 'Gerenciar locadoras',
     adminOnly: true  // Só admins podem ver este item
   },
 ];
