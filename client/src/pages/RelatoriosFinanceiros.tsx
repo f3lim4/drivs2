@@ -43,14 +43,6 @@ export default function RelatoriosFinanceiros() {
   const { infracoes, isLoading: infracoesLoading } = useInfracoes();
   const { despesas, isLoading: despesasLoading } = useDespesas();
   
-  // Debug temporário - remover depois
-  console.log('🔍 DESPESAS DEBUG:', {
-    profile: profile?.locadoraId,
-    despesasCount: despesas?.length || 0,
-    despesas: despesas?.filter(d => d.descricao?.includes('Fábio')) || [],
-    isAdmin,
-    profileFull: profile
-  });
   const { data: receitas = [], isLoading: receitasLoading } = useReceitas(profile?.locadoraId);
   const { veiculos, loading: veiculosLoading } = useVeiculos();
   const { motoristas, isLoading: motoristasLoading } = useMotoristas();
