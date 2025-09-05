@@ -2835,6 +2835,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Relatório Financeiro Administrativo - Receita/Despesas por Locadora
+  app.get("/api/admin/financeiro", async (req, res) => {
+    try {
+      console.log("[ADMIN FINANCEIRO] Iniciando cálculo do relatório financeiro de todas as locadoras");
+      
+      // Buscar todas as locadoras
+      const locadoras = await storage.getAllLocadoras();
+      console.log(`[ADMIN FINANCEIRO] Encontradas ${locadoras.length} locadoras`);
+      
+      const relatorioFinanceiro = [];
+      
+      for (const locadora of locadoras) {
+        console.log(`[ADMIN FINANCEIRO] Processando locadora: ${locadora.nome} (${locadora.id})`);
+        
+        // Buscar receitas (pagamentos)
+        const pagamentos = await storage.getPagamentosByLocadora(locadora.id);
+        const totalReceita = pagamentos
+          .filter(p => p.status === 'pago')
+          .reduce((sum, p) => sum + parseFloat(p.valor.toString()), 0);
+        
+        // Buscar despesas
+        const despesas = await storage.getDespesasByLocadora(locadora.id);
+        const totalDespesas = despesas.reduce((sum, d) => sum + parseFloat(d.valor.toString()), 0);
+        
+        // Calcular lucro e margem
+        const lucroLiquido = totalReceita - totalDespesas;
+        const margemLucro = totalReceita > 0 ? (lucroLiquido / totalReceita) * 100 : 0;
+        
+        // Buscar dados adicionais
+        const veiculos = await storage.getVeiculosByLocadora(locadora.id);
+        const motoristas = await storage.getMotoristasByLocadora(locadora.id);
+        
+        relatorioFinanceiro.push({
+          locadora: {
+            id: locadora.id,
+            nome: locadora.nome,
+            cnpj: locadora.cnpj,
+            email: locadora.email,
+            status: locadora.status,
+            plano: locadora.plano,
+            cidade: locadora.cidade,
+            estado: locadora.estado
+          },
+          financeiro: {
+            totalReceita: Number(totalReceita.toFixed(2)),
+            totalDespesas: Number(totalDespesas.toFixed(2)),
+            lucroLiquido: Number(lucroLiquido.toFixed(2)),
+            margemLucro: Number(margemLucro.toFixed(2))
+          },
+          estatisticas: {
+            totalVeiculos: veiculos.length,
+            totalMotoristas: motoristas.length,
+            totalPagamentos: pagamentos.length,
+            totalDespesasCount: despesas.length
+          }
+        });
+        
+        console.log(`[ADMIN FINANCEIRO] Locadora ${locadora.nome}: R$ ${totalReceita.toFixed(2)} receita, R$ ${totalDespesas.toFixed(2)} despesas, R$ ${lucroLiquido.toFixed(2)} lucro (${margemLucro.toFixed(1)}%)`);
+      }
+      
+      // Ordenar por lucro líquido (maior para menor)
+      relatorioFinanceiro.sort((a, b) => b.financeiro.lucroLiquido - a.financeiro.lucroLiquido);
+      
+      console.log(`[ADMIN FINANCEIRO] Relatório concluído para ${relatorioFinanceiro.length} locadoras`);
+      
+      res.json({
+        timestamp: new Date().toISOString(),
+        totalLocadoras: relatorioFinanceiro.length,
+        resumoGeral: {
+          receitaTotal: relatorioFinanceiro.reduce((sum, r) => sum + r.financeiro.totalReceita, 0),
+          despesaTotal: relatorioFinanceiro.reduce((sum, r) => sum + r.financeiro.totalDespesas, 0),
+          lucroTotal: relatorioFinanceiro.reduce((sum, r) => sum + r.financeiro.lucroLiquido, 0),
+        },
+        locadoras: relatorioFinanceiro
+      });
+    } catch (error) {
+      console.error("Error fetching admin financial report:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Informações dos planos com status do teste gratuito
   app.get("/api/planos", async (req, res) => {
     try {
