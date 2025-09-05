@@ -120,6 +120,13 @@ const navigationItems = [
     adminOnly: true  // Só admins podem ver este item
   },
   {
+    title: 'Financeiro Admin',
+    url: '/admin/financeiro',
+    icon: TrendingUp,
+    description: 'Relatório financeiro de locadoras',
+    adminOnly: true  // Só admins podem ver este item
+  },
+  {
     title: 'SEO',
     url: '/seo',
     icon: Search,

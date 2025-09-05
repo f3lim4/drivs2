@@ -15,6 +15,7 @@ import Locadoras from "./pages/Locadoras";
 import Pagamentos from "./pages/Pagamentos";
 import Infracoes from "./pages/Infracoes";
 import RelatoriosFinanceiros from "./pages/RelatoriosFinanceiros";
+import RelatorioFinanceiroAdmin from "./pages/RelatorioFinanceiroAdmin";
 import Manutencoes from "./pages/Manutencoes";
 import AnunciosAdmin from "./pages/AnunciosAdmin";
 import Planos from "./pages/Planos";
@@ -170,6 +171,11 @@ const App = () => (
           <Route path="/admin/dashboard" element={
             <AuthGuard>
               <DrivsLayout><DashboardAdmin /></DrivsLayout>
+            </AuthGuard>
+          } />
+          <Route path="/admin/financeiro" element={
+            <AuthGuard>
+              <DrivsLayout><RelatorioFinanceiroAdmin /></DrivsLayout>
             </AuthGuard>
           } />
           <Route path="/manual-treinamento" element={
