@@ -47,9 +47,21 @@ export default function RelatorioFinanceiroAdmin() {
   const [filtroTexto, setFiltroTexto] = useState("");
   const [filtroPlano, setFiltroPlano] = useState("");
   const [ordenacao, setOrdenacao] = useState("lucroLiquido");
+  const [mesAno, setMesAno] = useState(() => {
+    const hoje = new Date();
+    return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+  });
 
   const { data: relatorio, isLoading, error } = useQuery<RelatorioFinanceiro>({
-    queryKey: ["/api/admin/financeiro"],
+    queryKey: ["/api/admin/financeiro", mesAno],
+    queryFn: async () => {
+      const url = `/api/admin/financeiro?mes=${mesAno}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Erro ao carregar dados');
+      }
+      return response.json();
+    },
     refetchInterval: 5 * 60 * 1000, // Atualizar a cada 5 minutos
     staleTime: 2 * 60 * 1000, // Considerar dados frescos por 2 minutos
     retry: 1, // Apenas 1 tentativa em caso de erro
@@ -254,6 +266,23 @@ export default function RelatorioFinanceiroAdmin() {
                 />
               </div>
             </div>
+            
+            <Select value={mesAno} onValueChange={setMesAno}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2025-09">setembro 2025</SelectItem>
+                <SelectItem value="2025-08">agosto 2025</SelectItem>
+                <SelectItem value="2025-07">julho 2025</SelectItem>
+                <SelectItem value="2025-06">junho 2025</SelectItem>
+                <SelectItem value="2025-05">maio 2025</SelectItem>
+                <SelectItem value="2025-04">abril 2025</SelectItem>
+                <SelectItem value="2025-03">março 2025</SelectItem>
+                <SelectItem value="2025-02">fevereiro 2025</SelectItem>
+                <SelectItem value="2025-01">janeiro 2025</SelectItem>
+              </SelectContent>
+            </Select>
             
             <Select value={filtroPlano} onValueChange={setFiltroPlano}>
               <SelectTrigger className="w-48">

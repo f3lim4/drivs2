@@ -2828,7 +2828,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/financeiro", async (req, res) => {
     try {
       const startTime = Date.now();
+      const { mes } = req.query;
       console.log("[ADMIN FINANCEIRO SUPER-OTIMIZADO] Iniciando cálculo ultra-rápido");
+      console.log("🗓️ Filtro de mês:", mes);
+      
+      // Configurar filtros de data se mês for fornecido
+      let dataInicio, dataFim;
+      if (mes) {
+        const [ano, mesNum] = (mes as string).split('-');
+        dataInicio = new Date(parseInt(ano), parseInt(mesNum) - 1, 1);
+        dataFim = new Date(parseInt(ano), parseInt(mesNum), 0, 23, 59, 59, 999);
+        console.log("📅 Período:", dataInicio.toLocaleDateString(), "até", dataFim.toLocaleDateString());
+      }
       
       // Cache dos dados para evitar múltiplas consultas
       const cacheKey = 'admin-financeiro';
@@ -2847,10 +2858,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const relatorioFinanceiro = locadoras.map(locadora => {
         // Filtrar dados por locadora usando arrays já carregados
-        const pagamentosLocadora = todosPagamentos.filter(p => p.locadoraId === locadora.id);
-        const despesasLocadora = todasDespesas.filter(d => d.locadoraId === locadora.id);
+        let pagamentosLocadora = todosPagamentos.filter(p => p.locadoraId === locadora.id);
+        let despesasLocadora = todasDespesas.filter(d => d.locadoraId === locadora.id);
         const veiculosLocadora = todosVeiculos.filter(v => v.locadoraId === locadora.id);
         const motoristasLocadora = todosMotoristas.filter(m => m.locadoraId === locadora.id);
+        
+        // Aplicar filtro de data se especificado
+        if (dataInicio && dataFim) {
+          pagamentosLocadora = pagamentosLocadora.filter(p => {
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento >= dataInicio && dataPagamento <= dataFim;
+          });
+          
+          despesasLocadora = despesasLocadora.filter(d => {
+            const dataDespesa = new Date(d.data);
+            return dataDespesa >= dataInicio && dataDespesa <= dataFim;
+          });
+        }
         
         // Calcular receita (apenas pagamentos pagos)
         const totalReceita = pagamentosLocadora
