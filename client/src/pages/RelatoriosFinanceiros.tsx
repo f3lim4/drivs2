@@ -313,9 +313,20 @@ export default function RelatoriosFinanceiros() {
       isInPeriodSafe(infracao.dataInfracao)
     );
 
-    const despesasPeriodo = despesas.filter(despesa => 
-      isInPeriodSafe(despesa.data)
-    );
+    const despesasPeriodo = despesas.filter(despesa => {
+      const isInPeriod = isInPeriodSafe(despesa.data);
+      // Debug temporário - remove depois
+      if (despesa.descricao && despesa.descricao.includes('Fábio')) {
+        console.log('🔍 DEBUG FÁBIO:', {
+          descricao: despesa.descricao,
+          data: despesa.data,
+          isInPeriod,
+          monthStart: monthStart.toISOString(),
+          monthEnd: monthEnd.toISOString()
+        });
+      }
+      return isInPeriod;
+    });
 
     const manutencoesPeriodo = manutencoes.filter(manutencao => 
       isInPeriodSafe(manutencao.dataInicio)
