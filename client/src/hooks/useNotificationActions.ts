@@ -1,15 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 // Hook para gerenciar ações de notificação (marcar como lida, excluir)
 export function useNotificationActions() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { profile } = useAuth();
 
   // Mutation para marcar como lida
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const response = await fetch(`/api/notificacoes/${notificationId}/lida`, {
+      if (!profile?.locadoraId) {
+        throw new Error('Usuário não autenticado');
+      }
+
+      const response = await fetch(`/api/notificacoes/${notificationId}/lida?locadoraId=${profile.locadoraId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -23,7 +29,11 @@ export function useNotificationActions() {
       return response.json();
     },
     onSuccess: () => {
-      // Invalidar cache de notificações para refetch
+      // Invalidar cache de notificações para refetch (tanto híbridas quanto persistidas)
+      const notificationsUrl = profile?.locadoraId ? `/api/notificacoes?locadoraId=${profile.locadoraId}` : '/api/notificacoes';
+      queryClient.invalidateQueries({ queryKey: [notificationsUrl] });
+      
+      // Invalidar todas as consultas que dependem de notificações
       queryClient.invalidateQueries({ queryKey: ['/api/notificacoes'] });
       
       toast({
@@ -43,7 +53,11 @@ export function useNotificationActions() {
   // Mutation para excluir notificação
   const deleteNotificationMutation = useMutation({
     mutationFn: async (notificationId: string) => {
-      const response = await fetch(`/api/notificacoes/${notificationId}`, {
+      if (!profile?.locadoraId) {
+        throw new Error('Usuário não autenticado');
+      }
+
+      const response = await fetch(`/api/notificacoes/${notificationId}?locadoraId=${profile.locadoraId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +71,11 @@ export function useNotificationActions() {
       return response.json();
     },
     onSuccess: () => {
-      // Invalidar cache de notificações para refetch
+      // Invalidar cache de notificações para refetch (tanto híbridas quanto persistidas)
+      const notificationsUrl = profile?.locadoraId ? `/api/notificacoes?locadoraId=${profile.locadoraId}` : '/api/notificacoes';
+      queryClient.invalidateQueries({ queryKey: [notificationsUrl] });
+      
+      // Invalidar todas as consultas que dependem de notificações
       queryClient.invalidateQueries({ queryKey: ['/api/notificacoes'] });
       
       toast({

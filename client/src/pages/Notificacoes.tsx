@@ -10,23 +10,31 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useHybridNotifications } from '@/hooks/useHybridNotifications';
 import { useNotificationActions } from '@/hooks/useNotificationActions';
 import { formatDistanceToNow, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export default function Notificacoes() {
-  const { notifications, unreadCount, hasNotifications } = useNotifications();
-  const { markAsRead, deleteNotification, isMarkingAsRead, isDeleting } = useNotificationActions();
+  const { notifications, unreadCount, hasNotifications } = useHybridNotifications();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
+  const { markAsRead, deleteNotification, isMarkingAsRead, isDeleting } = useNotificationActions();
   
-  const handleMarkAsRead = (notificationId: string) => {
-    markAsRead(notificationId);
+  const handleMarkAsRead = (notificationId: string, isPersistent: boolean) => {
+    if (isPersistent) {
+      // Remover o prefixo 'persistent-' do ID para a API
+      const realId = notificationId.replace('persistent-', '');
+      markAsRead(realId);
+    }
   };
   
-  const handleDelete = (notificationId: string) => {
-    deleteNotification(notificationId);
+  const handleDelete = (notificationId: string, isPersistent: boolean) => {
+    if (isPersistent) {
+      // Remover o prefixo 'persistent-' do ID para a API
+      const realId = notificationId.replace('persistent-', '');
+      deleteNotification(realId);
+    }
   };
 
   const getNotificationIcon = (type: string) => {
@@ -249,28 +257,37 @@ export default function Notificacoes() {
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 gap-2 text-green-700 border-green-200 hover:bg-green-50"
-                          onClick={() => handleMarkAsRead(notification.id)}
-                          disabled={isMarkingAsRead || isDeleting}
-                          data-testid={`button-mark-read-page-${notification.id}`}
-                        >
-                          <Check className="w-4 h-4" />
-                          Marcar como lida
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 gap-2 text-red-700 border-red-200 hover:bg-red-50"
-                          onClick={() => handleDelete(notification.id)}
-                          disabled={isMarkingAsRead || isDeleting}
-                          data-testid={`button-delete-page-${notification.id}`}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          Excluir
-                        </Button>
+                        {notification.isPersistent ? (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 gap-2 text-green-700 border-green-200 hover:bg-green-50"
+                              onClick={() => handleMarkAsRead(notification.id, notification.isPersistent)}
+                              disabled={isMarkingAsRead || isDeleting}
+                              data-testid={`button-mark-read-page-${notification.id}`}
+                            >
+                              <Check className="w-4 h-4" />
+                              Marcar como lida
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 gap-2 text-red-700 border-red-200 hover:bg-red-50"
+                              onClick={() => handleDelete(notification.id, notification.isPersistent)}
+                              disabled={isMarkingAsRead || isDeleting}
+                              data-testid={`button-delete-page-${notification.id}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Excluir
+                            </Button>
+                          </>
+                        ) : (
+                          <div className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded">
+                            <Info className="w-4 h-4 inline mr-1" />
+                            Alerta automático - não pode ser removido
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
