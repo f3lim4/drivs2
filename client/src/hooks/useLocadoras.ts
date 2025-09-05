@@ -51,8 +51,8 @@ export const useLocadoras = () => {
       await queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
       
       toast({
-        title: "Locadora excluída",
-        description: "A locadora foi removida com sucesso",
+        title: "Locadora EXCLUÍDA PERMANENTEMENTE",
+        description: "A locadora e todos os dados relacionados (veículos, motoristas, contratos, pagamentos) foram removidos completamente do sistema",
       });
     } catch (error) {
       console.error('Erro ao excluir locadora:', error);
@@ -64,10 +64,42 @@ export const useLocadoras = () => {
     }
   };
 
+  const updateLocadora = async (id: string, updates: any) => {
+    try {
+      const response = await fetch(`/api/locadoras/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar locadora');
+      }
+
+      // Invalidar cache para atualizar a lista
+      await queryClient.invalidateQueries({ queryKey: ['/api/locadoras'] });
+      
+      toast({
+        title: "Status alterado",
+        description: "O status da locadora foi alterado com sucesso",
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar locadora:', error);
+      toast({
+        title: "Erro ao alterar status",
+        description: "Não foi possível alterar o status da locadora",
+        variant: "destructive",
+      });
+    }
+  };
+
   return {
     locadoras,
     isLoading,
     fetchLocadoras,
+    updateLocadora,
     deleteLocadora,
   };
 };

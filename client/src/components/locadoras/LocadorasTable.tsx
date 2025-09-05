@@ -2,7 +2,7 @@
  * Table component for displaying Locadoras
  */
 
-import { Mail, Phone, MapPin, Edit, Trash2, Eye } from 'lucide-react';
+import { Mail, Phone, MapPin, Edit, Trash2, Eye, UserX, Power } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -21,9 +21,10 @@ interface LocadorasTableProps {
   onView: (locadora: Locadora) => void;
   onEdit: (locadora: Locadora) => void;
   onDelete: (locadora: Locadora) => void;
+  onToggleStatus: (locadora: Locadora) => void;
 }
 
-export function LocadorasTable({ locadoras, onView, onEdit, onDelete }: LocadorasTableProps) {
+export function LocadorasTable({ locadoras, onView, onEdit, onDelete, onToggleStatus }: LocadorasTableProps) {
   return (
     <Card>
       <Table>
@@ -69,11 +70,12 @@ export function LocadorasTable({ locadoras, onView, onEdit, onDelete }: Locadora
               <TableCell>{getStatusBadge(locadora.status)}</TableCell>
               <TableCell>{getPlanoBadge(locadora.plano)}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => onView(locadora)}
+                    title="Visualizar detalhes"
                   >
                     <Eye className="w-4 h-4" />
                   </Button>
@@ -81,13 +83,25 @@ export function LocadorasTable({ locadoras, onView, onEdit, onDelete }: Locadora
                     variant="ghost"
                     size="icon"
                     onClick={() => onEdit(locadora)}
+                    title="Editar locadora"
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
+                    onClick={() => onToggleStatus(locadora)}
+                    title={locadora.status === 'ativa' ? 'Desativar locadora' : 'Ativar locadora'}
+                    className={locadora.status === 'ativa' ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700'}
+                  >
+                    {locadora.status === 'ativa' ? <UserX className="w-4 h-4" /> : <Power className="w-4 h-4" />}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => onDelete(locadora)}
+                    title="EXCLUIR permanentemente (remove tudo)"
+                    className="text-red-600 hover:text-red-700"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
