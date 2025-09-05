@@ -10,25 +10,33 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useHybridNotifications } from '@/hooks/useHybridNotifications';
 import { useNotificationActions } from '@/hooks/useNotificationActions';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 
 export function NotificationsDropdown() {
-  const { notifications, unreadCount, hasNotifications } = useNotifications();
-  const { markAsRead, deleteNotification, isMarkingAsRead, isDeleting } = useNotificationActions();
+  const { notifications, unreadCount, hasNotifications } = useHybridNotifications();
   const navigate = useNavigate();
+  const { markAsRead, deleteNotification, isMarkingAsRead, isDeleting } = useNotificationActions();
   
-  const handleMarkAsRead = (e: React.MouseEvent, notificationId: string) => {
+  const handleMarkAsRead = (e: React.MouseEvent, notificationId: string, isPersistent: boolean) => {
     e.stopPropagation();
-    markAsRead(notificationId);
+    if (isPersistent) {
+      // Remover o prefixo 'persistent-' do ID para a API
+      const realId = notificationId.replace('persistent-', '');
+      markAsRead(realId);
+    }
   };
   
-  const handleDelete = (e: React.MouseEvent, notificationId: string) => {
+  const handleDelete = (e: React.MouseEvent, notificationId: string, isPersistent: boolean) => {
     e.stopPropagation();
-    deleteNotification(notificationId);
+    if (isPersistent) {
+      // Remover o prefixo 'persistent-' do ID para a API
+      const realId = notificationId.replace('persistent-', '');
+      deleteNotification(realId);
+    }
   };
   
 
@@ -94,26 +102,34 @@ export function NotificationsDropdown() {
                     <div className={`w-2 h-2 rounded-full ${getNotificationColor(notification.type)}`}></div>
                     <span className="font-medium text-sm flex-1">{notification.title}</span>
                     <div className="flex items-center gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0 hover:bg-green-100 hover:text-green-700"
-                        onClick={(e) => handleMarkAsRead(e, notification.id)}
-                        disabled={isMarkingAsRead || isDeleting}
-                        data-testid={`button-mark-read-${notification.id}`}
-                      >
-                        <Check className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-700"
-                        onClick={(e) => handleDelete(e, notification.id)}
-                        disabled={isMarkingAsRead || isDeleting}
-                        data-testid={`button-delete-${notification.id}`}
-                      >
-                        <X className="w-3 h-3" />
-                      </Button>
+                      {notification.isPersistent ? (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 hover:bg-green-100 hover:text-green-700"
+                            onClick={(e) => handleMarkAsRead(e, notification.id, notification.isPersistent)}
+                            disabled={isMarkingAsRead || isDeleting}
+                            data-testid={`button-mark-read-${notification.id}`}
+                            title="Marcar como lida"
+                          >
+                            <Check className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0 hover:bg-red-100 hover:text-red-700"
+                            onClick={(e) => handleDelete(e, notification.id, notification.isPersistent)}
+                            disabled={isMarkingAsRead || isDeleting}
+                            data-testid={`button-delete-${notification.id}`}
+                            title="Excluir notificação"
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </>
+                      ) : (
+                        <span className="text-xs text-muted-foreground px-2">Alerta automático</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-start justify-between w-full gap-2">
