@@ -480,6 +480,8 @@ export default function PlanosLocadora() {
                     <p className="text-xl font-bold">
                       {planoAtual === 'vip'
                         ? 'Gratuito'
+                        : planoAtual === 'infinity'
+                        ? 'Preço a consultar'
                         : `R$ ${(planosEstaticos[planoAtual as keyof typeof planosEstaticos]?.preco || 99).toFixed(2)}`
                       }
                     </p>
