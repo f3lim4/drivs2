@@ -469,40 +469,42 @@ export default function CadastroLocadora() {
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Nome da Empresa e CPF/CNPJ na mesma linha */}
-                <div className="space-y-2">
-                  <Label htmlFor="nome" >Nome da Empresa *</Label>
-                  <Input
-                    id="nome"
-                    value={formData.nome}
-                    onChange={(e) => updateFormData('nome', e.target.value)}
-                    placeholder="Digite o nome da sua empresa"
-                    className={fieldErrors.nome ? 'border-red-500' : ''}
-                    required
-                  />
-                  {fieldErrors.nome && (
-                    <p className="text-red-500 text-sm mt-1">{fieldErrors.nome}</p>
-                  )}
+              <div className="space-y-4">
+                {/* Nome da Empresa */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="nome" >Nome da Empresa *</Label>
+                    <Input
+                      id="nome"
+                      value={formData.nome}
+                      onChange={(e) => updateFormData('nome', e.target.value)}
+                      placeholder="Digite o nome da sua empresa"
+                      className={fieldErrors.nome ? 'border-red-500' : ''}
+                      required
+                    />
+                    {fieldErrors.nome && (
+                      <p className="text-red-500 text-sm mt-1">{fieldErrors.nome}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="cnpj">{getLabelDocumento(formData.cnpj)} *</Label>
+                    <Input
+                      id="cnpj"
+                      value={formatarDocumento(formData.cnpj)}
+                      onChange={(e) => updateFormData('cnpj', e.target.value)}
+                      placeholder={getPlaceholderDocumento(formData.cnpj)}
+                      className={fieldErrors.cnpj ? 'border-red-500' : ''}
+                      required
+                    />
+                    {fieldErrors.cnpj && (
+                      <p className="text-red-500 text-sm mt-1">{fieldErrors.cnpj}</p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="cnpj">{getLabelDocumento(formData.cnpj)} *</Label>
-                  <Input
-                    id="cnpj"
-                    value={formatarDocumento(formData.cnpj)}
-                    onChange={(e) => updateFormData('cnpj', e.target.value)}
-                    placeholder={getPlaceholderDocumento(formData.cnpj)}
-                    className={fieldErrors.cnpj ? 'border-red-500' : ''}
-                    required
-                  />
-                  {fieldErrors.cnpj && (
-                    <p className="text-red-500 text-sm mt-1">{fieldErrors.cnpj}</p>
-                  )}
-                </div>
-
-                {/* Email, Telefone e Responsável na mesma linha */}
-                <div className="col-span-2 grid grid-cols-3 gap-3">
+                {/* Email, Telefone e Responsável */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="email" >Email *</Label>
                     <Input
@@ -550,8 +552,8 @@ export default function CadastroLocadora() {
                   </div>
                 </div>
 
-                {/* CEP, Endereço, Número e Complemento na mesma linha */}
-                <div className="col-span-2 grid gap-2" style={{gridTemplateColumns: '1fr 2fr 0.8fr 1fr'}}>
+                {/* CEP */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="cep" >CEP *</Label>
                     <Input
@@ -567,7 +569,7 @@ export default function CadastroLocadora() {
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="endereco" >Endereço *</Label>
                     <Input
                       id="endereco"
@@ -588,7 +590,10 @@ export default function CadastroLocadora() {
                       required
                     />
                   </div>
+                </div>
 
+                {/* Complemento */}
+                <div className="grid grid-cols-1">
                   <div className="space-y-2">
                     <Label htmlFor="complemento" >Complemento</Label>
                     <Input
@@ -600,8 +605,8 @@ export default function CadastroLocadora() {
                   </div>
                 </div>
 
-                {/* Bairro, Cidade e Estado na mesma linha */}
-                <div className="col-span-2 grid grid-cols-3 gap-3">
+                {/* Bairro, Cidade e Estado */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="bairro" >Bairro *</Label>
                     <Input
@@ -665,8 +670,6 @@ export default function CadastroLocadora() {
                     </Select>
                   </div>
                 </div>
-
-
               </div>
 
               {/* Logo, Senha e Confirmar Senha na mesma linha */}
