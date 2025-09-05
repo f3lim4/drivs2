@@ -528,11 +528,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { locadoraId } = req.query;
       
-      // TEMPORÁRIO: Buscar todos os veículos se não há locadoraId
+      // Verificar se locadoraId foi fornecido
       if (!locadoraId) {
-        const todosVeiculos = await storage.getAllVeiculos();
-        console.log('🚗 VEÍCULOS - Retornando todos:', todosVeiculos.length);
-        return res.json(todosVeiculos);
+        console.warn('[DEBUG] GET /api/veiculos - ERRO: locadoraId obrigatório');
+        return res.status(400).json({ message: "locadoraId é obrigatório" });
       }
 
       // VERIFICAR SE A LOCADORA EXISTE
@@ -545,27 +544,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      if (locadoraId) {
-        const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
-        
-
-        
-        // SECURITY: Validar que todos os veículos pertencem à locadora solicitada
-        const todosVeiculosCorretos = veiculos.every(v => v.locadoraId === locadoraId);
-        if (!todosVeiculosCorretos) {
-          console.error('SECURITY ALERT: Veículos de outras locadoras detectados no backend');
-          return res.status(403).json({ message: "Acesso negado: dados inconsistentes" });
-        }
-        
-        // Forçar headers sem cache para debug
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-        res.json(veiculos);
-      } else {
-        // SEGURANÇA: Nunca retornar todos os veículos sem locadoraId
-        return res.status(400).json({ message: "locadoraId é obrigatório" });
+      const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
+      
+      // SECURITY: Validar que todos os veículos pertencem à locadora solicitada
+      const todosVeiculosCorretos = veiculos.every(v => v.locadoraId === locadoraId);
+      if (!todosVeiculosCorretos) {
+        console.error('SECURITY ALERT: Veículos de outras locadoras detectados no backend');
+        return res.status(403).json({ message: "Acesso negado: dados inconsistentes" });
       }
+      
+      console.log('🚗 VEÍCULOS - Retornando veículos da locadora:', veiculos.length);
+      res.json(veiculos);
     } catch (error) {
       console.error("Error fetching veiculos:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -764,11 +753,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Debug: Log parâmetros recebidos
       console.log('[DEBUG] GET /api/motoristas - Parâmetros:', { locadoraId });
       
-      // TEMPORÁRIO: Buscar todos os motoristas se não há locadoraId
+      // Verificar se locadoraId foi fornecido
       if (!locadoraId) {
-        const todosMotoristas = await storage.getAllMotoristas();
-        console.log('👤 MOTORISTAS - Retornando todos:', todosMotoristas.length);
-        return res.json(todosMotoristas);
+        console.warn('[DEBUG] GET /api/motoristas - ERRO: locadoraId obrigatório');
+        return res.status(400).json({ message: "locadoraId é obrigatório" });
       }
 
       // VERIFICAR SE A LOCADORA EXISTE
