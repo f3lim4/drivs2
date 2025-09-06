@@ -1,6 +1,6 @@
 /**
- * Página de Documentação do Sistema DRIVS
- * Explica como o sistema funciona com guias visuais
+ * Manual de Uso do Sistema DRIVS
+ * Tutorial passo a passo com explicações práticas
  */
 
 import { useState } from 'react';
@@ -8,204 +8,369 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-  Car, 
   Users, 
+  Car, 
   FileText, 
   DollarSign, 
   Wrench, 
-  AlertTriangle, 
-  Bell,
-  BarChart3,
-  Settings,
-  Shield,
+  AlertTriangle,
+  Book,
+  MousePointer,
+  Eye,
+  Edit,
+  Plus,
   CheckCircle,
   ArrowRight,
-  Play,
-  Book,
-  Lightbulb,
-  Target,
-  Zap,
-  Crown,
-  Star,
-  Building2
+  Info,
+  Settings,
+  Upload,
+  Download,
+  Calendar,
+  CreditCard,
+  Search,
+  Filter
 } from 'lucide-react';
 
 export default function Documentacao() {
-  const [activeSection, setActiveSection] = useState('overview');
+  const [activeSection, setActiveSection] = useState('inicio');
 
-  const funcionalidades = [
+  const tutorialSections = [
     {
-      icone: Users,
-      titulo: "Gestão de Motoristas",
-      descricao: "Cadastro completo com validação de CPF, CNH e documentos",
-      cor: "bg-blue-500",
-      detalhes: [
-        "Validação automática de CPF e CNH",
-        "Upload de documentos (CNH, RG, Comprovante)",
-        "Controle de validade da CNH",
-        "Histórico completo de aluguéis",
-        "Status automático (ativo/inativo)"
+      id: 'motoristas',
+      titulo: 'Gestão de Motoristas',
+      icon: Users,
+      cor: 'bg-blue-500',
+      resumo: 'Como cadastrar e gerenciar motoristas no sistema',
+      passos: [
+        {
+          numero: 1,
+          titulo: 'Acessar a seção Motoristas',
+          descricao: 'No menu lateral esquerdo, clique em "Motoristas" (ícone de pessoas)',
+          dica: 'Você verá uma tabela com todos os motoristas cadastrados'
+        },
+        {
+          numero: 2,
+          titulo: 'Adicionar novo motorista',
+          descricao: 'Clique no botão azul "Adicionar Motorista" no canto superior direito',
+          dica: 'Um modal com formulário completo será aberto'
+        },
+        {
+          numero: 3,
+          titulo: 'Preencher dados pessoais',
+          descricao: 'Complete os campos obrigatórios: Nome completo, CPF, Data de nascimento, Telefone e Email',
+          dica: 'O CPF é validado automaticamente - só aceita números válidos'
+        },
+        {
+          numero: 4,
+          titulo: 'Informar dados da CNH',
+          descricao: 'Preencha: Número da CNH, Categoria (A, B, C, D, E) e Data de vencimento',
+          dica: 'O sistema alertará quando a CNH estiver próxima do vencimento'
+        },
+        {
+          numero: 5,
+          titulo: 'Completar endereço',
+          descricao: 'Digite o CEP - o endereço será preenchido automaticamente via ViaCEP',
+          dica: 'Complete apenas o número da casa/apartamento e complemento'
+        },
+        {
+          numero: 6,
+          titulo: 'Upload de documentos',
+          descricao: 'Faça upload das fotos: CNH (frente e verso), RG e Comprovante de residência',
+          dica: 'Aceita JPG, PNG, PDF até 5MB. Use fotos nítidas'
+        },
+        {
+          numero: 7,
+          titulo: 'Finalizar cadastro',
+          descricao: 'Revise todos os dados e clique em "Salvar Motorista"',
+          dica: 'O motorista aparecerá na lista com status "Disponível"'
+        }
       ]
     },
     {
-      icone: Car,
-      titulo: "Gestão de Veículos",
-      descricao: "Controle total da frota com documentação digital",
-      cor: "bg-green-500",
-      detalhes: [
-        "Cadastro completo (placa, modelo, ano, cor)",
-        "Cálculo automático de custos fixos",
-        "Upload de documentos do veículo",
-        "Status automático (disponível/alugado)",
-        "Histórico de manutenções"
+      id: 'veiculos',
+      titulo: 'Gestão de Veículos',
+      icon: Car,
+      cor: 'bg-green-500',
+      resumo: 'Como cadastrar e controlar sua frota de veículos',
+      passos: [
+        {
+          numero: 1,
+          titulo: 'Acessar seção Veículos',
+          descricao: 'No menu lateral, clique em "Veículos" (ícone de carro)',
+          dica: 'Visualize todos os veículos com status (Disponível/Alugado)'
+        },
+        {
+          numero: 2,
+          titulo: 'Adicionar novo veículo',
+          descricao: 'Clique em "Adicionar Veículo" no topo da página',
+          dica: 'Modal com formulário detalhado será aberto'
+        },
+        {
+          numero: 3,
+          titulo: 'Dados básicos do veículo',
+          descricao: 'Complete: Placa, Marca, Modelo, Ano de fabricação, Cor',
+          dica: 'A placa é validada no formato brasileiro (ABC-1234 ou ABC1234)'
+        },
+        {
+          numero: 4,
+          titulo: 'Informações técnicas',
+          descricao: 'Preencha: RENAVAM, Categoria (Carro, Moto, Caminhão), Quilometragem atual',
+          dica: 'A categoria define o tipo de CNH necessária para dirigir'
+        },
+        {
+          numero: 5,
+          titulo: 'Custos fixos mensais',
+          descricao: 'Informe valores: IPVA, Seguro, Rastreador, Financiamento (se houver)',
+          dica: 'Estes custos são usados nos cálculos de rentabilidade'
+        },
+        {
+          numero: 6,
+          titulo: 'Upload de documentos',
+          descricao: 'Anexe: CRLV, Seguro obrigatório, Vistoria, outros documentos',
+          dica: 'Mantenha documentação sempre atualizada'
+        },
+        {
+          numero: 7,
+          titulo: 'Confirmar cadastro',
+          descricao: 'Revise informações e clique em "Salvar Veículo"',
+          dica: 'Veículo ficará disponível para contratos imediatamente'
+        }
       ]
     },
     {
-      icone: FileText,
-      titulo: "Contratos Inteligentes",
-      descricao: "Geração automática de contratos profissionais",
-      cor: "bg-purple-500",
-      detalhes: [
-        "Geração automática de PDF profissional",
-        "Pagamentos recorrentes automáticos",
-        "Renovação automática de contratos",
-        "Upload de contratos assinados",
-        "Status em tempo real"
+      id: 'contratos',
+      titulo: 'Criação de Contratos',
+      icon: FileText,
+      cor: 'bg-purple-500',
+      resumo: 'Como criar contratos automáticos e profissionais',
+      passos: [
+        {
+          numero: 1,
+          titulo: 'Acessar seção Contratos',
+          descricao: 'No menu lateral, clique em "Contratos"',
+          dica: 'Veja todos os contratos: Abertos, Ativos, Cancelados, Fechados'
+        },
+        {
+          numero: 2,
+          titulo: 'Criar novo contrato',
+          descricao: 'Clique em "Novo Contrato" no canto superior direito',
+          dica: 'Só aparecem motoristas e veículos disponíveis'
+        },
+        {
+          numero: 3,
+          titulo: 'Selecionar motorista',
+          descricao: 'Escolha o motorista na lista suspensa',
+          dica: 'Sistema valida se CNH está válida e compatível'
+        },
+        {
+          numero: 4,
+          titulo: 'Escolher veículo',
+          descricao: 'Selecione o veículo disponível para locação',
+          dica: 'Categoria da CNH deve ser compatível com o veículo'
+        },
+        {
+          numero: 5,
+          titulo: 'Definir valores',
+          descricao: 'Configure: Valor do aluguel, Periodicidade (semanal/mensal), Caução',
+          dica: 'Valores podem ser alterados durante renovações'
+        },
+        {
+          numero: 6,
+          titulo: 'Configurar datas',
+          descricao: 'Defina: Data de início, Duração mínima do contrato',
+          dica: 'Data de início não pode ser anterior ao dia atual'
+        },
+        {
+          numero: 7,
+          titulo: 'Gerar contrato PDF',
+          descricao: 'Clique em "Gerar Contrato" - PDF profissional será criado',
+          dica: 'Contrato inclui todos os dados da locadora e cliente'
+        },
+        {
+          numero: 8,
+          titulo: 'Upload contrato assinado',
+          descricao: 'Após assinatura física, faça upload do PDF assinado',
+          dica: 'Contrato fica "Ativo" e pagamentos iniciam automaticamente'
+        }
       ]
     },
     {
-      icone: DollarSign,
-      titulo: "Controle Financeiro",
-      descricao: "Relatórios detalhados com lucros e perdas reais",
-      cor: "bg-yellow-500",
-      detalhes: [
-        "Dashboard com métricas em tempo real",
-        "Relatórios por período e veículo",
-        "Controle de receitas e despesas",
-        "Análise de rentabilidade por veículo",
-        "Gráficos de evolução mensal"
+      id: 'financeiro',
+      titulo: 'Relatórios Financeiros',
+      icon: DollarSign,
+      cor: 'bg-yellow-500',
+      resumo: 'Como acompanhar lucros, perdas e performance financeira',
+      passos: [
+        {
+          numero: 1,
+          titulo: 'Acessar relatórios',
+          descricao: 'No menu lateral, clique em "Financeiro"',
+          dica: 'Dashboard com métricas principais será exibido'
+        },
+        {
+          numero: 2,
+          titulo: 'Visão geral do dashboard',
+          descricao: 'Observe os cards: Receita Total, Despesas Totais, Lucro Líquido, Margem',
+          dica: 'Valores são calculados em tempo real'
+        },
+        {
+          numero: 3,
+          titulo: 'Filtrar por período',
+          descricao: 'Use o seletor de datas para analisar períodos específicos',
+          dica: 'Relatórios mostram apenas dados do período selecionado'
+        },
+        {
+          numero: 4,
+          titulo: 'Análise por veículo',
+          descricao: 'Clique na aba "Análise por Veículo" para ver rentabilidade individual',
+          dica: 'Identifique quais veículos são mais/menos lucrativos'
+        },
+        {
+          numero: 5,
+          titulo: 'Acompanhar receitas',
+          descricao: 'Veja pagamentos recebidos organizados por mês',
+          dica: 'Gráfico mostra evolução mensal da receita'
+        },
+        {
+          numero: 6,
+          titulo: 'Controlar despesas',
+          descricao: 'Monitore gastos: Fixos (IPVA, seguro) e Variáveis (manutenção, multas)',
+          dica: 'Categorização automática facilita análise'
+        },
+        {
+          numero: 7,
+          titulo: 'Exportar relatórios',
+          descricao: 'Use botão "Exportar" para gerar PDF dos relatórios',
+          dica: 'Útil para apresentações e análises detalhadas'
+        }
       ]
     },
     {
-      icone: Wrench,
-      titulo: "Manutenções",
-      descricao: "Controle completo de manutenções preventivas e corretivas",
-      cor: "bg-orange-500",
-      detalhes: [
-        "Agendamento de manutenções",
-        "Alertas por quilometragem",
-        "Controle de custos de peças",
-        "Histórico completo por veículo",
-        "Relatórios de gastos"
+      id: 'manutencoes',
+      titulo: 'Controle de Manutenções',
+      icon: Wrench,
+      cor: 'bg-orange-500',
+      resumo: 'Como gerenciar manutenções preventivas e corretivas',
+      passos: [
+        {
+          numero: 1,
+          titulo: 'Acessar manutenções',
+          descricao: 'No menu lateral, clique em "Manutenções"',
+          dica: 'Lista todas as manutenções realizadas e agendadas'
+        },
+        {
+          numero: 2,
+          titulo: 'Registrar nova manutenção',
+          descricao: 'Clique em "Nova Manutenção" no topo',
+          dica: 'Formulário específico para cada tipo de manutenção'
+        },
+        {
+          numero: 3,
+          titulo: 'Selecionar veículo',
+          descricao: 'Escolha o veículo que receberá manutenção',
+          dica: 'Sistema mostra quilometragem atual do veículo'
+        },
+        {
+          numero: 4,
+          titulo: 'Definir tipo de manutenção',
+          descricao: 'Escolha: Preventiva, Corretiva ou Revisão programada',
+          dica: 'Cada tipo tem campos específicos'
+        },
+        {
+          numero: 5,
+          titulo: 'Informar detalhes',
+          descricao: 'Complete: Oficina, Descrição do serviço, Data, Quilometragem',
+          dica: 'Seja específico na descrição para histórico'
+        },
+        {
+          numero: 6,
+          titulo: 'Registrar custos',
+          descricao: 'Informe: Valor da mão de obra, Valor das peças, Total geral',
+          dica: 'Custos são incluídos automaticamente nos relatórios'
+        },
+        {
+          numero: 7,
+          titulo: 'Agendar próxima',
+          descricao: 'Configure alertas para próxima manutenção (por km ou data)',
+          dica: 'Sistema enviará notificações automáticas'
+        }
       ]
     },
     {
-      icone: AlertTriangle,
-      titulo: "Infrações",
-      descricao: "Gestão inteligente de multas e infrações",
-      cor: "bg-red-500",
-      detalhes: [
-        "Registro automático de infrações",
-        "Cálculo de taxas administrativas",
-        "Alertas de vencimento",
-        "Controle por motorista/veículo",
-        "Relatórios detalhados"
+      id: 'infracoes',
+      titulo: 'Gestão de Infrações',
+      icon: AlertTriangle,
+      cor: 'bg-red-500',
+      resumo: 'Como controlar multas e infrações de trânsito',
+      passos: [
+        {
+          numero: 1,
+          titulo: 'Acessar infrações',
+          descricao: 'No menu lateral, clique em "Infrações"',
+          dica: 'Lista todas as multas pendentes e pagas'
+        },
+        {
+          numero: 2,
+          titulo: 'Registrar nova infração',
+          descricao: 'Clique em "Nova Infração" no canto superior',
+          dica: 'Sistema sugere motorista/veículo baseado no período'
+        },
+        {
+          numero: 3,
+          titulo: 'Dados da infração',
+          descricao: 'Preencha: Número do auto, Data da infração, Valor da multa',
+          dica: 'Use dados exatos do auto de infração'
+        },
+        {
+          numero: 4,
+          titulo: 'Identificar responsável',
+          descricao: 'Sistema sugere quem estava com o veículo na data',
+          dica: 'Baseado nos contratos ativos no período'
+        },
+        {
+          numero: 5,
+          titulo: 'Calcular taxa administrativa',
+          descricao: 'Sistema calcula automaticamente a taxa de administração',
+          dica: 'Taxa é configurável nas configurações da locadora'
+        },
+        {
+          numero: 6,
+          titulo: 'Definir vencimento',
+          descricao: 'Configure data limite para pagamento pelo motorista',
+          dica: 'Sistema enviará lembretes automáticos'
+        },
+        {
+          numero: 7,
+          titulo: 'Acompanhar status',
+          descricao: 'Monitore: Pendente, Pago pelo motorista, Pago pela locadora',
+          dica: 'Relatórios incluem custos com infrações'
+        }
       ]
     }
   ];
 
-  const planos = [
+  const dicas = [
     {
-      nome: "Start",
-      preco: "R$ 29,00",
-      icone: Car,
-      cor: "bg-blue-500",
-      veiculos: "Até 5 veículos",
-      recursos: [
-        "Gestão completa de motoristas",
-        "Contratos automáticos",
-        "Controle financeiro",
-        "Upload de documentos",
-        "Suporte por email"
-      ]
+      titulo: 'Navegação rápida',
+      descricao: 'Use as teclas de atalho ou clique nos ícones do menu para navegar rapidamente',
+      icone: MousePointer
     },
     {
-      nome: "Pro",
-      preco: "R$ 99,00",
-      icone: Zap,
-      cor: "bg-cyan-500",
-      veiculos: "Até 20 veículos",
-      popular: true,
-      recursos: [
-        "Todas as funcionalidades Start",
-        "Relatórios avançados",
-        "Notificações automáticas",
-        "Backup diário",
-        "Suporte prioritário"
-      ]
+      titulo: 'Filtros inteligentes',
+      descricao: 'Todas as listas têm filtros e busca para encontrar informações rapidamente',
+      icone: Search
     },
     {
-      nome: "Elite",
-      preco: "R$ 250,00",
-      icone: Crown,
-      cor: "bg-green-500",
-      veiculos: "Até 50 veículos",
-      recursos: [
-        "Todas as funcionalidades Pro",
-        "Integração com APIs externas",
-        "Relatórios personalizados",
-        "Múltiplos usuários",
-        "Suporte telefônico"
-      ]
+      titulo: 'Backup automático',
+      descricao: 'Seus dados são salvos automaticamente e têm backup diário na nuvem',
+      icone: Upload
     },
     {
-      nome: "Infinity",
-      preco: "Consultar",
-      icone: Star,
-      cor: "bg-gradient-to-r from-purple-500 to-pink-500",
-      veiculos: "Veículos ilimitados",
-      recursos: [
-        "Todas as funcionalidades Elite",
-        "Customizações específicas",
-        "Suporte 24/7",
-        "Treinamento personalizado",
-        "Gerente de conta dedicado"
-      ]
-    }
-  ];
-
-  const passosInicio = [
-    {
-      numero: "01",
-      titulo: "Cadastro da Locadora",
-      descricao: "Registre sua locadora com dados básicos",
-      icone: Building2
-    },
-    {
-      numero: "02", 
-      titulo: "Adicione Motoristas",
-      descricao: "Cadastre motoristas com documentação completa",
-      icone: Users
-    },
-    {
-      numero: "03",
-      titulo: "Registre Veículos",
-      descricao: "Adicione sua frota com todos os detalhes",
-      icone: Car
-    },
-    {
-      numero: "04",
-      titulo: "Crie Contratos",
-      descricao: "Gere contratos automáticos e profissionais",
-      icone: FileText
-    },
-    {
-      numero: "05",
-      titulo: "Acompanhe Resultados",
-      descricao: "Monitore lucros e performance em tempo real",
-      icone: BarChart3
+      titulo: 'Notificações importantes',
+      descricao: 'Sistema alerta sobre CNH vencidas, multas pendentes e manutenções',
+      icone: AlertTriangle
     }
   ];
 
@@ -215,209 +380,63 @@ export default function Documentacao() {
       <div className="text-center space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full">
           <Book className="w-5 h-5 text-blue-600" />
-          <span className="text-blue-800 font-medium">Documentação DRIVS</span>
+          <span className="text-blue-800 font-medium">Manual do Usuário</span>
         </div>
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Como Funciona o Sistema
+          Como Usar o Sistema DRIVS
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Descubra como o DRIVS revoluciona a gestão de locadoras de veículos com automação inteligente e controle total
+          Tutorial completo passo a passo para dominar todas as funcionalidades do sistema
         </p>
       </div>
 
       {/* Navegação por Tabs */}
       <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <Target className="w-4 h-4" />
-            <span className="hidden sm:inline">Visão Geral</span>
-          </TabsTrigger>
-          <TabsTrigger value="funcionalidades" className="flex items-center gap-2">
-            <Zap className="w-4 h-4" />
-            <span className="hidden sm:inline">Funcionalidades</span>
-          </TabsTrigger>
-          <TabsTrigger value="como-usar" className="flex items-center gap-2">
-            <Play className="w-4 h-4" />
-            <span className="hidden sm:inline">Como Usar</span>
-          </TabsTrigger>
-          <TabsTrigger value="planos" className="flex items-center gap-2">
-            <Crown className="w-4 h-4" />
-            <span className="hidden sm:inline">Planos</span>
-          </TabsTrigger>
-          <TabsTrigger value="faq" className="flex items-center gap-2">
-            <Lightbulb className="w-4 h-4" />
-            <span className="hidden sm:inline">FAQ</span>
-          </TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+          <TabsTrigger value="inicio">📋 Início</TabsTrigger>
+          <TabsTrigger value="tutorial">📖 Tutoriais</TabsTrigger>
+          <TabsTrigger value="dicas">💡 Dicas</TabsTrigger>
+          <TabsTrigger value="suporte">🆘 Suporte</TabsTrigger>
         </TabsList>
 
-        {/* Visão Geral */}
-        <TabsContent value="overview" className="space-y-6">
+        {/* Seção de Início */}
+        <TabsContent value="inicio" className="space-y-6">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">O que é o DRIVS?</CardTitle>
+              <CardTitle className="text-2xl">Bem-vindo ao Manual do DRIVS!</CardTitle>
               <CardDescription className="text-lg">
-                Sistema completo de gestão para locadoras de veículos
+                Este guia vai te ensinar a usar cada funcionalidade do sistema passo a passo
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                    <Shield className="w-8 h-8 text-blue-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Elimina Inadimplência</h3>
-                  <p className="text-muted-foreground">
-                    Sistema automatizado de contratos e pagamentos reduz drasticamente os calotes
-                  </p>
-                </div>
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                    <BarChart3 className="w-8 h-8 text-green-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Aumenta Receita</h3>
-                  <p className="text-muted-foreground">
-                    Otimização da frota e controle financeiro preciso maximizam os lucros
-                  </p>
-                </div>
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
-                    <Zap className="w-8 h-8 text-purple-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold">Automatiza Processos</h3>
-                  <p className="text-muted-foreground">
-                    Substitui planilhas manuais por automação inteligente e confiável
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              <Alert className="mb-6">
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Primeira vez no sistema?</strong> Comece pelos tutoriais de Motoristas e Veículos.
+                  Depois, aprenda a criar Contratos e acompanhe tudo no Financeiro.
+                </AlertDescription>
+              </Alert>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  Principais Benefícios
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Controle total da frota em tempo real</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Redução de 90% na inadimplência</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Aumento de 40% na eficiência operacional</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <span>Economia de 20 horas/semana</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <span>Relatórios financeiros precisos</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-blue-600" />
-                  Para Quem é Indicado
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="bg-blue-50">Micro</Badge>
-                  <span>Locadoras iniciantes (1-5 veículos)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="bg-green-50">Pequenas</Badge>
-                  <span>Locadoras em crescimento (6-20 veículos)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="bg-purple-50">Médias</Badge>
-                  <span>Locadoras estabelecidas (21-100 veículos)</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="bg-orange-50">Grandes</Badge>
-                  <span>Mega frotas (100+ veículos)</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        {/* Funcionalidades */}
-        <TabsContent value="funcionalidades" className="space-y-6">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {funcionalidades.map((func, index) => {
-              const IconComponent = func.icone;
-              return (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className={`p-3 rounded-lg ${func.cor}`}>
-                        <IconComponent className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">{func.titulo}</CardTitle>
-                        <CardDescription>{func.descricao}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {func.detalhes.map((detalhe, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span>{detalhe}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </TabsContent>
-
-        {/* Como Usar */}
-        <TabsContent value="como-usar" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Primeiros Passos</CardTitle>
-              <CardDescription className="text-center text-lg">
-                Siga este guia para começar a usar o DRIVS em minutos
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-8">
-                {passosInicio.map((passo, index) => {
-                  const IconComponent = passo.icone;
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {tutorialSections.map((section, index) => {
+                  const IconComponent = section.icon;
                   return (
-                    <div key={index} className="flex items-start gap-4">
-                      <div className="flex flex-col items-center">
-                        <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg">
-                          {passo.numero}
+                    <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer"
+                          onClick={() => setActiveSection('tutorial')}>
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className={`p-2 rounded-lg ${section.cor}`}>
+                            <IconComponent className="w-5 h-5 text-white" />
+                          </div>
+                          <h3 className="font-semibold">{section.titulo}</h3>
                         </div>
-                        {index < passosInicio.length - 1 && (
-                          <div className="w-0.5 h-16 bg-gray-200 mt-4"></div>
-                        )}
-                      </div>
-                      <div className="flex-1 pb-8">
-                        <div className="flex items-center gap-3 mb-2">
-                          <IconComponent className="w-5 h-5 text-blue-600" />
-                          <h3 className="text-xl font-semibold">{passo.titulo}</h3>
+                        <p className="text-sm text-muted-foreground">{section.resumo}</p>
+                        <div className="flex items-center gap-2 mt-3 text-blue-600">
+                          <span className="text-sm">Ver tutorial</span>
+                          <ArrowRight className="w-4 h-4" />
                         </div>
-                        <p className="text-muted-foreground">{passo.descricao}</p>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   );
                 })}
               </div>
@@ -425,128 +444,190 @@ export default function Documentacao() {
           </Card>
         </TabsContent>
 
-        {/* Planos */}
-        <TabsContent value="planos" className="space-y-6">
-          <div className="text-center space-y-4">
-            <h2 className="text-3xl font-bold">Escolha Seu Plano</h2>
-            <p className="text-muted-foreground text-lg">
-              Planos flexíveis para locadoras de todos os tamanhos
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {planos.map((plano, index) => {
-              const IconComponent = plano.icone;
-              return (
-                <Card key={index} className={`relative ${plano.popular ? 'ring-2 ring-blue-500' : ''}`}>
-                  {plano.popular && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                      <Badge className="bg-blue-500 hover:bg-blue-500">
-                        Mais Popular
-                      </Badge>
+        {/* Seção de Tutoriais */}
+        <TabsContent value="tutorial" className="space-y-6">
+          {tutorialSections.map((section, sectionIndex) => {
+            const IconComponent = section.icon;
+            return (
+              <Card key={sectionIndex}>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className={`p-3 rounded-lg ${section.cor}`}>
+                      <IconComponent className="w-6 h-6 text-white" />
                     </div>
-                  )}
-                  <CardHeader className="text-center">
-                    <div className={`w-16 h-16 ${plano.cor} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                      <IconComponent className="w-8 h-8 text-white" />
+                    <div>
+                      <CardTitle className="text-xl">{section.titulo}</CardTitle>
+                      <CardDescription>{section.resumo}</CardDescription>
                     </div>
-                    <CardTitle className="text-xl">{plano.nome}</CardTitle>
-                    <div className="text-3xl font-bold">{plano.preco}</div>
-                    <CardDescription>{plano.veiculos}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-3">
-                      {plano.recursos.map((recurso, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span>{recurso}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {section.passos.map((passo, passoIndex) => (
+                      <div key={passoIndex} className="flex gap-4">
+                        <div className="flex flex-col items-center">
+                          <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            {passo.numero}
+                          </div>
+                          {passoIndex < section.passos.length - 1 && (
+                            <div className="w-0.5 h-16 bg-gray-200 mt-4"></div>
+                          )}
+                        </div>
+                        <div className="flex-1 pb-8">
+                          <h4 className="font-semibold text-lg mb-2">{passo.titulo}</h4>
+                          <p className="text-muted-foreground mb-3">{passo.descricao}</p>
+                          {passo.dica && (
+                            <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded-r">
+                              <div className="flex items-start gap-2">
+                                <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                                <p className="text-blue-800 text-sm">
+                                  <strong>Dica:</strong> {passo.dica}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </TabsContent>
 
-        {/* FAQ */}
-        <TabsContent value="faq" className="space-y-6">
+        {/* Seção de Dicas */}
+        <TabsContent value="dicas" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl text-center">Perguntas Frequentes</CardTitle>
-              <CardDescription className="text-center">
-                Respostas para as principais dúvidas sobre o DRIVS
+              <CardTitle className="text-2xl">Dicas para Usar Melhor o Sistema</CardTitle>
+              <CardDescription>
+                Truques e funcionalidades que vão acelerar seu trabalho
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="border-l-4 border-blue-500 pl-4">
-                  <h4 className="font-semibold mb-2">Como funciona o período de teste gratuito?</h4>
-                  <p className="text-muted-foreground">
-                    Todas as novas locadoras recebem 30 dias gratuitos do Plano Pro com até 20 veículos. 
-                    Sem compromisso ou necessidade de cartão de crédito.
-                  </p>
-                </div>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                {dicas.map((dica, index) => {
+                  const IconComponent = dica.icone;
+                  return (
+                    <div key={index} className="flex gap-4 p-4 border rounded-lg">
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <IconComponent className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold mb-2">{dica.titulo}</h4>
+                        <p className="text-muted-foreground text-sm">{dica.descricao}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-                <div className="border-l-4 border-green-500 pl-4">
-                  <h4 className="font-semibold mb-2">Posso mudar de plano a qualquer momento?</h4>
-                  <p className="text-muted-foreground">
-                    Sim! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento. 
-                    As mudanças são aplicadas no próximo ciclo de cobrança.
-                  </p>
-                </div>
-
-                <div className="border-l-4 border-purple-500 pl-4">
-                  <h4 className="font-semibold mb-2">Os dados ficam seguros?</h4>
-                  <p className="text-muted-foreground">
-                    Absolutamente! Utilizamos criptografia de dados, backups automáticos e 
-                    servidores seguros. Seus dados nunca são compartilhados.
-                  </p>
-                </div>
-
-                <div className="border-l-4 border-orange-500 pl-4">
-                  <h4 className="font-semibold mb-2">Funciona em dispositivos móveis?</h4>
-                  <p className="text-muted-foreground">
-                    Sim! O sistema é totalmente responsivo e funciona perfeitamente em 
-                    smartphones, tablets e computadores.
-                  </p>
-                </div>
-
-                <div className="border-l-4 border-red-500 pl-4">
-                  <h4 className="font-semibold mb-2">Preciso de treinamento?</h4>
-                  <p className="text-muted-foreground">
-                    O sistema é intuitivo e fácil de usar. Oferecemos documentação completa, 
-                    tutoriais em vídeo e suporte técnico para ajudar.
-                  </p>
+              <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                <h3 className="font-semibold text-lg mb-4">Atalhos de Teclado</h3>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Dashboard</span>
+                      <Badge variant="outline">Ctrl + D</Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Motoristas</span>
+                      <Badge variant="outline">Ctrl + M</Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Veículos</span>
+                      <Badge variant="outline">Ctrl + V</Badge>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Contratos</span>
+                      <Badge variant="outline">Ctrl + C</Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Financeiro</span>
+                      <Badge variant="outline">Ctrl + F</Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Buscar</span>
+                      <Badge variant="outline">Ctrl + /</Badge>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
 
-      {/* Call to Action */}
-      <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-        <CardContent className="p-8">
-          <div className="text-center space-y-4">
-            <h3 className="text-2xl font-bold">Pronto para Revolucionar sua Locadora?</h3>
-            <p className="text-blue-100 text-lg">
-              Comece seu teste gratuito hoje e descubra como o DRIVS pode transformar seu negócio
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
-                <Play className="w-5 h-5 mr-2" />
-                Começar Teste Gratuito
-              </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
-                <Bell className="w-5 h-5 mr-2" />
-                Agendar Demonstração
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Seção de Suporte */}
+        <TabsContent value="suporte" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Precisa de Ajuda?</CardTitle>
+              <CardDescription>
+                Canais de suporte e recursos adicionais
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="w-5 h-5" />
+                      Suporte Técnico
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="text-sm space-y-2">
+                      <p><strong>Email:</strong> suporte@drivs.com.br</p>
+                      <p><strong>Telefone:</strong> (11) 99999-9999</p>
+                      <p><strong>Horário:</strong> Segunda a Sexta, 8h às 18h</p>
+                      <p><strong>Tempo médio:</strong> Resposta em até 4 horas</p>
+                    </div>
+                    <Button className="w-full">
+                      Abrir Chamado de Suporte
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Book className="w-5 h-5" />
+                      Recursos Adicionais
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <Button variant="outline" className="w-full justify-start">
+                        <Download className="w-4 h-4 mr-2" />
+                        Baixar Manual Completo (PDF)
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start">
+                        <Eye className="w-4 h-4 mr-2" />
+                        Assistir Vídeos Tutoriais
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        Agendar Treinamento Online
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Alert className="mt-6">
+                <CheckCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Lembrete:</strong> Este manual é atualizado automaticamente. 
+                  Sempre que o sistema receber melhorias, você encontrará as instruções aqui.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
