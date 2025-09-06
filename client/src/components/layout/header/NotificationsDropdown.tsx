@@ -123,7 +123,7 @@ export function NotificationsDropdown() {
         </Button>
       </DropdownMenuTrigger>
       
-      <DropdownMenuContent align="start" className="w-80">
+      <DropdownMenuContent align="center" className="w-80">
         <DropdownMenuLabel>Notificações</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
