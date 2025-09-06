@@ -33,15 +33,14 @@ export function useNotificationActions() {
       const notificationsUrl = profile?.locadoraId ? `/api/notificacoes?locadoraId=${profile.locadoraId}` : '/api/notificacoes';
       queryClient.invalidateQueries({ queryKey: [notificationsUrl] });
       
+      // Forçar refetch imediato
+      queryClient.refetchQueries({ queryKey: [notificationsUrl] });
+      
       // Invalidar todas as consultas que dependem de notificações
       queryClient.invalidateQueries({ queryKey: ['/api/notificacoes'] });
-      
-      toast({
-        title: 'Sucesso',
-        description: 'Notificação marcada como lida',
-      });
     },
     onError: (error: Error) => {
+      console.error('Erro ao marcar notificação como lida:', error);
       toast({
         title: 'Erro',
         description: error.message || 'Erro ao marcar notificação como lida',
