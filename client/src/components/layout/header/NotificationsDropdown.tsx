@@ -26,16 +26,20 @@ export function NotificationsDropdown() {
   // Marcar todas as notificações como visualizadas quando o dropdown for aberto
   useEffect(() => {
     if (isDropdownOpen && notifications.length > 0) {
-      // Marcar imediatamente para fazer o badge sumir
-      const unreadPersistentNotifications = notifications.filter(
-        notification => notification.isPersistent && !notification.isRead
-      );
+      // Aguardar um pequeno delay para o usuário ver as notificações antes de marcar como lidas
+      const timer = setTimeout(() => {
+        const unreadPersistentNotifications = notifications.filter(
+          notification => notification.isPersistent && !notification.isRead
+        );
+        
+        // Marcar cada notificação persistente não lida como lida
+        unreadPersistentNotifications.forEach(notification => {
+          const realId = notification.id.replace('persistent-', '');
+          markAsRead(realId);
+        });
+      }, 2000); // 2 segundos de delay
       
-      // Marcar cada notificação persistente não lida como lida
-      unreadPersistentNotifications.forEach(notification => {
-        const realId = notification.id.replace('persistent-', '');
-        markAsRead(realId);
-      });
+      return () => clearTimeout(timer);
     }
   }, [isDropdownOpen, notifications, markAsRead]);
   
@@ -59,14 +63,19 @@ export function NotificationsDropdown() {
 
   const handleNotificationClick = (notification: any) => {
     // Navegar baseado no conteúdo da notificação
-    if (notification.title?.toLowerCase().includes('cnh') || notification.message?.toLowerCase().includes('cnh')) {
+    const title = notification.title?.toLowerCase() || '';
+    const message = notification.message?.toLowerCase() || '';
+    
+    if (title.includes('cnh') || message.includes('cnh')) {
       navigate('/motoristas');
-    } else if (notification.title?.toLowerCase().includes('multa') || notification.message?.toLowerCase().includes('multa') || notification.message?.toLowerCase().includes('infração')) {
+    } else if (title.includes('multa') || message.includes('multa') || message.includes('infração')) {
       navigate('/infracoes');
-    } else if (notification.title?.toLowerCase().includes('pagamento') || notification.message?.toLowerCase().includes('pagamento')) {
+    } else if (title.includes('pagamento') || message.includes('pagamento')) {
       navigate('/pagamentos');
-    } else if (notification.title?.toLowerCase().includes('manutenção') || notification.message?.toLowerCase().includes('manutenção')) {
+    } else if (title.includes('manutenção') || message.includes('manutenção')) {
       navigate('/manutencoes');
+    } else if (title.includes('despesa') || message.includes('despesa') || title.includes('financeiro') || message.includes('financeiro')) {
+      navigate('/financeiro');
     } else {
       navigate('/dashboard');
     }
