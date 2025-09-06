@@ -23,23 +23,19 @@ export function NotificationsDropdown() {
   const { markAsRead, deleteNotification, isMarkingAsRead, isDeleting } = useNotificationActions();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
-  // Marcar todas as notificações persistentes como lidas quando o dropdown for aberto
+  // Marcar todas as notificações como visualizadas quando o dropdown for aberto
   useEffect(() => {
     if (isDropdownOpen && notifications.length > 0) {
-      // Aguardar um breve momento para que o usuário veja as notificações
-      const timer = setTimeout(() => {
-        const unreadPersistentNotifications = notifications.filter(
-          notification => notification.isPersistent && !notification.isRead
-        );
-        
-        // Marcar cada notificação persistente não lida como lida
-        unreadPersistentNotifications.forEach(notification => {
-          const realId = notification.id.replace('persistent-', '');
-          markAsRead(realId);
-        });
-      }, 1000); // 1 segundo de delay
+      // Marcar imediatamente para fazer o badge sumir
+      const unreadPersistentNotifications = notifications.filter(
+        notification => notification.isPersistent && !notification.isRead
+      );
       
-      return () => clearTimeout(timer);
+      // Marcar cada notificação persistente não lida como lida
+      unreadPersistentNotifications.forEach(notification => {
+        const realId = notification.id.replace('persistent-', '');
+        markAsRead(realId);
+      });
     }
   }, [isDropdownOpen, notifications, markAsRead]);
   
@@ -62,27 +58,17 @@ export function NotificationsDropdown() {
   };
 
   const handleNotificationClick = (notification: any) => {
-    // Navegar baseado no tipo de notificação
-    switch (notification.type) {
-      case 'cnh_vencida':
-      case 'cnh_vencendo':
-        navigate('/motoristas');
-        break;
-      case 'multa_vencendo':
-      case 'multa_vencida':
-        navigate('/infracoes');
-        break;
-      case 'pagamento_pendente':
-      case 'pagamento_vencido':
-        navigate('/pagamentos');
-        break;
-      case 'manutencao_agendada':
-      case 'manutencao_atrasada':
-        navigate('/manutencoes');
-        break;
-      default:
-        navigate('/dashboard');
-        break;
+    // Navegar baseado no conteúdo da notificação
+    if (notification.title?.toLowerCase().includes('cnh') || notification.message?.toLowerCase().includes('cnh')) {
+      navigate('/motoristas');
+    } else if (notification.title?.toLowerCase().includes('multa') || notification.message?.toLowerCase().includes('multa') || notification.message?.toLowerCase().includes('infração')) {
+      navigate('/infracoes');
+    } else if (notification.title?.toLowerCase().includes('pagamento') || notification.message?.toLowerCase().includes('pagamento')) {
+      navigate('/pagamentos');
+    } else if (notification.title?.toLowerCase().includes('manutenção') || notification.message?.toLowerCase().includes('manutenção')) {
+      navigate('/manutencoes');
+    } else {
+      navigate('/dashboard');
     }
     setIsDropdownOpen(false);
   };
@@ -141,7 +127,7 @@ export function NotificationsDropdown() {
         <DropdownMenuLabel>Notificações</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <div className="max-h-96 overflow-y-auto">
+        <div className="max-h-96 overflow-y-auto scrollbar-hide">
           {hasNotifications ? (
             notifications.map((notification, index) => (
               <div key={notification.id}>
@@ -175,9 +161,7 @@ export function NotificationsDropdown() {
                             <X className="w-3 h-3" />
                           </Button>
                         </>
-                      ) : (
-                        <span className="text-xs text-muted-foreground px-2">Alerta automático</span>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground w-full">
