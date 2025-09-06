@@ -55,6 +55,32 @@ export function NotificationsDropdown() {
       deleteNotification(realId);
     }
   };
+
+  const handleNotificationClick = (notification: any) => {
+    // Navegar baseado no tipo de notificação
+    switch (notification.type) {
+      case 'cnh_vencida':
+      case 'cnh_vencendo':
+        navigate('/motoristas');
+        break;
+      case 'multa_vencendo':
+      case 'multa_vencida':
+        navigate('/infracoes');
+        break;
+      case 'pagamento_pendente':
+      case 'pagamento_vencido':
+        navigate('/pagamentos');
+        break;
+      case 'manutencao_agendada':
+      case 'manutencao_atrasada':
+        navigate('/manutencoes');
+        break;
+      default:
+        navigate('/dashboard');
+        break;
+    }
+    setIsDropdownOpen(false);
+  };
   
 
 
@@ -106,7 +132,7 @@ export function NotificationsDropdown() {
         </Button>
       </DropdownMenuTrigger>
       
-      <DropdownMenuContent align="end" className="w-80">
+      <DropdownMenuContent align="start" className="w-80">
         <DropdownMenuLabel>Notificações</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
@@ -114,7 +140,7 @@ export function NotificationsDropdown() {
           {hasNotifications ? (
             notifications.map((notification, index) => (
               <div key={notification.id}>
-                <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
+                <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-pointer" onClick={() => handleNotificationClick(notification)}>
                   <div className="flex items-center gap-2 w-full">
                     <div className={`w-2 h-2 rounded-full ${getNotificationColor(notification.type)}`}></div>
                     <span className="font-medium text-sm flex-1">{notification.title}</span>
@@ -149,17 +175,9 @@ export function NotificationsDropdown() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-start justify-between w-full gap-2">
-                    <p className="text-xs text-muted-foreground flex-1">
-                      {notification.message}
-                    </p>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {formatDistanceToNow(notification.timestamp, { 
-                        addSuffix: true, 
-                        locale: ptBR 
-                      })}
-                    </span>
-                  </div>
+                  <p className="text-xs text-muted-foreground w-full">
+                    {notification.message}
+                  </p>
                 </DropdownMenuItem>
                 {index < notifications.length - 1 && <DropdownMenuSeparator />}
               </div>
