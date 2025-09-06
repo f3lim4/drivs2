@@ -133,12 +133,6 @@ const navigationItems = [
     description: 'Configurações de SEO e Analytics',
     adminOnly: true  // Só admins podem ver este item
   },
-  {
-    title: 'Documentação',
-    url: '/documentacao',
-    icon: BookOpen,
-    description: 'Como funciona o sistema DRIVS'
-  },
 ];
 
 // Ícones de veículos para alternância
