@@ -23,25 +23,7 @@ export function NotificationsDropdown() {
   const { markAsRead, deleteNotification, isMarkingAsRead, isDeleting } = useNotificationActions();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
-  // Marcar todas as notificações como visualizadas quando o dropdown for aberto
-  useEffect(() => {
-    if (isDropdownOpen && notifications.length > 0) {
-      // Aguardar um pequeno delay para o usuário ver as notificações antes de marcar como lidas
-      const timer = setTimeout(() => {
-        const unreadPersistentNotifications = notifications.filter(
-          notification => notification.isPersistent && !notification.isRead
-        );
-        
-        // Marcar cada notificação persistente não lida como lida
-        unreadPersistentNotifications.forEach(notification => {
-          const realId = notification.id.replace('persistent-', '');
-          markAsRead(realId);
-        });
-      }, 2000); // 2 segundos de delay
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isDropdownOpen, notifications, markAsRead]);
+  // Não marcar automaticamente como lida - apenas quando clicada individualmente
   
   const handleMarkAsRead = (e: React.MouseEvent, notificationId: string, isPersistent: boolean) => {
     e.stopPropagation();
@@ -62,6 +44,12 @@ export function NotificationsDropdown() {
   };
 
   const handleNotificationClick = (notification: any) => {
+    // Marcar notificação como lida se for persistente e não lida
+    if (notification.isPersistent && !notification.isRead) {
+      const realId = notification.id.replace('persistent-', '');
+      markAsRead(realId);
+    }
+    
     // Navegar baseado no conteúdo da notificação
     const title = notification.title?.toLowerCase() || '';
     const message = notification.message?.toLowerCase() || '';
@@ -140,7 +128,9 @@ export function NotificationsDropdown() {
           {hasNotifications ? (
             notifications.map((notification, index) => (
               <div key={notification.id}>
-                <DropdownMenuItem className="flex flex-col items-start gap-1 p-3 cursor-pointer" onClick={() => handleNotificationClick(notification)}>
+                <DropdownMenuItem className={`flex flex-col items-start gap-1 p-3 cursor-pointer ${
+                  !notification.isRead ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'
+                }`} onClick={() => handleNotificationClick(notification)}>
                   <div className="flex items-center gap-2 w-full">
                     <div className={`w-2 h-2 rounded-full ${getNotificationColor(notification.type)}`}></div>
                     <span className="font-medium text-sm flex-1">{notification.title}</span>
