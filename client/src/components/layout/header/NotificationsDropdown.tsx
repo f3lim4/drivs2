@@ -26,15 +26,20 @@ export function NotificationsDropdown() {
   // Marcar todas as notificações persistentes como lidas quando o dropdown for aberto
   useEffect(() => {
     if (isDropdownOpen && notifications.length > 0) {
-      const unreadPersistentNotifications = notifications.filter(
-        notification => notification.isPersistent && !notification.isRead
-      );
+      // Aguardar um breve momento para que o usuário veja as notificações
+      const timer = setTimeout(() => {
+        const unreadPersistentNotifications = notifications.filter(
+          notification => notification.isPersistent && !notification.isRead
+        );
+        
+        // Marcar cada notificação persistente não lida como lida
+        unreadPersistentNotifications.forEach(notification => {
+          const realId = notification.id.replace('persistent-', '');
+          markAsRead(realId);
+        });
+      }, 1000); // 1 segundo de delay
       
-      // Marcar cada notificação persistente não lida como lida
-      unreadPersistentNotifications.forEach(notification => {
-        const realId = notification.id.replace('persistent-', '');
-        markAsRead(realId);
-      });
+      return () => clearTimeout(timer);
     }
   }, [isDropdownOpen, notifications, markAsRead]);
   
