@@ -75,7 +75,7 @@ export function NotificationsDropdown() {
     } else if (title.includes('manutenção') || message.includes('manutenção')) {
       navigate('/manutencoes');
     } else if (title.includes('despesa') || message.includes('despesa') || title.includes('financeiro') || message.includes('financeiro')) {
-      navigate('/financeiro');
+      navigate('/relatorios-financeiros');
     } else {
       navigate('/dashboard');
     }
