@@ -312,14 +312,21 @@ export default function CadastroLocadora() {
     if (!email || !email.includes('@')) return;
     
     try {
+      // Força refresh sem cache
       const response = await fetch('/api/auth/check-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        },
+        body: JSON.stringify({ email }),
+        cache: 'no-store' // Força sem cache
       });
       
       if (response.ok) {
         const data = await response.json();
+        console.log('Verificação email:', email, '- Existe:', data.exists); // Debug log
         if (data.exists) {
           setFieldErrors(prev => ({ ...prev, email: 'Este email já está cadastrado no sistema' }));
         } else {
@@ -328,6 +335,8 @@ export default function CadastroLocadora() {
       }
     } catch (error) {
       console.log('Erro ao verificar email:', error);
+      // Em caso de erro, limpar o erro de email para não bloquear cadastro
+      setFieldErrors(prev => ({ ...prev, email: '' }));
     }
   };
 
