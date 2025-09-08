@@ -16,7 +16,9 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Só redireciona uma vez, quando carregamento terminou e não está autenticado
     if (!isLoading && !isAuthenticated) {
+      console.log('Redirecionando para login: não autenticado');
       navigate('/login', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
