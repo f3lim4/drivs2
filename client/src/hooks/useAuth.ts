@@ -104,47 +104,8 @@ export function useAuth() {
     window.location.reload();
   };
 
-  // Verificar periodicamente se a conta ainda está ativa
-  useEffect(() => {
-    if (!profile || profile.type !== 'locadora') return;
-
-    const checkAccountStatus = async () => {
-      try {
-        const response = await fetch(`/api/auth/profile?email=${profile.email}`);
-        
-        if (response.status === 410) {
-          // Conta excluída
-          logout("Esta conta foi excluída permanentemente do sistema. Você será desconectado.");
-          return;
-        }
-        
-        if (response.status === 403) {
-          // Conta desativada
-          const data = await response.json();
-          logout(data.details || "Esta conta foi desativada. Você será desconectado.");
-          return;
-        }
-        
-        if (!response.ok) {
-          console.warn('Erro ao verificar status da conta:', response.status);
-        }
-      } catch (error) {
-        console.warn('Erro na verificação periódica da conta:', error);
-      }
-    };
-
-    // Verificar a cada 30 segundos
-    const interval = setInterval(checkAccountStatus, 30000);
-
-    // Verificar também ao focar na aba
-    const handleFocus = () => checkAccountStatus();
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('focus', handleFocus);
-    };
-  }, [profile]);
+  // Sistema simplificado: tem conta = entra, não tem conta = não entra
+  // Removida verificação periódica que causava logout forçado
 
   const isAdmin = profile?.type === 'admin';
   const isLocadora = profile?.type === 'locadora';
