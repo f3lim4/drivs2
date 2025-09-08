@@ -3885,7 +3885,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(htmlResponse);
       
     } catch (error) {
-      console.error("Erro no logout forçado:", error);
+      console.error("Erro no logout:", error);
       res.status(500).send(`
         <h1>Erro no Logout</h1>
         <p>Houve um problema. <a href="/login">Clique aqui para ir ao login</a></p>

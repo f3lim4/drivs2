@@ -34,7 +34,6 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import EmergencyLogout from "./pages/EmergencyLogout";
 import Notificacoes from "./pages/Notificacoes";
 
 const queryClient = new QueryClient({
@@ -51,16 +50,9 @@ const queryClient = new QueryClient({
         
         const response = await fetch(url);
         
-        // DETECTAR LOCADORA EXCLUÍDA
+        // Sistema simplificado: se erro 410, apenas retorna vazio
         if (response.status === 410) {
-          const errorData = await response.json();
-          if (errorData.message === 'LOCADORA_DELETED') {
-            console.warn('Locadora foi excluída, forçando logout...');
-            // Limpar localStorage e redirecionar
-            localStorage.removeItem('drivs_profile');
-            window.location.href = '/emergency-logout';
-            return;
-          }
+          return [];
         }
         
         if (!response.ok) {
@@ -101,7 +93,6 @@ const App = () => (
             <Route path="/landing" element={<Landing />} />
             <Route path="/site" element={<Home />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/emergency-logout" element={<EmergencyLogout />} />
             <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={
             <AuthGuard>

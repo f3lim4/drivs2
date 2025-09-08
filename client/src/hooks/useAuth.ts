@@ -18,25 +18,19 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session in localStorage
+    // Check for existing session in localStorage  
     const savedProfile = localStorage.getItem('drivs_profile');
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile);
-        
-        // Validar se o profile tem dados essenciais
-        if (!profile || !profile.email || (!profile.locadoraId && !profile.id)) {
-          console.warn('Profile corrompido detectado, redirecionando para logout de emergência');
-          localStorage.removeItem('drivs_profile');
-          setProfile(null);
-          // Redirecionar para página de emergência
-          window.location.href = '/emergency-logout';
-          return;
-        } else {
+        // Sistema simples: se tem profile salvo, usa ele
+        if (profile && profile.email) {
           setProfile(profile);
+        } else {
+          localStorage.removeItem('drivs_profile');
         }
       } catch (error) {
-        console.error('Error parsing saved profile:', error);
+        // Se erro no parse, apenas remove e continua
         localStorage.removeItem('drivs_profile');
       }
     }
@@ -91,17 +85,10 @@ export function useAuth() {
     }
   };
 
-  const logout = async (reason?: string) => {
+  const logout = async () => {
     setProfile(null);
     localStorage.removeItem('drivs_profile');
-    
-    // Se tem um motivo específico, mostrar antes do reload
-    if (reason) {
-      alert(reason);
-    }
-    
-    // Força reload da página para limpar cache
-    window.location.reload();
+    // Logout simples sem forçar reload
   };
 
   // Sistema simplificado: tem conta = entra, não tem conta = não entra
