@@ -182,20 +182,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verificar se a locadora está ativa (se for tipo locadora)
       if (profile.type === 'locadora' && profile.locadoraId) {
         const locadora = await storage.getLocadoraById(profile.locadoraId);
-        if (!locadora) {
-          console.log("Locadora não encontrada ou excluída:", profile.locadoraId);
-          return res.status(401).json({ message: "Esta conta foi excluída permanentemente do sistema" });
+        if (locadora) {
+          // Verificar se a locadora está ativa
+          if (locadora.status !== 'ativa') {
+            console.log("Locadora inativa tentando fazer login:", profile.locadoraId, "Status:", locadora.status);
+            return res.status(401).json({ 
+              message: locadora.status === 'inativa' 
+                ? "Esta conta está temporariamente desativada. Entre em contato com o administrador."
+                : "Conta pendente de aprovação. Aguarde a ativação."
+            });
+          }
         }
-        
-        // Verificar se a locadora está ativa
-        if (locadora.status !== 'ativa') {
-          console.log("Locadora inativa tentando fazer login:", profile.locadoraId, "Status:", locadora.status);
-          return res.status(401).json({ 
-            message: locadora.status === 'inativa' 
-              ? "Esta conta está temporariamente desativada. Entre em contato com o administrador."
-              : "Conta pendente de aprovação. Aguarde a ativação."
-          });
-        }
+        // Se locadora não existe mais (foi excluída), permite continuar login
       }
       
       // Get user by user ID and verify password
@@ -535,14 +533,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(todosVeiculos);
       }
 
-      // VERIFICAR SE A LOCADORA EXISTE
+      // Se locadora não existir mais (foi excluída), retorna lista vazia
       const locadora = await storage.getLocadora(locadoraId as string);
       if (!locadora) {
-        console.warn(`[LOCADORA EXCLUÍDA] Tentativa de acesso à locadora inexistente: ${locadoraId}`);
-        return res.status(410).json({ 
-          message: "LOCADORA_DELETED",
-          details: "Esta locadora foi excluída. Faça login novamente." 
-        });
+        console.log(`Locadora não encontrada: ${locadoraId} - retornando lista vazia`);
+        return res.json([]);
       }
       
       const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
@@ -761,14 +756,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(todosMotoristas);
       }
 
-      // VERIFICAR SE A LOCADORA EXISTE
+      // Se locadora não existir mais (foi excluída), retorna lista vazia
       const locadora = await storage.getLocadora(locadoraId as string);
       if (!locadora) {
-        console.warn(`[LOCADORA EXCLUÍDA] Tentativa de acesso à locadora inexistente: ${locadoraId}`);
-        return res.status(410).json({ 
-          message: "LOCADORA_DELETED",
-          details: "Esta locadora foi excluída. Faça login novamente." 
-        });
+        console.log(`Locadora não encontrada: ${locadoraId} - retornando lista vazia`);
+        return res.json([]);
       }
       
       const motoristas = await storage.getMotoristasByLocadora(locadoraId as string);
@@ -1777,15 +1769,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         headers: req.headers
       });
 
-      // VERIFICAR SE A LOCADORA EXISTE (quando há locadoraId)
+      // Se locadora não existir mais (foi excluída), retorna lista vazia
       if (locadoraId) {
         const locadora = await storage.getLocadora(locadoraId as string);
         if (!locadora) {
-          console.warn(`[LOCADORA EXCLUÍDA] Tentativa de acesso à locadora inexistente: ${locadoraId}`);
-          return res.status(410).json({ 
-            message: "LOCADORA_DELETED",
-            details: "Esta locadora foi excluída. Faça login novamente." 
-          });
+          console.log(`Locadora não encontrada: ${locadoraId} - retornando lista vazia`);
+          return res.json([]);
         }
       }
       
@@ -3637,13 +3626,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "locadoraId é obrigatório" });
       }
 
-      // Verificar se a locadora existe
+      // Se locadora não existir mais (foi excluída), retorna lista vazia
       const locadora = await storage.getLocadora(locadoraId as string);
       if (!locadora) {
-        return res.status(410).json({ 
-          message: "LOCADORA_DELETED",
-          details: "Esta locadora foi excluída. Faça login novamente." 
-        });
+        console.log(`Locadora não encontrada: ${locadoraId} - retornando lista vazia`);
+        return res.json([]);
       }
 
       const notificacoes = await storage.getNotificacoesByLocadora(locadoraId as string);
