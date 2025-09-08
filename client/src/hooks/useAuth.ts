@@ -23,14 +23,17 @@ export function useAuth() {
     if (savedProfile) {
       try {
         const profile = JSON.parse(savedProfile);
-        // Sistema simples: se tem profile salvo, usa ele
-        if (profile && profile.email) {
+        // Validação básica para evitar loops
+        if (profile && profile.email && profile.type && (profile.id || profile.userId)) {
           setProfile(profile);
         } else {
+          // Profile inválido, remove mas não redireciona
+          console.log('Profile inválido removido do localStorage');
           localStorage.removeItem('drivs_profile');
         }
       } catch (error) {
         // Se erro no parse, apenas remove e continua
+        console.log('Erro ao fazer parse do profile, removendo');
         localStorage.removeItem('drivs_profile');
       }
     }
