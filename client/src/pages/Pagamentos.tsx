@@ -40,11 +40,11 @@ export default function Pagamentos() {
     userId: profile?.id
   });
   
-  // SOLUÇÃO TEMPORÁRIA: Forçar refetch se sem dados
-  const { data: pagamentos2 } = useQuery({
-    queryKey: ['/api/pagamentos-fresh', profile?.id],
+  // SOLUÇÃO TEMPORÁRIA: Forçar refetch com locadoraId correto
+  const { data: pagamentosFresh } = useQuery({
+    queryKey: ['/api/pagamentos-fresh', profile?.locadoraId],
     queryFn: async () => {
-      const response = await fetch(`/api/pagamentos?locadoraId=${profile?.id}`, {
+      const response = await fetch(`/api/pagamentos?locadoraId=${profile?.locadoraId}`, {
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
@@ -55,7 +55,7 @@ export default function Pagamentos() {
       console.log('🔄 FRESH PAGAMENTOS:', data);
       return data;
     },
-    enabled: !!profile?.id,
+    enabled: !!profile?.locadoraId,
     refetchOnMount: true,
     staleTime: 0
   });
