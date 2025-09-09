@@ -44,12 +44,18 @@ export default function Pagamentos() {
     freshData: pagamentosFresh?.length || 0
   });
 
-  // Forçar atualização do localStorage
-  if (profile && !profile.locadoraId) {
-    console.log('🔄 ATUALIZANDO PROFILE NO CACHE...');
-    localStorage.removeItem('drivs_profile');
-    window.location.reload();
-  }
+  // Cache corrigido - forçar re-login uma única vez se necessário
+  const [jaTentouCorrigir, setJaTentouCorrigir] = useState(false);
+  
+  useEffect(() => {
+    if (profile && !profile.locadoraId && !jaTentouCorrigir) {
+      console.log('🔄 CORRIGINDO CACHE DO PROFILE - UMA ÚNICA VEZ');
+      localStorage.removeItem('drivs_profile');
+      setJaTentouCorrigir(true);
+      // Força refetch do profile diretamente
+      window.location.href = '/login';
+    }
+  }, [profile, jaTentouCorrigir]);
   
   // SOLUÇÃO: Forçar busca com locadoraId correto (50764571000170)
   const { data: pagamentosFresh } = useQuery({
