@@ -62,24 +62,24 @@ export default function Pagamentos() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   
-  // Estados para alternar visualização dos cards de pagamentos
-  const [visualizacaoPagamento, setVisualizacaoPagamento] = useState<'geral' | 'mensal' | 'semanal'>('geral');
-  const [visualizacaoRecebido, setVisualizacaoRecebido] = useState<'geral' | 'mensal' | 'semanal'>('geral');
-  const [visualizacaoAberto, setVisualizacaoAberto] = useState<'geral' | 'mensal' | 'semanal'>('geral');
-  const [visualizacaoParcial, setVisualizacaoParcial] = useState<'geral' | 'mensal' | 'semanal'>('geral');
+  // Estados para alternar visualização dos cards de pagamentos (INICIANDO EM SEMANAL)
+  const [visualizacaoPagamento, setVisualizacaoPagamento] = useState<'geral' | 'mensal' | 'semanal'>('semanal');
+  const [visualizacaoRecebido, setVisualizacaoRecebido] = useState<'geral' | 'mensal' | 'semanal'>('semanal');
+  const [visualizacaoAberto, setVisualizacaoAberto] = useState<'geral' | 'mensal' | 'semanal'>('semanal');
+  const [visualizacaoParcial, setVisualizacaoParcial] = useState<'geral' | 'mensal' | 'semanal'>('semanal');
 
-  // Função para alternar visualização do primeiro card
+  // Função para alternar visualização do primeiro card (ORDEM: semanal → mensal → geral)
   const alternarVisualizacao = () => {
     setVisualizacaoPagamento(prev => {
       switch (prev) {
-        case 'geral':
+        case 'semanal':
           return 'mensal';
         case 'mensal':
+          return 'geral';
+        case 'geral':
           return 'semanal';
-        case 'semanal':
-          return 'geral';
         default:
-          return 'geral';
+          return 'semanal';
       }
     });
   };
@@ -88,14 +88,14 @@ export default function Pagamentos() {
   const alternarVisualizacaoRecebido = () => {
     setVisualizacaoRecebido(prev => {
       switch (prev) {
-        case 'geral':
+        case 'semanal':
           return 'mensal';
         case 'mensal':
+          return 'geral';
+        case 'geral':
           return 'semanal';
-        case 'semanal':
-          return 'geral';
         default:
-          return 'geral';
+          return 'semanal';
       }
     });
   };
@@ -104,14 +104,14 @@ export default function Pagamentos() {
   const alternarVisualizacaoAberto = () => {
     setVisualizacaoAberto(prev => {
       switch (prev) {
-        case 'geral':
+        case 'semanal':
           return 'mensal';
         case 'mensal':
+          return 'geral';
+        case 'geral':
           return 'semanal';
-        case 'semanal':
-          return 'geral';
         default:
-          return 'geral';
+          return 'semanal';
       }
     });
   };
@@ -120,9 +120,41 @@ export default function Pagamentos() {
   const alternarVisualizacaoParcial = () => {
     setVisualizacaoParcial(prev => {
       switch (prev) {
-        case 'geral':
+        case 'semanal':
           return 'mensal';
         case 'mensal':
+          return 'geral';
+        case 'geral':
+          return 'semanal';
+        default:
+          return 'semanal';
+      }
+    });
+  };
+
+  // Função para calcular início e fim da semana (Segunda a Domingo)
+  const calcularSemanaAtual = () => {
+    const hoje = new Date();
+    const diaSemana = hoje.getDay(); // 0 = domingo, 1 = segunda, ...
+    
+    // Calcular quantos dias voltar para chegar na segunda
+    const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1;
+    
+    const inicioSemana = new Date(hoje);
+    inicioSemana.setDate(hoje.getDate() - diasParaSegunda);
+    inicioSemana.setHours(0, 0, 0, 0);
+    
+    const fimSemana = new Date(inicioSemana);
+    fimSemana.setDate(inicioSemana.getDate() + 6);
+    fimSemana.setHours(23, 59, 59, 999);
+    
+    return { inicioSemana, fimSemana };
+  };
+
+  // Função auxiliar - continuação do switch que foi cortado
+  const continuarSwitch = () => {
+    switch ('mensal') {
+      case 'mensal':
           return 'semanal';
         case 'semanal':
           return 'geral';
