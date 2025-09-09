@@ -30,6 +30,35 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 export default function Pagamentos() {
   const { profile } = useAuth();
   const { pagamentos, isLoading: loadingPagamentos, createPagamento, updatePagamento, deletePagamento } = usePagamentos();
+  
+  // DEBUG: Adicionar logs para investigar o problema
+  console.log('📊 PAGAMENTOS DEBUG:', {
+    total: pagamentos?.length || 0,
+    primeiros3: pagamentos?.slice(0, 3) || [],
+    profile: profile?.email,
+    locadoraId: profile?.locadoraId,
+    userId: profile?.id
+  });
+  
+  // SOLUÇÃO TEMPORÁRIA: Forçar refetch se sem dados
+  const { data: pagamentos2 } = useQuery({
+    queryKey: ['/api/pagamentos-fresh', profile?.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/pagamentos?locadoraId=${profile?.id}`, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      const data = await response.json();
+      console.log('🔄 FRESH PAGAMENTOS:', data);
+      return data;
+    },
+    enabled: !!profile?.id,
+    refetchOnMount: true,
+    staleTime: 0
+  });
   const { motoristas, isLoading: loadingMotoristas } = useMotoristas();
 
   // Buscar dados adicionais necessários para o sistema completo
