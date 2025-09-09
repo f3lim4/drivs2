@@ -151,19 +151,6 @@ export default function Pagamentos() {
     return { inicioSemana, fimSemana };
   };
 
-  // Função auxiliar - continuação do switch que foi cortado
-  const continuarSwitch = () => {
-    switch ('mensal') {
-      case 'mensal':
-          return 'semanal';
-        case 'semanal':
-          return 'geral';
-        default:
-          return 'geral';
-      }
-    });
-  };
-
   const handleVerDetalhes = (pagamento: Pagamento) => {
     setPagamentoSelecionado(pagamento);
     setShowDetalhes(true);
@@ -329,15 +316,14 @@ export default function Pagamentos() {
           .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
       
       case 'semanal':
-        // Valor semanal (pagamentos dos últimos 7 dias)
-        const seteDiasAtras = new Date();
-        seteDiasAtras.setDate(hoje.getDate() - 7);
+        // Valor semanal (Segunda a Domingo da semana atual)
+        const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
         return pagamentosFiltrados
           .filter(p => {
             if (!p.dataPagamento) return false;
             const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento >= seteDiasAtras && dataPagamento <= hoje;
+            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
       
@@ -365,7 +351,11 @@ export default function Pagamentos() {
       case 'mensal':
         return `Pagamentos de ${mesNome}`;
       case 'semanal':
-        return 'Últimos 7 dias';
+        // Mostrar período da semana atual
+        const { inicioSemana, fimSemana } = calcularSemanaAtual();
+        const inicioFormatado = inicioSemana.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const fimFormatado = fimSemana.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        return `${inicioFormatado} a ${fimFormatado}`;
       default:
         return 'Todos os pagamentos';
     }
@@ -390,14 +380,14 @@ export default function Pagamentos() {
           .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
       
       case 'semanal':
-        const seteDiasAtras = new Date();
-        seteDiasAtras.setDate(hoje.getDate() - 7);
+        // Valor semanal (Segunda a Domingo da semana atual)
+        const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
         return pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento) return false;
             const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento >= seteDiasAtras && dataPagamento <= hoje;
+            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
       
@@ -425,7 +415,11 @@ export default function Pagamentos() {
       case 'mensal':
         return `Recebidos em ${mesNome}`;
       case 'semanal':
-        return 'Recebidos últimos 7 dias';
+        // Mostrar período da semana atual
+        const { inicioSemana, fimSemana } = calcularSemanaAtual();
+        const inicioFormatado = inicioSemana.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const fimFormatado = fimSemana.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        return `Recebidos ${inicioFormatado} a ${fimFormatado}`;
       default:
         return 'Todos recebidos';
     }
@@ -450,14 +444,14 @@ export default function Pagamentos() {
           .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
       
       case 'semanal':
-        const seteDiasAtras = new Date();
-        seteDiasAtras.setDate(hoje.getDate() - 7);
+        // Valor semanal (Segunda a Domingo da semana atual)
+        const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
         return pagamentosAberto
           .filter(p => {
             if (!p.dataPagamento) return false;
             const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento >= seteDiasAtras && dataPagamento <= hoje;
+            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
       
@@ -485,7 +479,11 @@ export default function Pagamentos() {
       case 'mensal':
         return `Em aberto em ${mesNome}`;
       case 'semanal':
-        return 'Em aberto últimos 7 dias';
+        // Mostrar período da semana atual
+        const { inicioSemana, fimSemana } = calcularSemanaAtual();
+        const inicioFormatado = inicioSemana.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const fimFormatado = fimSemana.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        return `Em aberto ${inicioFormatado} a ${fimFormatado}`;
       default:
         return 'Todos em aberto';
     }
@@ -510,14 +508,14 @@ export default function Pagamentos() {
           .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
       
       case 'semanal':
-        const seteDiasAtras = new Date();
-        seteDiasAtras.setDate(hoje.getDate() - 7);
+        // Valor semanal (Segunda a Domingo da semana atual)
+        const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
         return pagamentosParciais
           .filter(p => {
             if (!p.dataPagamento) return false;
             const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento >= seteDiasAtras && dataPagamento <= hoje;
+            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
       
@@ -545,7 +543,11 @@ export default function Pagamentos() {
       case 'mensal':
         return `Parciais em ${mesNome}`;
       case 'semanal':
-        return 'Parciais últimos 7 dias';
+        // Mostrar período da semana atual
+        const { inicioSemana, fimSemana } = calcularSemanaAtual();
+        const inicioFormatado = inicioSemana.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        const fimFormatado = fimSemana.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        return `Parciais ${inicioFormatado} a ${fimFormatado}`;
       default:
         return 'Todos parciais';
     }
