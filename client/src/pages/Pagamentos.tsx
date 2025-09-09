@@ -31,7 +31,7 @@ export default function Pagamentos() {
   const { profile } = useAuth();
   const { pagamentos, isLoading: loadingPagamentos, createPagamento, updatePagamento, deletePagamento } = usePagamentos();
   
-  // Usar dados corretos - priorizar os dados carregados com locadoraId correto
+  // CORRIGIR: Usar SEMPRE os dados corretos em vez dos dados do cache
   const dadosCorretos = pagamentosFresh || [];
   
   // Dados corrigidos - usando pagamentos reais do banco
@@ -236,7 +236,7 @@ export default function Pagamentos() {
 
   // Filtrar e ordenar pagamentos
   const pagamentosFiltrados = useMemo(() => {
-    let filtered = pagamentos;
+    let filtered = dadosCorretos;
 
     // Filtro por texto (nome do motorista, descrição, observações)
     if (filtroTexto) {
@@ -284,7 +284,7 @@ export default function Pagamentos() {
     });
 
     return filtered;
-  }, [pagamentos, filtroTexto, filtroStatus, filtroTipo, sortOrder]);
+  }, [dadosCorretos, filtroTexto, filtroStatus, filtroTipo, sortOrder]);
 
   // Paginação
   const totalPages = Math.ceil(pagamentosFiltrados.length / itemsPerPage);
