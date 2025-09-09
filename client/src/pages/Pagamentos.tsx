@@ -32,7 +32,7 @@ export default function Pagamentos() {
   
   // DIRETO: Dados fixos enquanto não corrige cache
   const [pagamentos, setPagamentos] = useState([
-    { id: "pag-001", locadoraId: "50764571000170", motoristaId: "mot-001", valorTotal: "550.00", valorPago: "550.00", status: "pago", dataPagamento: "2025-09-09", tipo: "semanal" },
+    { id: "pag-001", locadoraId: "50764571000170", motoristaId: "mot-001", valorTotal: "550.00", valorPago: "550.00", status: "pago", dataPagamento: "2025-09-09", tipo: "semanal", descricao: "Pagamento semanal", valorRestante: "0.00" },
     { id: "pag-002", locadoraId: "50764571000170", motoristaId: "mot-002", valorTotal: "413.79", valorPago: "413.79", status: "pago", dataPagamento: "2025-09-08", tipo: "semanal" },
     { id: "pag-003", locadoraId: "50764571000170", motoristaId: "mot-003", valorTotal: "505.75", valorPago: "505.75", status: "pago", dataPagamento: "2025-09-07", tipo: "semanal" },
     { id: "pag-004", locadoraId: "50764571000170", motoristaId: "mot-001", valorTotal: "550.00", valorPago: "0.00", status: "em_aberto", dataPagamento: "2025-09-16", tipo: "semanal" },
