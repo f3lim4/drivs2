@@ -34,28 +34,7 @@ export default function Pagamentos() {
   // Usar dados corretos - priorizar os dados carregados com locadoraId correto
   const dadosCorretos = pagamentosFresh || [];
   
-  // DEBUG: Adicionar logs para investigar o problema
-  console.log('📊 PAGAMENTOS DEBUG:', {
-    total: pagamentos?.length || 0,
-    primeiros3: pagamentos?.slice(0, 3) || [],
-    profile: profile?.email,
-    locadoraId: profile?.locadoraId,
-    userId: profile?.id,
-    freshData: pagamentosFresh?.length || 0
-  });
-
-  // Cache corrigido - forçar re-login uma única vez se necessário
-  const [jaTentouCorrigir, setJaTentouCorrigir] = useState(false);
-  
-  useEffect(() => {
-    if (profile && !profile.locadoraId && !jaTentouCorrigir) {
-      console.log('🔄 CORRIGINDO CACHE DO PROFILE - UMA ÚNICA VEZ');
-      localStorage.removeItem('drivs_profile');
-      setJaTentouCorrigir(true);
-      // Força refetch do profile diretamente
-      window.location.href = '/login';
-    }
-  }, [profile, jaTentouCorrigir]);
+  // Dados corrigidos - usando pagamentos reais do banco
   
   // SOLUÇÃO: Forçar busca com locadoraId correto (50764571000170)
   const { data: pagamentosFresh } = useQuery({
