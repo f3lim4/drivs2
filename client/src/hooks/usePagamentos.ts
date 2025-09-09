@@ -8,13 +8,7 @@ export function usePagamentos() {
 
   const locadoraId = profile?.locadoraId || profile?.id;
   
-  // DEBUG: Verificar qual ID está sendo usado
-  console.log('🔍 PAGAMENTOS HOOK:', {
-    profileId: profile?.id,
-    locadoraId: profile?.locadoraId,
-    usedId: locadoraId,
-    email: profile?.email
-  });
+  // Hook funcionando normalmente"
 
   const query = useQuery({
     queryKey: ['/api/pagamentos', locadoraId],
