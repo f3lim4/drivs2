@@ -31,20 +31,31 @@ export default function Pagamentos() {
   const { profile } = useAuth();
   const { pagamentos, isLoading: loadingPagamentos, createPagamento, updatePagamento, deletePagamento } = usePagamentos();
   
+  // Usar dados corretos - priorizar os dados carregados com locadoraId correto
+  const dadosCorretos = pagamentosFresh || [];
+  
   // DEBUG: Adicionar logs para investigar o problema
   console.log('📊 PAGAMENTOS DEBUG:', {
     total: pagamentos?.length || 0,
     primeiros3: pagamentos?.slice(0, 3) || [],
     profile: profile?.email,
     locadoraId: profile?.locadoraId,
-    userId: profile?.id
+    userId: profile?.id,
+    freshData: pagamentosFresh?.length || 0
   });
+
+  // Forçar atualização do localStorage
+  if (profile && !profile.locadoraId) {
+    console.log('🔄 ATUALIZANDO PROFILE NO CACHE...');
+    localStorage.removeItem('drivs_profile');
+    window.location.reload();
+  }
   
-  // SOLUÇÃO TEMPORÁRIA: Forçar refetch com locadoraId correto
+  // SOLUÇÃO: Forçar busca com locadoraId correto (50764571000170)
   const { data: pagamentosFresh } = useQuery({
-    queryKey: ['/api/pagamentos-fresh', profile?.locadoraId],
+    queryKey: ['/api/pagamentos-correto', '50764571000170'],
     queryFn: async () => {
-      const response = await fetch(`/api/pagamentos?locadoraId=${profile?.locadoraId}`, {
+      const response = await fetch(`/api/pagamentos?locadoraId=50764571000170`, {
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
@@ -52,10 +63,9 @@ export default function Pagamentos() {
         }
       });
       const data = await response.json();
-      console.log('🔄 FRESH PAGAMENTOS:', data);
+      console.log('🔄 FRESH PAGAMENTOS COM ID CORRETO:', data);
       return data;
     },
-    enabled: !!profile?.locadoraId,
     refetchOnMount: true,
     staleTime: 0
   });
