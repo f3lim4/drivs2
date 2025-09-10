@@ -32,10 +32,22 @@ export default function Pagamentos() {
   
   // BUSCAR DADOS REAIS DO BANCO COM ID CORRETO DA LOCADORA!
   const locadoraId = "50764571000170"; // ID correto da locadora
+  
+  console.log('🔧 [DEBUG] Forçando query com locadoraId:', locadoraId);
+  
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['/api/pagamentos', locadoraId],
-    queryFn: () => fetch(`/api/pagamentos?locadoraId=${locadoraId}`).then(res => res.json()),
-    enabled: true
+    queryKey: ['api-pagamentos-forçado', locadoraId, Date.now()], // Query key única para evitar cache
+    queryFn: async () => {
+      console.log('🔧 [DEBUG] Executando fetch com URL:', `/api/pagamentos?locadoraId=${locadoraId}`);
+      const response = await fetch(`/api/pagamentos?locadoraId=${locadoraId}`);
+      const data = await response.json();
+      console.log('🔧 [DEBUG] Dados recebidos:', data.length, 'pagamentos');
+      return data;
+    },
+    enabled: true,
+    staleTime: 0, // Sempre buscar dados frescos
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
   
   const createPagamento = () => {}; // Simplificado
