@@ -34,6 +34,7 @@ export default function Pagamentos() {
   const locadoraId = "50764571000170"; // ID correto da locadora
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
     queryKey: ['/api/pagamentos', locadoraId],
+    queryFn: () => fetch(`/api/pagamentos?locadoraId=${locadoraId}`).then(res => res.json()),
     enabled: true
   });
   
