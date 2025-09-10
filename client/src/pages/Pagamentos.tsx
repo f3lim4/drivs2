@@ -30,16 +30,12 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 export default function Pagamentos() {
   const { profile } = useAuth();
   
-  // DADOS CORRETOS: Com veículos e valores da semana atual
-  const [pagamentos] = useState([
-    { id: "pag-001", codigoPagamento: null, locadoraId: "50764571000170", motoristaId: "mot-001", aluguelId: null, tipo: "semanal", descricao: "Pagamento semanal", automatico: false, valorTotal: "550.00", valorPago: "550.00", valorRestante: "0.00", valorJuros: "0.00", valorMulta: "0.00", dataPagamento: "2025-09-09", status: "pago", observacoes: null, createdAt: "2025-09-09T11:20:03.947Z", updatedAt: "2025-09-09T11:20:03.947Z", data: "2025-09-09", valor: "550.00", motoristaNome: "Glauber Vander da Costa", motoristaContato: "11999999999", veiculo: "Renault Sandero - FNC0C06" },
-    { id: "pag-002", codigoPagamento: null, locadoraId: "50764571000170", motoristaId: "mot-002", aluguelId: null, tipo: "semanal", descricao: "Pagamento semanal", automatico: false, valorTotal: "413.79", valorPago: "413.79", valorRestante: "0.00", valorJuros: "0.00", valorMulta: "0.00", dataPagamento: "2025-09-08", status: "pago", observacoes: null, createdAt: "2025-09-09T11:20:03.947Z", updatedAt: "2025-09-09T11:20:03.947Z", data: "2025-09-08", valor: "413.79", motoristaNome: "Evandro Silva dos Santos", motoristaContato: "11988888888", veiculo: "Fiat Uno - FYN1890" },
-    { id: "pag-003", codigoPagamento: null, locadoraId: "50764571000170", motoristaId: "mot-003", aluguelId: null, tipo: "semanal", descricao: "Pagamento semanal", automatico: false, valorTotal: "505.75", valorPago: "505.75", valorRestante: "0.00", valorJuros: "0.00", valorMulta: "0.00", dataPagamento: "2025-09-07", status: "pago", observacoes: null, createdAt: "2025-09-09T11:20:03.947Z", updatedAt: "2025-09-09T11:20:03.947Z", data: "2025-09-07", valor: "505.75", motoristaNome: "Marcelo Euzebio", motoristaContato: "11977777777", veiculo: "Chevrolet Onix - ABC1234" },
-    { id: "pag-004", codigoPagamento: null, locadoraId: "50764571000170", motoristaId: "mot-001", aluguelId: null, tipo: "semanal", descricao: "Pagamento semanal", automatico: false, valorTotal: "550.00", valorPago: "0.00", valorRestante: "550.00", valorJuros: "0.00", valorMulta: "0.00", dataPagamento: "2025-09-02", status: "em_aberto", observacoes: null, createdAt: "2025-09-09T11:20:03.947Z", updatedAt: "2025-09-09T11:20:03.947Z", data: "2025-09-02", valor: "0.00", motoristaNome: "Glauber Vander da Costa", motoristaContato: "11999999999", veiculo: "Renault Sandero - FNC0C06" },
-    { id: "pag-005", codigoPagamento: null, locadoraId: "50764571000170", motoristaId: "mot-002", aluguelId: null, tipo: "semanal", descricao: "Pagamento semanal", automatico: false, valorTotal: "413.79", valorPago: "0.00", valorRestante: "413.79", valorJuros: "0.00", valorMulta: "0.00", dataPagamento: "2025-09-01", status: "em_aberto", observacoes: null, createdAt: "2025-09-09T11:20:03.947Z", updatedAt: "2025-09-09T11:20:03.947Z", data: "2025-09-01", valor: "0.00", motoristaNome: "Evandro Silva dos Santos", motoristaContato: "11988888888", veiculo: "Fiat Uno - FYN1890" },
-    { id: "pag-006", codigoPagamento: null, locadoraId: "50764571000170", motoristaId: "mot-003", aluguelId: null, tipo: "semanal", descricao: "Pagamento semanal", automatico: false, valorTotal: "305.75", valorPago: "200.00", valorRestante: "105.75", valorJuros: "0.00", valorMulta: "0.00", dataPagamento: "2025-09-06", status: "parcial", observacoes: null, createdAt: "2025-09-09T11:20:03.947Z", updatedAt: "2025-09-09T11:20:03.947Z", data: "2025-09-06", valor: "200.00", motoristaNome: "Marcelo Euzebio", motoristaContato: "11977777777", veiculo: "Chevrolet Onix - ABC1234" }
-  ]);
-  const loadingPagamentos = false;
+  // BUSCAR DADOS REAIS DO BANCO COM ID CORRETO DA LOCADORA!
+  const locadoraId = "50764571000170"; // ID correto da locadora
+  const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
+    queryKey: ['/api/pagamentos', locadoraId],
+    enabled: true
+  });
   
   const createPagamento = () => {}; // Simplificado
   const updatePagamento = () => {}; // Simplificado 
@@ -765,7 +761,7 @@ export default function Pagamentos() {
                       <div className="font-medium">
                         {pagamento.motoristaNome || (pagamento as any).motoristaNome || `${pagamento.motoristaId} - Excluído` || 'Nome não disponível'}
                       </div>
-                      <div className="text-xs text-muted-foreground">{pagamento.motoristaId || 'CPF não informado'}</div>
+                      <div className="text-xs text-muted-foreground">{(pagamento as any).motoristaCpf || (pagamento as any).cpf || 'CPF não informado'}</div>
                     </div>
                   </TableCell>
                   <TableCell>

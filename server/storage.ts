@@ -965,6 +965,7 @@ export class DatabaseStorage implements IStorage {
             valor: pagamento.valorPago, // Mapear campo valor corretamente
             motoristaNome: motorista[0] ? motorista[0].nome : `${pagamento.motoristaId} - Excluído`,
             motoristaContato: motorista[0]?.telefone || '',
+            motoristaCpf: motorista[0]?.cpf || '', // ADICIONADO: CPF do motorista
             // Adicionar dados do veículo
             ...veiculoData
           };
