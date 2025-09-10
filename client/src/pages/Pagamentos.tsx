@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { usePagamentos } from '@/hooks/usePagamentos';
+// REMOVIDO: import { usePagamentos } from '@/hooks/usePagamentos'; // Causava conflito com ID errado
 import { useMotoristas } from '@/hooks/useMotoristas';
 import { useAuth } from '@/hooks/useAuth';
 import { Pagination } from '@/components/ui/pagination';
@@ -36,22 +36,29 @@ export default function Pagamentos() {
   console.log('🚀 [VERSÃO V3] Usando locadoraId correto:', locadoraId);
   console.log('🚀 [VERSÃO V3] Profile atual:', profile?.id);
   
+  // FORÇA QUERY ÚNICA COM ID CORRETO - DESABILITA QUALQUER CACHE
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['api-pagamentos-forçado-v2', locadoraId], // Query key simplificada
+    queryKey: ['pagamentos-final-v4', locadoraId, Date.now()], // Key única toda vez
     queryFn: async () => {
       const url = `/api/pagamentos?locadoraId=${locadoraId}`;
-      console.log('🔧 [DEBUG] EXECUTANDO FETCH:', url);
-      const response = await fetch(url);
+      console.log('🚀 [V4] FETCH FORÇADO:', url);
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       const data = await response.json();
-      console.log('🔧 [DEBUG] RESPONSE DATA:', data);
-      console.log('🔧 [DEBUG] TOTAL PAGAMENTOS:', data.length);
+      console.log('🚀 [V4] DADOS RECEBIDOS:', data.length, 'pagamentos');
+      console.log('🚀 [V4] PRIMEIRO PAGAMENTO:', data[0]?.motoristaNome || 'vazio');
       return data;
     },
     enabled: true,
     staleTime: 0,
     cacheTime: 0,
     refetchOnMount: 'always',
-    refetchOnWindowFocus: true
+    retry: false // Não tentar novamente se falhar
   });
   
   const createPagamento = () => {}; // Simplificado
