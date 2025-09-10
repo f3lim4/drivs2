@@ -36,12 +36,12 @@ export default function Pagamentos() {
   console.log('🚀 [VERSÃO V3] Usando locadoraId correto:', locadoraId);
   console.log('🚀 [VERSÃO V3] Profile atual:', profile?.id);
   
-  // FORÇA QUERY ÚNICA COM ID CORRETO - DESABILITA QUALQUER CACHE
+  // QUERY CORRIGIDA - SEM LOOP INFINITO
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['pagamentos-final-v4', locadoraId, Date.now()], // Key única toda vez
+    queryKey: ['pagamentos-locadora-corrigida', locadoraId], // Key estável
     queryFn: async () => {
       const url = `/api/pagamentos?locadoraId=${locadoraId}`;
-      console.log('🚀 [V4] FETCH FORÇADO:', url);
+      console.log('✅ [QUERY FINAL] Executando:', url);
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -50,15 +50,12 @@ export default function Pagamentos() {
         }
       });
       const data = await response.json();
-      console.log('🚀 [V4] DADOS RECEBIDOS:', data.length, 'pagamentos');
-      console.log('🚀 [V4] PRIMEIRO PAGAMENTO:', data[0]?.motoristaNome || 'vazio');
+      console.log('✅ [QUERY FINAL] Sucesso:', data.length, 'pagamentos carregados');
       return data;
     },
     enabled: true,
-    staleTime: 0,
-    cacheTime: 0,
-    refetchOnMount: 'always',
-    retry: false // Não tentar novamente se falhar
+    staleTime: 1000, // 1 segundo de cache para evitar chamadas excessivas
+    retry: 1 // Apenas 1 tentativa
   });
   
   const createPagamento = () => {}; // Simplificado
