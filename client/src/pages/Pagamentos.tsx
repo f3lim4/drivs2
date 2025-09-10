@@ -469,38 +469,48 @@ export default function Pagamentos() {
     }
   };
 
-  // Funções para o card em aberto
+  // Funções para o card em aberto (CORRIGIDO)
   const calcularValorVisualizacaoAberto = () => {
     const hoje = new Date();
     const anoAtual = hoje.getFullYear();
     const mesAtual = hoje.getMonth();
     const pagamentosAberto = pagamentosFiltrados.filter(p => p.status === 'em_aberto' || p.status === 'pendente');
     
+    console.log('🔧 [DEBUG ABERTO] Visualização:', visualizacaoAberto);
+    console.log('🔧 [DEBUG ABERTO] Pagamentos em aberto encontrados:', pagamentosAberto.length);
+    
     switch (visualizacaoAberto) {
       case 'mensal':
-        return pagamentosAberto
+        const valorMensal = pagamentosAberto
           .filter(p => {
             if (!p.dataPagamento) return false;
             const dataPagamento = new Date(p.dataPagamento);
             return dataPagamento.getFullYear() === anoAtual && 
                    dataPagamento.getMonth() === mesAtual;
           })
-          .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
+          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0); // CORRIGIDO: valorRestante
+        console.log('🔧 [DEBUG ABERTO] Valor mensal calculado:', valorMensal);
+        return valorMensal;
       
       case 'semanal':
         // Valor semanal (Segunda a Domingo da semana atual)
         const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
-        return pagamentosAberto
+        const valorSemanal = pagamentosAberto
           .filter(p => {
             if (!p.dataPagamento) return false;
             const dataPagamento = new Date(p.dataPagamento);
             return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           })
-          .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
+          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0); // CORRIGIDO: valorRestante
+        console.log('🔧 [DEBUG ABERTO] Valor semanal calculado:', valorSemanal);
+        return valorSemanal;
       
       default:
-        return totalPendente;
+        // CORRIGIDO: Calcular valor geral dos pagamentos em aberto filtrados
+        const valorGeral = pagamentosAberto.reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
+        console.log('🔧 [DEBUG ABERTO] Valor geral calculado:', valorGeral);
+        return valorGeral;
     }
   };
 
