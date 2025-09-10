@@ -30,23 +30,27 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 export default function Pagamentos() {
   const { profile } = useAuth();
   
-  // BUSCAR DADOS REAIS DO BANCO COM ID CORRETO DA LOCADORA!
+  // DADOS REAIS DO BANCO - VERSÃO CORRIGIDA V3
   const locadoraId = "50764571000170"; // ID correto da locadora
   
-  console.log('🔧 [DEBUG] Forçando query com locadoraId:', locadoraId);
+  console.log('🚀 [VERSÃO V3] Usando locadoraId correto:', locadoraId);
+  console.log('🚀 [VERSÃO V3] Profile atual:', profile?.id);
   
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['api-pagamentos-forçado', locadoraId, Date.now()], // Query key única para evitar cache
+    queryKey: ['api-pagamentos-forçado-v2', locadoraId], // Query key simplificada
     queryFn: async () => {
-      console.log('🔧 [DEBUG] Executando fetch com URL:', `/api/pagamentos?locadoraId=${locadoraId}`);
-      const response = await fetch(`/api/pagamentos?locadoraId=${locadoraId}`);
+      const url = `/api/pagamentos?locadoraId=${locadoraId}`;
+      console.log('🔧 [DEBUG] EXECUTANDO FETCH:', url);
+      const response = await fetch(url);
       const data = await response.json();
-      console.log('🔧 [DEBUG] Dados recebidos:', data.length, 'pagamentos');
+      console.log('🔧 [DEBUG] RESPONSE DATA:', data);
+      console.log('🔧 [DEBUG] TOTAL PAGAMENTOS:', data.length);
       return data;
     },
     enabled: true,
-    staleTime: 0, // Sempre buscar dados frescos
-    refetchOnMount: true,
+    staleTime: 0,
+    cacheTime: 0,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: true
   });
   
@@ -342,13 +346,26 @@ export default function Pagamentos() {
         // Valor semanal (Segunda a Domingo da semana atual)
         const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
-        return pagamentosFiltrados
+        console.log('🔧 [DEBUG SEMANAL] Período da semana:', inicioSemana.toISOString(), 'até', fimSemana.toISOString());
+        console.log('🔧 [DEBUG SEMANAL] Total pagamentos para filtrar:', pagamentosFiltrados.length);
+        
+        const pagamentosSemana = pagamentosFiltrados
           .filter(p => {
-            if (!p.dataPagamento) return false;
+            if (!p.dataPagamento) {
+              console.log('🔧 [DEBUG SEMANAL] Pagamento sem data:', p.id);
+              return false;
+            }
             const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
-          })
-          .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
+            const dentroDoIntervalo = dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
+            console.log('🔧 [DEBUG SEMANAL] Pagamento', p.id, 'data:', dataPagamento.toISOString(), 'dentro?', dentroDoIntervalo);
+            return dentroDoIntervalo;
+          });
+        
+        console.log('🔧 [DEBUG SEMANAL] Pagamentos na semana:', pagamentosSemana.length);
+        const total = pagamentosSemana.reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
+        console.log('🔧 [DEBUG SEMANAL] Total calculado:', total);
+        
+        return total;
       
       default:
         return totalGeral;
