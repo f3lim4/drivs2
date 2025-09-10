@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Plus, Eye, Edit, Trash2, Calendar, DollarSign, User, AlertCircle, Search, Filter, CheckCircle, Clock, Calculator, Car } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +24,7 @@ import { EditarPagamentoModal } from '@/components/pagamentos/EditarPagamentoMod
 import { DetalhesPagamentoModal } from '@/components/pagamentos/DetalhesPagamentoModal';
 import { ExcluirPagamentoModal } from '@/components/pagamentos/ExcluirPagamentoModal';
 import { formatDate } from '@/lib/utils';
-import type { Pagamento } from '@shared/schema';
+import type { Pagamento, InsertPagamento } from '@shared/schema';
 import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 
 export default function Pagamentos() {
@@ -58,9 +58,73 @@ export default function Pagamentos() {
     retry: 1 // Apenas 1 tentativa
   });
   
-  const createPagamento = () => {}; // Simplificado
-  const updatePagamento = () => {}; // Simplificado 
-  const deletePagamento = () => {}; // Simplificado
+  // FUNÇÕES CORRIGIDAS - USANDO MUTATIONS DO HOOK usePagamentos
+  const queryClient = useQueryClient();
+  
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<InsertPagamento> }) => {
+      console.log('🔧 [UPDATE] Atualizando pagamento:', id, updates);
+      const response = await fetch(`/api/pagamentos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      
+      if (!response.ok) throw new Error('Failed to update pagamento');
+      const result = await response.json();
+      console.log('✅ [UPDATE] Pagamento atualizado:', result);
+      return result;
+    },
+    onSuccess: () => {
+      // Invalidar cache para recarregar dados
+      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      console.log('✅ [UPDATE] Cache invalidado, dados recarregados');
+    },
+    onError: (error: Error) => {
+      console.error('❌ [UPDATE] Erro ao atualizar:', error);
+    }
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (pagamento: InsertPagamento) => {
+      console.log('🔧 [CREATE] Criando pagamento:', pagamento);
+      const response = await fetch('/api/pagamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pagamento),
+      });
+      
+      if (!response.ok) throw new Error('Failed to create pagamento');
+      const result = await response.json();
+      console.log('✅ [CREATE] Pagamento criado:', result);
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      console.log('✅ [CREATE] Cache invalidado, dados recarregados');
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      console.log('🔧 [DELETE] Excluindo pagamento:', id);
+      const response = await fetch(`/api/pagamentos/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) throw new Error('Failed to delete pagamento');
+      console.log('✅ [DELETE] Pagamento excluído');
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      console.log('✅ [DELETE] Cache invalidado, dados recarregados');
+    }
+  });
+
+  const createPagamento = (data: InsertPagamento) => createMutation.mutate(data);
+  const updatePagamento = (params: { id: string; updates: Partial<InsertPagamento> }) => updateMutation.mutate(params);
+  const deletePagamento = (id: string) => deleteMutation.mutate(id);
   const { motoristas, isLoading: loadingMotoristas } = useMotoristas();
 
   // Buscar dados adicionais necessários para o sistema completo
