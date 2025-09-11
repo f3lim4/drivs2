@@ -247,16 +247,18 @@ export default function Pagamentos() {
     });
   };
 
-  // Função para calcular início e fim da semana (Segunda a Domingo)
+  // Função para calcular início e fim da semana (Domingo a Domingo)
   const calcularSemanaAtual = () => {
     const hoje = new Date();
     const diaSemana = hoje.getDay(); // 0 = domingo, 1 = segunda, ...
     
-    // Calcular quantos dias voltar para chegar na segunda
-    const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1;
+    // Calcular quantos dias voltar para chegar no domingo
+    // Se hoje é domingo (0), não volta nenhum dia
+    // Se hoje é segunda (1), volta 1 dia, etc.
+    const diasParaDomingo = diaSemana;
     
     const inicioSemana = new Date(hoje);
-    inicioSemana.setDate(hoje.getDate() - diasParaSegunda);
+    inicioSemana.setDate(hoje.getDate() - diasParaDomingo);
     inicioSemana.setHours(0, 0, 0, 0);
     
     const fimSemana = new Date(inicioSemana);
@@ -431,7 +433,7 @@ export default function Pagamentos() {
           .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
       
       case 'semanal':
-        // Valor semanal (Segunda a Domingo da semana atual)
+        // Valor semanal (Domingo a Domingo da semana atual)
         const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
         console.log('🔧 [DEBUG SEMANAL] Período da semana:', inicioSemana.toISOString(), 'até', fimSemana.toISOString());
@@ -508,7 +510,7 @@ export default function Pagamentos() {
           .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
       
       case 'semanal':
-        // Valor semanal (Segunda a Domingo da semana atual)
+        // Valor semanal (Domingo a Domingo da semana atual)
         const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
         return pagamentosPagos
@@ -577,7 +579,7 @@ export default function Pagamentos() {
         return valorMensal;
       
       case 'semanal':
-        // Valor semanal (Segunda a Domingo da semana atual)
+        // Valor semanal (Domingo a Domingo da semana atual)
         const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
         const valorSemanal = pagamentosAberto
@@ -646,7 +648,7 @@ export default function Pagamentos() {
           .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
       
       case 'semanal':
-        // Valor semanal (Segunda a Domingo da semana atual)
+        // Valor semanal (Domingo a Domingo da semana atual)
         const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
         return pagamentosParciais
