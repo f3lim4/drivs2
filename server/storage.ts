@@ -1732,6 +1732,9 @@ export class DatabaseStorage implements IStorage {
       // Buscar dados do veículo
       const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, updated.veiculoId)).limit(1);
       
+      // Sincronizar status dos veículos após atualizar manutenção
+      await this.syncVeiculosStatus();
+      
       return {
         ...updated,
         veiculoModelo: veiculo[0]?.modelo || '',
