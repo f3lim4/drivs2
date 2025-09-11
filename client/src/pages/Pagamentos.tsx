@@ -63,34 +63,26 @@ export default function Pagamentos() {
   
   const updateMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<InsertPagamento> }) => {
-      console.log('🔧 [UPDATE MUTATION] Iniciando atualização:', id, updates);
-      
       const response = await fetch(`/api/pagamentos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
       });
       
-      console.log('🔧 [UPDATE MUTATION] Response status:', response.status);
-      console.log('🔧 [UPDATE MUTATION] Response ok:', response.ok);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('❌ [UPDATE MUTATION] Erro na resposta:', errorText);
         throw new Error(`Failed to update pagamento: ${response.status} - ${errorText}`);
       }
       
       const result = await response.json();
-      console.log('✅ [UPDATE MUTATION] Pagamento atualizado com sucesso:', result);
       return result;
     },
     onSuccess: () => {
       // Invalidar cache para recarregar dados
       queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
-      console.log('✅ [UPDATE MUTATION] Cache invalidado, dados recarregados');
     },
     onError: (error: Error) => {
-      console.error('❌ [UPDATE MUTATION] Erro ao atualizar:', error);
+      console.error('Erro ao atualizar pagamento:', error);
     }
   });
 
@@ -131,20 +123,9 @@ export default function Pagamentos() {
     }
   });
 
-  const createPagamento = (data: InsertPagamento) => {
-    console.log('🔧 [CREATE PAGAMENTO] Função chamada:', data);
-    createMutation.mutate(data);
-  };
-  
-  const updatePagamento = (params: { id: string; updates: Partial<InsertPagamento> }) => {
-    console.log('🔧 [UPDATE PAGAMENTO] Função chamada:', params);
-    updateMutation.mutate(params);
-  };
-  
-  const deletePagamento = (id: string) => {
-    console.log('🔧 [DELETE PAGAMENTO] Função chamada:', id);
-    deleteMutation.mutate(id);
-  };
+  const createPagamento = (data: InsertPagamento) => createMutation.mutate(data);
+  const updatePagamento = (params: { id: string; updates: Partial<InsertPagamento> }) => updateMutation.mutate(params);
+  const deletePagamento = (id: string) => deleteMutation.mutate(id);
   const { motoristas, isLoading: loadingMotoristas } = useMotoristas();
 
   // Buscar dados adicionais necessários para o sistema completo
@@ -436,26 +417,14 @@ export default function Pagamentos() {
         // Valor semanal (Domingo a Domingo da semana atual)
         const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
-        console.log('🔧 [DEBUG SEMANAL] Período da semana:', inicioSemana.toISOString(), 'até', fimSemana.toISOString());
-        console.log('🔧 [DEBUG SEMANAL] Total pagamentos para filtrar:', pagamentosFiltrados.length);
-        
         const pagamentosSemana = pagamentosFiltrados
           .filter(p => {
-            if (!p.dataPagamento) {
-              console.log('🔧 [DEBUG SEMANAL] Pagamento sem data:', p.id);
-              return false;
-            }
+            if (!p.dataPagamento) return false;
             const dataPagamento = new Date(p.dataPagamento);
-            const dentroDoIntervalo = dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
-            console.log('🔧 [DEBUG SEMANAL] Pagamento', p.id, 'data:', dataPagamento.toISOString(), 'dentro?', dentroDoIntervalo);
-            return dentroDoIntervalo;
+            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           });
         
-        console.log('🔧 [DEBUG SEMANAL] Pagamentos na semana:', pagamentosSemana.length);
-        const total = pagamentosSemana.reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
-        console.log('🔧 [DEBUG SEMANAL] Total calculado:', total);
-        
-        return total;
+        return pagamentosSemana.reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
       
       default:
         return totalGeral;
