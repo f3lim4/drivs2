@@ -115,183 +115,201 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[90vw] sm:max-w-[600px] lg:max-w-[800px] max-h-[90vh] overflow-y-auto p-8">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[680px] md:max-w-3xl lg:max-w-4xl xl:max-w-[1000px] max-h-[90vh] overflow-y-auto p-0">
+        <DialogHeader className="px-8 pt-8 pb-4">
           <DialogTitle>Nova Manutenção</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="veiculoId">Veículo</Label>
-              <Select 
-                value={form.watch('veiculoId')} 
-                onValueChange={(value) => form.setValue('veiculoId', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um veículo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {veiculos.map((veiculo: Veiculo) => (
-                    <SelectItem key={veiculo.id} value={veiculo.id}>
-                      {veiculo.modelo} - {veiculo.placa}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="tipo">Tipo</Label>
-              <Select 
-                value={form.watch('tipo')} 
-                onValueChange={(value) => form.setValue('tipo', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="preventiva">Preventiva</SelectItem>
-                  <SelectItem value="corretiva">Corretiva</SelectItem>
-                  <SelectItem value="revisao">Revisão</SelectItem>
-                  <SelectItem value="outros">Outros</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Linha 2: Descrição */}
-          <div className="space-y-2">
-            <Label htmlFor="descricao">Descrição</Label>
-            <Textarea
-              id="descricao"
-              {...form.register('descricao')}
-              placeholder="Descreva o serviço a ser realizado"
-              rows={2}
-            />
-          </div>
-
-          {/* Linha 3: Local/Oficina e Contato na mesma linha */}
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <Label className="text-base font-semibold">Local/Oficina</Label>
-              <div className="flex gap-4">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    id="local-manual"
-                    name="local-type"
-                    checked={!useLocalCadastrado}
-                    onChange={() => handleTipoLocalChange(false)}
-                  />
-                  <Label htmlFor="local-manual">Digitar manualmente</Label>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+          <div className="flex-1 px-8 pb-4 space-y-8 overflow-y-auto">
+            {/* Seção 1: Identificação */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Identificação</h3>
+                <p className="text-sm text-gray-600">Informações básicas da manutenção</p>
+              </div>
+              <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-12 md:col-span-7 space-y-2">
+                  <Label htmlFor="veiculoId">Veículo</Label>
+                  <Select 
+                    value={form.watch('veiculoId')} 
+                    onValueChange={(value) => form.setValue('veiculoId', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um veículo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {veiculos.map((veiculo: Veiculo) => (
+                        <SelectItem key={veiculo.id} value={veiculo.id}>
+                          {veiculo.modelo} - {veiculo.placa}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    id="local-cadastrado"
-                    name="local-type"
-                    checked={useLocalCadastrado}
-                    onChange={() => handleTipoLocalChange(true)}
-                  />
-                  <Label htmlFor="local-cadastrado">Selecionar local cadastrado</Label>
+
+                <div className="col-span-12 md:col-span-5 space-y-2">
+                  <Label htmlFor="tipo">Tipo de Manutenção</Label>
+                  <Select 
+                    value={form.watch('tipo')} 
+                    onValueChange={(value) => form.setValue('tipo', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="preventiva">Preventiva</SelectItem>
+                      <SelectItem value="corretiva">Corretiva</SelectItem>
+                      <SelectItem value="revisao">Revisão</SelectItem>
+                      <SelectItem value="outros">Outros</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
 
-            {useLocalCadastrado ? (
-              <div className="space-y-2">
-                <Label htmlFor="local-select">Selecionar Local</Label>
-                <Select 
-                  value={localSelecionado} 
-                  onValueChange={handleLocalSelection}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um local" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locais.map((local) => (
-                      <SelectItem key={local.id} value={local.id}>
-                        {local.nome} - {local.tipo === 'oficina' ? 'Oficina' : 
-                         local.tipo === 'concessionaria' ? 'Concessionária' : 
-                         local.tipo === 'lava_jato' ? 'Lava Jato' : 'Outros'}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            {/* Seção 2: Descrição */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Descrição do Serviço</h3>
+                <p className="text-sm text-gray-600">Detalhe o que será realizado na manutenção</p>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="oficina">Oficina</Label>
+              <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-12 space-y-2">
+                  <Label htmlFor="descricao">Descrição</Label>
+                  <Textarea
+                    id="descricao"
+                    {...form.register('descricao')}
+                    placeholder="Descreva detalhadamente o serviço a ser realizado, peças necessárias, problemas identificados..."
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Seção 3: Local/Oficina */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Local de Execução</h3>
+                <p className="text-sm text-gray-600">Onde a manutenção será realizada</p>
+              </div>
+              <div className="space-y-4">
+                <div className="flex gap-6">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="local-manual"
+                      name="local-type"
+                      checked={!useLocalCadastrado}
+                      onChange={() => handleTipoLocalChange(false)}
+                      className="text-blue-600"
+                    />
+                    <Label htmlFor="local-manual">Digitar manualmente</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="local-cadastrado"
+                      name="local-type"
+                      checked={useLocalCadastrado}
+                      onChange={() => handleTipoLocalChange(true)}
+                      className="text-blue-600"
+                    />
+                    <Label htmlFor="local-cadastrado">Selecionar local cadastrado</Label>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-12 gap-6">
+                  {useLocalCadastrado ? (
+                    <div className="col-span-12 md:col-span-8 space-y-2">
+                      <Label htmlFor="local-select">Local Cadastrado</Label>
+                      <Select 
+                        value={localSelecionado} 
+                        onValueChange={handleLocalSelection}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione um local cadastrado" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {locais.map((local) => (
+                            <SelectItem key={local.id} value={local.id}>
+                              {local.nome} - {local.tipo === 'oficina' ? 'Oficina' : 
+                               local.tipo === 'concessionaria' ? 'Concessionária' : 
+                               local.tipo === 'lava_jato' ? 'Lava Jato' : 'Outros'}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="col-span-12 md:col-span-7 space-y-2">
+                        <Label htmlFor="oficina">Nome da Oficina</Label>
+                        <Input
+                          id="oficina"
+                          {...form.register('oficina')}
+                          placeholder="Ex: Oficina do João, AutoPeças Central..."
+                        />
+                      </div>
+
+                      <div className="col-span-12 md:col-span-5 space-y-2">
+                        <Label htmlFor="contato">Telefone de Contato</Label>
+                        <Input
+                          id="contato"
+                          {...form.register('contato')}
+                          placeholder="(11) 9999-9999"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Seção 4: Planejamento */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Planejamento</h3>
+                <p className="text-sm text-gray-600">Datas e prioridade da manutenção</p>
+              </div>
+              <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-12 md:col-span-4 space-y-2">
+                  <Label htmlFor="dataInicio">Data de Início</Label>
                   <Input
-                    id="oficina"
-                    {...form.register('oficina')}
-                    placeholder="Nome da oficina"
+                    id="dataInicio"
+                    type="date"
+                    {...form.register('dataInicio')}
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="contato">Contato</Label>
+                <div className="col-span-12 md:col-span-4 space-y-2">
+                  <Label htmlFor="dataPrevisao">Data Prevista</Label>
                   <Input
-                    id="contato"
-                    {...form.register('contato')}
-                    placeholder="Telefone da oficina"
+                    id="dataPrevisao"
+                    type="date"
+                    {...form.register('dataPrevisao')}
                   />
+                </div>
+
+                <div className="col-span-12 md:col-span-4 space-y-2">
+                  <Label htmlFor="prioridade">Prioridade</Label>
+                  <Select 
+                    value={form.watch('prioridade')} 
+                    onValueChange={(value) => form.setValue('prioridade', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a prioridade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="baixa">Baixa</SelectItem>
+                      <SelectItem value="normal">Normal</SelectItem>
+                      <SelectItem value="alta">Alta</SelectItem>
+                      <SelectItem value="urgente">Urgente</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* Linha 4: Data de Início, Data Prevista, Valor do Orçamento, Prioridade */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="dataInicio">Data de Início</Label>
-              <Input
-                id="dataInicio"
-                type="date"
-                {...form.register('dataInicio')}
-              />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="dataPrevisao">Data Prevista</Label>
-              <Input
-                id="dataPrevisao"
-                type="date"
-                {...form.register('dataPrevisao')}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="valorOrcamento">Valor do Orçamento</Label>
-              <Input
-                id="valorOrcamento"
-                type="number"
-                step="0.01"
-                {...form.register('valorOrcamento')}
-                placeholder="0,00"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="prioridade">Prioridade</Label>
-              <Select 
-                value={form.watch('prioridade')} 
-                onValueChange={(value) => form.setValue('prioridade', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="baixa">Baixa</SelectItem>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="alta">Alta</SelectItem>
-                  <SelectItem value="urgente">Urgente</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
 
 
           {/* Campos condicionais quando a manutenção está concluída */}
@@ -435,11 +453,25 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t mt-4">
-            <Button type="button" variant="outline" onClick={handleClose}>
+          </div>
+
+          {/* Footer Sticky com Botões */}
+          <div className="sticky bottom-0 bg-white dark:bg-black border-t px-8 py-4 flex gap-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={handleClose} 
+              className="flex-1"
+              data-testid="button-cancelar-manutencao"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isCreating}>
+            <Button 
+              type="submit" 
+              disabled={isCreating} 
+              className="flex-1"
+              data-testid="button-criar-manutencao"
+            >
               {isCreating ? 'Criando...' : 'Criar Manutenção'}
             </Button>
           </div>
