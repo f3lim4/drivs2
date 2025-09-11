@@ -20,7 +20,7 @@ localPort = 34207
 externalPort = 3000
 
 [[ports]]
-localPort = 45149
+localPort = 42791
 externalPort = 3001
 
 [workflows]
@@ -45,3 +45,6 @@ args = "npm run dev"
 waitForPort = 5000
 
 [agent]
+
+[objectStorage]
+defaultBucketID = "replit-objstore-d8a28fe4-0575-4263-abbb-26c454e4992e"
