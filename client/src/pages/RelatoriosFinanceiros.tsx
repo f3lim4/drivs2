@@ -1695,7 +1695,10 @@ export default function RelatoriosFinanceiros() {
               <div className="flex items-center gap-4">
                 <Select 
                   value={format(selectedMonth, 'yyyy-MM')} 
-                  onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
+                  onValueChange={(value) => {
+                    const [year, month] = value.split('-');
+                    setSelectedMonth(new Date(parseInt(year), parseInt(month) - 1, 1));
+                  }}
                 >
                   <SelectTrigger className="w-40">
                     <SelectValue />
