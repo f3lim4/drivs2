@@ -460,7 +460,7 @@ export default function Pagamentos() {
     }
   };
 
-  // Funções para o card de recebidos
+  // Funções para o card de recebidos (CORRIGIDO - inclui todas as receitas como no Financeiro)
   const calcularValorVisualizacaoRecebido = () => {
     const hoje = new Date();
     const anoAtual = hoje.getFullYear();
@@ -469,26 +469,52 @@ export default function Pagamentos() {
     
     switch (visualizacaoRecebido) {
       case 'mensal':
-        return pagamentosPagos
+        // Calcular pagamentos regulares do mês
+        const pagamentosRegularesMes = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento.getFullYear() === anoAtual && 
+                   dataPagamento.getMonth() === mesAtual &&
+                   p.tipo !== 'taxa administrativa'; // Excluir taxas admin para evitar duplicação
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
+        
+        // Calcular taxas administrativas do mês
+        const taxasAdministrativasMes = pagamentosPagos
+          .filter(p => {
+            if (!p.dataPagamento || p.tipo !== 'taxa administrativa') return false;
             const dataPagamento = new Date(p.dataPagamento);
             return dataPagamento.getFullYear() === anoAtual && 
                    dataPagamento.getMonth() === mesAtual;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
+        
+        // Total = pagamentos regulares + taxas administrativas (mesmo cálculo do Financeiro)
+        return pagamentosRegularesMes + taxasAdministrativasMes;
       
       case 'semanal':
         // Valor semanal (Domingo a Domingo da semana atual)
         const { inicioSemana, fimSemana } = calcularSemanaAtual();
         
-        return pagamentosPagos
+        const pagamentosRegularesSemana = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana &&
+                   p.tipo !== 'taxa administrativa';
+          })
+          .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
+        
+        const taxasAdministrativasSemana = pagamentosPagos
+          .filter(p => {
+            if (!p.dataPagamento || p.tipo !== 'taxa administrativa') return false;
             const dataPagamento = new Date(p.dataPagamento);
             return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
+        
+        return pagamentosRegularesSemana + taxasAdministrativasSemana;
       
       default:
         return totalRecebido;
