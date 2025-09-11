@@ -136,13 +136,67 @@ export default function PlanosLocadora() {
     valor: number;
   } | null>(null);
 
-  // Cache dos planos estáticos (carregamento instantâneo)
+  // Função para obter classes de cores sofisticadas (igual página admin)
+  const getColorClasses = (cor: string) => {
+    switch (cor) {
+      case 'blue':
+        return {
+          border: 'border-blue-400/30 hover:border-blue-400/50',
+          bg: 'from-blue-500/10',
+          iconBg: 'from-blue-500 to-blue-600',
+          text: 'text-blue-600',
+          check: 'text-blue-500'
+        };
+      case 'cyan':
+        return {
+          border: 'border-2 border-cyan-400/50 hover:border-cyan-400/70',
+          bg: 'from-cyan-500/15 to-purple-500/10',
+          iconBg: 'from-cyan-500 to-purple-600',
+          text: 'text-cyan-600',
+          check: 'text-cyan-500'
+        };
+      case 'green':
+        return {
+          border: 'border-green-400/30 hover:border-green-400/50',
+          bg: 'from-green-500/10',
+          iconBg: 'from-green-500 to-green-600',
+          text: 'text-green-600',
+          check: 'text-green-500'
+        };
+      case 'purple':
+        return {
+          border: 'border-purple-400/30 hover:border-purple-400/50',
+          bg: 'from-purple-500/10',
+          iconBg: 'from-purple-500 to-purple-600',
+          text: 'text-purple-600',
+          check: 'text-purple-500'
+        };
+      case 'gradient':
+        return {
+          border: 'border-2 border-gradient-to-r from-purple-400/50 to-pink-400/50',
+          bg: 'from-purple-500/15 to-pink-500/10',
+          iconBg: 'from-purple-500 to-pink-600',
+          text: 'text-purple-600',
+          check: 'text-purple-500'
+        };
+      default:
+        return {
+          border: 'border-gray-400/30 hover:border-gray-400/50',
+          bg: 'from-gray-500/10',
+          iconBg: 'from-gray-500 to-gray-600',
+          text: 'text-gray-600',
+          check: 'text-gray-500'
+        };
+    }
+  };
+
+  // Cache dos planos estáticos (carregamento instantâneo) - CORES ATUALIZADAS
   const planosEstaticos = {
-    start: { nome: "Start", preco: 29.00, valor: 29.00, icone: Car, cor: "bg-blue-500", descricao: "Para locadoras iniciantes com até 5 veículos", popular: false },
-    pro: { nome: "Pro", preco: 99.00, valor: 99.00, icone: Rocket, cor: "bg-cyan-500", descricao: "Para locadoras em crescimento com até 20 veículos", popular: true },
-    elite: { nome: "Elite", preco: 250.00, valor: 250.00, icone: Zap, cor: "bg-green-500", descricao: "Para frotas médias com até 50 veículos", popular: false },
-    prime: { nome: "Prime", preco: 500.00, valor: 500.00, icone: Crown, cor: "bg-purple-500", descricao: "Para grandes frotas com até 100 veículos", popular: false },
-    infinity: { nome: "Infinity", preco: 0.00, valor: 0.00, icone: Star, cor: "bg-gradient-to-r from-purple-600 to-pink-600", descricao: "Veículos ilimitados - Preço a consultar", popular: false, consultar: true }
+    start: { nome: "Start", preco: 29.00, valor: 29.00, icone: Car, cor: "blue", descricao: "Para locadoras iniciantes com até 5 veículos", popular: false },
+    pro: { nome: "Pro", preco: 99.00, valor: 99.00, icone: Rocket, cor: "cyan", descricao: "Para locadoras em crescimento com até 20 veículos", popular: true },
+    elite: { nome: "Elite", preco: 250.00, valor: 250.00, icone: Zap, cor: "green", descricao: "Para frotas médias com até 50 veículos", popular: false },
+    prime: { nome: "Prime", preco: 500.00, valor: 500.00, icone: Crown, cor: "purple", descricao: "Para grandes frotas com até 100 veículos", popular: false },
+    infinity: { nome: "Infinity", preco: 0.00, valor: 0.00, icone: Star, cor: "gradient", descricao: "Veículos ilimitados - Preço a consultar", popular: false, consultar: true }
   };
 
   // Buscar dados da locadora se usuário é uma locadora
@@ -279,40 +333,40 @@ export default function PlanosLocadora() {
   // VIP e Infinity sempre têm acesso - não podem estar expirados
   const isPlanExpired = (isVipPlan || planoAtual === 'infinity') ? false : ((subscriptionStatus?.isExpired && !subscriptionStatus?.canAccess) || false);
 
-  // Dados fallback para garantir renderização em produção
+  // Dados fallback para garantir renderização em produção - CORES ATUALIZADAS
   const planosSegurosProdução = {
     start: { 
       id: "start", nome: "Start", preco: 29, valor: 29, 
       descricao: "Para locadoras iniciantes", 
-      icone: "Car", cor: "bg-blue-500", 
+      icone: "Car", cor: "blue", 
       recursos: ["Até 5 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
       limiteVeiculos: 5
     },
     pro: { 
       id: "pro", nome: "Pro", preco: 99, valor: 99, 
       descricao: "Para locadoras em crescimento", 
-      icone: "Rocket", cor: "bg-cyan-500", popular: true,
+      icone: "Rocket", cor: "cyan", popular: true,
       recursos: ["Até 20 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
       limiteVeiculos: 20
     },
     elite: { 
       id: "elite", nome: "Elite", preco: 250, valor: 250, 
       descricao: "Para frotas médias", 
-      icone: "Zap", cor: "bg-green-500",
+      icone: "Zap", cor: "green",
       recursos: ["Até 50 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
       limiteVeiculos: 50
     },
     prime: {
       id: "prime", nome: "Prime", preco: 500, valor: 500,
       descricao: "Para grandes frotas",
-      icone: "Crown", cor: "bg-purple-500",
+      icone: "Crown", cor: "purple",
       recursos: ["Até 100 veículos na frota", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"],
       limiteVeiculos: 100
     },
     infinity: {
-      id: "infinity", nome: "Infinity", consultar: true,
+      id: "infinity", nome: "Infinity", preco: 0, valor: 0, consultar: true,
       descricao: "Solução personalizada para mega frotas", 
-      icone: "Star", cor: "bg-gradient-to-r from-purple-500 to-pink-500",
+      icone: "Star", cor: "gradient",
       recursos: ["Veículos ilimitados", "Gestão completa de motoristas", "Contratos automáticos", "Controle de pagamentos"]
     }
   };
@@ -572,13 +626,14 @@ export default function PlanosLocadora() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {/* Plano Start */}
           {planoAtual !== 'start' && (
-          <Card className="relative">
-            <CardHeader className="text-center pb-4">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-500 flex items-center justify-center">
+          <Card className={`relative transition-all duration-300 hover:shadow-lg ${getColorClasses('blue').border}`}>
+            <div className={`absolute inset-0 bg-gradient-to-br ${getColorClasses('blue').bg} to-transparent rounded-lg`}></div>
+            <CardHeader className="text-center pb-4 relative z-10">
+              <div className={`w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r ${getColorClasses('blue').iconBg} flex items-center justify-center`}>
                 <Car className="h-6 w-6 text-white" />
               </div>
               <CardTitle className="text-2xl">Start</CardTitle>
-              <div className="text-3xl font-bold text-blue-600">R$ 29,00</div>
+              <div className={`text-3xl font-bold ${getColorClasses('blue').text}`}>R$ 29,00</div>
               <CardDescription className="text-base">por mês</CardDescription>
               <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1 space-y-1">
                 <div>💰 Anual: R$ 290 (10 meses + 2 grátis)</div>
@@ -589,19 +644,19 @@ export default function PlanosLocadora() {
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <div className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <Check className={`h-4 w-4 ${getColorClasses('blue').check} flex-shrink-0 mt-0.5`} />
                   <span>Até 5 veículos na frota</span>
                 </div>
                 <div className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <Check className={`h-4 w-4 ${getColorClasses('blue').check} flex-shrink-0 mt-0.5`} />
                   <span>Gestão completa de motoristas</span>
                 </div>
                 <div className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <Check className={`h-4 w-4 ${getColorClasses('blue').check} flex-shrink-0 mt-0.5`} />
                   <span>Contratos automáticos profissionais</span>
                 </div>
                 <div className="flex items-start gap-2 text-sm">
-                  <Check className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <Check className={`h-4 w-4 ${getColorClasses('blue').check} flex-shrink-0 mt-0.5`} />
                   <span>Controle de pagamentos</span>
                 </div>
               </div>
@@ -628,18 +683,22 @@ export default function PlanosLocadora() {
 
           {/* Plano Pro */}
           {planoAtual !== 'pro' && (
-          <Card className="relative border-2 border-cyan-200 bg-gradient-to-br from-cyan-50 to-cyan-100">
+          <Card className={`relative transition-all duration-300 hover:shadow-lg ${getColorClasses('cyan').border}`}>
+            <div className={`absolute inset-0 bg-gradient-to-br ${getColorClasses('cyan').bg} to-transparent rounded-lg`}></div>
+            
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-              <Badge className="bg-cyan-500 text-white px-3 py-1">
-                Mais Popular
+              <Badge className="bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold text-xs">
+                <Crown className="h-3 w-3 mr-1" />
+                POPULAR
               </Badge>
             </div>
-            <CardHeader className="text-center pb-4">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-cyan-500 flex items-center justify-center">
+            
+            <CardHeader className="text-center pb-4 relative z-10">
+              <div className={`w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r ${getColorClasses('cyan').iconBg} flex items-center justify-center`}>
                 <Rocket className="h-6 w-6 text-white" />
               </div>
               <CardTitle className="text-2xl">Pro</CardTitle>
-              <div className="text-3xl font-bold text-cyan-600">R$ 99,00</div>
+              <div className={`text-3xl font-bold ${getColorClasses('cyan').text}`}>R$ 99,00</div>
               <CardDescription className="text-base">por mês</CardDescription>
               <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-xs font-medium mt-1 space-y-1">
                 <div>💰 Anual: R$ 990 (10 meses + 2 grátis)</div>
