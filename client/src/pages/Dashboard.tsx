@@ -393,14 +393,14 @@ export default function Dashboard() {
   const seteDiasAtras = new Date();
   seteDiasAtras.setDate(hoje.getDate() - 7);
 
-  // CORRIGIDO: Calcular receita semanal esperada baseada apenas nos pagamentos em aberto dessa semana
+  // CORRIGIDO: Calcular receita semanal esperada baseada em TODOS os pagamentos dessa semana (recebidos + em aberto)
   const pagamentosSemanaEsperados = pagamentos
     .filter((p: any) => {
       if (!p.dataPagamento) return false;
       const dataPagamento = new Date(p.dataPagamento);
       return dataPagamento >= seteDiasAtras && 
-             dataPagamento <= hoje &&
-             (p.status === 'em_aberto' || p.status === 'pendente');
+             dataPagamento <= hoje;
+             // REMOVIDO FILTRO POR STATUS - agora inclui todos
     });
 
   const receitaSemanalEsperada = pagamentosSemanaEsperados
