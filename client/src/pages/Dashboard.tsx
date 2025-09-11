@@ -378,10 +378,17 @@ export default function Dashboard() {
   const veiculosManutencao = veiculosSeguro.filter((v: any) => v.status === 'manutencao').length;
   const veiculosParado = veiculosSeguro.filter((v: any) => v.status === 'parado').length;
 
-  // Estatísticas de aluguéis
+  // Estatísticas de aluguéis - COM DEBUG
   const totalAlugueis = alugueisSeguro.length;
   const alugueisAtivos = alugueisSeguro.filter((a: any) => a.status === 'ativo').length;
   const alugueisPendentes = alugueisSeguro.filter((a: any) => a.status === 'pendente').length;
+
+  console.log('[DEBUG DASHBOARD] Dados de aluguéis:', {
+    totalAlugueis,
+    alugueisAtivos,
+    alugueisPendentes,
+    alugueisSeguro: alugueisSeguro.slice(0, 3) // Primeiros 3 para debug
+  });
   
   // Calcular receita mensal baseada nos aluguéis ativos
   const receitaMensal = alugueisSeguro
