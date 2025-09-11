@@ -1686,6 +1686,9 @@ export class DatabaseStorage implements IStorage {
       
       console.log('Manutenção inserida com sucesso no banco de dados');
       
+      // Sincronizar status dos veículos após criar manutenção
+      await this.syncVeiculosStatus();
+      
       // Buscar dados do veículo para retornar objeto completo
       const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, manutencaoData.veiculoId)).limit(1);
       
