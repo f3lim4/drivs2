@@ -559,6 +559,15 @@ export const insertDocumentoVeiculoSchema = createInsertSchema(documentosVeiculo
 });
 
 export type InsertDocumentoVeiculo = z.infer<typeof insertDocumentoVeiculoSchema>;
+
+// Schemas para documentos de motorista
+export const insertDocumentoMotoristaSchema = createInsertSchema(documentosMotorista).omit({
+  createdAt: true,
+  updatedAt: true
+});
+
+export type InsertDocumentoMotorista = z.infer<typeof insertDocumentoMotoristaSchema>;
+export type DocumentoMotorista = typeof documentosMotorista.$inferSelect;
 export type DocumentoVeiculo = typeof documentosVeiculos.$inferSelect;
 
 export type InsertMotorista = z.infer<typeof insertMotoristaSchema>;
