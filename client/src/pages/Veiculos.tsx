@@ -290,6 +290,8 @@ export default function Veiculos() {
         return <Badge variant="default" className="bg-success text-success-foreground">Disponível</Badge>;
       case 'alugado':
         return <Badge variant="default" className="bg-primary text-primary-foreground">Alugado</Badge>;
+      case 'em_manutencao':
+        return <Badge variant="default" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100">Em Manutenção</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
