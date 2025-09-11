@@ -207,7 +207,7 @@ export function DrivsSidebar() {
     <Sidebar className="border-r transition-all duration-300 bg-blue-600 border-blue-500">
       <SidebarContent className="bg-blue-600">
         {/* Header da sidebar com logo DRIVS */}
-        <div className="p-6 border-b border-blue-500 flex items-center justify-center">
+        <div className="px-4 py-3 border-b border-blue-500 flex items-center justify-start">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1">
               <img src={logoPath} alt="DRIVS Logo" className="w-full h-full" />
