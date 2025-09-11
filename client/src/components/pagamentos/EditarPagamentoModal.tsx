@@ -103,9 +103,6 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
   };
 
   const handleSubmit = (data: FormData) => {
-    console.log('🔧 [MODAL] handleSubmit chamado com dados:', data);
-    console.log('🔧 [MODAL] Pagamento sendo editado:', pagamento.id);
-    
     const updates: Partial<InsertPagamento> = {
       // Para pagamentos automáticos, não permitir alterar motorista, tipo e descrição
       ...(isPagamentoAutomatico ? {} : {
@@ -124,10 +121,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
       observacoes: data.observacoes || undefined,
     };
 
-    console.log('🔧 [MODAL] Updates calculados:', updates);
-    console.log('🔧 [MODAL] Chamando onSubmit...');
     onSubmit(updates);
-    console.log('🔧 [MODAL] onSubmit chamado, fechando modal...');
     handleClose();
   };
 
