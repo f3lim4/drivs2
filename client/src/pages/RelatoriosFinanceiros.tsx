@@ -1247,27 +1247,6 @@ export default function RelatoriosFinanceiros() {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Seletor de mês e botão Nova Despesa (apenas para locadoras) */}
-      <div className="flex justify-end items-center gap-4">
-        <Select 
-          value={format(selectedMonth, 'yyyy-MM')} 
-          onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
-        >
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {Array.from({ length: 12 }, (_, i) => {
-              const date = subMonths(new Date(), i);
-              return (
-                <SelectItem key={i} value={format(date, 'yyyy-MM')}>
-                  {format(date, 'MMMM yyyy', { locale: pt })}
-                </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
-      </div>
 
       {/* Cards de Resumo Financeiro - apenas para locadoras */}
       {!isAdmin && (
@@ -1714,6 +1693,24 @@ export default function RelatoriosFinanceiros() {
                 </CardDescription>
               </div>
               <div className="flex items-center gap-4">
+                <Select 
+                  value={format(selectedMonth, 'yyyy-MM')} 
+                  onValueChange={(value) => setSelectedMonth(new Date(value + '-01'))}
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const date = subMonths(new Date(), i);
+                      return (
+                        <SelectItem key={i} value={format(date, 'yyyy-MM')}>
+                          {format(date, 'MMMM yyyy', { locale: pt })}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
                 <Select value={sortHistorico} onValueChange={setSortHistorico}>
                   <SelectTrigger className="w-48">
                     <SelectValue />
