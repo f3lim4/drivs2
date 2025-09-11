@@ -157,7 +157,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Motorista */}
               <FormField
                 control={form.control}
@@ -260,7 +260,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
               )}
             />
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Valor Total */}
               <FormField
                 control={form.control}
@@ -357,7 +357,7 @@ export function EditarPagamentoModal({ open, onClose, pagamento, onSubmit, motor
                   <DollarSign className="w-4 h-4" />
                   Receita Extra
                 </h4>
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Juros */}
                   <FormField
                     control={form.control}
