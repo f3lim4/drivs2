@@ -61,13 +61,27 @@ const queryClient = new QueryClient({
         return response.json();
       },
       retry: 3,
-      staleTime: 5 * 60 * 1000, // 5 minutos de cache - dados frescos sem ser excessivo
-      gcTime: 10 * 60 * 1000, // 10 minutos na memória
-      refetchOnWindowFocus: false, // Reduzir refetch desnecessários  
-      refetchOnMount: true // Refetch ao montar componente apenas quando necessário
+      staleTime: 0, // SEM CACHE para debug - forçar dados frescos
+      gcTime: 0, // SEM CACHE na memória
+      refetchOnWindowFocus: true, // SEMPRE refetch ao focar
+      refetchOnMount: true, // SEMPRE refetch ao montar
+      refetchInterval: 5000, // Refetch automático a cada 5s para debug
     },
   },
 });
+
+// FUNÇÃO EMERGENCIAL PARA LIMPAR TODO CACHE
+if (typeof window !== 'undefined') {
+  (window as any).clearAllCache = () => {
+    console.log('🚨 [EMERGENCY CACHE CLEAR] Limpando TUDO...');
+    queryClient.clear();
+    queryClient.removeQueries();
+    queryClient.invalidateQueries();
+    localStorage.clear();
+    sessionStorage.clear();
+    location.reload();
+  };
+}
 
 // Capturar erros não tratados para evitar crashes do sistema
 if (typeof window !== 'undefined') {
