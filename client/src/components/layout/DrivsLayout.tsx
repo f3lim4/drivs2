@@ -74,7 +74,7 @@ export function DrivsLayout({ children }: DrivsLayoutProps) {
             />
             
             {/* Área de conteúdo */}
-            <main className="flex-1 overflow-auto pt-12 md:pt-0">
+            <main className="flex-1 overflow-auto pt-14 md:pt-0">
               <div className="p-6">
                 <SubscriptionAlert />
                 <div className="-mx-6 -mb-6">
