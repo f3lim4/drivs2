@@ -287,7 +287,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                         <FormItem>
                           <FormLabel>Telefone de Contato</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="(11) 9999-9999" />
+                            <Input {...field} value={field.value || ""} placeholder="(11) 9999-9999" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -390,6 +390,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                         type="number" 
                         placeholder="0" 
                         {...field}
+                        value={field.value || ""}
                         onChange={(e) => field.onChange(Number(e.target.value))}
                       />
                     </FormControl>
@@ -460,7 +461,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                       <FormItem>
                         <FormLabel>Data de Conclusão</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <Input type="date" {...field} value={field.value || ""} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -474,7 +475,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                       <FormItem>
                         <FormLabel>Valor Final</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" placeholder="0,00" {...field} />
+                          <Input type="number" step="0.01" placeholder="0,00" {...field} value={field.value || ""} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -492,6 +493,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                             type="number" 
                             placeholder="0" 
                             {...field}
+                            value={field.value || ""}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
                         </FormControl>
@@ -513,6 +515,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                             type="number" 
                             placeholder="Ex: 80000" 
                             {...field}
+                            value={field.value || ""}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
                         </FormControl>
@@ -528,7 +531,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                       <FormItem>
                         <FormLabel>Próxima Manutenção (Data)</FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <Input type="date" {...field} value={field.value || ""} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -546,6 +549,7 @@ export function NovaManutencaoModal({ open, onClose }: NovaManutencaoModalProps)
                         <Textarea 
                           placeholder="Liste as peças que foram substituídas" 
                           {...field} 
+                          value={field.value || ""}
                           rows={2}
                           className="resize-none"
                         />
