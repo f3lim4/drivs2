@@ -23,14 +23,16 @@ export function useAlugueis() {
       if (!response.ok) throw new Error('Failed to fetch alugueis');
       
       const data = await response.json();
+      console.log('[DEBUG ALUGUEIS] Dados recebidos da API:', data);
       
       return data as Aluguel[];
     },
     enabled: !!locadoraId,
-    staleTime: 30 * 1000, // 30 segundos de cache
-    gcTime: 5 * 60 * 1000, // 5 minutos
-    refetchOnWindowFocus: false,
-    refetchOnMount: true
+    staleTime: 0, // SEM cache
+    gcTime: 0, // SEM cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    refetchInterval: 5000, // Recarregar a cada 5 segundos
   });
 
   const createMutation = useMutation({
