@@ -186,7 +186,7 @@ export function DrivsSidebar() {
 
   // Classes CSS para links ativos/inativos
   const getLinkClasses = (path: string) => {
-    const baseClasses = "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 min-h-[48px]";
+    const baseClasses = "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 min-h-[40px]";
     
     if (isActive(path)) {
       return `${baseClasses} bg-blue-800 text-white font-medium`;
