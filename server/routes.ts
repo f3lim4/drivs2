@@ -2561,7 +2561,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Upload de documentos de motoristas com campos específicos
+  // Upload de documentos de motoristas com campos específicos - NOVA ESTRUTURA
   app.post("/api/motoristas/:id/upload-imagens", upload.fields([
     { name: 'fotoPerfil', maxCount: 1 },
     { name: 'cnhImagem', maxCount: 1 },
@@ -2585,42 +2585,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[UPLOAD] Iniciando upload de documentos para motorista ${motoristaId}`);
       
-      // Mapear campos específicos
-      const fieldMapping = {
-        fotoPerfil: 'imagem1',
-        cnhImagem: 'imagem2', 
-        fotoComCnh: 'imagem3',
-        comprovanteEndereco: 'imagem4',
-        fotoExtra: 'imagem5',
-        fotoExtra2: 'imagem6'
+      // Mapear campos para tipos de documento na nova estrutura
+      const tipoDocumentoMapping: { [key: string]: string } = {
+        fotoPerfil: 'foto_perfil',
+        cnhImagem: 'cnh', 
+        fotoComCnh: 'foto_com_cnh',
+        comprovanteEndereco: 'comprovante',
+        fotoExtra: 'foto_extra',
+        fotoExtra2: 'foto_extra_2'
       };
       
-      const updates: any = {};
       let uploadedCount = 0;
       
-      // Processar cada tipo de documento
-      Object.keys(files).forEach(fieldName => {
-        const fieldFiles = files[fieldName];
+      // Processar cada tipo de documento na nova estrutura
+      for (const [fieldName, fieldFiles] of Object.entries(files)) {
         if (fieldFiles && fieldFiles.length > 0) {
           const file = fieldFiles[0];
-          const dbFieldName = fieldMapping[fieldName as keyof typeof fieldMapping];
-          if (dbFieldName) {
-            updates[dbFieldName] = file.filename;
+          const tipoDocumento = tipoDocumentoMapping[fieldName];
+          
+          if (tipoDocumento) {
+            // Remover documento anterior do mesmo tipo se existir
+            const documentosExistentes = await storage.getDocumentosMotorista(motoristaId);
+            const documentoAntigo = documentosExistentes.find(d => d.tipoDocumento === tipoDocumento);
+            if (documentoAntigo) {
+              await storage.deleteDocumentoMotorista(documentoAntigo.id);
+              console.log(`[UPLOAD] Removido documento anterior: ${documentoAntigo.id}`);
+            }
+            
+            // Criar novo documento na tabela estruturada
+            const novoDocumento = await storage.createDocumentoMotorista({
+              id: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              motoristaId: motoristaId,
+              locadoraId: motorista.locadoraId,
+              tipoDocumento: tipoDocumento,
+              nomeOriginal: file.originalname,
+              url: `/uploads/motoristas/${file.filename}`,
+              tamanho: file.size,
+              tipo: file.mimetype
+            });
+            
             uploadedCount++;
-            console.log(`[UPLOAD] ${fieldName} -> ${dbFieldName}: ${file.filename}`);
+            console.log(`[UPLOAD] ${fieldName} (${tipoDocumento}) -> documento criado: ${novoDocumento.id}`);
           }
         }
-      });
-      
-      if (uploadedCount > 0) {
-        await storage.updateMotorista(motoristaId, updates);
-        console.log(`[UPLOAD] ${uploadedCount} documentos salvos com sucesso`);
       }
       
       res.json({ 
         message: "Documentos enviados com sucesso", 
         uploadedCount,
-        uploadedAt: new Date().toISOString() 
+        uploadedAt: new Date().toISOString(),
+        estrutura: "nova_tabela_documentos_motorista"
       });
     } catch (error) {
       console.error("Error uploading motorista documents:", error);
@@ -2628,7 +2642,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Listar documentos de um motorista
+  // Listar documentos de um motorista - NOVA ESTRUTURA
   app.get("/api/motoristas/:id/imagens", async (req, res) => {
     try {
       const motoristaId = req.params.id;
@@ -2638,17 +2652,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Motorista não encontrado" });
       }
       
-      // Mapear campos específicos
-      const documentos = {
-        fotoPerfil: motorista.imagem1 ? `/uploads/motoristas/${motorista.imagem1}` : null,
-        cnhImagem: motorista.imagem2 ? `/uploads/motoristas/${motorista.imagem2}` : null,
-        fotoComCnh: motorista.imagem3 ? `/uploads/motoristas/${motorista.imagem3}` : null,
-        comprovanteEndereco: motorista.imagem4 ? `/uploads/motoristas/${motorista.imagem4}` : null,
-        fotoExtra: motorista.imagem5 ? `/uploads/motoristas/${motorista.imagem5}` : null,
-        fotoExtra2: motorista.imagem6 ? `/uploads/motoristas/${motorista.imagem6}` : null,
+      // Buscar documentos na nova tabela estruturada
+      const documentosDb = await storage.getDocumentosMotorista(motoristaId);
+      
+      // Mapear documentos por tipo para compatibilidade com frontend
+      const documentos: { [key: string]: string | null } = {
+        fotoPerfil: null,
+        cnhImagem: null,
+        fotoComCnh: null,
+        comprovanteEndereco: null,
+        fotoExtra: null,
+        fotoExtra2: null,
       };
       
-      res.json({ documentos });
+      // Preencher com documentos encontrados
+      documentosDb.forEach(doc => {
+        switch (doc.tipoDocumento) {
+          case 'foto_perfil':
+            documentos.fotoPerfil = doc.url;
+            break;
+          case 'cnh':
+            documentos.cnhImagem = doc.url;
+            break;
+          case 'foto_com_cnh':
+            documentos.fotoComCnh = doc.url;
+            break;
+          case 'comprovante':
+            documentos.comprovanteEndereco = doc.url;
+            break;
+          case 'foto_extra':
+            documentos.fotoExtra = doc.url;
+            break;
+          case 'foto_extra_2':
+            documentos.fotoExtra2 = doc.url;
+            break;
+        }
+      });
+      
+      // FALLBACK: Se não houver documentos na nova estrutura, usar campos antigos
+      if (documentosDb.length === 0) {
+        console.log(`[FALLBACK] Usando sistema legado para motorista ${motoristaId}`);
+        documentos.fotoPerfil = motorista.imagem1 ? `/uploads/motoristas/${motorista.imagem1}` : null;
+        documentos.cnhImagem = motorista.imagem2 ? `/uploads/motoristas/${motorista.imagem2}` : null;
+        documentos.fotoComCnh = motorista.imagem3 ? `/uploads/motoristas/${motorista.imagem3}` : null;
+        documentos.comprovanteEndereco = motorista.imagem4 ? `/uploads/motoristas/${motorista.imagem4}` : null;
+        documentos.fotoExtra = motorista.imagem5 ? `/uploads/motoristas/${motorista.imagem5}` : null;
+        documentos.fotoExtra2 = motorista.imagem6 ? `/uploads/motoristas/${motorista.imagem6}` : null;
+      }
+      
+      res.json({ 
+        documentos,
+        estrutura: documentosDb.length > 0 ? "nova_tabela" : "sistema_legado",
+        totalDocumentos: documentosDb.length
+      });
     } catch (error) {
       console.error("Error fetching motorista documents:", error);
       res.status(500).json({ message: "Internal server error" });
