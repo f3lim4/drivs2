@@ -1267,9 +1267,6 @@ export default function RelatoriosFinanceiros() {
             })}
           </SelectContent>
         </Select>
-        {!isAdmin && (
-          <NovaDespesaModal />
-        )}
       </div>
 
       {/* Cards de Resumo Financeiro - apenas para locadoras */}
@@ -1476,6 +1473,9 @@ export default function RelatoriosFinanceiros() {
                 <option value="lavagem">Lavagem</option>
                 <option value="outros">Outros</option>
               </select>
+              {!isAdmin && (
+                <NovaDespesaModal />
+              )}
               {(searchTerm || filterType !== 'todos') && (
                 <button
                   onClick={() => {
