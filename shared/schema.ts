@@ -122,6 +122,20 @@ export const documentosVeiculos = pgTable("documentos_veiculos", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Tabela de documentos de motoristas
+export const documentosMotorista = pgTable("documentos_motorista", {
+  id: text("id").primaryKey(),
+  motoristaId: text("motorista_id").notNull(), // ID do motorista (CPF)
+  locadoraId: text("locadora_id").notNull(), // Para segurança adicional
+  tipoDocumento: text("tipo_documento").notNull(), // 'foto_perfil', 'cnh', 'foto_com_cnh', 'comprovante', 'foto_extra', 'foto_extra_2'
+  nomeOriginal: text("nome_original").notNull(), // Nome original do arquivo
+  url: text("url").notNull(), // URL do documento no storage
+  tamanho: integer("tamanho"), // Tamanho em bytes
+  tipo: text("tipo"), // Tipo MIME do arquivo
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Motoristas table
 export const motoristas = pgTable("motoristas", {
   id: text("id").primaryKey(), // CPF será usado como ID
