@@ -1748,6 +1748,9 @@ export class DatabaseStorage implements IStorage {
 
   async deleteManutencao(id: string): Promise<void> {
     await db.delete(manutencoes).where(eq(manutencoes.id, id));
+    
+    // Sincronizar status dos veículos após deletar manutenção
+    await this.syncVeiculosStatus();
   }
 
   // Local operations
