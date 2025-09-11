@@ -193,26 +193,25 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  // Função para sincronizar status dos veículos com aluguéis ativos
+  // Função para sincronizar status dos veículos com aluguéis ativos e manutenções
   private async syncVeiculosStatus(): Promise<void> {
     try {
-      // Atualizar veículos para 'disponivel' que não têm contrato ativo ou em aberto
+      // Primeiro, atualizar veículos para 'em_manutencao' que têm manutenção ativa (agendada ou em_andamento)
       await db.execute(sql`
         UPDATE veiculos 
-        SET status = 'disponivel' 
-        WHERE status = 'alugado' 
-        AND id NOT IN (
+        SET status = 'em_manutencao' 
+        WHERE id IN (
           SELECT DISTINCT veiculo_id 
-          FROM contratos 
-          WHERE status IN ('ativo', 'em_aberto')
+          FROM manutencoes 
+          WHERE status IN ('agendada', 'em_andamento')
         )
       `);
 
-      // Atualizar veículos para 'alugado' que têm contrato ativo ou em aberto
+      // Atualizar veículos para 'alugado' que têm contrato ativo ou em aberto (e não estão em manutenção)
       await db.execute(sql`
         UPDATE veiculos 
         SET status = 'alugado' 
-        WHERE status = 'disponivel' 
+        WHERE status NOT IN ('em_manutencao') 
         AND id IN (
           SELECT DISTINCT veiculo_id 
           FROM contratos 
@@ -220,7 +219,19 @@ export class DatabaseStorage implements IStorage {
         )
       `);
 
-      console.log('[STATUS SYNC] Status dos veículos sincronizado com contratos (ativo + em_aberto)');
+      // Por último, atualizar veículos para 'disponivel' que não têm contrato ativo nem manutenção ativa
+      await db.execute(sql`
+        UPDATE veiculos 
+        SET status = 'disponivel' 
+        WHERE status NOT IN ('em_manutencao') 
+        AND id NOT IN (
+          SELECT DISTINCT veiculo_id 
+          FROM contratos 
+          WHERE status IN ('ativo', 'em_aberto')
+        )
+      `);
+
+      console.log('[STATUS SYNC] Status dos veículos sincronizado com contratos e manutenções');
     } catch (error) {
       console.error('[STATUS SYNC] Erro ao sincronizar status:', error);
     }
