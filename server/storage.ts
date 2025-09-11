@@ -196,8 +196,16 @@ export class DatabaseStorage implements IStorage {
   // Função para sincronizar status dos veículos com aluguéis ativos e manutenções
   private async syncVeiculosStatus(): Promise<void> {
     try {
+      console.log('[STATUS SYNC] Iniciando sincronização...');
+      
+      // Verificar manutenções ativas para debug
+      const manutencaoAtiva = await db.execute(sql`
+        SELECT veiculo_id, status FROM manutencoes WHERE status IN ('agendada', 'em_andamento')
+      `);
+      console.log('[STATUS SYNC] Manutenções ativas encontradas:', manutencaoAtiva);
+      
       // Primeiro, atualizar veículos para 'em_manutencao' que têm manutenção ativa (agendada ou em_andamento)
-      await db.execute(sql`
+      const resultManutencao = await db.execute(sql`
         UPDATE veiculos 
         SET status = 'em_manutencao' 
         WHERE id IN (
@@ -206,30 +214,37 @@ export class DatabaseStorage implements IStorage {
           WHERE status IN ('agendada', 'em_andamento')
         )
       `);
+      console.log('[STATUS SYNC] Veículos marcados como em_manutencao:', resultManutencao.rowCount);
 
       // Atualizar veículos para 'alugado' que têm contrato ativo ou em aberto (e não estão em manutenção)
-      await db.execute(sql`
+      const resultAlugado = await db.execute(sql`
         UPDATE veiculos 
         SET status = 'alugado' 
-        WHERE status NOT IN ('em_manutencao') 
+        WHERE status != 'em_manutencao' 
         AND id IN (
           SELECT DISTINCT veiculo_id 
           FROM contratos 
           WHERE status IN ('ativo', 'em_aberto')
         )
       `);
+      console.log('[STATUS SYNC] Veículos marcados como alugado:', resultAlugado.rowCount);
 
       // Por último, atualizar veículos para 'disponivel' que não têm contrato ativo nem manutenção ativa
-      await db.execute(sql`
+      const resultDisponivel = await db.execute(sql`
         UPDATE veiculos 
         SET status = 'disponivel' 
-        WHERE status NOT IN ('em_manutencao') 
+        WHERE id NOT IN (
+          SELECT DISTINCT veiculo_id 
+          FROM manutencoes 
+          WHERE status IN ('agendada', 'em_andamento')
+        )
         AND id NOT IN (
           SELECT DISTINCT veiculo_id 
           FROM contratos 
           WHERE status IN ('ativo', 'em_aberto')
         )
       `);
+      console.log('[STATUS SYNC] Veículos marcados como disponivel:', resultDisponivel.rowCount);
 
       console.log('[STATUS SYNC] Status dos veículos sincronizado com contratos e manutenções');
     } catch (error) {
