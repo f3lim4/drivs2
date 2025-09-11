@@ -49,6 +49,17 @@
 
 /* DRIVS Design System - Sistema de cores e estilos baseado no layout da locadora */
 
+/* Remover spinners dos inputs numéricos */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* Scrollbar personalizada para melhorar navegação */
 .scrollbar-thin {
   scrollbar-width: thin;
