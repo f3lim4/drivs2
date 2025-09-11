@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, pagamentosExcluidos, documentosVeiculos, notificacoes,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, pagamentosExcluidos, documentosVeiculos, documentosMotorista, notificacoes,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -17,6 +17,7 @@ import {
   type Atividade, type InsertAtividade,
   type SeoConfig, type InsertSeoConfig,
   type DocumentoVeiculo, type InsertDocumentoVeiculo,
+  type DocumentoMotorista, type InsertDocumentoMotorista,
   type Notificacao, type InsertNotificacao
 } from "@shared/schema";
 import { db } from "./db";
@@ -77,6 +78,12 @@ export interface IStorage {
   getDocumentosVeiculo(veiculoId: string): Promise<DocumentoVeiculo[]>;
   deleteDocumentoVeiculo(documentoId: string): Promise<void>;
   getDocumentoVeiculoById(documentoId: string): Promise<DocumentoVeiculo | undefined>;
+  
+  // Documentos de motoristas operations
+  createDocumentoMotorista(documento: InsertDocumentoMotorista): Promise<DocumentoMotorista>;
+  getDocumentosMotorista(motoristaId: string): Promise<DocumentoMotorista[]>;
+  deleteDocumentoMotorista(documentoId: string): Promise<void>;
+  getDocumentoMotoristaById(documentoId: string): Promise<DocumentoMotorista | undefined>;
   
   // Motorista operations
   getAllMotoristas(): Promise<Motorista[]>;
@@ -650,6 +657,28 @@ export class DatabaseStorage implements IStorage {
 
   async getDocumentoVeiculoById(documentoId: string): Promise<DocumentoVeiculo | undefined> {
     const [documento] = await db.select().from(documentosVeiculos).where(eq(documentosVeiculos.id, documentoId));
+    return documento;
+  }
+
+  // Implementações para documentos de motorista
+  async createDocumentoMotorista(documento: InsertDocumentoMotorista): Promise<DocumentoMotorista> {
+    const result = await db.insert(documentosMotorista).values(documento).returning();
+    return result[0];
+  }
+
+  async getDocumentosMotorista(motoristaId: string): Promise<DocumentoMotorista[]> {
+    const result = await db.select().from(documentosMotorista)
+      .where(eq(documentosMotorista.motoristaId, motoristaId))
+      .orderBy(desc(documentosMotorista.createdAt));
+    return result;
+  }
+
+  async deleteDocumentoMotorista(documentoId: string): Promise<void> {
+    await db.delete(documentosMotorista).where(eq(documentosMotorista.id, documentoId));
+  }
+
+  async getDocumentoMotoristaById(documentoId: string): Promise<DocumentoMotorista | undefined> {
+    const [documento] = await db.select().from(documentosMotorista).where(eq(documentosMotorista.id, documentoId));
     return documento;
   }
 
