@@ -1703,7 +1703,7 @@ export default function RelatoriosFinanceiros() {
                   <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent align="start" side="bottom" className="max-h-48 overflow-y-auto">
                     {Array.from({ length: 12 }, (_, i) => {
                       const date = subMonths(new Date(), i);
                       return (
