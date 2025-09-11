@@ -69,6 +69,7 @@ export function useVeiculos() {
     gcTime: 0, // Sem cache
     refetchOnWindowFocus: true,
     refetchOnMount: true,
+    refetchInterval: 5000, // Recarregar a cada 5 segundos para garantir dados atualizados
   });
 
   // Função para formatar dados do veículo
@@ -120,10 +121,18 @@ export function useVeiculos() {
   // Adicionar veículo - apenas invalida cache para recarregar dados
   const adicionarVeiculo = (_novoVeiculo?: Veiculo) => {
     queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
+    queryClient.refetchQueries({ queryKey: ['veiculos', locadoraId] });
   };
 
   const atualizarVeiculo = (_veiculoAtualizado?: Veiculo) => {
     queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
+    queryClient.refetchQueries({ queryKey: ['veiculos', locadoraId] });
+  };
+
+  const forcarAtualizacao = () => {
+    queryClient.removeQueries({ queryKey: ['veiculos'] });
+    queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
+    queryClient.refetchQueries({ queryKey: ['veiculos', locadoraId] });
   };
 
   const removerVeiculo = (_veiculoId?: string) => {
@@ -138,5 +147,6 @@ export function useVeiculos() {
     adicionarVeiculo,
     atualizarVeiculo,
     removerVeiculo,
+    forcarAtualizacao,
   };
 }
