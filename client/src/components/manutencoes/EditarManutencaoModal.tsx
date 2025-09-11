@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,10 +10,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useManutencoes } from '@/hooks/useManutencoes';
 import { useVeiculos } from '@/hooks/useVeiculos';
+import { useLocais } from '@/hooks/useLocais';
+import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { insertManutencaoSchema } from '@shared/schema';
 import type { Manutencao, Veiculo } from '@shared/schema';
-import { useEffect } from 'react';
 
 const formSchema = insertManutencaoSchema.omit({ id: true });
 
@@ -25,7 +27,29 @@ interface EditarManutencaoModalProps {
 export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManutencaoModalProps) {
   const { updateManutencao, isUpdating } = useManutencoes();
   const { veiculos } = useVeiculos();
+  const { locais } = useLocais();
   const { toast } = useToast();
+  
+  const [useLocalCadastrado, setUseLocalCadastrado] = useState(false);
+  const [localSelecionado, setLocalSelecionado] = useState<string>('');
+
+  const handleLocalSelection = (localId: string) => {
+    setLocalSelecionado(localId);
+    const local = locais.find(l => l.id === localId);
+    if (local) {
+      form.setValue('oficina', local.nome);
+      form.setValue('contato', local.telefone || '');
+    }
+  };
+
+  const handleTipoLocalChange = (useCadastrado: boolean) => {
+    setUseLocalCadastrado(useCadastrado);
+    if (!useCadastrado) {
+      setLocalSelecionado('');
+      form.setValue('oficina', '');
+      form.setValue('contato', '');
+    }
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -102,7 +126,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-[98vw] w-full max-h-[95vh] overflow-y-auto p-8">
+      <DialogContent className="w-[90vw] sm:max-w-[600px] lg:max-w-[800px] max-h-[90vh] overflow-y-auto p-8">
         <DialogHeader>
           <DialogTitle>Editar Manutenção</DialogTitle>
         </DialogHeader>
@@ -157,27 +181,80 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="oficina">Oficina</Label>
-              <Input
-                id="oficina"
-                {...form.register('oficina')}
-                placeholder="Nome da oficina"
-              />
+          {/* Linha 3: Local/Oficina e Contato na mesma linha */}
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Local/Oficina</Label>
+              <div className="flex gap-4">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="local-manual"
+                    name="local-type"
+                    checked={!useLocalCadastrado}
+                    onChange={() => handleTipoLocalChange(false)}
+                  />
+                  <Label htmlFor="local-manual">Digitar manualmente</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="local-cadastrado"
+                    name="local-type"
+                    checked={useLocalCadastrado}
+                    onChange={() => handleTipoLocalChange(true)}
+                  />
+                  <Label htmlFor="local-cadastrado">Selecionar local cadastrado</Label>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="contato">Contato</Label>
-              <Input
-                id="contato"
-                {...form.register('contato')}
-                placeholder="Telefone da oficina"
-              />
-            </div>
+            {useLocalCadastrado ? (
+              <div className="space-y-2">
+                <Label htmlFor="local-select">Selecionar Local</Label>
+                <Select 
+                  value={localSelecionado} 
+                  onValueChange={handleLocalSelection}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um local" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locais.map((local) => (
+                      <SelectItem key={local.id} value={local.id}>
+                        {local.nome} - {local.tipo === 'oficina' ? 'Oficina' : 
+                         local.tipo === 'concessionaria' ? 'Concessionária' : 
+                         local.tipo === 'lava_jato' ? 'Lava Jato' : 'Outros'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="oficina">Oficina</Label>
+                  <Input
+                    id="oficina"
+                    {...form.register('oficina')}
+                    placeholder="Nome da oficina"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="contato">Contato</Label>
+                  <Input
+                    id="contato"
+                    {...form.register('contato')}
+                    placeholder="Telefone da oficina"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Linha 4: Data de Início, Data Prevista, Valor do Orçamento, Prioridade */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dataInicio">Data de Início</Label>
               <Input
