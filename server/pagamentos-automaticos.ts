@@ -59,32 +59,33 @@ const processarAluguelAtivo = async (aluguel: any) => {
       .orderBy(desc(pagamentos.dataPagamento))
       .limit(1);
 
+    // Obter data de hoje como string no formato YYYY-MM-DD (local timezone)
     const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+    const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
     // Se não há pagamentos, usar data de início do aluguel
-    let proximaDataPagamento: Date;
+    let proximaDataPagamentoStr: string;
     
     if (ultimosPagamentos.length === 0) {
       // Primeiro pagamento baseado na data de início
-      proximaDataPagamento = new Date(aluguel.dataInicio);
-      console.log(`[PRIMEIRO PAGAMENTO] Aluguel ${aluguel.id} - Data: ${proximaDataPagamento.toDateString()}`);
+      proximaDataPagamentoStr = aluguel.dataInicio;
+      console.log(`[PRIMEIRO PAGAMENTO] Aluguel ${aluguel.id} - Data: ${proximaDataPagamentoStr}`);
     } else {
       const ultimoPagamento = ultimosPagamentos[0];
-      proximaDataPagamento = new Date(ultimoPagamento.dataPagamento);
-      proximaDataPagamento.setDate(proximaDataPagamento.getDate() + 7); // Próxima semana
-      console.log(`[PRÓXIMO PAGAMENTO] Aluguel ${aluguel.id} - Data: ${proximaDataPagamento.toDateString()}`);
+      // Calcular próxima data (7 dias depois) usando UTC para evitar problemas de timezone
+      const baseDate = new Date(`${ultimoPagamento.dataPagamento}T00:00:00Z`);
+      baseDate.setUTCDate(baseDate.getUTCDate() + 7);
+      proximaDataPagamentoStr = baseDate.toISOString().slice(0, 10);
+      console.log(`[PRÓXIMO PAGAMENTO] Aluguel ${aluguel.id} - Data: ${proximaDataPagamentoStr}`);
     }
 
-    // Verificar se precisa criar pagamento (1 dia antes do vencimento)
-    const dataLimite = new Date(proximaDataPagamento);
-    dataLimite.setDate(dataLimite.getDate() - 1); // 1 dia antes
-
-    if (hoje >= dataLimite) {
-      console.log(`[CRIANDO] Pagamento para aluguel ${aluguel.id} - Vencimento: ${proximaDataPagamento.toDateString()}`);
+    // Verificar se precisa criar pagamento (no dia do vencimento ou atrasado para catch-up)
+    if (hojeStr >= proximaDataPagamentoStr) {
+      console.log(`[CRIANDO] Pagamento para aluguel ${aluguel.id} - Vencimento: ${proximaDataPagamentoStr}`);
+      const proximaDataPagamento = new Date(`${proximaDataPagamentoStr}T00:00:00Z`);
       await criarPagamentoAutomatico(aluguel, proximaDataPagamento);
     } else {
-      console.log(`[AGUARDANDO] Aluguel ${aluguel.id} - Criar em: ${dataLimite.toDateString()}`);
+      console.log(`[AGUARDANDO] Aluguel ${aluguel.id} - Criar em: ${proximaDataPagamentoStr}`);
     }
 
   } catch (error) {
@@ -166,8 +167,8 @@ export const pararPagamentosAutomaticos = async (aluguelId: string, status: stri
   }
 };
 
-// Executar verificação a cada hora
-setInterval(gerarProximosPagamentos, 60 * 60 * 1000); // 1 hora
+// Executar verificação a cada 30 minutos para capturar primeiros minutos do dia
+setInterval(gerarProximosPagamentos, 30 * 60 * 1000); // 30 minutos
 
 // Executar uma vez ao iniciar o servidor
 setTimeout(gerarProximosPagamentos, 10000); // 10 segundos após iniciar
