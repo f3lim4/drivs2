@@ -214,7 +214,6 @@ export function DrivsSidebar() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-white">Drivs</h1>
-              <p className="text-xs text-white/70">Sistema de Locadoras</p>
             </div>
           </div>
         </div>
