@@ -1,11 +1,10 @@
 
 /**
  * Header principal do sistema DRIVS
- * Contém busca global, notificações e informações do usuário
+ * Contém notificações e informações do usuário
  */
 
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { SearchBar } from './header/SearchBar';
 import { NotificationsDropdown } from './header/NotificationsDropdown';
 import { UserMenu } from './header/UserMenu';
 import { HeaderTitle } from './header/HeaderTitle';
@@ -31,11 +30,6 @@ export function DrivsHeader({ title, subtitle }: DrivsHeaderProps) {
 
         {/* Spacer para empurrar elementos para a direita */}
         <div className="flex-1" />
-
-        {/* Barra de busca global - escondida em mobile */}
-        <div className="hidden md:block">
-          <SearchBar />
-        </div>
 
         {/* Notificações com badge */}
         <NotificationsDropdown />
