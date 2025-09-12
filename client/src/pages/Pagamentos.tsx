@@ -35,23 +35,50 @@ export default function Pagamentos() {
   
   console.log('📊 [PAGAMENTOS] LocadoraId do perfil:', locadoraId);
   
-  // Query corrigida com key estável
+  // Query DEBUG - forçar limpeza de cache e logs detalhados
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['pagamentos', locadoraId],
+    queryKey: ['pagamentos-debug', locadoraId, Date.now()], // Key única para evitar cache
     queryFn: async () => {
       const url = `/api/pagamentos?locadoraId=${locadoraId}`;
-      console.log('📊 [PAGAMENTOS] Executando query:', url);
-      const response = await fetch(url);
+      console.log('🔍 [DEBUG] Executando query LIMPA:', url);
+      console.log('🔍 [DEBUG] LocadoraId atual:', locadoraId);
+      
+      const response = await fetch(url, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      });
+      
       if (!response.ok) {
+        console.error('🔍 [DEBUG] Erro na response:', response.status, response.statusText);
         throw new Error('Erro ao buscar pagamentos');
       }
+      
       const data = await response.json();
-      console.log('📊 [PAGAMENTOS] Dados recebidos:', data.length, 'pagamentos');
+      console.log('🔍 [DEBUG] Raw response data:', data);
+      console.log('🔍 [DEBUG] Data type:', typeof data, 'Array?', Array.isArray(data));
+      console.log('🔍 [DEBUG] Total items:', data?.length || 0);
+      
+      if (data && data.length > 0) {
+        console.log('🔍 [DEBUG] First item:', data[0]);
+        data.forEach((item, index) => {
+          console.log(`🔍 [DEBUG] Item ${index}:`, {
+            id: item.id,
+            motoristaNome: item.motoristaNome,
+            tipo: item.tipo,
+            valor: item.valor
+          });
+        });
+      }
+      
       return data;
     },
     enabled: !!locadoraId,
-    refetchOnMount: 'always',
-    staleTime: 0
+    refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0
   });
   
   // FUNÇÕES CORRIGIDAS - USANDO MUTATIONS DO HOOK usePagamentos
