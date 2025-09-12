@@ -1014,16 +1014,37 @@ export class DatabaseStorage implements IStorage {
             }
           }
           
-          // Para pagamentos de contratos, extrair nome do cliente da descrição
+          // Para pagamentos de contratos, buscar dados do contrato diretamente
           let nomeDisplay = '';
+          let contato = '';
+          let cpf = '';
+          
           if (motorista[0]) {
+            // Motorista encontrado - usar dados do motorista
             nomeDisplay = motorista[0].nome;
-          } else if (pagamento.tipo === 'contrato' && pagamento.descricao) {
-            // Extrair nome da descrição "Pagamento semanal do contrato - João Silva"
-            const match = pagamento.descricao.match(/contrato - (.+)$/);
-            nomeDisplay = match ? match[1] : 'Cliente do Contrato';
+            contato = motorista[0]?.telefone || '';
+            cpf = motorista[0]?.cpf || '';
+          } else if (pagamento.tipo === 'contrato' && pagamento.aluguelId) {
+            // Pagamento de contrato - buscar dados do contrato
+            try {
+              const contrato = await db.select().from(contratos).where(eq(contratos.id, pagamento.aluguelId)).limit(1);
+              if (contrato[0]) {
+                nomeDisplay = contrato[0].cliente;
+                contato = contrato[0].clienteTelefone || '';
+                cpf = contrato[0].clienteCpf || 'CPF não informado';
+              } else {
+                nomeDisplay = 'Cliente do Contrato';
+                cpf = 'CPF não informado';
+              }
+            } catch (error) {
+              console.error('[STORAGE] Erro ao buscar dados do contrato:', error);
+              nomeDisplay = 'Cliente do Contrato';
+              cpf = 'CPF não informado';
+            }
           } else {
+            // Nem motorista nem contrato - manter comportamento antigo
             nomeDisplay = `${pagamento.motoristaId} - Excluído`;
+            cpf = 'CPF não informado';
           }
 
           return {
@@ -1031,8 +1052,8 @@ export class DatabaseStorage implements IStorage {
             data: pagamento.dataPagamento, // Mapear campo data corretamente
             valor: pagamento.valorPago, // Mapear campo valor corretamente
             motoristaNome: nomeDisplay,
-            motoristaContato: motorista[0]?.telefone || '',
-            motoristaCpf: motorista[0]?.cpf || 'CPF não informado', // ADICIONADO: CPF do motorista
+            motoristaContato: contato,
+            motoristaCpf: cpf,
             // Adicionar dados do veículo
             ...veiculoData
           };
