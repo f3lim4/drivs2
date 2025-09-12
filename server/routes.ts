@@ -1362,20 +1362,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Não falha a criação do contrato, apenas log do erro
       }
       
-      // 🎯 GERAÇÃO AUTOMÁTICA DE PAGAMENTOS: Verificar se deve criar pagamentos recorrentes
+      // 🎯 GERAÇÃO AUTOMÁTICA DE PAGAMENTOS: Usar configurações reais do contrato
       try {
         console.log('[PAGAMENTOS-AUTO] Verificando necessidade de gerar pagamentos automáticos...');
+        console.log('[PAGAMENTOS-AUTO] Dados do contrato:', {
+          pagamentoRecorrente: contrato.pagamentoRecorrente,
+          recorrencia: contrato.recorrencia,
+          marcarPagamentosAnteriores: contrato.marcarPagamentosAnteriores
+        });
         
-        // Por padrão, considerar que contratos devem ter pagamentos recorrentes semanais
-        // TODO: No futuro, isso pode vir do body da requisição com opções do usuário
+        // Usar dados REAIS vindos do formulário, não valores fixos
+        const tipoRecorrenciaValida = contrato.recorrencia === 'quinzenal' || contrato.recorrencia === 'mensal' 
+          ? contrato.recorrencia 
+          : 'semanal' as const;
+        
         const opcoesPagamento = {
-          pagamentoRecorrente: true, // Por padrão ativar pagamentos automáticos
-          tipoRecorrencia: 'semanal' as 'semanal' | 'quinzenal' | 'mensal',
-          marcarPagamentosAnterioresComoPago: false // Por padrão não marcar anteriores como pago
+          pagamentoRecorrente: contrato.pagamentoRecorrente || false,
+          tipoRecorrencia: tipoRecorrenciaValida,
+          marcarPagamentosAnterioresComoPago: contrato.marcarPagamentosAnteriores || false,
+          // NOVOS CAMPOS: usar configurações completas do contrato
+          dataPrimeiroPagamento: contrato.dataPrimeiroPagamento,
+          tipoPagamento: contrato.tipoPagamento || 'ilimitado',
+          quantidadePagamentos: contrato.quantidadePagamentos
         };
         
-        await criarPagamentosRecorrentes(contrato, opcoesPagamento);
-        console.log(`[PAGAMENTOS-AUTO] Pagamentos automáticos gerados com sucesso para contrato ${contrato.id}`);
+        console.log('[PAGAMENTOS-AUTO] Opções finais:', opcoesPagamento);
+        
+        if (opcoesPagamento.pagamentoRecorrente) {
+          await criarPagamentosRecorrentes(contrato, opcoesPagamento);
+          console.log(`[PAGAMENTOS-AUTO] Pagamentos automáticos gerados com sucesso para contrato ${contrato.id}`);
+        } else {
+          console.log('[PAGAMENTOS-AUTO] Pagamentos automáticos desabilitados para este contrato');
+        }
         
       } catch (error) {
         console.error('[PAGAMENTOS-AUTO] Erro ao gerar pagamentos automáticos:', error);

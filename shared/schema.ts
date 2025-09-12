@@ -226,6 +226,13 @@ export const contratos = pgTable("contratos", {
   template: text("template"), // conteúdo do contrato
   arquivoAssinado: text("arquivo_assinado"), // nome do arquivo assinado
   dataAssinatura: timestamp("data_assinatura"), // quando foi assinado
+  // NOVOS CAMPOS: Configurações de pagamentos automáticos
+  pagamentoRecorrente: boolean("pagamento_recorrente").notNull().default(false),
+  dataPrimeiroPagamento: date("data_primeiro_pagamento"),
+  recorrencia: text("recorrencia"), // 'semanal', 'quinzenal', 'mensal'
+  tipoPagamento: text("tipo_pagamento").notNull().default("ilimitado"), // 'ilimitado', 'limitado'
+  quantidadePagamentos: integer("quantidade_pagamentos"),
+  marcarPagamentosAnteriores: boolean("marcar_pagamentos_anteriores").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -293,6 +300,13 @@ export const insertContratoSchema = createInsertSchema(contratos).omit({
     return val;
   }),
   tempoContrato: z.number().optional(),
+  // Novos campos de pagamentos automáticos
+  pagamentoRecorrente: z.boolean().optional(),
+  dataPrimeiroPagamento: z.string().optional(), // Pode vir como string do frontend
+  recorrencia: z.enum(['semanal', 'quinzenal', 'mensal']).optional(),
+  tipoPagamento: z.enum(['ilimitado', 'limitado']).optional(),
+  quantidadePagamentos: z.number().optional(),
+  marcarPagamentosAnteriores: z.boolean().optional(),
 });
 
 // Schema mais flexível para atualizações (todos campos opcionais)
