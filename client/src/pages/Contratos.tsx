@@ -140,7 +140,7 @@ export default function Contratos() {
 
   const handleConfirmarExclusao = async (contrato: Contrato, excluirPagamentos: boolean) => {
     try {
-      await deleteContrato.mutateAsync(contrato.id, excluirPagamentos);
+      await deleteContrato.mutateAsync({ id: contrato.id, excluirPagamentos });
       
       // Registrar atividade
       try {
@@ -182,7 +182,7 @@ export default function Contratos() {
     if (!contratoParaExcluir) return;
     
     try {
-      await deleteContrato.mutateAsync(contratoParaExcluir.id, false); // Por padrão, não excluir pagamentos
+      await deleteContrato.mutateAsync({ id: contratoParaExcluir.id, excluirPagamentos: false }); // Por padrão, não excluir pagamentos
       
       // Registrar atividade
       try {

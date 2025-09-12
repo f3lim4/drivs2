@@ -1487,6 +1487,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/contratos/:id", async (req, res) => {
     try {
+      // Capturar parâmetro de exclusão de pagamentos
+      const excluirPagamentos = req.query.excluirPagamentos === 'true';
+      console.log(`[CONTRACT DELETE] Iniciando exclusão - Contrato: ${req.params.id}, Excluir pagamentos: ${excluirPagamentos}`);
+      
       // Buscar o contrato para obter informações do aluguel
       const contrato = await storage.getContrato(req.params.id);
       
@@ -1512,8 +1516,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // CORREÇÃO: Excluir pagamentos relacionados ao contrato antes de excluir o contrato
-      if (contrato) {
+      // OPCIONAL: Excluir pagamentos relacionados somente se solicitado
+      if (contrato && excluirPagamentos) {
         console.log(`[CONTRACT DELETE] Excluindo pagamentos relacionados ao contrato: ${contrato.id}`);
         const pagamentos = await storage.getPagamentosByLocadora(contrato.locadoraId);
         const pagamentosDoContrato = pagamentos.filter(p => 
@@ -1527,6 +1531,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`[CONTRACT DELETE] Excluindo pagamento: ${pagamento.id} - ${pagamento.motoristaNome}`);
           await storage.deletePagamento(pagamento.id);
         }
+      } else if (contrato) {
+        console.log(`[CONTRACT DELETE] Mantendo pagamentos relacionados ao contrato: ${contrato.id} (excluirPagamentos=false)`);
       }
       
       // Excluir o contrato
@@ -1544,7 +1550,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      res.json({ message: "Contrato deleted successfully" });
+      res.json({ 
+        message: "Contrato deleted successfully",
+        pagamentosExcluidos: excluirPagamentos 
+      });
     } catch (error) {
       console.error("Error deleting contrato:", error);
       res.status(500).json({ message: "Internal server error" });
