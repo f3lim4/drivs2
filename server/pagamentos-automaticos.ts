@@ -264,13 +264,27 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
     for (const dataPagamento of datasPagamento) {
       const isRetroativo = dataPagamento < hoje;
       
-      // Verificar se pagamento já existe (usar aluguelId para armazenar ID do contrato)
+      // VERIFICAÇÃO ROBUSTA: Verificar se pagamento já existe para o mesmo motorista + data + locadora
+      // Isso previne pagamentos duplicados mesmo se múltiplos contratos forem criados por engano
+      const dataVencimentoStr = dataPagamento.toISOString().split('T')[0];
+      
       const pagamentoExistente = await db
         .select()
         .from(pagamentos)
         .where(and(
-          eq(pagamentos.aluguelId, contrato.id),
-          eq(pagamentos.dataVencimento, dataPagamento.toISOString().split('T')[0])
+          eq(pagamentos.locadoraId, contrato.locadoraId),
+          eq(pagamentos.dataVencimento, dataVencimentoStr),
+          or(
+            // Verificar por ID do contrato atual
+            eq(pagamentos.aluguelId, contrato.id),
+            // OU por motorista + cliente (se motorista foi encontrado)
+            motoristaIdReal ? and(
+              eq(pagamentos.motoristaId, motoristaIdReal),
+              eq(pagamentos.tipo, 'contrato')
+            ) : sql`false`,
+            // OU por nome do cliente (fallback para casos sem motorista)
+            sql`${pagamentos.descricao} LIKE ${`%${contrato.cliente}%`}`
+          )
         ))
         .limit(1);
 
