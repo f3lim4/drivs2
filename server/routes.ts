@@ -1218,8 +1218,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Cache para prevenir contratos duplicados por duplo clique
+  // Cache para prevenir contratos duplicados por duplo clique e race conditions
   const contratoCreationCache = new Map();
+  const contratoCreationLocks = new Map(); // Locks para prevenção de race conditions
 
   app.post("/api/contratos", async (req, res) => {
     try {
@@ -1231,10 +1232,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
-      // PROTEÇÃO CONTRA DUPLO CLIQUE: Verificar se já há criação em andamento
+      // PROTEÇÃO CONTRA DUPLO CLIQUE E RACE CONDITIONS
       const cacheKey = `${result.data.locadoraId}-${result.data.cliente}-${result.data.dataInicio}`;
+      const veiculoLockKey = `veiculo-${result.data.veiculoId}`;
       const agora = Date.now();
       
+      // Verificar cache de duplo clique
       if (contratoCreationCache.has(cacheKey)) {
         const tempoUltimaCreacao = contratoCreationCache.get(cacheKey);
         const diferencaTempo = agora - tempoUltimaCreacao;
@@ -1253,61 +1256,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Registrar tentativa de criação
-      contratoCreationCache.set(cacheKey, agora);
+      // LOCK DE VEÍCULO: Prevenir race conditions para o mesmo veículo
+      if (contratoCreationLocks.has(veiculoLockKey)) {
+        console.log('[RACE-CONDITION] Veículo já está sendo processado em outra requisição:', {
+          veiculoId: result.data.veiculoId,
+          lockAtivo: true
+        });
+        return res.status(409).json({ 
+          message: "Veículo está sendo processado em outra operação. Tente novamente.",
+          error: 'VEHICLE_LOCKED'
+        });
+      }
+      
+      // Adquirir lock do veículo
+      contratoCreationLocks.set(veiculoLockKey, agora);
+      console.log('[LOCK-ACQUIRED] Lock adquirido para veículo:', result.data.veiculoId);
+      
+      // Função para liberar locks
+      const liberarLocks = () => {
+        contratoCreationLocks.delete(veiculoLockKey);
+        console.log('[LOCK-RELEASED] Lock liberado para veículo:', result.data.veiculoId);
+      };
+      
+      // Garantir que locks sejam liberados em caso de erro
+      try {
+        // Registrar tentativa de criação
+        contratoCreationCache.set(cacheKey, agora);
       
       // VERIFICAÇÃO INTELIGENTE: CPF vs CNPJ
-      console.log('[DEBUG-CRITICO] Iniciando validação de veículo:', {
+      console.log('[DEBUG-CRITICO] ==================== INICIANDO VALIDAÇÃO ====================');
+      console.log('[DEBUG-CRITICO] Validação de veículo:', {
         veiculoId: result.data.veiculoId,
-        tipo: typeof result.data.veiculoId
+        cliente: result.data.cliente,
+        tipo: typeof result.data.veiculoId,
+        timestamp: new Date().toISOString()
       });
       
+      // VALIDAÇÃO 1: Buscar contratos existentes
       const contratosExistentes = await storage.getAllContratos();
       console.log('[DEBUG-CRITICO] Total contratos no sistema:', contratosExistentes.length);
       
+      // VALIDAÇÃO 2: Verificar se veículo já está em uso por outro contrato
       const contratoVeiculoExistente = contratosExistentes.find(c => {
-        const match = (c.veiculoId === result.data.veiculoId || c.veiculo_id === result.data.veiculoId || c.veiculo === result.data.veiculoId) && 
-          (c.status === 'ativo' || c.status === 'em_aberto');
+        // Verificar múltiplas possibilidades de campo veículo
+        const veiculoMatch = c.veiculoId === result.data.veiculoId || 
+                           c.veiculo_id === result.data.veiculoId || 
+                           c.veiculo === result.data.veiculoId;
+        const statusAtivo = c.status === 'ativo' || c.status === 'em_aberto';
+        const match = veiculoMatch && statusAtivo;
+        
         if (match) {
-          console.log('[DEBUG-CRITICO] Contrato conflitante encontrado:', {
+          console.log('[DEBUG-CRITICO] ⚠️ CONTRATO CONFLITANTE ENCONTRADO:', {
             contratoId: c.id,
             veiculoContrato: c.veiculoId || c.veiculo_id || c.veiculo,
             veiculoRecebido: result.data.veiculoId,
-            statusContrato: c.status
+            statusContrato: c.status,
+            cliente: c.cliente
           });
         }
         return match;
       });
       
-      // Verificar se há aluguel ativo para o mesmo veículo
+      // VALIDAÇÃO 3: Verificar se há aluguel ativo para o mesmo veículo
       const alugueis = await storage.getAllAlugueis();
-      console.log('[DEBUG-CRITICO] Total alugueis no sistema:', alugueis.length);
+      console.log('[DEBUG-CRITICO] Total aluguéis no sistema:', alugueis.length);
       
       const aluguelVeiculoAtivo = alugueis.find(a => {
         const match = a.veiculoId === result.data.veiculoId && a.status === 'ativo';
         if (match) {
-          console.log('[DEBUG-CRITICO] Aluguel conflitante encontrado:', {
+          console.log('[DEBUG-CRITICO] ⚠️ ALUGUEL CONFLITANTE ENCONTRADO:', {
             aluguelId: a.id,
             veiculoAluguel: a.veiculoId,
             veiculoRecebido: result.data.veiculoId,
-            statusAluguel: a.status
+            statusAluguel: a.status,
+            motorista: a.motoristaNome
           });
         }
         return match;
       });
 
-      // BLOQUEAR SEMPRE: Veículo já ocupado (independente de CPF/CNPJ)
+      // VALIDAÇÃO 4: BLOQUEAR SEMPRE se veículo já ocupado (independente de CPF/CNPJ)
       if (contratoVeiculoExistente || aluguelVeiculoAtivo) {
-        console.log('[VEICULO-OCUPADO] Veículo já está ocupado:', {
-          veiculo: result.data.veiculoId,
+        console.log('[DEBUG-CRITICO] ❌ BLOQUEIO: VEÍCULO JÁ OCUPADO');
+        console.log('[DEBUG-CRITICO] Detalhes do bloqueio:', {
+          veiculoId: result.data.veiculoId,
           contratoExistente: !!contratoVeiculoExistente,
           aluguelAtivo: !!aluguelVeiculoAtivo,
-          dadosContratoConflito: contratoVeiculoExistente,
-          dadosAluguelConflito: aluguelVeiculoAtivo
+          dadosContratoConflito: contratoVeiculoExistente ? {
+            id: contratoVeiculoExistente.id,
+            cliente: contratoVeiculoExistente.cliente,
+            status: contratoVeiculoExistente.status
+          } : null,
+          dadosAluguelConflito: aluguelVeiculoAtivo ? {
+            id: aluguelVeiculoAtivo.id,
+            motorista: aluguelVeiculoAtivo.motoristaNome,
+            status: aluguelVeiculoAtivo.status
+          } : null
         });
         
+        // Limpar cache e locks em caso de bloqueio
+        contratoCreationCache.delete(cacheKey);
+        liberarLocks();
+        
         return res.status(400).json({ 
-          message: `Veículo já está ocupado por outro contrato/aluguel ativo.`
+          message: `Veículo já está ocupado por outro contrato/aluguel ativo.`,
+          error: 'VEHICLE_ALREADY_IN_USE',
+          details: {
+            hasActiveContract: !!contratoVeiculoExistente,
+            hasActiveRental: !!aluguelVeiculoAtivo
+          }
         });
       }
 
@@ -1335,6 +1392,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             aluguelAtivo: !!aluguelClienteAtivo
           });
           
+          // Limpar locks antes de retornar erro
+          liberarLocks();
+          contratoCreationCache.delete(cacheKey);
+          
           return res.status(400).json({ 
             message: `CPF '${result.data.cliente}' já possui contrato/aluguel ativo. Pessoa física só pode alugar 1 veículo por vez.`
           });
@@ -1347,12 +1408,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         // Documento inválido
         console.log('[DOC-INVALIDO] Documento não é CPF nem CNPJ:', result.data.cliente);
+        // Limpar locks antes de retornar erro
+        liberarLocks();
+        contratoCreationCache.delete(cacheKey);
+        
         return res.status(400).json({ 
           message: `Documento '${result.data.cliente}' inválido. Deve ser CPF (11 dígitos) ou CNPJ (14 dígitos).`
         });
       }
       
-      console.log('[DEBUG] Dados validados, criando contrato...');
+      console.log('[DEBUG-CRITICO] ✅ TODAS AS VALIDAÇÕES PASSARAM');
+      console.log('[DEBUG-CRITICO] Iniciando criação do contrato...');
       
       // Função auxiliar para normalizar datas de string ISO para formato YYYY-MM-DD local
       const normalizarData = (data: any) => {
@@ -1375,8 +1441,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dataFimTipo: typeof dadosNormalizados.dataFim
       });
       
+      // CRIAÇÃO DO CONTRATO: Só criar após todas as validações
+      console.log('[DEBUG-CRITICO] Chamando storage.createContrato com dados:', {
+        locadoraId: dadosNormalizados.locadoraId,
+        veiculoId: dadosNormalizados.veiculoId,
+        cliente: dadosNormalizados.cliente,
+        status: dadosNormalizados.status
+      });
+      
       const contrato = await storage.createContrato(dadosNormalizados);
-      console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
+      
+      console.log('[DEBUG-CRITICO] ✅ CONTRATO CRIADO COM SUCESSO:', {
+        id: contrato.id,
+        veiculoId: contrato.veiculoId,
+        cliente: contrato.cliente,
+        status: contrato.status
+      });
       
       // 🎯 REGRA DE NEGÓCIO: Atualizar status automaticamente após criação do contrato
       try {
@@ -1450,6 +1530,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }, 15000); // 15 segundos
       
       res.json(contrato);
+      
+      // Liberar lock do veículo após sucesso
+      liberarLocks();
+      
+      } catch (innerError) {
+        // Liberar locks em caso de erro
+        console.error('[DEBUG-CRITICO] Erro na criação do contrato:', innerError);
+        liberarLocks();
+        
+        // Limpar cache em caso de erro
+        contratoCreationCache.delete(cacheKey);
+        
+        throw innerError; // Re-lançar o erro para o catch externo
+      }
+      
     } catch (error) {
       console.error("Error creating contrato:", error);
       res.status(500).json({ message: "Internal server error" });
