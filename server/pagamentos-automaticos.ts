@@ -139,6 +139,7 @@ const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
       motoristaId: aluguel.motoristaId,
       locadoraId: aluguel.locadoraId,
       dataPagamento: dataFormatada,
+      dataVencimento: dataFormatada, // Adicionar dataVencimento obrigatório
       valorTotal: valorSemanal.toFixed(2),
       valorPago: '0',
       valorRestante: valorSemanal.toFixed(2),
