@@ -126,7 +126,7 @@ export function EditarManutencaoModal({ open, onClose, manutencao }: EditarManut
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl w-full max-h-[85vh] overflow-y-auto p-6">
+      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
         <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center gap-2">
             <Wrench className="h-5 w-5 text-blue-600" />

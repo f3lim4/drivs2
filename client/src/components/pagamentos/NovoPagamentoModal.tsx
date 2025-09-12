@@ -257,7 +257,7 @@ export function NovoPagamentoModal({ open, onClose, onSubmit, motoristas }: Novo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
         <DialogHeader>
           <DialogTitle>Novo Pagamento</DialogTitle>
         </DialogHeader>
