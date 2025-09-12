@@ -110,9 +110,9 @@ export function useContratos() {
 
   // Excluir contrato
   const deleteContrato = useMutation({
-    mutationFn: async (id: string) => {
-      console.log(`Excluindo contrato: ${id}`);
-      const response = await fetch(`/api/contratos/${id}`, {
+    mutationFn: async (id: string, excluirPagamentos: boolean = false) => {
+      console.log(`Excluindo contrato: ${id} - Excluir pagamentos: ${excluirPagamentos}`);
+      const response = await fetch(`/api/contratos/${id}?excluirPagamentos=${excluirPagamentos}`, {
         method: 'DELETE',
       });
       
