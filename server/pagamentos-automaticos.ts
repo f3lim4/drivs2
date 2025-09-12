@@ -163,6 +163,9 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
   marcarPagamentosAnterioresComoPago?: boolean;
   pagamentoRecorrente?: boolean;
   tipoRecorrencia?: 'semanal' | 'quinzenal' | 'mensal';
+  dataPrimeiroPagamento?: string; // Data específica para primeiro pagamento
+  tipoPagamento?: 'ilimitado' | 'limitado'; // Tipo de pagamento
+  quantidadePagamentos?: number; // Quantidade específica de pagamentos
 }) => {
   try {
     if (!opcoes?.pagamentoRecorrente) {
@@ -175,6 +178,8 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
 
     const tipoRecorrencia = opcoes.tipoRecorrencia || 'semanal';
     const marcarAnterioresComoPago = opcoes.marcarPagamentosAnterioresComoPago || false;
+    const tipoPagamento = opcoes.tipoPagamento || 'ilimitado';
+    const quantidadeEspecifica = opcoes.quantidadePagamentos;
 
     // Calcular valor do pagamento baseado no tipo de recorrência
     let valorPagamento: number;
@@ -206,21 +211,47 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
     console.log(`[PAGAMENTOS CONTRATO] Valor ${descricaoTipo}: R$ ${valorPagamento.toFixed(2)}`);
 
     // Datas de início e fim
-    const dataInicio = new Date(contrato.dataInicio);
+    const dataInicioContrato = new Date(contrato.dataInicio);
     const dataFim = contrato.dataFim ? new Date(contrato.dataFim) : null;
     const hoje = new Date();
 
-    // Se não há data fim, criar pagamentos por 3 meses (período padrão)
-    const dataFimEfetiva = dataFim || new Date(dataInicio.getTime() + (90 * 24 * 60 * 60 * 1000)); // 90 dias
+    // Usar data do primeiro pagamento se especificada, senão usar data de início do contrato
+    const dataPrimeiro = opcoes.dataPrimeiroPagamento 
+      ? new Date(opcoes.dataPrimeiroPagamento)
+      : dataInicioContrato;
 
-    console.log(`[PAGAMENTOS CONTRATO] Período: ${dataInicio.toDateString()} até ${dataFimEfetiva.toDateString()}`);
+    console.log(`[PAGAMENTOS CONTRATO] Data primeiro pagamento: ${dataPrimeiro.toDateString()}`);
+    console.log(`[PAGAMENTOS CONTRATO] Tipo pagamento: ${tipoPagamento}`);
+    if (quantidadeEspecifica) {
+      console.log(`[PAGAMENTOS CONTRATO] Quantidade específica: ${quantidadeEspecifica} pagamentos`);
+    }
+
+    // Determinar data fim baseada no tipo de pagamento
+    let dataFimEfetiva: Date;
+    
+    if (tipoPagamento === 'limitado' && quantidadeEspecifica) {
+      // Para pagamentos limitados, calcular data fim baseada na quantidade
+      const duracaoTotalDias = quantidadeEspecifica * intervaloDias;
+      dataFimEfetiva = new Date(dataPrimeiro.getTime() + (duracaoTotalDias * 24 * 60 * 60 * 1000));
+      console.log(`[PAGAMENTOS CONTRATO] Fim calculado por quantidade: ${dataFimEfetiva.toDateString()}`);
+    } else {
+      // Para ilimitados, usar data fim do contrato ou 3 meses como padrão
+      dataFimEfetiva = dataFim || new Date(dataPrimeiro.getTime() + (90 * 24 * 60 * 60 * 1000)); // 90 dias
+      console.log(`[PAGAMENTOS CONTRATO] Fim por data contrato/padrão: ${dataFimEfetiva.toDateString()}`);
+    }
 
     // Gerar todas as datas de pagamento no período
     const datasPagamento: Date[] = [];
-    let dataAtual = new Date(dataInicio);
+    let dataAtual = new Date(dataPrimeiro);
 
     while (dataAtual <= dataFimEfetiva) {
       datasPagamento.push(new Date(dataAtual));
+      
+      // Se é limitado e já atingiu a quantidade, parar
+      if (tipoPagamento === 'limitado' && quantidadeEspecifica && datasPagamento.length >= quantidadeEspecifica) {
+        break;
+      }
+      
       dataAtual.setDate(dataAtual.getDate() + intervaloDias);
     }
 
