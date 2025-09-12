@@ -440,7 +440,7 @@ export function NovoContratoModal({
             console.log('🚗 VEÍCULOS FILTRADOS (status disponivel):', {
               total: veiculosData.length,
               disponiveis: veiculosDisponiveis.length,
-              placasDisponiveis: veiculosDisponiveis.map(v => v.placa)
+              placasDisponiveis: veiculosDisponiveis.map((v: any) => v.placa)
             });
             
             setVeiculos(veiculosDisponiveis);
@@ -472,7 +472,7 @@ export function NovoContratoModal({
             console.log('👤 MOTORISTAS FILTRADOS (status aprovado):', {
               total: motoristasData.length,
               aprovados: motoristasDisponiveis.length,
-              nomesAprovados: motoristasDisponiveis.map(m => m.nome)
+              nomesAprovados: motoristasDisponiveis.map((m: any) => m.nome)
             });
             
             setMotoristas(motoristasDisponiveis);
@@ -903,7 +903,6 @@ ____________________________________        ____________________________________
           toast({
             title: "✅ Pagamentos Recorrentes Criados",
             description: mensagem,
-            duration: 4000,
           });
         } else {
           console.log('[DEBUG PAGAMENTOS] Nenhum pagamento foi criado');
