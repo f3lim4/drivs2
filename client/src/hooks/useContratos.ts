@@ -128,6 +128,8 @@ export function useContratos() {
       queryClient.invalidateQueries({ queryKey: ['alugueis', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
+      // FORÇA atualização imediata dos veículos após exclusão de contrato
+      queryClient.refetchQueries({ queryKey: ['veiculos', locadoraId] });
       // Removido: queryClient.invalidateQueries({ queryKey: ['motoristas', locadoraId] });
       queryClient.removeQueries({ queryKey: ['/api/pagamentos', locadoraId] });
     },

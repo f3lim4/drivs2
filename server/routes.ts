@@ -1573,6 +1573,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } else if (contrato) {
         console.log(`[CONTRACT DELETE] Mantendo pagamentos relacionados ao contrato: ${contrato.id} (excluirPagamentos=false)`);
+        // NOTA: Pagamentos relacionados ficarão no sistema para preservar histórico financeiro
+        // Podem ser identificados posteriormente via aluguelId se necessário
       }
       
       // Excluir o contrato

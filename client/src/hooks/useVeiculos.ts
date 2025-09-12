@@ -65,11 +65,11 @@ export function useVeiculos() {
       return data.map(formatVeiculo);
     },
     enabled: !!profile && (isAdmin || !!locadoraId),
-    staleTime: 0, // Sem cache
-    gcTime: 0, // Sem cache
+    staleTime: 30000, // 30 segundos antes dos dados ficarem obsoletos
+    gcTime: 5 * 60 * 1000, // 5 minutos para garbage collection  
     refetchOnWindowFocus: true,
     refetchOnMount: true,
-    refetchInterval: 5000, // Recarregar a cada 5 segundos para garantir dados atualizados
+    // Removido refetchInterval - deixar React Query gerenciar quando refetch baseado em staleTime
   });
 
   // Função para formatar dados do veículo
