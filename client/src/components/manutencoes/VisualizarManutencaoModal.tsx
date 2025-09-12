@@ -93,7 +93,7 @@ export function VisualizarManutencaoModal({ open, onClose, manutencao, onMarcarC
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-[98vw] w-full max-h-[95vh] overflow-y-auto p-8">
+      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Wrench className="h-5 w-5" />

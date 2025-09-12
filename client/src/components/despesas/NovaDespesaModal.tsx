@@ -265,7 +265,7 @@ export function NovaDespesaModal() {
           Nova Despesa
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[95vw] sm:max-w-2xl max-h-[95vh] sm:max-h-[80vh] overflow-y-auto p-3 sm:p-6">
+      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
         <DialogHeader>
           <DialogTitle>Nova Despesa</DialogTitle>
         </DialogHeader>
