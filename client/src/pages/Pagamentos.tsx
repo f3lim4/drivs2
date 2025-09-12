@@ -30,35 +30,28 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 export default function Pagamentos() {
   const { profile } = useAuth();
   
-  // DADOS REAIS DO BANCO - VERSÃO CORRIGIDA V3
-  const locadoraId = "50764571000170"; // ID correto da locadora
+  // Usar locadora do perfil do usuário
+  const locadoraId = profile?.locadoraId;
   
-  console.log('🚀 [VERSÃO V3] Usando locadoraId correto:', locadoraId);
-  console.log('🚀 [VERSÃO V3] Profile atual:', profile?.id);
+  console.log('📊 [PAGAMENTOS] LocadoraId do perfil:', locadoraId);
   
-  // QUERY CORRIGIDA - FORCE REFRESH SEM CACHE
+  // Query corrigida com key estável
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['pagamentos-locadora-v4', locadoraId, Date.now()], // Key única com timestamp para forçar refresh
+    queryKey: ['pagamentos', locadoraId],
     queryFn: async () => {
       const url = `/api/pagamentos?locadoraId=${locadoraId}`;
-      console.log('✅ [QUERY V4] Executando SEM CACHE:', url);
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      });
+      console.log('📊 [PAGAMENTOS] Executando query:', url);
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Erro ao buscar pagamentos');
+      }
       const data = await response.json();
-      console.log('✅ [QUERY V4] Resposta do servidor:', data);
-      console.log('✅ [QUERY V4] Total:', data.length, 'pagamentos');
+      console.log('📊 [PAGAMENTOS] Dados recebidos:', data.length, 'pagamentos');
       return data;
     },
-    enabled: true,
-    staleTime: 0, // Sem cache
-    cacheTime: 0, // Não armazenar no cache
-    retry: 1
+    enabled: !!locadoraId,
+    refetchOnMount: 'always',
+    staleTime: 0
   });
   
   // FUNÇÕES CORRIGIDAS - USANDO MUTATIONS DO HOOK usePagamentos
@@ -82,7 +75,7 @@ export default function Pagamentos() {
     },
     onSuccess: () => {
       // Invalidar cache para recarregar dados
-      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-v4'] });
+      queryClient.invalidateQueries({ queryKey: ['pagamentos', locadoraId] });
     },
     onError: (error: Error) => {
       console.error('Erro ao atualizar pagamento:', error);
@@ -104,7 +97,7 @@ export default function Pagamentos() {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      queryClient.invalidateQueries({ queryKey: ['pagamentos', locadoraId] });
       console.log('✅ [CREATE] Cache invalidado, dados recarregados');
     }
   });
@@ -121,7 +114,7 @@ export default function Pagamentos() {
       return true;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      queryClient.invalidateQueries({ queryKey: ['pagamentos', locadoraId] });
       console.log('✅ [DELETE] Cache invalidado, dados recarregados');
     }
   });
