@@ -1257,25 +1257,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       contratoCreationCache.set(cacheKey, agora);
       
       // VERIFICAÇÃO INTELIGENTE: CPF vs CNPJ
+      console.log('[DEBUG-CRITICO] Iniciando validação de veículo:', {
+        veiculoId: result.data.veiculoId,
+        tipo: typeof result.data.veiculoId
+      });
+      
       const contratosExistentes = await storage.getAllContratos();
-      const contratoVeiculoExistente = contratosExistentes.find(c => 
-        (c.veiculoId === result.data.veiculoId || c.veiculo_id === result.data.veiculoId || c.veiculo === result.data.veiculoId) && 
-        (c.status === 'ativo' || c.status === 'em_aberto')
-      );
+      console.log('[DEBUG-CRITICO] Total contratos no sistema:', contratosExistentes.length);
+      
+      const contratoVeiculoExistente = contratosExistentes.find(c => {
+        const match = (c.veiculoId === result.data.veiculoId || c.veiculo_id === result.data.veiculoId || c.veiculo === result.data.veiculoId) && 
+          (c.status === 'ativo' || c.status === 'em_aberto');
+        if (match) {
+          console.log('[DEBUG-CRITICO] Contrato conflitante encontrado:', {
+            contratoId: c.id,
+            veiculoContrato: c.veiculoId || c.veiculo_id || c.veiculo,
+            veiculoRecebido: result.data.veiculoId,
+            statusContrato: c.status
+          });
+        }
+        return match;
+      });
       
       // Verificar se há aluguel ativo para o mesmo veículo
       const alugueis = await storage.getAllAlugueis();
-      const aluguelVeiculoAtivo = alugueis.find(a => 
-        a.veiculoId === result.data.veiculoId && 
-        a.status === 'ativo'
-      );
+      console.log('[DEBUG-CRITICO] Total alugueis no sistema:', alugueis.length);
+      
+      const aluguelVeiculoAtivo = alugueis.find(a => {
+        const match = a.veiculoId === result.data.veiculoId && a.status === 'ativo';
+        if (match) {
+          console.log('[DEBUG-CRITICO] Aluguel conflitante encontrado:', {
+            aluguelId: a.id,
+            veiculoAluguel: a.veiculoId,
+            veiculoRecebido: result.data.veiculoId,
+            statusAluguel: a.status
+          });
+        }
+        return match;
+      });
 
       // BLOQUEAR SEMPRE: Veículo já ocupado (independente de CPF/CNPJ)
       if (contratoVeiculoExistente || aluguelVeiculoAtivo) {
         console.log('[VEICULO-OCUPADO] Veículo já está ocupado:', {
           veiculo: result.data.veiculoId,
           contratoExistente: !!contratoVeiculoExistente,
-          aluguelAtivo: !!aluguelVeiculoAtivo
+          aluguelAtivo: !!aluguelVeiculoAtivo,
+          dadosContratoConflito: contratoVeiculoExistente,
+          dadosAluguelConflito: aluguelVeiculoAtivo
         });
         
         return res.status(400).json({ 
