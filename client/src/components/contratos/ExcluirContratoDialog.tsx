@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Contrato } from '@/types';
 
 interface ExcluirContratoDialogProps {
@@ -30,20 +31,37 @@ export function ExcluirContratoDialog({
   contrato,
   onConfirmarExclusao
 }: ExcluirContratoDialogProps) {
+  const [textoConfirmacao, setTextoConfirmacao] = useState('');
+  const [confirmarExclusao, setConfirmarExclusao] = useState(false);
   const [excluirPagamentos, setExcluirPagamentos] = useState(false);
 
+  const podeConfirmar = textoConfirmacao.toLowerCase() === 'excluir' && confirmarExclusao;
+
   const handleConfirmar = () => {
-    if (contrato) {
+    if (contrato && podeConfirmar) {
       onConfirmarExclusao(contrato, excluirPagamentos);
       onOpenChange(false);
-      setExcluirPagamentos(false); // Reset checkbox
+      // Reset todos os campos
+      setTextoConfirmacao('');
+      setConfirmarExclusao(false);
+      setExcluirPagamentos(false);
+    }
+  };
+
+  const handleClose = (open: boolean) => {
+    onOpenChange(open);
+    if (!open) {
+      // Reset todos os campos quando fechar
+      setTextoConfirmacao('');
+      setConfirmarExclusao(false);
+      setExcluirPagamentos(false);
     }
   };
 
   if (!contrato) return null;
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={handleClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-destructive">⚠️ Confirmar Exclusão de Contrato</AlertDialogTitle>
@@ -77,27 +95,61 @@ export function ExcluirContratoDialog({
                 O contrato será excluído permanentemente e não poderá ser recuperado.
               </p>
             </div>
-            <br /><br />
-            <div className="flex items-center space-x-2 p-3 bg-orange-50 dark:bg-orange-900/20 rounded border">
-              <Checkbox 
-                id="excluir-pagamentos" 
-                checked={excluirPagamentos}
-                onCheckedChange={(checked) => setExcluirPagamentos(!!checked)}
-                data-testid="checkbox-excluir-pagamentos"
-              />
-              <Label 
-                htmlFor="excluir-pagamentos" 
-                className="text-sm font-medium text-orange-800 dark:text-orange-200 cursor-pointer"
-              >
-                Excluir também os pagamentos relacionados a este contrato
-              </Label>
+            <br />
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="texto-confirmacao" className="text-sm font-medium">
+                  Para confirmar, digite <strong>"excluir"</strong> no campo abaixo:
+                </Label>
+                <Input
+                  id="texto-confirmacao"
+                  type="text"
+                  value={textoConfirmacao}
+                  onChange={(e) => setTextoConfirmacao(e.target.value)}
+                  placeholder="Digite: excluir"
+                  className="mt-1"
+                  data-testid="input-confirmacao"
+                />
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 bg-gray-50 dark:bg-gray-900/20 rounded border">
+                <Checkbox 
+                  id="confirmar-exclusao" 
+                  checked={confirmarExclusao}
+                  onCheckedChange={(checked) => setConfirmarExclusao(!!checked)}
+                  data-testid="checkbox-confirmar-exclusao"
+                />
+                <Label 
+                  htmlFor="confirmar-exclusao" 
+                  className="text-sm font-medium cursor-pointer"
+                >
+                  Tenho certeza que desejo excluir este contrato
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2 p-3 bg-orange-50 dark:bg-orange-900/20 rounded border">
+                <Checkbox 
+                  id="excluir-pagamentos" 
+                  checked={excluirPagamentos}
+                  onCheckedChange={(checked) => setExcluirPagamentos(!!checked)}
+                  data-testid="checkbox-excluir-pagamentos"
+                />
+                <Label 
+                  htmlFor="excluir-pagamentos" 
+                  className="text-sm font-medium text-orange-800 dark:text-orange-200 cursor-pointer"
+                >
+                  Excluir também os pagamentos relacionados a este contrato
+                </Label>
+              </div>
+              
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {excluirPagamentos 
+                  ? "⚠️ Os pagamentos serão excluídos permanentemente" 
+                  : "✅ Os pagamentos serão mantidos na página de pagamentos"
+                }
+              </p>
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
-              {excluirPagamentos 
-                ? "⚠️ Os pagamentos serão excluídos permanentemente" 
-                : "✅ Os pagamentos serão mantidos na página de pagamentos"
-              }
-            </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -106,7 +158,11 @@ export function ExcluirContratoDialog({
           </AlertDialogCancel>
           <AlertDialogAction 
             onClick={handleConfirmar}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            disabled={!podeConfirmar}
+            className={`${podeConfirmar 
+              ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' 
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
             data-testid="button-confirmar-exclusao"
           >
             ⚠️ Excluir Permanentemente
