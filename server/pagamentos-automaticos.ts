@@ -49,6 +49,48 @@ const processarAluguelAtivo = async (aluguel: any) => {
   try {
     console.log(`[PROCESSANDO] Aluguel ${aluguel.id} - Motorista: ${aluguel.motoristaId}`);
     
+    // CORREÇÃO: Buscar contrato relacionado por nome do motorista
+    // Primeiro buscar o nome do motorista pelo ID
+    const motoristasData = await db
+      .select()
+      .from(motoristas)
+      .where(eq(motoristas.id, aluguel.motoristaId))
+      .limit(1);
+    
+    let contratosRelacionados: any[] = [];
+    
+    if (motoristasData.length > 0) {
+      const nomeMotorista = motoristasData[0].nome;
+      
+      // Buscar contrato pelo nome do motorista e veículo
+      contratosRelacionados = await db
+        .select()
+        .from(contratos)
+        .where(and(
+          eq(contratos.veiculoId, aluguel.veiculoId),
+          eq(contratos.cliente, nomeMotorista), // cliente é o nome do motorista
+          or(eq(contratos.status, 'ativo'), eq(contratos.status, 'em_aberto'))
+        ))
+        .limit(1);
+    }
+    
+    let contratoRelacionado = null;
+    let recorrencia = 'semanal';
+    let valorSemanal = 0;
+    let valorMensal = 0;
+    
+    if (contratosRelacionados.length > 0) {
+      contratoRelacionado = contratosRelacionados[0];
+      recorrencia = contratoRelacionado.recorrencia || 'semanal';
+      valorSemanal = contratoRelacionado.valorSemanal ? parseFloat(contratoRelacionado.valorSemanal) : 0;
+      valorMensal = contratoRelacionado.valor ? parseFloat(contratoRelacionado.valor) : 0;
+      console.log(`[CONTRATO] Encontrado contrato ${contratoRelacionado.id} - Recorrência: ${recorrencia}`);
+    } else {
+      // Fallback para alugueis antigos sem contrato
+      valorSemanal = aluguel.valorMensal ? parseFloat(aluguel.valorMensal) / 4.35 : 0;
+      console.log(`[CONTRATO] Nenhum contrato encontrado, usando valores do aluguel`);
+    }
+    
     // Buscar último pagamento do aluguel
     const ultimosPagamentos = await db
       .select()
@@ -73,18 +115,43 @@ const processarAluguelAtivo = async (aluguel: any) => {
       console.log(`[PRIMEIRO PAGAMENTO] Aluguel ${aluguel.id} - Data: ${proximaDataPagamentoStr}`);
     } else {
       const ultimoPagamento = ultimosPagamentos[0];
-      // Calcular próxima data (7 dias depois) usando UTC para evitar problemas de timezone
+      
+      // Usar dados já obtidos acima para determinar intervalo
+      let intervaloDias = 7; // Default: semanal
+      
+      switch (recorrencia) {
+        case 'semanal':
+          intervaloDias = 7;
+          break;
+        case 'quinzenal':
+          intervaloDias = 14;
+          break;
+        case 'mensal':
+          intervaloDias = 30;
+          break;
+        default:
+          intervaloDias = 7;
+      }
+      
+      // Calcular próxima data usando recorrência específica do contrato
       const baseDate = new Date(`${ultimoPagamento.dataPagamento}T00:00:00Z`);
-      baseDate.setUTCDate(baseDate.getUTCDate() + 7);
+      baseDate.setUTCDate(baseDate.getUTCDate() + intervaloDias);
       proximaDataPagamentoStr = baseDate.toISOString().slice(0, 10);
-      console.log(`[PRÓXIMO PAGAMENTO] Aluguel ${aluguel.id} - Data: ${proximaDataPagamentoStr}`);
+      console.log(`[PRÓXIMO PAGAMENTO] Aluguel ${aluguel.id} - Data: ${proximaDataPagamentoStr} (${intervaloDias} dias)`);
     }
 
     // Verificar se precisa criar pagamento (no dia do vencimento ou atrasado para catch-up)
     if (hojeStr >= proximaDataPagamentoStr) {
       console.log(`[CRIANDO] Pagamento para aluguel ${aluguel.id} - Vencimento: ${proximaDataPagamentoStr}`);
       const proximaDataPagamento = new Date(`${proximaDataPagamentoStr}T00:00:00Z`);
-      await criarPagamentoAutomatico(aluguel, proximaDataPagamento);
+      
+      // CORREÇÃO: Passar dados do contrato para cálculo correto do valor
+      await criarPagamentoAutomatico(aluguel, proximaDataPagamento, {
+        recorrencia,
+        valorSemanal,
+        valorMensal,
+        contratoRelacionado
+      });
     } else {
       console.log(`[AGUARDANDO] Aluguel ${aluguel.id} - Criar em: ${proximaDataPagamentoStr}`);
     }
@@ -95,7 +162,12 @@ const processarAluguelAtivo = async (aluguel: any) => {
 };
 
 // Criar pagamento automático para aluguel
-const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
+const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date, dadosContrato?: {
+  recorrencia: string;
+  valorSemanal: number;
+  valorMensal: number;
+  contratoRelacionado: any;
+}) => {
   try {
     // Verificar se já existe pagamento para esta data
     const dataFormatada = dataVencimento.toISOString().split('T')[0]; // YYYY-MM-DD
@@ -113,10 +185,45 @@ const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
       return;
     }
 
-    // Verificação de exclusão manual removida - agora exclusões são permanentes
+    // CORREÇÃO: Calcular valor correto baseado na recorrência
+    let valorPagamento: number;
+    let descricaoTipo: string;
+    
+    if (dadosContrato) {
+      // Usar dados do contrato se disponível
+      const recorrencia = dadosContrato.recorrencia;
+      
+      switch (recorrencia) {
+        case 'semanal':
+          valorPagamento = dadosContrato.valorSemanal || (dadosContrato.valorMensal / 4.35);
+          descricaoTipo = 'semanal';
+          break;
+        case 'quinzenal':
+          valorPagamento = dadosContrato.valorSemanal ? dadosContrato.valorSemanal * 2 : (dadosContrato.valorMensal / 2.17);
+          descricaoTipo = 'quinzenal';
+          break;
+        case 'mensal':
+          valorPagamento = dadosContrato.valorMensal;
+          descricaoTipo = 'mensal';
+          break;
+        default:
+          valorPagamento = dadosContrato.valorSemanal || (dadosContrato.valorMensal / 4.35);
+          descricaoTipo = 'semanal';
+      }
+      
+      console.log(`[VALOR] Contrato ${dadosContrato.contratoRelacionado?.id} - Recorrência: ${recorrencia} - Valor: R$ ${valorPagamento.toFixed(2)}`);
+    } else {
+      // Fallback para alugueis sem contrato (usar valor semanal padrão)
+      valorPagamento = parseFloat(aluguel.valorMensal) / 4.35;
+      descricaoTipo = 'semanal';
+      console.log(`[VALOR] Sem contrato - Usando valor semanal padrão: R$ ${valorPagamento.toFixed(2)}`);
+    }
 
-    // Calcular valor semanal baseado no valor mensal
-    const valorSemanal = parseFloat(aluguel.valorMensal) / 4.35; // Conversão mensal para semanal
+    // SEGURANÇA: Evitar pagamentos com valor zero
+    if (valorPagamento <= 0) {
+      console.warn(`[ERRO VALOR] Aluguel ${aluguel.id} - Valor inválido: R$ ${valorPagamento.toFixed(2)}, pulando criação`);
+      return;
+    }
 
     // Criar novo pagamento automático
     const novoPagamento: PagamentoAutomatico = {
@@ -126,19 +233,19 @@ const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
       locadoraId: aluguel.locadoraId,
       dataPagamento: dataFormatada,
       dataVencimento: dataFormatada, // Adicionar dataVencimento obrigatório
-      valorTotal: valorSemanal.toFixed(2),
+      valorTotal: valorPagamento.toFixed(2),
       valorPago: '0',
-      valorRestante: valorSemanal.toFixed(2),
+      valorRestante: valorPagamento.toFixed(2),
       status: 'em_aberto',
       tipo: 'aluguel',
-      descricao: 'Pagamento semanal gerado automaticamente pelo sistema',
+      descricao: `Pagamento ${descricaoTipo} gerado automaticamente pelo sistema`,
       automatico: true,
       codigoPagamento: `PAG-AUTO-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
     };
 
     await db.insert(pagamentos).values([novoPagamento]);
 
-    console.log(`[PAGAMENTO CRIADO] Aluguel ${aluguel.id} - Valor: R$ ${valorSemanal.toFixed(2)} - Vencimento: ${dataVencimento.toDateString()}`);
+    console.log(`[PAGAMENTO CRIADO] Aluguel ${aluguel.id} - Valor: R$ ${valorPagamento.toFixed(2)} - Vencimento: ${dataVencimento.toDateString()}`);
 
   } catch (error) {
     console.error(`[ERRO CRIAÇÃO PAGAMENTO] Aluguel ${aluguel.id}:`, error);
@@ -155,8 +262,41 @@ export const pararPagamentosAutomaticos = async (aluguelId: string, status: stri
   }
 };
 
-// Executar verificação a cada 30 minutos para capturar primeiros minutos do dia
-setInterval(gerarProximosPagamentos, 30 * 60 * 1000); // 30 minutos
+// SCHEDULER ESPECÍFICO: Executar às 00:10 todos os dias
+const agendarPagamentosAs0010 = () => {
+  const agora = new Date();
+  const proxima0010 = new Date();
+  
+  // Configurar para 00:10 do dia seguinte
+  proxima0010.setDate(agora.getDate() + 1);
+  proxima0010.setHours(0, 10, 0, 0); // 00:10:00
+  
+  // Se ainda não passou das 00:10 hoje, usar hoje mesmo
+  const hoje0010 = new Date();
+  hoje0010.setHours(0, 10, 0, 0);
+  if (agora < hoje0010) {
+    proxima0010.setDate(agora.getDate()); // Usar hoje
+  }
+  
+  const tempoAteProxima = proxima0010.getTime() - agora.getTime();
+  
+  console.log(`[SCHEDULER] Próxima execução de pagamentos: ${proxima0010.toLocaleString('pt-BR')} (em ${Math.round(tempoAteProxima / 60000)} minutos)`);
+  
+  setTimeout(() => {
+    console.log('[SCHEDULER] Executando pagamentos automáticos às 00:10...');
+    gerarProximosPagamentos();
+    
+    // Reagendar para o próximo dia às 00:10
+    setInterval(() => {
+      console.log('[SCHEDULER] Executando pagamentos automáticos diários às 00:10...');
+      gerarProximosPagamentos();
+    }, 24 * 60 * 60 * 1000); // 24 horas
+    
+  }, tempoAteProxima);
+};
+
+// Inicializar scheduler
+agendarPagamentosAs0010();
 
 // Função para criar pagamentos recorrentes quando um contrato é criado ou ativado
 export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
