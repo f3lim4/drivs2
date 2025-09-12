@@ -403,13 +403,13 @@ export default function Pagamentos() {
     
     switch (visualizacaoPagamento) {
       case 'mensal':
-        // Valor mensal (pagamentos do mês atual)
+        // Valor mensal (pagamentos do mês atual - do dia 1 ao último dia)
         return pagamentosFiltrados
           .filter(p => {
-            if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento.getFullYear() === anoAtual && 
-                   dataPagamento.getMonth() === mesAtual;
+            // Usar dataPagamento se existir, senão usar createdAt como referência
+            const dataReferencia = p.dataPagamento ? new Date(p.dataPagamento) : new Date(p.createdAt);
+            return dataReferencia.getFullYear() === anoAtual && 
+                   dataReferencia.getMonth() === mesAtual;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
       
@@ -469,7 +469,7 @@ export default function Pagamentos() {
     
     switch (visualizacaoRecebido) {
       case 'mensal':
-        // Calcular pagamentos regulares do mês
+        // Calcular pagamentos regulares do mês (baseado na data de pagamento)
         const pagamentosRegularesMes = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento) return false;
@@ -480,7 +480,7 @@ export default function Pagamentos() {
           })
           .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
         
-        // Calcular taxas administrativas do mês
+        // Calcular taxas administrativas do mês (baseado na data de pagamento)
         const taxasAdministrativasMes = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento || p.tipo !== 'taxa administrativa') return false;
@@ -564,10 +564,10 @@ export default function Pagamentos() {
       case 'mensal':
         const valorMensal = pagamentosAberto
           .filter(p => {
-            if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento.getFullYear() === anoAtual && 
-                   dataPagamento.getMonth() === mesAtual;
+            // Para pagamentos em aberto, usar createdAt como referência pois dataPagamento pode estar vazia
+            const dataReferencia = p.dataPagamento ? new Date(p.dataPagamento) : new Date(p.createdAt);
+            return dataReferencia.getFullYear() === anoAtual && 
+                   dataReferencia.getMonth() === mesAtual;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0); // CORRIGIDO: valorRestante
         console.log('🔧 [DEBUG ABERTO] Valor mensal calculado:', valorMensal);
@@ -579,9 +579,9 @@ export default function Pagamentos() {
         
         const valorSemanal = pagamentosAberto
           .filter(p => {
-            if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
+            // Para pagamentos em aberto, usar createdAt como referência pois dataPagamento pode estar vazia
+            const dataReferencia = p.dataPagamento ? new Date(p.dataPagamento) : new Date(p.createdAt);
+            return dataReferencia >= inicioSemana && dataReferencia <= fimSemana;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0); // CORRIGIDO: valorRestante
         console.log('🔧 [DEBUG ABERTO] Valor semanal calculado:', valorSemanal);
@@ -635,10 +635,10 @@ export default function Pagamentos() {
       case 'mensal':
         return pagamentosParciais
           .filter(p => {
-            if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento.getFullYear() === anoAtual && 
-                   dataPagamento.getMonth() === mesAtual;
+            // Usar dataPagamento se existir, senão usar createdAt como referência
+            const dataReferencia = p.dataPagamento ? new Date(p.dataPagamento) : new Date(p.createdAt);
+            return dataReferencia.getFullYear() === anoAtual && 
+                   dataReferencia.getMonth() === mesAtual;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
       
@@ -648,9 +648,9 @@ export default function Pagamentos() {
         
         return pagamentosParciais
           .filter(p => {
-            if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
+            // Usar dataPagamento se existir, senão usar createdAt como referência
+            const dataReferencia = p.dataPagamento ? new Date(p.dataPagamento) : new Date(p.createdAt);
+            return dataReferencia >= inicioSemana && dataReferencia <= fimSemana;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
       
