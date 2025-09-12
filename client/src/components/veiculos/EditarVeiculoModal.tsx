@@ -178,7 +178,7 @@ export function EditarVeiculoModal({
         ipva: Number(veiculo.ipva) || undefined,
         rastreador: veiculo.rastreador || '',
         valorRastreadorMensal: Number(veiculo.valorRastreadorMensal) || undefined,
-        dataCompra: veiculo.dataCompra || '',
+        dataCompra: (veiculo as any).dataCompra || '',
         financiado: veiculo.financiado || false,
         valorFinanciamento: Number(veiculo.valorFinanciamento) || undefined,
         quantidadeParcelas: veiculo.quantidadeParcelas || undefined,
@@ -295,7 +295,7 @@ export function EditarVeiculoModal({
         
         // Invalidar cache de veículos para atualizar a lista (usando query key correta)
         await queryClient.invalidateQueries({ queryKey: ['veiculos'] });
-        await queryClient.invalidateQueries({ queryKey: ['veiculos', veiculo.locadoraId] });
+        await queryClient.invalidateQueries({ queryKey: ['veiculos', (veiculo as any).locadoraId] });
         
         toast({
           title: "Documento salvo",
@@ -373,8 +373,8 @@ export function EditarVeiculoModal({
 
       // Log da atividade
       await registrarAtividade(
-        profile.locadoraId,
-        profile.email || 'usuario@drivs.me',
+        profile?.locadoraId || '',
+        profile?.email || 'usuario@drivs.me',
         'atualizar',
         'veiculo',
         veiculo.id,
@@ -391,7 +391,7 @@ export function EditarVeiculoModal({
       onOpenChange(false);
       
     } catch (error) {
-      alert('Erro ao atualizar veículo: ' + (error.message || 'Erro desconhecido'));
+      alert('Erro ao atualizar veículo: ' + ((error as any)?.message || 'Erro desconhecido'));
     } finally {
       setLoading(false);
     }
