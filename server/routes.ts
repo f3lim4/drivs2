@@ -1574,7 +1574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ 
         message: "Contrato deleted successfully",
-        pagamentosExcluidos: excluirPagamentos 
+        // pagamentosExcluidos removido - exclusão permanente implementada 
       });
     } catch (error) {
       console.error("Error deleting contrato:", error);
