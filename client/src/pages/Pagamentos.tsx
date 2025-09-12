@@ -45,14 +45,12 @@ export default function Pagamentos() {
     const lastLocadoraId = localStorage.getItem('LAST_LOCADORA_ID');
     const currentLocadoraId = profile?.locadoraId;
     
-    if (lastLocadoraId !== currentLocadoraId) {
+    if (currentLocadoraId && lastLocadoraId !== currentLocadoraId) {
       console.log('🔄 [LOCADORA-CHANGE] Mudança de locadora detectada, limpando cache...');
       limparCacheCompleto();
-      if (currentLocadoraId) {
-        localStorage.setItem('LAST_LOCADORA_ID', currentLocadoraId);
-      }
+      localStorage.setItem('LAST_LOCADORA_ID', currentLocadoraId);
     }
-  }, [profile?.locadoraId, queryClient]);
+  }, [profile?.locadoraId]); // Remover queryClient das dependências para evitar loop
   
   // USAR HOOK PADRÃO - UNIFICANDO FONTE DE DADOS
   const { 
