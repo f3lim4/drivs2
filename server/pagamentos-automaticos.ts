@@ -1,7 +1,7 @@
 // Sistema de Pagamentos Automáticos para Aluguéis Ativos
 import { db } from './db';
 import { contratos, pagamentos, alugueis, motoristas } from '../shared/schema';
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, or, desc, sql } from 'drizzle-orm';
 import crypto from 'crypto';
 
 interface PagamentoAutomatico {
@@ -264,6 +264,28 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
     for (const dataPagamento of datasPagamento) {
       const isRetroativo = dataPagamento < hoje;
       
+      // Buscar motorista real pelo nome do cliente ANTES da verificação de duplicados
+      let motoristaIdReal = null;
+      try {
+        const motoristaResult = await db
+          .select({ id: motoristas.id })
+          .from(motoristas)
+          .where(and(
+            sql`lower(${motoristas.nome}) = lower(${contrato.cliente})`,
+            eq(motoristas.locadoraId, contrato.locadoraId)
+          ))
+          .limit(1);
+        
+        if (motoristaResult.length > 0) {
+          motoristaIdReal = motoristaResult[0].id;
+          console.log(`[CONTRATO-PAGAMENTO] Motorista encontrado: ${contrato.cliente} -> ${motoristaIdReal}`);
+        } else {
+          console.log(`[CONTRATO-PAGAMENTO] Motorista não encontrado para: ${contrato.cliente}`);
+        }
+      } catch (error) {
+        console.log(`[CONTRATO-PAGAMENTO] Erro ao buscar motorista: ${error}`);
+      }
+      
       // VERIFICAÇÃO ROBUSTA: Verificar se pagamento já existe para o mesmo motorista + data + locadora
       // Isso previne pagamentos duplicados mesmo se múltiplos contratos forem criados por engano
       const dataVencimentoStr = dataPagamento.toISOString().split('T')[0];
@@ -282,8 +304,8 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
               eq(pagamentos.motoristaId, motoristaIdReal),
               eq(pagamentos.tipo, 'contrato')
             ) : sql`false`,
-            // OU por nome do cliente (fallback para casos sem motorista)
-            sql`${pagamentos.descricao} LIKE ${`%${contrato.cliente}%`}`
+            // OU por nome do cliente (fallback para casos sem motorista) - case insensitive
+            sql`lower(${pagamentos.descricao}) LIKE lower(${`%${contrato.cliente}%`})`
           )
         ))
         .limit(1);
@@ -306,33 +328,12 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
         dataPagamentoEfetiva = null; // Null para pagamentos em aberto
       }
 
-      // Buscar motorista real pelo nome do cliente
-      let motoristaIdReal = null;
-      try {
-        const motoristaResult = await db
-          .select({ id: motoristas.id })
-          .from(motoristas)
-          .where(and(
-            sql`lower(${motoristas.nome}) = lower(${contrato.cliente})`,
-            eq(motoristas.locadoraId, contrato.locadoraId)
-          ))
-          .limit(1);
-        
-        if (motoristaResult.length > 0) {
-          motoristaIdReal = motoristaResult[0].id;
-          console.log(`[CONTRATO-PAGAMENTO] Motorista encontrado: ${contrato.cliente} -> ${motoristaIdReal}`);
-        } else {
-          console.log(`[CONTRATO-PAGAMENTO] Motorista não encontrado para: ${contrato.cliente}`);
-        }
-      } catch (error) {
-        console.log(`[CONTRATO-PAGAMENTO] Erro ao buscar motorista: ${error}`);
-      }
 
       // Criar novo pagamento (usar aluguelId para armazenar ID do contrato)
       const novoPagamento = {
         id: crypto.randomUUID(),
         aluguelId: contrato.id, // Usando aluguelId para armazenar ID do contrato
-        motoristaId: motoristaIdReal || 'CONTRATO', // Usar motorista real ou ID especial fixo
+        motoristaId: motoristaIdReal, // Usar motorista real ou null se não encontrado
         locadoraId: contrato.locadoraId,
         dataPagamento: dataPagamentoEfetiva,
         dataVencimento: dataPagamento.toISOString().split('T')[0],
