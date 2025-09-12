@@ -1256,57 +1256,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Registrar tentativa de criação
       contratoCreationCache.set(cacheKey, agora);
       
-      // VERIFICAÇÃO UNIVERSAL: Contrato existente para MOTORISTA
+      // VERIFICAÇÃO INTELIGENTE: CPF vs CNPJ
       const contratosExistentes = await storage.getAllContratos();
-      const contratoClienteExistente = contratosExistentes.find(c => 
-        c.cliente === result.data.cliente && 
-        (c.status === 'ativo' || c.status === 'em_aberto')
-      );
-      
-      // VERIFICAÇÃO UNIVERSAL: Contrato existente para VEÍCULO
       const contratoVeiculoExistente = contratosExistentes.find(c => 
         (c.veiculoId === result.data.veiculoId || c.veiculo_id === result.data.veiculoId || c.veiculo === result.data.veiculoId) && 
         (c.status === 'ativo' || c.status === 'em_aberto')
       );
       
-      // Verificar se há aluguel ativo para o mesmo motorista
+      // Verificar se há aluguel ativo para o mesmo veículo
       const alugueis = await storage.getAllAlugueis();
-      const aluguelAtivo = alugueis.find(a => 
-        a.motoristaNome === result.data.cliente && 
+      const aluguelVeiculoAtivo = alugueis.find(a => 
+        a.veiculoId === result.data.veiculoId && 
         a.status === 'ativo'
       );
-      
-      // BLOQUEAR SEMPRE: Não permitir múltiplos contratos/aluguéis ativos
-      if (contratoClienteExistente || contratoVeiculoExistente || aluguelAtivo) {
-        console.log('[ANTI-DUPLICATE] Duplicação detectada:', {
-          cliente: result.data.cliente,
-          veiculo: result.data.veiculo,
-          contratoClienteExistente: !!contratoClienteExistente,
-          contratoVeiculoExistente: !!contratoVeiculoExistente,
-          aluguelAtivo: !!aluguelAtivo,
-          contratoClienteId: contratoClienteExistente?.id,
-          contratoVeiculoId: contratoVeiculoExistente?.id,
-          aluguelId: aluguelAtivo?.id
+
+      // BLOQUEAR SEMPRE: Veículo já ocupado (independente de CPF/CNPJ)
+      if (contratoVeiculoExistente || aluguelVeiculoAtivo) {
+        console.log('[VEICULO-OCUPADO] Veículo já está ocupado:', {
+          veiculo: result.data.veiculoId,
+          contratoExistente: !!contratoVeiculoExistente,
+          aluguelAtivo: !!aluguelVeiculoAtivo
         });
         
-        let message = "Não é possível criar contrato: ";
-        if (contratoClienteExistente) {
-          message += `Cliente '${result.data.cliente}' já possui contrato ${contratoClienteExistente.status}. `;
-        }
-        if (contratoVeiculoExistente) {
-          message += `Veículo ID '${result.data.veiculoId}' já está ocupado por contrato ${contratoVeiculoExistente.status} com cliente '${contratoVeiculoExistente.cliente}'. `;
-        }
-        if (aluguelAtivo) {
-          message += `Cliente possui aluguel ativo. `;
+        return res.status(400).json({ 
+          message: `Veículo já está ocupado por outro contrato/aluguel ativo.`
+        });
+      }
+
+      // REGRA ESPECÍFICA: CPF (11 dígitos) = apenas 1 veículo | CNPJ (14 dígitos) = múltiplos veículos
+      const clienteDoc = result.data.cliente.replace(/\D/g, ''); // Remove caracteres não numéricos
+      const isPessoaFisica = clienteDoc.length === 11; // CPF tem 11 dígitos
+      const isPessoaJuridica = clienteDoc.length === 14; // CNPJ tem 14 dígitos
+
+      if (isPessoaFisica) {
+        // CPF: Verificar se já tem contrato ativo (apenas 1 permitido)
+        const contratoClienteExistente = contratosExistentes.find(c => 
+          c.cliente === result.data.cliente && 
+          (c.status === 'ativo' || c.status === 'em_aberto')
+        );
+        
+        const aluguelClienteAtivo = alugueis.find(a => 
+          a.motoristaNome === result.data.cliente && 
+          a.status === 'ativo'
+        );
+
+        if (contratoClienteExistente || aluguelClienteAtivo) {
+          console.log('[CPF-BLOQUEIO] CPF já possui contrato ativo:', {
+            cliente: result.data.cliente,
+            contratoExistente: !!contratoClienteExistente,
+            aluguelAtivo: !!aluguelClienteAtivo
+          });
+          
+          return res.status(400).json({ 
+            message: `CPF '${result.data.cliente}' já possui contrato/aluguel ativo. Pessoa física só pode alugar 1 veículo por vez.`
+          });
         }
         
+        console.log('[CPF-OK] CPF livre para novo contrato:', result.data.cliente);
+      } else if (isPessoaJuridica) {
+        // CNPJ: Permitir múltiplos contratos (sem verificação de duplicação de cliente)
+        console.log('[CNPJ-OK] CNPJ pode ter múltiplos contratos:', result.data.cliente);
+      } else {
+        // Documento inválido
+        console.log('[DOC-INVALIDO] Documento não é CPF nem CNPJ:', result.data.cliente);
         return res.status(400).json({ 
-          message: message.trim(),
-          motorista: result.data.cliente,
-          veiculo: result.data.veiculoId,
-          contratoClienteExistente: !!contratoClienteExistente,
-          contratoVeiculoExistente: !!contratoVeiculoExistente,
-          aluguelAtivo: !!aluguelAtivo
+          message: `Documento '${result.data.cliente}' inválido. Deve ser CPF (11 dígitos) ou CNPJ (14 dígitos).`
         });
       }
       
