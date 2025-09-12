@@ -447,6 +447,7 @@ export function EditarMotoristaModal({
 
       // Invalidar cache do React Query para forçar atualização
       queryClient.invalidateQueries({ queryKey: ['/api/motoristas'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/motoristas', motorista.id] });
       
       onMotoristaEditado(motoristaAtualizado);
       setMostrarNegativacao(false);
@@ -457,6 +458,76 @@ export function EditarMotoristaModal({
       console.error('Error negativing motorista:', error);
       toast({
         title: "Erro ao negativar motorista",
+        description: "Tente novamente mais tarde",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const desnegativarMotorista = async () => {
+    if (!motorista || !profile || !motivoNegativacao.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, descreva o motivo da desnegativação",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const desnegativacaoData = {
+        negativado: false,
+        motivoNegativacao: null,
+        dataNegativacao: null,
+        status: 'ativo' // Reativar o motorista
+      };
+      
+      const response = await fetch(`/api/motoristas/${motorista.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(desnegativacaoData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao desnegativar motorista');
+      }
+
+      const motoristaAtualizado = await response.json();
+
+      // Log da atividade
+      await registrarAtividade(
+        profile.locadoraId || profile.id,
+        profile.email || 'usuario@drivs.me',
+        'desnegativar',
+        'motorista',
+        motorista.id,
+        `Motorista desnegativado: ${motoristaAtualizado.nome} (CPF: ${motoristaAtualizado.cpf}) - Motivo: ${motivoNegativacao}`
+      );
+
+      toast({
+        title: "Motorista desnegativado!",
+        description: `${motoristaAtualizado.nome} foi desnegativado com sucesso.`,
+      });
+
+      // Invalidar cache do React Query para forçar atualização
+      queryClient.invalidateQueries({ queryKey: ['/api/motoristas'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/motoristas', motorista.id] });
+      
+      onMotoristaEditado(motoristaAtualizado);
+      setMostrarNegativacao(false);
+      setMotivoNegativacao('');
+      onOpenChange(false);
+      
+    } catch (error) {
+      console.error('Error desnegativando motorista:', error);
+      toast({
+        title: "Erro ao desnegativar motorista",
         description: "Tente novamente mais tarde",
         variant: "destructive",
       });
@@ -1295,41 +1366,76 @@ export function EditarMotoristaModal({
 
             {/* STATUS */}
             <div className="space-y-4">
-              {/* BOTÃO NEGATIVAR */}
+              {/* BOTÃO NEGATIVAR/DESNEGATIVAR */}
               <div className="flex justify-end">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => setMostrarNegativacao(!mostrarNegativacao)}
-                  className="text-red-600 border-red-300 hover:bg-red-50 text-xs"
+                  className={motorista.negativado 
+                    ? "text-green-600 border-green-300 hover:bg-green-50 text-xs"
+                    : "text-red-600 border-red-300 hover:bg-red-50 text-xs"
+                  }
                 >
-                  Negativar Motorista
+                  {motorista.negativado ? "Desnegativar Motorista" : "Negativar Motorista"}
                 </Button>
               </div>
 
-              {/* SEÇÃO NEGATIVAR MOTORISTA */}
+              {/* SEÇÃO NEGATIVAR/DESNEGATIVAR MOTORISTA */}
               {mostrarNegativacao && (
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-3">
+                        <div className={motorista.negativado 
+                          ? "bg-green-50 border border-green-200 rounded-lg p-3 space-y-3"
+                          : "bg-red-50 border border-red-200 rounded-lg p-3 space-y-3"
+                        }>
                           <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                            <h3 className="text-sm font-semibold text-red-700">Negativar Motorista</h3>
+                            <div className={motorista.negativado 
+                              ? "w-2 h-2 bg-green-500 rounded-full"
+                              : "w-2 h-2 bg-red-500 rounded-full"
+                            }></div>
+                            <h3 className={motorista.negativado 
+                              ? "text-sm font-semibold text-green-700"
+                              : "text-sm font-semibold text-red-700"
+                            }>
+                              {motorista.negativado ? "Desnegativar Motorista" : "Negativar Motorista"}
+                            </h3>
                           </div>
                           
                           <div className="space-y-3">
                             <Label htmlFor="motivo-negativacao" className="text-sm">
-                              Descreva o motivo da negativação *
+                              {motorista.negativado 
+                                ? "Descreva o motivo da desnegativação *" 
+                                : "Descreva o motivo da negativação *"
+                              }
                             </Label>
                             <textarea
                               id="motivo-negativacao"
                               value={motivoNegativacao}
                               onChange={(e) => setMotivoNegativacao(e.target.value)}
-                              placeholder="Ex: Inadimplência, problemas com documentação, histórico de infrações..."
-                              className="w-full p-2 border border-red-300 rounded-md text-sm resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                              placeholder={motorista.negativado 
+                                ? "Ex: Regularização da situação, pagamento de débitos, revisão do caso..."
+                                : "Ex: Inadimplência, problemas com documentação, histórico de infrações..."
+                              }
+                              className={motorista.negativado 
+                                ? "w-full p-2 border border-green-300 rounded-md text-sm resize-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                : "w-full p-2 border border-red-300 rounded-md text-sm resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                              }
                               rows={3}
                             />
                             
                             <div className="flex gap-2">
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={motorista.negativado ? desnegativarMotorista : negativarMotorista}
+                                disabled={loading || !motivoNegativacao.trim()}
+                                className={motorista.negativado 
+                                  ? "flex-1 bg-green-600 hover:bg-green-700 text-white"
+                                  : "flex-1 bg-red-600 hover:bg-red-700 text-white"
+                                }
+                              >
+                                {loading ? "Processando..." : "Confirmar"}
+                              </Button>
                               <Button
                                 type="button"
                                 variant="outline"
@@ -1342,19 +1448,16 @@ export function EditarMotoristaModal({
                               >
                                 Cancelar
                               </Button>
-                              <Button
-                                type="button"
-                                size="sm"
-                                onClick={negativarMotorista}
-                                disabled={loading || !motivoNegativacao.trim()}
-                                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                              >
-                                {loading ? "Processando..." : "Confirmar"}
-                              </Button>
                             </div>
                             
-                            <p className="text-xs text-red-600">
-                              ⚠️ Ação irreversível: O motorista será marcado como negativado no sistema
+                            <p className={motorista.negativado 
+                              ? "text-xs text-green-600"
+                              : "text-xs text-red-600"
+                            }>
+                              {motorista.negativado 
+                                ? "✅ O motorista será reativado e poderá usar o sistema novamente"
+                                : "⚠️ Ação irreversível: O motorista será marcado como negativado no sistema"
+                              }
                             </p>
                           </div>
                         </div>
