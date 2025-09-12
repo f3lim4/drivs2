@@ -981,7 +981,7 @@ ____________________________________        ____________________________________
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] sm:max-w-[800px] max-w-[800px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
         <DialogHeader className="pb-3 sm:pb-6">
           <DialogTitle className="text-lg sm:text-xl">Gerar Novo Contrato</DialogTitle>
           <DialogDescription className="text-sm sm:text-base">
