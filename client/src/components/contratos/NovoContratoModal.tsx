@@ -822,7 +822,14 @@ ____________________________________        ____________________________________
         dataFim: dataFimContrato ? format(dataFimContrato, 'yyyy-MM-dd') : null, // ✅ NULL para contratos renováveis
         status: 'em_aberto' as const, // Inicia sempre como em_aberto
         template: templateContent,
-        veiculoId: data.veiculoId // ✅ INCLUIR VEÍCULO ID NO CONTRATO
+        veiculoId: data.veiculoId, // ✅ INCLUIR VEÍCULO ID NO CONTRATO
+        // 🎯 CAMPOS DE PAGAMENTO AUTOMÁTICO - ERA ISSO QUE ESTAVA FALTANDO!
+        pagamentoRecorrente: data.pagamentoRecorrente,
+        dataPrimeiroPagamento: data.dataPrimeiroPagamento ? format(data.dataPrimeiroPagamento, 'yyyy-MM-dd') : null,
+        recorrencia: data.recorrencia,
+        tipoPagamento: data.tipoPagamento,
+        quantidadePagamentos: data.quantidadePagamentos,
+        marcarPagamentosAnteriores: data.marcarPagamentosAnteriores
       };
 
       console.log('[FRONTEND] Criando contrato com dados:', novoContrato);
