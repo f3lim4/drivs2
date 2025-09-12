@@ -84,7 +84,7 @@ export function NovaDespesaModal() {
   // Preenchimento automático quando categoria é seguro e veículo selecionado
   useEffect(() => {
     if (categoria === 'seguro' && veiculoId && veiculoId !== 'sem-veiculo') {
-      const veiculo = veiculos.find(v => v.id === veiculoId);
+      const veiculo = veiculos.find((v: any) => v.id === veiculoId);
       if (veiculo && veiculo.valorSeguroMensal) {
         form.setValue('valor', parseFloat(veiculo.valorSeguroMensal.toString()));
         form.setValue('descricao', `Seguro ${veiculo.seguradora || 'mensal'} - ${veiculo.placa}`);
@@ -108,7 +108,7 @@ export function NovaDespesaModal() {
 
   const handleSelectAllVehicles = (checked: boolean) => {
     if (checked) {
-      setSelectedVehicles(veiculos.map(v => v.id));
+      setSelectedVehicles(veiculos.map((v: any) => v.id));
     } else {
       setSelectedVehicles([]);
     }
@@ -209,7 +209,7 @@ export function NovaDespesaModal() {
     } catch (error) {
       console.error('Error creating despesa:', error);
       
-      if (error.message === 'DUPLICATE') {
+      if (error instanceof Error && error.message === 'DUPLICATE') {
         toast({
           title: 'Despesa duplicada',
           description: 'Uma despesa igual já existe para este veículo na mesma data com o mesmo valor.',
@@ -311,7 +311,7 @@ export function NovaDespesaModal() {
                         {selectedVehicles.length === 0 
                           ? "Selecionar veículos" 
                           : selectedVehicles.length === 1 
-                            ? `${veiculos.find(v => v.id === selectedVehicles[0])?.placa} - ${veiculos.find(v => v.id === selectedVehicles[0])?.modelo}`
+                            ? `${veiculos.find((v: any) => v.id === selectedVehicles[0])?.placa} - ${veiculos.find((v: any) => v.id === selectedVehicles[0])?.modelo}`
                             : `${selectedVehicles.length} veículos selecionados`
                         }
                         <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -352,7 +352,7 @@ export function NovaDespesaModal() {
                       
                       {/* Lista de veículos filtrada */}
                       {veiculos
-                        .filter((veiculo) => {
+                        .filter((veiculo: any) => {
                           if (!searchVehicle) return true;
                           const search = searchVehicle.toLowerCase();
                           return (
@@ -361,7 +361,7 @@ export function NovaDespesaModal() {
                             veiculo.marca?.toLowerCase().includes(search)
                           );
                         })
-                        .map((veiculo) => (
+                        .map((veiculo: any) => (
                         <div key={veiculo.id} className="flex items-center space-x-2">
                           <Checkbox
                             id={veiculo.id}
@@ -538,7 +538,8 @@ export function NovaDespesaModal() {
                   <FormLabel>Observações</FormLabel>
                   <FormControl>
                     <Textarea 
-                      {...field} 
+                      {...field}
+                      value={field.value || ''}
                       placeholder="Observações adicionais" 
                       className="resize-none"
                       rows={3}
