@@ -264,7 +264,26 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
     for (const dataPagamento of datasPagamento) {
       const isRetroativo = dataPagamento < hoje;
       
-      // Buscar motorista real pelo nome do cliente ANTES da verificação de duplicados
+      
+      // VERIFICAÇÃO SIMPLES: Verificar se pagamento já existe para este contrato específico nesta data
+      // Cada contrato deve criar seus próprios pagamentos únicos
+      const dataVencimentoStr = dataPagamento.toISOString().split('T')[0];
+      
+      const pagamentoExistente = await db
+        .select()
+        .from(pagamentos)
+        .where(and(
+          eq(pagamentos.aluguelId, contrato.id),
+          eq(pagamentos.dataVencimento, dataVencimentoStr)
+        ))
+        .limit(1);
+
+      if (pagamentoExistente.length > 0) {
+        console.log(`[SKIP] Pagamento já existe para contrato ${contrato.id} em ${dataPagamento.toDateString()}`);
+        continue;
+      }
+      
+      // Buscar motorista real pelo nome do cliente
       let motoristaIdReal = null;
       try {
         const motoristaResult = await db
@@ -284,35 +303,6 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
         }
       } catch (error) {
         console.log(`[CONTRATO-PAGAMENTO] Erro ao buscar motorista: ${error}`);
-      }
-      
-      // VERIFICAÇÃO ROBUSTA: Verificar se pagamento já existe para o mesmo motorista + data + locadora
-      // Isso previne pagamentos duplicados mesmo se múltiplos contratos forem criados por engano
-      const dataVencimentoStr = dataPagamento.toISOString().split('T')[0];
-      
-      const pagamentoExistente = await db
-        .select()
-        .from(pagamentos)
-        .where(and(
-          eq(pagamentos.locadoraId, contrato.locadoraId),
-          eq(pagamentos.dataVencimento, dataVencimentoStr),
-          or(
-            // Verificar por ID do contrato atual
-            eq(pagamentos.aluguelId, contrato.id),
-            // OU por motorista + cliente (se motorista foi encontrado)
-            motoristaIdReal ? and(
-              eq(pagamentos.motoristaId, motoristaIdReal),
-              eq(pagamentos.tipo, 'contrato')
-            ) : sql`false`,
-            // OU por nome do cliente (fallback para casos sem motorista) - case insensitive
-            sql`lower(${pagamentos.descricao}) LIKE lower(${`%${contrato.cliente}%`})`
-          )
-        ))
-        .limit(1);
-
-      if (pagamentoExistente.length > 0) {
-        console.log(`[SKIP] Pagamento já existe para contrato ${contrato.id} em ${dataPagamento.toDateString()}`);
-        continue;
       }
 
       // Definir status do pagamento
