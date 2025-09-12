@@ -9,7 +9,8 @@ interface PagamentoAutomatico {
   aluguelId: string | null;
   motoristaId: string;
   locadoraId: string;
-  dataPagamento: string; // Data no formato YYYY-MM-DD
+  dataPagamento: string | null; // Data no formato YYYY-MM-DD (nullable para pagamentos em aberto)
+  dataVencimento: string; // Data de vencimento obrigatória
   valorTotal: string; // Decimal como string
   valorPago: string; // Decimal como string  
   valorRestante: string; // Decimal como string
@@ -245,12 +246,12 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
     for (const dataPagamento of datasPagamento) {
       const isRetroativo = dataPagamento < hoje;
       
-      // Verificar se pagamento já existe
+      // Verificar se pagamento já existe (usar aluguelId para armazenar ID do contrato)
       const pagamentoExistente = await db
         .select()
         .from(pagamentos)
         .where(and(
-          eq(pagamentos.contratoId, contrato.id),
+          eq(pagamentos.aluguelId, contrato.id),
           eq(pagamentos.dataVencimento, dataPagamento.toISOString().split('T')[0])
         ))
         .limit(1);
@@ -273,10 +274,12 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
         dataPagamentoEfetiva = null; // Null para pagamentos em aberto
       }
 
-      // Criar novo pagamento
+      // Criar novo pagamento (usar aluguelId para armazenar ID do contrato)
+      // Para contratos, usar o cliente como motoristaId (campo obrigatório)
       const novoPagamento = {
         id: crypto.randomUUID(),
-        contratoId: contrato.id,
+        aluguelId: contrato.id, // Usando aluguelId para armazenar ID do contrato
+        motoristaId: contrato.cliente || contrato.id, // Usar cliente ou ID do contrato como fallback
         locadoraId: contrato.locadoraId,
         dataPagamento: dataPagamentoEfetiva,
         dataVencimento: dataPagamento.toISOString().split('T')[0],

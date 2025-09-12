@@ -18,6 +18,7 @@ import {
   ObjectStorageService,
   ObjectNotFoundError,
 } from "./objectStorage";
+import { criarPagamentosRecorrentes } from "./pagamentos-automaticos";
 
 // Declaração de tipos para sessão
 declare module 'express-session' {
@@ -1361,6 +1362,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Não falha a criação do contrato, apenas log do erro
       }
       
+      // 🎯 GERAÇÃO AUTOMÁTICA DE PAGAMENTOS: Verificar se deve criar pagamentos recorrentes
+      try {
+        console.log('[PAGAMENTOS-AUTO] Verificando necessidade de gerar pagamentos automáticos...');
+        
+        // Por padrão, considerar que contratos devem ter pagamentos recorrentes semanais
+        // TODO: No futuro, isso pode vir do body da requisição com opções do usuário
+        const opcoesPagamento = {
+          pagamentoRecorrente: true, // Por padrão ativar pagamentos automáticos
+          tipoRecorrencia: 'semanal' as 'semanal' | 'quinzenal' | 'mensal',
+          marcarPagamentosAnterioresComoPago: false // Por padrão não marcar anteriores como pago
+        };
+        
+        await criarPagamentosRecorrentes(contrato, opcoesPagamento);
+        console.log(`[PAGAMENTOS-AUTO] Pagamentos automáticos gerados com sucesso para contrato ${contrato.id}`);
+        
+      } catch (error) {
+        console.error('[PAGAMENTOS-AUTO] Erro ao gerar pagamentos automáticos:', error);
+        // Não falhar a criação do contrato por erro na geração de pagamentos
+        // O contrato ainda foi criado com sucesso
+      }
+
       // Limpar cache após criação bem-sucedida
       setTimeout(() => {
         contratoCreationCache.delete(cacheKey);
