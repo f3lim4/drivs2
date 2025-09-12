@@ -335,9 +335,15 @@ export default function Pagamentos() {
     filtered.sort((a, b) => {
       switch (sortOrder) {
         case 'mais-novos':
-          return new Date(b.dataPagamento || '').getTime() - new Date(a.dataPagamento || '').getTime();
+          // Para ordenação, usar dataVencimento quando dataPagamento for null
+          const dateA = a.dataPagamento || a.dataVencimento || '';
+          const dateB = b.dataPagamento || b.dataVencimento || '';
+          return new Date(dateB).getTime() - new Date(dateA).getTime();
         case 'mais-antigos':
-          return new Date(a.dataPagamento || '').getTime() - new Date(b.dataPagamento || '').getTime();
+          // Para ordenação, usar dataVencimento quando dataPagamento for null
+          const dateA2 = a.dataPagamento || a.dataVencimento || '';
+          const dateB2 = b.dataPagamento || b.dataVencimento || '';
+          return new Date(dateA2).getTime() - new Date(dateB2).getTime();
         case 'nome-az':
           return (a.motoristaNome || '').localeCompare(b.motoristaNome || '');
         case 'nome-za':
