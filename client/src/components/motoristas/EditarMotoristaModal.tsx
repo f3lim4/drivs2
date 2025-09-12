@@ -1367,7 +1367,7 @@ export function EditarMotoristaModal({
             {/* STATUS */}
             <div className="space-y-4">
               {/* BOTÃO NEGATIVAR/DESNEGATIVAR */}
-              <div className="flex justify-end">
+              <div className="flex justify-start">
                 <Button
                   type="button"
                   variant="outline"
