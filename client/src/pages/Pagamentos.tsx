@@ -36,26 +36,29 @@ export default function Pagamentos() {
   console.log('🚀 [VERSÃO V3] Usando locadoraId correto:', locadoraId);
   console.log('🚀 [VERSÃO V3] Profile atual:', profile?.id);
   
-  // QUERY CORRIGIDA - SEM LOOP INFINITO
+  // QUERY CORRIGIDA - FORCE REFRESH SEM CACHE
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['pagamentos-locadora-corrigida', locadoraId], // Key estável
+    queryKey: ['pagamentos-locadora-v4', locadoraId, Date.now()], // Key única com timestamp para forçar refresh
     queryFn: async () => {
       const url = `/api/pagamentos?locadoraId=${locadoraId}`;
-      console.log('✅ [QUERY FINAL] Executando:', url);
+      console.log('✅ [QUERY V4] Executando SEM CACHE:', url);
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       });
       const data = await response.json();
-      console.log('✅ [QUERY FINAL] Sucesso:', data.length, 'pagamentos carregados');
+      console.log('✅ [QUERY V4] Resposta do servidor:', data);
+      console.log('✅ [QUERY V4] Total:', data.length, 'pagamentos');
       return data;
     },
     enabled: true,
-    staleTime: 1000, // 1 segundo de cache para evitar chamadas excessivas
-    retry: 1 // Apenas 1 tentativa
+    staleTime: 0, // Sem cache
+    cacheTime: 0, // Não armazenar no cache
+    retry: 1
   });
   
   // FUNÇÕES CORRIGIDAS - USANDO MUTATIONS DO HOOK usePagamentos
@@ -79,7 +82,7 @@ export default function Pagamentos() {
     },
     onSuccess: () => {
       // Invalidar cache para recarregar dados
-      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-v4'] });
     },
     onError: (error: Error) => {
       console.error('Erro ao atualizar pagamento:', error);
