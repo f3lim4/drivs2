@@ -1238,8 +1238,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const tempoUltimaCreacao = contratoCreationCache.get(cacheKey);
         const diferencaTempo = agora - tempoUltimaCreacao;
         
-        // Se tentativa de criação em menos de 10 segundos, bloquear
-        if (diferencaTempo < 10000) {
+        // Se tentativa de criação em menos de 3 segundos, bloquear
+        if (diferencaTempo < 3000) {
           console.log('[ANTI-DUPLICATE] Tentativa de criação duplicada bloqueada:', {
             cacheKey,
             diferencaTempo,
@@ -1247,7 +1247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           return res.status(429).json({ 
             message: "Aguarde antes de criar outro contrato",
-            tempoEspera: Math.ceil((10000 - diferencaTempo) / 1000)
+            tempoEspera: Math.ceil((3000 - diferencaTempo) / 1000)
           });
         }
       }
