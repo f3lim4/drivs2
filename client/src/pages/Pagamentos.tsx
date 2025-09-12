@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Plus, Eye, Edit, Trash2, Calendar, DollarSign, User, AlertCircle, Search, Filter, CheckCircle, Clock, Calculator, Car } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-// REMOVIDO: import { usePagamentos } from '@/hooks/usePagamentos'; // Causava conflito com ID errado
+import { usePagamentos } from '@/hooks/usePagamentos';
 import { useMotoristas } from '@/hooks/useMotoristas';
 import { useAuth } from '@/hooks/useAuth';
 import { Pagination } from '@/components/ui/pagination';
@@ -29,126 +29,58 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 
 export default function Pagamentos() {
   const { profile } = useAuth();
-  
-  // Usar locadora do perfil do usuário
-  const locadoraId = profile?.locadoraId;
-  
-  console.log('📊 [PAGAMENTOS] LocadoraId do perfil:', locadoraId);
-  
-  // Query DEBUG - forçar limpeza de cache e logs detalhados
-  const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['pagamentos-debug', locadoraId, Date.now()], // Key única para evitar cache
-    queryFn: async () => {
-      const url = `/api/pagamentos?locadoraId=${locadoraId}`;
-      console.log('🔍 [DEBUG] Executando query LIMPA:', url);
-      console.log('🔍 [DEBUG] LocadoraId atual:', locadoraId);
-      
-      const response = await fetch(url, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate',
-          'Pragma': 'no-cache'
-        }
-      });
-      
-      if (!response.ok) {
-        console.error('🔍 [DEBUG] Erro na response:', response.status, response.statusText);
-        throw new Error('Erro ao buscar pagamentos');
-      }
-      
-      const data = await response.json();
-      console.log('🔍 [DEBUG] Raw response data:', data);
-      console.log('🔍 [DEBUG] Data type:', typeof data, 'Array?', Array.isArray(data));
-      console.log('🔍 [DEBUG] Total items:', data?.length || 0);
-      
-      if (data && data.length > 0) {
-        console.log('🔍 [DEBUG] First item:', data[0]);
-        data.forEach((item, index) => {
-          console.log(`🔍 [DEBUG] Item ${index}:`, {
-            id: item.id,
-            motoristaNome: item.motoristaNome,
-            tipo: item.tipo,
-            valor: item.valor
-          });
-        });
-      }
-      
-      return data;
-    },
-    enabled: !!locadoraId,
-    refetchOnMount: true,
-    staleTime: 0,
-    gcTime: 0
-  });
-  
-  // FUNÇÕES CORRIGIDAS - USANDO MUTATIONS DO HOOK usePagamentos
   const queryClient = useQueryClient();
   
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<InsertPagamento> }) => {
-      const response = await fetch(`/api/pagamentos/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update pagamento: ${response.status} - ${errorText}`);
+  // LIMPAR CACHE PERSISTENTE DO REACT QUERY - CORREÇÃO DOS DADOS FANTASMAS  
+  const limparCacheCompleto = () => {
+    console.log('🧹 [CACHE-CLEAR] Limpando todo cache persistente...');
+    queryClient.clear();
+    localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+    sessionStorage.clear();
+    console.log('🧹 [CACHE-CLEAR] Cache limpo completamente');
+  };
+  
+  // Limpar cache uma vez quando componente monta se locadora mudou
+  useEffect(() => {
+    const lastLocadoraId = localStorage.getItem('LAST_LOCADORA_ID');
+    const currentLocadoraId = profile?.locadoraId;
+    
+    if (lastLocadoraId !== currentLocadoraId) {
+      console.log('🔄 [LOCADORA-CHANGE] Mudança de locadora detectada, limpando cache...');
+      limparCacheCompleto();
+      if (currentLocadoraId) {
+        localStorage.setItem('LAST_LOCADORA_ID', currentLocadoraId);
       }
-      
-      const result = await response.json();
-      return result;
-    },
-    onSuccess: () => {
-      // Invalidar cache para recarregar dados
-      queryClient.invalidateQueries({ queryKey: ['pagamentos', locadoraId] });
-    },
-    onError: (error: Error) => {
-      console.error('Erro ao atualizar pagamento:', error);
     }
-  });
-
-  const createMutation = useMutation({
-    mutationFn: async (pagamento: InsertPagamento) => {
-      console.log('🔧 [CREATE] Criando pagamento:', pagamento);
-      const response = await fetch('/api/pagamentos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(pagamento),
-      });
-      
-      if (!response.ok) throw new Error('Failed to create pagamento');
-      const result = await response.json();
-      console.log('✅ [CREATE] Pagamento criado:', result);
-      return result;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pagamentos', locadoraId] });
-      console.log('✅ [CREATE] Cache invalidado, dados recarregados');
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      console.log('🔧 [DELETE] Excluindo pagamento:', id);
-      const response = await fetch(`/api/pagamentos/${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) throw new Error('Failed to delete pagamento');
-      console.log('✅ [DELETE] Pagamento excluído');
-      return true;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pagamentos', locadoraId] });
-      console.log('✅ [DELETE] Cache invalidado, dados recarregados');
-    }
-  });
-
-  const createPagamento = (data: InsertPagamento) => createMutation.mutate(data);
-  const updatePagamento = (params: { id: string; updates: Partial<InsertPagamento> }) => updateMutation.mutate(params);
-  const deletePagamento = (id: string) => deleteMutation.mutate(id);
+  }, [profile?.locadoraId, queryClient]);
+  
+  // USAR HOOK PADRÃO - UNIFICANDO FONTE DE DADOS
+  const { 
+    pagamentos, 
+    isLoading: loadingPagamentos, 
+    createPagamento,
+    updatePagamento,
+    deletePagamento,
+    isCreating,
+    isUpdating,
+    isDeleting
+  } = usePagamentos();
+  
+  console.log('📊 [PAGAMENTOS-UNIFIED] Total encontrados:', pagamentos.length);
+  console.log('📊 [PAGAMENTOS-UNIFIED] LocadoraId:', profile?.locadoraId);
+  
+  // LOG DETALHADO APENAS SE HOUVER DADOS (para debug)
+  if (pagamentos.length > 0) {
+    console.log('📊 [PAGAMENTOS-UNIFIED] Dados encontrados:', pagamentos.map(p => ({
+      id: p.id,
+      motoristaNome: p.motoristaNome,
+      tipo: p.tipo,
+      valor: p.valor
+    })));
+  }
+  
+  // As funções de CRUD já vêm do hook usePagamentos
+  // createPagamento, updatePagamento, deletePagamento já estão disponíveis
   const { motoristas, isLoading: loadingMotoristas } = useMotoristas();
 
   // Buscar dados adicionais necessários para o sistema completo
