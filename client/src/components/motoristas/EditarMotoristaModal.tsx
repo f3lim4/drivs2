@@ -38,7 +38,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { registrarAtividade } from '@/utils/activityLogger';
 import { useQueryClient } from '@tanstack/react-query';
-import { Image, Upload, X, FileText, Eye, Download } from 'lucide-react';
+import { Image, Upload, X, FileText } from 'lucide-react';
 
 // Funções de validação
 function validarCPF(cpf: string): boolean {
@@ -379,12 +379,12 @@ export function EditarMotoristaModal({
         const data = await response.json();
         const documentos = data.documentos || {};
         
-        // Mapear documentos para previews
+        // Mapear documentos para previews (apenas imagens, não PDFs)
         const novosPreviews: typeof imagePreviews = {
           fotoPerfil: documentos.fotoPerfil || null,
-          cnhImagem: documentos.cnhImagem || null,
+          cnhImagem: (documentos.cnhImagem && !documentos.cnhImagem.includes('.pdf')) ? documentos.cnhImagem : null,
           fotoComCnh: documentos.fotoComCnh || null,
-          comprovanteEndereco: documentos.comprovanteEndereco || null,
+          comprovanteEndereco: (documentos.comprovanteEndereco && !documentos.comprovanteEndereco.includes('.pdf')) ? documentos.comprovanteEndereco : null,
           fotoExtra: documentos.fotoExtra || null,
           fotoExtra2: documentos.fotoExtra2 || null,
         };
@@ -930,156 +930,27 @@ export function EditarMotoristaModal({
                           </Button>
                         </div>
                         {imagePreviews.fotoPerfil && (
-                          <div className="relative group">
-                            <img 
-                              src={imagePreviews.fotoPerfil} 
-                              alt="Preview" 
-                              className="w-12 h-12 object-cover rounded"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                size="sm"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  window.open(imagePreviews.fotoPerfil!, '_blank');
-                                }}
-                              >
-                                <Eye className="w-2 h-2 mr-1" />
-                                Ver
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                size="sm"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                                onClick={async (e) => {
-                                  e.stopPropagation();
-                                  try {
-                                    const response = await fetch(imagePreviews.fotoPerfil!);
-                                    const blob = await response.blob();
-                                    const url = window.URL.createObjectURL(blob);
-                                    const link = document.createElement('a');
-                                    link.href = url;
-                                    link.download = `motorista-${motorista.nome}-foto-perfil.jpg`;
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    document.body.removeChild(link);
-                                    window.URL.revokeObjectURL(url);
-                                  } catch (error) {
-                                    console.error('Erro ao baixar imagem:', error);
-                                    toast({
-                                      title: "Erro ao baixar",
-                                      description: "Não foi possível baixar a imagem",
-                                      variant: "destructive",
-                                    });
-                                  }
-                                }}
-                              >
-                                <Download className="w-2 h-2 mr-1" />
-                                Baixar
-                              </Button>
-                            </div>
-                          </div>
+                          <img 
+                            src={imagePreviews.fotoPerfil} 
+                            alt="Preview" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
                         )}
                       </div>
                     ) : imagePreviews.fotoPerfil ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <div className="relative group">
-                          <img 
-                            src={imagePreviews.fotoPerfil} 
-                            alt="Imagem atual" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(imagePreviews.fotoPerfil!, '_blank');
-                              }}
-                            >
-                              <Eye className="w-2 h-2 mr-1" />
-                              Ver
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                              onClick={async (e) => {
-                                e.stopPropagation();
-                                try {
-                                  const response = await fetch(imagePreviews.fotoPerfil!);
-                                  const blob = await response.blob();
-                                  const url = window.URL.createObjectURL(blob);
-                                  const link = document.createElement('a');
-                                  link.href = url;
-                                  link.download = `motorista-${motorista.nome}-foto-perfil.jpg`;
-                                  document.body.appendChild(link);
-                                  link.click();
-                                  document.body.removeChild(link);
-                                  window.URL.revokeObjectURL(url);
-                                } catch (error) {
-                                  console.error('Erro ao baixar imagem:', error);
-                                  toast({
-                                    title: "Erro ao baixar",
-                                    description: "Não foi possível baixar a imagem",
-                                    variant: "destructive",
-                                  });
-                                }
-                              }}
-                            >
-                              <Download className="w-2 h-2 mr-1" />
-                              Baixar
-                            </Button>
-                          </div>
-                        </div>
-                        <label
-                          htmlFor="foto-perfil"
-                          className="cursor-pointer flex flex-col items-center justify-center py-1"
-                        >
-                          <Upload className="h-4 w-4 text-blue-500" />
-                          <span className="text-xs text-blue-600">Substituir</span>
-                        </label>
-                      </div>
-                    ) : imagePreviews.fotoPerfil ? (
-                      <div className="space-y-2">
-                        <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <div className="relative group">
-                          <img 
-                            src={imagePreviews.fotoPerfil} 
-                            alt="Foto de perfil atual" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(imagePreviews.fotoPerfil!, '_blank');
-                              }}
-                            >
-                              <Eye className="w-2 h-2 mr-1" />
-                              Ver
-                            </Button>
-                          </div>
-                        </div>
+                        <img 
+                          src={imagePreviews.fotoPerfil} 
+                          alt="Imagem atual" 
+                          className="w-12 h-12 object-cover rounded"
+                        />
                         <label
                           htmlFor="foto-perfil"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir</span>
+                          <span className="text-xs text-blue-600">Substituir Foto</span>
                         </label>
                       </div>
                     ) : (
@@ -1096,7 +967,7 @@ export function EditarMotoristaModal({
 
                 {/* CNH */}
                 <div className="space-y-1">
-                  <Label htmlFor="cnh-imagem" className="text-xs font-medium">CNH</Label>
+                  <Label htmlFor="cnh-imagem" className="text-xs font-medium">CNH (Imagem ou PDF)</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="cnh-imagem"
@@ -1121,59 +992,11 @@ export function EditarMotoristaModal({
                           </Button>
                         </div>
                         {imagePreviews.cnhImagem ? (
-                          <div className="relative group">
-                            <img 
-                              src={imagePreviews.cnhImagem} 
-                              alt="Preview" 
-                              className="w-12 h-12 object-cover rounded"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                size="sm"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  window.open(imagePreviews.cnhImagem!, '_blank');
-                                }}
-                              >
-                                <Eye className="w-2 h-2 mr-1" />
-                                Ver
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="secondary"
-                                size="sm"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                                onClick={async (e) => {
-                                  e.stopPropagation();
-                                  try {
-                                    const response = await fetch(imagePreviews.cnhImagem!);
-                                    const blob = await response.blob();
-                                    const url = window.URL.createObjectURL(blob);
-                                    const link = document.createElement('a');
-                                    link.href = url;
-                                    link.download = `motorista-${motorista.nome}-cnh.jpg`;
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    document.body.removeChild(link);
-                                    window.URL.revokeObjectURL(url);
-                                  } catch (error) {
-                                    console.error('Erro ao baixar imagem:', error);
-                                    toast({
-                                      title: "Erro ao baixar",
-                                      description: "Não foi possível baixar a imagem",
-                                      variant: "destructive",
-                                    });
-                                  }
-                                }}
-                              >
-                                <Download className="w-2 h-2 mr-1" />
-                                Baixar
-                              </Button>
-                            </div>
-                          </div>
+                          <img 
+                            src={imagePreviews.cnhImagem} 
+                            alt="Preview" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
                         ) : (
                           <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded">
                             <FileText className="h-4 w-4 text-gray-400" />
@@ -1184,65 +1007,17 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.cnhImagem ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <div className="relative group">
-                          <img 
-                            src={imagePreviews.cnhImagem} 
-                            alt="CNH atual" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(imagePreviews.cnhImagem!, '_blank');
-                              }}
-                            >
-                              <Eye className="w-2 h-2 mr-1" />
-                              Ver
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                              onClick={async (e) => {
-                                e.stopPropagation();
-                                try {
-                                  const response = await fetch(imagePreviews.cnhImagem!);
-                                  const blob = await response.blob();
-                                  const url = window.URL.createObjectURL(blob);
-                                  const link = document.createElement('a');
-                                  link.href = url;
-                                  link.download = `motorista-${motorista.nome}-cnh.jpg`;
-                                  document.body.appendChild(link);
-                                  link.click();
-                                  document.body.removeChild(link);
-                                  window.URL.revokeObjectURL(url);
-                                } catch (error) {
-                                  console.error('Erro ao baixar imagem:', error);
-                                  toast({
-                                    title: "Erro ao baixar",
-                                    description: "Não foi possível baixar a imagem",
-                                    variant: "destructive",
-                                  });
-                                }
-                              }}
-                            >
-                              <Download className="w-2 h-2 mr-1" />
-                              Baixar
-                            </Button>
-                          </div>
-                        </div>
+                        <img 
+                          src={imagePreviews.cnhImagem} 
+                          alt="CNH atual" 
+                          className="w-12 h-12 object-cover rounded"
+                        />
                         <label
                           htmlFor="cnh-imagem"
-                          className="cursor-pointer flex flex-col items-center justify-center py-1"
+                          className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
-                          <Upload className="h-4 w-4 text-blue-500" />
-                          <span className="text-xs text-blue-600">Substituir</span>
+                          <Upload className="h-3 w-3 text-blue-600 mr-1" />
+                          <span className="text-xs text-blue-600">Substituir Foto</span>
                         </label>
                       </div>
                     ) : (
@@ -1257,9 +1032,9 @@ export function EditarMotoristaModal({
                   </div>
                 </div>
 
-                {/* Foto com CNH */}
+                {/* Foto Segurando CNH */}
                 <div className="space-y-1">
-                  <Label htmlFor="foto-com-cnh" className="text-xs font-medium">Foto com CNH</Label>
+                  <Label htmlFor="foto-com-cnh" className="text-xs font-medium">Foto Segurando CNH</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="foto-com-cnh"
@@ -1272,7 +1047,7 @@ export function EditarMotoristaModal({
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-gray-600">
-                            {imagens.fotoComCnh ? imagens.fotoComCnh.name : "Foto com CNH atual"}
+                            {imagens.fotoComCnh ? imagens.fotoComCnh.name : "Foto segurando CNH atual"}
                           </span>
                           <Button
                             type="button"
@@ -1294,34 +1069,17 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.fotoComCnh ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <div className="relative group">
-                          <img 
-                            src={imagePreviews.fotoComCnh} 
-                            alt="Foto com CNH atual" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(imagePreviews.fotoComCnh!, '_blank');
-                              }}
-                            >
-                              <Eye className="w-2 h-2 mr-1" />
-                              Ver
-                            </Button>
-                          </div>
-                        </div>
+                        <img 
+                          src={imagePreviews.fotoComCnh} 
+                          alt="Foto segurando CNH atual" 
+                          className="w-12 h-12 object-cover rounded"
+                        />
                         <label
                           htmlFor="foto-com-cnh"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir</span>
+                          <span className="text-xs text-blue-600">Substituir Foto</span>
                         </label>
                       </div>
                     ) : (
@@ -1338,7 +1096,7 @@ export function EditarMotoristaModal({
 
                 {/* Comprovante de Endereço */}
                 <div className="space-y-1">
-                  <Label htmlFor="comprovante-endereco" className="text-xs font-medium">Comprovante</Label>
+                  <Label htmlFor="comprovante-endereco" className="text-xs font-medium">Comprovante de Endereço</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="comprovante-endereco"
@@ -1378,40 +1136,23 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.comprovanteEndereco ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Documento atual:</div>
-                        <div className="relative group">
-                          {imagePreviews.comprovanteEndereco.includes('.pdf') ? (
-                            <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded">
-                              <FileText className="h-4 w-4 text-gray-400" />
-                            </div>
-                          ) : (
-                            <img 
-                              src={imagePreviews.comprovanteEndereco} 
-                              alt="Comprovante atual" 
-                              className="w-12 h-12 object-cover rounded"
-                            />
-                          )}
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(imagePreviews.comprovanteEndereco!, '_blank');
-                              }}
-                            >
-                              <Eye className="w-2 h-2 mr-1" />
-                              Ver
-                            </Button>
+                        {imagePreviews.comprovanteEndereco.includes('.pdf') ? (
+                          <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded">
+                            <FileText className="h-4 w-4 text-gray-400" />
                           </div>
-                        </div>
+                        ) : (
+                          <img 
+                            src={imagePreviews.comprovanteEndereco} 
+                            alt="Comprovante atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                        )}
                         <label
                           htmlFor="comprovante-endereco"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir</span>
+                          <span className="text-xs text-blue-600">Substituir Foto</span>
                         </label>
                       </div>
                     ) : (
@@ -1428,7 +1169,7 @@ export function EditarMotoristaModal({
 
                 {/* Foto Extra */}
                 <div className="space-y-1">
-                  <Label htmlFor="foto-extra" className="text-xs font-medium">Foto Extra</Label>
+                  <Label htmlFor="foto-extra" className="text-xs font-medium">Foto Extra (Opcional)</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="foto-extra"
@@ -1463,34 +1204,17 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.fotoExtra ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <div className="relative group">
-                          <img 
-                            src={imagePreviews.fotoExtra} 
-                            alt="Foto extra atual" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(imagePreviews.fotoExtra!, '_blank');
-                              }}
-                            >
-                              <Eye className="w-2 h-2 mr-1" />
-                              Ver
-                            </Button>
-                          </div>
-                        </div>
+                        <img 
+                          src={imagePreviews.fotoExtra} 
+                          alt="Foto extra atual" 
+                          className="w-12 h-12 object-cover rounded"
+                        />
                         <label
                           htmlFor="foto-extra"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir</span>
+                          <span className="text-xs text-blue-600">Substituir Foto</span>
                         </label>
                       </div>
                     ) : (
@@ -1507,7 +1231,7 @@ export function EditarMotoristaModal({
 
                 {/* Foto Extra 2 */}
                 <div className="space-y-1">
-                  <Label htmlFor="foto-extra-2" className="text-xs font-medium">Foto Extra 2</Label>
+                  <Label htmlFor="foto-extra-2" className="text-xs font-medium">Foto Extra 2 (Opcional)</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="foto-extra-2"
@@ -1542,34 +1266,17 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.fotoExtra2 ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <div className="relative group">
-                          <img 
-                            src={imagePreviews.fotoExtra2} 
-                            alt="Foto extra 2 atual" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(imagePreviews.fotoExtra2!, '_blank');
-                              }}
-                            >
-                              <Eye className="w-2 h-2 mr-1" />
-                              Ver
-                            </Button>
-                          </div>
-                        </div>
+                        <img 
+                          src={imagePreviews.fotoExtra2} 
+                          alt="Foto extra 2 atual" 
+                          className="w-12 h-12 object-cover rounded"
+                        />
                         <label
                           htmlFor="foto-extra-2"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir</span>
+                          <span className="text-xs text-blue-600">Substituir Foto</span>
                         </label>
                       </div>
                     ) : (
