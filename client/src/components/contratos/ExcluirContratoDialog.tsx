@@ -2,6 +2,7 @@
  * Dialog de confirmação para exclusão de contratos
  */
 
+import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,13 +13,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { Contrato } from '@/types';
 
 interface ExcluirContratoDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   contrato: Contrato | null;
-  onConfirmarExclusao: (contrato: Contrato) => void;
+  onConfirmarExclusao: (contrato: Contrato, excluirPagamentos: boolean) => void;
 }
 
 export function ExcluirContratoDialog({ 
@@ -27,10 +30,13 @@ export function ExcluirContratoDialog({
   contrato,
   onConfirmarExclusao
 }: ExcluirContratoDialogProps) {
+  const [excluirPagamentos, setExcluirPagamentos] = useState(false);
+
   const handleConfirmar = () => {
     if (contrato) {
-      onConfirmarExclusao(contrato);
+      onConfirmarExclusao(contrato, excluirPagamentos);
       onOpenChange(false);
+      setExcluirPagamentos(false); // Reset checkbox
     }
   };
 
@@ -63,7 +69,27 @@ export function ExcluirContratoDialog({
               </>
             )}
             <br /><br />
-            Esta ação não pode ser desfeita. Todos os dados relacionados serão removidos permanentemente.
+            Esta ação não pode ser desfeita.
+            <br /><br />
+            <div className="flex items-center space-x-2 p-3 bg-orange-50 dark:bg-orange-900/20 rounded border">
+              <Checkbox 
+                id="excluir-pagamentos" 
+                checked={excluirPagamentos}
+                onCheckedChange={(checked) => setExcluirPagamentos(!!checked)}
+              />
+              <Label 
+                htmlFor="excluir-pagamentos" 
+                className="text-sm font-medium text-orange-800 dark:text-orange-200 cursor-pointer"
+              >
+                Excluir também os pagamentos relacionados a este contrato
+              </Label>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+              {excluirPagamentos 
+                ? "⚠️ Os pagamentos serão excluídos permanentemente" 
+                : "✅ Os pagamentos serão mantidos na página de pagamentos"
+              }
+            </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
