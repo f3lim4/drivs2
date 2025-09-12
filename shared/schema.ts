@@ -360,7 +360,8 @@ export const pagamentos = pgTable("pagamentos", {
   valorRestante: decimal("valor_restante", { precision: 10, scale: 2 }).notNull(),
   valorJuros: decimal("valor_juros", { precision: 10, scale: 2 }).default("0.00"), // Juros cobrados
   valorMulta: decimal("valor_multa", { precision: 10, scale: 2 }).default("0.00"), // Multa cobrada
-  dataPagamento: date("data_pagamento").notNull(),
+  dataPagamento: date("data_pagamento"), // Nullable - pode estar vazio para pagamentos em aberto
+  dataVencimento: date("data_vencimento").notNull(), // Data de vencimento do pagamento
   status: text("status").notNull().default("em_aberto"), // 'em_aberto', 'parcial', 'pago', 'atrasado'
   observacoes: text("observacoes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
