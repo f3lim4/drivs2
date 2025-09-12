@@ -1014,13 +1014,25 @@ export class DatabaseStorage implements IStorage {
             }
           }
           
+          // Para pagamentos de contratos, extrair nome do cliente da descrição
+          let nomeDisplay = '';
+          if (motorista[0]) {
+            nomeDisplay = motorista[0].nome;
+          } else if (pagamento.tipo === 'contrato' && pagamento.descricao) {
+            // Extrair nome da descrição "Pagamento semanal do contrato - João Silva"
+            const match = pagamento.descricao.match(/contrato - (.+)$/);
+            nomeDisplay = match ? match[1] : 'Cliente do Contrato';
+          } else {
+            nomeDisplay = `${pagamento.motoristaId} - Excluído`;
+          }
+
           return {
             ...pagamento,
             data: pagamento.dataPagamento, // Mapear campo data corretamente
             valor: pagamento.valorPago, // Mapear campo valor corretamente
-            motoristaNome: motorista[0] ? motorista[0].nome : `${pagamento.motoristaId} - Excluído`,
+            motoristaNome: nomeDisplay,
             motoristaContato: motorista[0]?.telefone || '',
-            motoristaCpf: motorista[0]?.cpf || '', // ADICIONADO: CPF do motorista
+            motoristaCpf: motorista[0]?.cpf || 'CPF não informado', // ADICIONADO: CPF do motorista
             // Adicionar dados do veículo
             ...veiculoData
           };

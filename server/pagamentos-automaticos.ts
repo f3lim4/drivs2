@@ -1,7 +1,7 @@
 // Sistema de Pagamentos Automáticos para Aluguéis Ativos
 import { db } from './db';
-import { contratos, pagamentos, alugueis } from '../shared/schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { contratos, pagamentos, alugueis, motoristas } from '../shared/schema';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import crypto from 'crypto';
 
 interface PagamentoAutomatico {
@@ -261,12 +261,33 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
         dataPagamentoEfetiva = null; // Null para pagamentos em aberto
       }
 
+      // Buscar motorista real pelo nome do cliente
+      let motoristaIdReal = null;
+      try {
+        const motoristaResult = await db
+          .select({ id: motoristas.id })
+          .from(motoristas)
+          .where(and(
+            sql`lower(${motoristas.nome}) = lower(${contrato.cliente})`,
+            eq(motoristas.locadoraId, contrato.locadoraId)
+          ))
+          .limit(1);
+        
+        if (motoristaResult.length > 0) {
+          motoristaIdReal = motoristaResult[0].id;
+          console.log(`[CONTRATO-PAGAMENTO] Motorista encontrado: ${contrato.cliente} -> ${motoristaIdReal}`);
+        } else {
+          console.log(`[CONTRATO-PAGAMENTO] Motorista não encontrado para: ${contrato.cliente}`);
+        }
+      } catch (error) {
+        console.log(`[CONTRATO-PAGAMENTO] Erro ao buscar motorista: ${error}`);
+      }
+
       // Criar novo pagamento (usar aluguelId para armazenar ID do contrato)
-      // Para contratos, usar o cliente como motoristaId (campo obrigatório)
       const novoPagamento = {
         id: crypto.randomUUID(),
         aluguelId: contrato.id, // Usando aluguelId para armazenar ID do contrato
-        motoristaId: contrato.cliente || contrato.id, // Usar cliente ou ID do contrato como fallback
+        motoristaId: motoristaIdReal || 'CONTRATO-' + crypto.randomUUID(), // Usar motorista real ou ID especial
         locadoraId: contrato.locadoraId,
         dataPagamento: dataPagamentoEfetiva,
         dataVencimento: dataPagamento.toISOString().split('T')[0],
@@ -274,7 +295,7 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
         valorPago: statusPagamento === 'pago' ? valorPagamento.toFixed(2) : '0',
         valorRestante: statusPagamento === 'pago' ? '0' : valorPagamento.toFixed(2),
         status: statusPagamento,
-        tipo: 'aluguel',
+        tipo: 'contrato', // Mudar de 'aluguel' para 'contrato'
         descricao: `Pagamento ${descricaoTipo} do contrato - ${contrato.cliente}`,
         automatico: true,
         codigoPagamento: `PAG-CONT-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
