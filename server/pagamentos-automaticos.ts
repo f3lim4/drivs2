@@ -287,7 +287,7 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
       const novoPagamento = {
         id: crypto.randomUUID(),
         aluguelId: contrato.id, // Usando aluguelId para armazenar ID do contrato
-        motoristaId: motoristaIdReal || 'CONTRATO-' + crypto.randomUUID(), // Usar motorista real ou ID especial
+        motoristaId: motoristaIdReal || 'CONTRATO', // Usar motorista real ou ID especial fixo
         locadoraId: contrato.locadoraId,
         dataPagamento: dataPagamentoEfetiva,
         dataVencimento: dataPagamento.toISOString().split('T')[0],
