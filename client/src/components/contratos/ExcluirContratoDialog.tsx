@@ -46,7 +46,7 @@ export function ExcluirContratoDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+          <AlertDialogTitle className="text-destructive">⚠️ Confirmar Exclusão de Contrato</AlertDialogTitle>
           <AlertDialogDescription>
             Tem certeza que deseja excluir {contrato.id.startsWith('aluguel_') ? 'o aluguel ativo' : 'o contrato'} de <strong>{(contrato as any).motoristaNome || contrato.cliente || 'N/A'}</strong>?
             <br /><br />
@@ -69,13 +69,21 @@ export function ExcluirContratoDialog({
               </>
             )}
             <br /><br />
-            Esta ação não pode ser desfeita.
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
+              <p className="text-red-700 dark:text-red-300 font-semibold text-sm">
+                🚨 ATENÇÃO: Esta ação é IRREVERSÍVEL!
+              </p>
+              <p className="text-red-600 dark:text-red-400 text-xs mt-1">
+                O contrato será excluído permanentemente e não poderá ser recuperado.
+              </p>
+            </div>
             <br /><br />
             <div className="flex items-center space-x-2 p-3 bg-orange-50 dark:bg-orange-900/20 rounded border">
               <Checkbox 
                 id="excluir-pagamentos" 
                 checked={excluirPagamentos}
                 onCheckedChange={(checked) => setExcluirPagamentos(!!checked)}
+                data-testid="checkbox-excluir-pagamentos"
               />
               <Label 
                 htmlFor="excluir-pagamentos" 
@@ -93,12 +101,15 @@ export function ExcluirContratoDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel data-testid="button-cancelar-exclusao">
+            Cancelar
+          </AlertDialogCancel>
           <AlertDialogAction 
             onClick={handleConfirmar}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            data-testid="button-confirmar-exclusao"
           >
-            Excluir Contrato
+            ⚠️ Excluir Permanentemente
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
