@@ -190,7 +190,7 @@ export function NovoVeiculoModal({
     'infinity': -1 // -1 = ilimitado
   };
 
-  const limiteAtual = limitesPorPlano[locadora?.plano] || 0;
+  const limiteAtual = limitesPorPlano[locadora?.plano || 'start'] || 0;
   const quantidadeAtual = veiculos?.length || 0;
   const proximoDoLimite = limiteAtual > 0 && quantidadeAtual >= limiteAtual - 1;
 
@@ -369,7 +369,7 @@ export function NovoVeiculoModal({
         valorRastreadorMensal: data.valorRastreadorMensal?.toString(),
         visualizar: data.visualizar || null,
         // Processar documentos carregados
-        documentos: data.documentos || [],
+        documentos: data.documento ? [data.documento] : [],
         status: 'disponivel', // Sempre "disponível" no cadastro
       };
 
