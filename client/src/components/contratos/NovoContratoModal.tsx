@@ -867,58 +867,21 @@ ____________________________________        ____________________________________
         `Novo contrato gerado: ${aluguel.motoristaNome} - ${aluguel.veiculoModelo} (${aluguel.veiculoPlaca})`
       );
 
-      // Criar pagamentos recorrentes se habilitado
-      console.log('[DEBUG PAGAMENTOS] Verificando criação automática:', {
+      // ✅ PAGAMENTOS AUTOMÁTICOS: Agora são criados apenas pelo BACKEND
+      // O backend já processa os campos de pagamento recorrente automaticamente
+      console.log('[PAGAMENTOS AUTOMÁTICOS] Configuração enviada para backend:', {
         pagamentoRecorrente: data.pagamentoRecorrente,
         dataPrimeiroPagamento: data.dataPrimeiroPagamento,
-        recorrencia: data.recorrencia
+        recorrencia: data.recorrencia,
+        tipoPagamento: data.tipoPagamento,
+        quantidadePagamentos: data.quantidadePagamentos
       });
       
-      if (data.pagamentoRecorrente && data.dataPrimeiroPagamento && data.recorrencia) {
-        console.log('[DEBUG PAGAMENTOS] Iniciando criação de pagamentos recorrentes...');
-        const quantidadePagamentos = await criarPagamentosRecorrentes(
-          aluguel.id,
-          data.motoristaId,
-          data.dataPrimeiroPagamento,
-          data.recorrencia,
-          data.valorSemanal,
-          data.prazoMinimo || '',
-          data.dataInicio,  // Passa a data de início do contrato
-          data.tipoPagamento,  // Tipo: ilimitado ou limitado
-          data.quantidadePagamentos,  // Quantidade específica (se limitado)
-          data.marcarPagamentosAnteriores  // Marcar pagamentos anteriores como pagos
-        );
-        
-        console.log('[DEBUG PAGAMENTOS] Resultado:', quantidadePagamentos);
-        
-        // Exibir notificação baseada no resultado
-        if (quantidadePagamentos.totalCriados > 0) {
-          let mensagem = '';
-          
-          if (quantidadePagamentos.statusRetroativos === 'pago') {
-            // Checkbox marcado - pagamentos anteriores como pagos, semana atual em aberto
-            if (quantidadePagamentos.retroativos > 0) {
-              mensagem = `${quantidadePagamentos.totalCriados} pagamentos criados: ${quantidadePagamentos.retroativos} retroativos como PAGOS + semana atual EM ABERTO`;
-            } else {
-              mensagem = `1 pagamento da semana atual criado como EM ABERTO - pagamentos são sempre segundas`;
-            }
-          } else {
-            // Checkbox desmarcado - todos em aberto
-            mensagem = `${quantidadePagamentos.totalCriados} pagamento${quantidadePagamentos.totalCriados > 1 ? 's' : ''} criado${quantidadePagamentos.totalCriados > 1 ? 's' : ''} como EM ABERTO`;
-          }
-            
-          toast({
-            title: "✅ Pagamentos Recorrentes Criados",
-            description: mensagem,
-          });
-        } else {
-          console.log('[DEBUG PAGAMENTOS] Nenhum pagamento foi criado');
-        }
-      } else {
-        console.log('[DEBUG PAGAMENTOS] Criação de pagamentos recorrentes DESABILITADA:', {
-          habilitado: data.pagamentoRecorrente,
-          temData: !!data.dataPrimeiroPagamento,
-          temRecorrencia: !!data.recorrencia
+      if (data.pagamentoRecorrente) {
+        toast({
+          title: "🎯 Pagamentos Configurados",
+          description: `Pagamentos ${data.recorrencia}s serão criados automaticamente pelo sistema`,
+          variant: "default"
         });
       }
 
