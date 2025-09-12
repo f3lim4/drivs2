@@ -188,6 +188,15 @@ export function EditarVeiculoModal({
     }
   }, [veiculo, open, form]);
 
+  // Calcular IPVA automaticamente (4% do valor do veículo)
+  const valorVeiculo = form.watch('valorVeiculo');
+  useEffect(() => {
+    if (valorVeiculo && valorVeiculo > 0) {
+      const ipvaCalculado = valorVeiculo * 0.04; // 4% do valor do veículo
+      form.setValue('ipva', ipvaCalculado);
+    }
+  }, [valorVeiculo, form]);
+
   // Função para obter categorias baseadas no tipo de veículo
   const getCategoriasDisponiveis = () => {
     if (!veiculo) return [];
@@ -793,9 +802,13 @@ export function EditarVeiculoModal({
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                          placeholder="Calculado automaticamente"
                         />
                       </FormControl>
                       <FormMessage />
+                      <p className="text-xs text-muted-foreground">
+                        Valor calculado automaticamente como 4% do valor do veículo. Pode ser editado se necessário.
+                      </p>
                     </FormItem>
                   )}
                 />
