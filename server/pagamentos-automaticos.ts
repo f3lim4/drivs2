@@ -407,14 +407,14 @@ export const criarPagamentosRecorrentes = async (contrato: any, opcoes?: {
       
       // VERIFICAÇÃO SIMPLES: Verificar se pagamento já existe para este contrato específico nesta data
       // Cada contrato deve criar seus próprios pagamentos únicos
-      const dataVencimentoStr = dataPagamento.toISOString().split('T')[0];
+      const dataPagamentoStr = dataPagamento.toISOString().split('T')[0];
       
       const pagamentoExistente = await db
         .select()
         .from(pagamentos)
         .where(and(
           eq(pagamentos.aluguelId, contrato.id),
-          eq(pagamentos.dataVencimento, dataVencimentoStr)
+          eq(pagamentos.dataPagamento, dataPagamentoStr)
         ))
         .limit(1);
 
