@@ -813,7 +813,7 @@ ____________________________________        ____________________________________
         locadoraId: profile?.locadoraId || '',
         tipo: 'locacao' as const,
         titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
-        cliente: motorista?.documento || motorista?.cpf || '',
+        cliente: motorista?.cpf || '',
         valor: valorTotal.toFixed(2), // Enviar como string
         valorSemanal: data.valorSemanal.toFixed(2), // ✅ INCLUIR VALOR SEMANAL
         caucao: data.caucao.toFixed(2), // ✅ INCLUIR CAUÇÃO
