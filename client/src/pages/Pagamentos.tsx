@@ -30,8 +30,8 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 export default function Pagamentos() {
   const { profile } = useAuth();
   
-  // DADOS REAIS DO BANCO - VERSÃO CORRIGIDA V3
-  const locadoraId = "50764571000170"; // ID correto da locadora
+  // DADOS REAIS DO BANCO - VERSÃO CORRIGIDA V4
+  const locadoraId = "33e284e9-9aeb-42a0-83f2-c80542a42b5e"; // ID REALMENTE CORRETO da locadora Fernando
   
   console.log('🚀 [VERSÃO V3] Usando locadoraId correto:', locadoraId);
   console.log('🚀 [VERSÃO V3] Profile atual:', profile?.id);

@@ -6,9 +6,13 @@ export function usePagamentos() {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
 
-  const locadoraId = profile?.locadoraId || profile?.id;
+  // CORREÇÃO TEMPORÁRIA: Forçar uso do locadoraId correto
+  const locadoraId = profile?.locadoraId === '33e284e9-9aeb-42a0-83f2-c80542a42b5e' 
+    ? '33e284e9-9aeb-42a0-83f2-c80542a42b5e' 
+    : (profile?.locadoraId || (profile?.id === '50764571000170' ? '33e284e9-9aeb-42a0-83f2-c80542a42b5e' : profile?.id));
   
-  // Hook funcionando normalmente"
+  console.log('🚀 [PAGAMENTOS DEBUG] Profile:', profile);
+  console.log('🚀 [PAGAMENTOS DEBUG] LocadoraId usado:', locadoraId);
 
   const query = useQuery({
     queryKey: ['/api/pagamentos', locadoraId],
