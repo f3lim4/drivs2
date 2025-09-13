@@ -825,7 +825,7 @@ ____________________________________        ____________________________________
         veiculoId: data.veiculoId, // ✅ INCLUIR VEÍCULO ID NO CONTRATO
         // 🎯 CAMPOS DE PAGAMENTO AUTOMÁTICO - ERA ISSO QUE ESTAVA FALTANDO!
         pagamentoRecorrente: data.pagamentoRecorrente,
-        dataPrimeiroPagamento: data.dataPrimeiroPagamento ? format(data.dataPrimeiroPagamento, 'yyyy-MM-dd') : null,
+        dataPrimeiroPagamento: data.dataPrimeiroPagamento ? format(data.dataPrimeiroPagamento, 'yyyy-MM-dd') : undefined,
         recorrencia: data.recorrencia,
         tipoPagamento: data.tipoPagamento,
         quantidadePagamentos: data.quantidadePagamentos,
