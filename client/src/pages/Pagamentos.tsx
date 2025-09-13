@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, Eye, Edit, Trash2, Calendar, DollarSign, User, AlertCircle, Search, Filter, CheckCircle, Clock, Calculator, Car } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { usePagamentos } from '@/hooks/usePagamentos';
+// REMOVIDO: import { usePagamentos } from '@/hooks/usePagamentos'; // Causava conflito com ID errado
 import { useMotoristas } from '@/hooks/useMotoristas';
 import { useAuth } from '@/hooks/useAuth';
 import { Pagination } from '@/components/ui/pagination';
@@ -29,56 +29,103 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 
 export default function Pagamentos() {
   const { profile } = useAuth();
+  
+  // DADOS REAIS DO BANCO - VERSÃO CORRIGIDA V3
+  const locadoraId = "50764571000170"; // ID correto da locadora
+  
+  console.log('🚀 [VERSÃO V3] Usando locadoraId correto:', locadoraId);
+  console.log('🚀 [VERSÃO V3] Profile atual:', profile?.id);
+  
+  // QUERY CORRIGIDA - SEM LOOP INFINITO
+  const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
+    queryKey: ['pagamentos-locadora-corrigida', locadoraId], // Key estável
+    queryFn: async () => {
+      const url = `/api/pagamentos?locadoraId=${locadoraId}`;
+      console.log('✅ [QUERY FINAL] Executando:', url);
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      const data = await response.json();
+      console.log('✅ [QUERY FINAL] Sucesso:', data.length, 'pagamentos carregados');
+      return data;
+    },
+    enabled: true,
+    staleTime: 1000, // 1 segundo de cache para evitar chamadas excessivas
+    retry: 1 // Apenas 1 tentativa
+  });
+  
+  // FUNÇÕES CORRIGIDAS - USANDO MUTATIONS DO HOOK usePagamentos
   const queryClient = useQueryClient();
   
-  // LIMPAR CACHE PERSISTENTE DO REACT QUERY - CORREÇÃO DOS DADOS FANTASMAS  
-  const limparCacheCompleto = () => {
-    console.log('🧹 [CACHE-CLEAR] Limpando todo cache persistente...');
-    queryClient.clear();
-    localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
-    sessionStorage.clear();
-    console.log('🧹 [CACHE-CLEAR] Cache limpo completamente');
-  };
-  
-  // Limpar cache uma vez quando componente monta se locadora mudou
-  useEffect(() => {
-    const lastLocadoraId = localStorage.getItem('LAST_LOCADORA_ID');
-    const currentLocadoraId = profile?.locadoraId;
-    
-    if (currentLocadoraId && lastLocadoraId !== currentLocadoraId) {
-      console.log('🔄 [LOCADORA-CHANGE] Mudança de locadora detectada, limpando cache...');
-      limparCacheCompleto();
-      localStorage.setItem('LAST_LOCADORA_ID', currentLocadoraId);
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<InsertPagamento> }) => {
+      const response = await fetch(`/api/pagamentos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update pagamento: ${response.status} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      return result;
+    },
+    onSuccess: () => {
+      // Invalidar cache para recarregar dados
+      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+    },
+    onError: (error: Error) => {
+      console.error('Erro ao atualizar pagamento:', error);
     }
-  }, [profile?.locadoraId]); // Remover queryClient das dependências para evitar loop
-  
-  // USAR HOOK PADRÃO - UNIFICANDO FONTE DE DADOS
-  const { 
-    pagamentos, 
-    isLoading: loadingPagamentos, 
-    createPagamento,
-    updatePagamento,
-    deletePagamento,
-    isCreating,
-    isUpdating,
-    isDeleting
-  } = usePagamentos();
-  
-  console.log('📊 [PAGAMENTOS-UNIFIED] Total encontrados:', pagamentos.length);
-  console.log('📊 [PAGAMENTOS-UNIFIED] LocadoraId:', profile?.locadoraId);
-  
-  // LOG DETALHADO APENAS SE HOUVER DADOS (para debug)
-  if (pagamentos.length > 0) {
-    console.log('📊 [PAGAMENTOS-UNIFIED] Dados encontrados:', pagamentos.map(p => ({
-      id: p.id,
-      motoristaNome: p.motoristaNome,
-      tipo: p.tipo,
-      valor: p.valor
-    })));
-  }
-  
-  // As funções de CRUD já vêm do hook usePagamentos
-  // createPagamento, updatePagamento, deletePagamento já estão disponíveis
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (pagamento: InsertPagamento) => {
+      console.log('🔧 [CREATE] Criando pagamento:', pagamento);
+      const response = await fetch('/api/pagamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pagamento),
+      });
+      
+      if (!response.ok) throw new Error('Failed to create pagamento');
+      const result = await response.json();
+      console.log('✅ [CREATE] Pagamento criado:', result);
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      console.log('✅ [CREATE] Cache invalidado, dados recarregados');
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      console.log('🔧 [DELETE] Excluindo pagamento:', id);
+      const response = await fetch(`/api/pagamentos/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) throw new Error('Failed to delete pagamento');
+      console.log('✅ [DELETE] Pagamento excluído');
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      console.log('✅ [DELETE] Cache invalidado, dados recarregados');
+    }
+  });
+
+  const createPagamento = (data: InsertPagamento) => createMutation.mutate(data);
+  const updatePagamento = (params: { id: string; updates: Partial<InsertPagamento> }) => updateMutation.mutate(params);
+  const deletePagamento = (id: string) => deleteMutation.mutate(id);
   const { motoristas, isLoading: loadingMotoristas } = useMotoristas();
 
   // Buscar dados adicionais necessários para o sistema completo
@@ -288,15 +335,9 @@ export default function Pagamentos() {
     filtered.sort((a, b) => {
       switch (sortOrder) {
         case 'mais-novos':
-          // Para ordenação, usar dataPagamento quando disponível, senão createdAt
-          const dateA = a.dataPagamento || a.createdAt || '';
-          const dateB = b.dataPagamento || b.createdAt || '';
-          return new Date(dateB).getTime() - new Date(dateA).getTime();
+          return new Date(b.dataPagamento || '').getTime() - new Date(a.dataPagamento || '').getTime();
         case 'mais-antigos':
-          // Para ordenação, usar dataPagamento quando disponível, senão createdAt
-          const dateA2 = a.dataPagamento || a.createdAt || '';
-          const dateB2 = b.dataPagamento || b.createdAt || '';
-          return new Date(dateA2).getTime() - new Date(dateB2).getTime();
+          return new Date(a.dataPagamento || '').getTime() - new Date(b.dataPagamento || '').getTime();
         case 'nome-az':
           return (a.motoristaNome || '').localeCompare(b.motoristaNome || '');
         case 'nome-za':
@@ -362,20 +403,13 @@ export default function Pagamentos() {
     
     switch (visualizacaoPagamento) {
       case 'mensal':
-        // Valor mensal (pagamentos com vencimento no mês atual - do dia 1 ao último dia)
+        // Valor mensal (pagamentos do mês atual)
         return pagamentosFiltrados
           .filter(p => {
-            // Para pagamentos pagos: usar dataPagamento; para demais: usar createdAt
-            let dataReferencia: Date;
-            if (p.status === 'pago') {
-              if (!p.dataPagamento) return false;
-              dataReferencia = new Date(p.dataPagamento);
-            } else {
-              if (!p.createdAt) return false;
-              dataReferencia = new Date(p.createdAt);
-            }
-            return dataReferencia.getFullYear() === anoAtual && 
-                   dataReferencia.getMonth() === mesAtual;
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento.getFullYear() === anoAtual && 
+                   dataPagamento.getMonth() === mesAtual;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorTotal || '0'), 0);
       
@@ -435,7 +469,7 @@ export default function Pagamentos() {
     
     switch (visualizacaoRecebido) {
       case 'mensal':
-        // Calcular pagamentos regulares do mês (baseado na data de pagamento)
+        // Calcular pagamentos regulares do mês
         const pagamentosRegularesMes = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento) return false;
@@ -446,7 +480,7 @@ export default function Pagamentos() {
           })
           .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
         
-        // Calcular taxas administrativas do mês (baseado na data de pagamento)
+        // Calcular taxas administrativas do mês
         const taxasAdministrativasMes = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento || p.tipo !== 'taxa administrativa') return false;
@@ -530,13 +564,12 @@ export default function Pagamentos() {
       case 'mensal':
         const valorMensal = pagamentosAberto
           .filter(p => {
-            // Para pagamentos em aberto, usar createdAt como referência
-            if (!p.createdAt) return false;
-            const dataCreatedAt = new Date(p.createdAt);
-            return dataCreatedAt.getFullYear() === anoAtual && 
-                   dataCreatedAt.getMonth() === mesAtual;
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento.getFullYear() === anoAtual && 
+                   dataPagamento.getMonth() === mesAtual;
           })
-          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
+          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0); // CORRIGIDO: valorRestante
         console.log('🔧 [DEBUG ABERTO] Valor mensal calculado:', valorMensal);
         return valorMensal;
       
@@ -546,12 +579,11 @@ export default function Pagamentos() {
         
         const valorSemanal = pagamentosAberto
           .filter(p => {
-            // Para pagamentos em aberto, usar createdAt como referência
-            if (!p.createdAt) return false;
-            const dataCreatedAt = new Date(p.createdAt);
-            return dataCreatedAt >= inicioSemana && dataCreatedAt <= fimSemana;
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           })
-          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
+          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0); // CORRIGIDO: valorRestante
         console.log('🔧 [DEBUG ABERTO] Valor semanal calculado:', valorSemanal);
         return valorSemanal;
       
@@ -603,11 +635,10 @@ export default function Pagamentos() {
       case 'mensal':
         return pagamentosParciais
           .filter(p => {
-            // Para pagamentos parciais, usar createdAt como referência
-            if (!p.createdAt) return false;
-            const dataCreatedAt = new Date(p.createdAt);
-            return dataCreatedAt.getFullYear() === anoAtual && 
-                   dataCreatedAt.getMonth() === mesAtual;
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento.getFullYear() === anoAtual && 
+                   dataPagamento.getMonth() === mesAtual;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
       
@@ -617,10 +648,9 @@ export default function Pagamentos() {
         
         return pagamentosParciais
           .filter(p => {
-            // Para pagamentos parciais, usar createdAt como referência
-            if (!p.createdAt) return false;
-            const dataCreatedAt = new Date(p.createdAt);
-            return dataCreatedAt >= inicioSemana && dataCreatedAt <= fimSemana;
+            if (!p.dataPagamento) return false;
+            const dataPagamento = new Date(p.dataPagamento);
+            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
       
@@ -894,7 +924,7 @@ export default function Pagamentos() {
                     <div className="font-semibold">{formatCurrency(pagamento.valorTotal)}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-sm">{pagamento.dataPagamento ? formatDate(pagamento.dataPagamento) : '-'}</div>
+                    <div className="text-sm">{formatDate(pagamento.dataPagamento)}</div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">

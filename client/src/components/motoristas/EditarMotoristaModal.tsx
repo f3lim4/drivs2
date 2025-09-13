@@ -38,7 +38,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { registrarAtividade } from '@/utils/activityLogger';
 import { useQueryClient } from '@tanstack/react-query';
-import { Image, Upload, X, FileText } from 'lucide-react';
+import { Image, Upload, X, FileText, Eye, Download } from 'lucide-react';
 
 // Funções de validação
 function validarCPF(cpf: string): boolean {
@@ -379,12 +379,12 @@ export function EditarMotoristaModal({
         const data = await response.json();
         const documentos = data.documentos || {};
         
-        // Mapear documentos para previews (apenas imagens, não PDFs)
+        // Mapear documentos para previews
         const novosPreviews: typeof imagePreviews = {
           fotoPerfil: documentos.fotoPerfil || null,
-          cnhImagem: (documentos.cnhImagem && !documentos.cnhImagem.includes('.pdf')) ? documentos.cnhImagem : null,
+          cnhImagem: documentos.cnhImagem || null,
           fotoComCnh: documentos.fotoComCnh || null,
-          comprovanteEndereco: (documentos.comprovanteEndereco && !documentos.comprovanteEndereco.includes('.pdf')) ? documentos.comprovanteEndereco : null,
+          comprovanteEndereco: documentos.comprovanteEndereco || null,
           fotoExtra: documentos.fotoExtra || null,
           fotoExtra2: documentos.fotoExtra2 || null,
         };
@@ -447,7 +447,6 @@ export function EditarMotoristaModal({
 
       // Invalidar cache do React Query para forçar atualização
       queryClient.invalidateQueries({ queryKey: ['/api/motoristas'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/motoristas', motorista.id] });
       
       onMotoristaEditado(motoristaAtualizado);
       setMostrarNegativacao(false);
@@ -458,76 +457,6 @@ export function EditarMotoristaModal({
       console.error('Error negativing motorista:', error);
       toast({
         title: "Erro ao negativar motorista",
-        description: "Tente novamente mais tarde",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const desnegativarMotorista = async () => {
-    if (!motorista || !profile || !motivoNegativacao.trim()) {
-      toast({
-        title: "Erro",
-        description: "Por favor, descreva o motivo da desnegativação",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setLoading(true);
-      
-      const desnegativacaoData = {
-        negativado: false,
-        motivoNegativacao: null,
-        dataNegativacao: null,
-        status: 'ativo' // Reativar o motorista
-      };
-      
-      const response = await fetch(`/api/motoristas/${motorista.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(desnegativacaoData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao desnegativar motorista');
-      }
-
-      const motoristaAtualizado = await response.json();
-
-      // Log da atividade
-      await registrarAtividade(
-        profile.locadoraId || profile.id,
-        profile.email || 'usuario@drivs.me',
-        'desnegativar',
-        'motorista',
-        motorista.id,
-        `Motorista desnegativado: ${motoristaAtualizado.nome} (CPF: ${motoristaAtualizado.cpf}) - Motivo: ${motivoNegativacao}`
-      );
-
-      toast({
-        title: "Motorista desnegativado!",
-        description: `${motoristaAtualizado.nome} foi desnegativado com sucesso.`,
-      });
-
-      // Invalidar cache do React Query para forçar atualização
-      queryClient.invalidateQueries({ queryKey: ['/api/motoristas'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/motoristas', motorista.id] });
-      
-      onMotoristaEditado(motoristaAtualizado);
-      setMostrarNegativacao(false);
-      setMotivoNegativacao('');
-      onOpenChange(false);
-      
-    } catch (error) {
-      console.error('Error desnegativando motorista:', error);
-      toast({
-        title: "Erro ao desnegativar motorista",
         description: "Tente novamente mais tarde",
         variant: "destructive",
       });
@@ -633,7 +562,7 @@ export function EditarMotoristaModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
+      <DialogContent className="w-[95vw] sm:max-w-[900px] lg:max-w-[1100px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Motorista</DialogTitle>
           <DialogDescription>
@@ -1001,27 +930,156 @@ export function EditarMotoristaModal({
                           </Button>
                         </div>
                         {imagePreviews.fotoPerfil && (
-                          <img 
-                            src={imagePreviews.fotoPerfil} 
-                            alt="Preview" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
+                          <div className="relative group">
+                            <img 
+                              src={imagePreviews.fotoPerfil} 
+                              alt="Preview" 
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.open(imagePreviews.fotoPerfil!, '_blank');
+                                }}
+                              >
+                                <Eye className="w-2 h-2 mr-1" />
+                                Ver
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  try {
+                                    const response = await fetch(imagePreviews.fotoPerfil!);
+                                    const blob = await response.blob();
+                                    const url = window.URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = `motorista-${motorista.nome}-foto-perfil.jpg`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    window.URL.revokeObjectURL(url);
+                                  } catch (error) {
+                                    console.error('Erro ao baixar imagem:', error);
+                                    toast({
+                                      title: "Erro ao baixar",
+                                      description: "Não foi possível baixar a imagem",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                              >
+                                <Download className="w-2 h-2 mr-1" />
+                                Baixar
+                              </Button>
+                            </div>
+                          </div>
                         )}
                       </div>
                     ) : imagePreviews.fotoPerfil ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <img 
-                          src={imagePreviews.fotoPerfil} 
-                          alt="Imagem atual" 
-                          className="w-12 h-12 object-cover rounded"
-                        />
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.fotoPerfil} 
+                            alt="Imagem atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.fotoPerfil!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                  const response = await fetch(imagePreviews.fotoPerfil!);
+                                  const blob = await response.blob();
+                                  const url = window.URL.createObjectURL(blob);
+                                  const link = document.createElement('a');
+                                  link.href = url;
+                                  link.download = `motorista-${motorista.nome}-foto-perfil.jpg`;
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                  window.URL.revokeObjectURL(url);
+                                } catch (error) {
+                                  console.error('Erro ao baixar imagem:', error);
+                                  toast({
+                                    title: "Erro ao baixar",
+                                    description: "Não foi possível baixar a imagem",
+                                    variant: "destructive",
+                                  });
+                                }
+                              }}
+                            >
+                              <Download className="w-2 h-2 mr-1" />
+                              Baixar
+                            </Button>
+                          </div>
+                        </div>
+                        <label
+                          htmlFor="foto-perfil"
+                          className="cursor-pointer flex flex-col items-center justify-center py-1"
+                        >
+                          <Upload className="h-4 w-4 text-blue-500" />
+                          <span className="text-xs text-blue-600">Substituir</span>
+                        </label>
+                      </div>
+                    ) : imagePreviews.fotoPerfil ? (
+                      <div className="space-y-2">
+                        <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.fotoPerfil} 
+                            alt="Foto de perfil atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.fotoPerfil!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
                         <label
                           htmlFor="foto-perfil"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir Foto</span>
+                          <span className="text-xs text-blue-600">Substituir</span>
                         </label>
                       </div>
                     ) : (
@@ -1038,7 +1096,7 @@ export function EditarMotoristaModal({
 
                 {/* CNH */}
                 <div className="space-y-1">
-                  <Label htmlFor="cnh-imagem" className="text-xs font-medium">CNH (Imagem ou PDF)</Label>
+                  <Label htmlFor="cnh-imagem" className="text-xs font-medium">CNH</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="cnh-imagem"
@@ -1063,11 +1121,59 @@ export function EditarMotoristaModal({
                           </Button>
                         </div>
                         {imagePreviews.cnhImagem ? (
-                          <img 
-                            src={imagePreviews.cnhImagem} 
-                            alt="Preview" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
+                          <div className="relative group">
+                            <img 
+                              src={imagePreviews.cnhImagem} 
+                              alt="Preview" 
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.open(imagePreviews.cnhImagem!, '_blank');
+                                }}
+                              >
+                                <Eye className="w-2 h-2 mr-1" />
+                                Ver
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  try {
+                                    const response = await fetch(imagePreviews.cnhImagem!);
+                                    const blob = await response.blob();
+                                    const url = window.URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = `motorista-${motorista.nome}-cnh.jpg`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    window.URL.revokeObjectURL(url);
+                                  } catch (error) {
+                                    console.error('Erro ao baixar imagem:', error);
+                                    toast({
+                                      title: "Erro ao baixar",
+                                      description: "Não foi possível baixar a imagem",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                              >
+                                <Download className="w-2 h-2 mr-1" />
+                                Baixar
+                              </Button>
+                            </div>
+                          </div>
                         ) : (
                           <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded">
                             <FileText className="h-4 w-4 text-gray-400" />
@@ -1078,17 +1184,65 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.cnhImagem ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <img 
-                          src={imagePreviews.cnhImagem} 
-                          alt="CNH atual" 
-                          className="w-12 h-12 object-cover rounded"
-                        />
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.cnhImagem} 
+                            alt="CNH atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.cnhImagem!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                  const response = await fetch(imagePreviews.cnhImagem!);
+                                  const blob = await response.blob();
+                                  const url = window.URL.createObjectURL(blob);
+                                  const link = document.createElement('a');
+                                  link.href = url;
+                                  link.download = `motorista-${motorista.nome}-cnh.jpg`;
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                  window.URL.revokeObjectURL(url);
+                                } catch (error) {
+                                  console.error('Erro ao baixar imagem:', error);
+                                  toast({
+                                    title: "Erro ao baixar",
+                                    description: "Não foi possível baixar a imagem",
+                                    variant: "destructive",
+                                  });
+                                }
+                              }}
+                            >
+                              <Download className="w-2 h-2 mr-1" />
+                              Baixar
+                            </Button>
+                          </div>
+                        </div>
                         <label
                           htmlFor="cnh-imagem"
-                          className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
+                          className="cursor-pointer flex flex-col items-center justify-center py-1"
                         >
-                          <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir Foto</span>
+                          <Upload className="h-4 w-4 text-blue-500" />
+                          <span className="text-xs text-blue-600">Substituir</span>
                         </label>
                       </div>
                     ) : (
@@ -1103,9 +1257,9 @@ export function EditarMotoristaModal({
                   </div>
                 </div>
 
-                {/* Foto Segurando CNH */}
+                {/* Foto com CNH */}
                 <div className="space-y-1">
-                  <Label htmlFor="foto-com-cnh" className="text-xs font-medium">Foto Segurando CNH</Label>
+                  <Label htmlFor="foto-com-cnh" className="text-xs font-medium">Foto com CNH</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="foto-com-cnh"
@@ -1118,7 +1272,7 @@ export function EditarMotoristaModal({
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-gray-600">
-                            {imagens.fotoComCnh ? imagens.fotoComCnh.name : "Foto segurando CNH atual"}
+                            {imagens.fotoComCnh ? imagens.fotoComCnh.name : "Foto com CNH atual"}
                           </span>
                           <Button
                             type="button"
@@ -1140,17 +1294,34 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.fotoComCnh ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <img 
-                          src={imagePreviews.fotoComCnh} 
-                          alt="Foto segurando CNH atual" 
-                          className="w-12 h-12 object-cover rounded"
-                        />
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.fotoComCnh} 
+                            alt="Foto com CNH atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.fotoComCnh!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
                         <label
                           htmlFor="foto-com-cnh"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir Foto</span>
+                          <span className="text-xs text-blue-600">Substituir</span>
                         </label>
                       </div>
                     ) : (
@@ -1167,7 +1338,7 @@ export function EditarMotoristaModal({
 
                 {/* Comprovante de Endereço */}
                 <div className="space-y-1">
-                  <Label htmlFor="comprovante-endereco" className="text-xs font-medium">Comprovante de Endereço</Label>
+                  <Label htmlFor="comprovante-endereco" className="text-xs font-medium">Comprovante</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="comprovante-endereco"
@@ -1207,23 +1378,40 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.comprovanteEndereco ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Documento atual:</div>
-                        {imagePreviews.comprovanteEndereco.includes('.pdf') ? (
-                          <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded">
-                            <FileText className="h-4 w-4 text-gray-400" />
+                        <div className="relative group">
+                          {imagePreviews.comprovanteEndereco.includes('.pdf') ? (
+                            <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded">
+                              <FileText className="h-4 w-4 text-gray-400" />
+                            </div>
+                          ) : (
+                            <img 
+                              src={imagePreviews.comprovanteEndereco} 
+                              alt="Comprovante atual" 
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.comprovanteEndereco!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
                           </div>
-                        ) : (
-                          <img 
-                            src={imagePreviews.comprovanteEndereco} 
-                            alt="Comprovante atual" 
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                        )}
+                        </div>
                         <label
                           htmlFor="comprovante-endereco"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir Foto</span>
+                          <span className="text-xs text-blue-600">Substituir</span>
                         </label>
                       </div>
                     ) : (
@@ -1240,7 +1428,7 @@ export function EditarMotoristaModal({
 
                 {/* Foto Extra */}
                 <div className="space-y-1">
-                  <Label htmlFor="foto-extra" className="text-xs font-medium">Foto Extra (Opcional)</Label>
+                  <Label htmlFor="foto-extra" className="text-xs font-medium">Foto Extra</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="foto-extra"
@@ -1275,17 +1463,34 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.fotoExtra ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <img 
-                          src={imagePreviews.fotoExtra} 
-                          alt="Foto extra atual" 
-                          className="w-12 h-12 object-cover rounded"
-                        />
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.fotoExtra} 
+                            alt="Foto extra atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.fotoExtra!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
                         <label
                           htmlFor="foto-extra"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir Foto</span>
+                          <span className="text-xs text-blue-600">Substituir</span>
                         </label>
                       </div>
                     ) : (
@@ -1302,7 +1507,7 @@ export function EditarMotoristaModal({
 
                 {/* Foto Extra 2 */}
                 <div className="space-y-1">
-                  <Label htmlFor="foto-extra-2" className="text-xs font-medium">Foto Extra 2 (Opcional)</Label>
+                  <Label htmlFor="foto-extra-2" className="text-xs font-medium">Foto Extra 2</Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-1">
                     <input
                       id="foto-extra-2"
@@ -1337,17 +1542,34 @@ export function EditarMotoristaModal({
                     ) : imagePreviews.fotoExtra2 ? (
                       <div className="space-y-2">
                         <div className="text-xs text-gray-600 mb-1">Imagem atual:</div>
-                        <img 
-                          src={imagePreviews.fotoExtra2} 
-                          alt="Foto extra 2 atual" 
-                          className="w-12 h-12 object-cover rounded"
-                        />
+                        <div className="relative group">
+                          <img 
+                            src={imagePreviews.fotoExtra2} 
+                            alt="Foto extra 2 atual" 
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity rounded flex items-center justify-center gap-1">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity text-xs h-6"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(imagePreviews.fotoExtra2!, '_blank');
+                              }}
+                            >
+                              <Eye className="w-2 h-2 mr-1" />
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
                         <label
                           htmlFor="foto-extra-2"
                           className="cursor-pointer flex items-center justify-center py-1 border border-blue-300 rounded"
                         >
                           <Upload className="h-3 w-3 text-blue-600 mr-1" />
-                          <span className="text-xs text-blue-600">Substituir Foto</span>
+                          <span className="text-xs text-blue-600">Substituir</span>
                         </label>
                       </div>
                     ) : (
@@ -1366,76 +1588,41 @@ export function EditarMotoristaModal({
 
             {/* STATUS */}
             <div className="space-y-4">
-              {/* BOTÃO NEGATIVAR/DESNEGATIVAR */}
-              <div className="flex justify-start">
+              {/* BOTÃO NEGATIVAR */}
+              <div className="flex justify-end">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => setMostrarNegativacao(!mostrarNegativacao)}
-                  className={motorista.negativado 
-                    ? "text-green-600 border-green-300 hover:bg-green-50 text-xs"
-                    : "text-red-600 border-red-300 hover:bg-red-50 text-xs"
-                  }
+                  className="text-red-600 border-red-300 hover:bg-red-50 text-xs"
                 >
-                  {motorista.negativado ? "Desnegativar Motorista" : "Negativar Motorista"}
+                  Negativar Motorista
                 </Button>
               </div>
 
-              {/* SEÇÃO NEGATIVAR/DESNEGATIVAR MOTORISTA */}
+              {/* SEÇÃO NEGATIVAR MOTORISTA */}
               {mostrarNegativacao && (
-                        <div className={motorista.negativado 
-                          ? "bg-green-50 border border-green-200 rounded-lg p-3 space-y-3"
-                          : "bg-red-50 border border-red-200 rounded-lg p-3 space-y-3"
-                        }>
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-3">
                           <div className="flex items-center gap-2">
-                            <div className={motorista.negativado 
-                              ? "w-2 h-2 bg-green-500 rounded-full"
-                              : "w-2 h-2 bg-red-500 rounded-full"
-                            }></div>
-                            <h3 className={motorista.negativado 
-                              ? "text-sm font-semibold text-green-700"
-                              : "text-sm font-semibold text-red-700"
-                            }>
-                              {motorista.negativado ? "Desnegativar Motorista" : "Negativar Motorista"}
-                            </h3>
+                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                            <h3 className="text-sm font-semibold text-red-700">Negativar Motorista</h3>
                           </div>
                           
                           <div className="space-y-3">
                             <Label htmlFor="motivo-negativacao" className="text-sm">
-                              {motorista.negativado 
-                                ? "Descreva o motivo da desnegativação *" 
-                                : "Descreva o motivo da negativação *"
-                              }
+                              Descreva o motivo da negativação *
                             </Label>
                             <textarea
                               id="motivo-negativacao"
                               value={motivoNegativacao}
                               onChange={(e) => setMotivoNegativacao(e.target.value)}
-                              placeholder={motorista.negativado 
-                                ? "Ex: Regularização da situação, pagamento de débitos, revisão do caso..."
-                                : "Ex: Inadimplência, problemas com documentação, histórico de infrações..."
-                              }
-                              className={motorista.negativado 
-                                ? "w-full p-2 border border-green-300 rounded-md text-sm resize-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                : "w-full p-2 border border-red-300 rounded-md text-sm resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                              }
+                              placeholder="Ex: Inadimplência, problemas com documentação, histórico de infrações..."
+                              className="w-full p-2 border border-red-300 rounded-md text-sm resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                               rows={3}
                             />
                             
                             <div className="flex gap-2">
-                              <Button
-                                type="button"
-                                size="sm"
-                                onClick={motorista.negativado ? desnegativarMotorista : negativarMotorista}
-                                disabled={loading || !motivoNegativacao.trim()}
-                                className={motorista.negativado 
-                                  ? "flex-1 bg-green-600 hover:bg-green-700 text-white"
-                                  : "flex-1 bg-red-600 hover:bg-red-700 text-white"
-                                }
-                              >
-                                {loading ? "Processando..." : "Confirmar"}
-                              </Button>
                               <Button
                                 type="button"
                                 variant="outline"
@@ -1448,16 +1635,19 @@ export function EditarMotoristaModal({
                               >
                                 Cancelar
                               </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={negativarMotorista}
+                                disabled={loading || !motivoNegativacao.trim()}
+                                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                              >
+                                {loading ? "Processando..." : "Confirmar"}
+                              </Button>
                             </div>
                             
-                            <p className={motorista.negativado 
-                              ? "text-xs text-green-600"
-                              : "text-xs text-red-600"
-                            }>
-                              {motorista.negativado 
-                                ? "✅ O motorista será reativado e poderá usar o sistema novamente"
-                                : "⚠️ Ação irreversível: O motorista será marcado como negativado no sistema"
-                              }
+                            <p className="text-xs text-red-600">
+                              ⚠️ Ação irreversível: O motorista será marcado como negativado no sistema
                             </p>
                           </div>
                         </div>

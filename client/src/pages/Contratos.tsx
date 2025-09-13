@@ -32,7 +32,7 @@ import { EditarContratoModal } from '@/components/contratos/EditarContratoModal'
 import { UploadTemplateModal } from '@/components/contratos/UploadTemplateModal';
 import { TemplatesModal } from '@/components/contratos/TemplatesModal';
 import { UploadContratoModal } from '@/components/contratos/UploadContratoModal';
-import { ExcluirContratoDialog } from '@/components/contratos/ExcluirContratoDialog';
+import { ConfirmarSenhaModal } from '@/components/contratos/ConfirmarSenhaModal';
 import { useTemplateContratos } from '@/hooks/useTemplateContratos';
 import { Contrato } from '@/types';
 import jsPDF from 'jspdf';
@@ -66,7 +66,7 @@ export default function Contratos() {
   const [showUploadTemplateModal, setShowUploadTemplateModal] = useState(false);
   const [showTemplatesModal, setShowTemplatesModal] = useState(false);
   const [showUploadContratoModal, setShowUploadContratoModal] = useState(false);
-  const [showExcluirContratoDialog, setShowExcluirContratoDialog] = useState(false);
+  const [showConfirmarSenhaModal, setShowConfirmarSenhaModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
   const [contratoParaExcluir, setContratoParaExcluir] = useState<Contrato | null>(null);
   const [busca, setBusca] = useState('');
@@ -135,54 +135,14 @@ export default function Contratos() {
 
   const handleExcluirContrato = (contrato: Contrato) => {
     setContratoParaExcluir(contrato);
-    setShowExcluirContratoDialog(true);
+    setShowConfirmarSenhaModal(true);
   };
 
-  const handleConfirmarExclusao = async (contrato: Contrato, excluirPagamentos: boolean) => {
-    try {
-      await deleteContrato.mutateAsync({ id: contrato.id, excluirPagamentos });
-      
-      // Registrar atividade
-      try {
-        await registrarAtividade(
-          profile?.locadoraId || '',
-          profile?.email || 'usuario@drivs.me',
-          'excluir',
-          'contrato',
-          contrato.id,
-          `Contrato excluído: ${contrato.cliente} - ${contrato.tipo}${excluirPagamentos ? ' (com pagamentos)' : ' (sem pagamentos)'}`
-        );
-      } catch (activityError) {
-        console.warn('Erro ao registrar atividade:', activityError);
-      }
-
-      toast({
-        title: "Contrato Excluído",
-        description: `Contrato de ${contrato.cliente} foi excluído com sucesso${excluirPagamentos ? ' (incluindo pagamentos)' : ''}.`,
-      });
-      
-      setShowExcluirContratoDialog(false);
-      setContratoParaExcluir(null);
-    } catch (error) {
-      console.error('Erro ao excluir contrato:', error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível excluir o contrato. Tente novamente.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleCancelarExclusao = () => {
-    setShowExcluirContratoDialog(false);
-    setContratoParaExcluir(null);
-  };
-
-  const handleConfirmarExclusaoLegado = async () => {
+  const handleConfirmarExclusao = async () => {
     if (!contratoParaExcluir) return;
     
     try {
-      await deleteContrato.mutateAsync({ id: contratoParaExcluir.id, excluirPagamentos: false }); // Por padrão, não excluir pagamentos
+      await deleteContrato.mutateAsync(contratoParaExcluir.id);
       
       // Registrar atividade
       try {
@@ -203,7 +163,7 @@ export default function Contratos() {
         description: `Contrato de ${contratoParaExcluir.cliente} foi excluído com sucesso.`,
       });
       
-      setShowExcluirContratoDialog(false);
+      setShowConfirmarSenhaModal(false);
       setContratoParaExcluir(null);
     } catch (error) {
       console.error('Erro ao excluir contrato:', error);
@@ -822,11 +782,12 @@ export default function Contratos() {
         </>
       )}
 
-      <ExcluirContratoDialog
-        open={showExcluirContratoDialog}
-        onOpenChange={setShowExcluirContratoDialog}
-        contrato={contratoParaExcluir}
-        onConfirmarExclusao={handleConfirmarExclusao}
+      <ConfirmarSenhaModal
+        open={showConfirmarSenhaModal}
+        onOpenChange={setShowConfirmarSenhaModal}
+        onConfirm={handleConfirmarExclusao}
+        contratoNome={contratoParaExcluir ? `${contratoParaExcluir.cliente} - ${contratoParaExcluir.tipo}` : ''}
+        loading={deleteContrato.isPending}
       />
     </div>
   );

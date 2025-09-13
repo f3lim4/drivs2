@@ -18,7 +18,6 @@ import {
   ObjectStorageService,
   ObjectNotFoundError,
 } from "./objectStorage";
-import { criarPagamentosRecorrentes } from "./pagamentos-automaticos";
 
 // Declaração de tipos para sessão
 declare module 'express-session' {
@@ -1218,9 +1217,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Cache para prevenir contratos duplicados por duplo clique e race conditions
+  // Cache para prevenir contratos duplicados por duplo clique
   const contratoCreationCache = new Map();
-  const contratoCreationLocks = new Map(); // Locks para prevenção de race conditions
 
   app.post("/api/contratos", async (req, res) => {
     try {
@@ -1232,18 +1230,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
-      // PROTEÇÃO CONTRA DUPLO CLIQUE E RACE CONDITIONS
+      // PROTEÇÃO CONTRA DUPLO CLIQUE: Verificar se já há criação em andamento
       const cacheKey = `${result.data.locadoraId}-${result.data.cliente}-${result.data.dataInicio}`;
-      const veiculoLockKey = `veiculo-${result.data.veiculoId}`;
       const agora = Date.now();
       
-      // Verificar cache de duplo clique
       if (contratoCreationCache.has(cacheKey)) {
         const tempoUltimaCreacao = contratoCreationCache.get(cacheKey);
         const diferencaTempo = agora - tempoUltimaCreacao;
         
-        // Se tentativa de criação em menos de 3 segundos, bloquear
-        if (diferencaTempo < 3000) {
+        // Se tentativa de criação em menos de 10 segundos, bloquear
+        if (diferencaTempo < 10000) {
           console.log('[ANTI-DUPLICATE] Tentativa de criação duplicada bloqueada:', {
             cacheKey,
             diferencaTempo,
@@ -1251,174 +1247,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           return res.status(429).json({ 
             message: "Aguarde antes de criar outro contrato",
-            tempoEspera: Math.ceil((3000 - diferencaTempo) / 1000)
+            tempoEspera: Math.ceil((10000 - diferencaTempo) / 1000)
           });
         }
       }
       
-      // LOCK DE VEÍCULO: Prevenir race conditions para o mesmo veículo
-      if (contratoCreationLocks.has(veiculoLockKey)) {
-        console.log('[RACE-CONDITION] Veículo já está sendo processado em outra requisição:', {
-          veiculoId: result.data.veiculoId,
-          lockAtivo: true
-        });
-        return res.status(409).json({ 
-          message: "Veículo está sendo processado em outra operação. Tente novamente.",
-          error: 'VEHICLE_LOCKED'
-        });
-      }
+      // Registrar tentativa de criação
+      contratoCreationCache.set(cacheKey, agora);
       
-      // Adquirir lock do veículo
-      contratoCreationLocks.set(veiculoLockKey, agora);
-      console.log('[LOCK-ACQUIRED] Lock adquirido para veículo:', result.data.veiculoId);
-      
-      // Função para liberar locks
-      const liberarLocks = () => {
-        contratoCreationLocks.delete(veiculoLockKey);
-        console.log('[LOCK-RELEASED] Lock liberado para veículo:', result.data.veiculoId);
-      };
-      
-      // Garantir que locks sejam liberados em caso de erro
-      try {
-        // Registrar tentativa de criação
-        contratoCreationCache.set(cacheKey, agora);
-      
-      // VERIFICAÇÃO INTELIGENTE: CPF vs CNPJ
-      console.log('[DEBUG-CRITICO] ==================== INICIANDO VALIDAÇÃO ====================');
-      console.log('[DEBUG-CRITICO] Validação de veículo:', {
-        veiculoId: result.data.veiculoId,
-        cliente: result.data.cliente,
-        tipo: typeof result.data.veiculoId,
-        timestamp: new Date().toISOString()
-      });
-      
-      // VALIDAÇÃO 1: Buscar contratos existentes
+      // VERIFICAÇÃO UNIVERSAL: Contrato existente para MOTORISTA
       const contratosExistentes = await storage.getAllContratos();
-      console.log('[DEBUG-CRITICO] Total contratos no sistema:', contratosExistentes.length);
+      const contratoClienteExistente = contratosExistentes.find(c => 
+        c.cliente === result.data.cliente && 
+        (c.status === 'ativo' || c.status === 'em_aberto')
+      );
       
-      // VALIDAÇÃO 2: Verificar se veículo já está em uso por outro contrato
-      const contratoVeiculoExistente = contratosExistentes.find(c => {
-        // Verificar múltiplas possibilidades de campo veículo
-        const veiculoMatch = c.veiculoId === result.data.veiculoId || 
-                           c.veiculo_id === result.data.veiculoId || 
-                           c.veiculo === result.data.veiculoId;
-        const statusAtivo = c.status === 'ativo' || c.status === 'em_aberto';
-        const match = veiculoMatch && statusAtivo;
-        
-        if (match) {
-          console.log('[DEBUG-CRITICO] ⚠️ CONTRATO CONFLITANTE ENCONTRADO:', {
-            contratoId: c.id,
-            veiculoContrato: c.veiculoId || c.veiculo_id || c.veiculo,
-            veiculoRecebido: result.data.veiculoId,
-            statusContrato: c.status,
-            cliente: c.cliente
-          });
-        }
-        return match;
-      });
+      // VERIFICAÇÃO UNIVERSAL: Contrato existente para VEÍCULO
+      const contratoVeiculoExistente = contratosExistentes.find(c => 
+        (c.veiculoId === result.data.veiculoId || c.veiculo_id === result.data.veiculoId || c.veiculo === result.data.veiculoId) && 
+        (c.status === 'ativo' || c.status === 'em_aberto')
+      );
       
-      // VALIDAÇÃO 3: Verificar se há aluguel ativo para o mesmo veículo
+      // Verificar se há aluguel ativo para o mesmo motorista
       const alugueis = await storage.getAllAlugueis();
-      console.log('[DEBUG-CRITICO] Total aluguéis no sistema:', alugueis.length);
+      const aluguelAtivo = alugueis.find(a => 
+        a.motoristaNome === result.data.cliente && 
+        a.status === 'ativo'
+      );
       
-      const aluguelVeiculoAtivo = alugueis.find(a => {
-        const match = a.veiculoId === result.data.veiculoId && a.status === 'ativo';
-        if (match) {
-          console.log('[DEBUG-CRITICO] ⚠️ ALUGUEL CONFLITANTE ENCONTRADO:', {
-            aluguelId: a.id,
-            veiculoAluguel: a.veiculoId,
-            veiculoRecebido: result.data.veiculoId,
-            statusAluguel: a.status,
-            motorista: a.motoristaNome
-          });
-        }
-        return match;
-      });
-
-      // VALIDAÇÃO 4: BLOQUEAR SEMPRE se veículo já ocupado (independente de CPF/CNPJ)
-      if (contratoVeiculoExistente || aluguelVeiculoAtivo) {
-        console.log('[DEBUG-CRITICO] ❌ BLOQUEIO: VEÍCULO JÁ OCUPADO');
-        console.log('[DEBUG-CRITICO] Detalhes do bloqueio:', {
-          veiculoId: result.data.veiculoId,
-          contratoExistente: !!contratoVeiculoExistente,
-          aluguelAtivo: !!aluguelVeiculoAtivo,
-          dadosContratoConflito: contratoVeiculoExistente ? {
-            id: contratoVeiculoExistente.id,
-            cliente: contratoVeiculoExistente.cliente,
-            status: contratoVeiculoExistente.status
-          } : null,
-          dadosAluguelConflito: aluguelVeiculoAtivo ? {
-            id: aluguelVeiculoAtivo.id,
-            motorista: aluguelVeiculoAtivo.motoristaNome,
-            status: aluguelVeiculoAtivo.status
-          } : null
+      // BLOQUEAR SEMPRE: Não permitir múltiplos contratos/aluguéis ativos
+      if (contratoClienteExistente || contratoVeiculoExistente || aluguelAtivo) {
+        console.log('[ANTI-DUPLICATE] Duplicação detectada:', {
+          cliente: result.data.cliente,
+          veiculo: result.data.veiculo,
+          contratoClienteExistente: !!contratoClienteExistente,
+          contratoVeiculoExistente: !!contratoVeiculoExistente,
+          aluguelAtivo: !!aluguelAtivo,
+          contratoClienteId: contratoClienteExistente?.id,
+          contratoVeiculoId: contratoVeiculoExistente?.id,
+          aluguelId: aluguelAtivo?.id
         });
         
-        // Limpar cache e locks em caso de bloqueio
-        contratoCreationCache.delete(cacheKey);
-        liberarLocks();
-        
-        return res.status(400).json({ 
-          message: `Veículo já está ocupado por outro contrato/aluguel ativo.`,
-          error: 'VEHICLE_ALREADY_IN_USE',
-          details: {
-            hasActiveContract: !!contratoVeiculoExistente,
-            hasActiveRental: !!aluguelVeiculoAtivo
-          }
-        });
-      }
-
-      // REGRA ESPECÍFICA: CPF (11 dígitos) = apenas 1 veículo | CNPJ (14 dígitos) = múltiplos veículos
-      const clienteDoc = result.data.cliente.replace(/\D/g, ''); // Remove caracteres não numéricos
-      const isPessoaFisica = clienteDoc.length === 11; // CPF tem 11 dígitos
-      const isPessoaJuridica = clienteDoc.length === 14; // CNPJ tem 14 dígitos
-
-      if (isPessoaFisica) {
-        // CPF: Verificar se já tem contrato ativo (apenas 1 permitido)
-        const contratoClienteExistente = contratosExistentes.find(c => 
-          c.cliente === result.data.cliente && 
-          (c.status === 'ativo' || c.status === 'em_aberto')
-        );
-        
-        const aluguelClienteAtivo = alugueis.find(a => 
-          a.motoristaNome === result.data.cliente && 
-          a.status === 'ativo'
-        );
-
-        if (contratoClienteExistente || aluguelClienteAtivo) {
-          console.log('[CPF-BLOQUEIO] CPF já possui contrato ativo:', {
-            cliente: result.data.cliente,
-            contratoExistente: !!contratoClienteExistente,
-            aluguelAtivo: !!aluguelClienteAtivo
-          });
-          
-          // Limpar locks antes de retornar erro
-          liberarLocks();
-          contratoCreationCache.delete(cacheKey);
-          
-          return res.status(400).json({ 
-            message: `CPF '${result.data.cliente}' já possui contrato/aluguel ativo. Pessoa física só pode alugar 1 veículo por vez.`
-          });
+        let message = "Não é possível criar contrato: ";
+        if (contratoClienteExistente) {
+          message += `Cliente '${result.data.cliente}' já possui contrato ${contratoClienteExistente.status}. `;
+        }
+        if (contratoVeiculoExistente) {
+          message += `Veículo ID '${result.data.veiculoId}' já está ocupado por contrato ${contratoVeiculoExistente.status} com cliente '${contratoVeiculoExistente.cliente}'. `;
+        }
+        if (aluguelAtivo) {
+          message += `Cliente possui aluguel ativo. `;
         }
         
-        console.log('[CPF-OK] CPF livre para novo contrato:', result.data.cliente);
-      } else if (isPessoaJuridica) {
-        // CNPJ: Permitir múltiplos contratos (sem verificação de duplicação de cliente)
-        console.log('[CNPJ-OK] CNPJ pode ter múltiplos contratos:', result.data.cliente);
-      } else {
-        // Documento inválido
-        console.log('[DOC-INVALIDO] Documento não é CPF nem CNPJ:', result.data.cliente);
-        // Limpar locks antes de retornar erro
-        liberarLocks();
-        contratoCreationCache.delete(cacheKey);
-        
         return res.status(400).json({ 
-          message: `Documento '${result.data.cliente}' inválido. Deve ser CPF (11 dígitos) ou CNPJ (14 dígitos).`
+          message: message.trim(),
+          motorista: result.data.cliente,
+          veiculo: result.data.veiculoId,
+          contratoClienteExistente: !!contratoClienteExistente,
+          contratoVeiculoExistente: !!contratoVeiculoExistente,
+          aluguelAtivo: !!aluguelAtivo
         });
       }
       
-      console.log('[DEBUG-CRITICO] ✅ TODAS AS VALIDAÇÕES PASSARAM');
-      console.log('[DEBUG-CRITICO] Iniciando criação do contrato...');
+      console.log('[DEBUG] Dados validados, criando contrato...');
       
       // Função auxiliar para normalizar datas de string ISO para formato YYYY-MM-DD local
       const normalizarData = (data: any) => {
@@ -1441,22 +1332,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dataFimTipo: typeof dadosNormalizados.dataFim
       });
       
-      // CRIAÇÃO DO CONTRATO: Só criar após todas as validações
-      console.log('[DEBUG-CRITICO] Chamando storage.createContrato com dados:', {
-        locadoraId: dadosNormalizados.locadoraId,
-        veiculoId: dadosNormalizados.veiculoId,
-        cliente: dadosNormalizados.cliente,
-        status: dadosNormalizados.status
-      });
-      
       const contrato = await storage.createContrato(dadosNormalizados);
-      
-      console.log('[DEBUG-CRITICO] ✅ CONTRATO CRIADO COM SUCESSO:', {
-        id: contrato.id,
-        veiculoId: contrato.veiculoId,
-        cliente: contrato.cliente,
-        status: contrato.status
-      });
+      console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
       
       // 🎯 REGRA DE NEGÓCIO: Atualizar status automaticamente após criação do contrato
       try {
@@ -1484,45 +1361,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Não falha a criação do contrato, apenas log do erro
       }
       
-      // 🎯 GERAÇÃO AUTOMÁTICA DE PAGAMENTOS: Usar configurações reais do contrato
-      try {
-        console.log('[PAGAMENTOS-AUTO] Verificando necessidade de gerar pagamentos automáticos...');
-        console.log('[PAGAMENTOS-AUTO] Dados do contrato:', {
-          pagamentoRecorrente: contrato.pagamentoRecorrente,
-          recorrencia: contrato.recorrencia,
-          marcarPagamentosAnteriores: contrato.marcarPagamentosAnteriores
-        });
-        
-        // Usar dados REAIS vindos do formulário, não valores fixos
-        const tipoRecorrenciaValida = contrato.recorrencia === 'quinzenal' || contrato.recorrencia === 'mensal' 
-          ? contrato.recorrencia 
-          : 'semanal' as const;
-        
-        const opcoesPagamento = {
-          pagamentoRecorrente: contrato.pagamentoRecorrente || false,
-          tipoRecorrencia: tipoRecorrenciaValida,
-          marcarPagamentosAnterioresComoPago: contrato.marcarPagamentosAnteriores || false,
-          // NOVOS CAMPOS: usar configurações completas do contrato
-          dataPrimeiroPagamento: contrato.dataPrimeiroPagamento,
-          tipoPagamento: contrato.tipoPagamento || 'ilimitado',
-          quantidadePagamentos: contrato.quantidadePagamentos
-        };
-        
-        console.log('[PAGAMENTOS-AUTO] Opções finais:', opcoesPagamento);
-        
-        if (opcoesPagamento.pagamentoRecorrente) {
-          await criarPagamentosRecorrentes(contrato, opcoesPagamento);
-          console.log(`[PAGAMENTOS-AUTO] Pagamentos automáticos gerados com sucesso para contrato ${contrato.id}`);
-        } else {
-          console.log('[PAGAMENTOS-AUTO] Pagamentos automáticos desabilitados para este contrato');
-        }
-        
-      } catch (error) {
-        console.error('[PAGAMENTOS-AUTO] Erro ao gerar pagamentos automáticos:', error);
-        // Não falhar a criação do contrato por erro na geração de pagamentos
-        // O contrato ainda foi criado com sucesso
-      }
-
       // Limpar cache após criação bem-sucedida
       setTimeout(() => {
         contratoCreationCache.delete(cacheKey);
@@ -1530,21 +1368,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }, 15000); // 15 segundos
       
       res.json(contrato);
-      
-      // Liberar lock do veículo após sucesso
-      liberarLocks();
-      
-      } catch (innerError) {
-        // Liberar locks em caso de erro
-        console.error('[DEBUG-CRITICO] Erro na criação do contrato:', innerError);
-        liberarLocks();
-        
-        // Limpar cache em caso de erro
-        contratoCreationCache.delete(cacheKey);
-        
-        throw innerError; // Re-lançar o erro para o catch externo
-      }
-      
     } catch (error) {
       console.error("Error creating contrato:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -1664,10 +1487,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/contratos/:id", async (req, res) => {
     try {
-      // Capturar parâmetro de exclusão de pagamentos
-      const excluirPagamentos = req.query.excluirPagamentos === 'true';
-      console.log(`[CONTRACT DELETE] Iniciando exclusão - Contrato: ${req.params.id}, Excluir pagamentos: ${excluirPagamentos}`);
-      
       // Buscar o contrato para obter informações do aluguel
       const contrato = await storage.getContrato(req.params.id);
       
@@ -1693,8 +1512,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // OPCIONAL: Excluir pagamentos relacionados somente se solicitado
-      if (contrato && excluirPagamentos) {
+      // CORREÇÃO: Excluir pagamentos relacionados ao contrato antes de excluir o contrato
+      if (contrato) {
         console.log(`[CONTRACT DELETE] Excluindo pagamentos relacionados ao contrato: ${contrato.id}`);
         const pagamentos = await storage.getPagamentosByLocadora(contrato.locadoraId);
         const pagamentosDoContrato = pagamentos.filter(p => 
@@ -1708,10 +1527,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`[CONTRACT DELETE] Excluindo pagamento: ${pagamento.id} - ${pagamento.motoristaNome}`);
           await storage.deletePagamento(pagamento.id);
         }
-      } else if (contrato) {
-        console.log(`[CONTRACT DELETE] Mantendo pagamentos relacionados ao contrato: ${contrato.id} (excluirPagamentos=false)`);
-        // NOTA: Pagamentos relacionados ficarão no sistema para preservar histórico financeiro
-        // Podem ser identificados posteriormente via aluguelId se necessário
       }
       
       // Excluir o contrato
@@ -1729,10 +1544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      res.json({ 
-        message: "Contrato deleted successfully",
-        // pagamentosExcluidos removido - exclusão permanente implementada 
-      });
+      res.json({ message: "Contrato deleted successfully" });
     } catch (error) {
       console.error("Error deleting contrato:", error);
       res.status(500).json({ message: "Internal server error" });

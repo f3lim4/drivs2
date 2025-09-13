@@ -110,9 +110,9 @@ export function useContratos() {
 
   // Excluir contrato
   const deleteContrato = useMutation({
-    mutationFn: async ({ id, excluirPagamentos = false }: { id: string; excluirPagamentos?: boolean }) => {
-      console.log(`Excluindo contrato: ${id} - Excluir pagamentos: ${excluirPagamentos}`);
-      const response = await fetch(`/api/contratos/${id}?excluirPagamentos=${excluirPagamentos}`, {
+    mutationFn: async (id: string) => {
+      console.log(`Excluindo contrato: ${id}`);
+      const response = await fetch(`/api/contratos/${id}`, {
         method: 'DELETE',
       });
       
@@ -128,8 +128,6 @@ export function useContratos() {
       queryClient.invalidateQueries({ queryKey: ['alugueis', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', locadoraId] });
       queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
-      // FORÇA atualização imediata dos veículos após exclusão de contrato
-      queryClient.refetchQueries({ queryKey: ['veiculos', locadoraId] });
       // Removido: queryClient.invalidateQueries({ queryKey: ['motoristas', locadoraId] });
       queryClient.removeQueries({ queryKey: ['/api/pagamentos', locadoraId] });
     },

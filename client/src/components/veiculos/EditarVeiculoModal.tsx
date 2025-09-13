@@ -178,7 +178,7 @@ export function EditarVeiculoModal({
         ipva: Number(veiculo.ipva) || undefined,
         rastreador: veiculo.rastreador || '',
         valorRastreadorMensal: Number(veiculo.valorRastreadorMensal) || undefined,
-        dataCompra: (veiculo as any).dataCompra || '',
+        dataCompra: veiculo.dataCompra || '',
         financiado: veiculo.financiado || false,
         valorFinanciamento: Number(veiculo.valorFinanciamento) || undefined,
         quantidadeParcelas: veiculo.quantidadeParcelas || undefined,
@@ -187,15 +187,6 @@ export function EditarVeiculoModal({
       });
     }
   }, [veiculo, open, form]);
-
-  // Calcular IPVA automaticamente (4% do valor do veículo)
-  const valorVeiculo = form.watch('valorVeiculo');
-  useEffect(() => {
-    if (valorVeiculo && valorVeiculo > 0) {
-      const ipvaCalculado = valorVeiculo * 0.04; // 4% do valor do veículo
-      form.setValue('ipva', ipvaCalculado);
-    }
-  }, [valorVeiculo, form]);
 
   // Função para obter categorias baseadas no tipo de veículo
   const getCategoriasDisponiveis = () => {
@@ -295,7 +286,7 @@ export function EditarVeiculoModal({
         
         // Invalidar cache de veículos para atualizar a lista (usando query key correta)
         await queryClient.invalidateQueries({ queryKey: ['veiculos'] });
-        await queryClient.invalidateQueries({ queryKey: ['veiculos', (veiculo as any).locadoraId] });
+        await queryClient.invalidateQueries({ queryKey: ['veiculos', veiculo.locadoraId] });
         
         toast({
           title: "Documento salvo",
@@ -373,8 +364,8 @@ export function EditarVeiculoModal({
 
       // Log da atividade
       await registrarAtividade(
-        profile?.locadoraId || '',
-        profile?.email || 'usuario@drivs.me',
+        profile.locadoraId,
+        profile.email || 'usuario@drivs.me',
         'atualizar',
         'veiculo',
         veiculo.id,
@@ -391,7 +382,7 @@ export function EditarVeiculoModal({
       onOpenChange(false);
       
     } catch (error) {
-      alert('Erro ao atualizar veículo: ' + ((error as any)?.message || 'Erro desconhecido'));
+      alert('Erro ao atualizar veículo: ' + (error.message || 'Erro desconhecido'));
     } finally {
       setLoading(false);
     }
@@ -802,13 +793,9 @@ export function EditarVeiculoModal({
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
-                          placeholder="Calculado automaticamente"
                         />
                       </FormControl>
                       <FormMessage />
-                      <p className="text-xs text-muted-foreground">
-                        Valor calculado automaticamente como 4% do valor do veículo. Pode ser editado se necessário.
-                      </p>
                     </FormItem>
                   )}
                 />
