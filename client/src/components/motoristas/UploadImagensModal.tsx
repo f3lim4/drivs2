@@ -171,7 +171,7 @@ export function UploadImagensModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
+      <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>Gerenciar Imagens - {motorista?.nome}</DialogTitle>
           <DialogDescription>

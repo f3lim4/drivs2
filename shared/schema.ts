@@ -226,13 +226,6 @@ export const contratos = pgTable("contratos", {
   template: text("template"), // conteúdo do contrato
   arquivoAssinado: text("arquivo_assinado"), // nome do arquivo assinado
   dataAssinatura: timestamp("data_assinatura"), // quando foi assinado
-  // NOVOS CAMPOS: Configurações de pagamentos automáticos
-  pagamentoRecorrente: boolean("pagamento_recorrente").notNull().default(false),
-  dataPrimeiroPagamento: date("data_primeiro_pagamento"),
-  recorrencia: text("recorrencia"), // 'semanal', 'quinzenal', 'mensal'
-  tipoPagamento: text("tipo_pagamento").notNull().default("ilimitado"), // 'ilimitado', 'limitado'
-  quantidadePagamentos: integer("quantidade_pagamentos"),
-  marcarPagamentosAnteriores: boolean("marcar_pagamentos_anteriores").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -248,6 +241,16 @@ export const templateContratos = pgTable("template_contratos", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Tabela para rastrear pagamentos excluídos manualmente
+export const pagamentosExcluidos = pgTable("pagamentos_excluidos", {
+  id: text("id").primaryKey(),
+  locadoraId: text("locadora_id").notNull(),
+  aluguelId: text("aluguel_id"),
+  dataPagamento: date("data_pagamento").notNull(),
+  motivo: text("motivo").default("exclusao_manual").notNull(),
+  usuarioId: text("usuario_id"), // Quem excluiu
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -300,13 +303,6 @@ export const insertContratoSchema = createInsertSchema(contratos).omit({
     return val;
   }),
   tempoContrato: z.number().optional(),
-  // Novos campos de pagamentos automáticos
-  pagamentoRecorrente: z.boolean().optional(),
-  dataPrimeiroPagamento: z.string().optional(), // Pode vir como string do frontend
-  recorrencia: z.enum(['semanal', 'quinzenal', 'mensal']).optional(),
-  tipoPagamento: z.enum(['ilimitado', 'limitado']).optional(),
-  quantidadePagamentos: z.number().optional(),
-  marcarPagamentosAnteriores: z.boolean().optional(),
 });
 
 // Schema mais flexível para atualizações (todos campos opcionais)
@@ -364,7 +360,7 @@ export const pagamentos = pgTable("pagamentos", {
   valorRestante: decimal("valor_restante", { precision: 10, scale: 2 }).notNull(),
   valorJuros: decimal("valor_juros", { precision: 10, scale: 2 }).default("0.00"), // Juros cobrados
   valorMulta: decimal("valor_multa", { precision: 10, scale: 2 }).default("0.00"), // Multa cobrada
-  dataPagamento: date("data_pagamento"), // Nullable - pode estar vazio para pagamentos em aberto
+  dataPagamento: date("data_pagamento").notNull(),
   status: text("status").notNull().default("em_aberto"), // 'em_aberto', 'parcial', 'pago', 'atrasado'
   observacoes: text("observacoes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

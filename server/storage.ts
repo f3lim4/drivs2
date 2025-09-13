@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, documentosVeiculos, documentosMotorista, notificacoes,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, pagamentosExcluidos, documentosVeiculos, documentosMotorista, notificacoes,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -1014,46 +1014,13 @@ export class DatabaseStorage implements IStorage {
             }
           }
           
-          // Para pagamentos de contratos, buscar dados do contrato diretamente
-          let nomeDisplay = '';
-          let contato = '';
-          let cpf = '';
-          
-          if (motorista[0]) {
-            // Motorista encontrado - usar dados do motorista
-            nomeDisplay = motorista[0].nome;
-            contato = motorista[0]?.telefone || '';
-            cpf = motorista[0]?.cpf || '';
-          } else if (pagamento.tipo === 'contrato' && pagamento.aluguelId) {
-            // Pagamento de contrato - buscar dados do contrato
-            try {
-              const contrato = await db.select().from(contratos).where(eq(contratos.id, pagamento.aluguelId)).limit(1);
-              if (contrato[0]) {
-                nomeDisplay = contrato[0].cliente;
-                contato = contrato[0].clienteTelefone || '';
-                cpf = contrato[0].clienteCpf || 'CPF não informado';
-              } else {
-                nomeDisplay = 'Cliente do Contrato';
-                cpf = 'CPF não informado';
-              }
-            } catch (error) {
-              console.error('[STORAGE] Erro ao buscar dados do contrato:', error);
-              nomeDisplay = 'Cliente do Contrato';
-              cpf = 'CPF não informado';
-            }
-          } else {
-            // Nem motorista nem contrato - manter comportamento antigo
-            nomeDisplay = `${pagamento.motoristaId} - Excluído`;
-            cpf = 'CPF não informado';
-          }
-
           return {
             ...pagamento,
             data: pagamento.dataPagamento, // Mapear campo data corretamente
             valor: pagamento.valorPago, // Mapear campo valor corretamente
-            motoristaNome: nomeDisplay,
-            motoristaContato: contato,
-            motoristaCpf: cpf,
+            motoristaNome: motorista[0] ? motorista[0].nome : `${pagamento.motoristaId} - Excluído`,
+            motoristaContato: motorista[0]?.telefone || '',
+            motoristaCpf: motorista[0]?.cpf || '', // ADICIONADO: CPF do motorista
             // Adicionar dados do veículo
             ...veiculoData
           };
@@ -1185,7 +1152,15 @@ export class DatabaseStorage implements IStorage {
       const rowsAffected = result.rowCount || result.changes || 0;
       console.log(`[STORAGE] Pagamento excluído do banco, linhas afetadas: ${rowsAffected}`);
       
-      // Exclusão permanente - sem registro de histórico
+      // Se a exclusão foi bem-sucedida e o pagamento era automático, registrar na tabela de exclusões
+      if (rowsAffected > 0 && pagamento.automatico) {
+        console.log(`[STORAGE] Registrando exclusão manual de pagamento automático: ${id}`);
+        await this.registrarExclusaoManual(
+          pagamento.locadoraId, 
+          pagamento.aluguelId, 
+          pagamento.dataPagamento
+        );
+      }
       
       return rowsAffected > 0;
     } catch (error) {
@@ -1194,7 +1169,23 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Função removida - exclusões agora são permanentes sem histórico
+  async registrarExclusaoManual(locadoraId: string, aluguelId: string | null, dataPagamento: string): Promise<void> {
+    try {
+      await db.insert(pagamentosExcluidos).values({
+        id: crypto.randomUUID(),
+        locadoraId,
+        aluguelId,
+        dataPagamento,
+        motivo: 'exclusao_manual',
+        usuarioId: null, // Pode ser expandido no futuro
+      });
+      
+      console.log(`[STORAGE] Exclusão registrada: locadora ${locadoraId}, aluguel ${aluguelId}, data ${dataPagamento}`);
+    } catch (error) {
+      console.error(`[STORAGE] Erro ao registrar exclusão manual:`, error);
+      // Não interrompe o fluxo se falhar
+    }
+  }
 
   async getAluguelValorSemanal(aluguelId: string): Promise<number | undefined> {
     const result = await db.select({

@@ -80,7 +80,7 @@ export function ExcluirPagamentoModal({ open, onClose, pagamento, onConfirm }: E
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-red-600">
             <AlertTriangle className="h-5 w-5" />
@@ -156,7 +156,7 @@ export function ExcluirPagamentoModal({ open, onClose, pagamento, onConfirm }: E
               <Checkbox 
                 id="final-confirmation"
                 checked={isConfirmed}
-                onCheckedChange={(checked) => setIsConfirmed(checked === true)}
+                onCheckedChange={setIsConfirmed}
                 data-testid="checkbox-confirm-delete-payment"
               />
               <Label htmlFor="final-confirmation" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">

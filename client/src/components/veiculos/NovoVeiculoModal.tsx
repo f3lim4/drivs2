@@ -190,7 +190,7 @@ export function NovoVeiculoModal({
     'infinity': -1 // -1 = ilimitado
   };
 
-  const limiteAtual = limitesPorPlano[locadora?.plano || 'start'] || 0;
+  const limiteAtual = limitesPorPlano[locadora?.plano] || 0;
   const quantidadeAtual = veiculos?.length || 0;
   const proximoDoLimite = limiteAtual > 0 && quantidadeAtual >= limiteAtual - 1;
 
@@ -260,15 +260,6 @@ export function NovoVeiculoModal({
       setModelosDisponiveis([]);
     }
   }, [marcaSelecionada, tipoSelecionado, form]);
-
-  // Calcular IPVA automaticamente (4% do valor do veículo)
-  const valorVeiculo = form.watch('valorVeiculo');
-  useEffect(() => {
-    if (valorVeiculo && valorVeiculo > 0) {
-      const ipvaCalculado = valorVeiculo * 0.04; // 4% do valor do veículo
-      form.setValue('ipva', ipvaCalculado);
-    }
-  }, [valorVeiculo, form]);
 
   // Função para obter categorias baseadas no tipo de veículo
   const getCategoriasDisponiveis = (tipoVeiculo: string) => {
@@ -369,7 +360,7 @@ export function NovoVeiculoModal({
         valorRastreadorMensal: data.valorRastreadorMensal?.toString(),
         visualizar: data.visualizar || null,
         // Processar documentos carregados
-        documentos: data.documento ? [data.documento] : [],
+        documentos: data.documentos || [],
         status: 'disponivel', // Sempre "disponível" no cadastro
       };
 
@@ -468,7 +459,7 @@ export function NovoVeiculoModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
+      <DialogContent className="w-[95vw] sm:max-w-[900px] lg:max-w-[1100px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-6">
         <DialogHeader>
           <DialogTitle>Novo Veículo</DialogTitle>
           <DialogDescription>
@@ -962,7 +953,7 @@ export function NovoVeiculoModal({
                   name="ipva"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>IPVA (R$) <span className="text-xs text-green-600">(4% do valor)</span></FormLabel>
+                      <FormLabel>IPVA (R$)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -971,13 +962,9 @@ export function NovoVeiculoModal({
                           {...field}
                           value={field.value || ''}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
-                          placeholder="Calculado automaticamente"
                         />
                       </FormControl>
                       <FormMessage />
-                      <p className="text-xs text-muted-foreground">
-                        Valor calculado automaticamente como 4% do valor do veículo. Pode ser editado se necessário.
-                      </p>
                     </FormItem>
                   )}
                 />

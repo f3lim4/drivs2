@@ -429,7 +429,7 @@ export function NovoMotoristaModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
+      <DialogContent className="w-[95vw] sm:max-w-[900px] lg:max-w-[1100px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Novo Motorista</DialogTitle>
           <DialogDescription>

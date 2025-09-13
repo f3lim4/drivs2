@@ -440,7 +440,7 @@ export function NovoContratoModal({
             console.log('🚗 VEÍCULOS FILTRADOS (status disponivel):', {
               total: veiculosData.length,
               disponiveis: veiculosDisponiveis.length,
-              placasDisponiveis: veiculosDisponiveis.map((v: any) => v.placa)
+              placasDisponiveis: veiculosDisponiveis.map(v => v.placa)
             });
             
             setVeiculos(veiculosDisponiveis);
@@ -472,7 +472,7 @@ export function NovoContratoModal({
             console.log('👤 MOTORISTAS FILTRADOS (status aprovado):', {
               total: motoristasData.length,
               aprovados: motoristasDisponiveis.length,
-              nomesAprovados: motoristasDisponiveis.map((m: any) => m.nome)
+              nomesAprovados: motoristasDisponiveis.map(m => m.nome)
             });
             
             setMotoristas(motoristasDisponiveis);
@@ -813,7 +813,7 @@ ____________________________________        ____________________________________
         locadoraId: profile?.locadoraId || '',
         tipo: 'locacao' as const,
         titulo: `Contrato de Locação - ${aluguel.motoristaNome}`,
-        cliente: motorista?.cpf || '',
+        cliente: aluguel.motoristaNome,
         valor: valorTotal.toFixed(2), // Enviar como string
         valorSemanal: data.valorSemanal.toFixed(2), // ✅ INCLUIR VALOR SEMANAL
         caucao: data.caucao.toFixed(2), // ✅ INCLUIR CAUÇÃO
@@ -822,14 +822,7 @@ ____________________________________        ____________________________________
         dataFim: dataFimContrato ? format(dataFimContrato, 'yyyy-MM-dd') : null, // ✅ NULL para contratos renováveis
         status: 'em_aberto' as const, // Inicia sempre como em_aberto
         template: templateContent,
-        veiculoId: data.veiculoId, // ✅ INCLUIR VEÍCULO ID NO CONTRATO
-        // 🎯 CAMPOS DE PAGAMENTO AUTOMÁTICO - ERA ISSO QUE ESTAVA FALTANDO!
-        pagamentoRecorrente: data.pagamentoRecorrente,
-        dataPrimeiroPagamento: data.dataPrimeiroPagamento ? format(data.dataPrimeiroPagamento, 'yyyy-MM-dd') : undefined,
-        recorrencia: data.recorrencia,
-        tipoPagamento: data.tipoPagamento,
-        quantidadePagamentos: data.quantidadePagamentos,
-        marcarPagamentosAnteriores: data.marcarPagamentosAnteriores
+        veiculoId: data.veiculoId // ✅ INCLUIR VEÍCULO ID NO CONTRATO
       };
 
       console.log('[FRONTEND] Criando contrato com dados:', novoContrato);
@@ -867,21 +860,59 @@ ____________________________________        ____________________________________
         `Novo contrato gerado: ${aluguel.motoristaNome} - ${aluguel.veiculoModelo} (${aluguel.veiculoPlaca})`
       );
 
-      // ✅ PAGAMENTOS AUTOMÁTICOS: Agora são criados apenas pelo BACKEND
-      // O backend já processa os campos de pagamento recorrente automaticamente
-      console.log('[PAGAMENTOS AUTOMÁTICOS] Configuração enviada para backend:', {
+      // Criar pagamentos recorrentes se habilitado
+      console.log('[DEBUG PAGAMENTOS] Verificando criação automática:', {
         pagamentoRecorrente: data.pagamentoRecorrente,
         dataPrimeiroPagamento: data.dataPrimeiroPagamento,
-        recorrencia: data.recorrencia,
-        tipoPagamento: data.tipoPagamento,
-        quantidadePagamentos: data.quantidadePagamentos
+        recorrencia: data.recorrencia
       });
       
-      if (data.pagamentoRecorrente) {
-        toast({
-          title: "🎯 Pagamentos Configurados",
-          description: `Pagamentos ${data.recorrencia}s serão criados automaticamente pelo sistema`,
-          variant: "default"
+      if (data.pagamentoRecorrente && data.dataPrimeiroPagamento && data.recorrencia) {
+        console.log('[DEBUG PAGAMENTOS] Iniciando criação de pagamentos recorrentes...');
+        const quantidadePagamentos = await criarPagamentosRecorrentes(
+          aluguel.id,
+          data.motoristaId,
+          data.dataPrimeiroPagamento,
+          data.recorrencia,
+          data.valorSemanal,
+          data.prazoMinimo || '',
+          data.dataInicio,  // Passa a data de início do contrato
+          data.tipoPagamento,  // Tipo: ilimitado ou limitado
+          data.quantidadePagamentos,  // Quantidade específica (se limitado)
+          data.marcarPagamentosAnteriores  // Marcar pagamentos anteriores como pagos
+        );
+        
+        console.log('[DEBUG PAGAMENTOS] Resultado:', quantidadePagamentos);
+        
+        // Exibir notificação baseada no resultado
+        if (quantidadePagamentos.totalCriados > 0) {
+          let mensagem = '';
+          
+          if (quantidadePagamentos.statusRetroativos === 'pago') {
+            // Checkbox marcado - pagamentos anteriores como pagos, semana atual em aberto
+            if (quantidadePagamentos.retroativos > 0) {
+              mensagem = `${quantidadePagamentos.totalCriados} pagamentos criados: ${quantidadePagamentos.retroativos} retroativos como PAGOS + semana atual EM ABERTO`;
+            } else {
+              mensagem = `1 pagamento da semana atual criado como EM ABERTO - pagamentos são sempre segundas`;
+            }
+          } else {
+            // Checkbox desmarcado - todos em aberto
+            mensagem = `${quantidadePagamentos.totalCriados} pagamento${quantidadePagamentos.totalCriados > 1 ? 's' : ''} criado${quantidadePagamentos.totalCriados > 1 ? 's' : ''} como EM ABERTO`;
+          }
+            
+          toast({
+            title: "✅ Pagamentos Recorrentes Criados",
+            description: mensagem,
+            duration: 4000,
+          });
+        } else {
+          console.log('[DEBUG PAGAMENTOS] Nenhum pagamento foi criado');
+        }
+      } else {
+        console.log('[DEBUG PAGAMENTOS] Criação de pagamentos recorrentes DESABILITADA:', {
+          habilitado: data.pagamentoRecorrente,
+          temData: !!data.dataPrimeiroPagamento,
+          temRecorrencia: !!data.recorrencia
         });
       }
 
@@ -950,7 +981,7 @@ ____________________________________        ____________________________________
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] sm:max-w-[700px] lg:max-w-[800px] max-h-[85vh] overflow-y-auto p-3 sm:p-4">
+      <DialogContent className="w-[95vw] sm:max-w-[800px] max-w-[800px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-6">
         <DialogHeader className="pb-3 sm:pb-6">
           <DialogTitle className="text-lg sm:text-xl">Gerar Novo Contrato</DialogTitle>
           <DialogDescription className="text-sm sm:text-base">
