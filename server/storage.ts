@@ -992,59 +992,10 @@ export class DatabaseStorage implements IStorage {
     try {
       const result = await db.select().from(pagamentos).where(eq(pagamentos.locadoraId, locadoraId));
       
-      // Buscar dados dos motoristas e veículos separadamente para evitar problemas com joins
+      // ✅ NOVA VERSÃO: Usar dados do veículo diretamente da tabela de pagamentos
       const pagamentosEnriquecidos = await Promise.all(
         result.map(async (pagamento) => {
           const motorista = await db.select().from(motoristas).where(eq(motoristas.id, pagamento.motoristaId)).limit(1);
-          
-          let veiculoData = null;
-          // Se o pagamento tem aluguelId, buscar dados do veículo via aluguel
-          if (pagamento.aluguelId) {
-            const aluguel = await db.select().from(alugueis).where(eq(alugueis.id, pagamento.aluguelId)).limit(1);
-            if (aluguel[0]) {
-              const veiculo = await db.select().from(veiculos).where(eq(veiculos.id, aluguel[0].veiculoId)).limit(1);
-              if (veiculo[0]) {
-                veiculoData = {
-                  veiculoId: veiculo[0].id,
-                  veiculoPlaca: veiculo[0].placa,
-                  veiculoMarca: veiculo[0].marca,
-                  veiculoModelo: veiculo[0].modelo
-                };
-              }
-            }
-          }
-          
-          // ✅ FALLBACK: Se não conseguiu buscar via aluguel (pode ter sido excluído),
-          // tentar buscar veículo através de contratos históricos do motorista
-          if (!veiculoData && pagamento.motoristaId) {
-            const contratosMotorista = await db
-              .select()
-              .from(contratos)
-              .where(
-                and(
-                  eq(contratos.locadoraId, locadoraId),
-                  eq(contratos.cliente, motorista[0]?.nome || '')
-                )
-              )
-              .limit(1);
-              
-            if (contratosMotorista[0] && contratosMotorista[0].veiculoId) {
-              const veiculo = await db
-                .select()
-                .from(veiculos)
-                .where(eq(veiculos.id, contratosMotorista[0].veiculoId))
-                .limit(1);
-                
-              if (veiculo[0]) {
-                veiculoData = {
-                  veiculoId: veiculo[0].id,
-                  veiculoPlaca: veiculo[0].placa,
-                  veiculoMarca: veiculo[0].marca,
-                  veiculoModelo: veiculo[0].modelo
-                };
-              }
-            }
-          }
           
           return {
             ...pagamento,
@@ -1053,8 +1004,11 @@ export class DatabaseStorage implements IStorage {
             motoristaNome: motorista[0] ? motorista[0].nome : `${pagamento.motoristaId} - Excluído`,
             motoristaContato: motorista[0]?.telefone || '',
             motoristaCpf: motorista[0]?.cpf || '', // ADICIONADO: CPF do motorista
-            // Adicionar dados do veículo
-            ...veiculoData
+            // ✅ Usar dados do veículo diretamente dos campos preservados
+            veiculoId: pagamento.veiculoId || undefined,
+            veiculoPlaca: pagamento.veiculoPlaca || undefined,
+            veiculoMarca: pagamento.veiculoMarca || undefined,
+            veiculoModelo: pagamento.veiculoModelo || undefined
           };
         })
       );

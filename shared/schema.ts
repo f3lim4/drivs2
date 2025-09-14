@@ -352,6 +352,11 @@ export const pagamentos = pgTable("pagamentos", {
   locadoraId: text("locadora_id").notNull(),
   motoristaId: text("motorista_id").notNull(),
   aluguelId: text("aluguel_id"), // Opcional - apenas para pagamentos de aluguel
+  // ✅ Campos do veículo - preservados mesmo após exclusão de contratos
+  veiculoId: text("veiculo_id"), // ID do veículo (RENAVAM)
+  veiculoPlaca: text("veiculo_placa"), // Placa do veículo
+  veiculoModelo: text("veiculo_modelo"), // Modelo do veículo  
+  veiculoMarca: text("veiculo_marca"), // Marca do veículo
   tipo: text("tipo").notNull(), // 'aluguel', 'infrações', 'manutenção', 'danos', 'outros'
   descricao: text("descricao"), // Descrição adicional do pagamento
   automatico: boolean("automatico").default(false), // Marca se o pagamento foi criado automaticamente pelo contrato
