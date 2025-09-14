@@ -230,7 +230,25 @@ export function DetalhesVeiculoAnaliseModal({
                   // Criar array unificado de eventos
                   const eventos: any[] = [];
                   
-                  // Adicionar aluguéis como receitas
+                  // ✅ Adicionar pagamentos como receitas (dados preservados)
+                  if (dadosVeiculo?.historico?.pagamentos) {
+                    dadosVeiculo.historico.pagamentos
+                      .filter(pagamento => pagamento.status === 'pago')
+                      .forEach((pagamento: any) => {
+                        eventos.push({
+                          tipo: 'receita',
+                          data: pagamento.dataPagamento || pagamento.data,
+                          descricao: `Pagamento - ${pagamento.motoristaNome || 'Motorista'}`,
+                          categoria: pagamento.tipo === 'taxa administrativa' ? 'Taxa Administrativa' : 'Pagamento Aluguel',
+                          valor: parseFloat(pagamento.valorPago || pagamento.valorTotal || '0'),
+                          status: 'pago',
+                          icone: <Calendar className="w-4 h-4 text-green-600" />,
+                          cor: 'text-green-600'
+                        });
+                      });
+                  }
+                  
+                  // Adicionar aluguéis como receitas (caso ainda existam)
                   if (dadosVeiculo?.historico?.alugueis) {
                     dadosVeiculo.historico.alugueis.forEach((aluguel: any) => {
                       eventos.push({
