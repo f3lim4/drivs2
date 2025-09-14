@@ -949,7 +949,7 @@ export default function RelatoriosFinanceiros() {
     const motorista = aluguelVeiculo ? motoristas.find(m => m.id === aluguelVeiculo.motoristaId) : null;
     const despesasVeiculo = despesas.filter(d => d.veiculoId === veiculo.id);
     
-    // Histórico completo do veículo
+    // ✅ Histórico completo do veículo usando dados preservados
     const historicoAlugueis = alugueis.filter(a => a.veiculoId === veiculo.id);
     const historicoManutencoes = manutencoes?.filter(m => m.veiculoId === veiculo.id) || [];
     const historicoPagamentos = pagamentos?.filter(p => p.veiculoId === veiculo.id) || [];
@@ -978,8 +978,19 @@ export default function RelatoriosFinanceiros() {
       despesasFixasMensais += parseFloat(veiculo.valorFinanciamento);
     }
     
-    // Receita do aluguel
-    const receitaAluguel = aluguelVeiculo ? parseFloat(aluguelVeiculo.valorMensal || aluguelVeiculo.valorDiario) : 0;
+    // ✅ Receita baseada nos pagamentos diretos do veículo (dados preservados)
+    const pagamentosVeiculoPeriodo = historicoPagamentos.filter(p => {
+      if (p.status !== 'pago') return false;
+      const dataStr = p.dataPagamento || p.data;
+      if (!dataStr) return false;
+      const dateParts = dataStr.split('-');
+      const dataPagamento = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+      return isWithinInterval(dataPagamento, { start: monthStart, end: monthEnd });
+    });
+    
+    const receitaPagamentos = pagamentosVeiculoPeriodo.reduce((total, pagamento) => {
+      return total + parseFloat(pagamento.valorPago || pagamento.valorTotal || '0');
+    }, 0);
     
     // Adicionar infrações pagas como entradas (receita)
     const infracoesVeiculo = infracoes.filter(infracao => 
@@ -992,7 +1003,7 @@ export default function RelatoriosFinanceiros() {
     const receitaInfracoes = infracoesVeiculo
       .reduce((total, infracao) => total + parseFloat(infracao.valorFinal || '0'), 0);
     
-    const receitaMensal = receitaAluguel + receitaInfracoes;
+    const receitaMensal = receitaPagamentos + receitaInfracoes;
     const despesasManuais = despesasVeiculo
       .filter(d => d.tipo === 'despesa' && d.categoria !== 'financiamento' && d.categoria !== 'manutencao' && isWithinInterval(new Date(d.data), { start: monthStart, end: monthEnd }))
       .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
@@ -1138,10 +1149,17 @@ export default function RelatoriosFinanceiros() {
         new Date(a.dataFim) >= mesStart
       );
       
-      // Calcular receita baseada nos pagamentos do período
-      const receitaMes = aluguelPeriodo ? pagamentosVeiculo
-        .filter(p => isWithinInterval(new Date(p.data), { start: mesStart, end: mesEnd }))
-        .reduce((total, pagamento) => total + parseFloat(pagamento.valor || '0'), 0) : 0;
+      // ✅ Calcular receita baseada nos pagamentos diretos do veículo
+      const receitaMes = historicoPagamentos
+        .filter(p => {
+          if (p.status !== 'pago') return false;
+          const dataStr = p.dataPagamento || p.data;
+          if (!dataStr) return false;
+          const dateParts = dataStr.split('-');
+          const dataPagamento = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+          return isWithinInterval(dataPagamento, { start: mesStart, end: mesEnd });
+        })
+        .reduce((total, pagamento) => total + parseFloat(pagamento.valorPago || pagamento.valorTotal || '0'), 0);
       const despesasManuaisMes = despesasVeiculo
         .filter(d => d.tipo === 'despesa' && isWithinInterval(new Date(d.data), { start: mesStart, end: mesEnd }))
         .reduce((total, despesa) => total + parseFloat(despesa.valor || '0'), 0);
