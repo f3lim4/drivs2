@@ -417,9 +417,8 @@ export default function RelatoriosFinanceiros() {
           return isWithinInterval(dataPagamento, { start: monthStart, end: monthEnd });
         })
         .map(pagamento => {
-          // Buscar o veículo através do aluguel/motorista
-          const aluguel = alugueis.find(a => a.id === pagamento.aluguelId);
-          const veiculoId = aluguel?.veiculoId || pagamento.veiculoId;
+          // ✅ Usar dados do veículo diretamente dos campos preservados no pagamento
+          const veiculoId = pagamento.veiculoId;
           const motorista = motoristas.find(m => m.id === pagamento.motoristaId);
           
           return {
@@ -809,9 +808,9 @@ export default function RelatoriosFinanceiros() {
         despesasFixasMensais += parseFloat(veiculo.valorFinanciamento);
       }
       
-      // Calcular receita baseada nos pagamentos do motorista do veículo
+      // ✅ Calcular receita baseada nos pagamentos diretos do veículo
       const pagamentosVeiculo = pagamentos.filter(p => {
-        return aluguelVeiculo && p.motoristaNome === aluguelVeiculo.motoristaNome;
+        return p.veiculoId === veiculo.id && p.status === 'pago';
       });
       
       const receitaMensal = pagamentosVeiculo
