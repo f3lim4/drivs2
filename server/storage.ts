@@ -1014,6 +1014,38 @@ export class DatabaseStorage implements IStorage {
             }
           }
           
+          // ✅ FALLBACK: Se não conseguiu buscar via aluguel (pode ter sido excluído),
+          // tentar buscar veículo através de contratos históricos do motorista
+          if (!veiculoData && pagamento.motoristaId) {
+            const contratosMotorista = await db
+              .select()
+              .from(contratos)
+              .where(
+                and(
+                  eq(contratos.locadoraId, locadoraId),
+                  eq(contratos.cliente, motorista[0]?.nome || '')
+                )
+              )
+              .limit(1);
+              
+            if (contratosMotorista[0] && contratosMotorista[0].veiculoId) {
+              const veiculo = await db
+                .select()
+                .from(veiculos)
+                .where(eq(veiculos.id, contratosMotorista[0].veiculoId))
+                .limit(1);
+                
+              if (veiculo[0]) {
+                veiculoData = {
+                  veiculoId: veiculo[0].id,
+                  veiculoPlaca: veiculo[0].placa,
+                  veiculoMarca: veiculo[0].marca,
+                  veiculoModelo: veiculo[0].modelo
+                };
+              }
+            }
+          }
+          
           return {
             ...pagamento,
             data: pagamento.dataPagamento, // Mapear campo data corretamente
