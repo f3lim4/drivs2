@@ -161,7 +161,7 @@ export default function Pagamentos() {
   // Estados para alternar visualização dos cards de pagamentos (INICIANDO EM SEMANAL)
   const [visualizacaoPagamento, setVisualizacaoPagamento] = useState<'geral' | 'mensal' | 'semanal'>('semanal');
   const [visualizacaoRecebido, setVisualizacaoRecebido] = useState<'geral' | 'mensal' | 'semanal'>('semanal');
-  const [visualizacaoAberto, setVisualizacaoAberto] = useState<'geral' | 'mensal' | 'semanal'>('semanal');
+  const [visualizacaoAberto, setVisualizacaoAberto] = useState<'geral' | 'mensal' | 'semanal'>('geral'); // TEMPORÁRIO para debug
   const [visualizacaoParcial, setVisualizacaoParcial] = useState<'geral' | 'mensal' | 'semanal'>('semanal');
 
   // Função para alternar visualização do primeiro card (ORDEM: semanal → mensal → geral)
@@ -559,31 +559,48 @@ export default function Pagamentos() {
     
     console.log('🔧 [DEBUG ABERTO] Visualização:', visualizacaoAberto);
     console.log('🔧 [DEBUG ABERTO] Pagamentos em aberto encontrados:', pagamentosAberto.length);
+    console.log('🔧 [DEBUG ABERTO] Detalhes dos pagamentos:', pagamentosAberto.map(p => ({
+      id: p.id,
+      dataPagamento: p.dataPagamento,
+      valorRestante: p.valorRestante,
+      status: p.status
+    })));
     
     switch (visualizacaoAberto) {
       case 'mensal':
-        const valorMensal = pagamentosAberto
-          .filter(p => {
-            if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento.getFullYear() === anoAtual && 
-                   dataPagamento.getMonth() === mesAtual;
-          })
-          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0); // CORRIGIDO: valorRestante
+        const pagamentosMensal = pagamentosAberto.filter(p => {
+          if (!p.dataPagamento) return false;
+          const dataPagamento = new Date(p.dataPagamento);
+          return dataPagamento.getFullYear() === anoAtual && 
+                 dataPagamento.getMonth() === mesAtual;
+        });
+        console.log('🔧 [DEBUG ABERTO] Pagamentos filtrados mensal:', pagamentosMensal.length);
+        const valorMensal = pagamentosMensal.reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
         console.log('🔧 [DEBUG ABERTO] Valor mensal calculado:', valorMensal);
         return valorMensal;
       
       case 'semanal':
         // Valor semanal (Domingo a Domingo da semana atual)
         const { inicioSemana, fimSemana } = calcularSemanaAtual();
+        console.log('🔧 [DEBUG ABERTO] Período semanal:', { inicioSemana, fimSemana });
         
-        const valorSemanal = pagamentosAberto
-          .filter(p => {
-            if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
-            return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
-          })
-          .reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0); // CORRIGIDO: valorRestante
+        const pagamentosSemanal = pagamentosAberto.filter(p => {
+          if (!p.dataPagamento) {
+            console.log('🔧 [DEBUG ABERTO] Pagamento sem data:', p.id);
+            return false;
+          }
+          const dataPagamento = new Date(p.dataPagamento);
+          console.log('🔧 [DEBUG ABERTO] Comparando data:', {
+            pagamentoId: p.id,
+            dataPagamento: dataPagamento,
+            inicioSemana: inicioSemana,
+            fimSemana: fimSemana,
+            dentroDoPerido: dataPagamento >= inicioSemana && dataPagamento <= fimSemana
+          });
+          return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
+        });
+        console.log('🔧 [DEBUG ABERTO] Pagamentos filtrados semanal:', pagamentosSemanal.length);
+        const valorSemanal = pagamentosSemanal.reduce((sum, p) => sum + parseFloat(p.valorRestante || '0'), 0);
         console.log('🔧 [DEBUG ABERTO] Valor semanal calculado:', valorSemanal);
         return valorSemanal;
       
