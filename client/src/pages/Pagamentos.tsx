@@ -403,11 +403,12 @@ export default function Pagamentos() {
     
     switch (visualizacaoPagamento) {
       case 'mensal':
-        // Valor mensal (pagamentos do mês atual)
+        // ✅ Valor mensal (pagamentos do mês atual) - CORRIGIDO conversão de datas
         return pagamentosFiltrados
           .filter(p => {
             if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
+            // Garantir que a data seja interpretada corretamente (formato YYYY-MM-DD do banco)
+            const dataPagamento = new Date(p.dataPagamento + 'T00:00:00');
             return dataPagamento.getFullYear() === anoAtual && 
                    dataPagamento.getMonth() === mesAtual;
           })
@@ -420,7 +421,8 @@ export default function Pagamentos() {
         const pagamentosSemana = pagamentosFiltrados
           .filter(p => {
             if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
+            // ✅ Garantir interpretação correta das datas
+            const dataPagamento = new Date(p.dataPagamento + 'T00:00:00');
             return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           });
         
@@ -473,7 +475,8 @@ export default function Pagamentos() {
         const pagamentosRegularesMes = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
+            // ✅ Garantir interpretação correta das datas
+            const dataPagamento = new Date(p.dataPagamento + 'T00:00:00');
             return dataPagamento.getFullYear() === anoAtual && 
                    dataPagamento.getMonth() === mesAtual &&
                    p.tipo !== 'taxa administrativa'; // Excluir taxas admin para evitar duplicação
@@ -484,7 +487,8 @@ export default function Pagamentos() {
         const taxasAdministrativasMes = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento || p.tipo !== 'taxa administrativa') return false;
-            const dataPagamento = new Date(p.dataPagamento);
+            // ✅ Garantir interpretação correta das datas
+            const dataPagamento = new Date(p.dataPagamento + 'T00:00:00');
             return dataPagamento.getFullYear() === anoAtual && 
                    dataPagamento.getMonth() === mesAtual;
           })
@@ -500,7 +504,8 @@ export default function Pagamentos() {
         const pagamentosRegularesSemana = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento) return false;
-            const dataPagamento = new Date(p.dataPagamento);
+            // ✅ Garantir interpretação correta das datas
+            const dataPagamento = new Date(p.dataPagamento + 'T00:00:00');
             return dataPagamento >= inicioSemana && dataPagamento <= fimSemana &&
                    p.tipo !== 'taxa administrativa';
           })
@@ -509,7 +514,8 @@ export default function Pagamentos() {
         const taxasAdministrativasSemana = pagamentosPagos
           .filter(p => {
             if (!p.dataPagamento || p.tipo !== 'taxa administrativa') return false;
-            const dataPagamento = new Date(p.dataPagamento);
+            // ✅ Garantir interpretação correta das datas
+            const dataPagamento = new Date(p.dataPagamento + 'T00:00:00');
             return dataPagamento >= inicioSemana && dataPagamento <= fimSemana;
           })
           .reduce((sum, p) => sum + parseFloat(p.valorPago || '0'), 0);
@@ -570,7 +576,8 @@ export default function Pagamentos() {
       case 'mensal':
         const pagamentosMensal = pagamentosAberto.filter(p => {
           if (!p.dataPagamento) return false;
-          const dataPagamento = new Date(p.dataPagamento);
+          // ✅ Garantir interpretação correta das datas
+          const dataPagamento = new Date(p.dataPagamento + 'T00:00:00');
           return dataPagamento.getFullYear() === anoAtual && 
                  dataPagamento.getMonth() === mesAtual;
         });
@@ -589,7 +596,8 @@ export default function Pagamentos() {
             console.log('🔧 [DEBUG ABERTO] Pagamento sem data:', p.id);
             return false;
           }
-          const dataPagamento = new Date(p.dataPagamento);
+          // ✅ Garantir interpretação correta das datas
+          const dataPagamento = new Date(p.dataPagamento + 'T00:00:00');
           console.log('🔧 [DEBUG ABERTO] Comparando data:', {
             pagamentoId: p.id,
             dataPagamento: dataPagamento,
