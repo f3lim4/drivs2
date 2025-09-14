@@ -1512,21 +1512,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // CORREÇÃO: Excluir pagamentos relacionados ao contrato antes de excluir o contrato
+      // ✅ MANTER HISTÓRICO: Pagamentos NÃO são excluídos quando contrato é removido
+      // Isso preserva o histórico financeiro e permite análises retroativas
       if (contrato) {
-        console.log(`[CONTRACT DELETE] Excluindo pagamentos relacionados ao contrato: ${contrato.id}`);
-        const pagamentos = await storage.getPagamentosByLocadora(contrato.locadoraId);
-        const pagamentosDoContrato = pagamentos.filter(p => 
-          p.motoristaId === contrato.motoristaId || 
-          p.motoristaNome === contrato.cliente ||
-          (p.veiculoId && p.veiculoId === contrato.veiculoId)
-        );
+        console.log(`[CONTRACT DELETE] Preservando histórico de pagamentos do contrato: ${contrato.id}`);
+        console.log(`[CONTRACT DELETE] Os pagamentos existentes permanecerão para análise histórica`);
         
-        console.log(`[CONTRACT DELETE] Encontrados ${pagamentosDoContrato.length} pagamentos para exclusão`);
-        for (const pagamento of pagamentosDoContrato) {
-          console.log(`[CONTRACT DELETE] Excluindo pagamento: ${pagamento.id} - ${pagamento.motoristaNome}`);
-          await storage.deletePagamento(pagamento.id);
-        }
+        // Opcional: Marcar algum flag nos pagamentos para indicar que o contrato foi excluído
+        // Por enquanto, apenas preservamos os dados existentes
       }
       
       // Excluir o contrato
@@ -1534,14 +1527,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // CORREÇÃO: Forçar sincronização de status após exclusão
       if (contrato) {
-        console.log(`[CONTRACT DELETE] Iniciando sincronização automática de status - Locadora: ${contrato.locadoraId}`);
-        try {
-          await syncMotoristaStatus(contrato.locadoraId);
-          await syncVeiculoStatus();
-          console.log(`[CONTRACT DELETE] Sincronização concluída com sucesso`);
-        } catch (syncError) {
-          console.error(`[CONTRACT DELETE] Erro na sincronização:`, syncError);
-        }
+        console.log(`[CONTRACT DELETE] Sincronização automática será feita pelo sistema de status`);
+        // TODO: Implementar funções syncMotoristaStatus e syncVeiculoStatus se necessário
+        // As atualizações de status já foram feitas acima durante a exclusão do aluguel
       }
       
       res.json({ message: "Contrato deleted successfully" });
