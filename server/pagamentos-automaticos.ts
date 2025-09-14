@@ -48,6 +48,31 @@ const processarAluguelAtivo = async (aluguel: any) => {
   try {
     console.log(`[PROCESSANDO] Aluguel ${aluguel.id} - Motorista: ${aluguel.motoristaId}`);
     
+    // ✅ VERIFICAR STATUS DO CONTRATO ANTES DE GERAR PAGAMENTOS
+    // Buscar contrato relacionado ao aluguel para verificar se ainda está ativo
+    const contratosRelacionados = await db
+      .select()
+      .from(contratos)
+      .where(eq(contratos.locadoraId, aluguel.locadoraId));
+    
+    const contratoRelacionado = contratosRelacionados.find(c => 
+      c.cliente === aluguel.motoristaNome || 
+      (c.veiculoId && c.veiculoId === aluguel.veiculoId)
+    );
+    
+    // Se contrato foi excluído ou está encerrado/cancelado, não gerar pagamentos
+    if (!contratoRelacionado) {
+      console.log(`[SKIP] Aluguel ${aluguel.id} - Contrato relacionado não encontrado (pode ter sido excluído)`);
+      return;
+    }
+    
+    if (contratoRelacionado.status === 'encerrado' || contratoRelacionado.status === 'cancelado') {
+      console.log(`[SKIP] Aluguel ${aluguel.id} - Contrato com status '${contratoRelacionado.status}' - não gerando novos pagamentos`);
+      return;
+    }
+    
+    console.log(`[OK] Aluguel ${aluguel.id} - Contrato ${contratoRelacionado.id} ativo (status: ${contratoRelacionado.status})`);
+    
     // Buscar último pagamento do aluguel
     const ultimosPagamentos = await db
       .select()
