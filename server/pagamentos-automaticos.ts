@@ -47,9 +47,16 @@ export const gerarProximosPagamentos = async () => {
 const processarAluguelAtivo = async (aluguel: any) => {
   try {
     console.log(`[PROCESSANDO] Aluguel ${aluguel.id} - Motorista: ${aluguel.motoristaId}`);
+    console.log(`[DEBUG] Aluguel data:`, JSON.stringify({ 
+      id: aluguel.id, 
+      locadoraId: aluguel.locadoraId, 
+      veiculoId: aluguel.veiculoId, 
+      motoristaId: aluguel.motoristaId 
+    }));
     
     // ✅ SEGURANÇA: VERIFICAR STATUS DO CONTRATO COM LOOKUP DETERMINÍSTICO
     // CRITICAL: Use vehicle ID matching for robust contract lookup since contratos table doesn't have motoristaId
+    console.log(`[DEBUG] Executando query de contratos...`);
     const contratorelacionadoQuery = await db
       .select({
         contratoId: contratos.id,
@@ -65,6 +72,8 @@ const processarAluguelAtivo = async (aluguel: any) => {
         eq(contratos.status, 'ativo') // SEGURANÇA: Only consider active contracts
       ))
       .limit(1);
+      
+    console.log(`[DEBUG] Query de contratos executada com sucesso`);
 
     const contratoRelacionado = contratorelacionadoQuery[0] || null;
     
