@@ -6,10 +6,8 @@ export function usePagamentos() {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
 
-  // CORREÇÃO TEMPORÁRIA: Forçar uso do locadoraId correto
-  const locadoraId = profile?.locadoraId === '33e284e9-9aeb-42a0-83f2-c80542a42b5e' 
-    ? '33e284e9-9aeb-42a0-83f2-c80542a42b5e' 
-    : (profile?.locadoraId || (profile?.id === '50764571000170' ? '33e284e9-9aeb-42a0-83f2-c80542a42b5e' : profile?.id));
+  // SEGURANÇA: Usar apenas o locadoraId do perfil autenticado
+  const locadoraId = profile?.locadoraId;
   
   console.log('🚀 [PAGAMENTOS DEBUG] Profile:', profile);
   console.log('🚀 [PAGAMENTOS DEBUG] LocadoraId usado:', locadoraId);
