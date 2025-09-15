@@ -910,8 +910,8 @@ export default function Pagamentos() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-72">Motorista</TableHead>
-                <TableHead>Veículo</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Veículo</TableHead>
                 <TableHead>Descrição</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Valor</TableHead>
@@ -931,6 +931,9 @@ export default function Pagamentos() {
                     </div>
                   </TableCell>
                   <TableCell>
+                    {getStatusBadge(pagamento.status)}
+                  </TableCell>
+                  <TableCell>
                     {(pagamento as any).veiculo || (pagamento as any).veiculoPlaca ? (
                       <div>
                         <div className="font-medium text-sm">{(pagamento as any).veiculo || (pagamento as any).veiculoPlaca}</div>
@@ -941,9 +944,6 @@ export default function Pagamentos() {
                     ) : (
                       <div className="text-sm text-muted-foreground">-</div>
                     )}
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(pagamento.status)}
                   </TableCell>
                   <TableCell>
                     <div className="max-w-[120px]">
