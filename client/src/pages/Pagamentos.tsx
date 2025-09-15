@@ -30,23 +30,11 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 export default function Pagamentos() {
   const { profile } = useAuth();
   
-  // ✅ CORREÇÃO DE SEGURANÇA: Usar locadoraId do profile do usuário autenticado
-  if (!profile?.locadoraId) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <LoadingSpinner size="lg" />
-          <p className="text-muted-foreground mt-4">Carregando dados do usuário...</p>
-        </div>
-      </div>
-    );
-  }
-  
   // ✅ QUERY SEGURA - Usando ID da locadora do usuário autenticado
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['/api/pagamentos', profile.locadoraId], // Key baseada no usuário
+    queryKey: ['/api/pagamentos', profile?.locadoraId], // Key baseada no usuário
     queryFn: async () => {
-      const url = `/api/pagamentos?locadoraId=${profile.locadoraId}`;
+      const url = `/api/pagamentos?locadoraId=${profile?.locadoraId}`;
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -54,6 +42,11 @@ export default function Pagamentos() {
           'Pragma': 'no-cache'
         }
       });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch pagamentos: ${response.status} ${response.statusText}`);
+      }
+      
       const data = await response.json();
       return data;
     },
@@ -83,7 +76,7 @@ export default function Pagamentos() {
     },
     onSuccess: () => {
       // ✅ Invalidar cache correto baseado no usuário
-      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', profile.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', profile?.locadoraId] });
     },
     onError: (error: Error) => {
       console.error('Erro ao atualizar pagamento:', error);
@@ -106,7 +99,7 @@ export default function Pagamentos() {
     },
     onSuccess: () => {
       // ✅ Invalidar cache correto baseado no usuário
-      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', profile.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', profile?.locadoraId] });
       console.log('✅ [CREATE] Cache invalidado, dados recarregados');
     }
   });
@@ -124,7 +117,7 @@ export default function Pagamentos() {
     },
     onSuccess: () => {
       // ✅ Invalidar cache correto baseado no usuário
-      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', profile.locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', profile?.locadoraId] });
       console.log('✅ [DELETE] Cache invalidado, dados recarregados');
     }
   });
@@ -316,7 +309,12 @@ export default function Pagamentos() {
 
   // Filtrar e ordenar pagamentos
   const pagamentosFiltrados = useMemo(() => {
-    let filtered = pagamentos as Pagamento[];
+    // ✅ PROTEÇÃO: Garantir que pagamentos seja sempre um array
+    if (!Array.isArray(pagamentos)) {
+      return [];
+    }
+    // ✅ CORREÇÃO: Copiar array antes de sort para evitar mutação do cache
+    let filtered = [...(pagamentos as Pagamento[])];
 
     // Filtro por texto (nome do motorista, descrição, observações)
     if (filtroTexto) {
@@ -365,6 +363,18 @@ export default function Pagamentos() {
 
     return filtered;
   }, [pagamentos, filtroTexto, filtroStatus, filtroTipo, sortOrder]);
+
+  // ✅ VERIFICAÇÃO DE SEGURANÇA: Verificar autenticação APÓS todos os hooks
+  if (!profile?.locadoraId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground mt-4">Carregando dados do usuário...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Paginação
   const totalPages = Math.ceil(pagamentosFiltrados.length / itemsPerPage);
