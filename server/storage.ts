@@ -1173,6 +1173,54 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  // AUDIT TRAIL: Comprehensive audit trail method for payment deletion  
+  async createPagamentoExcluido(dadosExclusao: {
+    pagamentoId: string;
+    aluguelId: string | null;
+    motoristaId: string;
+    locadoraId: string;
+    dataPagamento: string;
+    valorTotal: string;
+    valorPago: string;
+    valorRestante: string;
+    status: string;
+    tipo: string;
+    descricao: string | null;
+    observacoes: string | null;
+    automatico: boolean;
+    codigoPagamento: string | null;
+    dataExclusao: string;
+    motivoExclusao: string;
+  }): Promise<void> {
+    try {
+      await db.insert(pagamentosExcluidos).values({
+        id: crypto.randomUUID(),
+        pagamentoId: dadosExclusao.pagamentoId,
+        locadoraId: dadosExclusao.locadoraId,
+        aluguelId: dadosExclusao.aluguelId,
+        motoristaId: dadosExclusao.motoristaId,
+        dataPagamento: dadosExclusao.dataPagamento,
+        valorTotal: dadosExclusao.valorTotal,
+        valorPago: dadosExclusao.valorPago,
+        valorRestante: dadosExclusao.valorRestante,
+        status: dadosExclusao.status,
+        tipo: dadosExclusao.tipo,
+        descricao: dadosExclusao.descricao,
+        observacoes: dadosExclusao.observacoes,
+        automatico: dadosExclusao.automatico,
+        codigoPagamento: dadosExclusao.codigoPagamento,
+        motivo: dadosExclusao.motivoExclusao,
+        dataExclusao: dadosExclusao.dataExclusao,
+        usuarioId: null
+      });
+      
+      console.log(`[AUDIT TRAIL] Comprehensive payment deletion record created for payment: ${dadosExclusao.pagamentoId}`);
+    } catch (error) {
+      console.error(`[AUDIT TRAIL ERROR] Failed to create comprehensive audit record:`, error);
+      // Don't throw error to avoid breaking deletion flow
+    }
+  }
+
   async getAluguelValorSemanal(aluguelId: string): Promise<number | undefined> {
     const result = await db.select({
       valorSemanal: veiculos.valorSemanal
