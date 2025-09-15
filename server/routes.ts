@@ -1746,44 +1746,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Authentication middleware for pagamentos endpoints
+  const requirePagamentosAuth = (req: any, res: any, next: any) => {
+    console.log("[AUTH MIDDLEWARE] Checking authentication:", {
+      hasSession: !!req.session,
+      hasUser: !!req.session?.user,
+      hasLocadoraId: !!req.session?.user?.locadoraId,
+      sessionUser: req.session?.user?.email
+    });
+    
+    if (!req.session?.user) {
+      return res.status(401).json({ 
+        message: "Authentication required", 
+        debug: "No user session found"
+      });
+    }
+    
+    // For locadora users, they must have a locadoraId
+    if (req.session.user.type !== 'admin' && !req.session.user.locadoraId) {
+      return res.status(403).json({ 
+        message: "Access denied: No locadora associated",
+        debug: "User has no locadoraId"
+      });
+    }
+    
+    next();
+  };
+
   // Pagamentos routes
-  app.get("/api/pagamentos", async (req, res) => {
+  app.get("/api/pagamentos", requirePagamentosAuth, async (req, res) => {
     try {
-      // SEGURANÇA: Usar locadoraId da sessão autenticada, não do query parameter
-      const locadoraId = req.session.user?.locadoraId;
+      // SECURITY: Only use locadoraId from authenticated session - IGNORE all query parameters
+      const sessionUser = req.session.user;
       
-      console.log("[DEBUG PAGAMENTOS] Requisição recebida:", {
-        sessionLocadoraId: locadoraId,
-        sessionUser: req.session.user?.email,
+      console.log("[DEBUG PAGAMENTOS] Authenticated request:", {
+        sessionUser: sessionUser.email,
+        userType: sessionUser.type,
+        locadoraId: sessionUser.locadoraId,
         url: req.url
       });
 
-      // Verificar se usuário está autenticado
-      if (!req.session.user) {
-        return res.status(401).json({ message: "Authentication required" });
+      // Admin users can see all payments if they don't have a locadoraId
+      if (sessionUser.type === 'admin' && !sessionUser.locadoraId) {
+        const pagamentos = await storage.getAllPagamentos();
+        console.log("[DEBUG PAGAMENTOS] Admin - returning all payments:", pagamentos.length);
+        return res.json(pagamentos);
       }
 
-      // Admins podem ver todos os pagamentos se não tiverem locadoraId
-      if (!locadoraId) {
-        // Verificar se é admin (não tem locadoraId associado)
-        const profile = await storage.getProfileByEmail(req.session.user.email);
-        if (profile?.type === 'admin') {
-          const pagamentos = await storage.getAllPagamentos();
-          console.log("[DEBUG PAGAMENTOS] Admin - retornando todos os pagamentos:", pagamentos.length);
-          return res.json(pagamentos);
-        } else {
-          return res.status(403).json({ message: "Access denied: no locadora associated" });
-        }
-      }
-
-      // Verificar se a locadora ainda existe e está ativa
+      const locadoraId = sessionUser.locadoraId;
+      
+      // Verify locadora still exists and is active
       const locadora = await storage.getLocadora(locadoraId);
       if (!locadora) {
-        console.log(`Locadora não encontrada: ${locadoraId} - retornando lista vazia`);
+        console.log(`Locadora not found: ${locadoraId} - returning empty list`);
         return res.json([]);
       }
       
-      // SEGURANÇA: Garantir que só retorna pagamentos da locadora autenticada
+      // SECURITY: Only return payments for the authenticated locadora
       const pagamentos = await storage.getPagamentosByLocadora(locadoraId);
         
       console.log("[DEBUG PAGAMENTOS] Pagamentos retornados:", {
@@ -1803,12 +1822,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/pagamentos/:id", async (req, res) => {
+  app.get("/api/pagamentos/:id", requirePagamentosAuth, async (req, res) => {
     try {
+      const sessionUser = req.session.user;
       const pagamento = await storage.getPagamento(req.params.id);
+      
       if (!pagamento) {
         return res.status(404).json({ message: "Pagamento not found" });
       }
+      
+      // SECURITY: Verify pagamento belongs to user's locadora (or user is admin)
+      if (sessionUser.type !== 'admin' && pagamento.locadoraId !== sessionUser.locadoraId) {
+        return res.status(403).json({ message: "Access denied: Pagamento belongs to different locadora" });
+      }
+      
       res.json(pagamento);
     } catch (error) {
       console.error("Error fetching pagamento:", error);
@@ -1816,10 +1843,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/pagamentos/motorista/:motoristaId", async (req, res) => {
+  app.get("/api/pagamentos/motorista/:motoristaId", requirePagamentosAuth, async (req, res) => {
     try {
+      const sessionUser = req.session.user;
       const pagamentos = await storage.getPagamentosByMotorista(req.params.motoristaId);
-      res.json(pagamentos);
+      
+      // SECURITY: Filter payments to only show those from user's locadora (or user is admin)
+      const filteredPagamentos = sessionUser.type === 'admin' ? pagamentos : 
+        pagamentos.filter(p => p.locadoraId === sessionUser.locadoraId);
+      
+      res.json(filteredPagamentos);
     } catch (error) {
       console.error("Error fetching pagamentos by motorista:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -1839,11 +1872,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/pagamentos", async (req, res) => {
+  app.post("/api/pagamentos", requirePagamentosAuth, async (req, res) => {
     try {
       console.log("[PAGAMENTO API] Dados recebidos:", JSON.stringify(req.body, null, 2));
-      const validatedData = insertPagamentoSchema.parse(req.body);
+      const sessionUser = req.session.user;
+      
+      // SECURITY: Ensure the pagamento is being created for the authenticated locadora
+      const requestData = { ...req.body };
+      if (sessionUser.type !== 'admin') {
+        requestData.locadoraId = sessionUser.locadoraId; // Force the locadoraId from session
+      }
+      
+      const validatedData = insertPagamentoSchema.parse(requestData);
       console.log("[PAGAMENTO API] Dados validados:", JSON.stringify(validatedData, null, 2));
+      
       const pagamento = await storage.createPagamento(validatedData);
       console.log("[PAGAMENTO API] Pagamento criado:", JSON.stringify(pagamento, null, 2));
       res.json(pagamento);
@@ -1853,9 +1895,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/pagamentos/:id", async (req, res) => {
+  app.put("/api/pagamentos/:id", requirePagamentosAuth, async (req, res) => {
     try {
-      const validatedData = insertPagamentoSchema.partial().parse(req.body);
+      const sessionUser = req.session.user;
+      
+      // SECURITY: Verify pagamento exists and belongs to user's locadora
+      const existingPagamento = await storage.getPagamento(req.params.id);
+      if (!existingPagamento) {
+        return res.status(404).json({ message: "Pagamento not found" });
+      }
+      
+      if (sessionUser.type !== 'admin' && existingPagamento.locadoraId !== sessionUser.locadoraId) {
+        return res.status(403).json({ message: "Access denied: Pagamento belongs to different locadora" });
+      }
+      
+      const requestData = { ...req.body };
+      // SECURITY: Prevent locadoraId changes for non-admin users
+      if (sessionUser.type !== 'admin') {
+        delete requestData.locadoraId;
+      }
+      
+      const validatedData = insertPagamentoSchema.partial().parse(requestData);
       const pagamento = await storage.updatePagamento(req.params.id, validatedData);
       res.json(pagamento);
     } catch (error) {
@@ -1864,21 +1924,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/pagamentos/:id", async (req, res) => {
+  app.delete("/api/pagamentos/:id", requirePagamentosAuth, async (req, res) => {
     const pagamentoId = req.params.id;
     console.log(`[DELETE PAGAMENTO] Tentando excluir pagamento: ${pagamentoId}`);
     
     try {
-      // Verificar se o pagamento existe antes de excluir
+      const sessionUser = req.session.user;
+      
+      // SECURITY: Verify pagamento exists and belongs to user's locadora
       const pagamentoExistente = await storage.getPagamento(pagamentoId);
       if (!pagamentoExistente) {
         console.log(`[DELETE PAGAMENTO] Pagamento não encontrado: ${pagamentoId}`);
         return res.status(404).json({ message: "Pagamento não encontrado" });
       }
       
+      if (sessionUser.type !== 'admin' && pagamentoExistente.locadoraId !== sessionUser.locadoraId) {
+        return res.status(403).json({ message: "Access denied: Pagamento belongs to different locadora" });
+      }
+      
       console.log(`[DELETE PAGAMENTO] Pagamento encontrado, locadora: ${pagamentoExistente.locadoraId}`);
       
-      // Excluir o pagamento
+      // AUDIT TRAIL: Write to pagamentosExcluidos table before deletion
+      try {
+        await storage.createPagamentoExcluido({
+          pagamentoId: pagamentoExistente.id,
+          aluguelId: pagamentoExistente.aluguelId,
+          motoristaId: pagamentoExistente.motoristaId,
+          locadoraId: pagamentoExistente.locadoraId,
+          dataPagamento: pagamentoExistente.dataPagamento,
+          valorTotal: pagamentoExistente.valorTotal,
+          valorPago: pagamentoExistente.valorPago,
+          valorRestante: pagamentoExistente.valorRestante,
+          status: pagamentoExistente.status,
+          tipo: pagamentoExistente.tipo,
+          descricao: pagamentoExistente.descricao,
+          observacoes: pagamentoExistente.observacoes,
+          automatico: pagamentoExistente.automatico,
+          codigoPagamento: pagamentoExistente.codigoPagamento,
+          dataExclusao: new Date().toISOString(),
+          motivoExclusao: 'Exclusão manual via interface administrativa'
+        });
+        console.log(`[AUDIT] Pagamento registrado em pagamentosExcluidos: ${pagamentoId}`);
+      } catch (auditError) {
+        console.error(`[AUDIT ERROR] Falha ao registrar exclusão: ${auditError}`);
+        // Continue with deletion even if audit trail fails
+      }
+      
+      // Delete the pagamento
       const deleted = await storage.deletePagamento(pagamentoId);
       
       if (!deleted) {
