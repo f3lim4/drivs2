@@ -61,9 +61,11 @@ export function ExcluirVeiculoDialog({
           <AlertDialogDescription>
             Tem certeza que deseja excluir o veículo <strong>{veiculo.marca} {veiculo.modelo}</strong> (Placa: {veiculo.placa})?
             <br /><br />
-            Esta ação não pode ser desfeita. Todos os dados relacionados a este veículo serão removidos permanentemente.
+<strong>⚠️ Atenção:</strong> Esta ação não pode ser desfeita. O veículo será excluído permanentemente.
             <br /><br />
-            <strong>Atenção:</strong> Certifique-se de que este veículo não possui contratos ativos antes de excluí-lo.
+            <strong>✅ Histórico preservado:</strong> Os contratos, pagamentos e outros dados relacionados a este veículo serão mantidos para preservar o histórico.
+            <br /><br />
+            <strong>Importante:</strong> Certifique-se de que este veículo não possui contratos ativos antes de excluí-lo.
           </AlertDialogDescription>
         </AlertDialogHeader>
         
@@ -86,11 +88,11 @@ export function ExcluirVeiculoDialog({
             <Checkbox 
               id="final-confirmation"
               checked={isConfirmed}
-              onCheckedChange={setIsConfirmed}
+              onCheckedChange={(checked) => setIsConfirmed(checked === true)}
               data-testid="checkbox-confirm-delete"
             />
             <Label htmlFor="final-confirmation" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Tenho certeza que quero excluir este contrato
+              Tenho certeza que quero excluir este veículo
             </Label>
           </div>
         </div>
