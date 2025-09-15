@@ -144,8 +144,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.get("/api/auth/profile", async (req, res) => {
     try {
+      // ✅ DESABILITAR CACHE - garantir que Set-Cookie seja enviado (evitar 304)
+      res.set('Cache-Control', 'no-store');
+      
       // Para simplificar, vou usar um endpoint que retorna o perfil baseado no email
-      // Em produção, isso seria baseado na sessão do usuário
+      // ✅ CORREÇÃO: Agora também restaura a sessão para compatibilidade com APIs autenticadas
       const { email } = req.query;
       
       if (!email) {
@@ -157,7 +160,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Profile not found" });
       }
       
-      res.json(profile);
+      // ✅ RESTAURAR SESSÃO - para compatibilidade com APIs que exigem autenticação (como /api/pagamentos)
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("Error regenerating session on profile restore:", err);
+          // Continue mesmo com erro na sessão
+        }
+        
+        // Store user info in session (igual ao login)
+        req.session.user = {
+          id: profile.userId, // Usar userId do profile
+          email: profile.email,
+          nome: profile.name,
+          locadoraId: profile.locadoraId,
+          type: profile.type
+        };
+        
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error("Error saving session on profile restore:", saveErr);
+            // Continue mesmo com erro na sessão
+          }
+          
+          console.log("Session restored for profile:", profile.email, "SessionID:", req.sessionID);
+          res.json(profile);
+        });
+      });
     } catch (error) {
       console.error("Error fetching profile:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -211,18 +239,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Senha incorreta" });
       }
       
-      // Store user info in session (incluindo locadoraId)
-      req.session.user = {
-        id: user.id,
-        email: profile.email,
-        nome: profile.name,
-        locadoraId: profile.locadoraId
-      };
-      
-      console.log("Login successful for:", email);
-      res.json({ 
-        profile,
-        message: "Login successful" 
+      // Store user info in session com regeneração segura
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error("Error regenerating session:", err);
+          return res.status(500).json({ message: "Session error" });
+        }
+        
+        // Store user info in session (incluindo locadoraId e type)
+        req.session.user = {
+          id: user.id,
+          email: profile.email,
+          nome: profile.name,
+          locadoraId: profile.locadoraId,
+          type: profile.type
+        };
+        
+        // Salvar sessão explicitamente
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error("Error saving session:", saveErr);
+            return res.status(500).json({ message: "Session save error" });
+          }
+          
+          console.log("Login successful for:", email, "SessionID:", req.sessionID);
+          res.json({ 
+            profile,
+            message: "Login successful" 
+          });
+        });
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -1752,7 +1797,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       hasSession: !!req.session,
       hasUser: !!req.session?.user,
       hasLocadoraId: !!req.session?.user?.locadoraId,
-      sessionUser: req.session?.user?.email
+      sessionUser: req.session?.user?.email,
+      sessionID: req.sessionID,
+      cookieHeader: req.headers.cookie
     });
     
     if (!req.session?.user) {

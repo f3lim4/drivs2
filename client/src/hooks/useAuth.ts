@@ -26,6 +26,22 @@ export function useAuth() {
         // Validação básica para evitar loops
         if (profile && profile.email && profile.type && (profile.id || profile.userId)) {
           setProfile(profile);
+          
+          // ✅ RESTAURAR SESSÃO NO SERVIDOR - para compatibilidade com APIs autenticadas
+          fetch(`/api/auth/profile?email=${encodeURIComponent(profile.email)}`, {
+            credentials: 'include', // ✅ Garantir que cookies sejam enviados e recebidos
+            cache: 'no-store'       // ✅ Evitar 304 que pode pular Set-Cookie
+          })
+            .then(response => {
+              if (response.ok) {
+                console.log('✅ Sessão restaurada no servidor para:', profile.email);
+              } else {
+                console.warn('❌ Falha ao restaurar sessão no servidor:', response.status);
+              }
+            })
+            .catch(error => {
+              console.warn('❌ Erro ao restaurar sessão no servidor:', error);
+            });
         } else {
           // Profile inválido, remove mas não redireciona
           console.log('Profile inválido removido do localStorage');

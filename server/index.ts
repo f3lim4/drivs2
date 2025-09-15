@@ -12,14 +12,18 @@ app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 // Configurar sessões
 const isProduction = app.get("env") === "production" || process.env.REPLIT_DEPLOYMENT === "1";
 
+// ✅ CONFIGURAR TRUST PROXY - essencial para cookies seguros atrás de proxy (Replit)
+app.set('trust proxy', 1);
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key-here',
   resave: false,
   saveUninitialized: true, // Permitir criação de sessões vazias - necessário para produção
   cookie: {
-    secure: isProduction, // true para HTTPS em produção, false para desenvolvimento
+    secure: true, // ✅ Sempre true agora que temos trust proxy
     httpOnly: true, // Prevenir acesso via JavaScript - segurança adicional
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax' // ✅ Melhor compatibilidade com proxies
   }
 }));
 
