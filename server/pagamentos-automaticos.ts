@@ -49,21 +49,19 @@ const processarAluguelAtivo = async (aluguel: any) => {
     console.log(`[PROCESSANDO] Aluguel ${aluguel.id} - Motorista: ${aluguel.motoristaId}`);
     
     // ✅ SEGURANÇA: VERIFICAR STATUS DO CONTRATO COM LOOKUP DETERMINÍSTICO
-    // CRITICAL: Use vehicle ID matching instead of fragile name matching for robust contract lookup
+    // CRITICAL: Use vehicle ID matching for robust contract lookup since contratos table doesn't have motoristaId
     const contratorelacionadoQuery = await db
       .select({
         contratoId: contratos.id,
         contratoStatus: contratos.status,
         contratoLocadoraId: contratos.locadoraId,
         contratoVeiculoId: contratos.veiculoId,
-        contratoMotoristaId: contratos.motoristaId,
         contratoCliente: contratos.cliente
       })
       .from(contratos)
       .where(and(
         eq(contratos.locadoraId, aluguel.locadoraId), // SEGURANÇA: Tenant isolation
         eq(contratos.veiculoId, aluguel.veiculoId), // SEGURANÇA: Vehicle-based lookup (more reliable than name)
-        eq(contratos.motoristaId, aluguel.motoristaId), // SEGURANÇA: Exact motorista ID match
         eq(contratos.status, 'ativo') // SEGURANÇA: Only consider active contracts
       ))
       .limit(1);

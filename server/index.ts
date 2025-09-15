@@ -10,12 +10,15 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
 // Configurar sessões
+const isProduction = app.get("env") === "production" || process.env.REPLIT_DEPLOYMENT === "1";
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key-here',
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true, // Permitir criação de sessões vazias - necessário para produção
   cookie: {
-    secure: false, // set to true if using HTTPS
+    secure: isProduction, // true para HTTPS em produção, false para desenvolvimento
+    httpOnly: true, // Prevenir acesso via JavaScript - segurança adicional
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
