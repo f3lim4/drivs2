@@ -1927,7 +1927,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/pagamentos/contrato/:contratoId/count", requirePagamentosAuth, async (req, res) => {
     try {
       const sessionUser = req.session.user;
-      const locadoraId = sessionUser.type === 'admin' ? req.query.locadoraId as string || sessionUser.locadoraId : sessionUser.locadoraId;
+      // 🔒 SEGURANÇA: Usar sempre locadoraId da sessão (não do query param)
+      const locadoraId = sessionUser.locadoraId;
       
       const count = await storage.countPagamentosByContrato(req.params.contratoId, locadoraId);
       
