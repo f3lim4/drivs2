@@ -1,6 +1,6 @@
 // Sistema de Pagamentos Automáticos para Aluguéis Ativos
 import { db } from './db';
-import { contratos, pagamentos, alugueis, pagamentosExcluidos } from '../shared/schema';
+import { contratos, pagamentos, alugueis, pagamentosExcluidos, motoristas } from '../shared/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import crypto from 'crypto';
 
@@ -48,30 +48,43 @@ const processarAluguelAtivo = async (aluguel: any) => {
   try {
     console.log(`[PROCESSANDO] Aluguel ${aluguel.id} - Motorista: ${aluguel.motoristaId}`);
     
-    // ✅ VERIFICAR STATUS DO CONTRATO ANTES DE GERAR PAGAMENTOS
-    // Buscar contrato relacionado ao aluguel para verificar se ainda está ativo
-    const contratosRelacionados = await db
-      .select()
+    // ✅ SEGURANÇA: VERIFICAR STATUS DO CONTRATO COM LOOKUP DETERMINÍSTICO
+    // Buscar contrato usando JOIN com motoristas para garantir correspondência precisa
+    // CRITICAL: Use JOIN instead of string matching to prevent cross-tenant access
+    const contratorelacionadoQuery = await db
+      .select({
+        contratoId: contratos.id,
+        contratoStatus: contratos.status,
+        contratoLocadoraId: contratos.locadoraId,
+        contratoVeiculoId: contratos.veiculoId,
+        contratoCliente: contratos.cliente,
+        motoristaNome: motoristas.nome,
+        motoristaId: motoristas.id
+      })
       .from(contratos)
-      .where(eq(contratos.locadoraId, aluguel.locadoraId));
+      .innerJoin(motoristas, eq(contratos.cliente, motoristas.nome))
+      .where(and(
+        eq(contratos.locadoraId, aluguel.locadoraId), // SEGURANÇA: Tenant isolation
+        eq(motoristas.id, aluguel.motoristaId), // SEGURANÇA: Exact motorista match
+        eq(motoristas.locadoraId, aluguel.locadoraId) // SEGURANÇA: Double tenant check
+      ))
+      .limit(1);
+
+    const contratoRelacionado = contratorelacionadoQuery[0] || null;
     
-    const contratoRelacionado = contratosRelacionados.find(c => 
-      c.cliente === aluguel.motoristaNome || 
-      (c.veiculoId && c.veiculoId === aluguel.veiculoId)
-    );
-    
-    // Se contrato foi excluído ou está encerrado/cancelado, não gerar pagamentos
+    // SEGURANÇA: Se contrato foi excluído ou está encerrado/cancelado, não gerar pagamentos
     if (!contratoRelacionado) {
-      console.log(`[SKIP] Aluguel ${aluguel.id} - Contrato relacionado não encontrado (pode ter sido excluído)`);
+      console.log(`[SECURITY SKIP] Aluguel ${aluguel.id} - Contrato relacionado não encontrado via JOIN seguro (pode ter sido excluído ou sem permissão)`);
       return;
     }
     
-    if (contratoRelacionado.status === 'encerrado' || contratoRelacionado.status === 'cancelado') {
-      console.log(`[SKIP] Aluguel ${aluguel.id} - Contrato com status '${contratoRelacionado.status}' - não gerando novos pagamentos`);
+    // SEGURANÇA: Verificar status do contrato
+    if (contratoRelacionado.contratoStatus === 'encerrado' || contratoRelacionado.contratoStatus === 'cancelado') {
+      console.log(`[SKIP] Aluguel ${aluguel.id} - Contrato com status '${contratoRelacionado.contratoStatus}' - não gerando novos pagamentos`);
       return;
     }
     
-    console.log(`[OK] Aluguel ${aluguel.id} - Contrato ${contratoRelacionado.id} ativo (status: ${contratoRelacionado.status})`);
+    console.log(`[OK] Aluguel ${aluguel.id} - Contrato ${contratoRelacionado.contratoId} ativo (status: ${contratoRelacionado.contratoStatus})`);
     
     // Buscar último pagamento do aluguel
     const ultimosPagamentos = await db

@@ -1749,26 +1749,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pagamentos routes
   app.get("/api/pagamentos", async (req, res) => {
     try {
-      const { locadoraId } = req.query;
+      // SEGURANÇA: Usar locadoraId da sessão autenticada, não do query parameter
+      const locadoraId = req.session.user?.locadoraId;
       
       console.log("[DEBUG PAGAMENTOS] Requisição recebida:", {
-        locadoraId,
-        url: req.url,
-        headers: req.headers
+        sessionLocadoraId: locadoraId,
+        sessionUser: req.session.user?.email,
+        url: req.url
       });
 
-      // Se locadora não existir mais (foi excluída), retorna lista vazia
-      if (locadoraId) {
-        const locadora = await storage.getLocadora(locadoraId as string);
-        if (!locadora) {
-          console.log(`Locadora não encontrada: ${locadoraId} - retornando lista vazia`);
-          return res.json([]);
+      // Verificar se usuário está autenticado
+      if (!req.session.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      // Admins podem ver todos os pagamentos se não tiverem locadoraId
+      if (!locadoraId) {
+        // Verificar se é admin (não tem locadoraId associado)
+        const profile = await storage.getProfileByEmail(req.session.user.email);
+        if (profile?.type === 'admin') {
+          const pagamentos = await storage.getAllPagamentos();
+          console.log("[DEBUG PAGAMENTOS] Admin - retornando todos os pagamentos:", pagamentos.length);
+          return res.json(pagamentos);
+        } else {
+          return res.status(403).json({ message: "Access denied: no locadora associated" });
         }
       }
+
+      // Verificar se a locadora ainda existe e está ativa
+      const locadora = await storage.getLocadora(locadoraId);
+      if (!locadora) {
+        console.log(`Locadora não encontrada: ${locadoraId} - retornando lista vazia`);
+        return res.json([]);
+      }
       
-      const pagamentos = locadoraId
-        ? await storage.getPagamentosByLocadora(locadoraId as string)
-        : await storage.getAllPagamentos();
+      // SEGURANÇA: Garantir que só retorna pagamentos da locadora autenticada
+      const pagamentos = await storage.getPagamentosByLocadora(locadoraId);
         
       console.log("[DEBUG PAGAMENTOS] Pagamentos retornados:", {
         locadoraId,
