@@ -171,11 +171,34 @@ const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
       return;
     }
 
+    // Buscar informações do veículo para preservar no pagamento
+    let veiculoInfo = { id: null, placa: null, marca: null, modelo: null };
+    if (aluguel.veiculoId) {
+      const veiculo = await db
+        .select({
+          id: veiculos.id,
+          placa: veiculos.placa,
+          marca: veiculos.marca,
+          modelo: veiculos.modelo
+        })
+        .from(veiculos)
+        .where(and(
+          eq(veiculos.id, aluguel.veiculoId),
+          eq(veiculos.locadoraId, aluguel.locadoraId) // SEGURANÇA: Tenant isolation
+        ))
+        .limit(1);
+
+      if (veiculo.length > 0) {
+        veiculoInfo = veiculo[0];
+        console.log(`[VEICULO INFO] Aluguel ${aluguel.id} - Veículo: ${veiculoInfo.marca} ${veiculoInfo.modelo} - Placa: ${veiculoInfo.placa}`);
+      }
+    }
+
     // Calcular valor semanal baseado no valor mensal
     const valorSemanal = parseFloat(aluguel.valorMensal) / 4.35; // Conversão mensal para semanal
 
-    // Criar novo pagamento automático
-    const novoPagamento: PagamentoAutomatico = {
+    // Criar novo pagamento automático com informações do veículo preservadas
+    const novoPagamento: any = {
       id: crypto.randomUUID(),
       aluguelId: aluguel.id,
       motoristaId: aluguel.motoristaId,
@@ -188,12 +211,17 @@ const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
       tipo: 'aluguel',
       descricao: 'Pagamento semanal gerado automaticamente pelo sistema',
       automatico: true,
-      codigoPagamento: `PAG-AUTO-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+      codigoPagamento: `PAG-AUTO-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+      // ✅ PRESERVAR informações do veículo no pagamento
+      veiculoId: veiculoInfo.id,
+      veiculoPlaca: veiculoInfo.placa,
+      veiculoMarca: veiculoInfo.marca,
+      veiculoModelo: veiculoInfo.modelo
     };
 
     await db.insert(pagamentos).values([novoPagamento]);
 
-    console.log(`[PAGAMENTO CRIADO] Aluguel ${aluguel.id} - Valor: R$ ${valorSemanal.toFixed(2)} - Vencimento: ${dataVencimento.toDateString()}`);
+    console.log(`[PAGAMENTO CRIADO] Aluguel ${aluguel.id} - Valor: R$ ${valorSemanal.toFixed(2)} - Vencimento: ${dataVencimento.toDateString()} - Veículo: ${veiculoInfo.placa}`);
 
   } catch (error) {
     console.error(`[ERRO CRIAÇÃO PAGAMENTO] Aluguel ${aluguel.id}:`, error);
