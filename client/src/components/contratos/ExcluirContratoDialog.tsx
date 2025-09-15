@@ -63,7 +63,9 @@ export function ExcluirContratoDialog({
               </>
             )}
             <br /><br />
-            Esta ação não pode ser desfeita. Todos os dados relacionados serão removidos permanentemente.
+            <strong>⚠️ Atenção:</strong> Esta ação não pode ser desfeita. O contrato será excluído permanentemente.
+            <br /><br />
+            <strong>✅ Histórico preservado:</strong> Os pagamentos relacionados a este contrato serão mantidos para preservar o histórico financeiro e permitir análises futuras.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
