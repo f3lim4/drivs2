@@ -136,8 +136,8 @@ export default function Contratos() {
 
   const handleExcluirContrato = async (contrato: Contrato) => {
     try {
-      // ✅ USAR ENDPOINT DE CONTAGEM - mais eficiente
-      const response = await fetch(`/api/pagamentos/contrato/${contrato.id}/count?locadoraId=${profile?.locadoraId}`, {
+      // ✅ USAR ENDPOINT DE CONTAGEM - mais eficiente + seguro
+      const response = await fetch(`/api/pagamentos/contrato/${contrato.id}/count`, {
         credentials: 'include'
       });
       
