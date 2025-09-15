@@ -1906,6 +1906,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/pagamentos/contrato/:contratoId", requirePagamentosAuth, async (req, res) => {
+    try {
+      const sessionUser = req.session.user;
+      const pagamentos = await storage.getPagamentosByContrato(req.params.contratoId);
+      
+      // SECURITY: Filter payments to only show those from user's locadora (or user is admin)
+      const filteredPagamentos = sessionUser.type === 'admin' ? pagamentos : 
+        pagamentos.filter(p => p.locadoraId === sessionUser.locadoraId);
+      
+      console.log(`[DEBUG PAGAMENTOS] Retornando ${filteredPagamentos.length} pagamentos para contrato:`, req.params.contratoId);
+      
+      res.json(filteredPagamentos);
+    } catch (error) {
+      console.error("Error fetching pagamentos by contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/pagamentos/contrato/:contratoId/count", requirePagamentosAuth, async (req, res) => {
+    try {
+      const sessionUser = req.session.user;
+      const locadoraId = sessionUser.type === 'admin' ? req.query.locadoraId as string || sessionUser.locadoraId : sessionUser.locadoraId;
+      
+      const count = await storage.countPagamentosByContrato(req.params.contratoId, locadoraId);
+      
+      console.log(`[DEBUG PAGAMENTOS] Contando ${count} pagamentos para contrato:`, req.params.contratoId);
+      
+      res.json({ count });
+    } catch (error) {
+      console.error("Error counting pagamentos by contrato:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.get("/api/aluguel/:aluguelId/valor-semanal", async (req, res) => {
     try {
       const valorSemanal = await storage.getAluguelValorSemanal(req.params.aluguelId);
