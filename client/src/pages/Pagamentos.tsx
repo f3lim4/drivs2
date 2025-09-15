@@ -142,6 +142,28 @@ export default function Pagamentos() {
     queryKey: ['/api/contratos', profile?.locadoraId],
     enabled: !!profile?.locadoraId,
   });
+
+  // Função para encontrar o status do contrato baseado no veículo
+  const getStatusContrato = (pagamento: any) => {
+    // Primeiro tenta pela relação com aluguel
+    if (pagamento.aluguelId) {
+      const aluguel = alugueis.find((a: any) => a.id === pagamento.aluguelId);
+      if (aluguel?.veiculoId) {
+        // Busca contrato pelo veículo do aluguel
+        const contrato = contratos.find((c: any) => c.veiculoId === aluguel.veiculoId);
+        return contrato?.status || 'sem contrato';
+      }
+    }
+    
+    // Se não tem aluguelId, tenta pela relação direta com o veículo
+    if (pagamento.veiculoId || (pagamento as any).veiculoPlaca) {
+      const veiculoId = pagamento.veiculoId || (pagamento as any).veiculoPlaca;
+      const contrato = contratos.find((c: any) => c.veiculoId === veiculoId);
+      return contrato?.status || 'sem contrato';
+    }
+    
+    return 'sem contrato';
+  };
   
   const [showNovoPagamento, setShowNovoPagamento] = useState(false);
   const [showDetalhes, setShowDetalhes] = useState(false);
@@ -277,6 +299,23 @@ export default function Pagamentos() {
         return <Badge variant="secondary" className="bg-red-100 text-red-800">Atrasado</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
+  const getStatusContratoBadge = (status: string) => {
+    switch (status) {
+      case 'ativo':
+        return <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">Ativo</Badge>;
+      case 'encerrado':
+        return <Badge variant="secondary" className="bg-gray-100 text-gray-800 text-xs">Encerrado</Badge>;
+      case 'cancelado':
+        return <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs">Cancelado</Badge>;
+      case 'em_aberto':
+        return <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">Em Aberto</Badge>;
+      case 'sem contrato':
+        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">Sem Contrato</Badge>;
+      default:
+        return <Badge variant="secondary" className="text-xs">{status}</Badge>;
     }
   };
 
@@ -940,9 +979,17 @@ export default function Pagamentos() {
                         <div className="text-xs text-muted-foreground">
                           {(pagamento as any).veiculoMarca} {(pagamento as any).veiculoModelo}
                         </div>
+                        <div className="mt-1">
+                          {getStatusContratoBadge(getStatusContrato(pagamento))}
+                        </div>
                       </div>
                     ) : (
-                      <div className="text-sm text-muted-foreground">-</div>
+                      <div>
+                        <div className="text-sm text-muted-foreground">-</div>
+                        <div className="mt-1">
+                          {getStatusContratoBadge(getStatusContrato(pagamento))}
+                        </div>
+                      </div>
                     )}
                   </TableCell>
                   <TableCell>
