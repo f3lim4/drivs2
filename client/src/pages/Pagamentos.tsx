@@ -30,18 +30,23 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 export default function Pagamentos() {
   const { profile } = useAuth();
   
-  // DADOS REAIS DO BANCO - VERSÃO CORRIGIDA V4
-  const locadoraId = "33e284e9-9aeb-42a0-83f2-c80542a42b5e"; // ID REALMENTE CORRETO da locadora Fernando
+  // ✅ CORREÇÃO DE SEGURANÇA: Usar locadoraId do profile do usuário autenticado
+  if (!profile?.locadoraId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="text-muted-foreground mt-4">Carregando dados do usuário...</p>
+        </div>
+      </div>
+    );
+  }
   
-  console.log('🚀 [VERSÃO V3] Usando locadoraId correto:', locadoraId);
-  console.log('🚀 [VERSÃO V3] Profile atual:', profile?.id);
-  
-  // QUERY CORRIGIDA - SEM LOOP INFINITO
+  // ✅ QUERY SEGURA - Usando ID da locadora do usuário autenticado
   const { data: pagamentos = [], isLoading: loadingPagamentos } = useQuery({
-    queryKey: ['pagamentos-locadora-corrigida', locadoraId], // Key estável
+    queryKey: ['/api/pagamentos', profile.locadoraId], // Key baseada no usuário
     queryFn: async () => {
-      const url = `/api/pagamentos?locadoraId=${locadoraId}`;
-      console.log('✅ [QUERY FINAL] Executando:', url);
+      const url = `/api/pagamentos?locadoraId=${profile.locadoraId}`;
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -50,12 +55,11 @@ export default function Pagamentos() {
         }
       });
       const data = await response.json();
-      console.log('✅ [QUERY FINAL] Sucesso:', data.length, 'pagamentos carregados');
       return data;
     },
-    enabled: true,
-    staleTime: 1000, // 1 segundo de cache para evitar chamadas excessivas
-    retry: 1 // Apenas 1 tentativa
+    enabled: !!profile?.locadoraId, // Só executa se tiver locadoraId
+    staleTime: 30000, // 30 segundos de cache
+    retry: 1
   });
   
   // FUNÇÕES CORRIGIDAS - USANDO MUTATIONS DO HOOK usePagamentos
@@ -78,8 +82,8 @@ export default function Pagamentos() {
       return result;
     },
     onSuccess: () => {
-      // Invalidar cache para recarregar dados
-      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      // ✅ Invalidar cache correto baseado no usuário
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', profile.locadoraId] });
     },
     onError: (error: Error) => {
       console.error('Erro ao atualizar pagamento:', error);
@@ -101,7 +105,8 @@ export default function Pagamentos() {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      // ✅ Invalidar cache correto baseado no usuário
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', profile.locadoraId] });
       console.log('✅ [CREATE] Cache invalidado, dados recarregados');
     }
   });
@@ -118,7 +123,8 @@ export default function Pagamentos() {
       return true;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pagamentos-locadora-corrigida'] });
+      // ✅ Invalidar cache correto baseado no usuário
+      queryClient.invalidateQueries({ queryKey: ['/api/pagamentos', profile.locadoraId] });
       console.log('✅ [DELETE] Cache invalidado, dados recarregados');
     }
   });
