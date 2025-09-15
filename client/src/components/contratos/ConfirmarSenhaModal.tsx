@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ConfirmarSenhaModalProps {
@@ -13,6 +13,7 @@ interface ConfirmarSenhaModalProps {
   onConfirm: () => void;
   contratoNome: string;
   loading?: boolean;
+  pagamentosAssociados?: number;
 }
 
 export function ConfirmarSenhaModal({
@@ -20,7 +21,8 @@ export function ConfirmarSenhaModal({
   onOpenChange,
   onConfirm,
   contratoNome,
-  loading = false
+  loading = false,
+  pagamentosAssociados = 0
 }: ConfirmarSenhaModalProps) {
   const [textoConfirmacao, setTextoConfirmacao] = useState("");
   const [confirmouExclusao, setConfirmouExclusao] = useState(false);
@@ -87,6 +89,25 @@ export function ConfirmarSenhaModal({
               {contratoNome}
             </p>
           </div>
+
+          {pagamentosAssociados > 0 && (
+            <div className="rounded-lg bg-yellow-50 dark:bg-yellow-900/10 p-4 mb-6 border border-yellow-200 dark:border-yellow-800">
+              <div className="flex items-center gap-3 mb-2">
+                <DollarSign className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                <p className="font-semibold text-yellow-800 dark:text-yellow-200">
+                  Atenção: Pagamentos Associados
+                </p>
+              </div>
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                Este contrato possui <span className="font-semibold">{pagamentosAssociados} pagamento(s)</span> registrado(s). 
+                Estes registros financeiros serão <span className="font-semibold">preservados</span> para histórico, 
+                mas as informações do veículo podem ficar desatualizadas nos relatórios.
+              </p>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
+                <span className="font-semibold">Recomendação:</span> Considere cancelar o contrato ao invés de excluí-lo.
+              </p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">

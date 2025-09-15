@@ -1038,6 +1038,52 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async getPagamentosByContrato(contratoId: string): Promise<Pagamento[]> {
+    try {
+      const result = await db.select().from(pagamentos).where(eq(pagamentos.contratoId, contratoId));
+      
+      // Enriquecer com dados do motorista
+      const pagamentosEnriquecidos = await Promise.all(
+        result.map(async (pagamento) => {
+          const motorista = await db.select().from(motoristas).where(eq(motoristas.id, pagamento.motoristaId)).limit(1);
+          
+          return {
+            ...pagamento,
+            data: pagamento.dataPagamento,
+            valor: pagamento.valorPago,
+            motoristaNome: motorista[0] ? motorista[0].nome : `${pagamento.motoristaId} - Excluído`,
+            motoristaContato: motorista[0]?.telefone || '',
+            motoristaCpf: motorista[0]?.cpf || '',
+            // Usar dados preservados do veículo
+            veiculoId: pagamento.veiculoId || undefined,
+            veiculoPlaca: pagamento.veiculoPlaca || undefined,
+            veiculoMarca: pagamento.veiculoMarca || undefined,
+            veiculoModelo: pagamento.veiculoModelo || undefined
+          };
+        })
+      );
+      
+      return pagamentosEnriquecidos;
+    } catch (error) {
+      console.error('Error getting pagamentos by contrato:', error);
+      return [];
+    }
+  }
+
+  async countPagamentosByContrato(contratoId: string, locadoraId: string): Promise<number> {
+    try {
+      const result = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(pagamentos)
+        .where(and(eq(pagamentos.contratoId, contratoId), eq(pagamentos.locadoraId, locadoraId)));
+      
+      return result[0]?.count || 0;
+    } catch (error) {
+      console.error('Error counting pagamentos by contrato:', error);
+      return 0;
+    }
+  }
+
   async getPagamento(id: string): Promise<Pagamento | undefined> {
     try {
       const result = await db.select().from(pagamentos).where(eq(pagamentos.id, id));

@@ -69,6 +69,7 @@ export default function Contratos() {
   const [showConfirmarSenhaModal, setShowConfirmarSenhaModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
   const [contratoParaExcluir, setContratoParaExcluir] = useState<Contrato | null>(null);
+  const [pagamentosDoContrato, setPagamentosDoContrato] = useState<number>(0);
   const [busca, setBusca] = useState('');
   const [filtroStatus, setFiltroStatus] = useState<string>('todos');
 
@@ -133,7 +134,25 @@ export default function Contratos() {
     }
   };
 
-  const handleExcluirContrato = (contrato: Contrato) => {
+  const handleExcluirContrato = async (contrato: Contrato) => {
+    try {
+      // ✅ USAR ENDPOINT DE CONTAGEM - mais eficiente
+      const response = await fetch(`/api/pagamentos/contrato/${contrato.id}/count?locadoraId=${profile?.locadoraId}`, {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const { count } = await response.json();
+        setPagamentosDoContrato(count);
+      } else {
+        console.warn('Erro ao verificar pagamentos do contrato:', response.status);
+        setPagamentosDoContrato(0);
+      }
+    } catch (error) {
+      console.warn('Erro ao verificar pagamentos associados:', error);
+      setPagamentosDoContrato(0);
+    }
+    
     setContratoParaExcluir(contrato);
     setShowConfirmarSenhaModal(true);
   };
@@ -788,6 +807,7 @@ export default function Contratos() {
         onConfirm={handleConfirmarExclusao}
         contratoNome={contratoParaExcluir ? `${contratoParaExcluir.cliente} - ${contratoParaExcluir.tipo}` : ''}
         loading={deleteContrato.isPending}
+        pagamentosAssociados={pagamentosDoContrato}
       />
     </div>
   );
