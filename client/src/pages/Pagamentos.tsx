@@ -155,6 +155,16 @@ export default function Pagamentos() {
       }
     }
     
+    // Busca contrato pelo nome do motorista
+    if (pagamento.motoristaId && pagamento.motoristaNome) {
+      const contrato = contratos.find((c: any) => {
+        return c.cliente === pagamento.motoristaNome;
+      });
+      if (contrato) {
+        return contrato.status;
+      }
+    }
+    
     // Se não tem aluguelId, tenta pela relação direta com o veículo
     if (pagamento.veiculoId || (pagamento as any).veiculoPlaca) {
       const veiculoId = pagamento.veiculoId || (pagamento as any).veiculoPlaca;
