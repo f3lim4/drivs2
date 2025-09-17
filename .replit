@@ -36,10 +36,6 @@ localPort = 40685
 externalPort = 3001
 
 [[ports]]
-localPort = 40987
-externalPort = 6000
-
-[[ports]]
 localPort = 43015
 externalPort = 5000
 
@@ -69,6 +65,7 @@ args = "npm run dev"
 waitForPort = 5000
 
 [agent]
+integrations = ["javascript_stripe:1.0.0"]
 
 [objectStorage]
 defaultBucketID = "replit-objstore-d8a28fe4-0575-4263-abbb-26c454e4992e"
