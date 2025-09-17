@@ -149,8 +149,8 @@ const veiculoSchema = z.object({
   // Campo para melhor visualização do veículo
   visualizar: z.string().optional(),
   
-  // Documento do veículo (apenas um documento por veículo)
-  documento: z.string().optional(),
+  // Documentos do veículo (array de URLs)
+  documentos: z.array(z.string()).default([]),
 });
 
 type VeiculoFormData = z.infer<typeof veiculoSchema>;
@@ -227,7 +227,7 @@ export function NovoVeiculoModal({
       // Status será definido automaticamente como "disponível"
       valorLimiteKm: undefined,
       visualizar: '',
-      documento: undefined,
+      documentos: [],
     },
   });
 
@@ -1160,7 +1160,7 @@ export function NovoVeiculoModal({
                     const file = e.target.files?.[0];
                     if (!file) return;
                     
-                    console.log('[UPLOAD DIRETO] Arquivo selecionado:', file.name);
+                    console.log('[UPLOAD] Arquivo selecionado:', file.name);
                     setDocumentUploading(true);
                     setUploadedFileName(null);
                     
@@ -1173,7 +1173,7 @@ export function NovoVeiculoModal({
                         },
                       });
                       const data = await response.json();
-                      console.log('[UPLOAD DIRETO] URL obtida:', data.uploadURL);
+                      console.log('[UPLOAD] URL obtida:', data.uploadURL);
                       
                       // Upload do arquivo
                       const uploadResponse = await fetch(data.uploadURL, {
@@ -1185,29 +1185,21 @@ export function NovoVeiculoModal({
                       });
                       
                       if (uploadResponse.ok) {
-                        // Notificar o backend sobre o documento carregado
-                        const notifyResponse = await fetch(`/api/veiculos/${form.getValues('renavam')}/documentos`, {
-                          method: 'PUT',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({ documentURL: data.uploadURL }),
-                        });
+                        console.log('[UPLOAD] Arquivo carregado com sucesso');
                         
-                        let documentoURL;
-                        if (notifyResponse.ok) {
-                          const result = await notifyResponse.json();
-                          console.log('[UPLOAD DIRETO] Documento registrado no backend:', result);
-                          documentoURL = result.objectPath;
-                        } else {
-                          documentoURL = data.uploadURL;
-                        }
-                        
-                        form.setValue('documento', documentoURL);
+                        // Apenas armazenar a URL no formulário (sem chamada ao backend)
+                        const currentDocs = form.getValues('documentos') || [];
+                        form.setValue('documentos', [...currentDocs, data.uploadURL]);
                         setUploadedFileName(file.name);
+                        
+                        toast({
+                          title: "Documento carregado",
+                          description: file.name,
+                          variant: "default",
+                        });
                       }
                     } catch (error) {
-                      console.error('[UPLOAD DIRETO] Erro:', error);
+                      console.error('[UPLOAD] Erro:', error);
                       toast({
                         title: "Erro no upload",
                         description: `Falha ao carregar ${file.name}`,
@@ -1232,11 +1224,11 @@ export function NovoVeiculoModal({
                   className="text-xs h-7 px-3 bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                 >
                   <Upload className="w-3 h-3 mr-1" />
-                  {form.watch('documento') ? 'Substituir' : 'Adicionar'}
+                  {form.watch('documentos')?.length > 0 ? 'Substituir' : 'Adicionar'}
                 </Button>
-                {form.watch('documento') && (
+                {form.watch('documentos')?.length > 0 && (
                   <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">
-                    1 documento
+                    {form.watch('documentos')?.length} documento{form.watch('documentos')?.length !== 1 ? 's' : ''}
                   </span>
                 )}
               </div>
