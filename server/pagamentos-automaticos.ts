@@ -1,7 +1,7 @@
 // Sistema de Pagamentos Automáticos para Aluguéis Ativos
 import { db } from './db';
 import { contratos, pagamentos, alugueis, pagamentosExcluidos, motoristas, veiculos } from '../shared/schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, or } from 'drizzle-orm';
 import crypto from 'crypto';
 
 interface PagamentoAutomatico {
@@ -101,7 +101,10 @@ const processarAluguelAtivo = async (aluguel: any) => {
       .where(and(
         eq(contratos.locadoraId, aluguel.locadoraId), // SEGURANÇA: Tenant isolation
         eq(contratos.veiculoId, aluguel.veiculoId), // SEGURANÇA: Vehicle-based lookup (more reliable than name)
-        eq(contratos.status, 'ativo') // SEGURANÇA: Only consider active contracts
+        or(
+          eq(contratos.status, 'ativo'),
+          eq(contratos.status, 'em_aberto')
+        ) // SEGURANÇA: Consider active and open contracts for payment generation
       ))
       .limit(1);
       
