@@ -1433,17 +1433,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         console.log('[STATUS-UPDATE] Aplicando regras de negócio...');
         
-        // 1. Ativar contrato recém-criado para permitir geração de pagamentos
-        await storage.updateContrato(contrato.id, { status: 'ativo' });
-        console.log(`[STATUS-UPDATE] Contrato ${contrato.id} → status: ativo`);
-        
-        // 2. Atualizar veículo para status "alugado"
+        // 1. Atualizar veículo para status "alugado"
         if (result.data.veiculoId) {
           await storage.updateVeiculo(result.data.veiculoId, { status: 'alugado' });
           console.log(`[STATUS-UPDATE] Veículo ${result.data.veiculoId} → status: alugado`);
         }
         
-        // 3. Buscar motorista pelo nome e atualizar para status "ativo"
+        // 2. Buscar motorista pelo nome e atualizar para status "ativo"
         const motoristas = await storage.getAllMotoristas();
         const motorista = motoristas.find(m => m.nome === result.data.cliente);
         if (motorista) {
