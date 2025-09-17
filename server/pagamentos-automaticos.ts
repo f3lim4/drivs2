@@ -1,6 +1,6 @@
 // Sistema de Pagamentos Automáticos para Aluguéis Ativos
 import { db } from './db';
-import { contratos, pagamentos, alugueis, pagamentosExcluidos, motoristas } from '../shared/schema';
+import { contratos, pagamentos, alugueis, pagamentosExcluidos, motoristas, veiculos } from '../shared/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import crypto from 'crypto';
 
@@ -19,6 +19,38 @@ interface PagamentoAutomatico {
   automatico: boolean;
   codigoPagamento: string | null;
 }
+
+// Função pública para processar um aluguel específico (mais eficiente para criação de contratos)
+export const gerarPagamentosParaAluguel = async (aluguelId: string) => {
+  try {
+    console.log(`[PAGAMENTOS ESPECÍFICO] Gerando pagamentos para aluguel: ${aluguelId}`);
+    
+    // Buscar o aluguel específico
+    const aluguelQuery = await db
+      .select()
+      .from(alugueis)
+      .where(eq(alugueis.id, aluguelId))
+      .limit(1);
+      
+    if (aluguelQuery.length === 0) {
+      console.log(`[PAGAMENTOS ESPECÍFICO] Aluguel ${aluguelId} não encontrado`);
+      return;
+    }
+    
+    const aluguel = aluguelQuery[0];
+    
+    if (aluguel.status !== 'ativo') {
+      console.log(`[PAGAMENTOS ESPECÍFICO] Aluguel ${aluguelId} não está ativo (status: ${aluguel.status})`);
+      return;
+    }
+    
+    await processarAluguelAtivo(aluguel);
+    console.log(`[PAGAMENTOS ESPECÍFICO] Processamento concluído para aluguel: ${aluguelId}`);
+    
+  } catch (error) {
+    console.error(`[ERRO PAGAMENTOS ESPECÍFICO] Erro ao processar aluguel ${aluguelId}:`, error);
+  }
+};
 
 // Função para gerar próximo pagamento para aluguéis ativos
 export const gerarProximosPagamentos = async () => {
@@ -172,7 +204,12 @@ const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
     }
 
     // Buscar informações do veículo para preservar no pagamento
-    let veiculoInfo = { id: null, placa: null, marca: null, modelo: null };
+    let veiculoInfo: { id: string | null, placa: string | null, marca: string | null, modelo: string | null } = { 
+      id: null, 
+      placa: null, 
+      marca: null, 
+      modelo: null 
+    };
     if (aluguel.veiculoId) {
       const veiculo = await db
         .select({

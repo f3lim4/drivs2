@@ -18,6 +18,7 @@ import {
   ObjectStorageService,
   ObjectNotFoundError,
 } from "./objectStorage";
+import { gerarPagamentosParaAluguel } from "./pagamentos-automaticos";
 
 // Declaração de tipos para sessão
 declare module 'express-session' {
@@ -1380,17 +1381,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contrato = await storage.createContrato(dadosNormalizados);
       console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
       
+      // 🎯 CRIAR ALUGUEL AUTOMÁTICO: Criar aluguel associado ao contrato para geração de pagamentos
+      try {
+        console.log('[AUTO-ALUGUEL] Criando aluguel automático para o contrato...');
+        
+        // Buscar motorista pelo nome para obter o ID
+        const motoristas = await storage.getAllMotoristas();
+        const motorista = motoristas.find(m => m.nome === result.data.cliente);
+        
+        if (motorista) {
+          // Calcular período de contrato (em meses) - padrão 12 meses se não especificado
+          const dataInicio = new Date(dadosNormalizados.dataInicio);
+          const dataFim = dadosNormalizados.dataFim 
+            ? new Date(dadosNormalizados.dataFim) 
+            : new Date(dataInicio.getFullYear(), dataInicio.getMonth() + 12, dataInicio.getDate());
+          
+          const meses = Math.ceil((dataFim.getTime() - dataInicio.getTime()) / (1000 * 60 * 60 * 24 * 30));
+          
+          // Converter valor semanal para mensal (4.35 semanas por mês)
+          const valorSemanal = parseFloat(result.data.valorSemanal || '0');
+          const valorMensal = valorSemanal * 4.35;
+          const valorTotal = valorMensal * meses;
+          
+          const aluguelData = {
+            id: crypto.randomUUID(),
+            locadoraId: result.data.locadoraId,
+            motoristaId: motorista.id,
+            veiculoId: result.data.veiculoId,
+            dataInicio: dadosNormalizados.dataInicio,
+            dataFim: dataFim.toISOString().split('T')[0],
+            tempoContrato: meses,
+            valorMensal: valorMensal.toFixed(2),
+            valorTotal: valorTotal.toFixed(2),
+            caucao: result.data.caucao || '0',
+            taxaAdministrativa: '0',
+            status: 'ativo', // Definir como ativo para permitir geração de pagamentos
+            observacoes: `Aluguel criado automaticamente para contrato ${contrato.id}`
+          };
+          
+          const aluguel = await storage.createAluguel(aluguelData);
+          console.log(`[AUTO-ALUGUEL] Aluguel criado com sucesso: ${aluguel.id}`);
+        } else {
+          console.warn(`[AUTO-ALUGUEL] Motorista '${result.data.cliente}' não encontrado - aluguel não criado`);
+        }
+      } catch (error) {
+        console.error('[AUTO-ALUGUEL] Erro ao criar aluguel automático:', error);
+        // Não falha a criação do contrato, apenas log do erro
+      }
+      
       // 🎯 REGRA DE NEGÓCIO: Atualizar status automaticamente após criação do contrato
       try {
         console.log('[STATUS-UPDATE] Aplicando regras de negócio...');
         
-        // 1. Atualizar veículo para status "alugado"
+        // 1. Ativar contrato recém-criado para permitir geração de pagamentos
+        await storage.updateContrato(contrato.id, { status: 'ativo' });
+        console.log(`[STATUS-UPDATE] Contrato ${contrato.id} → status: ativo`);
+        
+        // 2. Atualizar veículo para status "alugado"
         if (result.data.veiculoId) {
           await storage.updateVeiculo(result.data.veiculoId, { status: 'alugado' });
           console.log(`[STATUS-UPDATE] Veículo ${result.data.veiculoId} → status: alugado`);
         }
         
-        // 2. Buscar motorista pelo nome e atualizar para status "ativo"
+        // 3. Buscar motorista pelo nome e atualizar para status "ativo"
         const motoristas = await storage.getAllMotoristas();
         const motorista = motoristas.find(m => m.nome === result.data.cliente);
         if (motorista) {
@@ -1401,6 +1454,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         console.log('[STATUS-UPDATE] Regras de negócio aplicadas com sucesso');
+        
+        // 🎯 GERAR PAGAMENTOS AUTOMÁTICOS após contrato estar ativo
+        try {
+          console.log('[AUTO-PAGAMENTOS] Gerando pagamentos automáticos iniciais...');
+          // Buscar aluguel criado para este contrato
+          const alugueis = await storage.getAllAlugueis();
+          const aluguelContrato = alugueis.find(a => 
+            a.veiculoId === result.data.veiculoId && 
+            a.locadoraId === result.data.locadoraId &&
+            a.status === 'ativo'
+          );
+          
+          if (aluguelContrato) {
+            await gerarPagamentosParaAluguel(aluguelContrato.id);
+            console.log(`[AUTO-PAGAMENTOS] Pagamentos gerados para aluguel: ${aluguelContrato.id}`);
+          } else {
+            console.warn('[AUTO-PAGAMENTOS] Aluguel relacionado não encontrado');
+          }
+        } catch (error) {
+          console.error('[AUTO-PAGAMENTOS] Erro ao gerar pagamentos:', error);
+          // Não falha a criação do contrato
+        }
+        
       } catch (error) {
         console.error('[STATUS-UPDATE] Erro ao aplicar regras de negócio:', error);
         // Não falha a criação do contrato, apenas log do erro
