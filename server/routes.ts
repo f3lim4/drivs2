@@ -1751,53 +1751,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contrato = await storage.createContrato(secureContratoData);
       console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
       
-      // 🎯 CRIAR ALUGUEL AUTOMÁTICO: Criar aluguel associado ao contrato para geração de pagamentos
-      try {
-        console.log('[AUTO-ALUGUEL] Criando aluguel automático para o contrato...');
-        
-        // Buscar motorista pelo nome para obter o ID
-        const motoristas = await storage.getAllMotoristas();
-        const motorista = motoristas.find(m => m.nome === result.data.cliente);
-        
-        if (motorista) {
-          // Calcular período de contrato (em meses) - padrão 12 meses se não especificado
-          const dataInicio = new Date(dadosNormalizados.dataInicio);
-          const dataFim = dadosNormalizados.dataFim 
-            ? new Date(dadosNormalizados.dataFim) 
-            : new Date(dataInicio.getFullYear(), dataInicio.getMonth() + 12, dataInicio.getDate());
-          
-          const meses = Math.ceil((dataFim.getTime() - dataInicio.getTime()) / (1000 * 60 * 60 * 24 * 30));
-          
-          // Converter valor semanal para mensal (4.35 semanas por mês)
-          const valorSemanal = parseFloat(result.data.valorSemanal || '0');
-          const valorMensal = valorSemanal * 4.35;
-          const valorTotal = valorMensal * meses;
-          
-          const aluguelData = {
-            id: crypto.randomUUID(),
-            locadoraId: result.data.locadoraId,
-            motoristaId: motorista.id,
-            veiculoId: result.data.veiculoId,
-            dataInicio: dadosNormalizados.dataInicio,
-            dataFim: dataFim.toISOString().split('T')[0],
-            tempoContrato: meses,
-            valorMensal: valorMensal.toFixed(2),
-            valorTotal: valorTotal.toFixed(2),
-            caucao: result.data.caucao || '0',
-            taxaAdministrativa: '0',
-            status: 'ativo', // Definir como ativo para permitir geração de pagamentos
-            observacoes: `Aluguel criado automaticamente para contrato ${contrato.id}`
-          };
-          
-          const aluguel = await storage.createAluguel(aluguelData);
-          console.log(`[AUTO-ALUGUEL] Aluguel criado com sucesso: ${aluguel.id}`);
-        } else {
-          console.warn(`[AUTO-ALUGUEL] Motorista '${result.data.cliente}' não encontrado - aluguel não criado`);
-        }
-      } catch (error) {
-        console.error('[AUTO-ALUGUEL] Erro ao criar aluguel automático:', error);
-        // Não falha a criação do contrato, apenas log do erro
-      }
+      console.log('[DEBUG] Contrato criado - aluguel já existe, não criando duplicado');
       
       // 🎯 REGRA DE NEGÓCIO: Atualizar status automaticamente após criação do contrato
       try {
