@@ -1342,7 +1342,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message += `Veículo ID '${result.data.veiculoId}' já está ocupado por contrato ${contratoVeiculoExistente.status} com cliente '${contratoVeiculoExistente.cliente}'. `;
         }
         if (aluguelAtivo) {
-          message += `Cliente possui aluguel ativo. `;
+          message += `O motorista "${result.data.cliente}" já possui um aluguel ativo (ID: ${aluguelAtivo.id}). Para criar um novo contrato, primeiro encerre o aluguel atual na seção Aluguéis ou escolha outro motorista. `;
         }
         
         return res.status(400).json({ 
