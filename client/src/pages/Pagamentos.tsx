@@ -989,16 +989,10 @@ export default function Pagamentos() {
                         <div className="text-xs text-muted-foreground">
                           {(pagamento as any).veiculoMarca} {(pagamento as any).veiculoModelo}
                         </div>
-                        <div className="mt-1">
-                          {getStatusContratoBadge(getStatusContrato(pagamento))}
-                        </div>
                       </div>
                     ) : (
                       <div>
                         <div className="text-sm text-muted-foreground">-</div>
-                        <div className="mt-1">
-                          {getStatusContratoBadge(getStatusContrato(pagamento))}
-                        </div>
                       </div>
                     )}
                   </TableCell>
