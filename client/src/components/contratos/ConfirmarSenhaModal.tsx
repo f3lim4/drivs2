@@ -100,10 +100,10 @@ export function ConfirmarSenhaModal({
               </div>
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
                 Este contrato possui <span className="font-semibold">{pagamentosAssociados} pagamento(s)</span> registrado(s). 
-                Estes registros financeiros serão <span className="font-semibold text-red-600 dark:text-red-400">permanentemente excluídos</span> junto com o contrato.
+                Os registros financeiros serão <span className="font-semibold text-green-600 dark:text-green-400">preservados</span> para manter o histórico.
               </p>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
-                <span className="font-semibold">Recomendação:</span> Considere cancelar o contrato para preservar o histórico financeiro.
+              <p className="text-sm text-green-700 dark:text-green-300 mt-2">
+                <span className="font-semibold">ℹ️ Informação:</span> O histórico de pagamentos será mantido para análises futuras e relatórios financeiros.
               </p>
             </div>
           )}
