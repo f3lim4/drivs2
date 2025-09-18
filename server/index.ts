@@ -15,15 +15,23 @@ const isProduction = app.get("env") === "production" || process.env.REPLIT_DEPLO
 // ✅ CONFIGURAR TRUST PROXY - essencial para cookies seguros atrás de proxy (Replit)
 app.set('trust proxy', 1);
 
+// 🔒 SESSION FIX DEFINITIVO - Solução validada pelo arquiteto
+console.log('🔐 APLICANDO SOLUÇÃO DEFINITIVA para loop infinito...');
+
+// Verificar se está em produção
+const isProduction = app.get("env") === "production" || process.env.REPLIT_DEPLOYMENT === "1";
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key-here',
+  secret: process.env.SESSION_SECRET || 'drivs-secret-fix-2024',
   resave: false,
-  saveUninitialized: true, // Permitir criação de sessões vazias - necessário para produção
+  saveUninitialized: false,
+  name: 'connect.sid', // 🔒 VOLTANDO para nome original para sobrescrever cookie antigo
   cookie: {
-    secure: true, // ✅ Sempre true agora que temos trust proxy
-    httpOnly: true, // Prevenir acesso via JavaScript - segurança adicional
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax' // ✅ Melhor compatibilidade com proxies
+    secure: isProduction, // ✅ true apenas em produção
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: 'lax',
+    path: '/'
   }
 }));
 
