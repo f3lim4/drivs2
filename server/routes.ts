@@ -2100,10 +2100,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isAdmin: accessValidation.isAdmin 
       });
       
+      // Buscar aluguéis relacionados ao contrato
+      let aluguelRelacionado: any = null;
+      
       if (contrato) {
-        // Buscar aluguéis relacionados ao contrato
         const alugueis = await storage.getAlugueisByLocadora(contrato.locadoraId);
-        const aluguelRelacionado = alugueis.find(a => 
+        aluguelRelacionado = alugueis.find(a => 
           a.motoristaNome === contrato.cliente || 
           (contrato.titulo && contrato.titulo?.includes(a.veiculoPlaca || ''))
         );
