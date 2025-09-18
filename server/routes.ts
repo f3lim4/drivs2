@@ -2039,14 +2039,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // ✅ MANTER HISTÓRICO: Pagamentos NÃO são excluídos quando contrato é removido
-      // Isso preserva o histórico financeiro e permite análises retroativas
-      if (contrato) {
-        console.log(`[CONTRACT DELETE] Preservando histórico de pagamentos do contrato: ${contrato.id}`);
-        console.log(`[CONTRACT DELETE] Os pagamentos existentes permanecerão para análise histórica`);
+      // 🗑️ EXCLUIR PAGAMENTOS: Excluir pagamentos relacionados ao contrato (DETERMINÍSTICO E SEGURO)
+      if (contrato && aluguelRelacionado) {
+        console.log(`[CONTRACT DELETE] Excluindo pagamentos do aluguel específico: ${aluguelRelacionado.id}`);
         
-        // Opcional: Marcar algum flag nos pagamentos para indicar que o contrato foi excluído
-        // Por enquanto, apenas preservamos os dados existentes
+        // 🔒 SEGURANÇA: Buscar pagamentos apenas da locadora (tenant isolation)
+        const pagamentos = await storage.getPagamentosByLocadora(contrato.locadoraId);
+        
+        // 🔒 SEGURANÇA: Excluir APENAS pagamentos do aluguel específico relacionado ao contrato
+        const pagamentosRelacionados = pagamentos.filter(p => 
+          p.aluguelId === aluguelRelacionado.id
+        );
+        
+        // Excluir cada pagamento relacionado
+        for (const pagamento of pagamentosRelacionados) {
+          console.log(`[CONTRACT DELETE] Excluindo pagamento: ${pagamento.id} - Valor: R$ ${pagamento.valorTotal}`);
+          await storage.deletePagamento(pagamento.id);
+        }
+        
+        console.log(`[CONTRACT DELETE] ${pagamentosRelacionados.length} pagamentos excluídos com sucesso`);
+      } else if (contrato) {
+        console.log(`[CONTRACT DELETE] Nenhum aluguel relacionado encontrado - pagamentos não foram excluídos`);
       }
       
       // Excluir o contrato
