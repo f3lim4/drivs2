@@ -37,10 +37,20 @@ export function useAuth() {
                 console.log('✅ Sessão restaurada no servidor para:', profile.email);
               } else {
                 console.warn('❌ Falha ao restaurar sessão no servidor:', response.status);
+                // 🔒 SECURITY FIX: Se sessão está quebrada (401), limpar localStorage e forçar login
+                if (response.status === 401) {
+                  console.log('🔧 Sessão inválida detectada, limpando dados locais...');
+                  localStorage.removeItem('drivs_profile');
+                  setProfile(null); // Isso vai triggerar o AuthGuard para redirecionar para login
+                }
               }
             })
             .catch(error => {
               console.warn('❌ Erro ao restaurar sessão no servidor:', error);
+              // Em caso de erro de rede, também limpar para forçar novo login
+              console.log('🔧 Erro de rede, limpando dados locais para segurança...');
+              localStorage.removeItem('drivs_profile');
+              setProfile(null);
             });
         } else {
           // Profile inválido, remove mas não redireciona
