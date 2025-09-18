@@ -100,11 +100,10 @@ export function ConfirmarSenhaModal({
               </div>
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
                 Este contrato possui <span className="font-semibold">{pagamentosAssociados} pagamento(s)</span> registrado(s). 
-                Estes registros financeiros serão <span className="font-semibold">preservados</span> para histórico, 
-                mas as informações do veículo podem ficar desatualizadas nos relatórios.
+                Estes registros financeiros serão <span className="font-semibold text-red-600 dark:text-red-400">permanentemente excluídos</span> junto com o contrato.
               </p>
               <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-2">
-                <span className="font-semibold">Recomendação:</span> Considere cancelar o contrato ao invés de excluí-lo.
+                <span className="font-semibold">Recomendação:</span> Considere cancelar o contrato para preservar o histórico financeiro.
               </p>
             </div>
           )}
