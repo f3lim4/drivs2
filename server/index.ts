@@ -18,9 +18,6 @@ app.set('trust proxy', 1);
 // 🔒 SESSION FIX DEFINITIVO - Solução validada pelo arquiteto
 console.log('🔐 APLICANDO SOLUÇÃO DEFINITIVA para loop infinito...');
 
-// Verificar se está em produção
-const isProduction = app.get("env") === "production" || process.env.REPLIT_DEPLOYMENT === "1";
-
 app.use(session({
   secret: process.env.SESSION_SECRET || 'drivs-secret-fix-2024',
   resave: false,
