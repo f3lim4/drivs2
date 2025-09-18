@@ -531,23 +531,6 @@ export function NovoContratoModal({
     }
     
     try {
-      console.log('[FORM DEBUG] Dados do formulário recebidos:', data);
-      console.log('[MOTORISTA ID DEBUG] ID do motorista no formulário:', data.motoristaId);
-      console.log('[MOTORISTA ID DEBUG] Lista de motoristas disponível:', motoristas.map(m => ({ id: m.id, nome: m.nome })));
-      console.log('[MOTORISTA ID DEBUG] Verificando se motorista existe na lista...');
-      
-      // Verifica se o motoristaId existe na lista de motoristas
-      const motoristaEncontrado = motoristas.find(m => m.id === data.motoristaId);
-      if (!motoristaEncontrado) {
-        console.error('[MOTORISTA ID ERROR] Motorista com ID', data.motoristaId, 'não encontrado na lista!');
-        throw new Error(`Motorista com ID ${data.motoristaId} não encontrado na lista`);
-      } else {
-        console.log('[MOTORISTA ID SUCCESS] Motorista encontrado:', { id: motoristaEncontrado.id, nome: motoristaEncontrado.nome });
-      }
-      
-      console.log('[FORM DEBUG] Checkbox pagamento recorrente:', data.pagamentoRecorrente);
-      console.log('[FORM DEBUG] Data primeiro pagamento:', data.dataPrimeiroPagamento);
-      console.log('[FORM DEBUG] Recorrência:', data.recorrencia);
       console.log('Iniciando envio do formulário com dados:', data);
       
       let aluguel;
@@ -1059,11 +1042,7 @@ ____________________________________        ____________________________________
                     <FormItem>
                       <FormLabel>Motorista Disponível *</FormLabel>
                       <Select 
-                        onValueChange={(value) => {
-                          console.log('[SELECT MOTORISTA] Valor selecionado:', value);
-                          console.log('[SELECT MOTORISTA] Motorista selecionado encontrado na lista:', motoristas.find(m => m.id === value));
-                          field.onChange(value);
-                        }} 
+                        onValueChange={field.onChange} 
                         defaultValue={field.value}
                       >
                         <FormControl>
@@ -1073,21 +1052,18 @@ ____________________________________        ____________________________________
                         </FormControl>
                         <SelectContent>
                           {motoristas.length > 0 ? (
-                            motoristas.map((motorista) => {
-                              console.log('[DEBUG MOTORISTA] Renderizando:', { id: motorista.id, nome: motorista.nome });
-                              return (
-                                <SelectItem key={motorista.id} value={motorista.id}>
-                                  <div className="flex flex-col">
-                                    <span className="font-medium">
-                                      {motorista.nome}
-                                    </span>
-                                    <span className="text-sm text-muted-foreground">
-                                      CPF: {motorista.id}
-                                    </span>
-                                  </div>
-                                </SelectItem>
-                              );
-                            })
+                            motoristas.map((motorista) => (
+                              <SelectItem key={motorista.id} value={motorista.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {motorista.nome}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">
+                                    CPF: {motorista.id}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))
                           ) : (
                             <SelectItem value="none" disabled>
                               {loadingData ? "Carregando motoristas..." : "Nenhum motorista disponível. Cadastre um motorista com CNH válida primeiro."}
