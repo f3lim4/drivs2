@@ -1993,6 +1993,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint específico para cancelamento de contratos (preserva histórico)
+  app.put("/api/contratos/:id/cancelar", async (req, res) => {
+    try {
+      // 🔒 SECURITY: Verify ownership before allowing cancellation
+      const existingContrato = await storage.getContrato(req.params.id);
+      if (!existingContrato) {
+        return res.status(404).json({ message: "Contrato não encontrado" });
+      }
+
+      const accessValidation = validateLocadoraAccess(req, existingContrato.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] PUT /api/contratos/:id/cancelar - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        contratoId: req.params.id,
+        contratoLocadoraId: existingContrato.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+
+      const { motivo } = req.body;
+      
+      if (!motivo || motivo.trim().length === 0) {
+        return res.status(400).json({ message: "Motivo do cancelamento é obrigatório" });
+      }
+
+      // Validar se o contrato pode ser cancelado
+      if (existingContrato.status === 'cancelado') {
+        return res.status(400).json({ message: "Contrato já está cancelado" });
+      }
+      
+      if (existingContrato.status === 'encerrado') {
+        return res.status(400).json({ message: "Contrato já está encerrado e não pode ser cancelado" });
+      }
+
+      // Cancelar contrato (preserva histórico de pagamentos)
+      const contratoCancelado = await storage.updateContrato(req.params.id, {
+        status: 'cancelado',
+        motivoCancelamento: motivo.trim(),
+        updatedAt: new Date().toISOString()
+      });
+
+      console.log(`[CONTRATO CANCELADO] ID: ${req.params.id}, Motivo: ${motivo}`);
+
+      // 🎯 REGRA DE NEGÓCIO: Aplicar mudanças de status automaticamente
+      try {
+        // 1. Atualizar veículo para "disponivel" 
+        if (contratoCancelado.veiculoId) {
+          await storage.updateVeiculo(contratoCancelado.veiculoId, { status: 'disponivel' });
+          console.log(`[CANCELAMENTO] Veículo ${contratoCancelado.veiculoId} → status: disponivel`);
+        }
+        
+        // 2. Buscar motorista e atualizar status para aprovado (preserva histórico)
+        const motoristas = await storage.getAllMotoristas();
+        const motorista = motoristas.find(m => m.nome === contratoCancelado.cliente);
+        
+        if (motorista) {
+          await storage.updateMotorista(motorista.id, { status: 'aprovado' });
+          console.log(`[CANCELAMENTO] Motorista ${motorista.nome} (${motorista.id}) → status: aprovado`);
+        } else {
+          console.warn(`[CANCELAMENTO] Motorista '${contratoCancelado.cliente}' não encontrado`);
+        }
+        
+        console.log(`[CANCELAMENTO] Regras de negócio aplicadas - contrato cancelado, histórico preservado`);
+      } catch (error) {
+        console.error('[CANCELAMENTO] Erro ao aplicar regras de negócio:', error);
+      }
+
+      res.json({ 
+        message: "Contrato cancelado com sucesso",
+        contrato: contratoCancelado,
+        preservaHistorico: true
+      });
+    } catch (error) {
+      console.error("Error canceling contrato:", error);
+      res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
   app.delete("/api/contratos/:id", async (req, res) => {
     try {
       // 🔒 SECURITY: Verify ownership before allowing deletion
