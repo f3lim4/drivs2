@@ -23,7 +23,6 @@ export function useAlugueis() {
       if (!response.ok) throw new Error('Failed to fetch alugueis');
       
       const data = await response.json();
-      console.log('[DEBUG ALUGUEIS] Dados recebidos da API:', data);
       
       return data as Aluguel[];
     },
@@ -71,15 +70,12 @@ export function useAlugueis() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      console.log('Tentando excluir aluguel:', { id, locadoraId });
-      
       const response = await fetch(`/api/alugueis/${id}`, {
         method: 'DELETE',
       });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Erro ao excluir aluguel:', errorData);
         throw new Error('Failed to delete aluguel');
       }
       return response.json();
