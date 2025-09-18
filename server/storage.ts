@@ -1,5 +1,5 @@
 import { 
-  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, pagamentosExcluidos, documentosVeiculos, documentosMotorista, notificacoes,
+  users, profiles, locadoras, veiculos, motoristas, alugueis, contratos, templateContratos, pagamentos, infracoes, despesas, manutencoes, locais, anuncios, atividades, seoConfig, documentosVeiculos, documentosMotorista, notificacoes,
   type User, type InsertUser,
   type Profile, type InsertProfile,
   type Locadora, type InsertLocadora,
@@ -1184,15 +1184,6 @@ export class DatabaseStorage implements IStorage {
       const rowsAffected = result.rowCount || result.changes || 0;
       console.log(`[STORAGE] Pagamento excluído do banco, linhas afetadas: ${rowsAffected}`);
       
-      // Se a exclusão foi bem-sucedida e o pagamento era automático, registrar na tabela de exclusões
-      if (rowsAffected > 0 && pagamento.automatico) {
-        console.log(`[STORAGE] Registrando exclusão manual de pagamento automático: ${id}`);
-        await this.registrarExclusaoManual(
-          pagamento.locadoraId, 
-          pagamento.aluguelId, 
-          pagamento.dataPagamento
-        );
-      }
       
       return rowsAffected > 0;
     } catch (error) {
@@ -1201,71 +1192,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async registrarExclusaoManual(locadoraId: string, aluguelId: string | null, dataPagamento: string): Promise<void> {
-    try {
-      await db.insert(pagamentosExcluidos).values({
-        id: crypto.randomUUID(),
-        locadoraId,
-        aluguelId,
-        dataPagamento,
-        motivo: 'exclusao_manual',
-        usuarioId: null, // Pode ser expandido no futuro
-      });
-      
-      console.log(`[STORAGE] Exclusão registrada: locadora ${locadoraId}, aluguel ${aluguelId}, data ${dataPagamento}`);
-    } catch (error) {
-      console.error(`[STORAGE] Erro ao registrar exclusão manual:`, error);
-      // Não interrompe o fluxo se falhar
-    }
-  }
 
-  // AUDIT TRAIL: Comprehensive audit trail method for payment deletion  
-  async createPagamentoExcluido(dadosExclusao: {
-    pagamentoId: string;
-    aluguelId: string | null;
-    motoristaId: string;
-    locadoraId: string;
-    dataPagamento: string;
-    valorTotal: string;
-    valorPago: string;
-    valorRestante: string;
-    status: string;
-    tipo: string;
-    descricao: string | null;
-    observacoes: string | null;
-    automatico: boolean;
-    codigoPagamento: string | null;
-    dataExclusao: string;
-    motivoExclusao: string;
-  }): Promise<void> {
-    try {
-      await db.insert(pagamentosExcluidos).values({
-        id: crypto.randomUUID(),
-        pagamentoId: dadosExclusao.pagamentoId,
-        locadoraId: dadosExclusao.locadoraId,
-        aluguelId: dadosExclusao.aluguelId,
-        motoristaId: dadosExclusao.motoristaId,
-        dataPagamento: dadosExclusao.dataPagamento,
-        valorTotal: dadosExclusao.valorTotal,
-        valorPago: dadosExclusao.valorPago,
-        valorRestante: dadosExclusao.valorRestante,
-        status: dadosExclusao.status,
-        tipo: dadosExclusao.tipo,
-        descricao: dadosExclusao.descricao,
-        observacoes: dadosExclusao.observacoes,
-        automatico: dadosExclusao.automatico,
-        codigoPagamento: dadosExclusao.codigoPagamento,
-        motivo: dadosExclusao.motivoExclusao,
-        dataExclusao: dadosExclusao.dataExclusao,
-        usuarioId: null
-      });
-      
-      console.log(`[AUDIT TRAIL] Comprehensive payment deletion record created for payment: ${dadosExclusao.pagamentoId}`);
-    } catch (error) {
-      console.error(`[AUDIT TRAIL ERROR] Failed to create comprehensive audit record:`, error);
-      // Don't throw error to avoid breaking deletion flow
-    }
-  }
 
   async getAluguelValorSemanal(aluguelId: string): Promise<number | undefined> {
     const result = await db.select({
