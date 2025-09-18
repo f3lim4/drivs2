@@ -241,17 +241,6 @@ export const templateContratos = pgTable("template_contratos", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Tabela para rastrear pagamentos excluídos manualmente
-export const pagamentosExcluidos = pgTable("pagamentos_excluidos", {
-  id: text("id").primaryKey(),
-  locadoraId: text("locadora_id").notNull(),
-  aluguelId: text("aluguel_id"),
-  dataPagamento: date("data_pagamento").notNull(),
-  motivo: text("motivo").default("exclusao_manual").notNull(),
-  usuarioId: text("usuario_id"), // Quem excluiu
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,

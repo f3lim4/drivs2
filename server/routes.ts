@@ -2521,31 +2521,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`[DELETE PAGAMENTO] Pagamento encontrado, locadora: ${pagamentoExistente.locadoraId}`);
       
-      // AUDIT TRAIL: Write to pagamentosExcluidos table before deletion
-      try {
-        await storage.createPagamentoExcluido({
-          pagamentoId: pagamentoExistente.id,
-          aluguelId: pagamentoExistente.aluguelId,
-          motoristaId: pagamentoExistente.motoristaId,
-          locadoraId: pagamentoExistente.locadoraId,
-          dataPagamento: pagamentoExistente.dataPagamento,
-          valorTotal: pagamentoExistente.valorTotal,
-          valorPago: pagamentoExistente.valorPago,
-          valorRestante: pagamentoExistente.valorRestante,
-          status: pagamentoExistente.status,
-          tipo: pagamentoExistente.tipo,
-          descricao: pagamentoExistente.descricao,
-          observacoes: pagamentoExistente.observacoes,
-          automatico: pagamentoExistente.automatico,
-          codigoPagamento: pagamentoExistente.codigoPagamento,
-          dataExclusao: new Date().toISOString(),
-          motivoExclusao: 'Exclusão manual via interface administrativa'
-        });
-        console.log(`[AUDIT] Pagamento registrado em pagamentosExcluidos: ${pagamentoId}`);
-      } catch (auditError) {
-        console.error(`[AUDIT ERROR] Falha ao registrar exclusão: ${auditError}`);
-        // Continue with deletion even if audit trail fails
-      }
       
       // Delete the pagamento
       const deleted = await storage.deletePagamento(pagamentoId);

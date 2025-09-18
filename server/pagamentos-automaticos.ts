@@ -1,6 +1,6 @@
 // Sistema de Pagamentos Automáticos para Aluguéis Ativos
 import { db } from './db';
-import { contratos, pagamentos, alugueis, pagamentosExcluidos, motoristas, veiculos } from '../shared/schema';
+import { contratos, pagamentos, alugueis, motoristas, veiculos } from '../shared/schema';
 import { eq, and, desc, or } from 'drizzle-orm';
 import crypto from 'crypto';
 
@@ -221,21 +221,6 @@ const criarPagamentoAutomatico = async (aluguel: any, dataVencimento: Date) => {
       return;
     }
 
-    // Verificar se este pagamento foi excluído manualmente
-    const foiExcluidoManualmente = await db
-      .select()
-      .from(pagamentosExcluidos)
-      .where(and(
-        eq(pagamentosExcluidos.aluguelId, aluguel.id),
-        eq(pagamentosExcluidos.locadoraId, aluguel.locadoraId),
-        eq(pagamentosExcluidos.dataPagamento, dataFormatada)
-      ))
-      .limit(1);
-
-    if (foiExcluidoManualmente.length > 0) {
-      console.log(`[SKIP] Pagamento foi excluído manualmente para aluguel ${aluguel.id} em ${dataVencimento.toDateString()}`);
-      return;
-    }
 
     // Buscar informações do veículo para preservar no pagamento
     let veiculoInfo: { id: string | null, placa: string | null, marca: string | null, modelo: string | null } = { 
