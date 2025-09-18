@@ -1687,9 +1687,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message += `O motorista "${result.data.cliente}" já possui um aluguel ativo (ID: ${aluguelAtivo.id}). Para criar um novo contrato, primeiro encerre o aluguel atual na seção Aluguéis ou escolha outro motorista. `;
         }
         
+        // 🎯 ENHANCED ERROR: Provide actionable information for frontend buttons
         return res.status(400).json({ 
           message: message.trim(),
+          errorType: "DUPLICATE_CONTRACT",
+          actionable: true,
           motorista: result.data.cliente,
+          existingContract: contratoClienteExistente || null,
+          existingVehicleContract: contratoVeiculoExistente || null,
+          existingRental: aluguelAtivo || null,
+          suggestions: [
+            {
+              action: "VIEW_RENTALS",
+              label: "Ir para Aluguéis",
+              description: "Ver aluguel ativo do motorista",
+              enabled: !!aluguelAtivo
+            },
+            {
+              action: "CHANGE_DRIVER", 
+              label: "Trocar Motorista",
+              description: "Escolher outro motorista disponível",
+              enabled: true
+            },
+            {
+              action: "VIEW_CONTRACTS",
+              label: "Ver Contratos",
+              description: "Gerenciar contratos existentes",
+              enabled: !!(contratoClienteExistente || contratoVeiculoExistente)
+            }
+          ],
           veiculo: result.data.veiculoId,
           contratoClienteExistente: !!contratoClienteExistente,
           contratoVeiculoExistente: !!contratoVeiculoExistente,

@@ -21,6 +21,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Form,
   FormControl,
   FormField,
@@ -320,6 +330,7 @@ export function NovoContratoModal({
   const [motoristas, setMotoristas] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [contratoGerado, setContratoGerado] = useState(false);
+  const [duplicateContractError, setDuplicateContractError] = useState<any>(null);
   const processandoRef = useRef(false); // Proteção adicional via ref
   const { profile } = useAuth();
   
@@ -336,6 +347,36 @@ export function NovoContratoModal({
   
   // Hook para gerenciar contratos
   const { createContrato } = useContratos();
+  
+  // 🎯 ACTION HANDLERS: Functions to handle error dialog actions
+  const handleViewRentals = () => {
+    setDuplicateContractError(null);
+    onOpenChange(false);
+    // Navigate to rentals page - assuming router navigation
+    window.location.href = '/alugueis';
+  };
+  
+  const handleChangeDriver = () => {
+    setDuplicateContractError(null);
+    // Clear the current driver selection to allow user to choose another
+    form.setValue('motoristaId', '');
+    toast({
+      title: "Motorista limpo",
+      description: "Selecione outro motorista disponível para continuar.",
+      duration: 3000,
+    });
+  };
+  
+  const handleViewContracts = () => {
+    setDuplicateContractError(null);
+    onOpenChange(false);
+    // Navigate to contracts page
+    window.location.href = '/contratos';
+  };
+  
+  const handleCloseErrorDialog = () => {
+    setDuplicateContractError(null);
+  };
   
   // Hook para gerenciar templates
   const { templates } = useTemplateContratos();
@@ -955,11 +996,21 @@ ____________________________________        ____________________________________
       console.error('[FRONTEND] Stack trace:', error.stack);
       console.error('[FRONTEND] Mensagem do erro:', error.message);
       console.error('[FRONTEND] Response error:', error.response);
-      toast({
-        title: "Erro",
-        description: error.message || "Erro ao criar contrato. Tente novamente.",
-        variant: "destructive",
-      });
+      
+      // 🎯 ENHANCED ERROR HANDLING: Check if error is actionable
+      const errorData = error.response?.data || error;
+      
+      if (errorData.errorType === "DUPLICATE_CONTRACT" && errorData.actionable) {
+        // Show enhanced error with action buttons
+        setDuplicateContractError(errorData);
+      } else {
+        // Show regular error toast
+        toast({
+          title: "Erro",
+          description: error.message || "Erro ao criar contrato. Tente novamente.",
+          variant: "destructive",
+        });
+      }
     } finally {
       // Reset do ref em caso de erro
       processandoRef.current = false;
@@ -976,6 +1027,7 @@ ____________________________________        ____________________________________
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] sm:max-w-[800px] max-w-[800px] max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-6">
         <DialogHeader className="pb-3 sm:pb-6">
@@ -1440,5 +1492,46 @@ ____________________________________        ____________________________________
         )}
       </DialogContent>
     </Dialog>
+
+    {/* 🎯 ENHANCED ERROR DIALOG: Show actionable error with buttons */}
+    <AlertDialog open={!!duplicateContractError} onOpenChange={handleCloseErrorDialog}>
+      <AlertDialogContent data-testid="duplicate-contract-error-dialog">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-destructive">Contrato não pode ser criado</AlertDialogTitle>
+          <AlertDialogDescription className="text-base">
+            {duplicateContractError?.message}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+          {duplicateContractError?.suggestions?.map((suggestion: any, index: number) => (
+            suggestion.enabled && (
+              <AlertDialogAction
+                key={index}
+                onClick={() => {
+                  if (suggestion.action === "VIEW_RENTALS") {
+                    handleViewRentals();
+                  } else if (suggestion.action === "CHANGE_DRIVER") {
+                    handleChangeDriver();
+                  } else if (suggestion.action === "VIEW_CONTRACTS") {
+                    handleViewContracts();
+                  }
+                }}
+                className={index === 0 ? "bg-primary hover:bg-primary/90" : "bg-secondary hover:bg-secondary/90"}
+                data-testid={`button-${suggestion.action.toLowerCase().replace('_', '-')}`}
+              >
+                {suggestion.label}
+              </AlertDialogAction>
+            )
+          ))}
+          <AlertDialogCancel 
+            onClick={handleCloseErrorDialog}
+            data-testid="button-close-error"
+          >
+            Fechar
+          </AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
