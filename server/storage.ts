@@ -2500,6 +2500,13 @@ export class MemStorage implements IStorage {
   }
 
   async deleteAluguel(id: string): Promise<void> {
+    // Primeiro, excluir todos os pagamentos associados ao aluguel
+    console.log(`[MEM DELETE ALUGUEL] Excluindo pagamentos do aluguel: ${id}`);
+    const pagamentosParaExcluir = Array.from(this.pagamentosMap.values()).filter(p => p.aluguelId === id);
+    pagamentosParaExcluir.forEach(p => this.pagamentosMap.delete(p.id));
+    
+    // Depois excluir o aluguel
+    console.log(`[MEM DELETE ALUGUEL] Excluindo aluguel: ${id}`);
     this.alugueisMap.delete(id);
   }
 
