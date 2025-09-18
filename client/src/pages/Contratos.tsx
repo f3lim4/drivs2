@@ -32,7 +32,7 @@ import { EditarContratoModal } from '@/components/contratos/EditarContratoModal'
 import { UploadTemplateModal } from '@/components/contratos/UploadTemplateModal';
 import { TemplatesModal } from '@/components/contratos/TemplatesModal';
 import { UploadContratoModal } from '@/components/contratos/UploadContratoModal';
-import { ConfirmarSenhaModal } from '@/components/contratos/ConfirmarSenhaModal';
+import { AcaoContratoModal } from '@/components/contratos/AcaoContratoModal';
 import { useTemplateContratos } from '@/hooks/useTemplateContratos';
 import { Contrato } from '@/types';
 import jsPDF from 'jspdf';
@@ -42,7 +42,7 @@ import { ProtectedAction } from '@/components/subscription/ProtectedAction';
 export default function Contratos() {
   const { isAdmin, isLocadora, profile } = useAuth();
   const { toast } = useToast();
-  const { contratos, isLoading, createContrato, updateContrato, deleteContrato } = useContratos();
+  const { contratos, isLoading, createContrato, updateContrato, cancelContrato, deleteContrato } = useContratos();
   const { templates, isLoading: isLoadingTemplates, deleteTemplate } = useTemplateContratos();
   
   // Buscar dados adicionais necessários para o sistema completo
@@ -66,7 +66,7 @@ export default function Contratos() {
   const [showUploadTemplateModal, setShowUploadTemplateModal] = useState(false);
   const [showTemplatesModal, setShowTemplatesModal] = useState(false);
   const [showUploadContratoModal, setShowUploadContratoModal] = useState(false);
-  const [showConfirmarSenhaModal, setShowConfirmarSenhaModal] = useState(false);
+  const [showAcaoContratoModal, setShowAcaoContratoModal] = useState(false);
   const [selectedContrato, setSelectedContrato] = useState<Contrato | null>(null);
   const [contratoParaExcluir, setContratoParaExcluir] = useState<Contrato | null>(null);
   const [pagamentosDoContrato, setPagamentosDoContrato] = useState<number>(0);
@@ -134,7 +134,7 @@ export default function Contratos() {
     }
   };
 
-  const handleExcluirContrato = async (contrato: Contrato) => {
+  const handleAcaoContrato = async (contrato: Contrato) => {
     try {
       // ✅ USAR ENDPOINT DE CONTAGEM - mais eficiente + seguro
       const response = await fetch(`/api/pagamentos/contrato/${contrato.id}/count`, {
@@ -154,10 +154,50 @@ export default function Contratos() {
     }
     
     setContratoParaExcluir(contrato);
-    setShowConfirmarSenhaModal(true);
+    setShowAcaoContratoModal(true);
   };
 
-  const handleConfirmarExclusao = async () => {
+  const handleCancelarContrato = async (motivo: string) => {
+    if (!contratoParaExcluir) return;
+    
+    try {
+      await cancelContrato.mutateAsync({ 
+        id: contratoParaExcluir.id, 
+        motivo 
+      });
+      
+      // Registrar atividade
+      try {
+        await registrarAtividade(
+          profile?.locadoraId || '',
+          profile?.email || 'usuario@drivs.me',
+          'cancelar',
+          'contrato',
+          contratoParaExcluir.id,
+          `Contrato cancelado: ${contratoParaExcluir.cliente} - Motivo: ${motivo}`
+        );
+      } catch (activityError) {
+        console.warn('Erro ao registrar atividade:', activityError);
+      }
+
+      toast({
+        title: "Contrato Cancelado",
+        description: `Contrato de ${contratoParaExcluir.cliente} foi cancelado. Histórico preservado.`,
+      });
+      
+      setShowAcaoContratoModal(false);
+      setContratoParaExcluir(null);
+    } catch (error: any) {
+      console.error('Erro ao cancelar contrato:', error);
+      toast({
+        title: "Erro",
+        description: error.message || "Não foi possível cancelar o contrato. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExcluirContrato = async () => {
     if (!contratoParaExcluir) return;
     
     try {
@@ -171,7 +211,7 @@ export default function Contratos() {
           'excluir',
           'contrato',
           contratoParaExcluir.id,
-          `Contrato excluído: ${contratoParaExcluir.cliente} - ${contratoParaExcluir.tipo}`
+          `Contrato excluído permanentemente: ${contratoParaExcluir.cliente} - ${contratoParaExcluir.tipo}`
         );
       } catch (activityError) {
         console.warn('Erro ao registrar atividade:', activityError);
@@ -179,10 +219,10 @@ export default function Contratos() {
 
       toast({
         title: "Contrato Excluído",
-        description: `Contrato de ${contratoParaExcluir.cliente} foi excluído com sucesso.`,
+        description: `Contrato de ${contratoParaExcluir.cliente} foi excluído permanentemente.`,
       });
       
-      setShowConfirmarSenhaModal(false);
+      setShowAcaoContratoModal(false);
       setContratoParaExcluir(null);
     } catch (error) {
       console.error('Erro ao excluir contrato:', error);
@@ -718,7 +758,7 @@ export default function Contratos() {
                                   <Button 
                                     variant="ghost" 
                                     size="icon"
-                                    onClick={() => handleExcluirContrato(contrato)}
+                                    onClick={() => handleAcaoContrato(contrato)}
                                     title="Excluir"
                                   >
                                     <Trash2 className="w-4 h-4" />
@@ -801,12 +841,13 @@ export default function Contratos() {
         </>
       )}
 
-      <ConfirmarSenhaModal
-        open={showConfirmarSenhaModal}
-        onOpenChange={setShowConfirmarSenhaModal}
-        onConfirm={handleConfirmarExclusao}
+      <AcaoContratoModal
+        open={showAcaoContratoModal}
+        onOpenChange={setShowAcaoContratoModal}
+        onCancelar={handleCancelarContrato}
+        onExcluir={handleExcluirContrato}
         contratoNome={contratoParaExcluir ? `${contratoParaExcluir.cliente} - ${contratoParaExcluir.tipo}` : ''}
-        loading={deleteContrato.isPending}
+        loading={cancelContrato.isPending || deleteContrato.isPending}
         pagamentosAssociados={pagamentosDoContrato}
       />
     </div>
