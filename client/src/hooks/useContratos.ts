@@ -108,7 +108,35 @@ export function useContratos() {
     },
   });
 
-  // Excluir contrato
+  // Cancelar contrato (preserva histórico)
+  const cancelContrato = useMutation({
+    mutationFn: async ({ id, motivo }: { id: string; motivo: string }) => {
+      console.log(`Cancelando contrato: ${id}, Motivo: ${motivo}`);
+      const response = await fetch(`/api/contratos/${id}/cancelar`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ motivo }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to cancel contrato');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidar cache para atualizar interface
+      queryClient.invalidateQueries({ queryKey: ['contratos', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['alugueis', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['veiculos', locadoraId] });
+      queryClient.invalidateQueries({ queryKey: ['motoristas', locadoraId] });
+    },
+  });
+
+  // Excluir contrato (remove tudo permanentemente)
   const deleteContrato = useMutation({
     mutationFn: async (id: string) => {
       console.log(`Excluindo contrato: ${id}`);
@@ -148,7 +176,8 @@ export function useContratos() {
     error,
     createContrato,
     updateContrato,
-    deleteContrato,
+    cancelContrato, // Nova função para cancelar (preserva histórico)
+    deleteContrato, // Função para excluir (remove tudo)
     clearCache, // Nova função para limpar cache
   };
 }
