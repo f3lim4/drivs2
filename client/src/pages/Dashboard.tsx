@@ -121,14 +121,6 @@ export default function Dashboard() {
   const { veiculos: veiculosRaw = [], loading: loadingVeiculos } = useVeiculos();
   const { alugueis: alugueisRaw = [], isLoading: loadingAlugueis } = useAlugueis();
 
-  // DEBUG CRÍTICO: Rastrear origem dos dados
-  console.log('🔍 [DASHBOARD DEBUG CRÍTICO] Dados brutos dos hooks:', {
-    motoristasLength: motoristasRaw.length,
-    veiculosLength: veiculosRaw.length,
-    alugueisLength: alugueisRaw.length,
-    alugueisData: alugueisRaw,
-    loadingStates: { loadingMotoristas, loadingVeiculos, loadingAlugueis }
-  });
   const { pagamentos = [], isLoading: loadingPagamentos } = usePagamentos();
   
   const { data: despesas = [], isLoading: loadingDespesas } = useQuery({
@@ -146,13 +138,6 @@ export default function Dashboard() {
   const veiculosSeguro = veiculosRaw;
   const alugueisSeguro = alugueisRaw;
 
-  // DEBUG CRÍTICO: Confirmar dados seguros
-  console.log('✅ [DASHBOARD DEBUG] Dados seguros processados:', {
-    motoristasSeguroLength: motoristasSeguro.length,
-    veiculosSeguroLength: veiculosSeguro.length,
-    alugueisSeguroLength: alugueisSeguro.length,
-    primeiroAluguel: alugueisSeguro[0] || 'NENHUM'
-  });
 
   const [, setLocation] = useLocation();
 

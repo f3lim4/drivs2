@@ -9,8 +9,6 @@ export function usePagamentos() {
   // SEGURANÇA: Usar apenas o locadoraId do perfil autenticado
   const locadoraId = profile?.locadoraId;
   
-  console.log('🚀 [PAGAMENTOS DEBUG] Profile:', profile);
-  console.log('🚀 [PAGAMENTOS DEBUG] LocadoraId usado:', locadoraId);
 
   const query = useQuery({
     queryKey: ['/api/pagamentos', locadoraId],
@@ -122,11 +120,8 @@ export function usePagamentos() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      console.log(`[FRONTEND] Tentando excluir pagamento: ${id}`);
-      
       // Buscar dados do pagamento antes de excluir para o log
       const pagamentoPrevio = query.data?.find(p => p.id === id);
-      console.log(`[FRONTEND] Pagamento encontrado para exclusão:`, pagamentoPrevio);
       
       const response = await fetch(`/api/pagamentos/${id}`, {
         method: 'DELETE',
@@ -136,17 +131,12 @@ export function usePagamentos() {
         },
       });
       
-      console.log(`[FRONTEND] Response status: ${response.status}`);
-      console.log(`[FRONTEND] Response ok: ${response.ok}`);
-      
       if (!response.ok) {
         const errorData = await response.text();
-        console.error(`[FRONTEND] Erro na exclusão:`, errorData);
         throw new Error(`Failed to delete pagamento: ${response.status} - ${errorData}`);
       }
       
       const result = await response.json();
-      console.log(`[FRONTEND] Resultado da exclusão:`, result);
       
       // Log da atividade
       try {
@@ -166,12 +156,9 @@ export function usePagamentos() {
       return { id, deleted: true };
     },
     onSuccess: (_, deletedId) => {
-      console.log(`[FRONTEND] Exclusão bem-sucedida, invalidando cache para ID: ${deletedId}`);
-      
       // ATUALIZAÇÃO OTIMISTA: Remove o pagamento da lista imediatamente
       queryClient.setQueryData(['/api/pagamentos', locadoraId], (oldData: Pagamento[] | undefined) => {
         const filtered = oldData?.filter(p => p.id !== deletedId) || [];
-        console.log(`[FRONTEND] Cache atualizado otimisticamente, ${oldData?.length || 0} -> ${filtered.length} pagamentos`);
         return filtered;
       });
       
@@ -190,13 +177,7 @@ export function usePagamentos() {
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['/api/pagamentos'] });
         queryClient.refetchQueries({ queryKey: ['/api/pagamentos', locadoraId] });
-        console.log(`[FRONTEND] Refetch adicional após delay para sincronização de deploy`);
       }, 500);
-      
-      console.log(`[FRONTEND] Todas as queries invalidadas e refetch forçado`);
-    },
-    onError: (error, deletedId) => {
-      console.error(`[FRONTEND] Erro na exclusão do pagamento ${deletedId}:`, error);
     },
   });
 

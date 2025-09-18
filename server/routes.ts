@@ -27,6 +27,7 @@ declare module 'express-session' {
       id: number;
       email: string;
       nome: string;
+      type: 'admin' | 'locadora';
       locadoraId?: string | null;
     };
   }
@@ -57,6 +58,41 @@ const PLANOS_STRIPE = {
   elite: process.env.STRIPE_PRICE_ELITE || 'price_1RzH4mA24pm0ZMwJWFKaSdz1',
   prime: process.env.STRIPE_PRICE_PRIME || 'price_1RzH52A24pm0ZMwJxexrjhoQ',
   // Infinity não tem Stripe - é preço a consultar
+};
+
+// 🔒 SECURITY: Helper function to validate locadora access based on session
+const validateLocadoraAccess = (req: any, requestedLocadoraId?: string) => {
+  const sessionUser = req.session?.user;
+  
+  // Check if user is authenticated
+  if (!sessionUser) {
+    return { authorized: false, error: 'Usuário não autenticado', status: 401 };
+  }
+  
+  // Admin users can access any locadora or all data
+  if (sessionUser.type === 'admin') {
+    return { 
+      authorized: true, 
+      locadoraId: requestedLocadoraId || null, // null = access all for admin
+      isAdmin: true 
+    };
+  }
+  
+  // Non-admin users can only access their own locadora
+  if (sessionUser.type === 'locadora') {
+    // If user tries to access a different locadora, deny access
+    if (requestedLocadoraId && requestedLocadoraId !== sessionUser.locadoraId) {
+      return { authorized: false, error: 'Acesso negado: você só pode acessar dados da sua locadora', status: 403 };
+    }
+    
+    return { 
+      authorized: true, 
+      locadoraId: sessionUser.locadoraId, // Always use session's locadoraId
+      isAdmin: false 
+    };
+  }
+  
+  return { authorized: false, error: 'Tipo de usuário inválido', status: 403 };
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -145,48 +181,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.get("/api/auth/profile", async (req, res) => {
     try {
+      // 🔒 SECURITY: Only return profile if already authenticated (no email takeover)
+      if (!req.session.user || !req.session.user.id) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
       // ✅ DESABILITAR CACHE - garantir que Set-Cookie seja enviado (evitar 304)
       res.set('Cache-Control', 'no-store');
       
-      // Para simplificar, vou usar um endpoint que retorna o perfil baseado no email
-      // ✅ CORREÇÃO: Agora também restaura a sessão para compatibilidade com APIs autenticadas
-      const { email } = req.query;
-      
-      if (!email) {
-        return res.status(400).json({ message: "Email is required" });
-      }
-      
-      const profile = await storage.getProfileByEmail(email as string);
+      // 🔒 SECURITY: Use session user ID, not query parameter
+      const profile = await storage.getProfileByEmail(req.session.user.email);
       if (!profile) {
         return res.status(404).json({ message: "Profile not found" });
       }
       
-      // ✅ RESTAURAR SESSÃO - para compatibilidade com APIs que exigem autenticação (como /api/pagamentos)
-      req.session.regenerate((err) => {
-        if (err) {
-          console.error("Error regenerating session on profile restore:", err);
-          // Continue mesmo com erro na sessão
-        }
-        
-        // Store user info in session (igual ao login)
-        req.session.user = {
-          id: profile.userId, // Usar userId do profile
-          email: profile.email,
-          nome: profile.name,
-          locadoraId: profile.locadoraId,
-          type: profile.type
-        };
-        
-        req.session.save((saveErr) => {
-          if (saveErr) {
-            console.error("Error saving session on profile restore:", saveErr);
-            // Continue mesmo com erro na sessão
-          }
-          
-          console.log("Session restored for profile:", profile.email, "SessionID:", req.sessionID);
-          res.json(profile);
-        });
+      console.log('[SECURE] GET /api/auth/profile - Session validated:', { 
+        sessionUser: req.session.user.email,
+        userType: req.session.user.type,
+        sessionID: req.sessionID
       });
+      
+      // Return the profile without any session manipulation (security fix)
+      res.json(profile);
     } catch (error) {
       console.error("Error fetching profile:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -371,10 +387,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Profile routes
   app.put("/api/profiles/:userId", async (req, res) => {
     try {
+      // 🔒 SECURITY: Require authentication for profile updates
+      if (!req.session.user || !req.session.user.id) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
       const { userId } = req.params;
       const updates = req.body;
       
+      // 🔒 SECURITY: Only allow users to update their own profile (unless admin)
+      const isAdmin = req.session.user.type === 'admin';
+      const isOwnProfile = req.session.user.id === userId;
+      
+      if (!isAdmin && !isOwnProfile) {
+        return res.status(403).json({ 
+          message: "Access denied: you can only update your own profile" 
+        });
+      }
+
+      // 🔒 SECURITY: Restrict sensitive fields for non-admin users
+      if (!isAdmin) {
+        // Remove sensitive fields that only admins can modify
+        const { type, locadoraId, ...safeUpdates } = updates;
+        
+        if (type || locadoraId) {
+          return res.status(403).json({ 
+            message: "Access denied: only administrators can modify user type or locadora assignment" 
+          });
+        }
+        
+        // Use only safe updates for non-admin users
+        const profile = await storage.updateProfile(userId, safeUpdates);
+        
+        console.log('[SECURE] PUT /api/profiles/:userId - Non-admin profile update:', { 
+          sessionUser: req.session.user.email, 
+          profileUserId: userId,
+          updatedFields: Object.keys(safeUpdates)
+        });
+        
+        return res.json(profile);
+      }
+
+      // Admin can update any profile with any fields
       const profile = await storage.updateProfile(userId, updates);
+      
+      console.log('[SECURE] PUT /api/profiles/:userId - Admin profile update:', { 
+        sessionUser: req.session.user.email, 
+        profileUserId: userId,
+        updatedFields: Object.keys(updates),
+        isAdmin: true
+      });
+      
       res.json(profile);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -515,8 +578,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/locadoras/:id", async (req, res) => {
     try {
-      console.log("[DEBUG LOCADORA] Atualizando locadora:", req.params.id);
-      console.log("[DEBUG LOCADORA] Dados recebidos:", req.body);
+      // 🔒 SECURITY: Verify ownership before allowing update
+      const existingLocadora = await storage.getLocadoraById(req.params.id);
+      if (!existingLocadora) {
+        return res.status(404).json({ message: "Locadora não encontrada" });
+      }
+
+      const accessValidation = validateLocadoraAccess(req, existingLocadora.id);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] PUT /api/locadoras/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        locadoraId: req.params.id,
+        isAdmin: accessValidation.isAdmin 
+      });
       
       const locadora = await storage.updateLocadora(req.params.id, req.body);
       
@@ -541,14 +621,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/locadoras/:id", async (req, res) => {
     try {
-      console.log(`[DELETE LOCADORA API] Iniciando exclusão da locadora: ${req.params.id}`);
-      
-      // Primeiro verificar se a locadora existe
-      const locadora = await storage.getLocadoraById(req.params.id);
-      if (!locadora) {
-        console.log(`[DELETE LOCADORA API] Locadora não encontrada: ${req.params.id}`);
+      // 🔒 SECURITY: Verify ownership before allowing deletion
+      const existingLocadora = await storage.getLocadoraById(req.params.id);
+      if (!existingLocadora) {
         return res.status(404).json({ message: "Locadora não encontrada ou já foi excluída" });
       }
+
+      const accessValidation = validateLocadoraAccess(req, existingLocadora.id);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] DELETE /api/locadoras/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        locadoraId: req.params.id,
+        isAdmin: accessValidation.isAdmin 
+      });
       
       await storage.deleteLocadora(req.params.id);
       console.log(`[DELETE LOCADORA API] Locadora excluída com sucesso: ${req.params.id}`);
@@ -570,10 +661,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Veiculo routes
   app.get("/api/veiculos", async (req, res) => {
     try {
-      const { locadoraId } = req.query;
+      const { locadoraId: requestedLocadoraId } = req.query;
       
-      // ADMIN: Se não há locadoraId, retornar todos os veículos (para admins)
-      if (!locadoraId) {
+      // 🔒 SECURITY: Validate access based on session, not client input
+      const accessValidation = validateLocadoraAccess(req, requestedLocadoraId as string);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+      
+      const { locadoraId, isAdmin } = accessValidation;
+      
+      console.log('[SECURE] GET /api/veiculos - Validated access:', { 
+        sessionUser: req.session.user?.email, 
+        userType: req.session.user?.type,
+        locadoraId,
+        isAdmin 
+      });
+      
+      // ADMIN: Return all veiculos if no specific locadora requested
+      if (isAdmin && !locadoraId) {
         const todosVeiculos = await storage.getAllVeiculos();
         console.log('🚗 ADMIN VEÍCULOS - Retornando todos:', todosVeiculos.length);
         return res.json(todosVeiculos);
@@ -588,14 +697,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const veiculos = await storage.getVeiculosByLocadora(locadoraId as string);
       
-      // SECURITY: Validar que todos os veículos pertencem à locadora solicitada
-      const todosVeiculosCorretos = veiculos.every(v => v.locadoraId === locadoraId);
-      if (!todosVeiculosCorretos) {
-        console.error('SECURITY ALERT: Veículos de outras locadoras detectados no backend');
-        return res.status(403).json({ message: "Acesso negado: dados inconsistentes" });
-      }
-      
-      console.log('🚗 VEÍCULOS - Retornando veículos da locadora:', veiculos.length);
+      console.log('[SECURE] GET /api/veiculos - Resultado seguro:', veiculos.length, 'veiculos para locadora', locadoraId);
       res.json(veiculos);
     } catch (error) {
       console.error("Error fetching veiculos:", error);
@@ -609,6 +711,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!veiculo) {
         return res.status(404).json({ message: "Veiculo not found" });
       }
+
+      // 🔒 SECURITY: Verify ownership before returning vehicle data
+      const accessValidation = validateLocadoraAccess(req, veiculo.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] GET /api/veiculos/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        veiculoId: req.params.id,
+        veiculoLocadoraId: veiculo.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+
       res.json(veiculo);
     } catch (error) {
       console.error("Error fetching veiculo:", error);
@@ -618,13 +737,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/veiculos", async (req, res) => {
     try {
+      // 🔒 SECURITY: Validate session and override locadoraId from client
+      const accessValidation = validateLocadoraAccess(req, req.body.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] POST /api/veiculos - Validated access:', { 
+        sessionUser: req.session.user?.email, 
+        userType: req.session.user?.type,
+        authorizedLocadoraId: accessValidation.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+
       const result = insertVeiculoSchema.safeParse(req.body);
       if (!result.success) {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
-      // Validar limite de veículos por plano
-      const locadoraId = result.data.locadoraId;
+      // 🔒 SECURITY: Use validated locadoraId from session, not client input
+      const locadoraId = accessValidation.locadoraId;
       const locadora = await storage.getLocadora(locadoraId);
       
       if (!locadora) {
@@ -633,7 +768,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Verificar se a locadora é VIP (Vitalia) - bypass dos limites
       if (locadora.vitalia) {
-        const veiculo = await storage.createVeiculo(result.data);
+        // 🔒 SECURITY: Override client locadoraId with validated session locadoraId
+        const secureVeiculoData = { ...result.data, locadoraId };
+        const veiculo = await storage.createVeiculo(secureVeiculoData);
         return res.json(veiculo);
       }
       
@@ -665,7 +802,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const veiculo = await storage.createVeiculo(result.data);
+      // 🔒 SECURITY: Override client locadoraId with validated session locadoraId
+      const secureVeiculoData = { ...result.data, locadoraId };
+      const veiculo = await storage.createVeiculo(secureVeiculoData);
       res.json(veiculo);
     } catch (error) {
       console.error("Error creating veiculo:", error);
@@ -675,9 +814,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/veiculos/:id", async (req, res) => {
     try {
-      console.log("Atualizando veículo:", req.params.id, "com dados:", req.body);
+      // 🔒 SECURITY: Verify ownership before allowing update
+      const existingVeiculo = await storage.getVeiculo(req.params.id);
+      if (!existingVeiculo) {
+        return res.status(404).json({ message: "Veículo não encontrado" });
+      }
+
+      const accessValidation = validateLocadoraAccess(req, existingVeiculo.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] PUT /api/veiculos/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        veiculoId: req.params.id,
+        veiculoLocadoraId: existingVeiculo.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+
       const veiculo = await storage.updateVeiculo(req.params.id, req.body);
-      console.log("Veículo atualizado:", veiculo);
       res.json(veiculo);
     } catch (error) {
       console.error("Error updating veiculo:", error);
@@ -687,6 +845,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/veiculos/:id", async (req, res) => {
     try {
+      // 🔒 SECURITY: Verify ownership before allowing deletion
+      const existingVeiculo = await storage.getVeiculo(req.params.id);
+      if (!existingVeiculo) {
+        return res.status(404).json({ message: "Veículo não encontrado" });
+      }
+
+      const accessValidation = validateLocadoraAccess(req, existingVeiculo.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] DELETE /api/veiculos/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        veiculoId: req.params.id,
+        veiculoLocadoraId: existingVeiculo.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+
       await storage.deleteVeiculo(req.params.id);
       res.json({ message: "Veiculo deleted successfully" });
     } catch (error) {
@@ -788,15 +967,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Motoristas routes
+
   app.get("/api/motoristas", async (req, res) => {
     try {
-      const { locadoraId } = req.query;
+      const { locadoraId: requestedLocadoraId } = req.query;
       
-      // Debug: Log parâmetros recebidos
-      console.log('[DEBUG] GET /api/motoristas - Parâmetros:', { locadoraId });
+      // 🔒 SECURITY: Validate access based on session, not client input
+      const accessValidation = validateLocadoraAccess(req, requestedLocadoraId as string);
       
-      // ADMIN: Se não há locadoraId, retornar todos os motoristas (para admins)
-      if (!locadoraId) {
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+      
+      const { locadoraId, isAdmin } = accessValidation;
+      
+      console.log('[SECURE] GET /api/motoristas - Validated access:', { 
+        sessionUser: req.session.user?.email, 
+        userType: req.session.user?.type,
+        locadoraId,
+        isAdmin 
+      });
+      
+      // ADMIN: Return all motoristas if no specific locadora requested
+      if (isAdmin && !locadoraId) {
         const todosMotoristas = await storage.getAllMotoristas();
         console.log('👤 ADMIN MOTORISTAS - Retornando todos:', todosMotoristas.length);
         return res.json(todosMotoristas);
@@ -811,19 +1006,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const motoristas = await storage.getMotoristasByLocadora(locadoraId as string);
       
-      // Debug: Log resultado do storage
-      console.log('[DEBUG] GET /api/motoristas - Resultado do storage:', motoristas.length, 'motoristas');
-      
-      // Debug: Verificar se há "alias" nos dados
-      const aliasData = motoristas.filter(m => 
-        Object.values(m).some(value => 
-          typeof value === 'string' && value.toLowerCase().includes('alias')
-        )
-      );
-      
-      if (aliasData.length > 0) {
-        console.warn('[DEBUG] GET /api/motoristas - ENCONTRADO "alias" nos dados:', aliasData);
-      }
+      console.log('[SECURE] GET /api/motoristas - Resultado seguro:', motoristas.length, 'motoristas para locadora', locadoraId);
       
       res.json(motoristas);
     } catch (error) {
@@ -838,6 +1021,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!motorista) {
         return res.status(404).json({ message: "Motorista not found" });
       }
+
+      // 🔒 SECURITY: Verify ownership before returning motorista data
+      const accessValidation = validateLocadoraAccess(req, motorista.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] GET /api/motoristas/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        motoristaId: req.params.id,
+        motoristaLocadoraId: motorista.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+
       res.json(motorista);
     } catch (error) {
       console.error("Error fetching motorista:", error);
@@ -847,12 +1047,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/motoristas", async (req, res) => {
     try {
-      // Debug: Log dados recebidos
-      console.log('[DEBUG] POST /api/motoristas - Dados recebidos:', req.body);
+      // 🔒 SECURITY: Validate session and override locadoraId from client
+      const accessValidation = validateLocadoraAccess(req, req.body.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] POST /api/motoristas - Validated access:', { 
+        sessionUser: req.session.user?.email, 
+        userType: req.session.user?.type,
+        authorizedLocadoraId: accessValidation.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
       
       const result = insertMotoristaSchema.safeParse(req.body);
       if (!result.success) {
-        console.log('[DEBUG] POST /api/motoristas - Erro de validação:', result.error.errors);
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
@@ -867,7 +1079,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Debug: Log dados validados
       console.log('[DEBUG] POST /api/motoristas - Dados validados:', result.data);
       
-      const motorista = await storage.createMotorista(result.data);
+      // 🔒 SECURITY: Override client locadoraId with validated session locadoraId
+      const secureMotoristaData = { ...result.data, locadoraId: accessValidation.locadoraId };
+      const motorista = await storage.createMotorista(secureMotoristaData);
       
       // Debug: Log resultado do storage
       console.log('[DEBUG] POST /api/motoristas - Motorista criado:', motorista);
@@ -889,6 +1103,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/motoristas/:id", async (req, res) => {
     try {
+      // 🔒 SECURITY: Verify ownership before allowing update
+      const existingMotorista = await storage.getMotorista(req.params.id);
+      if (!existingMotorista) {
+        return res.status(404).json({ message: "Motorista não encontrado" });
+      }
+
+      const accessValidation = validateLocadoraAccess(req, existingMotorista.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] PUT /api/motoristas/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        motoristaId: req.params.id,
+        motoristaLocadoraId: existingMotorista.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+
       // Processar campos de data se existirem
       const updates = { ...req.body };
       
@@ -908,8 +1143,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/motoristas/:id", async (req, res) => {
     try {
       const { id } = req.params;
-      // Para agora, vamos permitir exclusão sem autenticação específica
-      // TODO: Implementar verificação de autenticação adequada
+      
+      // 🔒 SECURITY: Verify ownership before allowing deletion
+      const existingMotorista = await storage.getMotorista(id);
+      if (!existingMotorista) {
+        return res.status(404).json({ message: "Motorista não encontrado" });
+      }
+
+      const accessValidation = validateLocadoraAccess(req, existingMotorista.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] DELETE /api/motoristas/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        motoristaId: id,
+        motoristaLocadoraId: existingMotorista.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
 
       // Verificar se o motorista tem contratos ativos ou em aberto
       const contratos = await storage.getContratosByMotorista(id);
@@ -1059,23 +1313,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Aluguéis routes
   app.get("/api/alugueis", async (req, res) => {
     try {
-      const { locadoraId } = req.query;
+      const { locadoraId: requestedLocadoraId } = req.query;
       
-      if (locadoraId) {
-        const alugueis = await storage.getAlugueisByLocadora(locadoraId as string);
-        
-        // SECURITY: Validar que todos os aluguéis pertencem à locadora solicitada
-        const todosAlugueisCorretos = alugueis.every(a => a.locadoraId === locadoraId);
-        if (!todosAlugueisCorretos) {
-          console.error('SECURITY ALERT: Aluguéis de outras locadoras detectados no backend');
-          return res.status(403).json({ message: "Acesso negado: dados inconsistentes" });
-        }
-        
-        res.json(alugueis);
-      } else {
-        const alugueis = await storage.getAllAlugueis();
-        res.json(alugueis);
+      // 🔒 SECURITY: Validate access based on session, not client input
+      const accessValidation = validateLocadoraAccess(req, requestedLocadoraId as string);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
       }
+      
+      const { locadoraId, isAdmin } = accessValidation;
+      
+      console.log('[SECURE] GET /api/alugueis - Validated access:', { 
+        sessionUser: req.session.user?.email, 
+        userType: req.session.user?.type,
+        locadoraId,
+        isAdmin 
+      });
+      
+      // ADMIN: Return all alugueis if no specific locadora requested
+      if (isAdmin && !locadoraId) {
+        const alugueis = await storage.getAllAlugueis();
+        console.log('🚙 ADMIN ALUGUEIS - Retornando todos:', alugueis.length);
+        return res.json(alugueis);
+      }
+      
+      const alugueis = await storage.getAlugueisByLocadora(locadoraId as string);
+      
+      console.log('[SECURE] GET /api/alugueis - Resultado seguro:', alugueis.length, 'alugueis para locadora', locadoraId);
+      res.json(alugueis);
     } catch (error) {
       console.error("Error fetching alugueis:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -1088,6 +1356,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!aluguel) {
         return res.status(404).json({ message: "Aluguel not found" });
       }
+
+      // 🔒 SECURITY: Verify ownership before returning aluguel data
+      const accessValidation = validateLocadoraAccess(req, aluguel.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] GET /api/alugueis/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        aluguelId: req.params.id,
+        aluguelLocadoraId: aluguel.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+
       res.json(aluguel);
     } catch (error) {
       console.error("Error fetching aluguel:", error);
@@ -1097,17 +1382,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/alugueis", async (req, res) => {
     try {
+      // 🔒 SECURITY: Validate session and override locadoraId from client
+      const accessValidation = validateLocadoraAccess(req, req.body.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] POST /api/alugueis - Validated access:', { 
+        sessionUser: req.session.user?.email, 
+        userType: req.session.user?.type,
+        authorizedLocadoraId: accessValidation.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+      
       const result = insertAluguelSchema.safeParse(req.body);
       if (!result.success) {
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
+      // 🔒 SECURITY: Use validated locadoraId from session, not client input
+      const secureLocadoraId = accessValidation.locadoraId;
+      
       // CRITICAL SECURITY: Validar integridade dos dados antes de criar aluguel
-      const { locadoraId, motoristaId, veiculoId } = result.data;
+      const { motoristaId, veiculoId } = result.data;
       
       // Verificar se motorista pertence à mesma locadora
       const motorista = await storage.getMotorista(motoristaId);
-      if (!motorista || motorista.locadoraId !== locadoraId) {
+      if (!motorista || motorista.locadoraId !== secureLocadoraId) {
         console.error('SECURITY ALERT: Tentativa de criar aluguel com motorista de outra locadora');
         return res.status(403).json({ 
           message: "Acesso negado: motorista não pertence à sua locadora",
@@ -1117,7 +1421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Verificar se veículo pertence à mesma locadora
       const veiculo = await storage.getVeiculo(veiculoId);
-      if (!veiculo || veiculo.locadoraId !== locadoraId) {
+      if (!veiculo || veiculo.locadoraId !== secureLocadoraId) {
         console.error('SECURITY ALERT: Tentativa de criar aluguel com veículo de outra locadora');
         return res.status(403).json({ 
           message: "Acesso negado: veículo não pertence à sua locadora",
@@ -1125,7 +1429,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const aluguel = await storage.createAluguel(result.data);
+      // 🔒 SECURITY: Override client locadoraId with validated session locadoraId
+      const secureAluguelData = { ...result.data, locadoraId: secureLocadoraId };
+      const aluguel = await storage.createAluguel(secureAluguelData);
       
       // Atualizar status do veículo para "alugado"
       await storage.updateVeiculo(veiculoId, { status: 'alugado' });
@@ -1233,17 +1539,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Contratos routes
   app.get("/api/contratos", async (req, res) => {
     try {
-      const { locadoraId } = req.query;
-      console.log('[CONTRATOS API] Parâmetros recebidos:', { locadoraId });
+      const { locadoraId: requestedLocadoraId } = req.query;
       
-      if (locadoraId) {
-        const contratos = await storage.getContratosByLocadora(locadoraId as string);
-        console.log('[CONTRATOS API] Resultado do storage:', { locadoraId, total: contratos.length, contratos });
-        res.json(contratos);
-      } else {
-        const contratos = await storage.getAllContratos();
-        res.json(contratos);
+      // 🔒 SECURITY: Validate access based on session, not client input
+      const accessValidation = validateLocadoraAccess(req, requestedLocadoraId as string);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
       }
+      
+      const { locadoraId, isAdmin } = accessValidation;
+      
+      console.log('[SECURE] GET /api/contratos - Validated access:', { 
+        sessionUser: req.session.user?.email, 
+        userType: req.session.user?.type,
+        locadoraId,
+        isAdmin 
+      });
+      
+      // ADMIN: Return all contratos if no specific locadora requested
+      if (isAdmin && !locadoraId) {
+        const contratos = await storage.getAllContratos();
+        console.log('📋 ADMIN CONTRATOS - Retornando todos:', contratos.length);
+        return res.json(contratos);
+      }
+      
+      const contratos = await storage.getContratosByLocadora(locadoraId as string);
+      console.log('[SECURE] GET /api/contratos - Resultado seguro:', contratos.length, 'contratos para locadora', locadoraId);
+      res.json(contratos);
     } catch (error) {
       console.error("Error fetching contratos:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -1268,16 +1593,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/contratos", async (req, res) => {
     try {
-      console.log('[DEBUG] POST /api/contratos - Body recebido:', JSON.stringify(req.body, null, 2));
+      // 🔒 SECURITY: Validate session and override locadoraId from client
+      const accessValidation = validateLocadoraAccess(req, req.body.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] POST /api/contratos - Validated access:', { 
+        sessionUser: req.session.user?.email, 
+        userType: req.session.user?.type,
+        authorizedLocadoraId: accessValidation.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
       
       const result = insertContratoSchema.safeParse(req.body);
       if (!result.success) {
-        console.error('[DEBUG] Erro de validação do contrato:', result.error.errors);
         return res.status(400).json({ message: "Invalid data", errors: result.error.errors });
       }
       
+      // 🔒 SECURITY: Use validated locadoraId from session, not client input
+      const secureLocadoraId = accessValidation.locadoraId;
+      
       // PROTEÇÃO CONTRA DUPLO CLIQUE: Verificar se já há criação em andamento
-      const cacheKey = `${result.data.locadoraId}-${result.data.cliente}-${result.data.dataInicio}`;
+      const cacheKey = `${secureLocadoraId}-${result.data.cliente}-${result.data.dataInicio}`;
       const agora = Date.now();
       
       if (contratoCreationCache.has(cacheKey)) {
@@ -1378,7 +1719,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dataFimTipo: typeof dadosNormalizados.dataFim
       });
       
-      const contrato = await storage.createContrato(dadosNormalizados);
+      // 🔒 SECURITY: Override client locadoraId with validated session locadoraId
+      const secureContratoData = { ...dadosNormalizados, locadoraId: secureLocadoraId };
+      const contrato = await storage.createContrato(secureContratoData);
       console.log('[DEBUG] Contrato criado com sucesso:', contrato.id);
       
       // 🎯 CRIAR ALUGUEL AUTOMÁTICO: Criar aluguel associado ao contrato para geração de pagamentos
@@ -1524,6 +1867,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/contratos/:id", async (req, res) => {
     try {
+      // 🔒 SECURITY: Verify ownership before allowing update
+      const existingContrato = await storage.getContrato(req.params.id);
+      if (!existingContrato) {
+        return res.status(404).json({ message: "Contrato não encontrado" });
+      }
+
+      const accessValidation = validateLocadoraAccess(req, existingContrato.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] PUT /api/contratos/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        contratoId: req.params.id,
+        contratoLocadoraId: existingContrato.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
+
       // Validate the request body usando schema flexível para updates
       const result = updateContratoSchema.safeParse(req.body);
       if (!result.success) {
@@ -1604,8 +1968,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/contratos/:id", async (req, res) => {
     try {
-      // Buscar o contrato para obter informações do aluguel
+      // 🔒 SECURITY: Verify ownership before allowing deletion
       const contrato = await storage.getContrato(req.params.id);
+      
+      if (!contrato) {
+        return res.status(404).json({ message: "Contrato não encontrado" });
+      }
+
+      const accessValidation = validateLocadoraAccess(req, contrato.locadoraId);
+      
+      if (!accessValidation.authorized) {
+        return res.status(accessValidation.status).json({ 
+          message: accessValidation.error 
+        });
+      }
+
+      console.log('[SECURE] DELETE /api/contratos/:id - Validated ownership:', { 
+        sessionUser: req.session.user?.email, 
+        contratoId: req.params.id,
+        contratoLocadoraId: contrato.locadoraId,
+        isAdmin: accessValidation.isAdmin 
+      });
       
       if (contrato) {
         // Buscar aluguéis relacionados ao contrato
