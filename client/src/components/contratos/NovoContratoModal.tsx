@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useLocation } from 'wouter';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
@@ -348,12 +349,14 @@ export function NovoContratoModal({
   // Hook para gerenciar contratos
   const { createContrato } = useContratos();
   
-  // 🎯 ACTION HANDLERS: Functions to handle error dialog actions
+  // 🎯 ACTION HANDLERS: Functions to handle error dialog actions  
+  const [, setLocation] = useLocation();
+  
   const handleViewRentals = () => {
     setDuplicateContractError(null);
     onOpenChange(false);
-    // Navigate to rentals page - assuming router navigation
-    window.location.href = '/alugueis';
+    // Navigate using wouter instead of window.location.href to avoid full reload
+    setLocation('/alugueis');
   };
   
   const handleChangeDriver = () => {
@@ -370,8 +373,8 @@ export function NovoContratoModal({
   const handleViewContracts = () => {
     setDuplicateContractError(null);
     onOpenChange(false);
-    // Navigate to contracts page
-    window.location.href = '/contratos';
+    // Navigate using wouter instead of window.location.href to avoid full reload
+    setLocation('/contratos');
   };
   
   const handleCloseErrorDialog = () => {
@@ -1516,10 +1519,16 @@ ____________________________________        ____________________________________
                     handleViewContracts();
                   }
                 }}
+                disabled={!suggestion.enabled}
                 className={index === 0 ? "bg-primary hover:bg-primary/90" : "bg-secondary hover:bg-secondary/90"}
                 data-testid={`button-${suggestion.action.toLowerCase().replace('_', '-')}`}
               >
-                {suggestion.label}
+                <div className="flex flex-col items-center">
+                  <span>{suggestion.label}</span>
+                  {suggestion.description && (
+                    <span className="text-xs opacity-80 mt-1">{suggestion.description}</span>
+                  )}
+                </div>
               </AlertDialogAction>
             )
           ))}
