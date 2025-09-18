@@ -838,6 +838,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteAluguel(id: string): Promise<void> {
+    // Primeiro, excluir todos os pagamentos associados ao aluguel
+    console.log(`[DELETE ALUGUEL] Excluindo pagamentos do aluguel: ${id}`);
+    await db.delete(pagamentos).where(eq(pagamentos.aluguelId, id));
+    
+    // Depois excluir o aluguel
+    console.log(`[DELETE ALUGUEL] Excluindo aluguel: ${id}`);
     await db.delete(alugueis).where(eq(alugueis.id, id));
   }
 
