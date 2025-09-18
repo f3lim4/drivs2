@@ -24,7 +24,7 @@ import { gerarPagamentosParaAluguel } from "./pagamentos-automaticos";
 declare module 'express-session' {
   interface SessionData {
     user?: {
-      id: number;
+      id: string; // 🔒 SECURITY FIX: Stores user.uuid (string UUID) for consistency with profiles
       email: string;
       nome: string;
       type: 'admin' | 'locadora';
@@ -264,8 +264,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // Store user info in session (incluindo locadoraId e type)
+        // 🔒 SECURITY FIX: Use user.uuid (string) instead of user.id (number) for consistency with profiles
         req.session.user = {
-          id: user.id,
+          id: user.uuid, // Use UUID string instead of numeric id
           email: profile.email,
           nome: profile.name,
           locadoraId: profile.locadoraId,
