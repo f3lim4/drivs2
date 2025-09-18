@@ -117,6 +117,37 @@ const processarAluguelAtivo = async (aluguel: any) => {
       console.log(`[SECURITY SKIP] Aluguel ${aluguel.id} - Contrato relacionado não encontrado via JOIN seguro (pode ter sido excluído ou sem permissão)`);
       return;
     }
+
+    // ✅ NOVA VERIFICAÇÃO: VERIFICAR SE O CLIENTE DO CONTRATO CORRESPONDE AO MOTORISTA DO ALUGUEL
+    // Buscar nome do motorista para comparar com cliente do contrato
+    console.log(`[DEBUG] Verificando correspondência cliente-motorista...`);
+    const motoristaInfo = await db
+      .select({
+        nome: motoristas.nome,
+        id: motoristas.id
+      })
+      .from(motoristas)
+      .where(and(
+        eq(motoristas.id, aluguel.motoristaId),
+        eq(motoristas.locadoraId, aluguel.locadoraId) // SEGURANÇA: Tenant isolation
+      ))
+      .limit(1);
+
+    if (motoristaInfo.length === 0) {
+      console.log(`[SECURITY SKIP] Aluguel ${aluguel.id} - Motorista ${aluguel.motoristaId} não encontrado`);
+      return;
+    }
+
+    const nomeMotorista = motoristaInfo[0].nome;
+    const clienteContrato = contratoRelacionado.contratoCliente;
+
+    // Verificar se o cliente do contrato corresponde ao motorista do aluguel
+    if (nomeMotorista !== clienteContrato) {
+      console.log(`[CLIENTE MISMATCH] Aluguel ${aluguel.id} - Motorista: "${nomeMotorista}" != Cliente do contrato: "${clienteContrato}" - SKIP pagamento`);
+      return;
+    }
+
+    console.log(`[CLIENTE MATCH] Aluguel ${aluguel.id} - Motorista e cliente correspondem: "${nomeMotorista}"`);
     
     // SEGURANÇA: Verificar status do contrato
     if (contratoRelacionado.contratoStatus === 'encerrado' || contratoRelacionado.contratoStatus === 'cancelado') {
