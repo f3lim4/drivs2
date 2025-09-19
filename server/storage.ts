@@ -1118,16 +1118,55 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log("[STORAGE] Criando pagamento - dados recebidos:", JSON.stringify(pagamento, null, 2));
       
+      // 🎯 AUTO-DERIVAÇÃO: Se há aluguelId, buscar e incluir automaticamente dados do veículo
+      let veiculoInfo = {
+        veiculoId: pagamento.veiculoId || null,
+        veiculoPlaca: pagamento.veiculoPlaca || null,
+        veiculoMarca: pagamento.veiculoMarca || null,
+        veiculoModelo: pagamento.veiculoModelo || null
+      };
+
+      if (pagamento.aluguelId) {
+        console.log("[STORAGE] Buscando informações de veículo do aluguel:", pagamento.aluguelId);
+        try {
+          const aluguelInfo = await db
+            .select({
+              veiculoId: alugueis.veiculoId,
+              veiculoPlaca: veiculos.placa,
+              veiculoMarca: veiculos.marca,
+              veiculoModelo: veiculos.modelo
+            })
+            .from(alugueis)
+            .leftJoin(veiculos, eq(alugueis.veiculoId, veiculos.id))
+            .where(eq(alugueis.id, pagamento.aluguelId))
+            .limit(1);
+
+          if (aluguelInfo.length > 0 && aluguelInfo[0].veiculoId) {
+            veiculoInfo = {
+              veiculoId: aluguelInfo[0].veiculoId,
+              veiculoPlaca: aluguelInfo[0].veiculoPlaca,
+              veiculoMarca: aluguelInfo[0].veiculoMarca,
+              veiculoModelo: aluguelInfo[0].veiculoModelo
+            };
+            console.log("[STORAGE] Informações de veículo derivadas do aluguel:", veiculoInfo);
+          }
+        } catch (derivationError) {
+          console.error("[STORAGE] Erro ao derivar informações de veículo:", derivationError);
+          // Continuar com os dados originais se a derivação falhar
+        }
+      }
+      
       // Gerar código único de pagamento
       const codigoPagamento = await gerarCodigoPagamento();
       
       const pagamentoData = {
         ...pagamento,
+        ...veiculoInfo, // Incluir informações de veículo (derivadas ou originais)
         id: pagamento.id || crypto.randomUUID(),
         codigoPagamento: codigoPagamento,
       };
       
-      console.log("[STORAGE] Dados para inserção:", JSON.stringify(pagamentoData, null, 2));
+      console.log("[STORAGE] Dados para inserção (com veículo derivado):", JSON.stringify(pagamentoData, null, 2));
       
       // Inserir diretamente sem returning para evitar problemas com joins
       const insertResult = await db.insert(pagamentos).values(pagamentoData);
